@@ -1,0 +1,75 @@
+{
+ "_doc": "earshot's listening vocabulary: short caption-like phrases CLAP scores sounds against. 'templates' are prompt ensembles (each term is embedded through every template and averaged). Every term in every category also forms the background distribution used to calibrate scores (z = how far a match stands out from what an arbitrary description would score). Extend freely; keep phrases concrete (source + action + quality).",
+ "templates": ["{}", "the sound of {}", "a recording of {}"],
+ "categories": {
+  "transitions": [
+   "a fast whoosh", "a soft air whoosh", "a deep cinematic whoosh", "a short swish", "a swoosh passing by",
+   "a rising riser building tension", "an uplifter sweep", "a reverse cymbal swell", "a downlifter falling sweep",
+   "a tape stop slowing down", "a record scratch", "a quick swipe", "a whip pan transition", "a stutter glitch transition"
+  ],
+  "impacts": [
+   "a deep cinematic boom", "a sub bass drop", "a punchy impact hit", "a big braam", "a heavy thud", "a soft thump",
+   "a metallic clang", "a door slam", "a snare hit", "a kick drum", "a hand clap", "a gunshot", "an explosion",
+   "a low rumble", "a body falling on the ground"
+  ],
+  "ui": [
+   "a mouse click", "a soft UI button tap", "a crisp interface click", "a notification ding", "a chat message pop",
+   "a phone vibration buzz", "a camera shutter click", "a toggle switch click", "a scroll wheel tick",
+   "a success chime", "an error buzz", "a digital glitch", "a typing cursor blip", "a keyboard typing fast",
+   "a single mechanical keyboard key press", "a deep thocky mechanical keyboard", "a clicky mechanical keyboard",
+   "a laptop keyboard typing", "a spacebar press", "a touchscreen tap"
+  ],
+  "foley": [
+   "a plastic click", "a plastic toy snapping together", "lego bricks clicking", "a cork pop", "a bubble pop",
+   "a balloon squeak", "a rubber stretch", "a suction cup pop", "a finger tapping on wood", "a finger tapping on glass",
+   "glass clinking", "a glass ting", "a wine glass ring", "coins dropping", "paper rustling", "a page turning",
+   "a zipper", "cloth rustling", "footsteps on wood", "footsteps on grass", "footsteps on gravel", "high heels walking",
+   "a small object dropping on a table", "dominoes falling", "a wooden block hit", "a wood creak", "a metal scrape",
+   "water splashing", "a water drop", "a liquid bloop", "pouring water", "ice cubes in a glass", "leaves rustling",
+   "a branch snapping", "an apple falling on grass", "digging in soil"
+  ],
+  "ambience": [
+   "rain on a window", "heavy rain", "a thunderstorm", "wind blowing", "a gentle breeze in tall grass",
+   "birds singing in the morning", "a forest ambience", "a city street with traffic", "a busy cafe", "an office ambience",
+   "a quiet room tone", "a computer fan hum", "an electrical hum", "ocean waves", "a crackling fire", "crickets at night",
+   "an airplane flying overhead", "a crowd cheering", "a dog barking", "people talking in the background"
+  ],
+  "music_genre": [
+   "minimal electronic music", "future bass music", "lo-fi hip hop beat", "cinematic orchestral music",
+   "epic trailer music", "ambient synth pad music", "upbeat corporate pop music", "synthwave music", "house music",
+   "tech house music", "drum and bass music", "trap beat", "glitch hop music", "indie pop music", "solo piano music",
+   "acoustic guitar music", "jazz music", "rock music with electric guitars", "hip hop beat with heavy bass",
+   "chiptune video game music", "dubstep music", "classical string quartet", "funk music", "techno music"
+  ],
+  "music_mood": [
+   "uplifting and hopeful music", "playful and quirky music", "dark and tense music", "sad and melancholic music",
+   "calm and relaxing music", "energetic and driving music", "dreamy and ethereal music", "triumphant and heroic music",
+   "mysterious music", "romantic music", "aggressive music", "warm and cozy music", "futuristic music",
+   "confident and cool music", "suspenseful build-up music", "celebratory and joyful music"
+  ],
+  "instruments": [
+   "a deep sub bass", "a punchy kick drum pattern", "crisp hi-hats", "a snare roll", "a synthesizer lead",
+   "a warm analog synth pad", "a plucked synth arpeggio", "a grand piano", "an electric piano", "strings ensemble",
+   "brass section", "a celesta", "a glockenspiel", "bells", "a marimba", "an acoustic guitar", "an electric guitar",
+   "a bass guitar", "a choir", "a vocal chop", "orchestral percussion", "a music box"
+  ],
+  "voice": [
+   "a man speaking", "a woman speaking", "a voice-over narration", "someone whispering", "singing vocals",
+   "a crowd talking", "children laughing", "a person breathing", "a person coughing"
+  ],
+  "quality": [
+   "a deep sound", "a bright sound", "a thin sound", "a warm sound", "a harsh sound", "a muffled sound",
+   "a crisp sound", "a punchy sound", "a soft sound", "a loud sound", "a quiet sound", "a short sound", "a long sound",
+   "a dry close sound", "a reverberant sound in a large hall", "a distant sound", "a tight snappy sound",
+   "a boomy sound", "an airy sound", "a metallic sound", "a hollow sound", "a satisfying sound"
+  ],
+  "production": [
+   "a real recording of a physical object", "a close-miked foley recording", "a field recording outdoors",
+   "a professionally mixed and mastered music track", "a high quality studio recording",
+   "a cheap synthesized beep", "a pure sine wave tone", "a square wave chiptune blip", "a computer-generated electronic tone",
+   "white noise", "pink noise", "a retro video game sound effect", "an 8-bit sound effect", "a robotic synthetic sound",
+   "a low quality recording with hiss", "a distorted clipped recording", "a low bitrate mp3 with artifacts",
+   "a recording made on a phone", "silence"
+  ]
+ }
+}

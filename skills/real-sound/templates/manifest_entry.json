@@ -1,0 +1,42 @@
+[
+ {
+  "_doc": "One object per downloaded recording, in audio/assets/manifests/<category>.json (a JSON list). Values here are placeholders: copy the shape, never the data. Every field is read from the item's own page; never guess a licence. 'attribution' is required for CC BY (paste the form the author asks for on their page, else: \"<title>\" by <author> (<page_url>), licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)); null for CC0 / Mixkit / Pixabay. 'analysis' is what analyze.py measured; 'best_segment' the clean part in seconds.",
+  "id": "fs-000000",
+  "category": "ui",
+  "file": "audio/assets/ui/fs-000000_trackpad-click.ogg",
+  "title": "Trackpad click close.wav",
+  "author": "uploader_name",
+  "source": "freesound",
+  "page_url": "https://freesound.org/people/uploader_name/sounds/000000/",
+  "download_url": "https://cdn.freesound.org/previews/0/000000_0000000-hq.ogg",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "\"Trackpad click close.wav\" by uploader_name (https://freesound.org/people/uploader_name/sounds/000000/), licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+  "need": "ui_click",
+  "rank": 1,
+  "best_segment": [0.10, 0.32],
+  "notes": "What it is and how it was recorded (from the page), what you measured, what to use and avoid: e.g. 'close-miked laptop trackpad, press at 0.12 + release at 0.21 (85 ms later, 3 dB quieter), floor -78 dBFS, no room; use as the film's one click voice'.",
+  "analysis": {"duration": 0.84, "codec": "vorbis", "kbps": 192, "src_rate": 48000, "channels": 1, "peak_dbfs": -9.6,
+               "lufs": -31.2, "noise_floor_dbfs": -78.0, "clipped_samples": 0, "attack_at": 0.118, "centroid_hz": 3300,
+               "rolloff95_hz": 11800, "onsets": [0.118, 0.205]},
+  "earshot": {"realness": 0.97, "match": {"query": "a single crisp trackpad click", "z": 3.4, "verdict": "strong"}}
+ },
+ {
+  "id": "mk-0000",
+  "category": "impacts",
+  "file": "audio/assets/impacts/mk-0000_deep-drum-impact.wav",
+  "title": "Deep drum impact",
+  "author": "Mixkit",
+  "source": "mixkit",
+  "page_url": "https://mixkit.co/free-sound-effects/impact/",
+  "download_url": "https://assets.mixkit.co/active_storage/sfx/0000/0000.wav",
+  "license": "Mixkit Sound Effects Free License",
+  "license_url": "https://mixkit.co/license/#sfxFree",
+  "attribution": null,
+  "need": "hero_reveal_hit",
+  "rank": 2,
+  "best_segment": [0.0, 1.6],
+  "notes": "Mixkit has no per-item page for sound effects: record the category page that lists the item and the item's title there.",
+  "analysis": {"duration": 2.1, "codec": "pcm_s16le", "src_rate": 44100, "channels": 2, "peak_dbfs": -1.2}
+ }
+]

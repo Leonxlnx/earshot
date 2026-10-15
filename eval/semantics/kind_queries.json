@@ -1,0 +1,33 @@
+{
+ "_doc": "Labelled query texts for find()'s query-kind reader (event = one short sound you would trim as a sample; texture = a continuous sound you would loop). 'tune' = clear-cut class phrasings from queries.json (the threshold may be set on these); 'test' = generic queries written for this check, never used to set anything.",
+ "tune": {
+  "event": ["a soft plastic thud", "a small object landing softly on a table", "a finger squeaking on glass",
+            "a rubber stretch squeak and suction pop", "a plastic case snapping shut",
+            "a satisfying plastic click as something locks into place", "a small mouth pop",
+            "a short hollow pop like a cork or a finger pulled from the cheek", "an apple falling on grass",
+            "a single mechanical keyboard key press", "a deep thocky key press on a mechanical keyboard",
+            "a spacebar press", "pressing the spacebar of a mechanical keyboard", "an enter key press",
+            "a heavy enter key thock", "a soft key click", "a light tactile keyboard switch tick", "a tiny bell ting",
+            "a single small bell or glass ting", "a single celesta note", "a plucked kalimba or celesta note",
+            "a fast small whoosh", "a stick swung quickly through the air", "a big soft whoosh",
+            "an object plunging into water", "a deep cinematic impact", "a big boomy hit", "a latch closing",
+            "a box lid closing with a solid clunk", "a light switch click", "a switch flip or camera shutter click"],
+  "texture": ["a quiet computer room tone hum", "the steady low hum of a computer in a quiet room", "rain on a window",
+              "rain heard from inside a room, drops on the window glass", "birds singing in a spring meadow",
+              "a morning field recording of birdsong in the countryside", "wind blowing through grass and leaves",
+              "a breeze rustling tall grass and leaves", "fast typing on a mechanical keyboard",
+              "continuous typing on a keyboard", "an uplifting orchestral music track", "a cheerful music track"]
+ },
+ "test": {
+  "event": ["a dog bark", "a car horn", "a thunder clap", "a bird chirp", "a small bell", "a camera shutter", "a doorbell",
+            "a footstep", "a notification ding", "a gunshot", "a door slam", "a cork pop", "a hand clap", "a sneeze",
+            "a cough", "a glass breaking", "a balloon pop", "a mouse click", "a sword hit", "a punch", "a coin drop",
+            "a single drum hit", "a whoosh", "a swipe sound", "a UI pop", "a can opening", "a light switch",
+            "a knock on a door", "a cat meow", "a stapler"],
+  "texture": ["rain on a roof", "a crackling fire", "city traffic", "ocean waves", "wind in the trees",
+              "a quiet office ambience", "crowd chatter", "a refrigerator hum", "birdsong in a forest",
+              "an air conditioner", "a busy restaurant", "a river flowing", "crickets at night", "a lo-fi music loop",
+              "a drone pad", "a steady engine idle", "continuous typing", "a vacuum cleaner running", "white noise",
+              "a heavy rainstorm"]
+ }
+}

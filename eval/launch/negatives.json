@@ -1,0 +1,437 @@
+{
+ "base": {
+  "what": "control: the real Clawd soundtrack untouched",
+  "models": false,
+  "picture": false,
+  "expect": [],
+  "caught": [],
+  "verdict": "close",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.871,
+  "critical": 0,
+  "major": 2,
+  "flagged": [
+   "crest_lu high (major)",
+   "first_sound_s high (major)"
+  ],
+  "first_action": "nothing reaches body level until 0:01.01 (before that the sound sits around -42 LUFS, 27 LU under the body; refs 0.04 s .. 0.48 s): raise the opening or start the music at 0:00",
+  "p_real": null,
+  "seconds": 27.5
+ },
+ "quiet": {
+  "what": "unmastered: 12 dB quieter",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "lufs_i"
+  ],
+  "caught": [
+   "lufs_i"
+  ],
+  "verdict": "needs work",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.774,
+  "critical": 1,
+  "major": 2,
+  "flagged": [
+   "lufs_i low (critical)",
+   "crest_lu high (major)",
+   "first_sound_s high (major)"
+  ],
+  "first_action": "raise the master by +13.0 dB to about -14 LUFS integrated (web) with a true-peak limiter (ceiling -1 dBTP); if the limiter works harder than ~3 dB, compress the music bus first (refs -22.2 LUFS .. -7.3 LUFS)",
+  "p_real": null,
+  "seconds": 9.0
+ },
+ "hot": {
+  "what": "12 dB hotter, clipped by the 16-bit file",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "lufs_i",
+   "true_peak"
+  ],
+  "caught": [
+   "lufs_i",
+   "true_peak"
+  ],
+  "verdict": "needs work",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.774,
+  "critical": 1,
+  "major": 2,
+  "flagged": [
+   "lufs_i high (critical)",
+   "true_peak high (major)",
+   "first_sound_s high (major)"
+  ],
+  "first_action": "turn the master down by 7.8 dB to about -12 LUFS: above -9 LUFS normalising platforms turn it down anyway and the limiter flattens every hit (refs -22.2 LUFS .. -7.3 LUFS)",
+  "p_real": null,
+  "seconds": 8.8
+ },
+ "mono": {
+  "what": "folded to mono",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "side_to_mid_db"
+  ],
+  "caught": [
+   "side_to_mid_db"
+  ],
+  "verdict": "close",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.767,
+  "critical": 0,
+  "major": 3,
+  "flagged": [
+   "lufs_i low (major)",
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "side_to_mid_db low (minor)"
+  ],
+  "first_action": "nothing reaches body level until 0:01.01 (before that the sound sits around -43 LUFS, 26 LU under the body; refs 0.04 s .. 0.48 s): raise the opening or start the music at 0:00",
+  "p_real": null,
+  "seconds": 9.5
+ },
+ "muffled": {
+  "what": "low-passed at 3 kHz (12 dB/oct)",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "band_presence",
+   "band_air"
+  ],
+  "caught": [
+   "band_presence",
+   "band_air"
+  ],
+  "verdict": "close",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.806,
+  "critical": 0,
+  "major": 2,
+  "flagged": [
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "band_presence low (minor)",
+   "band_air low (minor)"
+  ],
+  "first_action": "nothing reaches body level until 0:00.94 (before that the sound sits around -44 LUFS, 29 LU under the body; refs 0.04 s .. 0.48 s): raise the opening or start the music at 0:00",
+  "p_real": null,
+  "seconds": 10.0
+ },
+ "late": {
+  "what": "2.5 s of silence before the start",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "first_sound_s"
+  ],
+  "caught": [
+   "first_sound_s"
+  ],
+  "verdict": "close",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.806,
+  "critical": 0,
+  "major": 3,
+  "flagged": [
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "onset_rate low (major)"
+  ],
+  "first_action": "nothing reaches body level until 0:03.51 (before that the sound sits around -46 LUFS, 32 LU under the body; refs 0.04 s .. 0.48 s): raise the opening or start the music at 0:00",
+  "p_real": null,
+  "seconds": 13.8
+ },
+ "deadair": {
+  "what": "4 s of silence after the end",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "end_silence_s"
+  ],
+  "caught": [
+   "end_silence_s"
+  ],
+  "verdict": "close",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.806,
+  "critical": 0,
+  "major": 3,
+  "flagged": [
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "end_silence_s high (major)"
+  ],
+  "first_action": "4.1 s of dead air after the sound ends at 0:59.93: trim the picture or let the final sting ring out over the end card (refs 0.02 s .. 1.90 s)",
+  "p_real": null,
+  "seconds": 14.4
+ },
+ "fadeout": {
+  "what": "12 s fade-out",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "fade_s",
+   "final_lu",
+   "end_lu"
+  ],
+  "caught": [
+   "fade_s",
+   "final_lu"
+  ],
+  "verdict": "close",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.774,
+  "critical": 0,
+  "major": 3,
+  "flagged": [
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "final_lu low (major)",
+   "fade_s high (minor)"
+  ],
+  "first_action": "the final moment sits 11.9 LU below the body: end on a logo sting / hit instead of fading away (refs -2.2 LU .. 5.6 LU)",
+  "p_real": null,
+  "seconds": 12.6
+ },
+ "hole": {
+  "what": "2.5 s muted mid-film",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "max_gap_s"
+  ],
+  "caught": [
+   "max_gap_s"
+  ],
+  "verdict": "needs work",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.742,
+  "critical": 0,
+  "major": 4,
+  "flagged": [
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "max_gap_s high (major)",
+   "onset_rate low (major)"
+  ],
+  "first_action": "nothing reaches body level until 0:01.01 (before that the sound sits around -42 LUFS, 27 LU under the body; refs 0.04 s .. 0.48 s): raise the opening or start the music at 0:00",
+  "p_real": null,
+  "seconds": 13.2
+ },
+ "squashed": {
+  "what": "over-compressed: 20:1 from -36 dB + limiter",
+  "models": false,
+  "picture": false,
+  "expect": [
+   "lra",
+   "crest_lu"
+  ],
+  "caught": [],
+  "verdict": "launch-grade",
+  "partial": [
+   "realness",
+   "music presence"
+  ],
+  "score": 0.903,
+  "critical": 0,
+  "major": 1,
+  "flagged": [
+   "true_peak high (major)",
+   "side_to_mid_db high (minor)"
+  ],
+  "first_action": "true peak +0.3 dBTP: end the master chain with a true-peak limiter, ceiling -1.0 dBTP, then re-encode",
+  "p_real": null,
+  "seconds": 14.6
+ },
+ "sfx_only": {
+  "what": "the SFX stem alone, with the picture",
+  "models": true,
+  "picture": true,
+  "expect": [
+   "music_frac"
+  ],
+  "caught": [
+   "music_frac"
+  ],
+  "verdict": "needs work",
+  "partial": [],
+  "score": 0.769,
+  "critical": 2,
+  "major": 0,
+  "flagged": [
+   "lufs_i low (critical)",
+   "music_frac low (critical)",
+   "band_sub low (minor)",
+   "band_low low (minor)",
+   "band_mid high (minor)"
+  ],
+  "first_action": "raise the master by +13.6 dB to about -14 LUFS integrated (web) with a true-peak limiter (ceiling -1 dBTP); if the limiter works harder than ~3 dB, compress the music bus first (refs -22.2 LUFS .. -7.3 LUFS)",
+  "p_real": 0.787,
+  "seconds": 194.8
+ },
+ "amb_only": {
+  "what": "the ambience stem alone",
+  "models": true,
+  "picture": false,
+  "expect": [
+   "music_frac",
+   "onset_rate",
+   "hit_rate"
+  ],
+  "caught": [
+   "music_frac"
+  ],
+  "verdict": "needs work",
+  "partial": [],
+  "score": 0.676,
+  "critical": 2,
+  "major": 1,
+  "flagged": [
+   "lufs_i low (critical)",
+   "music_frac low (critical)",
+   "crest_lu high (major)",
+   "band_sub low (minor)",
+   "band_low low (minor)",
+   "band_mid high (minor)",
+   "band_presence high (minor)"
+  ],
+  "first_action": "raise the master by +25.5 dB to about -14 LUFS integrated (web) with a true-peak limiter (ceiling -1 dBTP); if the limiter works harder than ~3 dB, compress the music bus first (refs -22.2 LUFS .. -7.3 LUFS)",
+  "p_real": 0.882,
+  "seconds": 90.6
+ },
+ "synth_bed": {
+  "what": "the retired code-synthesized music bed",
+  "models": true,
+  "picture": false,
+  "expect": [
+   "p_real"
+  ],
+  "caught": [
+   "p_real"
+  ],
+  "verdict": "not launch-grade",
+  "partial": [],
+  "score": 0.486,
+  "critical": 3,
+  "major": 3,
+  "flagged": [
+   "lufs_i low (critical)",
+   "p_real low (critical)",
+   "music_frac low (critical)",
+   "crest_lu high (major)",
+   "first_sound_s high (major)",
+   "onset_rate low (major)",
+   "band_sub low (minor)",
+   "band_low low (minor)",
+   "band_mid high (minor)",
+   "side_to_mid_db high (minor)"
+  ],
+  "first_action": "realness: likely code-synthesized (p_real 0.10, at or below the model's 0.40 threshold); 4 s windows at or below the window threshold 0.17 (code-synthesized): 0:08.00-0:12.00 (0.01), 0:12.00-0:16.00 (0.03), 0:16.00-0:20.00 (0.01), 0:28.00-0:32.00 (0.04), 0:52.00-0:56.00 (0.02), 0:56.00-1:00.00 (0.02) (+6 more): replace oscillator / noise layers with real recordings and produced music (skills/real-sound has the sourcing and licence workflow); judge each stem with `earshot realness stem.wav` (a finished mix is harder to judge than its sources)",
+  "p_real": 0.095,
+  "seconds": 43.7
+ },
+ "sine": {
+  "what": "30 s 440 Hz sine",
+  "models": true,
+  "picture": false,
+  "expect": [
+   "p_real",
+   "music_frac",
+   "onset_rate"
+  ],
+  "caught": [
+   "p_real",
+   "music_frac",
+   "onset_rate"
+  ],
+  "verdict": "not launch-grade",
+  "partial": [],
+  "score": 0.351,
+  "critical": 3,
+  "major": 4,
+  "flagged": [
+   "lufs_i low (critical)",
+   "p_real low (critical)",
+   "music_frac low (critical)",
+   "lra low (major)",
+   "crest_lu low (major)",
+   "onset_rate low (major)",
+   "hit_rate low (major)",
+   "band_sub low (minor)",
+   "band_low low (minor)",
+   "band_lowmid high (minor)",
+   "band_mid low (minor)",
+   "band_presence low (minor)",
+   "band_air low (minor)",
+   "side_to_mid_db low (minor)"
+  ],
+  "first_action": "realness: likely code-synthesized (p_real 0.03, at or below the model's 0.40 threshold); 4 s windows at or below the window threshold 0.17 (code-synthesized): 0:00.00-0:04.00 (0.03), 0:04.00-0:08.00 (0.03), 0:08.00-0:12.00 (0.03), 0:12.00-0:16.00 (0.03), 0:16.00-0:20.00 (0.03), 0:20.00-0:24.00 (0.03) (+2 more): replace oscillator / noise layers with real recordings and produced music (skills/real-sound has the sourcing and licence workflow); judge each stem with `earshot realness stem.wav` (a finished mix is harder to judge than its sources)",
+  "p_real": 0.03,
+  "seconds": 47.5
+ },
+ "pink": {
+  "what": "30 s pink noise",
+  "models": true,
+  "picture": false,
+  "expect": [
+   "p_real",
+   "music_frac",
+   "onset_rate"
+  ],
+  "caught": [
+   "p_real",
+   "music_frac",
+   "onset_rate"
+  ],
+  "verdict": "not launch-grade",
+  "partial": [],
+  "score": 0.459,
+  "critical": 3,
+  "major": 4,
+  "flagged": [
+   "lufs_i low (critical)",
+   "p_real low (critical)",
+   "music_frac low (critical)",
+   "lra low (major)",
+   "crest_lu low (major)",
+   "onset_rate low (major)",
+   "hit_rate low (major)",
+   "band_mid high (minor)",
+   "band_presence high (minor)",
+   "side_to_mid_db low (minor)"
+  ],
+  "first_action": "realness: likely code-synthesized (p_real 0.16, at or below the model's 0.40 threshold); 4 s windows at or below the window threshold 0.17 (code-synthesized): 0:00.00-0:04.00 (0.12), 0:08.00-0:12.00 (0.16), 0:12.00-0:16.00 (0.15), 0:20.00-0:24.00 (0.17), 0:24.00-0:28.00 (0.11), 0:26.00-0:30.00 (0.15): replace oscillator / noise layers with real recordings and produced music (skills/real-sound has the sourcing and licence workflow); judge each stem with `earshot realness stem.wav` (a finished mix is harder to judge than its sources)",
+  "p_real": 0.158,
+  "seconds": 22.7
+ }
+}

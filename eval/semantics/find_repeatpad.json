@@ -1,0 +1,844 @@
+{
+ "pad": "repeatpad",
+ "keychron_17_keys": {
+  "hits": 16,
+  "n": 17,
+  "distinct_presses": 16,
+  "in_unlabelled_part": 0,
+  "false_positives_in_skip_region": 1,
+  "median_lead_ms": 15.65,
+  "lead_ms_range": [
+   5.3,
+   54.3
+  ],
+  "rows": [
+   {
+    "start": 10.601,
+    "end": 10.855,
+    "z": 5.37,
+    "kind": "event",
+    "tail_db": -38.3,
+    "press": 10,
+    "lead_ms": 12.5,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 5.933,
+    "end": 6.295,
+    "z": 5.26,
+    "kind": "event",
+    "tail_db": -40.5,
+    "press": 6,
+    "lead_ms": 41.0,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 0.206,
+    "end": 0.43,
+    "z": 5.25,
+    "kind": "event",
+    "tail_db": -40.3,
+    "press": 0,
+    "lead_ms": 46.4,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 4.939,
+    "end": 5.145,
+    "z": 5.23,
+    "kind": "event",
+    "tail_db": -31.6,
+    "press": 5,
+    "lead_ms": 15.5,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 14.755,
+    "end": 15.05,
+    "z": 5.23,
+    "kind": "event",
+    "tail_db": -31.1,
+    "press": 13,
+    "lead_ms": 5.4,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 3.945,
+    "end": 4.19,
+    "z": 5.18,
+    "kind": "stroke",
+    "tail_db": -28.1,
+    "press": 4,
+    "lead_ms": 54.3,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 7.72,
+    "end": 8.07,
+    "z": 5.08,
+    "kind": "event",
+    "tail_db": -40.8,
+    "press": 8,
+    "lead_ms": 10.4,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 11.897,
+    "end": 12.195,
+    "z": 5.04,
+    "kind": "event",
+    "tail_db": -39.2,
+    "press": 11,
+    "lead_ms": 35.8,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 13.462,
+    "end": 13.665,
+    "z": 5.03,
+    "kind": "stroke",
+    "tail_db": -31.3,
+    "press": 12,
+    "lead_ms": 15.8,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 8.593,
+    "end": 8.88,
+    "z": 5.02,
+    "kind": "event",
+    "tail_db": -39.5,
+    "press": 9,
+    "lead_ms": 5.3,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 15.66,
+    "end": 15.89,
+    "z": 4.95,
+    "kind": "event",
+    "tail_db": -35.2,
+    "press": 14,
+    "lead_ms": 14.1,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 6.854,
+    "end": 7.135,
+    "z": 4.95,
+    "kind": "event",
+    "tail_db": -37.5,
+    "press": 7,
+    "lead_ms": 5.6,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 2.971,
+    "end": 3.205,
+    "z": 4.9,
+    "kind": "stroke",
+    "tail_db": -41.8,
+    "press": 3,
+    "lead_ms": 37.5,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 16.986,
+    "end": 17.2,
+    "z": 4.89,
+    "kind": "stroke",
+    "tail_db": -28.1,
+    "press": 16,
+    "lead_ms": 5.5,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 2.033,
+    "end": 2.36,
+    "z": 4.84,
+    "kind": "event",
+    "tail_db": -41.7,
+    "press": 2,
+    "lead_ms": 34.2,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 9.544,
+    "end": 9.832,
+    "z": 4.82,
+    "kind": "event",
+    "tail_db": -15.0,
+    "press": 9,
+    "lead_ms": -945.7,
+    "in_skip_region": true,
+    "hit": false
+   },
+   {
+    "start": 16.32,
+    "end": 16.61,
+    "z": 4.73,
+    "kind": "event",
+    "tail_db": -35.3,
+    "press": 15,
+    "lead_ms": 17.7,
+    "in_skip_region": false,
+    "hit": true
+   }
+  ],
+  "seconds": 4.2,
+  "seconds_cached": 0.17,
+  "duration": 18.204,
+  "n_candidates": 59,
+  "query": "a single mechanical keyboard key press"
+ },
+ "creamy_typing_slow_then_fast": {
+  "hits": 2,
+  "n": 5,
+  "distinct_presses": 2,
+  "in_unlabelled_part": 3,
+  "false_positives_in_skip_region": 0,
+  "median_lead_ms": 13.8,
+  "lead_ms_range": [
+   5.8,
+   21.8
+  ],
+  "rows": [
+   {
+    "start": 39.542,
+    "end": 39.82,
+    "z": 4.14,
+    "kind": "event",
+    "tail_db": -32.3,
+    "press": null,
+    "lead_ms": null,
+    "in_skip_region": false,
+    "hit": false
+   },
+   {
+    "start": 13.235,
+    "end": 13.345,
+    "z": 4.07,
+    "kind": "stroke",
+    "tail_db": -37.0,
+    "press": 14,
+    "lead_ms": 5.8,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 11.118,
+    "end": 11.425,
+    "z": 3.73,
+    "kind": "event",
+    "tail_db": -36.5,
+    "press": 11,
+    "lead_ms": 21.8,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 42.444,
+    "end": 42.56,
+    "z": 3.66,
+    "kind": "stroke",
+    "tail_db": -29.7,
+    "press": null,
+    "lead_ms": null,
+    "in_skip_region": false,
+    "hit": false
+   },
+   {
+    "start": 29.836,
+    "end": 29.952,
+    "z": 3.65,
+    "kind": "stroke",
+    "tail_db": -30.0,
+    "press": null,
+    "lead_ms": null,
+    "in_skip_region": false,
+    "hit": false
+   }
+  ],
+  "seconds": 0.3,
+  "seconds_cached": 0.28,
+  "duration": 47.864,
+  "n_candidates": 67,
+  "query": "a single mechanical keyboard key press",
+  "continuous_typing_query": {
+   "in_fast_part": 5,
+   "n": 5,
+   "segments": [
+    [
+     20.0,
+     25.0,
+     3.88,
+     "window"
+    ],
+    [
+     32.5,
+     37.5,
+     3.83,
+     "window"
+    ],
+    [
+     37.5,
+     42.5,
+     3.6,
+     "window"
+    ],
+    [
+     42.864,
+     47.864,
+     3.5,
+     "window"
+    ],
+    [
+     25.0,
+     30.0,
+     3.48,
+     "window"
+    ]
+   ]
+  }
+ },
+ "mars_32_keys": {
+  "hits": 9,
+  "n": 10,
+  "distinct_presses": 9,
+  "in_unlabelled_part": 0,
+  "false_positives_in_skip_region": 0,
+  "median_lead_ms": 6.3,
+  "lead_ms_range": [
+   5.8,
+   8.1
+  ],
+  "rows": [
+   {
+    "start": 0.987,
+    "end": 1.335,
+    "z": 5.79,
+    "kind": "event",
+    "tail_db": -31.9,
+    "press": 1,
+    "lead_ms": 75.1,
+    "in_skip_region": false,
+    "hit": false
+   },
+   {
+    "start": 5.031,
+    "end": 5.52,
+    "z": 5.64,
+    "kind": "event",
+    "tail_db": -39.3,
+    "press": 5,
+    "lead_ms": 6.7,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 25.369,
+    "end": 25.945,
+    "z": 5.43,
+    "kind": "event",
+    "tail_db": -30.8,
+    "press": 25,
+    "lead_ms": 6.3,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 0.114,
+    "end": 0.715,
+    "z": 5.33,
+    "kind": "event",
+    "tail_db": -28.9,
+    "press": 0,
+    "lead_ms": 8.1,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 4.121,
+    "end": 4.64,
+    "z": 5.29,
+    "kind": "event",
+    "tail_db": -45.3,
+    "press": 4,
+    "lead_ms": 6.0,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 2.061,
+    "end": 2.775,
+    "z": 5.24,
+    "kind": "event",
+    "tail_db": -32.7,
+    "press": 2,
+    "lead_ms": 5.8,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 26.963,
+    "end": 27.405,
+    "z": 5.19,
+    "kind": "event",
+    "tail_db": -34.7,
+    "press": 27,
+    "lead_ms": 7.2,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 3.053,
+    "end": 3.775,
+    "z": 5.17,
+    "kind": "event",
+    "tail_db": -35.7,
+    "press": 3,
+    "lead_ms": 6.1,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 9.979,
+    "end": 10.28,
+    "z": 5.16,
+    "kind": "event",
+    "tail_db": -42.6,
+    "press": 10,
+    "lead_ms": 6.0,
+    "in_skip_region": false,
+    "hit": true
+   },
+   {
+    "start": 28.448,
+    "end": 28.725,
+    "z": 5.09,
+    "kind": "event",
+    "tail_db": -34.4,
+    "press": 29,
+    "lead_ms": 6.5,
+    "in_skip_region": false,
+    "hit": true
+   }
+  ],
+  "seconds": 0.4,
+  "seconds_cached": 0.3,
+  "duration": 31.463,
+  "n_candidates": 60,
+  "query": "a single mechanical keyboard key press"
+ },
+ "scene_44s": {
+  "found": 8,
+  "n": 8,
+  "top1": 8,
+  "n_queries": 8,
+  "tight_trims": 7,
+  "seconds_all_queries": 19.6,
+  "rows": [
+   {
+    "query": "a glass ting",
+    "truth_starts": [
+     2.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      1.996,
+      2.775,
+      3.9,
+      "stroke"
+     ],
+     [
+      36.995,
+      42.075,
+      3.64,
+      "window"
+     ],
+     [
+      11.944,
+      12.145,
+      2.66,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     14.0
+    ]
+   },
+   {
+    "query": "a fast whoosh",
+    "truth_starts": [
+     7.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      6.997,
+      7.17,
+      4.84,
+      "stroke"
+     ],
+     [
+      11.944,
+      12.145,
+      1.9,
+      "stroke"
+     ],
+     [
+      32.002,
+      32.123,
+      1.63,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     13.0
+    ]
+   },
+   {
+    "query": "a cork pop",
+    "truth_starts": [
+     12.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      11.944,
+      12.145,
+      3.92,
+      "stroke"
+     ],
+     [
+      21.995,
+      22.305,
+      2.09,
+      "stroke"
+     ],
+     [
+      26.996,
+      27.06,
+      1.98,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     66.0
+    ]
+   },
+   {
+    "query": "a lego brick click",
+    "truth_starts": [
+     17.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      17.005,
+      17.06,
+      3.39,
+      "stroke"
+     ],
+     [
+      26.996,
+      27.06,
+      2.95,
+      "stroke"
+     ],
+     [
+      32.5,
+      37.02,
+      2.62,
+      "window"
+     ]
+    ],
+    "lead_ms": [
+     5.0
+    ]
+   },
+   {
+    "query": "an object dropping into water",
+    "truth_starts": [
+     22.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      21.995,
+      22.305,
+      3.49,
+      "stroke"
+     ],
+     [
+      36.997,
+      37.495,
+      0.3,
+      "stroke"
+     ],
+     [
+      0.905,
+      2.775,
+      0.27,
+      "event"
+     ]
+    ],
+    "lead_ms": [
+     15.0
+    ]
+   },
+   {
+    "query": "a light switch click",
+    "truth_starts": [
+     27.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      26.996,
+      27.06,
+      2.63,
+      "stroke"
+     ],
+     [
+      17.005,
+      17.06,
+      1.66,
+      "stroke"
+     ],
+     [
+      32.002,
+      32.123,
+      1.62,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     14.0
+    ]
+   },
+   {
+    "query": "a spacebar press",
+    "truth_starts": [
+     32.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 28,
+    "segments": [
+     [
+      32.002,
+      32.29,
+      2.81,
+      "event"
+     ],
+     [
+      26.996,
+      27.06,
+      1.73,
+      "stroke"
+     ],
+     [
+      17.005,
+      17.06,
+      1.35,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     8.0
+    ]
+   },
+   {
+    "query": "a small bell",
+    "truth_starts": [
+     37.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "either",
+    "n_candidates": 31,
+    "segments": [
+     [
+      35.0,
+      40.0,
+      3.71,
+      "window"
+     ],
+     [
+      0.0,
+      5.0,
+      2.49,
+      "window"
+     ],
+     [
+      17.5,
+      22.5,
+      0.93,
+      "window"
+     ]
+    ],
+    "lead_ms": []
+   }
+  ]
+ },
+ "long_300s": {
+  "found": 5,
+  "n": 5,
+  "top1": 3,
+  "n_queries": 3,
+  "tight_trims": 5,
+  "seconds_all_queries": 44.3,
+  "rows": [
+   {
+    "query": "a glass ting",
+    "truth_starts": [
+     20.0,
+     150.0,
+     275.0
+    ],
+    "found_in_top_n": 3,
+    "n_truth": 3,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 88,
+    "segments": [
+     [
+      149.996,
+      150.795,
+      4.04,
+      "stroke"
+     ],
+     [
+      19.996,
+      20.79,
+      3.99,
+      "stroke"
+     ],
+     [
+      274.996,
+      275.775,
+      3.81,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     14.0,
+     14.0,
+     14.0
+    ]
+   },
+   {
+    "query": "a cork pop",
+    "truth_starts": [
+     205.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 88,
+    "segments": [
+     [
+      204.997,
+      205.145,
+      3.38,
+      "stroke"
+     ],
+     [
+      239.998,
+      240.17,
+      1.51,
+      "stroke"
+     ],
+     [
+      149.996,
+      150.795,
+      1.34,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     13.0
+    ]
+   },
+   {
+    "query": "a fast whoosh",
+    "truth_starts": [
+     240.0
+    ],
+    "found_in_top_n": 1,
+    "n_truth": 1,
+    "top1_hit": true,
+    "query_kind": "event",
+    "n_candidates": 88,
+    "segments": [
+     [
+      239.998,
+      240.17,
+      4.74,
+      "stroke"
+     ],
+     [
+      204.997,
+      205.145,
+      1.36,
+      "stroke"
+     ],
+     [
+      230.481,
+      230.63,
+      1.17,
+      "stroke"
+     ]
+    ],
+    "lead_ms": [
+     12.0
+    ]
+   }
+  ]
+ }
+}

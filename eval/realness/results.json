@@ -1,0 +1,3720 @@
+{
+ "data": {
+  "clips": 1484,
+  "real": 691,
+  "synth": 793,
+  "by_family": {
+   "cinetic": 318,
+   "generic": 260,
+   "pro-film": 72,
+   "pro-music": 119,
+   "real-asset": 366,
+   "real-rejected": 134,
+   "retired": 215
+  },
+  "real_groups": [
+   "ambience",
+   "film",
+   "foley",
+   "garden",
+   "keyboard",
+   "magic",
+   "motion",
+   "music",
+   "toy"
+  ],
+  "perturbed_clips": 1863
+ },
+ "schemes": {
+  "A": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.9219,
+   "acc@0.5": 0.8598,
+   "brier": 0.1088,
+   "logloss": 0.36
+  },
+  "A_noaug": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.9314,
+   "acc@0.5": 0.8693,
+   "brier": 0.1023,
+   "logloss": 0.3387
+  },
+  "A_clap": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.9257,
+   "acc@0.5": 0.8612,
+   "brier": 0.1069,
+   "logloss": 0.3514
+  },
+  "A_signal": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.721,
+   "acc@0.5": 0.7123,
+   "brier": 0.2448,
+   "logloss": 0.7195
+  },
+  "B": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.9576,
+   "acc@0.5": 0.9016,
+   "brier": 0.0764,
+   "logloss": 0.2599
+  },
+  "C": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.8854,
+   "acc@0.5": 0.8389,
+   "brier": 0.1298,
+   "logloss": 0.4509
+  },
+  "D": {
+   "n": 1224,
+   "n_real": 691,
+   "auc": 0.916,
+   "acc@0.5": 0.8554,
+   "brier": 0.1147,
+   "logloss": 0.401,
+   "note": "real vs retired + cinetic, neither ever trained on (generic generators were the only negatives)"
+  },
+  "M": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.92,
+   "acc@0.5": 0.8801,
+   "brier": 0.0984,
+   "logloss": 0.3549
+  }
+ },
+ "baselines": {
+  "clap_zero_shot": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.8579,
+   "acc@0.5": 0.7487,
+   "brier": 0.1887,
+   "logloss": 0.6675,
+   "prompts": {
+    "real": [
+     "a real recording made with a microphone",
+     "a field recording of a real place",
+     "a real foley recording of an object",
+     "a professionally produced music track",
+     "a professional cinematic sound effect from a sound library",
+     "a natural acoustic sound"
+    ],
+    "synth": [
+     "a cheap synthesized beep",
+     "a pure sine wave test tone",
+     "a simple electronic synthesizer tone made by code",
+     "an 8-bit video game sound effect",
+     "filtered white noise",
+     "a basic drum machine loop"
+    ]
+   }
+  },
+  "signal_univariate_auc": {
+   "silence_frac": 0.5435,
+   "floor_db": 0.4436,
+   "spec_floor_db": 0.7546,
+   "log_flatness": 0.7366,
+   "peakiness_db": 0.7232,
+   "line_share": 0.6516,
+   "bandwidth_khz": 0.6971,
+   "quiet_flat": 0.7859,
+   "tonal_frames": 0.599,
+   "pitch_wobble": 0.6744,
+   "env_resid_db": 0.594,
+   "texture_kurt": 0.5601,
+   "crest_db": 0.7385
+  }
+ },
+ "thresholds": {
+  "hi": 0.77,
+  "lo": 0.17,
+  "scheme": "M",
+  "how": ">= 92.5% precision on each side"
+ },
+ "band": {
+  "coverage": 0.7904,
+  "precision_real": 0.9241,
+  "precision_synth": 0.9224,
+  "real_called_synth": 0.0666,
+  "synth_called_real": 0.0555,
+  "uncertain_frac": 0.2096
+ },
+ "band_alt": {
+  "0.95": {
+   "hi": 0.88,
+   "lo": 0.05,
+   "coverage": 0.5195,
+   "precision_real": 0.9519,
+   "precision_synth": 0.9108,
+   "real_called_synth": 0.0405,
+   "synth_called_real": 0.0277,
+   "uncertain_frac": 0.4805
+  },
+  "0.925": {
+   "hi": 0.77,
+   "lo": 0.17,
+   "coverage": 0.7904,
+   "precision_real": 0.9241,
+   "precision_synth": 0.9224,
+   "real_called_synth": 0.0666,
+   "synth_called_real": 0.0555,
+   "uncertain_frac": 0.2096
+  },
+  "0.9": {
+   "hi": 0.68,
+   "lo": 0.47,
+   "coverage": 0.9407,
+   "precision_real": 0.9002,
+   "precision_synth": 0.9007,
+   "real_called_synth": 0.11,
+   "synth_called_real": 0.0794,
+   "uncertain_frac": 0.0593
+  }
+ },
+ "calibration": [
+  {
+   "bin": "0.0-0.1",
+   "n": 494,
+   "mean_p": 0.041,
+   "frac_real": 0.073
+  },
+  {
+   "bin": "0.1-0.2",
+   "n": 119,
+   "mean_p": 0.141,
+   "frac_real": 0.118
+  },
+  {
+   "bin": "0.2-0.3",
+   "n": 67,
+   "mean_p": 0.242,
+   "frac_real": 0.179
+  },
+  {
+   "bin": "0.3-0.4",
+   "n": 62,
+   "mean_p": 0.347,
+   "frac_real": 0.129
+  },
+  {
+   "bin": "0.4-0.5",
+   "n": 37,
+   "mean_p": 0.455,
+   "frac_real": 0.324
+  },
+  {
+   "bin": "0.5-0.6",
+   "n": 42,
+   "mean_p": 0.555,
+   "frac_real": 0.571
+  },
+  {
+   "bin": "0.6-0.7",
+   "n": 44,
+   "mean_p": 0.66,
+   "frac_real": 0.477
+  },
+  {
+   "bin": "0.7-0.8",
+   "n": 62,
+   "mean_p": 0.756,
+   "frac_real": 0.742
+  },
+  {
+   "bin": "0.8-0.9",
+   "n": 134,
+   "mean_p": 0.856,
+   "frac_real": 0.866
+  },
+  {
+   "bin": "0.9-1.0",
+   "n": 423,
+   "mean_p": 0.96,
+   "frac_real": 0.95
+  }
+ ],
+ "per_group_A": [
+  {
+   "group": "ambience",
+   "label": "real/pro",
+   "n": 77,
+   "mean_p_real": 0.78,
+   "acc@0.5": 0.974,
+   "auc_vs_other_class": 0.9542
+  },
+  {
+   "group": "cinetic",
+   "label": "synth",
+   "n": 318,
+   "mean_p_real": 0.081,
+   "acc@0.5": 0.9686,
+   "auc_vs_other_class": 0.9753
+  },
+  {
+   "group": "film",
+   "label": "real/pro",
+   "n": 72,
+   "mean_p_real": 0.75,
+   "acc@0.5": 0.9722,
+   "auc_vs_other_class": 0.9449
+  },
+  {
+   "group": "foley",
+   "label": "real/pro",
+   "n": 73,
+   "mean_p_real": 0.869,
+   "acc@0.5": 0.9726,
+   "auc_vs_other_class": 0.9721
+  },
+  {
+   "group": "garden",
+   "label": "real/pro",
+   "n": 78,
+   "mean_p_real": 0.835,
+   "acc@0.5": 0.9487,
+   "auc_vs_other_class": 0.9572
+  },
+  {
+   "group": "generic",
+   "label": "synth",
+   "n": 260,
+   "mean_p_real": 0.329,
+   "acc@0.5": 0.6731,
+   "auc_vs_other_class": 0.8355
+  },
+  {
+   "group": "keyboard",
+   "label": "real/pro",
+   "n": 77,
+   "mean_p_real": 0.969,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9925
+  },
+  {
+   "group": "magic",
+   "label": "real/pro",
+   "n": 68,
+   "mean_p_real": 0.451,
+   "acc@0.5": 0.4853,
+   "auc_vs_other_class": 0.753
+  },
+  {
+   "group": "motion",
+   "label": "real/pro",
+   "n": 66,
+   "mean_p_real": 0.649,
+   "acc@0.5": 0.6667,
+   "auc_vs_other_class": 0.8794
+  },
+  {
+   "group": "music",
+   "label": "real/pro",
+   "n": 119,
+   "mean_p_real": 0.595,
+   "acc@0.5": 0.6891,
+   "auc_vs_other_class": 0.8867
+  },
+  {
+   "group": "retired",
+   "label": "synth",
+   "n": 215,
+   "mean_p_real": 0.166,
+   "acc@0.5": 0.9674,
+   "auc_vs_other_class": 0.9474
+  },
+  {
+   "group": "toy",
+   "label": "real/pro",
+   "n": 61,
+   "mean_p_real": 0.838,
+   "acc@0.5": 0.9672,
+   "auc_vs_other_class": 0.9627
+  }
+ ],
+ "per_group_M": [
+  {
+   "group": "ambience",
+   "label": "real/pro",
+   "n": 77,
+   "mean_p_real": 0.868,
+   "acc@0.5": 0.987,
+   "auc_vs_other_class": 0.966
+  },
+  {
+   "group": "cinetic",
+   "label": "synth",
+   "n": 318,
+   "mean_p_real": 0.101,
+   "acc@0.5": 0.978,
+   "auc_vs_other_class": 0.9537
+  },
+  {
+   "group": "film",
+   "label": "real/pro",
+   "n": 72,
+   "mean_p_real": 0.886,
+   "acc@0.5": 0.9722,
+   "auc_vs_other_class": 0.9695
+  },
+  {
+   "group": "foley",
+   "label": "real/pro",
+   "n": 73,
+   "mean_p_real": 0.905,
+   "acc@0.5": 0.9726,
+   "auc_vs_other_class": 0.9726
+  },
+  {
+   "group": "garden",
+   "label": "real/pro",
+   "n": 78,
+   "mean_p_real": 0.857,
+   "acc@0.5": 0.9103,
+   "auc_vs_other_class": 0.9506
+  },
+  {
+   "group": "generic",
+   "label": "synth",
+   "n": 260,
+   "mean_p_real": 0.322,
+   "acc@0.5": 0.6846,
+   "auc_vs_other_class": 0.8642
+  },
+  {
+   "group": "keyboard",
+   "label": "real/pro",
+   "n": 77,
+   "mean_p_real": 0.963,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.987
+  },
+  {
+   "group": "magic",
+   "label": "real/pro",
+   "n": 68,
+   "mean_p_real": 0.405,
+   "acc@0.5": 0.4559,
+   "auc_vs_other_class": 0.6337
+  },
+  {
+   "group": "motion",
+   "label": "real/pro",
+   "n": 66,
+   "mean_p_real": 0.622,
+   "acc@0.5": 0.6667,
+   "auc_vs_other_class": 0.8263
+  },
+  {
+   "group": "music",
+   "label": "real/pro",
+   "n": 119,
+   "mean_p_real": 0.859,
+   "acc@0.5": 0.9244,
+   "auc_vs_other_class": 0.9569
+  },
+  {
+   "group": "retired",
+   "label": "synth",
+   "n": 215,
+   "mean_p_real": 0.157,
+   "acc@0.5": 0.9674,
+   "auc_vs_other_class": 0.9374
+  },
+  {
+   "group": "toy",
+   "label": "real/pro",
+   "n": 61,
+   "mean_p_real": 0.878,
+   "acc@0.5": 0.9672,
+   "auc_vs_other_class": 0.9649
+  }
+ ],
+ "non_music": {
+  "A": {
+   "n": 1365,
+   "n_real": 572,
+   "auc": 0.9292,
+   "acc@0.5": 0.8747,
+   "brier": 0.1002,
+   "logloss": 0.3375
+  },
+  "M": {
+   "n": 1365,
+   "n_real": 572,
+   "auc": 0.9123,
+   "acc@0.5": 0.8762,
+   "brier": 0.1022,
+   "logloss": 0.3683
+  }
+ },
+ "per_type_A": [
+  {
+   "group": "cinetic:bass",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.025,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9974
+  },
+  {
+   "group": "cinetic:blip",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.036,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9912
+  },
+  {
+   "group": "cinetic:clap",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.016,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9984
+  },
+  {
+   "group": "cinetic:crisp_tick",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.045,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9894
+  },
+  {
+   "group": "cinetic:drone",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.108,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9667
+  },
+  {
+   "group": "cinetic:fm_bell",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.067,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.981
+  },
+  {
+   "group": "cinetic:hat",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.141,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9569
+  },
+  {
+   "group": "cinetic:key_click",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.069,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9838
+  },
+  {
+   "group": "cinetic:keys",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.131,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9625
+  },
+  {
+   "group": "cinetic:kick",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.026,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9962
+  },
+  {
+   "group": "cinetic:marker",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.016,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9988
+  },
+  {
+   "group": "cinetic:mix",
+   "label": "synth",
+   "n": 16,
+   "mean_p_real": 0.094,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9688
+  },
+  {
+   "group": "cinetic:motif",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.012,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9999
+  },
+  {
+   "group": "cinetic:pluck",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.007,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9996
+  },
+  {
+   "group": "cinetic:riser",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.033,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9949
+  },
+  {
+   "group": "cinetic:score",
+   "label": "synth",
+   "n": 42,
+   "mean_p_real": 0.038,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9922
+  },
+  {
+   "group": "cinetic:snap",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.132,
+   "acc@0.5": 0.9,
+   "auc_vs_other_class": 0.9547
+  },
+  {
+   "group": "cinetic:sub_boom",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.04,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9907
+  },
+  {
+   "group": "cinetic:suck",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.176,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.942
+  },
+  {
+   "group": "cinetic:supersaw",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.004,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 1.0
+  },
+  {
+   "group": "cinetic:swell",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.023,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9978
+  },
+  {
+   "group": "cinetic:thock",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.092,
+   "acc@0.5": 0.9,
+   "auc_vs_other_class": 0.9713
+  },
+  {
+   "group": "cinetic:tick",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.155,
+   "acc@0.5": 0.9,
+   "auc_vs_other_class": 0.9381
+  },
+  {
+   "group": "cinetic:tock",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.271,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9135
+  },
+  {
+   "group": "cinetic:typing",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.022,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9978
+  },
+  {
+   "group": "cinetic:ui_click",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.165,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9236
+  },
+  {
+   "group": "cinetic:whoosh",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.363,
+   "acc@0.5": 0.7,
+   "auc_vs_other_class": 0.8795
+  },
+  {
+   "group": "cinetic:word_blip",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.097,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9726
+  },
+  {
+   "group": "generic:beep",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.299,
+   "acc@0.5": 0.7143,
+   "auc_vs_other_class": 0.83
+  },
+  {
+   "group": "generic:chiptune",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.19,
+   "acc@0.5": 0.9286,
+   "auc_vs_other_class": 0.9426
+  },
+  {
+   "group": "generic:chord",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.335,
+   "acc@0.5": 0.7143,
+   "auc_vs_other_class": 0.8453
+  },
+  {
+   "group": "generic:click",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.289,
+   "acc@0.5": 0.7143,
+   "auc_vs_other_class": 0.9031
+  },
+  {
+   "group": "generic:drums",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.009,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 1.0
+  },
+  {
+   "group": "generic:dtmf",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.713,
+   "acc@0.5": 0.0714,
+   "auc_vs_other_class": 0.6431
+  },
+  {
+   "group": "generic:fm",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.276,
+   "acc@0.5": 0.7857,
+   "auc_vs_other_class": 0.8704
+  },
+  {
+   "group": "generic:impact",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.178,
+   "acc@0.5": 0.8571,
+   "auc_vs_other_class": 0.9415
+  },
+  {
+   "group": "generic:lfsr",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.354,
+   "acc@0.5": 0.7143,
+   "auc_vs_other_class": 0.8778
+  },
+  {
+   "group": "generic:mix",
+   "label": "synth",
+   "n": 36,
+   "mean_p_real": 0.609,
+   "acc@0.5": 0.3611,
+   "auc_vs_other_class": 0.624
+  },
+  {
+   "group": "generic:pad",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.3,
+   "acc@0.5": 0.7857,
+   "auc_vs_other_class": 0.8947
+  },
+  {
+   "group": "generic:pluck",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.087,
+   "acc@0.5": 0.9286,
+   "auc_vs_other_class": 0.9295
+  },
+  {
+   "group": "generic:rain",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.664,
+   "acc@0.5": 0.2143,
+   "auc_vs_other_class": 0.6718
+  },
+  {
+   "group": "generic:riser",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.043,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.99
+  },
+  {
+   "group": "generic:siren",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.67,
+   "acc@0.5": 0.1429,
+   "auc_vs_other_class": 0.6116
+  },
+  {
+   "group": "generic:whoosh",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.103,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9687
+  },
+  {
+   "group": "generic:wind",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.035,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9924
+  },
+  {
+   "group": "retired:ambience",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.224,
+   "acc@0.5": 0.9333,
+   "auc_vs_other_class": 0.9312
+  },
+  {
+   "group": "retired:bed",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.285,
+   "acc@0.5": 0.9333,
+   "auc_vs_other_class": 0.9142
+  },
+  {
+   "group": "retired:melody",
+   "label": "synth",
+   "n": 12,
+   "mean_p_real": 0.151,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.951
+  },
+  {
+   "group": "retired:melody-event",
+   "label": "synth",
+   "n": 25,
+   "mean_p_real": 0.174,
+   "acc@0.5": 0.96,
+   "auc_vs_other_class": 0.9415
+  },
+  {
+   "group": "retired:stem_arp",
+   "label": "synth",
+   "n": 12,
+   "mean_p_real": 0.045,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9913
+  },
+  {
+   "group": "retired:stem_bass",
+   "label": "synth",
+   "n": 13,
+   "mean_p_real": 0.059,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9851
+  },
+  {
+   "group": "retired:stem_bed",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.292,
+   "acc@0.5": 0.9333,
+   "auc_vs_other_class": 0.9097
+  },
+  {
+   "group": "retired:stem_bells",
+   "label": "synth",
+   "n": 2,
+   "mean_p_real": 0.096,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9696
+  },
+  {
+   "group": "retired:stem_bells-event",
+   "label": "synth",
+   "n": 1,
+   "mean_p_real": 0.028,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9971
+  },
+  {
+   "group": "retired:stem_drums",
+   "label": "synth",
+   "n": 11,
+   "mean_p_real": 0.097,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9658
+  },
+  {
+   "group": "retired:stem_drums-event",
+   "label": "synth",
+   "n": 25,
+   "mean_p_real": 0.089,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9719
+  },
+  {
+   "group": "retired:stem_pad",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.045,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9909
+  },
+  {
+   "group": "retired:stem_reverb",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.239,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9274
+  },
+  {
+   "group": "retired:stem_sfx",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.241,
+   "acc@0.5": 0.9333,
+   "auc_vs_other_class": 0.9223
+  },
+  {
+   "group": "retired:stem_sfx-event",
+   "label": "synth",
+   "n": 25,
+   "mean_p_real": 0.196,
+   "acc@0.5": 0.92,
+   "auc_vs_other_class": 0.9293
+  }
+ ],
+ "per_type_B": [
+  {
+   "group": "cinetic:bass",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.021,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9959
+  },
+  {
+   "group": "cinetic:blip",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.035,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.988
+  },
+  {
+   "group": "cinetic:clap",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.013,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9978
+  },
+  {
+   "group": "cinetic:crisp_tick",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.015,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9974
+  },
+  {
+   "group": "cinetic:drone",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.144,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9616
+  },
+  {
+   "group": "cinetic:fm_bell",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.118,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9715
+  },
+  {
+   "group": "cinetic:hat",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.234,
+   "acc@0.5": 0.9,
+   "auc_vs_other_class": 0.9444
+  },
+  {
+   "group": "cinetic:key_click",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.058,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9891
+  },
+  {
+   "group": "cinetic:keys",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.203,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9585
+  },
+  {
+   "group": "cinetic:kick",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.066,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.978
+  },
+  {
+   "group": "cinetic:marker",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.01,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.999
+  },
+  {
+   "group": "cinetic:mix",
+   "label": "synth",
+   "n": 16,
+   "mean_p_real": 0.298,
+   "acc@0.5": 0.875,
+   "auc_vs_other_class": 0.9361
+  },
+  {
+   "group": "cinetic:motif",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.016,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9968
+  },
+  {
+   "group": "cinetic:pluck",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.012,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9959
+  },
+  {
+   "group": "cinetic:riser",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.037,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9887
+  },
+  {
+   "group": "cinetic:score",
+   "label": "synth",
+   "n": 42,
+   "mean_p_real": 0.148,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9563
+  },
+  {
+   "group": "cinetic:snap",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.246,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9466
+  },
+  {
+   "group": "cinetic:sub_boom",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.083,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9735
+  },
+  {
+   "group": "cinetic:suck",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.184,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9489
+  },
+  {
+   "group": "cinetic:supersaw",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.004,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 1.0
+  },
+  {
+   "group": "cinetic:swell",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.027,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9929
+  },
+  {
+   "group": "cinetic:thock",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.078,
+   "acc@0.5": 0.9,
+   "auc_vs_other_class": 0.9848
+  },
+  {
+   "group": "cinetic:tick",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.162,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9664
+  },
+  {
+   "group": "cinetic:tock",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.188,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.952
+  },
+  {
+   "group": "cinetic:typing",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.035,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9896
+  },
+  {
+   "group": "cinetic:ui_click",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.167,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9656
+  },
+  {
+   "group": "cinetic:whoosh",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.502,
+   "acc@0.5": 0.5,
+   "auc_vs_other_class": 0.8935
+  },
+  {
+   "group": "cinetic:word_blip",
+   "label": "synth",
+   "n": 10,
+   "mean_p_real": 0.081,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9797
+  },
+  {
+   "group": "generic:beep",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.126,
+   "acc@0.5": 0.9286,
+   "auc_vs_other_class": 0.9686
+  },
+  {
+   "group": "generic:chiptune",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.019,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9959
+  },
+  {
+   "group": "generic:chord",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.177,
+   "acc@0.5": 0.9286,
+   "auc_vs_other_class": 0.9559
+  },
+  {
+   "group": "generic:click",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.2,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.946
+  },
+  {
+   "group": "generic:drums",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.027,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9938
+  },
+  {
+   "group": "generic:dtmf",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.384,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9177
+  },
+  {
+   "group": "generic:fm",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.155,
+   "acc@0.5": 0.8571,
+   "auc_vs_other_class": 0.9657
+  },
+  {
+   "group": "generic:impact",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.19,
+   "acc@0.5": 0.8571,
+   "auc_vs_other_class": 0.9513
+  },
+  {
+   "group": "generic:lfsr",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.079,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9765
+  },
+  {
+   "group": "generic:mix",
+   "label": "synth",
+   "n": 36,
+   "mean_p_real": 0.588,
+   "acc@0.5": 0.3889,
+   "auc_vs_other_class": 0.7929
+  },
+  {
+   "group": "generic:pad",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.132,
+   "acc@0.5": 0.9286,
+   "auc_vs_other_class": 0.966
+  },
+  {
+   "group": "generic:pluck",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.077,
+   "acc@0.5": 0.9286,
+   "auc_vs_other_class": 0.9799
+  },
+  {
+   "group": "generic:rain",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.61,
+   "acc@0.5": 0.2143,
+   "auc_vs_other_class": 0.8701
+  },
+  {
+   "group": "generic:riser",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.039,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.989
+  },
+  {
+   "group": "generic:siren",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.177,
+   "acc@0.5": 0.8571,
+   "auc_vs_other_class": 0.9567
+  },
+  {
+   "group": "generic:whoosh",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.082,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9741
+  },
+  {
+   "group": "generic:wind",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.05,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9846
+  },
+  {
+   "group": "retired:ambience",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.216,
+   "acc@0.5": 0.8667,
+   "auc_vs_other_class": 0.9517
+  },
+  {
+   "group": "retired:bed",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.256,
+   "acc@0.5": 0.8667,
+   "auc_vs_other_class": 0.9429
+  },
+  {
+   "group": "retired:melody",
+   "label": "synth",
+   "n": 12,
+   "mean_p_real": 0.1,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9708
+  },
+  {
+   "group": "retired:melody-event",
+   "label": "synth",
+   "n": 25,
+   "mean_p_real": 0.147,
+   "acc@0.5": 0.92,
+   "auc_vs_other_class": 0.9629
+  },
+  {
+   "group": "retired:stem_arp",
+   "label": "synth",
+   "n": 12,
+   "mean_p_real": 0.011,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9987
+  },
+  {
+   "group": "retired:stem_bass",
+   "label": "synth",
+   "n": 13,
+   "mean_p_real": 0.027,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.993
+  },
+  {
+   "group": "retired:stem_bed",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.265,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9419
+  },
+  {
+   "group": "retired:stem_bells",
+   "label": "synth",
+   "n": 2,
+   "mean_p_real": 0.049,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9819
+  },
+  {
+   "group": "retired:stem_bells-event",
+   "label": "synth",
+   "n": 1,
+   "mean_p_real": 0.004,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 1.0
+  },
+  {
+   "group": "retired:stem_drums",
+   "label": "synth",
+   "n": 11,
+   "mean_p_real": 0.056,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.98
+  },
+  {
+   "group": "retired:stem_drums-event",
+   "label": "synth",
+   "n": 25,
+   "mean_p_real": 0.084,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.977
+  },
+  {
+   "group": "retired:stem_pad",
+   "label": "synth",
+   "n": 14,
+   "mean_p_real": 0.014,
+   "acc@0.5": 1.0,
+   "auc_vs_other_class": 0.9981
+  },
+  {
+   "group": "retired:stem_reverb",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.3,
+   "acc@0.5": 0.7333,
+   "auc_vs_other_class": 0.9363
+  },
+  {
+   "group": "retired:stem_sfx",
+   "label": "synth",
+   "n": 15,
+   "mean_p_real": 0.339,
+   "acc@0.5": 0.8,
+   "auc_vs_other_class": 0.9216
+  },
+  {
+   "group": "retired:stem_sfx-event",
+   "label": "synth",
+   "n": 25,
+   "mean_p_real": 0.221,
+   "acc@0.5": 0.84,
+   "auc_vs_other_class": 0.9377
+  }
+ ],
+ "music_M": {
+  "windows": 119,
+  "mean_p_real": 0.859,
+  "acc@0.5": 0.9244,
+  "files": 52,
+  "files_acc@0.5": 0.9615,
+  "files_called_synth": 0,
+  "files_called_real": 44,
+  "scheme_A_mean_p_real": 0.595,
+  "per_provider": [
+   {
+    "group": "music:ch",
+    "label": "real/pro",
+    "n": 30,
+    "mean_p_real": 0.83,
+    "acc@0.5": 0.9,
+    "auc_vs_other_class": 0.9407
+   },
+   {
+    "group": "music:mk",
+    "label": "real/pro",
+    "n": 45,
+    "mean_p_real": 0.887,
+    "acc@0.5": 0.9333,
+    "auc_vs_other_class": 0.9672
+   },
+   {
+    "group": "music:other",
+    "label": "real/pro",
+    "n": 8,
+    "mean_p_real": 0.77,
+    "acc@0.5": 0.75,
+    "auc_vs_other_class": 0.9232
+   },
+   {
+    "group": "music:sb",
+    "label": "real/pro",
+    "n": 36,
+    "mean_p_real": 0.867,
+    "acc@0.5": 0.9722,
+    "auc_vs_other_class": 0.9651
+   }
+  ]
+ },
+ "retired_check": {
+  "C: real vs retired": {
+   "auc": 0.9475,
+   "acc@0.5": 0.862,
+   "synth_mean_p": 0.166
+  },
+  "C: real recordings only (no music/films) vs retired": {
+   "auc": 0.9418
+  },
+  "D: real vs retired": {
+   "auc": 0.9085,
+   "acc@0.5": 0.8389,
+   "synth_mean_p": 0.185
+  },
+  "D: real vs cinetic": {
+   "auc": 0.921,
+   "acc@0.5": 0.8484,
+   "synth_mean_p": 0.145
+  },
+  "D: real recordings only (no music/films) vs retired": {
+   "auc": 0.9031
+  }
+ },
+ "file_level_A": {
+  "n": 119,
+  "n_real": 96,
+  "auc": 0.9022,
+  "acc@0.5": 0.8235,
+  "brier": 0.1254,
+  "logloss": 0.4123,
+  "note": "sources with >= 2 windows (films, music, ambience, retired stems, synthesized mixes): mean of window p_real",
+  "files": [
+   {
+    "src": "cinetic_score_2/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.021,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_0/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.029,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_1/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.03,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_5/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.036,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_4/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.039,
+    "windows": 7
+   },
+   {
+    "src": "stems/arp.wav",
+    "label": 0,
+    "p_real": 0.045,
+    "windows": 12
+   },
+   {
+    "src": "stems/pad.wav",
+    "label": 0,
+    "p_real": 0.045,
+    "windows": 14
+   },
+   {
+    "src": "stems/bass.wav",
+    "label": 0,
+    "p_real": 0.059,
+    "windows": 13
+   },
+   {
+    "src": "cinetic_score_3/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.07,
+    "windows": 7
+   },
+   {
+    "src": "stems/bells.wav",
+    "label": 0,
+    "p_real": 0.096,
+    "windows": 2
+   },
+   {
+    "src": "stems/drums.wav",
+    "label": 0,
+    "p_real": 0.097,
+    "windows": 11
+   },
+   {
+    "src": "audio/melody.wav",
+    "label": 0,
+    "p_real": 0.151,
+    "windows": 12
+   },
+   {
+    "src": "music/mk-1142_gummies.mp3",
+    "label": 1,
+    "p_real": 0.172,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-59068_sakuragirl-yay.mp3",
+    "label": 1,
+    "p_real": 0.217,
+    "windows": 4
+   },
+   {
+    "src": "audio/ambience.wav",
+    "label": 0,
+    "p_real": 0.224,
+    "windows": 15
+   },
+   {
+    "src": "music/ch-25837_ahimitsu-adventures.mp3",
+    "label": 1,
+    "p_real": 0.231,
+    "windows": 2
+   },
+   {
+    "src": "stems/reverb.wav",
+    "label": 0,
+    "p_real": 0.239,
+    "windows": 15
+   },
+   {
+    "src": "stems/sfx.wav",
+    "label": 0,
+    "p_real": 0.241,
+    "windows": 15
+   },
+   {
+    "src": "_retired_synth/bed.wav",
+    "label": 0,
+    "p_real": 0.285,
+    "windows": 15
+   },
+   {
+    "src": "stems/bed.wav",
+    "label": 0,
+    "p_real": 0.292,
+    "windows": 15
+   },
+   {
+    "src": "music/kmac-enchanted-valley_celesta-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.327,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-727_pop-track-01.mp3",
+    "label": 1,
+    "p_real": 0.338,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_4.wav",
+    "label": 0,
+    "p_real": 0.408,
+    "windows": 6
+   },
+   {
+    "src": "music/mk-746_relaxation-02.mp3",
+    "label": 1,
+    "p_real": 0.425,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-soar_family-adventure.mp3",
+    "label": 1,
+    "p_real": 0.431,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-racethesun_hybrid-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.445,
+    "windows": 2
+   },
+   {
+    "src": "music/ss-building-inspiration_orch-hybrid.mp3",
+    "label": 1,
+    "p_real": 0.456,
+    "windows": 4
+   },
+   {
+    "src": "music/ch-59608_sakuragirl-stars.mp3",
+    "label": 1,
+    "p_real": 0.456,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-4_delightful.mp3",
+    "label": 1,
+    "p_real": 0.456,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-639459_summer-meadow-wind.ogg",
+    "label": 1,
+    "p_real": 0.462,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-discovery_hybrid-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.462,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-bornofthesky_bright-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.465,
+    "windows": 4
+   },
+   {
+    "src": "music/mk-1037_my-little-star.mp3",
+    "label": 1,
+    "p_real": 0.483,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_1.wav",
+    "label": 0,
+    "p_real": 0.484,
+    "windows": 6
+   },
+   {
+    "src": "music/mk-506_little-bells.mp3",
+    "label": 1,
+    "p_real": 0.488,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-quirkylane_whimsical-winds.mp3",
+    "label": 1,
+    "p_real": 0.493,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-lifeinsilico_piano-strings.mp3",
+    "label": 1,
+    "p_real": 0.518,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-175_digital-clouds.mp3",
+    "label": 1,
+    "p_real": 0.548,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_0.wav",
+    "label": 0,
+    "p_real": 0.549,
+    "windows": 6
+   },
+   {
+    "src": "music/sb-clearskies_uplifting-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.557,
+    "windows": 4
+   },
+   {
+    "src": "music/ch-53234_roa-daybreak.mp3",
+    "label": 1,
+    "p_real": 0.563,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-felicity_hopeful-piano-pop.mp3",
+    "label": 1,
+    "p_real": 0.57,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-828_dont-worry.mp3",
+    "label": 1,
+    "p_real": 0.572,
+    "windows": 4
+   },
+   {
+    "src": "mixes/generic_mix_2.wav",
+    "label": 0,
+    "p_real": 0.59,
+    "windows": 6
+   },
+   {
+    "src": "music/ch-25942_keysofmoon-cheer-up.mp3",
+    "label": 1,
+    "p_real": 0.595,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-echoesofhome_warm-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.613,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-32_driving-ambition.mp3",
+    "label": 1,
+    "p_real": 0.616,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-38454_roa-bloom.mp3",
+    "label": 1,
+    "p_real": 0.617,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-60852_roa-stay-a-little.mp3",
+    "label": 1,
+    "p_real": 0.625,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-58303_roa-delighted.mp3",
+    "label": 1,
+    "p_real": 0.634,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-bringmethesky_uplifting-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.635,
+    "windows": 4
+   },
+   {
+    "src": "music/ch-60528_roa-dream-up.mp3",
+    "label": 1,
+    "p_real": 0.636,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_5.mp4",
+    "label": 1,
+    "p_real": 0.659,
+    "windows": 7
+   },
+   {
+    "src": "ambience/fs-331999_reed-grass-wind-close.ogg",
+    "label": 1,
+    "p_real": 0.672,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-511758_early-morning-birds-countryside.ogg",
+    "label": 1,
+    "p_real": 0.684,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2464_morning-garden.wav",
+    "label": 1,
+    "p_real": 0.684,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-158_happy-times.mp3",
+    "label": 1,
+    "p_real": 0.684,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-1026_el-embustero.mp3",
+    "label": 1,
+    "p_real": 0.689,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-tomorrow_quirky-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.689,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2472_morning-birds.wav",
+    "label": 1,
+    "p_real": 0.698,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-466242_dawn-chorus-hampshire.ogg",
+    "label": 1,
+    "p_real": 0.699,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-icecream_childlike-piano.mp3",
+    "label": 1,
+    "p_real": 0.699,
+    "windows": 4
+   },
+   {
+    "src": "ambience/fs-409143_summer-meadow-donegal.ogg",
+    "label": 1,
+    "p_real": 0.701,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_1.mp4",
+    "label": 1,
+    "p_real": 0.704,
+    "windows": 23
+   },
+   {
+    "src": "refs/ref_2.mp4",
+    "label": 1,
+    "p_real": 0.707,
+    "windows": 7
+   },
+   {
+    "src": "mixes/generic_mix_3.wav",
+    "label": 0,
+    "p_real": 0.707,
+    "windows": 6
+   },
+   {
+    "src": "ambience/fs-346533_birds-spring-woods.ogg",
+    "label": 1,
+    "p_real": 0.709,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-535_happy-spring.mp3",
+    "label": 1,
+    "p_real": 0.715,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-677535_woodlark-field-spring.ogg",
+    "label": 1,
+    "p_real": 0.716,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-565058_blackbird-garden-rustling-trees.ogg",
+    "label": 1,
+    "p_real": 0.72,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-595_secret-garden.mp3",
+    "label": 1,
+    "p_real": 0.724,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-855_pop-parapop.mp3",
+    "label": 1,
+    "p_real": 0.725,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2474_light-rain-atmosphere.wav",
+    "label": 1,
+    "p_real": 0.73,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-61388_sakuragirl-sunflower.mp3",
+    "label": 1,
+    "p_real": 0.73,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-271229_skylark-meadow-calm.ogg",
+    "label": 1,
+    "p_real": 0.735,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-81819_rain-window-reverb-room.ogg",
+    "label": 1,
+    "p_real": 0.738,
+    "windows": 2
+   },
+   {
+    "src": "music/kmac-wholesome_cello-marimba.mp3",
+    "label": 1,
+    "p_real": 0.74,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_4.mp4",
+    "label": 1,
+    "p_real": 0.746,
+    "windows": 8
+   },
+   {
+    "src": "ambience/fs-751473_soft-wind-leaves-rustle.ogg",
+    "label": 1,
+    "p_real": 0.75,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-440807_meadow-birds-nt3.ogg",
+    "label": 1,
+    "p_real": 0.753,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_6.mp4",
+    "label": 1,
+    "p_real": 0.756,
+    "windows": 12
+   },
+   {
+    "src": "music/mk-12_playground-fun.mp3",
+    "label": 1,
+    "p_real": 0.756,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-1249_light-rain-looping.wav",
+    "label": 1,
+    "p_real": 0.766,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-highgames_bouncy-comedy.mp3",
+    "label": 1,
+    "p_real": 0.768,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-jubilee_buoyant-adventure.mp3",
+    "label": 1,
+    "p_real": 0.77,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-31_dreaming-big.mp3",
+    "label": 1,
+    "p_real": 0.771,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-1146_im-not-the-only-one.mp3",
+    "label": 1,
+    "p_real": 0.772,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2467_morning-birds-singing.wav",
+    "label": 1,
+    "p_real": 0.774,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-333510_light-rain-skylight.ogg",
+    "label": 1,
+    "p_real": 0.777,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-215414_wind-tall-grass-prairie.ogg",
+    "label": 1,
+    "p_real": 0.783,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-587_discover.mp3",
+    "label": 1,
+    "p_real": 0.789,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-669486_rain-window-interior.ogg",
+    "label": 1,
+    "p_real": 0.79,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-58955_roa-aurora.mp3",
+    "label": 1,
+    "p_real": 0.792,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-788338_rain-inside-apartment.ogg",
+    "label": 1,
+    "p_real": 0.793,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-181801_breeze-pines.ogg",
+    "label": 1,
+    "p_real": 0.794,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-847380_spring-meadow-birds-soft-wind.ogg",
+    "label": 1,
+    "p_real": 0.794,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-58136_sakuragirl-daisy.mp3",
+    "label": 1,
+    "p_real": 0.797,
+    "windows": 4
+   },
+   {
+    "src": "ambience/fs-539750_raindrops-window-long.ogg",
+    "label": 1,
+    "p_real": 0.809,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-575645_large-leaves-rustle-wind.ogg",
+    "label": 1,
+    "p_real": 0.814,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-455828_roomtone-computer-fans.ogg",
+    "label": 1,
+    "p_real": 0.823,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-346642_rain-on-windows-interior.ogg",
+    "label": 1,
+    "p_real": 0.831,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-869851_rain-hitting-window.ogg",
+    "label": 1,
+    "p_real": 0.831,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-349044_meadow-forest-spring.ogg",
+    "label": 1,
+    "p_real": 0.846,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-502692_rain-bedroom-indoors.ogg",
+    "label": 1,
+    "p_real": 0.847,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-243781_rain-against-window-intense.ogg",
+    "label": 1,
+    "p_real": 0.849,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-2_comical.mp3",
+    "label": 1,
+    "p_real": 0.853,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-360756_raindrops-window-night.ogg",
+    "label": 1,
+    "p_real": 0.861,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-456766_birds-field-light-breeze.ogg",
+    "label": 1,
+    "p_real": 0.87,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_3.mp4",
+    "label": 1,
+    "p_real": 0.871,
+    "windows": 5
+   },
+   {
+    "src": "music/ch-61389_sakuragirl-lemonade.mp3",
+    "label": 1,
+    "p_real": 0.871,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-664152_roomtone-basement-hifi.ogg",
+    "label": 1,
+    "p_real": 0.874,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-637808_roomtone-small-quiet.ogg",
+    "label": 1,
+    "p_real": 0.874,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-6_fun-and-games.mp3",
+    "label": 1,
+    "p_real": 0.875,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-10_playful.mp3",
+    "label": 1,
+    "p_real": 0.877,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_7.mp4",
+    "label": 1,
+    "p_real": 0.888,
+    "windows": 10
+   },
+   {
+    "src": "ambience/fs-85145_rain-on-my-window.ogg",
+    "label": 1,
+    "p_real": 0.888,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-381258_computer-hum-gentle.ogg",
+    "label": 1,
+    "p_real": 0.907,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-543757_computer-hum.ogg",
+    "label": 1,
+    "p_real": 0.907,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_5.wav",
+    "label": 0,
+    "p_real": 0.915,
+    "windows": 6
+   }
+  ]
+ },
+ "file_level_M": {
+  "n": 119,
+  "n_real": 96,
+  "auc": 0.9538,
+  "acc@0.5": 0.9244,
+  "brier": 0.0527,
+  "logloss": 0.2148,
+  "note": "sources with >= 2 windows (films, music, ambience, retired stems, synthesized mixes): mean of window p_real",
+  "files": [
+   {
+    "src": "stems/bass.wav",
+    "label": 0,
+    "p_real": 0.053,
+    "windows": 13
+   },
+   {
+    "src": "stems/arp.wav",
+    "label": 0,
+    "p_real": 0.069,
+    "windows": 12
+   },
+   {
+    "src": "stems/pad.wav",
+    "label": 0,
+    "p_real": 0.072,
+    "windows": 14
+   },
+   {
+    "src": "cinetic_score_2/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.081,
+    "windows": 7
+   },
+   {
+    "src": "stems/bells.wav",
+    "label": 0,
+    "p_real": 0.086,
+    "windows": 2
+   },
+   {
+    "src": "stems/drums.wav",
+    "label": 0,
+    "p_real": 0.089,
+    "windows": 11
+   },
+   {
+    "src": "cinetic_score_1/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.105,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_0/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.106,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_4/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.129,
+    "windows": 7
+   },
+   {
+    "src": "cinetic_score_5/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.13,
+    "windows": 7
+   },
+   {
+    "src": "audio/melody.wav",
+    "label": 0,
+    "p_real": 0.131,
+    "windows": 12
+   },
+   {
+    "src": "audio/ambience.wav",
+    "label": 0,
+    "p_real": 0.191,
+    "windows": 15
+   },
+   {
+    "src": "cinetic_score_3/soundtrack.wav",
+    "label": 0,
+    "p_real": 0.197,
+    "windows": 7
+   },
+   {
+    "src": "stems/sfx.wav",
+    "label": 0,
+    "p_real": 0.207,
+    "windows": 15
+   },
+   {
+    "src": "_retired_synth/bed.wav",
+    "label": 0,
+    "p_real": 0.254,
+    "windows": 15
+   },
+   {
+    "src": "stems/bed.wav",
+    "label": 0,
+    "p_real": 0.256,
+    "windows": 15
+   },
+   {
+    "src": "stems/reverb.wav",
+    "label": 0,
+    "p_real": 0.316,
+    "windows": 15
+   },
+   {
+    "src": "music/ch-59068_sakuragirl-yay.mp3",
+    "label": 1,
+    "p_real": 0.401,
+    "windows": 4
+   },
+   {
+    "src": "music/mk-1142_gummies.mp3",
+    "label": 1,
+    "p_real": 0.435,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-639459_summer-meadow-wind.ogg",
+    "label": 1,
+    "p_real": 0.499,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_4.wav",
+    "label": 0,
+    "p_real": 0.513,
+    "windows": 6
+   },
+   {
+    "src": "mixes/generic_mix_0.wav",
+    "label": 0,
+    "p_real": 0.561,
+    "windows": 6
+   },
+   {
+    "src": "mixes/generic_mix_1.wav",
+    "label": 0,
+    "p_real": 0.614,
+    "windows": 6
+   },
+   {
+    "src": "music/ch-25837_ahimitsu-adventures.mp3",
+    "label": 1,
+    "p_real": 0.62,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-727_pop-track-01.mp3",
+    "label": 1,
+    "p_real": 0.654,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-4_delightful.mp3",
+    "label": 1,
+    "p_real": 0.656,
+    "windows": 2
+   },
+   {
+    "src": "music/kmac-enchanted-valley_celesta-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.659,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_2.wav",
+    "label": 0,
+    "p_real": 0.662,
+    "windows": 6
+   },
+   {
+    "src": "refs/ref_5.mp4",
+    "label": 1,
+    "p_real": 0.672,
+    "windows": 7
+   },
+   {
+    "src": "ambience/fs-331999_reed-grass-wind-close.ogg",
+    "label": 1,
+    "p_real": 0.684,
+    "windows": 2
+   },
+   {
+    "src": "music/ss-building-inspiration_orch-hybrid.mp3",
+    "label": 1,
+    "p_real": 0.717,
+    "windows": 4
+   },
+   {
+    "src": "music/mk-506_little-bells.mp3",
+    "label": 1,
+    "p_real": 0.72,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_3.wav",
+    "label": 0,
+    "p_real": 0.769,
+    "windows": 6
+   },
+   {
+    "src": "music/sb-quirkylane_whimsical-winds.mp3",
+    "label": 1,
+    "p_real": 0.781,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-soar_family-adventure.mp3",
+    "label": 1,
+    "p_real": 0.783,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2464_morning-garden.wav",
+    "label": 1,
+    "p_real": 0.786,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-409143_summer-meadow-donegal.ogg",
+    "label": 1,
+    "p_real": 0.792,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-bornofthesky_bright-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.8,
+    "windows": 4
+   },
+   {
+    "src": "music/sb-racethesun_hybrid-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.803,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2472_morning-birds.wav",
+    "label": 1,
+    "p_real": 0.813,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-2474_light-rain-atmosphere.wav",
+    "label": 1,
+    "p_real": 0.817,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-215414_wind-tall-grass-prairie.ogg",
+    "label": 1,
+    "p_real": 0.822,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-59608_sakuragirl-stars.mp3",
+    "label": 1,
+    "p_real": 0.826,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-271229_skylark-meadow-calm.ogg",
+    "label": 1,
+    "p_real": 0.827,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-751473_soft-wind-leaves-rustle.ogg",
+    "label": 1,
+    "p_real": 0.828,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-clearskies_uplifting-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.831,
+    "windows": 4
+   },
+   {
+    "src": "ambience/fs-511758_early-morning-birds-countryside.ogg",
+    "label": 1,
+    "p_real": 0.834,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-81819_rain-window-reverb-room.ogg",
+    "label": 1,
+    "p_real": 0.837,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-669486_rain-window-interior.ogg",
+    "label": 1,
+    "p_real": 0.838,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-181801_breeze-pines.ogg",
+    "label": 1,
+    "p_real": 0.84,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-175_digital-clouds.mp3",
+    "label": 1,
+    "p_real": 0.84,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-jubilee_buoyant-adventure.mp3",
+    "label": 1,
+    "p_real": 0.842,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_2.mp4",
+    "label": 1,
+    "p_real": 0.843,
+    "windows": 7
+   },
+   {
+    "src": "ambience/fs-440807_meadow-birds-nt3.ogg",
+    "label": 1,
+    "p_real": 0.844,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-53234_roa-daybreak.mp3",
+    "label": 1,
+    "p_real": 0.845,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-677535_woodlark-field-spring.ogg",
+    "label": 1,
+    "p_real": 0.852,
+    "windows": 2
+   },
+   {
+    "src": "ambience/mk-1249_light-rain-looping.wav",
+    "label": 1,
+    "p_real": 0.863,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-346533_birds-spring-woods.ogg",
+    "label": 1,
+    "p_real": 0.868,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-discovery_hybrid-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.872,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-333510_light-rain-skylight.ogg",
+    "label": 1,
+    "p_real": 0.875,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-539750_raindrops-window-long.ogg",
+    "label": 1,
+    "p_real": 0.876,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-1037_my-little-star.mp3",
+    "label": 1,
+    "p_real": 0.876,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_1.mp4",
+    "label": 1,
+    "p_real": 0.877,
+    "windows": 23
+   },
+   {
+    "src": "music/ch-25942_keysofmoon-cheer-up.mp3",
+    "label": 1,
+    "p_real": 0.877,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-466242_dawn-chorus-hampshire.ogg",
+    "label": 1,
+    "p_real": 0.879,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-565058_blackbird-garden-rustling-trees.ogg",
+    "label": 1,
+    "p_real": 0.889,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-felicity_hopeful-piano-pop.mp3",
+    "label": 1,
+    "p_real": 0.889,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-788338_rain-inside-apartment.ogg",
+    "label": 1,
+    "p_real": 0.89,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-60852_roa-stay-a-little.mp3",
+    "label": 1,
+    "p_real": 0.893,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-847380_spring-meadow-birds-soft-wind.ogg",
+    "label": 1,
+    "p_real": 0.894,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_6.mp4",
+    "label": 1,
+    "p_real": 0.9,
+    "windows": 12
+   },
+   {
+    "src": "music/mk-828_dont-worry.mp3",
+    "label": 1,
+    "p_real": 0.9,
+    "windows": 4
+   },
+   {
+    "src": "music/sb-echoesofhome_warm-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.9,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-455828_roomtone-computer-fans.ogg",
+    "label": 1,
+    "p_real": 0.902,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-61388_sakuragirl-sunflower.mp3",
+    "label": 1,
+    "p_real": 0.903,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-575645_large-leaves-rustle-wind.ogg",
+    "label": 1,
+    "p_real": 0.904,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-38454_roa-bloom.mp3",
+    "label": 1,
+    "p_real": 0.904,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-bringmethesky_uplifting-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.906,
+    "windows": 4
+   },
+   {
+    "src": "ambience/mk-2467_morning-birds-singing.wav",
+    "label": 1,
+    "p_real": 0.906,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-349044_meadow-forest-spring.ogg",
+    "label": 1,
+    "p_real": 0.907,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-869851_rain-hitting-window.ogg",
+    "label": 1,
+    "p_real": 0.914,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-icecream_childlike-piano.mp3",
+    "label": 1,
+    "p_real": 0.915,
+    "windows": 4
+   },
+   {
+    "src": "ambience/fs-346642_rain-on-windows-interior.ogg",
+    "label": 1,
+    "p_real": 0.92,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-360756_raindrops-window-night.ogg",
+    "label": 1,
+    "p_real": 0.922,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-664152_roomtone-basement-hifi.ogg",
+    "label": 1,
+    "p_real": 0.932,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-highgames_bouncy-comedy.mp3",
+    "label": 1,
+    "p_real": 0.932,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-746_relaxation-02.mp3",
+    "label": 1,
+    "p_real": 0.933,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_4.mp4",
+    "label": 1,
+    "p_real": 0.934,
+    "windows": 8
+   },
+   {
+    "src": "ambience/fs-243781_rain-against-window-intense.ogg",
+    "label": 1,
+    "p_real": 0.935,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-637808_roomtone-small-quiet.ogg",
+    "label": 1,
+    "p_real": 0.936,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-lifeinsilico_piano-strings.mp3",
+    "label": 1,
+    "p_real": 0.937,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-1026_el-embustero.mp3",
+    "label": 1,
+    "p_real": 0.94,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-12_playground-fun.mp3",
+    "label": 1,
+    "p_real": 0.942,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-32_driving-ambition.mp3",
+    "label": 1,
+    "p_real": 0.942,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-502692_rain-bedroom-indoors.ogg",
+    "label": 1,
+    "p_real": 0.943,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-85145_rain-on-my-window.ogg",
+    "label": 1,
+    "p_real": 0.944,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-158_happy-times.mp3",
+    "label": 1,
+    "p_real": 0.946,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-60528_roa-dream-up.mp3",
+    "label": 1,
+    "p_real": 0.953,
+    "windows": 2
+   },
+   {
+    "src": "mixes/generic_mix_5.wav",
+    "label": 0,
+    "p_real": 0.953,
+    "windows": 6
+   },
+   {
+    "src": "music/ch-58303_roa-delighted.mp3",
+    "label": 1,
+    "p_real": 0.955,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-855_pop-parapop.mp3",
+    "label": 1,
+    "p_real": 0.957,
+    "windows": 2
+   },
+   {
+    "src": "music/sb-tomorrow_quirky-orchestral.mp3",
+    "label": 1,
+    "p_real": 0.958,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-456766_birds-field-light-breeze.ogg",
+    "label": 1,
+    "p_real": 0.962,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_3.mp4",
+    "label": 1,
+    "p_real": 0.963,
+    "windows": 5
+   },
+   {
+    "src": "ambience/fs-381258_computer-hum-gentle.ogg",
+    "label": 1,
+    "p_real": 0.963,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-535_happy-spring.mp3",
+    "label": 1,
+    "p_real": 0.966,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-31_dreaming-big.mp3",
+    "label": 1,
+    "p_real": 0.967,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-58136_sakuragirl-daisy.mp3",
+    "label": 1,
+    "p_real": 0.969,
+    "windows": 4
+   },
+   {
+    "src": "music/ch-61389_sakuragirl-lemonade.mp3",
+    "label": 1,
+    "p_real": 0.969,
+    "windows": 2
+   },
+   {
+    "src": "music/ch-58955_roa-aurora.mp3",
+    "label": 1,
+    "p_real": 0.971,
+    "windows": 2
+   },
+   {
+    "src": "ambience/fs-543757_computer-hum.ogg",
+    "label": 1,
+    "p_real": 0.972,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-587_discover.mp3",
+    "label": 1,
+    "p_real": 0.973,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-1146_im-not-the-only-one.mp3",
+    "label": 1,
+    "p_real": 0.974,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-595_secret-garden.mp3",
+    "label": 1,
+    "p_real": 0.984,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-10_playful.mp3",
+    "label": 1,
+    "p_real": 0.985,
+    "windows": 2
+   },
+   {
+    "src": "music/kmac-wholesome_cello-marimba.mp3",
+    "label": 1,
+    "p_real": 0.987,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-2_comical.mp3",
+    "label": 1,
+    "p_real": 0.987,
+    "windows": 2
+   },
+   {
+    "src": "music/mk-6_fun-and-games.mp3",
+    "label": 1,
+    "p_real": 0.987,
+    "windows": 2
+   },
+   {
+    "src": "refs/ref_7.mp4",
+    "label": 1,
+    "p_real": 0.988,
+    "windows": 10
+   }
+  ],
+  "thresholds": {
+   "hi": 0.77,
+   "lo": 0.4,
+   "files": 119,
+   "synth_files": 23,
+   "how": "lo: 92.5% precision on held-out long files (scheme M); hi: max(that, the clip hi)"
+  },
+  "band": {
+   "coverage": 0.8655,
+   "precision_real": 0.9884,
+   "precision_synth": 1.0,
+   "real_called_synth": 0.0,
+   "synth_called_real": 0.0435,
+   "uncertain_frac": 0.1345
+  },
+  "calibration": [
+   {
+    "bin": "0.0-0.2",
+    "n": 13,
+    "mean_p": 0.111,
+    "frac_real": 0.0
+   },
+   {
+    "bin": "0.2-0.4",
+    "n": 4,
+    "mean_p": 0.258,
+    "frac_real": 0.0
+   },
+   {
+    "bin": "0.4-0.6",
+    "n": 5,
+    "mean_p": 0.482,
+    "frac_real": 0.6
+   },
+   {
+    "bin": "0.6-0.8",
+    "n": 15,
+    "mean_p": 0.705,
+    "frac_real": 0.8
+   },
+   {
+    "bin": "0.8-1.0",
+    "n": 82,
+    "mean_p": 0.907,
+    "frac_real": 0.988
+   }
+  ]
+ },
+ "robustness_A": [
+  {
+   "perturbation": "noise70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8,
+   "acc_unperturbed": 0.9304,
+   "mean_p_real": 0.281,
+   "mean_p_unperturbed": 0.154
+  },
+  {
+   "perturbation": "room70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.7391,
+   "acc_unperturbed": 0.8609,
+   "mean_p_real": 0.313,
+   "mean_p_unperturbed": 0.172
+  },
+  {
+   "perturbation": "gated",
+   "label": "real/pro",
+   "n": 106,
+   "acc@0.5": 0.7453,
+   "acc_unperturbed": 0.8113,
+   "mean_p_real": 0.656,
+   "mean_p_unperturbed": 0.715
+  },
+  {
+   "perturbation": "short",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8957,
+   "acc_unperturbed": 0.9043,
+   "mean_p_real": 0.156,
+   "mean_p_unperturbed": 0.145
+  },
+  {
+   "perturbation": "short",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.7383,
+   "acc_unperturbed": 0.8972,
+   "mean_p_real": 0.675,
+   "mean_p_unperturbed": 0.772
+  },
+  {
+   "perturbation": "mp3",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8609,
+   "acc_unperturbed": 0.887,
+   "mean_p_real": 0.21,
+   "mean_p_unperturbed": 0.159
+  },
+  {
+   "perturbation": "mp3",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.8505,
+   "acc_unperturbed": 0.8505,
+   "mean_p_real": 0.744,
+   "mean_p_unperturbed": 0.754
+  }
+ ],
+ "level_sensitivity": {
+  "real": {
+   "clips": 34,
+   "rms_db_median": -30.9,
+   "lifted_clips": 18,
+   "mean_p_orig": 0.887,
+   "mean_p_-20dB": 0.867,
+   "mean_p_norm-25": 0.86,
+   "mean_p_lifted": 0.876,
+   "mean_p_at-56": 0.864,
+   "mean_p_at-56_lifted": 0.863,
+   "acc_orig": 0.941,
+   "acc_-20dB": 0.941,
+   "acc_norm-25": 0.912,
+   "acc_lifted": 0.912,
+   "acc_at-56": 0.941,
+   "acc_at-56_lifted": 0.912,
+   "mean_abs_dp_-20dB": 0.046,
+   "mean_abs_dp_norm-25": 0.033,
+   "mean_abs_dp_lifted": 0.012,
+   "mean_abs_dp_at-56": 0.063,
+   "mean_abs_dp_at-56_lifted": 0.032
+  },
+  "cinetic": {
+   "clips": 31,
+   "rms_db_median": -24.3,
+   "lifted_clips": 8,
+   "mean_p_orig": 0.062,
+   "mean_p_-20dB": 0.08,
+   "mean_p_norm-25": 0.068,
+   "mean_p_lifted": 0.062,
+   "mean_p_at-56": 0.082,
+   "mean_p_at-56_lifted": 0.072,
+   "acc_orig": 1.0,
+   "acc_-20dB": 0.968,
+   "acc_norm-25": 1.0,
+   "acc_lifted": 1.0,
+   "acc_at-56": 0.968,
+   "acc_at-56_lifted": 1.0,
+   "mean_abs_dp_-20dB": 0.037,
+   "mean_abs_dp_norm-25": 0.012,
+   "mean_abs_dp_lifted": 0.001,
+   "mean_abs_dp_at-56": 0.059,
+   "mean_abs_dp_at-56_lifted": 0.017
+  },
+  "generic": {
+   "clips": 28,
+   "rms_db_median": -24.6,
+   "lifted_clips": 7,
+   "mean_p_orig": 0.042,
+   "mean_p_-20dB": 0.05,
+   "mean_p_norm-25": 0.043,
+   "mean_p_lifted": 0.042,
+   "mean_p_at-56": 0.064,
+   "mean_p_at-56_lifted": 0.042,
+   "acc_orig": 1.0,
+   "acc_-20dB": 1.0,
+   "acc_norm-25": 1.0,
+   "acc_lifted": 1.0,
+   "acc_at-56": 1.0,
+   "acc_at-56_lifted": 1.0,
+   "mean_abs_dp_-20dB": 0.015,
+   "mean_abs_dp_norm-25": 0.006,
+   "mean_abs_dp_lifted": 0.0,
+   "mean_abs_dp_at-56": 0.03,
+   "mean_abs_dp_at-56_lifted": 0.007
+  }
+ },
+ "robustness_A_noaug": [
+  {
+   "perturbation": "noise70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.687,
+   "acc_unperturbed": 0.9217,
+   "mean_p_real": 0.362,
+   "mean_p_unperturbed": 0.154
+  },
+  {
+   "perturbation": "room70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.7217,
+   "acc_unperturbed": 0.887,
+   "mean_p_real": 0.317,
+   "mean_p_unperturbed": 0.172
+  },
+  {
+   "perturbation": "gated",
+   "label": "real/pro",
+   "n": 106,
+   "acc@0.5": 0.7264,
+   "acc_unperturbed": 0.8113,
+   "mean_p_real": 0.638,
+   "mean_p_unperturbed": 0.715
+  },
+  {
+   "perturbation": "short",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.9565,
+   "acc_unperturbed": 0.9304,
+   "mean_p_real": 0.138,
+   "mean_p_unperturbed": 0.145
+  },
+  {
+   "perturbation": "short",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.7196,
+   "acc_unperturbed": 0.8879,
+   "mean_p_real": 0.67,
+   "mean_p_unperturbed": 0.772
+  },
+  {
+   "perturbation": "mp3",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8696,
+   "acc_unperturbed": 0.9304,
+   "mean_p_real": 0.191,
+   "mean_p_unperturbed": 0.159
+  },
+  {
+   "perturbation": "mp3",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.8411,
+   "acc_unperturbed": 0.8505,
+   "mean_p_real": 0.741,
+   "mean_p_unperturbed": 0.754
+  }
+ ],
+ "robustness_A_clap": [
+  {
+   "perturbation": "noise70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8,
+   "acc_unperturbed": 0.9304,
+   "mean_p_real": 0.281,
+   "mean_p_unperturbed": 0.154
+  },
+  {
+   "perturbation": "room70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.7391,
+   "acc_unperturbed": 0.8609,
+   "mean_p_real": 0.313,
+   "mean_p_unperturbed": 0.172
+  },
+  {
+   "perturbation": "gated",
+   "label": "real/pro",
+   "n": 106,
+   "acc@0.5": 0.7453,
+   "acc_unperturbed": 0.8113,
+   "mean_p_real": 0.66,
+   "mean_p_unperturbed": 0.715
+  },
+  {
+   "perturbation": "short",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8957,
+   "acc_unperturbed": 0.9043,
+   "mean_p_real": 0.156,
+   "mean_p_unperturbed": 0.145
+  },
+  {
+   "perturbation": "short",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.7383,
+   "acc_unperturbed": 0.9065,
+   "mean_p_real": 0.679,
+   "mean_p_unperturbed": 0.772
+  },
+  {
+   "perturbation": "mp3",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8609,
+   "acc_unperturbed": 0.887,
+   "mean_p_real": 0.21,
+   "mean_p_unperturbed": 0.159
+  },
+  {
+   "perturbation": "mp3",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.8505,
+   "acc_unperturbed": 0.8505,
+   "mean_p_real": 0.746,
+   "mean_p_unperturbed": 0.754
+  }
+ ],
+ "robustness_M": [
+  {
+   "perturbation": "noise70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8348,
+   "acc_unperturbed": 0.9478,
+   "mean_p_real": 0.278,
+   "mean_p_unperturbed": 0.154
+  },
+  {
+   "perturbation": "room70",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.7739,
+   "acc_unperturbed": 0.887,
+   "mean_p_real": 0.299,
+   "mean_p_unperturbed": 0.172
+  },
+  {
+   "perturbation": "gated",
+   "label": "real/pro",
+   "n": 106,
+   "acc@0.5": 0.7547,
+   "acc_unperturbed": 0.8396,
+   "mean_p_real": 0.69,
+   "mean_p_unperturbed": 0.715
+  },
+  {
+   "perturbation": "short",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.9043,
+   "acc_unperturbed": 0.9217,
+   "mean_p_real": 0.152,
+   "mean_p_unperturbed": 0.145
+  },
+  {
+   "perturbation": "short",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.729,
+   "acc_unperturbed": 0.8879,
+   "mean_p_real": 0.696,
+   "mean_p_unperturbed": 0.772
+  },
+  {
+   "perturbation": "mp3",
+   "label": "synth",
+   "n": 115,
+   "acc@0.5": 0.8957,
+   "acc_unperturbed": 0.9043,
+   "mean_p_real": 0.195,
+   "mean_p_unperturbed": 0.159
+  },
+  {
+   "perturbation": "mp3",
+   "label": "real/pro",
+   "n": 107,
+   "acc@0.5": 0.8505,
+   "acc_unperturbed": 0.8879,
+   "mean_p_real": 0.782,
+   "mean_p_unperturbed": 0.754
+  }
+ ],
+ "ast_subset": {
+  "ast_synth_classes_max": {
+   "n": 244,
+   "n_real": 118,
+   "auc": 0.7555,
+   "acc@0.5": 0.4918,
+   "brier": 0.4029,
+   "logloss": 1.2974,
+   "classes": [
+    "Synthesizer",
+    "Sine wave",
+    "Beep, bleep",
+    "Electronic tuner",
+    "Chirp tone",
+    "Dial tone",
+    "Pink noise",
+    "White noise",
+    "Static",
+    "Buzz",
+    "Hum",
+    "Theremin",
+    "Video game music",
+    "Ringtone",
+    "Sound effect"
+   ]
+  },
+  "ast_single:Synthesizer": {
+   "auc_real_high": 0.8465
+  },
+  "ast_single:Sine wave": {
+   "auc_real_high": 0.8253
+  },
+  "ast_single:Beep, bleep": {
+   "auc_real_high": 0.7498
+  },
+  "ast_single:Electronic music": {
+   "auc_real_high": 0.7551
+  },
+  "ast_single:Music": {
+   "auc_real_high": 0.6642
+  },
+  "S": {
+   "n": 244,
+   "n_real": 118,
+   "auc": 0.9566,
+   "acc@0.5": 0.877,
+   "brier": 0.0845,
+   "logloss": 0.2796
+  },
+  "S_ast": {
+   "n": 244,
+   "n_real": 118,
+   "auc": 0.9533,
+   "acc@0.5": 0.8689,
+   "brier": 0.0894,
+   "logloss": 0.291
+  },
+  "S_astonly": {
+   "n": 244,
+   "n_real": 118,
+   "auc": 0.7618,
+   "acc@0.5": 0.7418,
+   "brier": 0.1978,
+   "logloss": 0.5876
+  },
+  "A_on_subset": {
+   "n": 244,
+   "n_real": 118,
+   "auc": 0.951,
+   "acc@0.5": 0.8975,
+   "brier": 0.0884,
+   "logloss": 0.2969
+  },
+  "clap_zero_shot_on_subset": {
+   "n": 244,
+   "n_real": 118,
+   "auc": 0.8778,
+   "acc@0.5": 0.7582,
+   "brier": 0.1861,
+   "logloss": 0.651
+  }
+ },
+ "final_model": {
+  "fusion": {
+   "heads": [
+    "clap",
+    "signal"
+   ],
+   "coef": [
+    1.212409,
+    0.0
+   ],
+   "intercept": -0.153358
+  },
+  "signal_coef": {
+   "silence_frac": -0.106636,
+   "floor_db": 0.317801,
+   "spec_floor_db": 0.0,
+   "log_flatness": 0.0,
+   "peakiness_db": 0.0,
+   "line_share": 0.0,
+   "bandwidth_khz": 0.0,
+   "quiet_flat": 0.898494,
+   "tonal_frames": 0.0,
+   "pitch_wobble": 0.199091,
+   "env_resid_db": 0.007039,
+   "texture_kurt": 0.0,
+   "crest_db": 0.755868
+  },
+  "C": {
+   "clap": 0.001,
+   "signal": 0.1
+  },
+  "clap_direction": {
+   "toward_real": [
+    "a high quality studio recording",
+    "a metal scrape",
+    "an old typewriter",
+    "a match being struck",
+    "a knife chopping on a board",
+    "a small object dropping on a table",
+    "pizzicato strings",
+    "a can opening"
+   ],
+   "toward_synth": [
+    "a square wave chiptune blip",
+    "a simple electronic synthesizer tone made by code",
+    "a warm analog synth pad",
+    "a cheap synthesized beep",
+    "a computer-generated electronic tone",
+    "filtered white noise",
+    "an 8-bit video game sound effect",
+    "an 8-bit sound effect"
+   ],
+   "how": "cosine between each vocabulary text embedding and the CLAP head weight direction (coef / scale)"
+  }
+ },
+ "applications": {
+  "clawd_film_real_soundtrack": {
+   "final": {
+    "p_real_mean": 0.942,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   },
+   "held_out": {
+    "p_real_mean": 0.91,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   }
+  },
+  "clawd_film_synth_soundtrack": {
+   "final": {
+    "p_real_mean": 0.327,
+    "windows": 15,
+    "windows_lean_synth": 14,
+    "windows_le_lo": 1,
+    "verdict": "likely code-synthesized"
+   },
+   "held_out": {
+    "p_real_mean": 0.334,
+    "windows": 15,
+    "windows_lean_synth": 13,
+    "windows_le_lo": 1,
+    "verdict": "likely code-synthesized"
+   }
+  },
+  "clawd_soundtrack_wav": {
+   "final": {
+    "p_real_mean": 0.933,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   },
+   "held_out": {
+    "p_real_mean": 0.901,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   }
+  },
+  "clawd_stem_pro_sfx": {
+   "final": {
+    "p_real_mean": 0.787,
+    "windows": 15,
+    "windows_lean_synth": 2,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   },
+   "held_out": {
+    "p_real_mean": 0.646,
+    "windows": 15,
+    "windows_lean_synth": 5,
+    "windows_le_lo": 0,
+    "verdict": "uncertain"
+   }
+  },
+  "clawd_stem_pro_amb": {
+   "final": {
+    "p_real_mean": 0.882,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   },
+   "held_out": {
+    "p_real_mean": 0.84,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   }
+  },
+  "clawd_stem_pro_music": {
+   "final": {
+    "p_real_mean": 0.915,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   },
+   "held_out": {
+    "p_real_mean": 0.811,
+    "windows": 15,
+    "windows_lean_synth": 0,
+    "windows_le_lo": 0,
+    "verdict": "real or pro-produced"
+   }
+  }
+ },
+ "held_out_model": {
+  "clips": 1273,
+  "excluded": "accepted Clawd assets (incl. assets/music) and the retired score",
+  "file_thresholds": {
+   "hi": 0.77,
+   "lo": 0.4,
+   "files": 119,
+   "synth_files": 23,
+   "how": "lo: 92.5% precision on held-out long files (scheme M); hi: max(that, the clip hi)"
+  }
+ },
+ "windows_ui_sounds": {
+  "files": 70,
+  "median_p_real": 0.238,
+  "real or pro-produced": 6,
+  "uncertain": 32,
+  "likely code-synthesized": 32,
+  "lowest": [
+   [
+    "Windows Hardware Insert.wav",
+    0.006
+   ],
+   [
+    "Windows Hardware Remove.wav",
+    0.007
+   ],
+   [
+    "Alarm10.wav",
+    0.009
+   ],
+   [
+    "Windows Notify System Generic.wav",
+    0.009
+   ],
+   [
+    "Windows Background.wav",
+    0.013
+   ]
+  ],
+  "highest": [
+   [
+    "Ring08.wav",
+    0.861
+   ],
+   [
+    "Speech Off.wav",
+    0.885
+   ],
+   [
+    "ding.wav",
+    0.893
+   ],
+   [
+    "Windows Recycle.wav",
+    0.898
+   ],
+   [
+    "Windows Default.wav",
+    0.946
+   ]
+  ]
+ },
+ "layers": {
+  "clips": 369,
+  "beds": 184,
+  "bed_p_real_mean": 0.804,
+  "beds_lean_synth": 0.114,
+  "per_level": [
+   {
+    "level_db": -12,
+    "n": 93,
+    "base": {
+     "mean_p_real": 0.673,
+     "lean_synth": 0.269,
+     "le_lo": 0.172,
+     "ge_hi": 0.538
+    },
+    "train": {
+     "mean_p_real": 0.591,
+     "lean_synth": 0.344,
+     "le_lo": 0.204,
+     "ge_hi": 0.441
+    }
+   },
+   {
+    "level_db": -6,
+    "n": 91,
+    "base": {
+     "mean_p_real": 0.621,
+     "lean_synth": 0.33,
+     "le_lo": 0.121,
+     "ge_hi": 0.429
+    },
+    "train": {
+     "mean_p_real": 0.536,
+     "lean_synth": 0.418,
+     "le_lo": 0.132,
+     "ge_hi": 0.253
+    }
+   },
+   {
+    "level_db": 0,
+    "n": 94,
+    "base": {
+     "mean_p_real": 0.633,
+     "lean_synth": 0.298,
+     "le_lo": 0.149,
+     "ge_hi": 0.479
+    },
+    "train": {
+     "mean_p_real": 0.524,
+     "lean_synth": 0.457,
+     "le_lo": 0.17,
+     "ge_hi": 0.266
+    }
+   },
+   {
+    "level_db": 6,
+    "n": 91,
+    "base": {
+     "mean_p_real": 0.622,
+     "lean_synth": 0.286,
+     "le_lo": 0.143,
+     "ge_hi": 0.396
+    },
+    "train": {
+     "mean_p_real": 0.512,
+     "lean_synth": 0.484,
+     "le_lo": 0.154,
+     "ge_hi": 0.253
+    }
+   }
+  ],
+  "per_bed_group_base": {
+   "ambience": 0.167,
+   "film": 0.167,
+   "foley": 0.214,
+   "garden": 0.133,
+   "keyboard": 0.133,
+   "magic": 0.833,
+   "motion": 0.682,
+   "music": 0.222,
+   "toy": 0.227
+  },
+  "per_layer_family_base": {
+   "cinetic": 0.375,
+   "generic": 0.221,
+   "retired": 0.295
+  },
+  "M_layers": {
+   "n": 1484,
+   "n_real": 691,
+   "auc": 0.9281,
+   "acc@0.5": 0.8935,
+   "brier": 0.0926,
+   "logloss": 0.3313,
+   "hi": 0.68,
+   "lo": 0.05,
+   "band": {
+    "coverage": 0.5081,
+    "precision_real": 0.9249,
+    "precision_synth": 0.8359,
+    "real_called_synth": 0.0304,
+    "synth_called_real": 0.0593,
+    "uncertain_frac": 0.4919
+   }
+  },
+  "summary": "code-synthesized layers at -6..+6 dB inside real beds: 0.30 of windows lean synthesized (p_real < 0.5), 0.14 at or below lo; the beds alone: 0.114"
+ }
+}

@@ -1,0 +1,81 @@
+{
+ "_doc": "A complete design showing every feature mix.py understands, for a 12 s launch-video beat (cursor click, typing, whoosh into a transition, cards popping in, riser -> hero reveal hit, logo sting). It works as a single-file design (mix.py --design this.json) or as one category fragment listed in sounddesign.json 'include' (then 'duration', 'buses' and 'master' are read only from the top-level file). Keys starting with _ are comments. Every 'file' is a real licensed recording listed in a manifest (audio/assets/manifests/*.json). Prefix every name with the fragment's category so fragments never collide. Reference: references/design-format.md.",
+ "duration": 12.0,
+ "cues": "out/cues.json",
+
+ "samples": {
+  "ui.press": {"_doc": "the press half of a real mouse click: trim 3-5 ms before the attack, end before the release", "file": "audio/assets/ui/mk-0000_mouse-click.wav", "start": 0.096, "end": 0.150, "mono": true, "eq": {"hp": 400}, "norm_peak_db": -12, "fade_in": 0.002, "fade_out": 0.008},
+  "ui.release": {"file": "audio/assets/ui/mk-0000_mouse-click.wav", "start": 0.180, "end": 0.230, "mono": true, "eq": {"hp": 400}, "norm_peak_db": -15, "fade_in": 0.002, "fade_out": 0.008},
+  "kb.space": {"file": "audio/assets/keyboard/fs-000001_mech-spacebar.ogg", "start": 0.48, "end": 0.78, "mono": true, "eq": {"hp": 90, "highshelf": [5000, -3]}, "norm_peak_db": -10, "fade_out": 0.08},
+  "mo.whoosh": {"_doc": "a real swish (stick / cloth / bamboo past the mic); placed by its peak on the move's velocity peak", "file": "audio/assets/motion/fs-000002_stick-swish.ogg", "start": 0.0, "end": 0.55, "eq": {"hp": 150, "lp": 12000}, "norm_peak_db": -6, "fade_in": 0.01, "fade_out": 0.12},
+  "mo.whoosh.tail": {"file": "audio/assets/motion/fs-000002_stick-swish.ogg", "start": 0.05, "end": 0.55, "pitch": -3, "eq": {"hp": 120, "lp": 6000}, "norm_peak_db": -8, "fade_in": 0.02, "fade_out": 0.2},
+  "fx.pop": {"file": "audio/assets/ui/fs-000003_cork-pop.ogg", "start": 0.02, "end": 0.20, "mono": true, "eq": {"hp": 250, "peq": [[3200, 1.2, -2]]}, "norm_peak_db": -10, "fade_out": 0.04},
+  "fx.riser": {"_doc": "a real cymbal roll / orchestral swell; aligned by its END so it stops on the reveal", "file": "audio/assets/motion/fs-000004_cymbal-roll.ogg", "start": 0.3, "end": 2.3, "eq": {"hp": 200}, "norm_peak_db": -9, "fade_in": 0.6, "fade_out": 0.03, "env": [[0, -12], [1.5, -2], [2.0, 0]]},
+  "fx.hit": {"file": "audio/assets/impacts/mk-0005_deep-drum-impact.wav", "start": 0.0, "end": 1.6, "eq": {"hp": 30, "peq": [[300, 1.0, -3]]}, "norm_peak_db": -4, "fade_out": 0.4},
+  "fx.hit.top": {"file": "audio/assets/impacts/fs-000006_wood-slam.ogg", "start": 0.01, "end": 0.35, "mono": true, "eq": {"hp": 500}, "norm_peak_db": -10, "fade_out": 0.08},
+  "logo.chime": {"_doc": "the sting: one soft real bell / celesta note, in the music's key (resample with pitch to tune, within +-2 st)", "file": "audio/assets/magic/fs-000007_celesta-E5.ogg", "start": 0.0, "end": 2.4, "pitch": 0.0, "norm_peak_db": -9, "fade_out": 0.9},
+  "logo.air": {"file": "audio/assets/motion/fs-000002_stick-swish.ogg", "start": 0.0, "end": 0.5, "glide": [2, -1], "eq": {"hp": 300, "lp": 9000}, "norm_peak_db": -14, "fade_in": 0.05, "fade_out": 0.25}
+ },
+
+ "slices": {
+  "kb.type": {"_doc": "one recording of a mechanical keyboard typing, cut at its onsets into single keys: kb.type#0, kb.type#1 ... (check them with --dump)", "file": "audio/assets/keyboard/fs-000008_mech-typing.ogg", "start": 0.5, "end": 9.0, "pre": 0.004, "len": 0.14, "min_gap": 0.07, "gate_db": -15, "mono": true, "eq": {"hp": 110, "highshelf": [5000, -4]}, "norm_peak_db": -12, "fade_out": 0.03, "max": 16}
+ },
+
+ "pools": {
+  "ui.press": ["ui.press"],
+  "ui.release": ["ui.release"],
+  "kb.type": ["kb.type#*"],
+  "kb.space": ["kb.space"],
+  "mo.whoosh": ["mo.whoosh"],
+  "mo.whoosh.tail": ["mo.whoosh.tail"],
+  "fx.pop": ["fx.pop"],
+  "fx.riser": ["fx.riser"],
+  "fx.hit": ["fx.hit"],
+  "fx.hit.top": ["fx.hit.top"],
+  "logo.chime": ["logo.chime"]
+ },
+
+ "rules": [
+  {"name": "ui.click press", "match": {"kind": "click"}, "pool": "ui.press", "mode": "fixed", "gain_db": 0, "pan": 0, "align": "attack", "_doc": "one voice at one level for every click in the film"},
+  {"name": "ui.click release", "match": {"kind": "click"}, "pool": "ui.release", "mode": "fixed", "gain_db": -2, "pan": 0, "align": "attack", "offset": 0.085},
+  {"name": "kb.type", "match": {"kind": "key", "id": "^demo:type:key"}, "pool": "kb.type", "mode": "cycle", "gain_db": -2, "jitter_db": 1.5, "pitch": [-0.3, 0.3], "pan": 0, "align": "attack"},
+  {"name": "kb.space", "match": {"kind": "key", "id": "^demo:type:space"}, "pool": "kb.space", "mode": "fixed", "gain_db": -1, "pan": 0, "align": "attack"},
+  {"name": "mo.whoosh", "match": {"kind": "whoosh"}, "pool": "mo.whoosh", "mode": "fixed", "align": "peak", "gain_db": -6, "pan": "cue", "pan_scale": 0.8},
+  {"name": "mo.whoosh tail", "match": {"kind": "whoosh"}, "pool": "mo.whoosh.tail", "mode": "fixed", "align": "peak", "offset": 0.06, "gain_db": -12, "pan": "cue", "pan_scale": 0.5},
+  {"name": "fx.pops", "match": {"kind": "pop", "from": 5.0, "to": 7.0}, "pool": "fx.pop", "mode": "cycle", "gain_db": -4, "jitter_db": 1.0, "pitch": [-0.2, 0.2], "pitch_ramp": [0, 2], "gain_ramp": [-1, 1], "pan": "cue", "pan_scale": 0.3, "align": "attack"},
+  {"name": "fx.riser", "match": {"kind": "riser"}, "pool": "fx.riser", "mode": "fixed", "align": "end", "offset": -0.03, "gain_db": -6, "pan": 0, "_doc": "ends 30 ms before the reveal: a beat of air before the hit"},
+  {"name": "fx.hit", "match": {"kind": "hit", "id": "^demo:reveal$"}, "pool": "fx.hit", "mode": "fixed", "gain_db": -2, "pan": 0, "align": "attack"},
+  {"name": "fx.hit top", "match": {"kind": "hit", "id": "^demo:reveal$"}, "pool": "fx.hit.top", "mode": "fixed", "gain_db": -8, "pan": 0, "align": "attack", "offset": 0.004},
+  {"name": "logo.chime", "match": {"kind": "bell", "id": "^demo:lockup$"}, "pool": "logo.chime", "mode": "fixed", "gain_db": -3, "pan": 0, "align": "attack", "_doc": "on the frame the wordmark becomes readable (its settle), never later"}
+ ],
+
+ "place": [
+  {"sample": "logo.air", "at": 9.98, "align": "peak", "gain_db": -6, "pan": 0.0, "_doc": "a free placement (no cue event): a soft air lift that peaks just before the chime"}
+ ],
+
+ "ambience": [
+  {"name": "am.room", "_doc": "a quiet real room tone under the UI part; src_start..src_end is a clean window (no events), looped with a 1.5 s crossfade if needed", "file": "audio/assets/ambience/fs-000009_quiet-office-roomtone.ogg", "src_start": 5.0, "src_end": 45.0, "at": 0.0, "until": 8.2, "fade_in": 0.3, "fade_out": 0.4, "gain_db": -6, "width": 0.8, "eq": {"hp": 80, "lp": 12000}, "auto": [[0, 0], [7.5, 0], [8.0, -8]]}
+ ],
+
+ "music": {
+  "_doc": "one licensed track, edited at bar lines (arrange.py drafts the segments). src_* are ORIGINAL source seconds; 'at' is film time. 'at' can be nudged a few ms so the measured downbeat transient lands on the picture's downbeat.",
+  "file": "audio/assets/music/sb-0000_bright-launch-track.mp3",
+  "src_bpm": 120,
+  "target_bpm": 120,
+  "stretch": "none",
+  "gain_db": -4,
+  "eq": {"hp": 30},
+  "segments": [
+   {"label": "intro bars 1-4 (soft, no drums) under the UI", "src_from": 0.5, "src_to": 8.5, "at": 0.0, "fade_in": 0.15, "fade_out": 0.03},
+   {"label": "drop bars 17-18 on the hero reveal, ring out under the logo", "src_from": 32.5, "src_to": 36.5, "at": 8.0, "fade_in": 0.008, "fade_out": 0.06, "tail_fade": 1.2}
+  ]
+ },
+
+ "_buses_doc": "buses and master are read from the top-level design only. auto = [[film t, dB], ...] piecewise-linear fader rides: here the music dips 6 dB under the typing and comes back for the whoosh",
+ "buses": {
+  "music": {"gain_db": 0.0, "auto": [[0, 0], [1.9, 0], [2.0, -6], [3.6, -6], [3.8, 0], [12, 0]]},
+  "amb": {"gain_db": 0.0},
+  "sfx": {"gain_db": 0.0, "eq": {"hp": 40}}
+ },
+ "master": {"_doc": "read from the top-level design only. -14 LUFS for web/social; ceiling 0.77 linear (-2.3 dBFS): measure about -1 dBTP after AAC", "lufs": -14, "ceiling": 0.77, "no_glue": true}
+}

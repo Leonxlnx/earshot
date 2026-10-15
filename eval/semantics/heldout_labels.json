@@ -1,0 +1,26 @@
+{
+ "_doc": "Held-out library for earshot semantics: the 126 real recordings in <assets>/_rejected/<folder>/ (rejected by the Clawd project for quality, not for content). Labels were assigned from the folder and the file name ONLY, written on 2026-10-15 before any score on these files was computed; classes are those of queries.json. A file listed with [] has no matching class (counts only for its category). Files never used for choosing the vocabulary, templates, calibration or thresholds. The same lego file sits in foley/ and toy/: it is counted once, as toy (its manifest category).",
+ "classes": {
+  "fs-181801": ["wind_grass"], "fs-243781": ["rain"], "fs-333510": ["rain"], "fs-346533": ["meadow"], "fs-349044": ["meadow"],
+  "fs-360756": ["rain"], "fs-440807": ["meadow"], "fs-455828": ["room_tone"], "fs-456766": ["meadow"], "fs-511758": ["meadow"],
+  "fs-637808": ["room_tone"], "fs-639459": ["meadow", "wind_grass"], "fs-656629": ["room_tone"], "fs-669486": ["rain"],
+  "fs-751473": ["wind_grass"], "fs-847380": ["meadow", "wind_grass"], "fs-85145": ["rain"], "fs-869851": ["rain"],
+  "mk-2464": ["meadow"], "mk-2467": ["meadow"], "mk-2474": ["rain"],
+  "fs-151778": ["snap_lock"], "fs-162795": ["soft_landing"], "fs-162799": ["soft_landing"], "fs-203939": ["lego"],
+  "fs-253327": ["stretch_pop"], "fs-531501": ["tiny_steps"], "fs-704170": ["small_pop"],
+  "fs-445788": ["tree"], "fs-479160": [], "fs-530437": [], "fs-635012": ["tiny_crowd"], "fs-833834": [],
+  "fs-380144": ["spacebar"], "fs-391310": ["enter"], "fs-412923": ["key_thock"], "fs-450281": ["typing"], "fs-450282": ["typing"],
+  "fs-466049": ["spacebar"], "fs-499773": ["typing"], "fs-509171": ["key_thock"], "fs-546165": ["typing"],
+  "fs-561695": ["key_thock", "spacebar"], "fs-628325": ["typing"], "fs-660387": ["key_thock"], "fs-766628": ["key_thock"],
+  "fs-766629": ["key_thock"], "fs-766630": ["key_thock"], "fs-766633": ["key_thock"], "fs-813210": ["key_thock"],
+  "fs-813215": ["key_thock"], "fs-843786": ["spacebar"], "fs-868632": ["typing"],
+  "fs-175932": ["ting"], "fs-398496": ["ting"], "fs-447799": [], "mk-2936": ["ting"], "vsco-glock": ["chime_sweep"],
+  "fs-22036": ["plunge"], "fs-315931": ["plunge"], "fs-377829": ["big_whoosh"], "fs-394457": ["small_whoosh"],
+  "fs-416710": ["plunge"], "fs-428073": ["impact"], "fs-60013": ["small_whoosh"], "fs-67882": ["underwater"],
+  "mk-1304": ["plunge"], "mk-1461": ["small_whoosh"], "mk-1474": ["big_whoosh"], "mk-166": ["small_whoosh"],
+  "mk-2604": ["big_whoosh"], "mk-2605": ["small_whoosh"], "mk-2607": ["small_whoosh"],
+  "fs-128192": ["snap_lock"], "fs-402758": ["lego"], "fs-584215": ["latch"], "fs-686167": ["snap_lock"],
+  "fs-863290": ["lego"], "mk-2582": ["switch"]
+ },
+ "music_folder_class": "music"
+}

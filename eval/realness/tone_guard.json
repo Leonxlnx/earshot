@@ -1,0 +1,56 @@
+{
+ "sine_440hz_30s": {
+  "p_real_model_only": 0.478,
+  "p_real_with_rule": 0.03,
+  "windows": 8,
+  "rule_fired": 8
+ },
+ "real_recordings": {
+  "files": 345,
+  "audible_clips": 4741,
+  "rule_fired": 0,
+  "fired_on": [],
+  "closest": [
+   {
+    "file": "magic/fs-549899_small-wine-glass-tap.ogg",
+    "start": 0.0,
+    "tests_passed": 3,
+    "crest_db": 20.4,
+    "line_share": 0.99,
+    "tonal_frames": 1.0
+   },
+   {
+    "file": "_rejected/motion/fs-428073_sub-drop-smooth.ogg",
+    "start": 0.0,
+    "tests_passed": 2,
+    "crest_db": 5.5,
+    "line_share": 1.0,
+    "tonal_frames": 1.0
+   },
+   {
+    "file": "_rejected/music/sb-quirkylane_whimsical-winds.mp3",
+    "start": 16.0,
+    "tests_passed": 2,
+    "crest_db": 8.2,
+    "line_share": 0.95,
+    "tonal_frames": 0.99
+   },
+   {
+    "file": "_rejected/music/mk-506_little-bells.mp3",
+    "start": 0.0,
+    "tests_passed": 2,
+    "crest_db": 9.5,
+    "line_share": 0.99,
+    "tonal_frames": 1.0
+   },
+   {
+    "file": "_rejected/music/sb-quirkylane_whimsical-winds.mp3",
+    "start": 0.0,
+    "tests_passed": 2,
+    "crest_db": 9.9,
+    "line_share": 1.0,
+    "tonal_frames": 0.97
+   }
+  ]
+ }
+}

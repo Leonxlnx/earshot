@@ -1,0 +1,22 @@
+{
+ "_doc": "The film's soundtrack (real-sound skill): professional recordings only, credited in CREDITS.md. Built by <skill>/scripts/mix.py from this file and one fragment per category in audio/design/ (each designer owns one fragment; names are prefixed with the category). Keys starting with _ are comments. Reference: <skill>/references/design-format.md.",
+ "duration": 30.0,
+ "cues": "out/cues.json",
+ "include": [
+  "audio/design/music.json",
+  "audio/design/ambience.json",
+  "audio/design/ui.json",
+  "audio/design/keyboard.json",
+  "audio/design/motion.json",
+  "audio/design/impacts.json",
+  "audio/design/logo.json"
+ ],
+ "_buses_doc": "Fader rides that shape the arc (film seconds, dB). Write a reason for every ride here: e.g. the music dips 6 dB under the typing (2.0-3.6), comes back for the transition, lifts 1.5 dB into the drop, and resolves 3 dB down under the logo so the sting reads. Keep steps on a musical splice or under a transient.",
+ "buses": {
+  "music": {"gain_db": 0.0, "auto": [[0, 0], [1.9, 0], [2.0, -6], [3.6, -6], [3.8, 0], [14.9, 0], [15.0, 1.5], [24.0, 1.5], [26.0, -3], [30.0, -3]]},
+  "amb": {"gain_db": 0.0},
+  "sfx": {"gain_db": 0.0}
+ },
+ "_master_doc": "-14 LUFS integrated for web / social (YouTube, X, LinkedIn normalise to about -14). Ceiling 0.77 linear (-2.3 dBFS) leaves room for the AAC encode (measure about -1 dBTP after the mux). Lower the target to -15 / -16 only for a reason you write here (e.g. a dynamic orchestral track whose tutti the limiter would squash at -14).",
+ "master": {"lufs": -14, "ceiling": 0.77, "no_glue": true}
+}

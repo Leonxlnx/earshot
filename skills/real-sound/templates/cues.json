@@ -1,0 +1,29 @@
+{
+ "_doc": "The picture's cue file: the contract between picture and sound (Cinetic's scripts/export-cues.ts writes this exact format from the picture code; write it from the timeline for any other engine). f = absolute frame the sound belongs on (fractional is fine); kind = what happens (tick, tock, key, click, pop, snap, land, hit, drop, whoosh, riser, swell, suck, bell, or your own word); id = a stable label rules match with a regex ('act:thing:n'); weight 0..2 (1 = normal), pan -1..1 (the object's screen x), variant (key: word/space/return/back; land: light; click: confirm), dur in frames for whoosh / riser / swell. Optional: acts {name: {from, dur}} and cue {name: frame} (qa.py reports loudness per act). mix.py also accepts a list whose first element is this object. Sync points belong where the eye reads them: an impact on its contact frame, a pop-in at 50 % of its travel, a whoosh on the move's velocity peak, a riser on the frame of the hit it leads into, a logo sound on the frame the wordmark becomes readable.",
+ "fps": 60,
+ "bpm": 120,
+ "total": 720,
+ "acts": {"ui": {"from": 0, "dur": 240}, "cards": {"from": 240, "dur": 240}, "reveal": {"from": 480, "dur": 240}},
+ "cue": {"click": 60, "typeStart": 120, "transition": 240, "reveal": 480, "lockup": 600},
+ "events": [
+  {"f": 60, "kind": "click", "weight": 1, "pan": 0.2, "id": "demo:cursor:click"},
+  {"f": 120, "kind": "key", "weight": 0.6, "id": "demo:type:key:0", "variant": "word"},
+  {"f": 125, "kind": "key", "weight": 0.5, "id": "demo:type:key:1"},
+  {"f": 130, "kind": "key", "weight": 0.5, "id": "demo:type:key:2"},
+  {"f": 135, "kind": "key", "weight": 0.5, "id": "demo:type:key:3"},
+  {"f": 141, "kind": "key", "weight": 0.5, "id": "demo:type:space", "variant": "space"},
+  {"f": 146, "kind": "key", "weight": 0.6, "id": "demo:type:key:4", "variant": "word"},
+  {"f": 151, "kind": "key", "weight": 0.5, "id": "demo:type:key:5"},
+  {"f": 156, "kind": "key", "weight": 0.5, "id": "demo:type:key:6"},
+  {"f": 162, "kind": "key", "weight": 0.5, "id": "demo:type:key:7"},
+  {"f": 168, "kind": "key", "weight": 0.5, "id": "demo:type:key:8"},
+  {"f": 210, "kind": "click", "weight": 1, "pan": 0.35, "id": "demo:cursor:submit", "variant": "confirm"},
+  {"f": 240, "kind": "whoosh", "weight": 1, "pan": -0.6, "dur": 24, "apexFrac": 0.5, "id": "demo:transition"},
+  {"f": 330, "kind": "pop", "weight": 0.8, "pan": -0.4, "id": "demo:card:0"},
+  {"f": 345, "kind": "pop", "weight": 0.8, "pan": 0.0, "id": "demo:card:1"},
+  {"f": 360, "kind": "pop", "weight": 0.8, "pan": 0.4, "id": "demo:card:2"},
+  {"f": 480, "kind": "riser", "weight": 1, "dur": 120, "id": "demo:build"},
+  {"f": 480, "kind": "hit", "weight": 1.5, "id": "demo:reveal"},
+  {"f": 600, "kind": "bell", "weight": 0.7, "id": "demo:lockup"}
+ ]
+}

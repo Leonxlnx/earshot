@@ -1,0 +1,16 @@
+{
+ "torch": "2.14.1+cpu",
+ "cpu_capability": "AVX512",
+ "native_bf16": true,
+ "threads": 2,
+ "clips": 12,
+ "used": [
+  "fp32",
+  "bf16"
+ ],
+ "cosine_mean": 0.99975,
+ "cosine_min": 0.99925,
+ "s_per_window_fp32": 1.26,
+ "s_per_window_bf16": 0.904,
+ "speedup_bf16": 1.39
+}

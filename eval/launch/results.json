@@ -1,0 +1,702 @@
+{
+ "loo": [
+  {
+   "id": "ref_1",
+   "verdict": "close",
+   "score": 0.75,
+   "in_range": 17,
+   "scored": 22,
+   "critical": 0,
+   "major": 4,
+   "out": [
+    "true_peak high",
+    "lra low",
+    "first_sound_s high",
+    "end_silence_s high",
+    "side_to_mid_db low"
+   ],
+   "refs_basis_in_range": 16,
+   "refs_basis_scored": 20,
+   "in_sample_out": [
+    "true_peak high"
+   ]
+  },
+  {
+   "id": "ref_2",
+   "verdict": "launch-grade",
+   "score": 0.944,
+   "in_range": 21,
+   "scored": 22,
+   "critical": 0,
+   "major": 1,
+   "out": [
+    "true_peak high"
+   ],
+   "refs_basis_in_range": 20,
+   "refs_basis_scored": 20,
+   "in_sample_out": [
+    "true_peak high"
+   ]
+  },
+  {
+   "id": "ref_3",
+   "verdict": "close",
+   "score": 0.833,
+   "in_range": 17,
+   "scored": 22,
+   "critical": 0,
+   "major": 1,
+   "out": [
+    "true_peak high",
+    "end_lu low",
+    "band_sub low",
+    "band_lowmid high",
+    "band_air low"
+   ],
+   "refs_basis_in_range": 16,
+   "refs_basis_scored": 20,
+   "in_sample_out": [
+    "true_peak high"
+   ]
+  },
+  {
+   "id": "ref_4",
+   "verdict": "close",
+   "score": 0.889,
+   "in_range": 19,
+   "scored": 22,
+   "critical": 0,
+   "major": 1,
+   "out": [
+    "onset_rate high",
+    "intro_lu low",
+    "band_mid low"
+   ],
+   "refs_basis_in_range": 17,
+   "refs_basis_scored": 20,
+   "in_sample_out": []
+  },
+  {
+   "id": "ref_5",
+   "verdict": "needs work",
+   "score": 0.556,
+   "in_range": 14,
+   "scored": 22,
+   "critical": 2,
+   "major": 4,
+   "out": [
+    "lufs_i low",
+    "true_peak high",
+    "music_frac low",
+    "cuts_with_sound low",
+    "lra high",
+    "max_gap_s high",
+    "band_air high",
+    "side_to_mid_db high"
+   ],
+   "refs_basis_in_range": 14,
+   "refs_basis_scored": 20,
+   "in_sample_out": [
+    "lufs_i low",
+    "true_peak high"
+   ]
+  },
+  {
+   "id": "ref_6",
+   "verdict": "close",
+   "score": 0.857,
+   "in_range": 19,
+   "scored": 22,
+   "critical": 0,
+   "major": 2,
+   "out": [
+    "lufs_i low",
+    "true_peak high",
+    "intro_lu high"
+   ],
+   "refs_basis_in_range": 19,
+   "refs_basis_scored": 20,
+   "in_sample_out": [
+    "lufs_i low",
+    "true_peak high"
+   ]
+  },
+  {
+   "id": "ref_7",
+   "verdict": "close",
+   "score": 0.771,
+   "in_range": 18,
+   "scored": 22,
+   "critical": 0,
+   "major": 4,
+   "out": [
+    "lufs_i high",
+    "true_peak high",
+    "onset_rate low",
+    "hit_rate low"
+   ],
+   "refs_basis_in_range": 18,
+   "refs_basis_scored": 20,
+   "in_sample_out": [
+    "lufs_i high",
+    "true_peak high"
+   ]
+  }
+ ],
+ "per_metric": {
+  "lufs_i": {
+   "ok": 4,
+   "low": 2,
+   "high": 1,
+   "na": 0
+  },
+  "true_peak": {
+   "ok": 1,
+   "low": 0,
+   "high": 6,
+   "na": 0
+  },
+  "music_frac": {
+   "ok": 6,
+   "low": 1,
+   "high": 0,
+   "na": 0
+  },
+  "cuts_with_sound": {
+   "ok": 6,
+   "low": 1,
+   "high": 0,
+   "na": 0
+  },
+  "lra": {
+   "ok": 5,
+   "low": 1,
+   "high": 1,
+   "na": 0
+  },
+  "crest_lu": {
+   "ok": 7,
+   "low": 0,
+   "high": 0,
+   "na": 0
+  },
+  "first_sound_s": {
+   "ok": 6,
+   "low": 0,
+   "high": 1,
+   "na": 0
+  },
+  "end_silence_s": {
+   "ok": 6,
+   "low": 0,
+   "high": 1,
+   "na": 0
+  },
+  "max_gap_s": {
+   "ok": 6,
+   "low": 0,
+   "high": 1,
+   "na": 0
+  },
+  "final_lu": {
+   "ok": 7,
+   "low": 0,
+   "high": 0,
+   "na": 0
+  },
+  "onset_rate": {
+   "ok": 5,
+   "low": 1,
+   "high": 1,
+   "na": 0
+  },
+  "hit_rate": {
+   "ok": 6,
+   "low": 1,
+   "high": 0,
+   "na": 0
+  },
+  "intro_lu": {
+   "ok": 5,
+   "low": 1,
+   "high": 1,
+   "na": 0
+  },
+  "end_lu": {
+   "ok": 6,
+   "low": 1,
+   "high": 0,
+   "na": 0
+  },
+  "fade_s": {
+   "ok": 7,
+   "low": 0,
+   "high": 0,
+   "na": 0
+  },
+  "band_sub": {
+   "ok": 6,
+   "low": 1,
+   "high": 0,
+   "na": 0
+  },
+  "band_low": {
+   "ok": 7,
+   "low": 0,
+   "high": 0,
+   "na": 0
+  },
+  "band_lowmid": {
+   "ok": 6,
+   "low": 0,
+   "high": 1,
+   "na": 0
+  },
+  "band_mid": {
+   "ok": 6,
+   "low": 1,
+   "high": 0,
+   "na": 0
+  },
+  "band_presence": {
+   "ok": 7,
+   "low": 0,
+   "high": 0,
+   "na": 0
+  },
+  "band_air": {
+   "ok": 5,
+   "low": 1,
+   "high": 1,
+   "na": 0
+  },
+  "side_to_mid_db": {
+   "ok": 5,
+   "low": 1,
+   "high": 1,
+   "na": 0
+  }
+ },
+ "clawd": {
+  "clawd_real": {
+   "style": "Clawd short film with its real-recordings soundtrack (licensed music, foley, ambience)",
+   "verdict": "close",
+   "score": 0.897,
+   "in_range": 21,
+   "scored": 23,
+   "critical": 0,
+   "major": 2,
+   "actions": [
+    {
+     "weight": "major",
+     "metric": "first_sound_s",
+     "action": "nothing reaches body level until 0:01.01 (before that the sound sits around -42 LUFS, 27 LU under the body; refs 0.04 s .. 0.48 s): raise the opening or start the music at 0:00"
+    },
+    {
+     "weight": "major",
+     "metric": "crest_lu",
+     "action": "the loudest 3 s (around 0:41.50, -10.4 LUFS) stand 4.6 LU above the integrated level (refs 1.1 LU .. 3.5 LU): the rest of the film plays quiet next to it; lift the body (quietest stretch 0:06.20-0:09.20 at -24.5 LUFS short-term) or tame that peak"
+    }
+   ],
+   "tips": [
+    "5 of 26 visual events get no sound at all (no onset within 100 ms, no whoosh / riser peak within 300 ms, no level peak within 150 ms; the matcher earshot timeline uses): 0:00.30, 0:00.80, 0:01.30, 0:30.00, 0:51.85; give the ones that matter a whoosh into the cut, a hit or a UI click, or keep one as a deliberate stop-down",
+    "no stop-downs: 4 of 7 references drop the sound out for 0.2-1 s right before a big hit; try one before the biggest visual change at 0:20.00"
+   ],
+   "status": {
+    "lufs_i": [
+     -15.0,
+     "ok"
+    ],
+    "true_peak": [
+     -1.4,
+     "ok"
+    ],
+    "p_real": [
+     0.942,
+     "ok"
+    ],
+    "music_frac": [
+     1.0,
+     "ok"
+    ],
+    "cuts_with_sound": [
+     0.62,
+     "ok"
+    ],
+    "lra": [
+     10.4,
+     "ok"
+    ],
+    "crest_lu": [
+     4.6,
+     "high"
+    ],
+    "first_sound_s": [
+     1.01,
+     "high"
+    ],
+    "end_silence_s": [
+     0.09,
+     "ok"
+    ],
+    "max_gap_s": [
+     0.0,
+     "ok"
+    ],
+    "final_lu": [
+     0.3,
+     "ok"
+    ],
+    "onset_rate": [
+     2.48,
+     "ok"
+    ],
+    "hit_rate": [
+     0.27,
+     "ok"
+    ],
+    "intro_lu": [
+     -7.3,
+     "ok"
+    ],
+    "end_lu": [
+     -1.7,
+     "ok"
+    ],
+    "fade_s": [
+     0.23,
+     "ok"
+    ],
+    "band_sub": [
+     -13.8,
+     "ok"
+    ],
+    "band_low": [
+     -3.8,
+     "ok"
+    ],
+    "band_lowmid": [
+     -3.9,
+     "ok"
+    ],
+    "band_mid": [
+     -9.5,
+     "ok"
+    ],
+    "band_presence": [
+     -18.7,
+     "ok"
+    ],
+    "band_air": [
+     -19.6,
+     "ok"
+    ],
+    "side_to_mid_db": [
+     -4.3,
+     "ok"
+    ],
+    "speech_frac": [
+     0.0,
+     "info"
+    ],
+    "tempo": [
+     120,
+     "info"
+    ],
+    "peak_pos": [
+     0.69,
+     "info"
+    ],
+    "tail_s": [
+     2.4,
+     "info"
+    ],
+    "stopdowns_min": [
+     0.0,
+     "info"
+    ],
+    "cut_rate": [
+     0.43,
+     "info"
+    ],
+    "cut_hit_frac": [
+     0.19,
+     "info"
+    ],
+    "cut_frame_sync": [
+     0.38,
+     "info"
+    ],
+    "cuts_on_beat": [
+     0.69,
+     "info"
+    ],
+    "brightness_hz": [
+     2088,
+     "info"
+    ],
+    "correlation": [
+     0.46,
+     "info"
+    ]
+   },
+   "realness": "Clawd_1080p60.mp4: real or pro-produced (p_real 0.94, mean of 15 4 s windows; file thresholds lo 0.4 / hi 0.77, weak calibration): 0 of 15 windows lean synthesized (p_real < 0.5); mean CLAP head score +2.9. No window leans synthesized (lowest p_real 0.76); that does not rule out a code-made layer under a louder real mix (most are missed): judge the source files and stems.",
+   "seconds_critique": 4.6
+  },
+  "clawd_synth": {
+   "style": "the same film with the retired code-synthesized soundtrack",
+   "verdict": "needs work",
+   "score": 0.795,
+   "in_range": 19,
+   "scored": 23,
+   "critical": 1,
+   "major": 2,
+   "actions": [
+    {
+     "weight": "critical",
+     "metric": "p_real",
+     "action": "realness: likely code-synthesized (p_real 0.33, at or below the model's 0.40 threshold); 4 s windows at or below the window threshold 0.17 (code-synthesized): 0:56.00-1:00.00 (0.05): replace oscillator / noise layers with real recordings and produced music (skills/real-sound has the sourcing and licence workflow); judge each stem with `earshot realness stem.wav` (a finished mix is harder to judge than its sources)"
+    },
+    {
+     "weight": "major",
+     "metric": "final_lu",
+     "action": "the final moment sits 7.5 LU below the body: end on a logo sting / hit at the last visual event (0:59.00) instead of fading away (refs -2.2 LU .. 5.6 LU)"
+    },
+    {
+     "weight": "major",
+     "metric": "onset_rate",
+     "action": "sparse: 2.1 onsets/s (refs 2.46 /s .. 8.22 /s): use music with more rhythmic drive, or add UI foley (clicks, typing, ticks) on the on-screen actions"
+    },
+    {
+     "weight": "minor",
+     "metric": "fade_s",
+     "action": "4.4 s fade-out (refs 0.08 s .. 2.54 s): end on a sting with a short ring-out, or cut hard on the last picture cut"
+    }
+   ],
+   "tips": [
+    "8 of 26 visual events get no sound at all (no onset within 100 ms, no whoosh / riser peak within 300 ms, no level peak within 150 ms; the matcher earshot timeline uses): 0:00.80, 0:01.30, 0:28.33, 0:28.98, 0:30.00, 0:33.00, 0:40.88, 0:51.85; give the ones that matter a whoosh into the cut, a hit or a UI click, or keep one as a deliberate stop-down"
+   ],
+   "status": {
+    "lufs_i": [
+     -14.0,
+     "ok"
+    ],
+    "true_peak": [
+     -2.1,
+     "ok"
+    ],
+    "p_real": [
+     0.327,
+     "low"
+    ],
+    "music_frac": [
+     1.0,
+     "ok"
+    ],
+    "cuts_with_sound": [
+     0.54,
+     "ok"
+    ],
+    "lra": [
+     7.2,
+     "ok"
+    ],
+    "crest_lu": [
+     3.3,
+     "ok"
+    ],
+    "first_sound_s": [
+     0.0,
+     "ok"
+    ],
+    "end_silence_s": [
+     0.51,
+     "ok"
+    ],
+    "max_gap_s": [
+     0.04,
+     "ok"
+    ],
+    "final_lu": [
+     -7.5,
+     "low"
+    ],
+    "onset_rate": [
+     2.1,
+     "low"
+    ],
+    "hit_rate": [
+     0.38,
+     "ok"
+    ],
+    "intro_lu": [
+     -4.7,
+     "ok"
+    ],
+    "end_lu": [
+     -7.4,
+     "ok"
+    ],
+    "fade_s": [
+     4.4,
+     "high"
+    ],
+    "band_sub": [
+     -3.1,
+     "ok"
+    ],
+    "band_low": [
+     -5.0,
+     "ok"
+    ],
+    "band_lowmid": [
+     -8.4,
+     "ok"
+    ],
+    "band_mid": [
+     -13.7,
+     "ok"
+    ],
+    "band_presence": [
+     -23.4,
+     "ok"
+    ],
+    "band_air": [
+     -29.3,
+     "ok"
+    ],
+    "side_to_mid_db": [
+     -12.2,
+     "ok"
+    ],
+    "speech_frac": [
+     0.0,
+     "info"
+    ],
+    "tempo": [
+     120,
+     "info"
+    ],
+    "peak_pos": [
+     0.77,
+     "info"
+    ],
+    "tail_s": [
+     1.47,
+     "info"
+    ],
+    "stopdowns_min": [
+     1.0,
+     "info"
+    ],
+    "cut_rate": [
+     0.43,
+     "info"
+    ],
+    "cut_hit_frac": [
+     0.23,
+     "info"
+    ],
+    "cut_frame_sync": [
+     0.31,
+     "info"
+    ],
+    "cuts_on_beat": [
+     0.62,
+     "info"
+    ],
+    "brightness_hz": [
+     1756,
+     "info"
+    ],
+    "correlation": [
+     0.89,
+     "info"
+    ]
+   },
+   "realness": "Clawd_1080p60_synth-audio.mp4: likely code-synthesized (p_real 0.33, mean of 15 4 s windows; file thresholds lo 0.4 / hi 0.77, weak calibration): 14 of 15 windows lean synthesized (p_real < 0.5); mean CLAP head score -0.5. Leaning synthesized: 0:00.00-0:48.00, 0:52.00-1:00.00; 1 at or below the 4 s-window threshold 0.17 (code-synthesized): 0:56.00-1:00.00.",
+   "seconds_critique": 4.6
+  }
+ },
+ "detector": [
+  {
+   "id": "ref_1",
+   "scene_cuts": 0,
+   "visual_events": 28,
+   "same_as_first_build": true
+  },
+  {
+   "id": "ref_2",
+   "scene_cuts": 2,
+   "visual_events": 9,
+   "same_as_first_build": true
+  },
+  {
+   "id": "ref_3",
+   "scene_cuts": 15,
+   "visual_events": 17,
+   "recall_of_scene_cuts": 1.0,
+   "same_as_first_build": true
+  },
+  {
+   "id": "ref_4",
+   "scene_cuts": 17,
+   "visual_events": 42,
+   "recall_of_scene_cuts": 0.82,
+   "same_as_first_build": true
+  },
+  {
+   "id": "ref_5",
+   "scene_cuts": 2,
+   "visual_events": 16,
+   "same_as_first_build": true
+  },
+  {
+   "id": "ref_6",
+   "scene_cuts": 11,
+   "visual_events": 31,
+   "recall_of_scene_cuts": 1.0,
+   "same_as_first_build": true
+  },
+  {
+   "id": "ref_7",
+   "scene_cuts": 40,
+   "visual_events": 67,
+   "recall_of_scene_cuts": 0.8,
+   "same_as_first_build": true
+  },
+  {
+   "id": "clawd_real",
+   "scene_cuts": 10,
+   "visual_events": 26,
+   "recall_of_scene_cuts": 1.0,
+   "same_as_first_build": true
+  },
+  {
+   "id": "clawd_synth",
+   "scene_cuts": 10,
+   "visual_events": 26,
+   "recall_of_scene_cuts": 1.0,
+   "same_as_first_build": true
+  }
+ ],
+ "hit_timing": {
+  "placements": 264,
+  "hits": 16,
+  "onsets": 149,
+  "hit_offset_median_ms": 1.0,
+  "hits_within_2ms": 11,
+  "hit_precision_20ms": 0.75,
+  "hit_chance_20ms": 0.1,
+  "onset_precision_20ms": 0.61,
+  "placement_recall_20ms": 0.62,
+  "hit_precision_50ms": 0.88,
+  "hit_chance_50ms": 0.25,
+  "onset_precision_50ms": 0.75,
+  "placement_recall_50ms": 0.78,
+  "hit_precision_100ms": 0.88,
+  "hit_chance_100ms": 0.39,
+  "onset_precision_100ms": 0.79,
+  "placement_recall_100ms": 0.83
+ }
+}

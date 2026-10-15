@@ -1,0 +1,826 @@
+{
+ "detect": {
+  "n_truth_onsets": 147,
+  "n_detections": 270,
+  "detect_seconds": 3.27,
+  "recall_all": 0.932,
+  "recall_loud_snr_ge0": 0.964,
+  "n_loud": 83,
+  "recall_quiet_snr_lt0": 0.891,
+  "n_quiet": 64,
+  "recall_by_snr": {
+   "snr>=+6": [
+    0.964,
+    56
+   ],
+   "0..+6": [
+    0.963,
+    27
+   ],
+   "-6..0": [
+    0.979,
+    47
+   ],
+   "<-6": [
+    0.647,
+    17
+   ]
+  },
+  "recall_sfx_stem_alone": 0.952,
+  "precision_vs_placements": 0.507,
+  "precision_incl_music_amb_onsets": 0.811,
+  "extra_onsets_inside_sfx_samples": 39,
+  "precision_incl_all_real_onsets": 0.956,
+  "unexplained_detections": 12,
+  "timing_error_ms": {
+   "median": 0.0,
+   "median_abs": 0.5,
+   "p90_abs": 11.0
+  },
+  "peak_aligned_whoosh_swell": {
+   "n": 14,
+   "found_within_120ms": 9
+  },
+  "missed_loud_examples": [
+   28.05,
+   35.467
+  ],
+  "_run_s": 11.9
+ },
+ "tags": {
+  "keyboard": {
+   "n": 40,
+   "mix_shipped": {
+    "top1_strict": 0.575,
+    "top1_lenient": 0.925,
+    "top3_strict": 0.725,
+    "labels": {
+     "spacebar press": 21,
+     "chat message pop": 11,
+     "toggle switch click": 2,
+     "glockenspiel note": 2,
+     "wooden block hit": 1
+    }
+   },
+   "mix_first_build": {
+    "top1_strict": 0.6,
+    "top1_lenient": 0.975,
+    "top3_strict": 0.8,
+    "labels": {
+     "spacebar press": 22,
+     "chat message pop": 14,
+     "laptop key click": 2,
+     "wooden block hit": 1,
+     "toggle switch click": 1
+    }
+   },
+   "sfx_stem_shipped": {
+    "top1_strict": 0.625,
+    "top1_lenient": 0.65,
+    "top3_strict": 0.825,
+    "labels": {
+     "mechanical keyboard key press": 19,
+     "celesta note": 7,
+     "wooden block hit": 5,
+     "spacebar press": 3,
+     "laptop key click": 3
+    }
+   },
+   "sfx_stem_first_build": {
+    "top1_strict": 0.675,
+    "top1_lenient": 0.725,
+    "top3_strict": 0.925,
+    "labels": {
+     "mechanical keyboard key press": 12,
+     "spacebar press": 11,
+     "wooden block hit": 5,
+     "laptop key click": 4,
+     "celesta note": 4
+    }
+   }
+  },
+  "whoosh": {
+   "n": 9,
+   "mix_shipped": {
+    "top1_strict": 0.556,
+    "top1_lenient": 0.556,
+    "top3_strict": 0.778,
+    "labels": {
+     "uplifter sweep": 3,
+     "water drop": 2,
+     "breath": 1,
+     "swoosh passing by": 1,
+     "whip pan whoosh transition": 1
+    }
+   },
+   "mix_first_build": {
+    "top1_strict": 0.111,
+    "top1_lenient": 0.111,
+    "top3_strict": 0.667,
+    "labels": {
+     "orchestral stab": 3,
+     "water drop": 2,
+     "kick drum": 1,
+     "breath": 1,
+     "chat message pop": 1
+    }
+   },
+   "sfx_stem_shipped": {
+    "top1_strict": 0.778,
+    "top1_lenient": 0.778,
+    "top3_strict": 0.889,
+    "labels": {
+     "fast air whoosh": 3,
+     "whip pan whoosh transition": 2,
+     "uplifter sweep": 2,
+     "bubble pop": 1,
+     "water drop": 1
+    }
+   },
+   "sfx_stem_first_build": {
+    "top1_strict": 0.778,
+    "top1_lenient": 0.778,
+    "top3_strict": 0.889,
+    "labels": {
+     "whip pan whoosh transition": 3,
+     "fast air whoosh": 2,
+     "uplifter sweep": 2,
+     "bubble pop": 1,
+     "water drop": 1
+    }
+   }
+  },
+  "grass_steps": {
+   "n": 21,
+   "mix_shipped": {
+    "top1_strict": 0.0,
+    "top1_lenient": 0.0,
+    "top3_strict": 0.0,
+    "labels": {
+     "snare drum hit": 6,
+     "spacebar press": 5,
+     "hi-hat": 3,
+     "orchestral stab": 3,
+     "rising riser building tension": 3
+    }
+   },
+   "mix_first_build": {
+    "top1_strict": 0.0,
+    "top1_lenient": 0.0,
+    "top3_strict": 0.0,
+    "labels": {
+     "chat message pop": 7,
+     "spacebar press": 7,
+     "hi-hat": 3,
+     "orchestral stab": 3,
+     "snare drum hit": 1
+    }
+   },
+   "sfx_stem_shipped": {
+    "top1_strict": 0.0,
+    "top1_lenient": 0.048,
+    "top3_strict": 0.333,
+    "labels": {
+     "hi-hat": 19,
+     "wooden block hit": 1,
+     "short swish": 1
+    }
+   },
+   "sfx_stem_first_build": {
+    "top1_strict": 0.0,
+    "top1_lenient": 0.0,
+    "top3_strict": 0.095,
+    "labels": {
+     "hi-hat": 19,
+     "chat message pop": 2
+    }
+   }
+  },
+  "keyboard_without_celesta_layer": {
+   "n": 27,
+   "mix_shipped": {
+    "top1_strict": 0.815,
+    "top1_lenient": 0.963,
+    "top3_strict": 0.926,
+    "labels": {
+     "spacebar press": 21,
+     "toggle switch click": 2,
+     "chat message pop": 2,
+     "wooden block hit": 1,
+     "mechanical keyboard key press": 1
+    }
+   },
+   "mix_first_build": {
+    "top1_strict": 0.852,
+    "top1_lenient": 0.963,
+    "top3_strict": 0.963,
+    "labels": {
+     "spacebar press": 22,
+     "chat message pop": 2,
+     "wooden block hit": 1,
+     "toggle switch click": 1,
+     "laptop key click": 1
+    }
+   },
+   "sfx_stem_shipped": {
+    "top1_strict": 0.815,
+    "top1_lenient": 0.815,
+    "top3_strict": 0.963,
+    "labels": {
+     "mechanical keyboard key press": 18,
+     "wooden block hit": 5,
+     "spacebar press": 3,
+     "laptop key click": 1
+    }
+   },
+   "sfx_stem_first_build": {
+    "top1_strict": 0.815,
+    "top1_lenient": 0.815,
+    "top3_strict": 0.963,
+    "labels": {
+     "spacebar press": 11,
+     "mechanical keyboard key press": 10,
+     "wooden block hit": 5,
+     "laptop key click": 1
+    }
+   }
+  },
+  "amb_stem_shipped": {
+   "tagged": 20,
+   "key_or_ui": 0.35,
+   "kinds": {
+    "KEY": 6,
+    "FOLEY": 6,
+    "WHOOSH": 2,
+    "VOICE": 2,
+    "NOTE": 1,
+    "UI": 1,
+    "DRUM": 1,
+    "HIT": 1
+   },
+   "labels": {
+    "spacebar press": 4,
+    "small object dropping on a table": 3,
+    "short swish": 2,
+    "breath": 2
+   }
+  },
+  "amb_stem_first_build": {
+   "tagged": 20,
+   "key_or_ui": 0.7,
+   "kinds": {
+    "KEY": 10,
+    "UI": 4,
+    "FOLEY": 4,
+    "WHOOSH": 1,
+    "VOICE": 1
+   },
+   "labels": {
+    "spacebar press": 10,
+    "chat message pop": 3,
+    "leaves rustling": 2,
+    "small object dropping on a table": 2
+   }
+  },
+  "music_stem_shipped": {
+   "tagged": 20,
+   "key_or_ui": 0.05,
+   "kinds": {
+    "NOTE": 15,
+    "RISER": 2,
+    "VOICE": 2,
+    "UI": 1
+   },
+   "labels": {
+    "orchestral stab": 15,
+    "rising riser building tension": 2,
+    "short vocal sound": 2,
+    "chat message pop": 1
+   }
+  },
+  "music_stem_first_build": {
+   "tagged": 20,
+   "key_or_ui": 0.15,
+   "kinds": {
+    "NOTE": 16,
+    "UI": 3,
+    "RISER": 1
+   },
+   "labels": {
+    "orchestral stab": 16,
+    "chat message pop": 3,
+    "rising riser building tension": 1
+   }
+  },
+  "_run_s": 41.6
+ },
+ "sync": {
+  "cues": {
+   "n": 153,
+   "hit_within_1_frame": 0.889,
+   "hit_within_100ms": 0.967,
+   "median_abs_offset_ms": 0.5,
+   "answered_by_swell": 0,
+   "answered_by_level_peak": 3,
+   "no_sound": [
+    28.858,
+    50.5
+   ],
+   "frame_ms": 16.7,
+   "chance_within_1_frame": 0.152,
+   "chance_within_100ms": 0.608,
+   "accent_min_db": 8.2,
+   "accent_within_1_frame": 0.301,
+   "accent_chance_within_1_frame": 0.031,
+   "accent_within_100ms": 0.327,
+   "accent_chance_within_100ms": 0.124,
+   "on_beat": 0.477,
+   "on_beat_chance": 0.2
+  },
+  "n_cues_scored": 140,
+  "peak_or_end_aligned_cues": [
+   {
+    "t": 6.0,
+    "kind": "swell",
+    "status": "OK"
+   },
+   {
+    "t": 11.5,
+    "kind": "riser",
+    "status": "OK"
+   },
+   {
+    "t": 12.0,
+    "kind": "whoosh",
+    "status": "OK"
+   },
+   {
+    "t": 17.746,
+    "kind": "whoosh",
+    "status": "near"
+   },
+   {
+    "t": 27.5,
+    "kind": "whoosh",
+    "status": "near"
+   },
+   {
+    "t": 28.858,
+    "kind": "whoosh",
+    "status": "off"
+   },
+   {
+    "t": 39.75,
+    "kind": "riser",
+    "status": "peak"
+   },
+   {
+    "t": 48.0,
+    "kind": "pop",
+    "status": "OK"
+   },
+   {
+    "t": 50.5,
+    "kind": "whoosh",
+    "status": "no sound"
+   },
+   {
+    "t": 50.99,
+    "kind": "whoosh",
+    "status": "peak"
+   },
+   {
+    "t": 53.9,
+    "kind": "swell",
+    "status": "near"
+   }
+  ],
+  "without_a_hit_vs_truth_all_cues": {
+   "reported_without_a_hit": 2,
+   "of_them_truly_unsounded": 0,
+   "truly_unsounded": 2,
+   "sounded_reported_without_a_hit": 2,
+   "reported_level_peak_only": 3,
+   "level_peak_only_truly_unsounded": 1
+  },
+  "offset_error_ms": {
+   "within_5ms": 0.843,
+   "within_1_frame_16.7ms": 0.957,
+   "within_40ms": 0.986,
+   "median_abs": 0.0,
+   "p90_abs": 7.1
+  },
+  "sounded_cues_reported_without_sound": 0,
+  "truly_unsounded_cues": [
+   {
+    "t": 40.48,
+    "id": "swarm:hero:dodge",
+    "truth": "unsounded",
+    "status": "near"
+   },
+   {
+    "t": 48.12,
+    "id": "swarm:hero:cheer:done",
+    "truth": "unsounded",
+    "status": "peak"
+   }
+  ],
+  "beat_grid": {
+   "tempo": 120.0,
+   "confidence": "clear",
+   "pulse_clarity": 0.483,
+   "n_beats_0_52s": 105,
+   "beats_within_40ms_of_0.5s_grid": 0.876,
+   "downbeats_on_even_seconds_60ms": 0.923
+  },
+  "sections": {
+   "true_boundaries": [
+    10.5,
+    12.0,
+    28.0,
+    40.0,
+    51.0,
+    52.2
+   ],
+   "detected": [
+    10.75,
+    28.65,
+    40.0,
+    55.2
+   ],
+   "matched_within_1.5s": 3,
+   "labels": [
+    "0.0-10.75: glitch hop music?, glockenspiel",
+    "10.75-28.65: lo-fi hip hop beat?, glockenspiel | also: raindrop, rain on surface, rain (AST)",
+    "28.65-40.0: glitch hop music, orchestral percussion | also: crow, bird, caw (AST)",
+    "40.0-55.2: inspirational corporate background music, orchestral percussion, aggressive",
+    "55.2-60.0: inspirational corporate background music?, glockenspiel, suspenseful build-up"
+   ]
+  },
+  "summary": "soundtrack.wav: 0:00.00-1:00.00 (60.0 s). Loudness -15.0 LUFS integrated, true peak -1.6 dBTP, LRA 10.4 LU; loudest 0:40.00-0:43.00 (-10.3 LUFS short-term). Quiet lead-in 2.0 s (drop). Beat grid: ~120 BPM (clear pulse, clarity 0.48, 120 beats). 5 section(s): 0:00.00-0:10.75 glitch hop music?, glockenspiel; 0:10.75-0:28.65 lo-fi hip hop beat?, glockenspiel | also: raindrop, rain on surface, rain (AST); 0:28.65-0:40.00 glitch hop music, orchestral percussion | also: crow, bird, caw (AST); 0:40.00-0:55.20 inspirational corporate background music, orchestral percussion, aggressive; 0:55.20-1:00.00 inspirational corporate background music?, glockenspiel, suspenseful build-up. 274 events (4.6/s); 20 tagged (8 key, 5 ui, 4 note, 3 foley; tags are hints). Strongest accents over a running bed: 0:02.06 +28 dB (spacebar press), 0:00.01 +26 dB (wooden block hit), 0:02.88 +22 dB (spacebar press). Sync to 153 cues: 89% have an onset within 1 frame (chance 15%), 97% within 100 ms, median |offset| 0 ms; 30% land on a strong accent (>= 8 dB over the bed) within 1 frame (chance 3%); 48% on the beat grid (chance 20%); 3 only by a level peak (soft whoosh / swell?); 2 without a hit: 0:28.86, 0:50.50.",
+  "timing_s": {
+   "decode_s": 0.03,
+   "loudness_s": 4.76,
+   "events_s": 3.71,
+   "beats_s": 2.24,
+   "cuts_s": 0.0,
+   "tag_events_s": 2.52,
+   "sections_s": 0.99,
+   "total_s": 14.26
+  },
+  "model_calls": {
+   "clap_event_windows": 20,
+   "ast_event_windows": 1,
+   "clap_section_windows": 30,
+   "ast_section_windows": 3
+  },
+  "wall_s": 14.5,
+  "_run_s": 14.5
+ },
+ "film": {
+  "cuts": [
+   0.3,
+   0.5,
+   0.8,
+   1.0,
+   1.3,
+   1.5,
+   8.0,
+   9.0,
+   10.5,
+   10.767,
+   11.5,
+   17.5,
+   18.033,
+   20.0,
+   24.0,
+   28.333,
+   28.983,
+   30.0,
+   33.0,
+   36.0,
+   40.883,
+   42.0,
+   43.0,
+   48.0,
+   51.85,
+   59.0
+  ],
+  "act_changes": [
+   8.0,
+   14.0,
+   28.0,
+   40.0,
+   52.0
+  ],
+  "act_changes_found_100ms": 1,
+  "cut_sync": {
+   "n": 26,
+   "hit_within_1_frame": 0.462,
+   "hit_within_100ms": 0.808,
+   "median_abs_offset_ms": 18.0,
+   "answered_by_swell": 0,
+   "answered_by_level_peak": 0,
+   "no_sound": [
+    0.3,
+    0.8,
+    1.3,
+    30.0,
+    51.85
+   ],
+   "frame_ms": 16.7,
+   "chance_within_1_frame": 0.151,
+   "chance_within_100ms": 0.604,
+   "accent_min_db": 8.2,
+   "accent_within_1_frame": 0.269,
+   "accent_chance_within_1_frame": 0.03,
+   "accent_within_100ms": 0.346,
+   "accent_chance_within_100ms": 0.12,
+   "on_beat": 0.654,
+   "on_beat_chance": 0.2
+  },
+  "cue_sync": {
+   "n": 153,
+   "hit_within_1_frame": 0.863,
+   "hit_within_100ms": 0.967,
+   "median_abs_offset_ms": 0.5,
+   "answered_by_swell": 0,
+   "answered_by_level_peak": 4,
+   "no_sound": [
+    50.5
+   ],
+   "frame_ms": 16.7,
+   "chance_within_1_frame": 0.152,
+   "chance_within_100ms": 0.606,
+   "accent_min_db": 8.2,
+   "accent_within_1_frame": 0.275,
+   "accent_chance_within_1_frame": 0.03,
+   "accent_within_100ms": 0.314,
+   "accent_chance_within_100ms": 0.12,
+   "on_beat": 0.477,
+   "on_beat_chance": 0.2
+  },
+  "summary": "Clawd_1080p60.mp4: 0:00.00-1:00.01 (60.0 s). Loudness -15.0 LUFS integrated, true peak -1.4 dBTP, LRA 10.4 LU; loudest 0:40.00-0:43.00 (-10.4 LUFS short-term). Quiet lead-in 2.0 s (drop). Beat grid: ~120 BPM (clear pulse, clarity 0.48, 121 beats). 5 section(s): 0:00.00-0:10.75 glitch hop music?, glockenspiel; 0:10.75-0:28.65 lo-fi hip hop beat?, glockenspiel | also: raindrop, rain on surface, rain (AST); 0:28.65-0:40.00 glitch hop music, orchestral percussion, futuristic | also: crow, bird, caw (AST); 0:40.00-0:55.20 inspirational corporate background music, orchestral percussion, aggressive; 0:55.20-1:00.01 inspirational corporate background music?, glockenspiel, suspenseful build-up. 272 events (4.5/s); 20 tagged (7 key, 5 note, 4 ui, 2 foley, 1 whoosh, 1 drum; tags are hints). Strongest accents over a running bed: 0:02.06 +28 dB (spacebar press), 0:00.01 +26 dB (wooden block hit), 0:02.88 +22 dB (spacebar press). Sync to 26 cuts: 46% have an onset within 1 frame (chance 15%), 81% within 100 ms, median |offset| 18 ms; 27% land on a strong accent (>= 8 dB over the bed) within 1 frame (chance 3%); 65% on the beat grid (chance 20%); 5 without a hit: 0:00.30, 0:00.80, 0:01.30, 0:30.00, 0:51.85. Sync to 153 cues: 86% have an onset within 1 frame (chance 15%), 97% within 100 ms, median |offset| 0 ms; 28% land on a strong accent (>= 8 dB over the bed) within 1 frame (chance 3%); 48% on the beat grid (chance 20%); 4 only by a level peak (soft whoosh / swell?); 1 without a hit: 0:50.50.",
+  "timing_s": {
+   "decode_s": 0.04,
+   "loudness_s": 3.34,
+   "events_s": 2.5,
+   "beats_s": 1.26,
+   "cuts_s": 0.17,
+   "tag_events_s": 25.37,
+   "sections_s": 1.67,
+   "total_s": 34.37
+  },
+  "wall_s": 34.6,
+  "sheet": "Wrote out/timeline/eval/clawd_film_sheet.png (2000x1331): 0:00.00-1:00.01, 7 frames, 16 of 20 tagged events labelled, 272 event ticks, 26 cut lines. Open it with an image viewer / Read tool.",
+  "zoom_sheet": "Wrote out/timeline/eval/clawd_zoom_14-24.png (2000x1331): 0:14.00-0:24.00, 7 frames, 18 of 20 tagged events labelled, 54 event ticks, 3 cut lines. Open it with an image viewer / Read tool.",
+  "_run_s": 62.8
+ },
+ "refs": {
+  "ref_1": {
+   "duration": 93.12,
+   "summary": "ref_1.mp4: 0:00.00-1:33.12 (93.1 s). Loudness -12.1 LUFS integrated, true peak 0.1 dBTP, LRA 1.7 LU; loudest 0:56.50-0:59.50 (-11.0 LUFS short-term). True peak 0.1 dBTP is above -1 dBTP (risk of overs after encoding). Quiet lead-in 0.6 s (drop) and tail 3.5 s (drop). No steady beat grid (pulse clarity 0.11 < 0.15). 2 section(s): 0:00.00-0:05.70 tech house music, vocal chop, confident and cool; 0:05.70-1:33.12 tech house music, bass guitar, confident and cool | voice: voice-over narration. 662 events (7.1/s); 20 tagged (9 voice, 3 hit, 3 ui, 3 key, 1 whoosh, 1 note; tags are hints). Strongest accents over a running bed: 1:21.32 +35 dB, 0:09.78 +31 dB, 0:26.28 +30 dB. Sync to 28 cuts: 71% have an onset within 1 frame (chance 60%), 96% within 100 ms, median |offset| 26 ms; 25% land on a strong accent (>= 9 dB over the bed) within 1 frame (chance 11%); 1 without a hit: 0:39.87.",
+   "n_events": 662,
+   "tagged": 20,
+   "key_or_ui": 0.3,
+   "most_common_tag": [
+    "spoken word",
+    6
+   ],
+   "kinds": {
+    "VOICE": 9,
+    "HIT": 3,
+    "UI": 3,
+    "KEY": 3,
+    "WHOOSH": 1,
+    "NOTE": 1
+   },
+   "cuts": 28,
+   "sections": [
+    "tech house music, vocal chop, confident and cool",
+    "tech house music, bass guitar, confident and cool | voice: voice-over narration"
+   ],
+   "cut_sync": {
+    "n": 28,
+    "hit_within_1_frame": 0.714,
+    "hit_within_100ms": 0.964,
+    "median_abs_offset_ms": 26.0,
+    "answered_by_swell": 0,
+    "answered_by_level_peak": 0,
+    "no_sound": [
+     39.873
+    ],
+    "frame_ms": 41.7,
+    "chance_within_1_frame": 0.597,
+    "chance_within_100ms": 0.934,
+    "accent_min_db": 9.4,
+    "accent_within_1_frame": 0.25,
+    "accent_chance_within_1_frame": 0.114,
+    "accent_within_100ms": 0.321,
+    "accent_chance_within_100ms": 0.233
+   },
+   "timing_s": {
+    "decode_s": 0.11,
+    "loudness_s": 5.32,
+    "events_s": 4.08,
+    "beats_s": 2.27,
+    "cuts_s": 0.15,
+    "tag_events_s": 24.14,
+    "sections_s": 3.06,
+    "total_s": 39.14
+   },
+   "wall_s": 39.4,
+   "sheet": "Wrote out/timeline/eval/ref_1_sheet.png (2000x1300): 0:00.00-1:33.12, 7 frames, 17 of 20 tagged events labelled, 662 event ticks, 28 cut lines. Open it with an image viewer / Read tool."
+  },
+  "ref_2": {
+   "duration": 28.909,
+   "summary": "ref_2.mp4: 0:00.00-0:28.91 (28.9 s). Loudness -14.8 LUFS integrated, true peak 1.0 dBTP, LRA 3.6 LU; loudest 0:20.50-0:23.50 (-12.4 LUFS short-term). CLIPPING: 1 runs of clipped samples (first at 0:04.94). No steady beat grid (pulse clarity 0.11 < 0.15). 3 section(s): 0:00.00-0:05.75 tech house music?, vocal chop | also: plop (AST) | voice: voice-over narration; 0:05.75-0:17.95 house music, vocal chop, confident and cool | also: new-age music, drip, ambient music (AST) | voice: voice-over narration; 0:17.95-0:28.91 techno music, vocal chop, confident and cool | also: spray (AST) | voice: voice-over narration. 209 events (7.2/s); 20 tagged (12 ui, 3 foley, 3 hit, 1 note, 1 drum; tags are hints). Strongest accents over a running bed: 0:00.25 +34 dB, 0:14.55 +28 dB (sub bass drop), 0:27.45 +20 dB (water drop). Sync to 9 cuts: 67% have an onset within 1 frame (chance 46%), 89% within 100 ms, median |offset| 26 ms; 22% land on a strong accent (>= 10 dB over the bed) within 1 frame (chance 9%); 1 met by a whoosh / riser peak.",
+   "n_events": 209,
+   "tagged": 20,
+   "key_or_ui": 0.6,
+   "most_common_tag": [
+    "chat message pop",
+    6
+   ],
+   "kinds": {
+    "UI": 12,
+    "FOLEY": 3,
+    "HIT": 3,
+    "NOTE": 1,
+    "DRUM": 1
+   },
+   "cuts": 9,
+   "sections": [
+    "tech house music?, vocal chop | also: plop (AST) | voice: voice-over narration",
+    "house music, vocal chop, confident and cool | also: new-age music, drip, ambient music (AST) | voice: voice-over narration",
+    "techno music, vocal chop, confident and cool | also: spray (AST) | voice: voice-over narration"
+   ],
+   "cut_sync": {
+    "n": 9,
+    "hit_within_1_frame": 0.667,
+    "hit_within_100ms": 0.889,
+    "median_abs_offset_ms": 26.0,
+    "answered_by_swell": 1,
+    "answered_by_level_peak": 0,
+    "no_sound": [],
+    "frame_ms": 33.3,
+    "chance_within_1_frame": 0.461,
+    "chance_within_100ms": 0.888,
+    "accent_min_db": 10.3,
+    "accent_within_1_frame": 0.222,
+    "accent_chance_within_1_frame": 0.089,
+    "accent_within_100ms": 0.333,
+    "accent_chance_within_100ms": 0.191
+   },
+   "timing_s": {
+    "decode_s": 0.06,
+    "loudness_s": 1.56,
+    "events_s": 1.33,
+    "beats_s": 0.72,
+    "cuts_s": 0.16,
+    "tag_events_s": 0.78,
+    "sections_s": 0.65,
+    "total_s": 5.26
+   },
+   "wall_s": 5.4,
+   "sheet": "Wrote out/timeline/eval/ref_2_sheet.png (2000x1300): 0:00.00-0:28.91, 7 frames, 17 of 20 tagged events labelled, 209 event ticks, 9 cut lines. Open it with an image viewer / Read tool."
+  },
+  "ref_4": {
+   "duration": 32.256,
+   "summary": "ref_4.mp4: 0:00.00-0:32.26 (32.3 s). Loudness -14.8 LUFS integrated, true peak -0.8 dBTP, LRA 7.0 LU; loudest 0:23.50-0:26.50 (-12.8 LUFS short-term). True peak -0.8 dBTP is above -1 dBTP (risk of overs after encoding). 1 stop-down(s)/gap(s): 0:31.85 0.3 s drop. Quiet lead-in 1.1 s (drop). Beat grid: ~122 BPM (clear pulse, clarity 0.61, 66 beats). 3 section(s): 0:00.00-0:09.75 glitch hop music, orchestral percussion | also: electronica (AST); 0:09.75-0:29.55 inspirational corporate background music, orchestral percussion | also: liquid, drip (AST); 0:29.55-0:32.26 tech house music, pizzicato strings, confident and cool. 319 events (9.9/s); 20 tagged (13 drum, 6 foley, 1 ui; tags are hints). Strongest accents over a running bed: 0:00.35 +30 dB, 0:32.21 +18 dB, 0:31.23 +17 dB. Sync to 41 cuts: 80% have an onset within 1 frame (chance 71%), 100% within 100 ms, median |offset| 28 ms; 22% land on a strong accent (>= 10 dB over the bed) within 1 frame (chance 15%); 24% on the beat grid (chance 20%).",
+   "n_events": 319,
+   "tagged": 20,
+   "key_or_ui": 0.05,
+   "most_common_tag": [
+    "drum hit",
+    8
+   ],
+   "kinds": {
+    "DRUM": 13,
+    "FOLEY": 6,
+    "UI": 1
+   },
+   "cuts": 41,
+   "sections": [
+    "glitch hop music, orchestral percussion | also: electronica (AST)",
+    "inspirational corporate background music, orchestral percussion | also: liquid, drip (AST)",
+    "tech house music, pizzicato strings, confident and cool"
+   ],
+   "cut_sync": {
+    "n": 41,
+    "hit_within_1_frame": 0.805,
+    "hit_within_100ms": 1.0,
+    "median_abs_offset_ms": 28.0,
+    "answered_by_swell": 0,
+    "answered_by_level_peak": 0,
+    "no_sound": [],
+    "frame_ms": 40.0,
+    "chance_within_1_frame": 0.706,
+    "chance_within_100ms": 0.975,
+    "accent_min_db": 9.8,
+    "accent_within_1_frame": 0.22,
+    "accent_chance_within_1_frame": 0.148,
+    "accent_within_100ms": 0.341,
+    "accent_chance_within_100ms": 0.313,
+    "on_beat": 0.244,
+    "on_beat_chance": 0.204
+   },
+   "timing_s": {
+    "decode_s": 0.04,
+    "loudness_s": 1.91,
+    "events_s": 1.73,
+    "beats_s": 0.95,
+    "cuts_s": 0.18,
+    "tag_events_s": 2.27,
+    "sections_s": 1.87,
+    "total_s": 8.95
+   },
+   "wall_s": 9.2,
+   "sheet": "Wrote out/timeline/eval/ref_4_sheet.png (2000x1300): 0:00.00-0:32.26, 7 frames, 18 of 20 tagged events labelled, 319 event ticks, 41 cut lines. Open it with an image viewer / Read tool."
+  },
+  "_run_s": 72.1
+ },
+ "timing60": {
+  "soundtrack_60s": {
+   "wall_s_cli_incl_imports_and_model_load": 81.4,
+   "internal_timing_s": {
+    "decode_s": 0.02,
+    "loudness_s": 3.22,
+    "events_s": 2.55,
+    "beats_s": 1.59,
+    "cuts_s": 0.0,
+    "tag_events_s": 37.08,
+    "sections_s": 30.12,
+    "total_s": 74.59
+   },
+   "model_calls": {
+    "clap_event_windows": 20,
+    "ast_event_windows": 1,
+    "clap_section_windows": 30,
+    "ast_section_windows": 3
+   },
+   "threads": "2",
+   "duration_s": 60.0,
+   "other_python_processes_at_start": 2
+  },
+  "_run_s": 82.3
+ },
+ "timing93": {
+  "ref_1_film_93s": {
+   "wall_s_cli_incl_imports_and_model_load": 93.3,
+   "internal_timing_s": {
+    "decode_s": 0.02,
+    "loudness_s": 5.64,
+    "events_s": 4.58,
+    "beats_s": 2.25,
+    "cuts_s": 0.12,
+    "tag_events_s": 37.38,
+    "sections_s": 35.97,
+    "total_s": 85.98
+   },
+   "model_calls": {
+    "clap_event_windows": 20,
+    "ast_event_windows": 1,
+    "clap_section_windows": 32,
+    "ast_section_windows": 3
+   },
+   "threads": "2",
+   "duration_s": 93.12,
+   "other_python_processes_at_start": 4
+  },
+  "_run_s": 94.2
+ },
+ "probe": {
+  "python_processes_running": 12,
+  "clap_load_s": 23.3,
+  "clap_s_per_window": 0.49,
+  "ast_load_s": 1.8,
+  "ast_s_per_window": 4.75,
+  "_run_s": 39.9
+ },
+ "timing93low": {
+  "ref_1_film_93s_detail_low": {
+   "wall_s_cli_incl_imports_and_model_load": 76.6,
+   "internal_timing_s": {
+    "decode_s": 0.14,
+    "loudness_s": 7.3,
+    "events_s": 5.57,
+    "beats_s": 4.08,
+    "cuts_s": 0.12,
+    "tag_events_s": 36.84,
+    "sections_s": 13.68,
+    "total_s": 67.76
+   },
+   "model_calls": {
+    "clap_event_windows": 12,
+    "ast_event_windows": 0,
+    "clap_section_windows": 24,
+    "ast_section_windows": 0
+   },
+   "threads": "2",
+   "duration_s": 93.12,
+   "other_python_processes_at_start": 6
+  },
+  "_run_s": 77.2
+ }
+}

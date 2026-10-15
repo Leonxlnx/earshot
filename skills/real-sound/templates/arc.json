@@ -1,0 +1,7 @@
+{
+ "_doc": "Input for arrange.py --arc: the target loudness of each FILM bar in dB relative to the track's loud bars (0 = its biggest sections, -6 = a groove, -10 = a breakdown, -14 = a soft intro). One number per film bar (bar = beats_per_bar beats at film_bpm). Write it from the picture map in SOUND_BRIEF.md: soft under the cold open and typing, the groove for the feature beats, a breakdown before the turn, the build, the big section from the drop (the hero reveal), a resolve under the logo. This example: a 30 s launch film at 120 BPM = 15 bars, drop on film bar 9 (16.0 s), logo from bar 13.",
+ "film_bpm": 120,
+ "beats_per_bar": 4,
+ "drop_film_bar": 9,
+ "arc": [-14, -12, -7, -6, -6, -6, -10, -6, 0, 0, 0, -2, -8, -11, -14]
+}

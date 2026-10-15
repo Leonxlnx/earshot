@@ -1,0 +1,443 @@
+{
+ "n_files": 125,
+ "n_with_class": 121,
+ "per_category": {
+  "ambience": 21,
+  "foley": 6,
+  "garden": 5,
+  "keyboard": 20,
+  "magic": 6,
+  "motion": 15,
+  "music": 45,
+  "toy": 7
+ },
+ "thresholds": {
+  "strong": 3.0,
+  "plausible": 2.5,
+  "weak": 2.0
+ },
+ "shipped": {
+  "n_vocab": 322,
+  "metrics": {
+   "cat_map": 0.6913988597776911,
+   "cat_p5": 0.7,
+   "cat_p10": 0.625,
+   "class_map": 0.6459201163247413,
+   "class_top3": 0.8269230769230769,
+   "tag_acc": 0.7066115702479339,
+   "tag_mrr": 0.8070052286532279,
+   "pooled_auc": 0.9795993373835973,
+   "pooled_auc_strict": 0.9649479955430356
+  },
+  "detail": {
+   "category": {
+    "map": 0.6913988597776911,
+    "p5": 0.7,
+    "p10": 0.625,
+    "rows": [
+     {
+      "cat": "ambience",
+      "ap": 0.9244109997643022,
+      "p5": 1.0,
+      "p10": 1.0
+     },
+     {
+      "cat": "foley",
+      "ap": 0.17848260127671892,
+      "p5": 0.0,
+      "p10": 0.1
+     },
+     {
+      "cat": "garden",
+      "ap": 0.4472438672438672,
+      "p5": 0.4,
+      "p10": 0.3
+     },
+     {
+      "cat": "keyboard",
+      "ap": 0.9771264855687605,
+      "p5": 1.0,
+      "p10": 1.0
+     },
+     {
+      "cat": "magic",
+      "ap": 0.9761904761904762,
+      "p5": 1.0,
+      "p10": 0.6
+     },
+     {
+      "cat": "motion",
+      "ap": 0.8236778206778207,
+      "p5": 1.0,
+      "p10": 0.9
+     },
+     {
+      "cat": "music",
+      "ap": 1.0,
+      "p5": 1.0,
+      "p10": 1.0
+     },
+     {
+      "cat": "toy",
+      "ap": 0.20405862749958284,
+      "p5": 0.2,
+      "p10": 0.1
+     }
+    ]
+   },
+   "class": {
+    "map": 0.6459201163247413,
+    "top3": 0.8269230769230769,
+    "n_queries": 52
+   },
+   "tagging": {
+    "acc": 0.7066115702479339,
+    "mrr": 0.8070052286532279
+   },
+   "pooled_auc": 0.9795993373835973,
+   "pooled_auc_strict": 0.9649479955430356
+  },
+  "verdicts": {
+   "lenient": {
+    "n_pos": 248,
+    "n_neg": 7614,
+    "base_rate": 0.0315,
+    "strong": {
+     "z_range": [
+      3.0,
+      null
+     ],
+     "tp": 126,
+     "fp": 3,
+     "lr": 1289.47,
+     "precision": 0.977,
+     "precision_even_odds": 0.999,
+     "recall_at_or_above": 0.508
+    },
+    "plausible": {
+     "z_range": [
+      2.5,
+      3.0
+     ],
+     "tp": 31,
+     "fp": 45,
+     "lr": 21.15,
+     "precision": 0.408,
+     "precision_even_odds": 0.955,
+     "recall_at_or_above": 0.633
+    },
+    "weak": {
+     "z_range": [
+      2.0,
+      2.5
+     ],
+     "tp": 31,
+     "fp": 80,
+     "lr": 11.9,
+     "precision": 0.279,
+     "precision_even_odds": 0.922,
+     "recall_at_or_above": 0.758
+    },
+    "no match": {
+     "z_range": [
+      null,
+      2.0
+     ],
+     "tp": 60,
+     "fp": 7486,
+     "lr": 0.25,
+     "precision": 0.008,
+     "precision_even_odds": 0.197,
+     "recall_at_or_above": 1.0
+    }
+   },
+   "strict": {
+    "n_pos": 248,
+    "n_neg": 8222,
+    "base_rate": 0.0293,
+    "strong": {
+     "z_range": [
+      3.0,
+      null
+     ],
+     "tp": 126,
+     "fp": 82,
+     "lr": 50.94,
+     "precision": 0.606,
+     "precision_even_odds": 0.981,
+     "recall_at_or_above": 0.508
+    },
+    "plausible": {
+     "z_range": [
+      2.5,
+      3.0
+     ],
+     "tp": 31,
+     "fp": 113,
+     "lr": 9.1,
+     "precision": 0.215,
+     "precision_even_odds": 0.901,
+     "recall_at_or_above": 0.633
+    },
+    "weak": {
+     "z_range": [
+      2.0,
+      2.5
+     ],
+     "tp": 31,
+     "fp": 156,
+     "lr": 6.59,
+     "precision": 0.166,
+     "precision_even_odds": 0.868,
+     "recall_at_or_above": 0.758
+    },
+    "no match": {
+     "z_range": [
+      null,
+      2.0
+     ],
+     "tp": 60,
+     "fp": 7871,
+     "lr": 0.25,
+     "precision": 0.008,
+     "precision_even_odds": 0.202,
+     "recall_at_or_above": 1.0
+    }
+   }
+  }
+ },
+ "preregistered_217": {
+  "n_vocab": 217,
+  "metrics": {
+   "cat_map": 0.684794997075632,
+   "cat_p5": 0.65,
+   "cat_p10": 0.6375,
+   "class_map": 0.6691226676530339,
+   "class_top3": 0.8269230769230769,
+   "tag_acc": 0.7066115702479339,
+   "tag_mrr": 0.8070052286532279,
+   "pooled_auc": 0.9757169517950803,
+   "pooled_auc_strict": 0.9596587832801061
+  },
+  "detail": {
+   "category": {
+    "map": 0.684794997075632,
+    "p5": 0.65,
+    "p10": 0.6375,
+    "rows": [
+     {
+      "cat": "ambience",
+      "ap": 0.9595023655395172,
+      "p5": 1.0,
+      "p10": 1.0
+     },
+     {
+      "cat": "foley",
+      "ap": 0.1697744758228629,
+      "p5": 0.0,
+      "p10": 0.2
+     },
+     {
+      "cat": "garden",
+      "ap": 0.37741935483870964,
+      "p5": 0.2,
+      "p10": 0.3
+     },
+     {
+      "cat": "keyboard",
+      "ap": 0.9738565162907268,
+      "p5": 1.0,
+      "p10": 1.0
+     },
+     {
+      "cat": "magic",
+      "ap": 0.9761904761904762,
+      "p5": 1.0,
+      "p10": 0.6
+     },
+     {
+      "cat": "motion",
+      "ap": 0.8146956023831557,
+      "p5": 1.0,
+      "p10": 0.9
+     },
+     {
+      "cat": "music",
+      "ap": 1.0,
+      "p5": 1.0,
+      "p10": 1.0
+     },
+     {
+      "cat": "toy",
+      "ap": 0.20692118553960656,
+      "p5": 0.0,
+      "p10": 0.1
+     }
+    ]
+   },
+   "class": {
+    "map": 0.6691226676530339,
+    "top3": 0.8269230769230769,
+    "n_queries": 52
+   },
+   "tagging": {
+    "acc": 0.7066115702479339,
+    "mrr": 0.8070052286532279
+   },
+   "pooled_auc": 0.9757169517950803,
+   "pooled_auc_strict": 0.9596587832801061
+  },
+  "verdicts": {
+   "lenient": {
+    "n_pos": 248,
+    "n_neg": 7614,
+    "base_rate": 0.0315,
+    "strong": {
+     "z_range": [
+      3.0,
+      null
+     ],
+     "tp": 126,
+     "fp": 10,
+     "lr": 386.84,
+     "precision": 0.926,
+     "precision_even_odds": 0.997,
+     "recall_at_or_above": 0.508
+    },
+    "plausible": {
+     "z_range": [
+      2.5,
+      3.0
+     ],
+     "tp": 32,
+     "fp": 43,
+     "lr": 22.85,
+     "precision": 0.427,
+     "precision_even_odds": 0.958,
+     "recall_at_or_above": 0.637
+    },
+    "weak": {
+     "z_range": [
+      2.0,
+      2.5
+     ],
+     "tp": 25,
+     "fp": 99,
+     "lr": 7.75,
+     "precision": 0.202,
+     "precision_even_odds": 0.886,
+     "recall_at_or_above": 0.738
+    },
+    "no match": {
+     "z_range": [
+      null,
+      2.0
+     ],
+     "tp": 65,
+     "fp": 7462,
+     "lr": 0.27,
+     "precision": 0.009,
+     "precision_even_odds": 0.211,
+     "recall_at_or_above": 1.0
+    }
+   },
+   "strict": {
+    "n_pos": 248,
+    "n_neg": 8222,
+    "base_rate": 0.0293,
+    "strong": {
+     "z_range": [
+      3.0,
+      null
+     ],
+     "tp": 126,
+     "fp": 106,
+     "lr": 39.41,
+     "precision": 0.543,
+     "precision_even_odds": 0.975,
+     "recall_at_or_above": 0.508
+    },
+    "plausible": {
+     "z_range": [
+      2.5,
+      3.0
+     ],
+     "tp": 32,
+     "fp": 110,
+     "lr": 9.64,
+     "precision": 0.225,
+     "precision_even_odds": 0.906,
+     "recall_at_or_above": 0.637
+    },
+    "weak": {
+     "z_range": [
+      2.0,
+      2.5
+     ],
+     "tp": 25,
+     "fp": 179,
+     "lr": 4.63,
+     "precision": 0.123,
+     "precision_even_odds": 0.822,
+     "recall_at_or_above": 0.738
+    },
+    "no match": {
+     "z_range": [
+      null,
+      2.0
+     ],
+     "tp": 65,
+     "fp": 7827,
+     "lr": 0.28,
+     "precision": 0.008,
+     "precision_even_odds": 0.216,
+     "recall_at_or_above": 1.0
+    }
+   }
+  }
+ },
+ "raw_cosine_metrics": {
+  "cat_map": 0.6461843465427891,
+  "cat_p5": 0.725,
+  "cat_p10": 0.625,
+  "class_map": 0.6999272877356606,
+  "class_top3": 0.7884615384615384,
+  "tag_acc": 0.7272727272727273,
+  "tag_mrr": 0.8180022628886265,
+  "pooled_auc": 0.9780206453307574,
+  "pooled_auc_strict": 0.9640892648362772
+ },
+ "mood_check": {
+  "heldout": {
+   "n_tracks": 45,
+   "top_mood_negative_share": 0.178,
+   "chance_share": 0.312,
+   "top_moods": {
+    "playful and quirky music": 10,
+    "triumphant and heroic music": 7,
+    "sad and melancholic music": 6,
+    "uplifting and hopeful music": 5,
+    "romantic music": 3,
+    "dreamy and ethereal music": 3,
+    "celebratory and joyful music": 2,
+    "dark and tense music": 2,
+    "futuristic music": 2,
+    "warm and cozy music": 2,
+    "confident and cool music": 2,
+    "energetic and driving music": 1
+   }
+  },
+  "tuning": {
+   "n_tracks": 8,
+   "top_mood_negative_share": 0.0,
+   "chance_share": 0.312,
+   "top_moods": {
+    "dreamy and ethereal music": 3,
+    "playful and quirky music": 2,
+    "celebratory and joyful music": 1,
+    "romantic music": 1,
+    "energetic and driving music": 1
+   }
+  }
+ }
+}

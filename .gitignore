@@ -1,0 +1,33 @@
+.venv/
+.cache/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+out/
+.pytest_cache/
+# never commit media: reference videos, downloaded recordings, renders
+*.mp4
+*.mov
+*.wav
+*.flac
+*.ogg
+*.mp3
+*.m4a
+*.aac
+!tests/fixtures/*.wav
+# local secrets
+.env
+
+# local evaluation data locations (see eval/README.md) and data
+eval/local_paths.json
+eval/data/
+
+# demo media and scratch (the demo READMEs and scripts may be committed; renders, plots and logs stay local)
+demo/**/*.png
+demo/**/*.jpg
+demo/**/*.npy
+demo/**/*.log
+demo/**/*.err
+*.npy

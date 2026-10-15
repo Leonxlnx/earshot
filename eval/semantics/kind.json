@@ -1,0 +1,598 @@
+{
+ "threshold": -0.27,
+ "tune": {
+  "events": {
+   "event": 31,
+   "either": 0,
+   "texture": 0
+  },
+  "textures": {
+   "event": 0,
+   "either": 6,
+   "texture": 6
+  },
+  "events_read_as_texture": [],
+  "textures_read_as_event": [],
+  "rows": [
+   {
+    "query": "a soft plastic thud",
+    "truth": "event",
+    "read": "event",
+    "score": 0.04
+   },
+   {
+    "query": "a small object landing softly on a table",
+    "truth": "event",
+    "read": "event",
+    "score": 0.119
+   },
+   {
+    "query": "a finger squeaking on glass",
+    "truth": "event",
+    "read": "event",
+    "score": -0.073
+   },
+   {
+    "query": "a rubber stretch squeak and suction pop",
+    "truth": "event",
+    "read": "event",
+    "score": -0.018
+   },
+   {
+    "query": "a plastic case snapping shut",
+    "truth": "event",
+    "read": "event",
+    "score": 0.185
+   },
+   {
+    "query": "a satisfying plastic click as something locks into place",
+    "truth": "event",
+    "read": "event",
+    "score": 0.298
+   },
+   {
+    "query": "a small mouth pop",
+    "truth": "event",
+    "read": "event",
+    "score": 0.283
+   },
+   {
+    "query": "a short hollow pop like a cork or a finger pulled from the cheek",
+    "truth": "event",
+    "read": "event",
+    "score": 0.417
+   },
+   {
+    "query": "an apple falling on grass",
+    "truth": "event",
+    "read": "event",
+    "score": 0.015
+   },
+   {
+    "query": "a single mechanical keyboard key press",
+    "truth": "event",
+    "read": "event",
+    "score": 0.223
+   },
+   {
+    "query": "a deep thocky key press on a mechanical keyboard",
+    "truth": "event",
+    "read": "event",
+    "score": 0.146
+   },
+   {
+    "query": "a spacebar press",
+    "truth": "event",
+    "read": "event",
+    "score": 0.145
+   },
+   {
+    "query": "pressing the spacebar of a mechanical keyboard",
+    "truth": "event",
+    "read": "event",
+    "score": 0.099
+   },
+   {
+    "query": "an enter key press",
+    "truth": "event",
+    "read": "event",
+    "score": 0.28
+   },
+   {
+    "query": "a heavy enter key thock",
+    "truth": "event",
+    "read": "event",
+    "score": 0.154
+   },
+   {
+    "query": "a soft key click",
+    "truth": "event",
+    "read": "event",
+    "score": 0.121
+   },
+   {
+    "query": "a light tactile keyboard switch tick",
+    "truth": "event",
+    "read": "event",
+    "score": 0.231
+   },
+   {
+    "query": "a tiny bell ting",
+    "truth": "event",
+    "read": "event",
+    "score": -0.073
+   },
+   {
+    "query": "a single small bell or glass ting",
+    "truth": "event",
+    "read": "event",
+    "score": -0.018
+   },
+   {
+    "query": "a single celesta note",
+    "truth": "event",
+    "read": "event",
+    "score": 0.144
+   },
+   {
+    "query": "a plucked kalimba or celesta note",
+    "truth": "event",
+    "read": "event",
+    "score": 0.09
+   },
+   {
+    "query": "a fast small whoosh",
+    "truth": "event",
+    "read": "event",
+    "score": 0.25
+   },
+   {
+    "query": "a stick swung quickly through the air",
+    "truth": "event",
+    "read": "event",
+    "score": 0.195
+   },
+   {
+    "query": "a big soft whoosh",
+    "truth": "event",
+    "read": "event",
+    "score": 0.07
+   },
+   {
+    "query": "an object plunging into water",
+    "truth": "event",
+    "read": "event",
+    "score": -0.035
+   },
+   {
+    "query": "a deep cinematic impact",
+    "truth": "event",
+    "read": "event",
+    "score": 0.037
+   },
+   {
+    "query": "a big boomy hit",
+    "truth": "event",
+    "read": "event",
+    "score": 0.082
+   },
+   {
+    "query": "a latch closing",
+    "truth": "event",
+    "read": "event",
+    "score": 0.162
+   },
+   {
+    "query": "a box lid closing with a solid clunk",
+    "truth": "event",
+    "read": "event",
+    "score": 0.205
+   },
+   {
+    "query": "a light switch click",
+    "truth": "event",
+    "read": "event",
+    "score": 0.29
+   },
+   {
+    "query": "a switch flip or camera shutter click",
+    "truth": "event",
+    "read": "event",
+    "score": 0.115
+   },
+   {
+    "query": "a quiet computer room tone hum",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.344
+   },
+   {
+    "query": "the steady low hum of a computer in a quiet room",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.377
+   },
+   {
+    "query": "rain on a window",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.3
+   },
+   {
+    "query": "rain heard from inside a room, drops on the window glass",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.212
+   },
+   {
+    "query": "birds singing in a spring meadow",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.32
+   },
+   {
+    "query": "a morning field recording of birdsong in the countryside",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.223
+   },
+   {
+    "query": "wind blowing through grass and leaves",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.321
+   },
+   {
+    "query": "a breeze rustling tall grass and leaves",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.334
+   },
+   {
+    "query": "fast typing on a mechanical keyboard",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.164
+   },
+   {
+    "query": "continuous typing on a keyboard",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.247
+   },
+   {
+    "query": "an uplifting orchestral music track",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.185
+   },
+   {
+    "query": "a cheerful music track",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.183
+   }
+  ]
+ },
+ "test": {
+  "events": {
+   "event": 25,
+   "either": 4,
+   "texture": 1
+  },
+  "textures": {
+   "event": 0,
+   "either": 6,
+   "texture": 14
+  },
+  "events_read_as_texture": [
+   [
+    "a bird chirp",
+    -0.288
+   ]
+  ],
+  "textures_read_as_event": [],
+  "rows": [
+   {
+    "query": "a dog bark",
+    "truth": "event",
+    "read": "either",
+    "score": -0.203
+   },
+   {
+    "query": "a car horn",
+    "truth": "event",
+    "read": "either",
+    "score": -0.208
+   },
+   {
+    "query": "a thunder clap",
+    "truth": "event",
+    "read": "either",
+    "score": -0.249
+   },
+   {
+    "query": "a bird chirp",
+    "truth": "event",
+    "read": "texture",
+    "score": -0.288
+   },
+   {
+    "query": "a small bell",
+    "truth": "event",
+    "read": "either",
+    "score": -0.177
+   },
+   {
+    "query": "a camera shutter",
+    "truth": "event",
+    "read": "event",
+    "score": -0.015
+   },
+   {
+    "query": "a doorbell",
+    "truth": "event",
+    "read": "event",
+    "score": -0.071
+   },
+   {
+    "query": "a footstep",
+    "truth": "event",
+    "read": "event",
+    "score": -0.015
+   },
+   {
+    "query": "a notification ding",
+    "truth": "event",
+    "read": "event",
+    "score": -0.079
+   },
+   {
+    "query": "a gunshot",
+    "truth": "event",
+    "read": "event",
+    "score": 0.143
+   },
+   {
+    "query": "a door slam",
+    "truth": "event",
+    "read": "event",
+    "score": 0.079
+   },
+   {
+    "query": "a cork pop",
+    "truth": "event",
+    "read": "event",
+    "score": 0.345
+   },
+   {
+    "query": "a hand clap",
+    "truth": "event",
+    "read": "event",
+    "score": 0.138
+   },
+   {
+    "query": "a sneeze",
+    "truth": "event",
+    "read": "event",
+    "score": 0.049
+   },
+   {
+    "query": "a cough",
+    "truth": "event",
+    "read": "event",
+    "score": 0.048
+   },
+   {
+    "query": "a glass breaking",
+    "truth": "event",
+    "read": "event",
+    "score": -0.011
+   },
+   {
+    "query": "a balloon pop",
+    "truth": "event",
+    "read": "event",
+    "score": 0.203
+   },
+   {
+    "query": "a mouse click",
+    "truth": "event",
+    "read": "event",
+    "score": 0.057
+   },
+   {
+    "query": "a sword hit",
+    "truth": "event",
+    "read": "event",
+    "score": 0.154
+   },
+   {
+    "query": "a punch",
+    "truth": "event",
+    "read": "event",
+    "score": 0.217
+   },
+   {
+    "query": "a coin drop",
+    "truth": "event",
+    "read": "event",
+    "score": 0.067
+   },
+   {
+    "query": "a single drum hit",
+    "truth": "event",
+    "read": "event",
+    "score": 0.249
+   },
+   {
+    "query": "a whoosh",
+    "truth": "event",
+    "read": "event",
+    "score": 0.135
+   },
+   {
+    "query": "a swipe sound",
+    "truth": "event",
+    "read": "event",
+    "score": 0.15
+   },
+   {
+    "query": "a UI pop",
+    "truth": "event",
+    "read": "event",
+    "score": 0.293
+   },
+   {
+    "query": "a can opening",
+    "truth": "event",
+    "read": "event",
+    "score": 0.101
+   },
+   {
+    "query": "a light switch",
+    "truth": "event",
+    "read": "event",
+    "score": 0.238
+   },
+   {
+    "query": "a knock on a door",
+    "truth": "event",
+    "read": "event",
+    "score": 0.019
+   },
+   {
+    "query": "a cat meow",
+    "truth": "event",
+    "read": "event",
+    "score": -0.018
+   },
+   {
+    "query": "a stapler",
+    "truth": "event",
+    "read": "event",
+    "score": 0.099
+   },
+   {
+    "query": "rain on a roof",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.346
+   },
+   {
+    "query": "a crackling fire",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.091
+   },
+   {
+    "query": "city traffic",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.32
+   },
+   {
+    "query": "ocean waves",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.113
+   },
+   {
+    "query": "wind in the trees",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.397
+   },
+   {
+    "query": "a quiet office ambience",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.266
+   },
+   {
+    "query": "crowd chatter",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.303
+   },
+   {
+    "query": "a refrigerator hum",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.345
+   },
+   {
+    "query": "birdsong in a forest",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.32
+   },
+   {
+    "query": "an air conditioner",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.251
+   },
+   {
+    "query": "a busy restaurant",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.318
+   },
+   {
+    "query": "a river flowing",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.341
+   },
+   {
+    "query": "crickets at night",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.316
+   },
+   {
+    "query": "a lo-fi music loop",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.265
+   },
+   {
+    "query": "a drone pad",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.428
+   },
+   {
+    "query": "a steady engine idle",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.372
+   },
+   {
+    "query": "continuous typing",
+    "truth": "texture",
+    "read": "either",
+    "score": -0.245
+   },
+   {
+    "query": "a vacuum cleaner running",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.36
+   },
+   {
+    "query": "white noise",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.359
+   },
+   {
+    "query": "a heavy rainstorm",
+    "truth": "texture",
+    "read": "texture",
+    "score": -0.365
+   }
+  ]
+ }
+}

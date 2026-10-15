@@ -1,0 +1,15 @@
+{
+ "threads": 2,
+ "precision": "bf16",
+ "model_load_s": 27.0,
+ "describe_short_cold": 16.95,
+ "match_cached_new_query": 1.99,
+ "describe_31s_cold": 52.45,
+ "find_18s_cold": 29.88,
+ "find_18s_cached_new_query": 1.15,
+ "find_300s_cold": 61.83,
+ "rank_20_foley_files_cold": 55.81,
+ "rank_s_per_file": 2.79,
+ "rank_files_total_s": 803.7,
+ "rank_20_cached_new_query": 3.38
+}

@@ -1,0 +1,80 @@
+{
+ "n_music_files": 52,
+ "n_beds": 26,
+ "raw": {
+  "dark_or_aggressive_top_mood": 0.25,
+  "aggressive_top_mood": 0.038,
+  "hub_mood": [
+   "confident and cool music",
+   0.231
+  ],
+  "distinct_moods": 10,
+  "hub_genre": [
+   "inspirational corporate background music",
+   0.519
+  ],
+  "distinct_genres": 6,
+  "genre_keyword_agree": [
+   0.214,
+   14
+  ],
+  "instrument_keyword_in_top3": [
+   0.429,
+   7
+  ],
+  "bed_music_vs_ambience_correct": [
+   1.0,
+   26
+  ],
+  "ambience_keyword_in_top2": [
+   0.941,
+   17
+  ],
+  "bed_music_with_hits_dark_top_mood": [
+   0.444,
+   9
+  ],
+  "bed_music_with_hits_genre_keyword_agree": [
+   0.5,
+   2
+  ]
+ },
+ "centred": {
+  "dark_or_aggressive_top_mood": 0.25,
+  "aggressive_top_mood": 0.058,
+  "hub_mood": [
+   "celebratory and joyful music",
+   0.269
+  ],
+  "distinct_moods": 9,
+  "hub_genre": [
+   "inspirational corporate background music",
+   0.308
+  ],
+  "distinct_genres": 14,
+  "genre_keyword_agree": [
+   0.429,
+   14
+  ],
+  "instrument_keyword_in_top3": [
+   0.286,
+   7
+  ],
+  "bed_music_vs_ambience_correct": [
+   1.0,
+   26
+  ],
+  "ambience_keyword_in_top2": [
+   0.941,
+   17
+  ],
+  "bed_music_with_hits_dark_top_mood": [
+   0.778,
+   9
+  ],
+  "bed_music_with_hits_genre_keyword_agree": [
+   0.0,
+   2
+  ]
+ }
+}

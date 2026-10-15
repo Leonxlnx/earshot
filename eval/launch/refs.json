@@ -1,0 +1,25 @@
+{
+ "note": "The 7 professional launch films used as the quality bar (third-party, measured only, never copied or redistributed), as ref_1..ref_7 with neutral style lines. Local file locations come from eval/local_paths.json or EARSHOT_EVAL_REFS (see eval/README.md); test files are relative to the film project (EARSHOT_EVAL_FILM).",
+ "refs": [
+  {"id": "ref_1",
+   "style": "AI video-search SaaS launch: white UI walkthrough with chat prompts and cursor, kinetic type, thumbnail-wall reveals, logo end card; voice-over"},
+  {"id": "ref_2",
+   "style": "AI workspace explainer: white minimal kinetic type, app-icon clusters, chat UI, photographic logo reveal, gradient end card; voice-over"},
+  {"id": "ref_3",
+   "style": "editorial kinetic collage: grainy paper texture, typewriter text, photo cut-outs, pixel icons, hand-drawn strokes, fast cuts; voice-over"},
+  {"id": "ref_4",
+   "style": "fintech brand film: bold black and green kinetic typography, grids and numerals, flicker cuts, logo stings; music only"},
+  {"id": "ref_5",
+   "style": "AI image-generation launch: soft gradients, typed prompt, collage of generated photos; sound design with hard silences"},
+  {"id": "ref_6",
+   "style": "creator-commerce SaaS: blue UI walkthrough, notifications, cursor clicks, data-flow diagrams, tagline end card; voice-over"},
+  {"id": "ref_7",
+   "style": "gaming motion-design reel: logo stings, 3D explosions, saturated colour, very fast cuts, brickwall-loud music"}
+ ],
+ "tests": [
+  {"id": "clawd_real", "file": "out/Clawd_1080p60.mp4",
+   "style": "Clawd short film with its real-recordings soundtrack (licensed music, foley, ambience)"},
+  {"id": "clawd_synth", "file": "out/superseded/Clawd_1080p60_synth-audio.mp4",
+   "style": "the same film with the retired code-synthesized soundtrack"}
+ ]
+}

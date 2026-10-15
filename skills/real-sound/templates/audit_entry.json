@@ -1,0 +1,16 @@
+{
+ "_doc": "One record of audio/assets/manifests/audit.json. The licence auditor (prompts/licence_audit.md) writes ONLY the three agent fields below after reading the licence on the item's own page; audit.py computes everything else on every run and keeps the agent fields (matched by id + file). Never set licence_confirmed without having read the page in this session.",
+ "id": "fs-000000",
+ "licence_seen": "Freesound page https://freesound.org/people/uploader_name/sounds/000000/: licence 'Attribution 4.0' -> https://creativecommons.org/licenses/by/4.0/ (read 2026-10-14); page author 'uploader_name', title 'Trackpad click close.wav'; preview id/user match download_url",
+ "licence_confirmed": true,
+ "agent_notes": ["the author asks for credit as \"<title> by uploader_name (freesound.org)\": the manifest attribution follows it"],
+ "_computed_by_audit_py": {
+  "manifest": "audio/assets/manifests/ui.json", "need": "ui_click", "rank": 1, "in_scope": true, "severity": "ok",
+  "licence_in_manifest": "CC BY 4.0", "licence": "by4", "licence_status": "allowed", "attribution_required": true,
+  "attribution_ok": true, "attribution_in_manifest": "\"Trackpad click close.wav\" by uploader_name (...), licensed under CC BY 4.0 (...)",
+  "file_ok": true,
+  "file_check": {"path": "audio/assets/ui/fs-000000_trackpad-click.ogg", "exists": true, "codec": "vorbis", "sample_rate": 48000,
+                 "channels": 1, "kbps": 192, "duration_s": 0.84, "decodes_clean": true, "bytes_match_download_url": true},
+  "problems": [], "warnings": [], "audit_tool": "real-sound audit.py v1"
+ }
+}
