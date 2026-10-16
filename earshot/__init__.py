@@ -12,7 +12,7 @@ or explicitly: `from earshot import api` / `from earshot.describe import describ
 """
 import importlib
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 # modules that are callable as their main function (see _callable.py)
 _CALLABLE = {'describe', 'match', 'compare', 'realness', 'timeline', 'sheet', 'critique', 'profile'}

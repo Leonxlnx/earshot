@@ -16,7 +16,7 @@ On 12 real references, the renders of the generated code sit close to the origin
 - `earshot describe` gives the same top tag for both in 10 of 12.
 
 They are close but not identical: measured differences remain in onsets, tone balance and noise texture, listed
-below. Whether ears can tell them apart is what the mini blind test is for (`out/fit/blind_fit/`, below).
+below. In the mini blind test (below) the listener could not tell the recordings from the renders.
 
 ## How it works
 
@@ -125,8 +125,9 @@ The **12 forge-split refs** (never bench) are 2 each of click, typing_key, pop, 
 first file of each category and the first from another source.
 
 For each ref: every candidate was fitted, the engine chose (with `--clap`), the recipe module was written and
-imported, and **its** render (seed 0) was measured. Results are in `out/fit/validation/` (`summary.md`,
-`all_metrics.json`, `<category>/<stem>/pair.png`, the recipe modules, the WAVs).
+imported, and **its** render (seed 0) was measured. Results are in `out/fit/validation/` on the dev machine
+(`summary.md`, `all_metrics.json`, `<category>/<stem>/pair.png`, the recipe modules, the WAVs; local, because they
+are derived from licensed recordings).
 
 | category | ref | chosen | mel dB (floor) | env r | tone dB | onset err | excess dB | CLAP (floor) |
 |---|---|---|---|---|---|---|---|---|
@@ -195,6 +196,10 @@ Trim, level and the cleanliness checks are the clean blind test's own: `out/fit/
 
 After listening: `.venv\Scripts\python.exe out\fit\blind_fit\score_answers.py A B ...` (12 letters). 10 or more
 right is unlikely by luck (p = 0.019).
+
+**Result:** one listener took the test and could not tell the recording from the render; both clips of a trial
+sounded the same to them. One listener and 12 trials is a small test, not a proof. The kit stays local, because it
+plays licensed recordings.
 
 ## Morph examples
 

@@ -1,5 +1,9 @@
 # forge v2: review notes for the `forge-v2` branch
 
+> Released in 0.2.0 ([CHANGELOG.md](../CHANGELOG.md)). These notes were written on the branch before the merge, so
+> "not merged" and "nobody has listened" below describe that time. Paths under `out/` are local to the dev machine:
+> the made sounds, galleries and blind-test kits hold audio, and the reference recordings are licensed.
+
 What changed in `earshot forge` during the overnight iteration of 2026-10-16, how to try it, what the held-out
 measurements say, what is still weak, and what to check before merging. The branch is not merged; `main` is
 untouched. The round-by-round log with every number is [OVERNIGHT.md](../OVERNIGHT.md). Per-category verdicts are in
