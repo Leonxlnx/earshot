@@ -26,6 +26,7 @@ COMMANDS = {
     'critique': 'critique',      # launch-video sound scorecard against a profile of professional references
     'profile': 'profile',        # build a reference profile from your own reference films
     'forge': 'forge',            # make sounds in code and improve them by listening
+    'fit': 'forge.fit',          # translate a recording into code (analysis by synthesis) and vary it
     'gallery': 'gallery',        # one static HTML page of forge results: players, spectrograms, numbers
     'measure': 'features',       # objective measurements only (no models)
     'llm': 'llm',                # optional audio-LLM critique (only with your own API key + consent)
