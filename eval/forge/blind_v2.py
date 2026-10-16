@@ -1,6 +1,7 @@
 """Clean blind test (forge v2 finals vs held-out REAL recordings) + the v1 -> v2 progress listening file.
 
     python eval/forge/blind_v2.py --out out/showcase/blind_v2 --seed 2026
+    python eval/forge/blind_v2.py --dry-run                         (cleanliness only, writes nothing)
     python out/showcase/blind_v2/score_answers.py A B B A ...      (after listening)
 
 One command rebuilds both from whatever is in out/forge_v2/<category>/final/ now (rerun it after a polish round).
@@ -8,6 +9,9 @@ Nothing is synthesised here: every sound is a file that already exists (forge fi
 only trimmed, faded, gain-changed and placed on silence. No markers, beeps or voice: trials are separated by silence.
 
 BLIND TEST (--out, default out/showcase/blind_v2)
+  The rule: nothing but the sound itself may give the answer away. A real recording carries a room-noise floor and
+  a made sound sits on digital silence, so neither may play any floor before or after its sound; and the two must
+  play equally loud at their loudest moment.
   Trials: N (default 20) over the licensed real categories that have bench refs (PLAN: two trials for the strongest
   categories of the round-3 verdicts, one for the others, including the weak ones so the test is honest). Each trial
   pairs one forge v2 final (<category>_NN.wav in out/forge_v2/<category>/final/) with one REAL recording of the same
@@ -15,35 +19,61 @@ BLIND TEST (--out, default out/showcase/blind_v2)
   Picks: the made final is drawn at random (seeded) among the category's length-compatible finals (audible extent
   within 1.3x of an available bench ref; if too few, the closest in length), never by a score; the real one is the
   bench ref whose audible extent is closest to it, with no real file and, where possible, no source recording used
-  twice in the test (whoosh_fast / swish and notify / logo_sting share bench files). Duration is the only property
-  either pick looks at, so the trims below cut little.
-  Trim: A and B get the SAME length. Usually both start 5 ms before their onset (first 1 ms frame within 40 dB of the
-  loudest; zero-padded if the file has no 5 ms lead) and run for the shorter of the two files, at most the longer
-  audible extent (last 5 ms frame within 50 dB of the loudest) + 30 ms; a clip cut before its file ends gets a
-  raised-cosine fade-out (15 % of the length, 10-300 ms), a clip that ends with its file keeps its own ending, both
-  get a 1 ms fade-in. Pairs that both build to their end (risers: loudest frame in the last 30 %) are end-aligned
-  instead: both end with their files and the longer one loses its quiet start under a fade-in of the same size.
-  Level: the made sound is matched to the real one. Short pairs (< 1 s): half the sample-peak difference plus half
-  the loudest-100-ms RMS difference, the RMS K-weighted (BS.1770 pre-filter: unweighted, a real whoosh's low rumble
-  counted as loud and its made partner played 5-6 LU louder). Long pairs: half the integrated-LUFS difference
-  (BS.1770, gated, of the equal-length clips) plus half the momentary-max-LUFS difference (integrated alone let a made
-  hit with a shorter tail play 3-4 LU louder at its head). What is left is half the two sounds' crest difference
-  (about +-2 LU momentary). Then one common gain for the pair: the louder momentary-max LUFS at -16 LUFS, never a peak
-  above -1 dBFS.
+  twice in the test (whoosh_fast / swish and notify / logo_sting share bench files). Both picks prefer files that trim
+  cleanly, so the common trim levels below stay low: a cut file starts 30 dB under its loudest frame or with a strike
+  (not inside a sustained sound), the sound decays 30 dB before the file's own end fade (or builds to its end: a
+  riser), a measured recording floor at most -50 dB, no anti-phase stereo; the category with the fewest clean refs per
+  trial picks first. Duration and these edge facts are all a pick looks at, never a score.
+  Trim, the same way for both sounds of a pair. Levels are dB re each sound's own loudest envelope frame
+  (channel-summed power; 2.5 ms frames smoothed over 7.5 ms in short pairs, 5 ms over 30 ms in long ones).
+    end level   L_end = the highest of -50 dB, where each file's sound stands in the 15 ms before the file's own end
+                fade + 3 dB, and each measured recording floor + 10 dB (at most -6 dB): a level both decays reach
+                naturally, above any floor;
+    onset level L_on  = the highest of -50 dB, each bench ref's level 2-5 ms after its start (just after its own 2 ms
+                fade-in: a cut into the sound shows here; made finals are rendered from digital silence) + 1 dB, and
+                each floor + 10 dB (at most -6 dB).
+    Each clip starts 4 ms before its first 1 ms frame at L_on, faded in over those 4 ms (raised cosine; only sound
+    below L_on is under the fade; zero-padded when the file has no 4 ms lead), and ends where its envelope last stands
+    at L_end (before the file's own end fade), with a matched fade-out over the last 6 dB of its decay above L_end (at
+    least 5 ms). So neither clip carries floor before or after its sound, and both stop at the same point of their
+    decay. A pair that both build to their end (risers: loudest frame in the last 15 %) keep their files' own
+    endings. The floor of a real ref is measured in its SOURCE recording (out/refs/manifest.json: 5th percentile of
+    50 ms windows outside digital silence, within 20 s of the trim, at the trim's gain); made sounds have none.
+  Level: a pair is short (loudest 100 ms) or long (momentary, 400 ms) by its longer audible extent (1 s); both clips
+    are measured the same way. The made clip is matched to the real one on that pair measure (K-weighted, BS.1770),
+    then one common gain puts it at -15 LUFS (short) / -16 LUFS (long) unless a true peak (4x oversampled) would pass
+    -1 dBTP: then both go down together.
   Order: trials shuffled (no category twice in a row), real-as-A on exactly half the trials, both from --seed.
-  Layout: 1 s lead, A, 1.2 s silence, B, 2.5 s silence, next trial ... 1 s tail; 48 kHz, 24-bit stereo.
-  Writes: blind_test.wav, answer_sheet.txt (trial, category, A start, B start, blank), KEY_open_after.json (the
-  answers, picks, trims, gains and levels), score_answers.py (per trial right / wrong, per category, per tier,
-  overall, one-sided binomial p), blind_test_trials/tNN_A.wav + tNN_B.wav (each trial on its own, same levels).
-  The key stores the md5 of every file used. If a final or bench ref changes while this runs (a polish round writing
-  finals), it stops before writing anything, so the folder always holds one complete, consistent build.
+  Layout: 1 s lead, A, 1.2 s silence, B, 2.5 s silence, next trial ... 1 s tail; 48 kHz, 24-bit stereo. Gaps are exact
+    digital silence.
+  Cleanliness: every residual difference a listener could use besides quality is measured on the clips as they play:
+    loudest-moment difference (the pair measure, plus the other window and earshot's own momentary meter), true-peak
+    difference, pre-roll length and level, the recording floor as played, its margin under the onset / end levels and
+    how long the sound dips to within 6 dB of it inside a clip, playback lengths, the level of what each fade-in ramps
+    and of what each trim dropped after the end (onset / ending sharpness from trimming), fade lengths, stereo
+    correlation, silent gaps, and the loudest moment and true peak again from the written 24-bit trial files. Hard
+    limits (FAIL): pair measure > 0.5 LU, true peak > -1 dBTP, pre-roll > 5 ms or holding sound at the onset level,
+    floor margin < 6 dB, floor heard > 100 ms inside a clip above -70 dBFS, trim edges that differ by > 10 dB with the
+    louder above -20 dB, non-silent gaps. FAIL stops the build before anything is written (the folder keeps its
+    previous build) unless --allow-fail. Warnings (listed, not fatal): length ratio > 1.6, true-peak difference
+    > 6 dB, other window > 2 LU, a floor above -60 dBFS as played or within 6 dB for > 30 ms, one clip mono and the
+    other wide, anti-phase stereo.
+  Writes: blind_test.wav, answer_sheet.txt (trial, category, A start, B start, blank; one cleanliness line),
+  cleanliness.json (per trial only differences and maxima, never which side: safe to open before listening),
+  KEY_open_after.json (the answers, picks, trims, gains, per-side levels), score_answers.py (per trial right / wrong,
+  per category, per tier, overall, one-sided binomial p), blind_test_trials/tNN_A.wav + tNN_B.wav (each trial on its
+  own, same levels, 0.25 s of silence around each clip). The key stores the md5 of every file used. If a final or
+  bench ref changes while this runs (a polish round writing finals), it stops before writing anything.
 
 PROGRESS (--progress, default <out>/../progress)
   v1_vs_v2.wav: the five sounds v1 had (key press, UI click, pop, fast whoosh, impact): v1 final, v2 final, v1 final,
-  v2 final, each peak-matched to -1 dBFS (v1 = demo/forge-test/<sound>/final/<sound>_01 and _02; v2 = the v2 final
-  closest to that v1 final in 1/3-octave balance and audible length, so like is played against like). progress.txt
-  lists every start time. progress.md: the measured before / after numbers from eval/forge/results_v1.json against the
-  newest eval/forge/results_v2r<N>.json (both from the same frozen held-out benchmark, eval/forge/bench.py).
+  v2 final (v1 = demo/forge-test/<sound>/final/<sound>_01 and _02; v2 = the v2 final closest to that v1 final in
+  1/3-octave balance and audible length, so like is played against like). The four sounds of a group play equally
+  loud at their loudest moment (the blind test's measure: K-weighted loudest 100 ms, or momentary 400 ms for a group
+  with a sound of 1 s or more) at -15 / -16 LUFS, and one common gain per group keeps every true peak at or under
+  -1 dBTP. progress.txt lists every start time and level. progress.md: the measured before / after numbers from
+  eval/forge/results_v1.json against the newest eval/forge/results_v2r<N>.json (both from the same frozen held-out
+  benchmark, eval/forge/bench.py).
 """
 import argparse
 import glob
@@ -62,17 +92,33 @@ for _p in (REPO, HERE):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 import frozen_tone  # noqa: E402  (1/3-octave profile, the benchmark's own frozen copy)
-from earshot import features  # noqa: E402  (BS.1770 integrated LUFS)
+from earshot import features  # noqa: E402  (BS.1770 K-weighting, momentary meter, true peak)
 from earshot.forge import refsets  # noqa: E402
 
 SR = 48000
 MADE = f'{REPO}/out/forge_v2'
-PEAK_MAX_DB = -1.0
-PAIR_LUFS_M = -16.0          # the louder sound of a pair at this momentary-max loudness (unless the peak cap is lower)
-PRE, FADE_IN = 0.005, 0.001
+MANIFEST = f'{REPO}/out/refs/manifest.json'
 LEAD, GAP, BETWEEN, TAIL = 1.0, 1.2, 2.5, 1.0
-SHORT_S = 1.0
 COMPAT = 1.3                 # made finals whose audible extent is within this factor of an available bench ref
+# trim (see the module doc)
+ON_DB, END_DB = -50.0, -50.0
+REACH_MARGIN, FLOOR_MARGIN, HEAD_MARGIN = 3.0, 10.0, 1.0
+LEVEL_CAP = -6.0
+FADE_IN_S = 0.004
+FADE_DB, FADE_MIN_S = 6.0, 0.005
+REF_FADE_DEFAULT, MADE_FADE_GUARD = 0.03, 0.01
+ENV = {'short': (0.0025, 3), 'long': (0.005, 6)}          # envelope hop (s), smoothing (frames)
+CLEAN_HEAD, CLEAN_REACH, CLEAN_FLOOR = -30.0, -30.0, -50.0  # pick preference: quiet start, natural decay, low floor
+# level
+SHORT_S = 1.0
+WIN = {'short': 0.1, 'long': 0.4}
+TARGET = {'short': -15.0, 'long': -16.0}
+TP_MAX = -1.0
+# cleanliness limits
+FAIL_AT = {'loud_lu': 0.5, 'true_peak_dbtp': TP_MAX + 0.05, 'floor_margin_db': 6.0, 'preroll_ms': 5.0,
+           'edge_diff_db': 10.0, 'edge_loud_db': -20.0, 'floor_exposed_ms': 100.0, 'floor_exposed_dbfs': -70.0}
+WARN_AT = {'length_ratio': 1.6, 'true_peak_diff_db': 6.0, 'other_window_lu': 2.0, 'mono_corr': 0.995,
+           'wide_corr': 0.9, 'floor_dbfs': -60.0, 'floor_exposed_ms': 30.0}
 
 # (category, answer-sheet name, trials at N = 20, tier from the round-3 verdicts in OVERNIGHT.md / results_v2r3.md;
 #  round 4 moved toggle from weak to middle: tone 10.4 -> 7.8 dB, curve 14.6 -> 10.1 dB, ring lines gone, v2r4.md)
@@ -121,8 +167,16 @@ def rel(p):
     return p[len(REPO) + 1:] if p.lower().startswith(REPO.lower() + '/') else p
 
 
-def load(p):
-    x, sr = sf.read(p, always_2d=True, dtype='float64')
+def norm(p):
+    return os.path.normcase(os.path.abspath(p))
+
+
+def load(p, start=None, stop=None):
+    if start is None:
+        x, sr = sf.read(p, always_2d=True, dtype='float64')
+    else:
+        sr = sf.info(p).samplerate
+        x, sr = sf.read(p, start=int(start * sr), stop=int(stop * sr), always_2d=True, dtype='float64')
     if sr != SR:
         from math import gcd
         from scipy import signal
@@ -153,112 +207,296 @@ def end_of(x, below=50.0):
 
 
 def extent_s(x):
+    """audible extent: first 1 ms frame within 40 dB of the loudest to the last 5 ms frame within 50 dB (picks only)"""
     return (end_of(x) - onset(x)) / SR
-
-
-def peak_db(x):
-    return float(20 * np.log10(np.abs(x).max() + 1e-12))
-
-
-def rms100_db(x, kw=False):
-    """RMS of the loudest 100 ms (the whole sound over 100 ms when shorter); kw=True: K-weighted first (BS.1770
-    pre-filter), so low rumble does not count as loud"""
-    if kw:
-        x = features._kw(np.concatenate([np.zeros((int(0.05 * SR), 2)), x]))[int(0.05 * SR):]
-    m = (x ** 2).mean(axis=1)
-    w = int(0.1 * SR)
-    c = np.convolve(m, np.ones(w) / w, mode='valid') if len(m) > w else np.array([m.sum() / w])
-    return float(10 * np.log10(c.max() + 1e-20))
-
-
-def lufs_int(x):
-    n = int(0.4 * SR)
-    if len(x) < n:
-        x = np.concatenate([x, np.zeros((n - len(x), 2))])
-    return float(features.integrated_lufs(x))
-
-
-def lufs_max(x):
-    """momentary-max loudness (K-weighted 400 ms windows, zero-padded when shorter), as a meter shows it"""
-    t, L = features.loudness_curve(x if len(x) >= int(0.4 * SR) else np.concatenate(
-        [x, np.zeros((int(0.4 * SR) - len(x), 2))]), 0.4, 0.01)
-    return float(np.max(L))
 
 
 def raised(n):
     return 0.5 - 0.5 * np.cos(np.pi * np.arange(n) / max(1, n))
 
 
-def peak_late(x):
-    """riser-like: the loudest 5 ms frame lies in the last 30 % of the audible extent (it builds to its end)"""
-    e, n = frames_db(x, 5.0)
-    o, end = onset(x), end_of(x)
-    return int(np.argmax(e)) * n >= o + 0.7 * (end - o)
+def power_frames(x, n, smooth=1):
+    """channel-summed mean power per n-sample frame (the last partial frame zero-padded), optionally smoothed"""
+    p = (x ** 2).sum(axis=1)
+    k = -(-len(p) // n)
+    p = np.concatenate([p, np.zeros(k * n - len(p))]).reshape(k, n).mean(axis=1)
+    if smooth > 1 and k > 1:
+        p = np.convolve(p, np.ones(smooth) / smooth, mode='same')
+    return p
 
 
-def level_at(x, i):
-    """level (dB re the loudest 5 ms frame) of the 5 ms frame at sample i"""
-    e, n = frames_db(x, 5.0)
-    return round(float(e[max(0, min(len(e) - 1, i // n))] - e.max()), 1)
+def db10(p):
+    return 10 * np.log10(np.asarray(p, dtype='float64') + 1e-20)
 
 
-def trim_pair(a, b):
-    """one common length for both clips (see the module doc); returns (a', b', length, align, cut levels).
-    'start' alignment: both begin PRE before their onset; a clip that has to stop before its file ends gets a fade-out
-    (15 % of the length, 10-300 ms), a clip that ends with its file keeps its own ending. 'end' alignment (both build
-    to their end, risers): both end where their files end; the longer one loses its quiet start under a fade-in."""
-    pre = int(PRE * SR)
-    fo = lambda L: int(np.clip(0.15 * L, 0.010 * SR, 0.300 * SR))
-    if peak_late(a) and peak_late(b):
-        starts = [max(0, onset(x) - pre) for x in (a, b)]
-        L = int(min(len(a) - starts[0], len(b) - starts[1]))
-        out, cut = [], []
-        for x in (a, b):
-            s = len(x) - L
-            y = x[s:].copy()
-            n_in = fo(L) if s > max(0, onset(x) - pre) + int(0.001 * SR) else int(FADE_IN * SR)
-            cut.append(level_at(x, s) if n_in > int(FADE_IN * SR) else None)
-            y[:n_in] *= raised(n_in)[:, None]
-            out.append(y)
-        return out[0], out[1], L, 'end', cut
-    starts, avail, ext = [], [], []
-    for x in (a, b):
-        s = onset(x) - pre
-        starts.append(s)
-        avail.append(len(x) - s)
-        ext.append(end_of(x) - s)
-    L = int(min(min(avail), max(ext) + 0.03 * SR))
-    out, cut = [], []
-    for x, s, av in zip((a, b), starts, avail):
-        y = np.concatenate([np.zeros((-s, 2)), x[:s + L]]) if s < 0 else x[s:s + L].copy()
-        y = y[:L]
-        fi = int(FADE_IN * SR)
-        y[:fi] *= raised(fi)[:, None]
-        if L < av - int(0.001 * SR):                      # truncated: fade out (and say how loud it was there)
-            f = fo(L)
-            cut.append(level_at(x, max(0, s) + L - f))
-            y[L - f:] *= raised(f)[::-1][:, None]
-        else:
-            cut.append(None)
-        out.append(y)
-    return out[0], out[1], L, 'start', cut
+def loud_max(x, win):
+    """the loudest `win`-second window, K-weighted (BS.1770), LUFS scale (-0.691 + channel-summed mean square);
+    every sample position; a sound shorter than the window counts over the whole window (silence after it)"""
+    pad = np.zeros((int(0.05 * SR), 2))
+    y = features._kw(np.concatenate([pad, x, pad]))
+    p = (y ** 2).sum(axis=1)
+    w = int(round(win * SR))
+    if len(p) < w:
+        p = np.concatenate([p, np.zeros(w - len(p))])
+    c = np.concatenate([[0.0], np.cumsum(p)])
+    return float(-0.691 + 10 * np.log10(((c[w:] - c[:-w]) / w).max() + 1e-20))
 
 
-def match_pair(real, made):
-    """gain (dB) on the made clip so it plays as loud as the real one, the method name, and the two differences"""
-    if len(real) / SR < SHORT_S:
-        dp, dr = peak_db(real) - peak_db(made), rms100_db(real, kw=True) - rms100_db(made, kw=True)
-        return 0.5 * (dp + dr), 'short: mean of sample peak and K-weighted loudest-100-ms RMS', {
-            'peak_diff_db': dp, 'rms100_kw_diff_db': dr}
-    di, dm = lufs_int(real) - lufs_int(made), lufs_max(real) - lufs_max(made)
-    return 0.5 * (di + dm), 'long: mean of integrated and momentary-max LUFS', {'lufs_i_diff_db': di,
-                                                                                  'lufs_m_max_diff_db': dm}
+def meter_m400(x):
+    """earshot's own momentary meter (features.loudness_curve, 400 ms, 10 ms hop), padded to 400 ms: a cross-check"""
+    n = int(0.4 * SR)
+    xx = x if len(x) >= n else np.concatenate([x, np.zeros((n - len(x), 2))])
+    return float(np.max(features.loudness_curve(xx, 0.4, 0.01)[1]))
 
 
-def levels(x):
-    return {'peak_dbfs': round(peak_db(x), 2), 'rms100_dbfs': round(rms100_db(x), 2),
-            'rms100_kw_db': round(rms100_db(x, kw=True), 2), 'lufs_i': round(lufs_int(x), 2),
-            'lufs_m_max': round(lufs_max(x), 2)}
+def true_peak(x):
+    return float(features.true_peak_dbtp(x))
+
+
+def rms_dbfs(x):
+    return float(10 * np.log10(np.mean(x ** 2) + 1e-20)) if len(x) else -200.0
+
+
+def stereo_corr(x):
+    a, b = x[:, 0], x[:, 1]
+    return float((a * b).sum() / np.sqrt((a * a).sum() * (b * b).sum() + 1e-30))
+
+
+# ------------------------------------------------------------------------------------------------ file facts, trim
+_MANIFEST = None
+
+
+def manifest_entry(p):
+    """the refset manifest's record of a bench ref (source path, trim, fade, gain), or None"""
+    global _MANIFEST
+    if _MANIFEST is None:
+        _MANIFEST = {}
+        try:
+            m = json.load(open(MANIFEST, encoding='utf-8'))
+            for c in m.values():
+                for split in ('forge', 'bench'):
+                    for e in (c.get(split) or []) if isinstance(c, dict) else []:
+                        if isinstance(e, dict) and e.get('file'):
+                            _MANIFEST[norm(e['file'])] = e
+        except (OSError, ValueError):
+            pass
+    return _MANIFEST.get(norm(p))
+
+
+_FLOOR = {}
+
+
+def source_floor(p):
+    """recording floor of a bench ref (channel-summed mean power at the ref's own scale), measured in its source
+    recording: 5th percentile of 50 ms windows above digital silence (-100 dB), within 20 s of the trim, at the trim's
+    gain. None when the source is not on this machine (or p is not a bench ref)."""
+    if p in _FLOOR:
+        return _FLOOR[p]
+    e, out = manifest_entry(p), None
+    if e and e.get('source_path') and os.path.exists(e['source_path']):
+        try:
+            a, b = e.get('trim_s') or [0.0, 0.0]
+            dur = sf.info(e['source_path']).duration
+            x = load(e['source_path'], max(0.0, a - 20.0), min(dur, b + 20.0))
+            w = power_frames(x, int(0.05 * SR))
+            w = w[w > 2e-10]
+            if len(w):
+                out = float(np.percentile(w, 5)) * 10 ** (float(e.get('gain_db') or 0.0) / 10)
+        except (RuntimeError, ValueError, OSError):
+            out = None
+    _FLOOR[p] = out
+    return out
+
+
+def end_fade_s(p):
+    """length of the file's own end fade (bench refs: from the manifest; made finals: a short guard)"""
+    e = manifest_entry(p)
+    if e is not None:
+        return float(e.get('fade_out_s') or REF_FADE_DEFAULT)
+    return MADE_FADE_GUARD
+
+
+def analyse(x, cls, fade_s, floor_pow=None, cut_file=True):
+    """the facts a trim needs, levels in dB re the loudest envelope frame (`cls` envelope). cut_file: the file was cut
+    from a longer recording (a bench ref, after its own 2 ms fade-in): its level 2-5 ms in says whether the cut went
+    into the sound. Made finals are rendered from digital silence (head None)."""
+    hop, sm = ENV[cls]
+    n = int(round(hop * SR))
+    p = power_frames(x, n, sm)
+    top = float(db10(p.max()))
+    e = db10(p) - top
+    e1 = db10(power_frames(x, SR // 1000)) - top           # 1 ms frames, same reference
+    ip = int(np.argmax(e))
+    guard = int(np.ceil((fade_s + 0.005) * SR / n))
+    stop = max(ip + 1, len(e) - guard)
+    last = int(np.ceil(0.015 * SR / n))
+    return {'e': e, 'n': n, 'e1': e1, 'top': top, 'ip': ip, 'stop': stop,
+            'reach': float(e[max(ip, stop - last):stop].min()),     # where the sound stands as the file's fade begins
+            'head': (float(e1[2:5].max()) if len(e1) > 5 else float(e1.max())) if cut_file else None,
+            'peak_late': ip * n >= 0.85 * len(x),
+            'strike': float(e1[:15].max()) >= -6.0,          # loud within its first 15 ms: a struck sound
+            'floor': None if floor_pow is None else float(db10(floor_pow)) - top}
+
+
+def pair_levels(ia, ib):
+    """(L_on, L_end): the common onset and end levels of a pair, dB re each sound's loudest frame"""
+    floors = [i['floor'] + FLOOR_MARGIN for i in (ia, ib) if i['floor'] is not None]
+    l_end = max([END_DB] + [i['reach'] + REACH_MARGIN for i in (ia, ib)] + floors)
+    l_on = max([ON_DB] + [i['head'] + HEAD_MARGIN for i in (ia, ib) if i['head'] is not None] + floors)
+    return min(l_on, LEVEL_CAP), min(l_end, LEVEL_CAP)
+
+
+def cut(x, info, l_on, l_end, keep_end=False):
+    """one clip: 4 ms fade-in up to the onset (first 1 ms frame at l_on), to where the envelope last stands at l_end
+    (before the file's end fade), fade-out over the last FADE_DB of the decay. keep_end (a pair that both build to
+    their end, risers): the clip keeps the file's own ending (2 ms safety fade). Returns (clip, facts)."""
+    e, n, e1 = info['e'], info['n'], info['e1']
+    hit = np.nonzero(e1 >= l_on)[0]
+    on = int(hit[0]) * (SR // 1000) if len(hit) else 0
+    fi = int(round(FADE_IN_S * SR))
+    start = on - fi
+    above = np.nonzero(e[:info['stop']] >= l_end)[0]
+    j = int(above[-1]) if len(above) else info['ip']
+    end = int(min(len(x), (j + 1) * n))
+    hi = np.nonzero(e[:j + 1] >= l_end + FADE_DB)[0]
+    f0 = int((hi[-1] + 1) * n) if len(hi) else int((info['ip'] + 1) * n)
+    f0 = max(on, min(f0, end - int(FADE_MIN_S * SR)))
+    keep_end = bool(keep_end and e[info['stop'] - 1] >= l_end)
+    if keep_end:        # still loud where the file's own end fade begins: the file's own ending stays
+        end = len(x)
+        j = len(e) - 1
+        f0 = end - int(0.002 * SR)
+    y = x[max(0, start):end].copy()
+    if start < 0:
+        y = np.concatenate([np.zeros((-start, 2)), y])
+    y[:fi] *= raised(fi)[:, None]
+    nf = end - f0
+    y[len(y) - nf:] *= raised(nf)[::-1][:, None]
+    # trim edges (dB re the loudest frame): the loudest 1 ms in the first half of the fade-in (what it audibly ramps:
+    # the file before the onset, silence where the clip starts before the file) and the loudest of what the trim
+    # dropped in the 5 ms after the end (at the file's end: its last frame)
+    k1 = SR // 1000
+    pre = e1[max(0, start) // k1:max(0, start + fi // 2) // k1]
+    cut_in = float(pre.max()) if len(pre) else -200.0
+    m = int(np.ceil(0.005 * SR / n))
+    cut_out = float(e[j + 1:j + 1 + m].max()) if j + 1 < len(e) else float(e[-1])
+    # floor heard inside the clip: unfaded envelope frames within 6 dB of the recording floor (dips between events)
+    exposed = None
+    if info['floor'] is not None:
+        exposed = round(float((e[on // n:max(on // n, f0 // n)] < info['floor'] + 6.0).sum()) * n / SR * 1000, 1)
+    return y, {'onset_s': round(on / SR, 4), 'start_s': round(start / SR, 4), 'end_s': round(end / SR, 4),
+               'fade_out_ms': round(nf / SR * 1000, 1), 'cut_in_db': round(cut_in, 1),
+               'cut_out_db': round(cut_out, 1), 'reach_db': round(info['reach'], 1),
+               'head_db': None if info['head'] is None else round(info['head'], 1),
+               'floor_db': None if info['floor'] is None else round(info['floor'], 1),
+               'floor_exposed_ms': exposed, 'kept_file_end': keep_end, 'end_fade_s': None}
+
+
+def pair_class(xa, xb):
+    return 'long' if max(extent_s(xa), extent_s(xb)) >= SHORT_S else 'short'
+
+
+def trim_pair(real0, made0, real_path, made_path):
+    """both clips of a pair (see the module doc); returns (real, made, cls, l_on, l_end, facts real, facts made)"""
+    cls = pair_class(real0, made0)
+    ir = analyse(real0, cls, end_fade_s(real_path), source_floor(real_path))
+    im = analyse(made0, cls, end_fade_s(made_path), None, cut_file=False)
+    l_on, l_end = pair_levels(ir, im)
+    keep = ir['peak_late'] and im['peak_late']          # both build to their end (risers): both keep their endings
+    real, fr = cut(real0, ir, l_on, l_end, keep)
+    made, fm = cut(made0, im, l_on, l_end, keep)
+    fr['end_fade_s'], fm['end_fade_s'] = end_fade_s(real_path), end_fade_s(made_path)
+    fr['top_db'], fm['top_db'] = round(ir['top'], 3), round(im['top'], 3)
+    return real, made, cls, l_on, l_end, fr, fm
+
+
+def match_pair(real, made, cls):
+    """(made gain dB, common gain dB, cap hit dB): the made clip to the real one on the pair measure, then both to the
+    target, lowered together if a true peak would pass TP_MAX"""
+    g = loud_max(real, WIN[cls]) - loud_max(made, WIN[cls])
+    gc = TARGET[cls] - loud_max(real, WIN[cls])
+    tp = max(true_peak(real), true_peak(made) + g) + gc
+    over = max(0.0, tp - TP_MAX)
+    return g, gc - over, over
+
+
+def clip_levels(y, cls, pre_n):
+    other = 'long' if cls == 'short' else 'short'
+    return {'loud_pair_measure': round(loud_max(y, WIN[cls]), 3),
+            'loud_other_window': round(loud_max(y, WIN[other]), 3),
+            'meter_m400': round(meter_m400(y), 3), 'true_peak_dbtp': round(true_peak(y), 3),
+            'sample_peak_dbfs': round(float(20 * np.log10(np.abs(y).max() + 1e-12)), 3),
+            'preroll_dbfs': round(rms_dbfs(y[:pre_n]), 1), 'length_s': round(len(y) / SR, 4),
+            'stereo_corr': round(stereo_corr(y), 3)}
+
+
+def cleanliness(lr, lm, fr, fm, cls, l_on, l_end, gain_r_db):
+    """(per-side facts, symmetric row, fails, warnings) for one pair as played. gain_r_db: the gain the real clip got
+    (its floor as played = floor re its loudest frame + its loudest frame + this gain)"""
+    fails, warns = [], []
+    d_pair = abs(lr['loud_pair_measure'] - lm['loud_pair_measure'])
+    d_other = abs(lr['loud_other_window'] - lm['loud_other_window'])
+    d_meter = abs(lr['meter_m400'] - lm['meter_m400'])
+    d_tp = abs(lr['true_peak_dbtp'] - lm['true_peak_dbtp'])
+    tp_max = max(lr['true_peak_dbtp'], lm['true_peak_dbtp'])
+    pre_max = max(lr['preroll_dbfs'], lm['preroll_dbfs'])
+    floor_played = margin = None
+    if fr['floor_db'] is not None:
+        floor_played = round(fr['floor_db'] + fr['top_db'] + gain_r_db - 10 * np.log10(2), 1)   # dBFS, per channel
+        margin = round(min(l_end, l_on) - fr['floor_db'], 1)          # under the levels where clips start / end
+    pre_ms = max(fr['onset_s'] - fr['start_s'], fm['onset_s'] - fm['start_s']) * 1000
+    lens = sorted([lr['length_s'], lm['length_s']])
+    ratio = lens[1] / max(lens[0], 1e-6)
+    d_in = abs(fr['cut_in_db'] - fm['cut_in_db'])
+    d_out = abs(fr['cut_out_db'] - fm['cut_out_db'])
+    if d_pair > FAIL_AT['loud_lu']:
+        fails.append(f'loudest-moment difference {d_pair:.2f} LU > {FAIL_AT["loud_lu"]}')
+    if tp_max > FAIL_AT['true_peak_dbtp']:
+        fails.append(f'true peak {tp_max:.2f} dBTP > {TP_MAX}')
+    if pre_ms > FAIL_AT['preroll_ms']:
+        fails.append(f'pre-roll {pre_ms:.1f} ms > {FAIL_AT["preroll_ms"]} ms')
+    if max(fr['cut_in_db'], fm['cut_in_db']) >= l_on:
+        fails.append('the pre-roll holds sound at or above the onset level')
+    if margin is not None and margin < FAIL_AT['floor_margin_db']:
+        fails.append(f'recording floor only {margin:.1f} dB under the onset / end level')
+    exp = fr['floor_exposed_ms'] or 0.0
+    if exp > FAIL_AT['floor_exposed_ms'] and floor_played > FAIL_AT['floor_exposed_dbfs']:
+        fails.append(f'recording floor heard for {exp:.0f} ms inside the clip at {floor_played:.0f} dBFS')
+    elif exp > WARN_AT['floor_exposed_ms']:
+        warns.append(f'the sound dips to within 6 dB of a recording floor for {exp:.0f} ms inside a clip '
+                     f'(floor {floor_played:.0f} dBFS as played)')
+    if d_in > FAIL_AT['edge_diff_db'] and max(fr['cut_in_db'], fm['cut_in_db']) > FAIL_AT['edge_loud_db']:
+        fails.append(f'onset trims differ by {d_in:.1f} dB (louder edge '
+                     f'{max(fr["cut_in_db"], fm["cut_in_db"]):.1f} dB)')
+    if d_out > FAIL_AT['edge_diff_db'] and max(fr['cut_out_db'], fm['cut_out_db']) > FAIL_AT['edge_loud_db']:
+        fails.append(f'end trims differ by {d_out:.1f} dB (louder edge '
+                     f'{max(fr["cut_out_db"], fm["cut_out_db"]):.1f} dB)')
+    if ratio > WARN_AT['length_ratio']:
+        warns.append(f'lengths {lens[0]:.2f} / {lens[1]:.2f} s (x{ratio:.2f})')
+    if d_tp > WARN_AT['true_peak_diff_db']:
+        warns.append(f'true peaks differ by {d_tp:.1f} dB (crest of the sounds themselves)')
+    if d_other > WARN_AT['other_window_lu']:
+        warns.append(f'the other loudness window differs by {d_other:.1f} LU')
+    if floor_played is not None and floor_played > WARN_AT['floor_dbfs']:
+        warns.append(f'a recording floor at {floor_played:.0f} dBFS as played (under the sound, {margin:.0f} dB below '
+                     'where the clips start / end)')
+    cs = sorted([lr['stereo_corr'], lm['stereo_corr']])
+    if cs[1] >= WARN_AT['mono_corr'] and cs[0] < WARN_AT['wide_corr']:
+        warns.append(f'one clip mono, the other wide (stereo corr {cs[0]:.2f} / {cs[1]:.2f})')
+    if cs[0] < 0:
+        warns.append(f'a clip has anti-phase stereo (corr {cs[0]:.2f})')
+    row = {'class': cls, 'matched_on': f'K-weighted loudest {int(WIN[cls] * 1000)} ms',
+           'loudest_moment_diff_lu': round(d_pair, 3), 'other_window_diff_lu': round(d_other, 2),
+           'meter_m400_diff_lu': round(d_meter, 2), 'true_peak_diff_db': round(d_tp, 2),
+           'true_peak_max_dbtp': round(tp_max, 2), 'preroll_max_dbfs': round(pre_max, 1),
+           'preroll_ms': round(pre_ms, 1),
+           'floor_as_played_dbfs': floor_played, 'floor_margin_db': margin, 'floor_exposed_ms': fr['floor_exposed_ms'],
+           'onset_level_db': round(l_on, 1), 'end_level_db': round(l_end, 1),
+           'length_s': lens, 'length_ratio': round(ratio, 3),
+           'onset_trim_levels_db': sorted([fr['cut_in_db'], fm['cut_in_db']]),
+           'end_trim_levels_db': sorted([fr['cut_out_db'], fm['cut_out_db']]),
+           'fade_out_ms': sorted([fr['fade_out_ms'], fm['fade_out_ms']]), 'stereo_corr': cs}
+    return row, fails, warns
 
 
 def write(path, y):
@@ -305,6 +543,28 @@ def allocate(n):
     return {c: k for c, k in alloc.items() if k}
 
 
+_FACTS = {}
+
+
+def facts(p):
+    """(audible extent s, trims cleanly): a cut file starts quietly (2-5 ms in, <= CLEAN_HEAD) or with a strike (within
+    6 dB of its loudest frame in its first 15 ms), not inside a sustained sound; the sound decays naturally before the
+    file's own end fade (<= CLEAN_REACH) or builds to its end (loudest frame in the last 15 %, a riser); its recording
+    floor, where measurable, is at most CLEAN_FLOOR; no anti-phase stereo (corr > -0.5). On the envelope of the file's
+    own length class."""
+    if p not in _FACTS:
+        x = load(p)
+        ext = extent_s(x)
+        ref = manifest_entry(p) is not None
+        i = analyse(x, 'long' if ext >= SHORT_S else 'short', end_fade_s(p), source_floor(p) if ref else None,
+                    cut_file=ref)
+        ok = ((i['head'] is None or i['head'] <= CLEAN_HEAD or i['strike'])
+              and (i['reach'] <= CLEAN_REACH or i['peak_late'])
+              and (i['floor'] is None or i['floor'] <= CLEAN_FLOOR) and stereo_corr(x) > -0.5)
+        _FACTS[p] = (ext, bool(ok))
+    return _FACTS[p]
+
+
 def pick_trials(n, seed):
     import hashlib
     alloc = allocate(n)
@@ -315,31 +575,34 @@ def pick_trials(n, seed):
     for c in alloc:
         for p in bench[c]:
             digest[p] = hashlib.md5(load(p).astype(np.float32).tobytes()).hexdigest()
-    # most constrained category first: fewest distinct sources per trial
-    order = sorted(alloc, key=lambda c: (len({source_of(p) for p in bench[c]}) / alloc[c], c))
+    ext = lambda p: facts(p)[0]
+    clean = lambda p: facts(p)[1]
+    # most constrained category first: fewest distinct clean-trimming sources per trial, then fewest sources
+    order = sorted(alloc, key=lambda c: (len({digest[p] for p in bench[c] if clean(p)}) / alloc[c],
+                                         len({source_of(p) for p in bench[c]}) / alloc[c], c))
     used_hash, used_src, trials = set(), set(), []
-    ext_cache = {}
-
-    def ext(p):
-        if p not in ext_cache:
-            ext_cache[p] = extent_s(load(p))
-        return ext_cache[p]
 
     def available(c):
-        cands = [p for p in bench[c] if digest[p] not in used_hash and source_of(p) not in used_src]
-        if cands:
-            return cands, False
-        return [p for p in bench[c] if digest[p] not in used_hash], True
+        """unused bench refs; clean trimmers first, then (where possible) a source recording not used yet"""
+        cands = [p for p in bench[c] if digest[p] not in used_hash]
+        fresh = [p for p in cands if source_of(p) not in used_src]
+        for pool in ([p for p in fresh if clean(p)], [p for p in cands if clean(p)], fresh, cands):
+            if pool:
+                return pool, any(source_of(p) in used_src for p in pool)
+        return [], False
 
     for c in order:
         fin = finals(c)
         if len(fin) < alloc[c]:
             sys.exit(f'{c}: {len(fin)} finals, {alloc[c]} trials wanted')
-        # random among the length-compatible finals (audible extent within COMPAT of an available bench ref);
-        # if fewer than needed, the finals closest in length. Duration is the only property this pick looks at.
+        # random among the length-compatible finals (audible extent within COMPAT of an available bench ref), clean
+        # trimmers first; if fewer than needed, the finals closest in length. Duration and the edge levels are all
+        # this pick looks at.
         cands0, _ = available(c)
         gap = {m: min(abs(np.log(ext(p) / ext(m))) for p in cands0) for m in fin}
-        pool = [m for m in fin if gap[m] <= np.log(COMPAT)]
+        pool = [m for m in fin if gap[m] <= np.log(COMPAT) and clean(m)]
+        if len(pool) < alloc[c]:
+            pool = [m for m in fin if gap[m] <= np.log(COMPAT)]
         if len(pool) < alloc[c]:
             pool = sorted(fin, key=lambda m: (gap[m], m))[:alloc[c]]
         made = [pool[i] for i in sorted(rng_made.choice(len(pool), alloc[c], replace=False))]
@@ -349,10 +612,12 @@ def pick_trials(n, seed):
                 sys.exit(f'{c}: no unused bench ref left')
             em = ext(m)
             real = min(cands, key=lambda p: (abs(np.log(ext(p) / em)), p))
+            relaxed = source_of(real) in used_src
             used_hash.add(digest[real])
             used_src.add(source_of(real))
             trials.append({'category': c, 'sound': info[c][0], 'tier': info[c][1], 'made': m, 'real': real,
-                           'source_reused': relaxed, 'pool': [os.path.basename(q) for q in pool]})
+                           'source_reused': relaxed, 'pool': [os.path.basename(q) for q in pool],
+                           'clean_trim': {'real': clean(real), 'made': clean(m)}})
     # order: shuffled, no category twice in a row (deterministic from the seed)
     rng_order = np.random.default_rng([seed, 2])
     for _ in range(5000):
@@ -449,46 +714,53 @@ def md5(p):
     return hashlib.md5(open(p, 'rb').read()).hexdigest()
 
 
-def build_blind(out, n, seed, quiet=False):
+def build_blind(out, n, seed, quiet=False, allow_fail=False, dry_run=False):
     inputs = sorted({q for c, *_ in PLAN for q in finals(c) + refsets.refset(c, 'bench')})
     before = fingerprint(inputs)
     trials = pick_trials(n, seed)
     tdir = os.path.join(out, 'blind_test_trials')
-    parts, key, files, t = [], [], [], LEAD
+    pre_n = int(round(FADE_IN_S * SR))
+    parts, key, files, rows, spans, t = [], [], [], [], [], LEAD
+    all_fails, all_warns = [], []
     for i, tr in enumerate(trials, 1):
         real0, made0 = load(tr['real']), load(tr['made'])
-        real, made, L, align, cut = trim_pair(real0, made0)
-        g, how, diff = match_pair(real, made)
-        made = made * 10 ** (g / 20)
-        loud = max(lufs_max(real), lufs_max(made))
-        gc = min(PEAK_MAX_DB - max(peak_db(real), peak_db(made)), PAIR_LUFS_M - loud)
-        real, made = real * 10 ** (gc / 20), made * 10 ** (gc / 20)
+        real, made, cls, l_on, l_end, fr, fm = trim_pair(real0, made0, tr['real'], tr['made'])
+        g, gc, over = match_pair(real, made, cls)
+        made = made * 10 ** ((g + gc) / 20)
+        real = real * 10 ** (gc / 20)
+        lr, lm = clip_levels(real, cls, pre_n), clip_levels(made, cls, pre_n)
+        row, fails, warns = cleanliness(lr, lm, fr, fm, cls, l_on, l_end, gc)
         A, B = (real, made) if tr['real_is'] == 'A' else (made, real)
-        slot = L / SR
         ta = round(t, 2)                                  # on the 10 ms grid: the sheet times are exact
-        tb = round(ta + slot + GAP, 2)
+        tb = round(ta + len(A) / SR + GAP, 2)
         parts += [(ta, A), (tb, B)]
+        spans += [(int(round(ta * SR)), len(A)), (int(round(tb * SR)), len(B))]
         pad = np.zeros((int(0.25 * SR), 2))
         files += [(os.path.join(tdir, f't{i:02d}_A.wav'), np.concatenate([pad, A, pad])),
                   (os.path.join(tdir, f't{i:02d}_B.wav'), np.concatenate([pad, B, pad]))]
-        lr, lm = levels(real), levels(made)
+        rows.append({'trial': i, 'sound': tr['sound'], **row, 'fails': fails, 'warnings': warns})
+        all_fails += [f'trial {i} ({tr["sound"]}): {m}' for m in fails]
+        all_warns += [f'trial {i} ({tr["sound"]}): {m}' for m in warns]
         key.append({
             'trial': i, 'category': tr['category'], 'sound': tr['sound'], 'tier': tr['tier'],
-            'A_start': round(ta, 2), 'B_start': round(tb, 2), 'length_s': round(slot, 3), 'real': tr['real_is'],
+            'A_start': round(ta, 2), 'B_start': round(tb, 2),
+            'length_s': {'A': round(len(A) / SR, 3), 'B': round(len(B) / SR, 3)}, 'real': tr['real_is'],
             'real_file': rel(tr['real']), 'made_file': rel(tr['made']),
-            'real_source_reused_elsewhere': tr['source_reused'],
+            'real_source_reused_elsewhere': tr['source_reused'], 'clean_trim_pick': tr['clean_trim'],
             'file_length_s': {'real': round(len(real0) / SR, 3), 'made': round(len(made0) / SR, 3)},
             'audible_extent_s': {'real': round(extent_s(real0), 3), 'made': round(extent_s(made0), 3)},
-            'align': align,
-            'cut_at_db': {'real': cut[0], 'made': cut[1]},     # level where a truncated clip's fade begins (None: kept)
+            'class': cls, 'onset_level_db': round(l_on, 1), 'end_level_db': round(l_end, 1),
+            'trim': {'real': fr, 'made': fm},
             'made_drawn_from': tr['pool'],
-            'match': how, 'made_gain_db': round(g, 2), 'pair_gain_db': round(gc, 2),
-            'differences_before_match_db': {k: round(v, 2) for k, v in diff.items()},
+            'match': f'K-weighted loudest {int(WIN[cls] * 1000)} ms, made to real, then both to {TARGET[cls]} LUFS'
+                     f' (true peak <= {TP_MAX} dBTP)',
+            'made_gain_db': round(g, 2), 'pair_gain_db': round(gc, 2), 'peak_cap_lowered_db': round(over, 2),
             'levels_as_played': {'real': lr, 'made': lm},
+            'cleanliness': {'fails': fails, 'warnings': warns},
             'note': NOTES.get(tr['category'], ''),
             'md5': {'real': md5(tr['real']), 'made': md5(tr['made'])},
         })
-        t = round(tb + slot + BETWEEN, 2)
+        t = round(tb + len(B) / SR + BETWEEN, 2)
     now = fingerprint(inputs)
     if now != before:          # nothing is written: the folder keeps the previous complete build
         changed = [rel(q) for q in inputs if now.get(q) != before.get(q)]
@@ -496,19 +768,94 @@ def build_blind(out, n, seed, quiet=False):
                  'run this again when it is done (nothing written)')
     total = t - BETWEEN + TAIL
     y = place(parts, total)
-    assert np.abs(y).max() <= 10 ** (PEAK_MAX_DB / 20) + 1e-6
+    # silence-only gaps: every sample outside the clips is exactly zero
+    mask = np.ones(len(y), bool)
+    for s, ln in spans:
+        mask[s:s + ln] = False
+    gaps_silent = bool(np.all(y[mask] == 0.0))
+    if not gaps_silent:
+        all_fails.append('the gaps between clips are not digital silence')
+    if np.abs(y).max() > 10 ** (TP_MAX / 20) + 1e-6:
+        all_fails.append(f'a sample above {TP_MAX} dBFS in blind_test.wav')
+    worst = lambda k: max((r[k] for r in rows if r[k] is not None), default=None)
+    summary = {
+        'status': 'FAIL' if all_fails else 'PASS', 'trials': len(rows),
+        'pairs_with_fails': sum(bool(r['fails']) for r in rows),
+        'pairs_with_warnings': sum(bool(r['warnings']) for r in rows),
+        'max_loudest_moment_diff_lu': worst('loudest_moment_diff_lu'),
+        'max_meter_m400_diff_lu': worst('meter_m400_diff_lu'),
+        'max_true_peak_dbtp': worst('true_peak_max_dbtp'), 'max_true_peak_diff_db': worst('true_peak_diff_db'),
+        'max_preroll_dbfs': worst('preroll_max_dbfs'), 'max_floor_as_played_dbfs': worst('floor_as_played_dbfs'),
+        'min_floor_margin_db': min((r['floor_margin_db'] for r in rows if r['floor_margin_db'] is not None),
+                                   default=None),
+        'max_length_ratio': worst('length_ratio'), 'gaps_digital_silence': gaps_silent,
+        'fails': all_fails, 'warnings': all_warns}
+    clean = {
+        'what': 'residual differences between the two clips of each trial that a listener could use besides sound '
+                'quality, measured on the clips as they play. No answers here: every value is a difference, a '
+                'maximum or a sorted pair, never "real" or "made", so this file is safe to open before listening.',
+        'limits_fail': FAIL_AT, 'limits_warn': WARN_AT,
+        'method': {'trim': 'both clips start 4 ms (raised-cosine fade-in) before their first 1 ms frame at the '
+                           'common onset level and end where their decay last stands at the common end level, with a '
+                           'fade-out over the last 6 dB above it (see eval/forge/blind_v2.py)',
+                   'level': 'made matched to real on the K-weighted loudest 100 ms (short pairs) or 400 ms (long '
+                            'pairs), then both to -15 / -16 LUFS, lowered together if a true peak would pass -1 dBTP',
+                   'floor': "a real ref's recording floor is measured in its source recording (5th percentile of 50 "
+                            'ms windows), as it plays after the gains'},
+        'summary': summary, 'trials': rows}
+    if dry_run:
+        print(f"cleanliness {summary['status']} (dry run, nothing written): {len(rows)} trials, max loudest-moment "
+              f"difference {summary['max_loudest_moment_diff_lu']} LU, max true peak {summary['max_true_peak_dbtp']} "
+              f"dBTP, min floor margin {summary['min_floor_margin_db']} dB")
+        for m in all_fails:
+            print('  FAIL ' + m)
+        for m in all_warns:
+            print('  warning: ' + m)
+        return key, clean
+    if all_fails and not allow_fail:
+        print('CLEANLINESS FAIL (nothing written; the folder keeps its previous build):')
+        for m in all_fails:
+            print('  ' + m)
+        sys.exit(2)
+    json.dumps(clean), json.dumps(key)       # serialisable before anything is replaced
     os.makedirs(tdir, exist_ok=True)
     for old in glob.glob(os.path.join(tdir, 't*_[AB].wav')):
         os.remove(old)
     for f, x in files:
         write(f, x)
     write(os.path.join(out, 'blind_test.wav'), y)
+    # read the written trial files back (24-bit) and measure them again: what the listener gets
+    pad_n = int(0.25 * SR)
+    ver = []
+    for i, k in enumerate(key, 1):
+        cls = k['class']
+        ab = {s_: sf.read(os.path.join(tdir, f't{i:02d}_{s_}.wav'), always_2d=True, dtype='float64')[0][pad_n:-pad_n]
+              for s_ in 'AB'}
+        ver.append((abs(loud_max(ab['A'], WIN[cls]) - loud_max(ab['B'], WIN[cls])),
+                    max(true_peak(ab['A']), true_peak(ab['B']))))
+    summary['verified_from_written_files'] = {'max_loudest_moment_diff_lu': round(max(v[0] for v in ver), 3),
+                                              'max_true_peak_dbtp': round(max(v[1] for v in ver), 2)}
+    if max(v[0] for v in ver) > FAIL_AT['loud_lu'] or max(v[1] for v in ver) > FAIL_AT['true_peak_dbtp']:
+        summary['status'] = 'FAIL'
+        summary['fails'].append('the written trial files do not hold the matched levels')
+    json.dump(clean, open(os.path.join(out, 'cleanliness.json'), 'w', encoding='utf-8'), indent=1)
+    sign = lambda f, eps: {'made_more': int(sum(f(k) > eps for k in key)),
+                           'made_less': int(sum(f(k) < -eps for k in key)),
+                           'same': int(sum(abs(f(k)) <= eps for k in key))}
+    lv = lambda k, q: k['levels_as_played']['made'][q] - k['levels_as_played']['real'][q]
+    signs = {'other_loudness_window_0.1lu': sign(lambda k: lv(k, 'loud_other_window'), 0.1),
+             'meter_m400_0.1lu': sign(lambda k: lv(k, 'meter_m400'), 0.1),
+             'true_peak_0.5db': sign(lambda k: lv(k, 'true_peak_dbtp'), 0.5),
+             'length_10pct': sign(lambda k: np.log(k['levels_as_played']['made']['length_s']
+                                                    / k['levels_as_played']['real']['length_s']), np.log(1.1))}
     json.dump({'seed': seed, 'built': time.strftime('%Y-%m-%d %H:%M'), 'trials': key,
-               'excluded_categories': EXCLUDED,
+               'excluded_categories': EXCLUDED, 'cleanliness': summary,
+               'residual_signs_made_vs_real': signs,
                'how': 'built by eval/forge/blind_v2.py (see its docstring): forge v2 finals (random pick among the '
-                      'length-compatible ones) vs held-out bench refs (closest audible length, no file / source '
-                      'twice), equal-length trims (fade only where a clip is cut), made matched to real in level, '
-                      'random order and A/B (real = A on half the trials)'},
+                      'length-compatible, cleanly trimmable ones) vs held-out bench refs (closest audible length, no '
+                      'file / source twice), both trimmed to their audible extent at common levels re their own '
+                      'loudest frame (matched fades), made matched to real on the loudest moment, random order and '
+                      'A/B (real = A on half the trials)'},
               open(os.path.join(out, 'KEY_open_after.json'), 'w', encoding='utf-8'), indent=1)
     open(os.path.join(out, 'score_answers.py'), 'w', encoding='utf-8').write(SCORE_PY)
     from math import comb
@@ -516,16 +863,30 @@ def build_blind(out, n, seed, quiet=False):
     pk = lambda k: sum(comb(nt, j) for j in range(k, nt + 1)) / 2 ** nt
     k05 = next(k for k in range(nt + 1) if pk(k) < 0.05)
     cats = sorted({k['category'] for k in key})
+    fl, fm_ = summary['max_floor_as_played_dbfs'], summary['min_floor_margin_db']
+    fl_s = (f'recording floors at most {fl:.0f} dBFS, at least {fm_:.0f} dB under where the clips start and end'
+            if fl is not None
+            else 'no recording floor measurable')
+    cl = (f"Cleanliness: {summary['status']}. Loudest moments within {summary['max_loudest_moment_diff_lu']:.2f} LU "
+          f"in every pair; true peaks at most {summary['max_true_peak_dbtp']:.1f} dBTP; no clip plays room noise "
+          f"before or after its sound (each starts with a {FADE_IN_S * 1000:.0f} ms fade-in just before its onset and "
+          f"ends with a matched fade at the same decay level as its partner; {fl_s}); gaps are digital silence. "
+          f"{summary['pairs_with_warnings']} pair(s) with warnings, 0 with fails: cleanliness.json (safe to open now: "
+          'it never says which clip is real).')
+    if all_fails:
+        cl = f'Cleanliness: FAIL ({len(all_fails)} problem(s), see cleanliness.json); written with --allow-fail.'
+    import textwrap
+    cl = chr(10).join(textwrap.wrap(cl, 112))
     L = ['Blind test: blind_test.wav (or blind_test_trials/tNN_A.wav + tNN_B.wav, one trial at a time).',
          'In every trial you hear A, then B. One is a REAL recording, the other was made entirely in code by earshot',
          'forge. Write down which one you think is REAL (A or B; ? if you cannot decide). Do not open KEY_open_after.json',
-         'first. The two sounds of a trial are matched in loudness and trimmed to the same length (short fades),',
-         'and the real recordings come from a held-out set the forge never tuned against. Silence between trials, no',
-         'markers: each trial starts at the times below.',
+         'first. Both sounds of a trial are trimmed the same way to where they are audible (no room noise before or',
+         'after either), play equally loud at their loudest moment, and the real recordings come from a held-out set',
+         'the forge never tuned against. Silence between trials, no markers: each trial starts at the times below.',
          f'Then:  .venv\\Scripts\\python.exe {rel(out).replace("/", chr(92))}\\score_answers.py A B ...  '
          f'({nt} letters, in trial order)',
          f'By chance you would get about {nt // 2} of {nt} right; {k05} or more is unlikely by luck '
-         f'(p = {pk(k05):.3f}).', '',
+         f'(p = {pk(k05):.3f}).', '', cl, '',
          f"{'trial':>5}  {'sound':<18} {'A starts':>8}  {'B starts':>8}   real is (A/B)"]
     for k in key:
         L.append(f"{k['trial']:>5}  {k['sound']:<18} {k['A_start']:8.2f}  {k['B_start']:8.2f}   ____")
@@ -534,7 +895,9 @@ def build_blind(out, n, seed, quiet=False):
     open(os.path.join(out, 'answer_sheet.txt'), 'w', encoding='utf-8').write(chr(10).join(L) + chr(10))
     if not quiet:
         print(chr(10).join(L))
-    return key
+        for m in all_warns:
+            print('  warning: ' + m)
+    return key, clean
 
 
 # ------------------------------------------------------------------------------------------------ progress build
@@ -627,7 +990,6 @@ def build_progress(pdir, results_path=None, quiet=False):
     r2 = json.load(open(rp, encoding='utf-8'))
     # listening file
     parts, lines, t = [], [], LEAD
-    gain = 10 ** (PEAK_MAX_DB / 20)
     picks = []
     for name, cat, v1dir, stem in V1:
         v1 = [f'{REPO}/{v1dir}/{stem}_01.wav', f'{REPO}/{v1dir}/{stem}_02.wav']
@@ -637,23 +999,37 @@ def build_progress(pdir, results_path=None, quiet=False):
             d, c = nearest_v2(f, cands)
             cands = [q for q in cands if q != c]
             seq += [('v1', f, None), ('v2', c, d)]
-        lines.append(f'{name}  (v2 category {cat})')
-        for ver, f, d in seq:
-            x = load(f)
-            x = x * (gain / (np.abs(x).max() + 1e-12))
+        xs = [load(f) for _, f, _ in seq]
+        # the four sounds equally loud at their loudest moment (the blind test's measure), one common gain per group
+        # keeps every true peak at or under TP_MAX
+        cls = 'long' if max(extent_s(x) for x in xs) >= SHORT_S else 'short'
+        gains = [TARGET[cls] - loud_max(x, WIN[cls]) for x in xs]
+        over = max(0.0, max(true_peak(x) + g for x, g in zip(xs, gains)) - TP_MAX)
+        gains = [g - over for g in gains]
+        lines.append(f'{name}  (v2 category {cat}; matched on the K-weighted loudest {int(WIN[cls] * 1000)} ms'
+                     + (f', all {over:.1f} dB under the target so no true peak passes {TP_MAX} dBTP)' if over else ')'))
+        for (ver, f, d), x, g in zip(seq, xs, gains):
+            x = x * 10 ** (g / 20)
             parts.append((t, x))
+            lm, tp = loud_max(x, WIN[cls]), true_peak(x)
             extra = f'   (v2 final closest to the v1 final before it: distance {d:.1f})' if d is not None else ''
-            lines.append(f'  {t:7.2f} s  {ver}  {rel(f)}{extra}')
-            picks.append({'sound': name, 'version': ver, 'start': round(t, 2), 'file': rel(f)})
+            lines.append(f'  {t:7.2f} s  {ver}  loudest {lm:6.2f} LUFS  true peak {tp:6.2f} dBTP  {rel(f)}{extra}')
+            picks.append({'sound': name, 'version': ver, 'start': round(t, 2), 'file': rel(f),
+                          'gain_db': round(g, 2), 'loudest_lufs': round(lm, 3), 'true_peak_dbtp': round(tp, 2),
+                          'measure': f'K-weighted loudest {int(WIN[cls] * 1000)} ms'})
             t += len(x) / SR + 1.0
         t += 2.0
     total = t - 3.0 + TAIL
     y = place(parts, total)
     write(os.path.join(pdir, 'v1_vs_v2.wav'), y)
     head = ['v1_vs_v2.wav: the five sounds forge v1 had, before (v1) and after (v2), alternating v1, v2, v1, v2.',
-            'Every sound peak-matched to -1 dBFS (so the after is not just louder); 1 s between sounds, 3 s between',
-            'sound groups. Each v2 final is the one closest to the v1 final before it in 1/3-octave balance + audible',
-            'length (distance = RMS dB over the bands + 6 dB per octave of length), so each pair is like for like.',
+            'The four sounds of a group play equally loud at their loudest moment (K-weighted loudest 100 ms; 400 ms',
+            f'when a sound is 1 s or longer) at {TARGET["short"]:g} / {TARGET["long"]:g} LUFS; one common gain per '
+            f'group keeps every true peak at or under {TP_MAX:g} dBTP',
+            '(so neither version wins by level; the peaks left differ by the crest of the sounds). 1 s between sounds,',
+            '3 s between sound groups. Each v2 final is the one closest to the v1 final before it in 1/3-octave',
+            'balance + audible length (distance = RMS dB over the bands + 6 dB per octave of length), so each pair is',
+            'like for like.',
             f'total {len(y) / SR:.1f} s, 48 kHz, 24-bit stereo', '']
     open(os.path.join(pdir, 'progress.txt'), 'w', encoding='utf-8').write(chr(10).join(head + lines) + chr(10))
     # numbers
@@ -756,13 +1132,17 @@ def main():
     ap.add_argument('--n', type=int, default=20, help='trials (default 20)')
     ap.add_argument('--results', default=None, help='v2 benchmark JSON (default: the newest results_v2r<N>.json)')
     ap.add_argument('--only', choices=('blind', 'progress'), default=None)
+    ap.add_argument('--allow-fail', action='store_true',
+                    help='write the blind test even when a cleanliness limit fails (marked FAIL in the files)')
+    ap.add_argument('--dry-run', action='store_true', help='build the blind test in memory, print its cleanliness, '
+                    'write nothing (the progress file is skipped too)')
     a = ap.parse_args()
     out = os.path.abspath(a.out if os.path.isabs(a.out) else os.path.join(REPO, a.out))
     pdir = a.progress or os.path.join(os.path.dirname(out), 'progress')
     pdir = os.path.abspath(pdir if os.path.isabs(pdir) else os.path.join(REPO, pdir))
     if a.only != 'progress':
-        build_blind(out, a.n, a.seed)
-    if a.only != 'blind':
+        build_blind(out, a.n, a.seed, allow_fail=a.allow_fail, dry_run=a.dry_run)
+    if a.only != 'blind' and not a.dry_run:
         build_progress(pdir, a.results)
 
 

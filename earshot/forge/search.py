@@ -28,7 +28,11 @@ critic's reference recordings (Prescreen: 1/3-octave tonal balance in units of t
 artifact checks) and embed only the best `pop` with CLAP. The model checks are the expensive part (CLAP is ~70 % of a
 generation), the measurements cost ~10 ms a sound, and they are the signal that still separates made from real once
 the model checks saturate. `reps=N` renders each scored candidate on N seeds and ranks it by the mean (robust to lucky
-renders). Starting points: the recipe's DEFAULTS, `init` (e.g. a seed bank, `load_seeds()`) are scored in generation 0.
+renders). Starting points: the recipe's DEFAULTS, `init` (e.g. a seed bank, `load_seeds()`) are scored in generation 0,
+exactly as given; a SPACE key a start leaves out takes the recipe's DEFAULTS (the object's own, then those of the module
+that defines its render: recipe_defaults()), clipped into the space if they lie outside it, and the spec's mid-range
+only when no DEFAULTS has the key (a MidRangeFill warning; res['fill_warnings'] lists every such value). Before round 5
+a missing key always got the mid-range (search._encode's 0.5): a hidden value (pro_impact round 3: snap 0.75).
 
 `space=` restricts the search to a family (a narrower {name: spec} dict; parameters it leaves out keep the recipe's
 DEFAULTS). `robust()` re-renders a result on new noise seeds (the best single render of a search is a winner's curse:
@@ -42,6 +46,7 @@ import os
 import sys
 import time
 import traceback
+import warnings
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
@@ -50,6 +55,10 @@ from . import dsp
 
 SR = 48000
 SEEDS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'seeds')
+
+
+class MidRangeFill(UserWarning):
+    """a start point's SPACE key had no value in the start or in any DEFAULTS and was set to the spec's mid-range"""
 
 
 # ---------------------------------------------------------------------------------------------- parameters
@@ -96,6 +105,73 @@ def _inside(spec, v):
         return spec[0] <= v <= spec[1] and (len(spec) < 3 or spec[2] != 'int' or float(v).is_integer())
     except TypeError:
         return False
+
+
+def _clip(spec, v):
+    """the nearest value inside a numeric spec (None for a choice list or a value that is not a number)"""
+    if isinstance(spec, list):
+        return None
+    try:
+        lo, hi = float(spec[0]), float(spec[1])
+        c = min(max(float(v), lo), hi)
+    except (TypeError, ValueError):
+        return None
+    return int(round(c)) if len(spec) > 2 and spec[2] == 'int' else c
+
+
+def midrange(spec):
+    """the value a unit-cube 0.5 decodes to for one SPACE spec (what a key missing from a start point used to get)"""
+    return _decode({'k': spec}, [0.5])['k']
+
+
+def recipe_defaults(recipe):
+    """the values a key missing from a start point falls back to: the recipe object's own DEFAULTS over the DEFAULTS
+    of the module that defines its render(). A stand-in object (a family member whose DEFAULTS is one preset, a
+    driver's final-pass object whose DEFAULTS is its first member) still reaches the recipe module's DEFAULTS."""
+    own = dict(getattr(recipe, 'DEFAULTS', None) or {})
+    fn = getattr(recipe, 'render', None)
+    fn = getattr(fn, 'func', fn)                          # functools.partial
+    mod = sys.modules.get(getattr(fn, '__module__', None) or '')
+    if mod is not None and mod is not recipe and isinstance(getattr(mod, 'SPACE', None), dict):
+        md = getattr(mod, 'DEFAULTS', None)
+        if isinstance(md, dict):
+            return {**md, **own}
+    return own
+
+
+def fill_start(space, start, defaults, own=None):
+    """complete one start point for the searched `space`: each SPACE key keeps the start's own value, else the
+    recipe's DEFAULTS (`defaults`, recipe_defaults()), clipped into the space when it lies outside, and only when
+    neither has a value the spec's mid-range. Returns (full start dict, notes): notes = [{'key', 'value', 'from'}] for
+    every value not taken from the start or the object's own DEFAULTS (`own`): 'module DEFAULTS', 'DEFAULTS clipped'
+    (a default outside the space: the nearest value inside, for a choice the list does not hold its middle entry),
+    'mid-range' (no value anywhere: a hidden value; round 4 found one that put a 0 dB onset tick into pro_impact) or
+    'start clipped' (a start value outside the space: the search scores the decoded, clipped value as before)."""
+    full, notes = dict(start), []
+    own = own if own is not None else defaults
+    for k, spec in space.items():
+        v = start.get(k)
+        src = 'start'
+        if v is None:
+            v, src = defaults.get(k), ('DEFAULTS' if own.get(k) is not None else 'module DEFAULTS')
+        if v is None:
+            full[k] = midrange(spec)
+            notes.append({'key': k, 'value': full[k], 'from': 'mid-range'})
+            continue
+        if not _inside(spec, v):
+            to = _clip(spec, v)
+            if to is None:                                 # a choice the space's list does not hold: the list is
+                to = midrange(spec)                        # the author's narrower choice, take its middle entry
+            if src == 'start':
+                notes.append({'key': k, 'value': to, 'from': 'start clipped', 'was': v})
+                continue                                   # the search keeps today's rule: decoded (clipped)
+            full[k] = to
+            notes.append({'key': k, 'value': to, 'from': 'DEFAULTS clipped', 'was': v})
+            continue
+        full[k] = v
+        if src == 'module DEFAULTS':
+            notes.append({'key': k, 'value': v, 'from': src})
+    return full, notes
 
 
 def _mirror(x):
@@ -429,8 +505,9 @@ def optimize(recipe, critic, budget=160, pop=16, elite=4, seed=0, init=None, sig
              fresh=0.15, log=None, space=None, reps=1, strategy='es', prescreen=0, workers=None, patience=4,
              sigma_stop=0.03, pre=None, cma=None):
     """returns {'best': [top results], 'history': [every scored result], 'generations': n, 'gens': [per-generation
-    stats], 'timing': {...}, 'strategy', 'prescreen'}; a result = {gen, u, params, seed, score[, pre]}.
-    space: optional narrower {name: spec} (a family); parameters it leaves out keep the recipe's DEFAULTS.
+    stats], 'timing': {...}, 'strategy', 'prescreen', 'fill_warnings'}; a result = {gen, u, params, seed, score[, pre]}.
+    space: optional narrower {name: spec} (a family); parameters it leaves out keep the recipe's DEFAULTS (a start
+    point keeps its own; a start's missing SPACE keys are filled by fill_start(): DEFAULTS, never a silent mid-range).
     reps: renders per candidate (ranked by the mean total; budget counts candidates, so reps=2 costs twice the time).
     strategy: 'es' (v1) | 'cma' (separable CMA-ES with restarts). prescreen=K > pop: render K per generation, rank
     them model-free against the critic's refs (`pre=` a prebuilt Prescreen) and score only the best pop.
@@ -444,6 +521,24 @@ def optimize(recipe, critic, budget=160, pop=16, elite=4, seed=0, init=None, sig
     d = len(space)
     defaults = dict(getattr(recipe, 'DEFAULTS', {}) or {})
     starts = [defaults] + [{**defaults, **dict(p)} for p in (init or [])]
+    # a SPACE key a start leaves out takes the recipe's DEFAULTS (the object's, then its render module's), never the
+    # mid-range _encode() gives a missing key (round 4: a driver's final pass over members built off DEFAULTS got
+    # snap 0.75 / sheen 1.0 that way, a 0 dB onset tick); mid-range only when no DEFAULTS has the key, with a warning
+    fill_defaults = recipe_defaults(recipe)
+    fill_warnings = []
+    for j, st in enumerate(starts):
+        starts[j], notes = fill_start(space, st, fill_defaults, own=defaults)
+        for nt in notes:
+            if nt['from'] != 'module DEFAULTS':
+                fill_warnings.append({'start': j, **nt})
+    if fill_warnings:
+        msg = (f"forge: {len(fill_warnings)} start value(s) not from the start or DEFAULTS: "
+               + '; '.join(f"start {w['start']} {w['key']} = {w['value']!r} ({w['from']})" for w in fill_warnings[:8])
+               + (' ...' if len(fill_warnings) > 8 else ''))
+        if log:
+            log(msg)
+        if any(w['from'] == 'mid-range' for w in fill_warnings):  # a driver that silences log still hears this
+            warnings.warn(msg, MidRangeFill, stacklevel=2)
     gens = max(1, budget // pop)
     K = int(prescreen or 0)
     use_pre = K > pop
@@ -478,9 +573,9 @@ def optimize(recipe, critic, budget=160, pop=16, elite=4, seed=0, init=None, sig
                 U.append(u)
                 seeds.append(int(R.integers(0, 2 ** 31)))
         params = [{**base, **_decode(space, u)} for u in U]
-        if strategy == 'cma':                             # starting points keep their exact values (inside the space)
-            for j in range(fixed):
-                params[j].update({k: v for k, v in starts[j].items() if k in space and _inside(space[k], v)})
+        for j in range(fixed):                            # starting points are scored as given (filled: fill_start):
+            params[j].update({k: v for k, v in starts[j].items()        # exact values inside the space, their own
+                              if k not in space or _inside(space[k], v)})  # values for keys outside it
         prows, first = None, None
         if use_pre:
             t0 = time.time()
@@ -566,7 +661,7 @@ def optimize(recipe, critic, budget=160, pop=16, elite=4, seed=0, init=None, sig
     timing['rendered_per_min'] = round(timing['rendered'] / max(timing['total_s'], 1e-9) * 60, 1)
     return {'best': ranked[:max(elite, 8)], 'history': history, 'generations': gens, 'gens': gstats,
             'timing': timing, 'strategy': strategy, 'prescreen': K if use_pre else 0, 'restarts': restarts,
-            'full_space': full}
+            'full_space': full, 'fill_warnings': fill_warnings}
 
 
 def robust(recipe, critic, params, seeds=4, seed0=5000, workers=None):
@@ -630,61 +725,120 @@ def seeds_path(recipe, folder=None):
     return os.path.join(folder or SEEDS_DIR, f'{name}.json')
 
 
+def _rank(e):
+    v = e.get('rank_score')
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return -1e9
+    return v if np.isfinite(v) else -1e9
+
+
 def load_seeds(recipe, target=None, refs=None, n=6, folder=None):
     """good parameter sets found so far for a recipe (earshot/forge/seeds/<recipe>.json): up to n param dicts, the
-    ones found with the same target + refs first, then the rest by score. [] when there is no bank."""
+    ones found with the same target + refs first (the delivered members of that context first: save_seeds
+    delivered=), then the rest by score. [] when there is no bank."""
     path = seeds_path(recipe, folder)
     if not os.path.exists(path):
         return []
     with open(path, encoding='utf-8') as fh:
         bank = json.load(fh)
     ctx = _ctx(target, refs)
-    ents = sorted(bank.get('entries', []), key=lambda e: (e.get('context') != ctx, -float(e.get('rank_score', -1e9))))
+    ents = sorted(bank.get('entries', []), key=lambda e: (e.get('context') != ctx, not e.get('delivered'), -_rank(e)))
     return [dict(e['params']) for e in ents[:n]]
 
 
-def save_seeds(recipe, picks, target=None, refs=None, source='', folder=None, per_context=6, cap=48):
-    """merge picks ({params, score[, robust]} dicts) into the recipe's seed bank; ranked by the robust mean when there
-    is one, else the total. Keeps it small: per_context entries per target + refs, cap in all (the newest contexts
-    win; 48 leaves room for one recipe serving several categories, e.g. whoosh: fast / big / pro_big), near-duplicate
-    parameter sets merged. Atomic write. Returns the bank dict."""
+def save_seeds(recipe, picks, target=None, refs=None, source='', folder=None, per_context=6, cap=48, delivered=None):
+    """merge picks ({params, score[, robust, seed, family / preset / name]} dicts) into the recipe's seed bank; ranked
+    by the robust mean when there is one, else the total. Keeps it small: per_context entries per target + refs, cap
+    in all (the newest contexts win; 48 leaves room for one recipe serving several categories, e.g. whoosh: fast / big
+    / pro_big), near-duplicate parameter sets merged. Atomic write. Returns the bank dict.
+    delivered= a tag (a category name; True = the context) when the picks are a delivered family: those entries are
+    pinned, always kept (outside per_context and cap, never merged into an ordinary entry, kept without a finite
+    score), and the entries pinned earlier under the same tag lose their pin (a re-delivery replaces the delivery; the
+    old members stay as ordinary entries while they rank). Before round 5 a delivered member could be pushed out by
+    higher-scoring attempts of the same context that were never delivered (logo_sting kept 1 of its 5)."""
     path = seeds_path(recipe, folder)
     bank = {'recipe': os.path.basename(path)[:-5], 'entries': []}
     if os.path.exists(path):
         with open(path, encoding='utf-8') as fh:
             bank = json.load(fh)
     ctx = _ctx(target, refs)
+    tag = (ctx if delivered is True else str(delivered)) if delivered else None
     new = []
     for p in picks:
-        sc = p.get('score', {})
+        sc = p.get('score', {}) or {}
         rb = p.get('robust') or {}
         rank = rb.get('mean') if rb.get('mean') is not None else sc.get('total')
-        if rank is None or not np.isfinite(rank):
+        ok = rank is not None and np.isfinite(rank)
+        if not ok and not tag:
             continue
-        e = {'params': _round_params(p['params']), 'rank_score': round(float(rank), 3), 'context': ctx,
-             'total': sc.get('total'), 'tone_db': sc.get('tone_db'), 'passes': bool(sc.get('passes')),
+        e = {'params': _round_params(p['params']), 'rank_score': round(float(rank), 3) if ok else None,
+             'context': ctx, 'total': sc.get('total'), 'tone_db': sc.get('tone_db'), 'passes': bool(sc.get('passes')),
              'source': source}
         if rb:
             e['robust_mean'], e['robust_pass_rate'] = rb.get('mean'), rb.get('pass_rate')
+        if tag:
+            e['delivered'] = tag
+            member = p.get('family') or p.get('preset') or p.get('member') or p.get('name')
+            if member is not None:
+                e['member'] = str(member)
+            if p.get('seed') is not None:
+                e['seed'] = int(p['seed'])
         new.append(e)
-    ents = new + [e for e in bank.get('entries', [])]
+    old = [dict(e) for e in bank.get('entries', [])]
+    if tag:
+        for e in old:
+            if e.get('delivered') == tag:
+                e.pop('delivered')
+                e['was_delivered'] = tag
+    ents = new + old
+    pinned = [e for e in ents if e.get('delivered')]
     keep, seen_ctx = [], []
     for e in ents:
         if e['context'] not in seen_ctx:
             seen_ctx.append(e['context'])
     for c in seen_ctx:
-        mine = sorted([e for e in ents if e['context'] == c], key=lambda e: -float(e['rank_score']))
-        picked = []
+        mine = sorted([e for e in ents if e['context'] == c and not e.get('delivered')], key=lambda e: -_rank(e))
+        picked = [q for q in pinned if q['context'] == c]
+        n0 = len(picked)
         for e in mine:
+            if len(picked) - n0 >= per_context:
+                break
             if all(e['params'] != q['params'] for q in picked):
                 picked.append(e)
-            if len(picked) == per_context:
-                break
-        keep += picked
-    bank['entries'] = keep[:cap]
+        keep += picked[n0:]
+    bank['entries'] = pinned + keep[:max(0, cap - len(pinned))]
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + f'.tmp{os.getpid()}'
     with open(tmp, 'w', encoding='utf-8') as fh:
         json.dump(bank, fh, indent=1)
     os.replace(tmp, path)
     return bank
+
+
+def report_members(report):
+    """the delivered members of a final's report.json (dict or path) as save_seeds picks: params with the tonal /
+    pop finals' family_params merged under them, seed, score, robust and the member name"""
+    if isinstance(report, str):
+        with open(report, encoding='utf-8') as fh:
+            report = json.load(fh)
+    out = []
+    for pk in report.get('picks', []):
+        m = {k: pk[k] for k in ('score', 'robust', 'seed', 'family', 'preset', 'member', 'name') if pk.get(k) is not None}
+        m['params'] = {**(pk.get('family_params') or {}), **(pk.get('params') or {})}
+        m.setdefault('score', {})
+        out.append(m)
+    return out
+
+
+def pin_delivered(recipe, report, category, target=None, refs=None, folder=None, source=None):
+    """pin a delivered final's members in the recipe's seed bank (save_seeds delivered=category): `report` = the
+    final's report.json (dict or path); the context is the report's target + refs unless given. Returns the bank."""
+    path = report if isinstance(report, str) else None
+    if path:
+        with open(path, encoding='utf-8') as fh:
+            report = json.load(fh)
+    return save_seeds(recipe, report_members(report), target if target is not None else report.get('target'),
+                      refs if refs is not None else report.get('refs'), folder=folder, delivered=category,
+                      source=source or f"delivered final ({category})" + (f', {path}' if path else ''))

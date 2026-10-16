@@ -295,3 +295,48 @@ def test_round4_wrappers_keep_older_parameter_sets():
         mod = load_recipe(module)
         p = dict(mod.DEFAULTS_R3)
         assert np.array_equal(mod.render(p, dsp.rng(4)), W.render(p, dsp.rng(4))), module
+
+
+# ---------------------------------------------------------------------------------------------- round 5 (polish-ui)
+def test_round5_options_off_render_as_before():
+    """the round-5 keys (tail_sweep / tail_tau / hiss_q / tail_gust) at their off values render exactly as a parameter
+    set without them (the round-4 finals and seed-bank entries still reproduce)"""
+    mod = load_recipe('whoosh')
+    for base in (mod.FAST_R4, mod.FAST_R3, mod.BIG):
+        p = dict(base)
+        off = {**p, 'tail_sweep': 0.0, 'tail_tau': 0.4, 'hiss_q': 0.6, 'tail_gust': 0.0}
+        assert np.array_equal(mod.render(p, dsp.rng(6)), mod.render(off, dsp.rng(6)))
+    assert set(k for k in mod.OPTIONAL) <= set(mod.SPACE)
+
+
+def _tail_centroid_drop(x):
+    """log2 spectral centroid 120-180 ms after the peak over 20-80 ms after it (< 0: the tail keeps moving down)"""
+    m = _mono(x)
+    p = int(np.argmax(np.abs(m)))
+    f = np.fft.rfftfreq(int(0.06 * SR), 1 / SR)
+
+    def cen(a):
+        seg = m[p + int(a * SR):p + int(a * SR) + int(0.06 * SR)]
+        F = np.abs(np.fft.rfft(seg * np.hanning(len(seg)), n=len(f) * 2 - 2)) ** 2
+        return float((F * f).sum() / (F.sum() + 1e-20))
+    return float(np.log2(max(cen(0.12), 20.0) / max(cen(0.02), 20.0)))
+
+
+def test_round5_fast_tail_is_moving_air():
+    """round-4 bench: the long air tail leaned 'steam hiss' (a parked hiss band after the peak). With tail_sweep the
+    tail's band keeps sinking: the tail centroid falls further than with the round-4 tail (presets x seeds 3-5,
+    median), and the family median darken stays in the real range (> -0.45) with t40 kept (>= 180 ms)"""
+    mod = load_recipe('whoosh')
+    new, old, dk, t40 = [], [], [], []
+    for n in ('crisp', 'sleeve', 'whistle', 'heavy', 'reverse'):
+        p = mod.preset('fast', n)
+        assert p['tail_sweep'] > 0
+        for s in (3, 4, 5):
+            x = mod.render(p, dsp.rng(s))
+            new.append(_tail_centroid_drop(x))
+            old.append(_tail_centroid_drop(mod.render({**p, 'tail_sweep': 0.0, 'hiss_q': 0.6}, dsp.rng(s))))
+            dk.append(_darken(x))
+            t40.append(_t40(x))
+    assert np.median(new) < np.median(old) - 0.02, (np.median(new), np.median(old))   # (0.6 oct over 0.25 s: the
+    # hiss band alone sinks ~0.16 oct between the two windows; the air body dilutes the whole-sound centroid)
+    assert np.median(dk) > -0.45 and np.median(t40) >= 180

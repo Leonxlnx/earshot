@@ -228,6 +228,37 @@ R4_EDITS = {
 }
 
 
+# Round 5 (polish-pro; the brief: match the film dings - a 2 kHz fundamental + a ~3.4x partial, 1-15 ms attack, t20
+# 27-42 ms - clean and pleasant, a semitone family). What earshot showed first: CLAP calls the four film dings themselves
+# 'a cheap synthesized beep' / 'a computer-generated electronic tone' (out/forge_v2/pro_notify/LOG.md, round 5), so the
+# 'cheap beep' words that sank the round-4 attempts are the films' own reading, not a fault; the round-3 members carry a
+# 3-16 kHz noise breath ('crisp hi-hats'), struck-bar modes and a driven body (a harmonic comb) the films do not have.
+# The round-5 members are the film's two-stage ding made clean: a pure head (sine + the 3.4x partial dying faster, a slow
+# doublet beat, no drive, no breath, no bar modes), held 30-40 ms and gated ~20 dB, then the body an octave under (with
+# its 3x / 7x lines: the films' 1.5x / 3.5x-of-head lines) swelling in under the gate with a gentle tremolo, a small
+# plate, a little width. One per film ding on the semitone ladder, each with that ding's measured attack (1 / 15 / 3 /
+# 14 ms), and a fifth member a semitone up. The round-3 family (the delivered finals until round 5) is FAMILY_R3.
+FAMILY_R3 = {'pro_notify': [dict(p) for p in FAMILY['pro_notify']]}
+_CLEAN = dict(style='ding', step_db=-30.0, hold=0.034, hold_tau=0.25, drop_db=-20.0, drop_ms=4.0, ring_tau=0.05,
+              bright=0.25, p2=3.42, oct=0.0, detune=0.8, tick_db=-30.0, tick_f=9000.0, body_db=-22.0, body_ratio=0.5,
+              body_in=0.03, body_tau=0.13, body_p3=0.25, body_p7=0.2, trem=0.35, trem_hz=24.0, drive=0.0,
+              head_drive=0.0, air=-60.0, p3=0.0, verb=0.15, rt60=0.3, width=0.7, head_width=0.15, length=0.3,
+              fade=0.05, hp=500.0)
+FAMILY['pro_notify'] = [
+    _fam(**{**_CLEAN, 'f0': _LADDER[0], 'att': 0.0015, 'length': 0.26}),                                    # film ding 1
+    _fam(**{**_CLEAN, 'f0': _LADDER[1], 'att': 0.012, 'step_db': -26.0, 'hold': 0.04, 'body_db': -21.0,
+            'width': 0.9, 'head_width': 0.25, 'length': 0.27}),                                             # film ding 2
+    _fam(**{**_CLEAN, 'f0': _LADDER[2], 'att': 0.003, 'hold': 0.036, 'body_tau': 0.2, 'body_db': -20.0,
+            'length': 0.36, 'trem': 0.45}),                                                                 # film ding 3
+    _fam(**{**_CLEAN, 'f0': _LADDER[3], 'att': 0.011, 'step_db': -26.0, 'hold': 0.04, 'bright': 0.32,
+            'width': 0.9, 'head_width': 0.25, 'length': 0.3}),                                              # film ding 4
+    _fam(**{**_CLEAN, 'f0': _LADDER[4], 'att': 0.004, 'hold': 0.03, 'bright': 0.2, 'body_ratio': 1.0,
+            'body_p3': 0.15, 'body_p7': 0.0, 'body_db': -19.0, 'body_tau': 0.16, 'trem': 0.25,
+            'length': 0.26}),                                                                               # a semitone up
+]
+FAMILY_NAMES = {'pro_notify': ['ding_1822', 'ding_1930', 'ding_2045', 'ding_2167', 'ding_2296']}
+
+
 def family_space(params, style=None):
     """the search space for one family member: its FINE keys free (full SPACE ranges), every other key fixed to its
     value (a one-element choice list: the forge's way of pinning a parameter)"""

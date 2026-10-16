@@ -137,10 +137,15 @@ SPACE = {
     'hiss_width': (0.0, 1.0),           # decorrelated hiss side (L +, R -; mono sum unchanged): a wide surface
     'room_damp': (0.1, 0.8),            # room high damping (default 0.55): lower = a brighter, airier tail
     'low_width': (0.0, 1.0),            # decorrelated low band side (L +, R -; mono sum unchanged): a wide surface
+    # round 5 (optional, off = absent: renders exactly as before): the tail as MOVING air, not a static hiss
+    'tail_sweep': (0.0, 3.0),           # octaves the hiss band (both edges) and the air body keep sinking after the peak
+    'tail_tau': (0.05, 0.6, 'log'),     # time constant of that glide (s): the wake recedes for the whole tail
+    'hiss_q': (0.6, 3.0),               # resonance of the hiss low-pass (0.6 = round 4): a filtered band with a peak
+    'tail_gust': (0.0, 0.8),            # slow (4-7 Hz) gust AM of the hiss in the tail only (turbulence, not a steady hiss)
 }
 OPTIONAL = {'low_lag': 0.0, 'hiss_rustle': 0.0, 'hiss_lo': None, 'eq_lo_db': 0.0, 'eq_lo_f': 150.0, 'eq_hi_db': 0.0, 'eq_hi_f': 4000.0,
             'hiss_pre': None, 'hiss_tail': None, 'hiss_mfloor': 0.0, 'hiss_width': 0.0, 'room_damp': 0.55,
-            'low_width': 0.0}
+            'low_width': 0.0, 'tail_sweep': 0.0, 'tail_tau': 0.25, 'hiss_q': 0.6, 'tail_gust': 0.0}
 
 # whoosh_fast 'crisp' of round 2 (the base the big / pro_big families and swish / swipe derive from)
 DEFAULTS_R2 = {
@@ -191,6 +196,17 @@ FAST_R3 = FAST
 # 130 ms approach (rise 0.13 at rise_k 0.7) cut the door-like labels 0.43 -> 0.13 and lifted 'Whoosh' 0.07 -> 0.25
 FAST = {**FAST_R3, 'rise': 0.13, 'rise_k': 0.7, 'fall': 0.2, 'room_wet': 0.1, 'room_damp': 0.3,
         'hiss_tail': 0.75, 'hiss_mfloor': 0.35, 'hiss_pre': 0.8}
+FAST_R4 = FAST
+# round 5 (polish-ui; the round-4 bench: the long air tail leans 'steam hiss', CLAP margin 2.56 -> 1.66, and 3 of 6
+# still read door-like): round 4's open hiss parked at a fixed band after the peak (hiss_mfloor keeps the low-pass at
+# its floor), a static hiss. Now the wake keeps receding: both hiss band edges sink tail_sweep octaves (and the air
+# body half that) with a 0.25 s time constant after the peak, under a resonant low-pass (hiss_q 1.4: a filtered band
+# with a moving peak). Same tail length. Probe (out/forge_v2/_polish_ui/wf_probe.py, the 6 round-4 picks x 2 seeds,
+# with the member fixes below): darken -0.04 -> -0.18 (forge refs -0.16), tail 4-12 kHz share -23.6 -> -24.9 dB (forge
+# refs -24.7), t40 225 -> 238 ms; diagnostics: AudioSet door-like 0.135 -> 0.089, 'Whoosh' 0.21 -> 0.29, CLAP
+# (whoosh - 'a static white noise hiss') +0.373 -> +0.395. Stronger sweeps (1-1.5 oct) overshoot the darkening
+# (-0.27..-0.30); tail gusts (slow AM) raised the door labels (0.135 -> 0.19): not used
+FAST = {**FAST_R4, 'tail_sweep': 0.6, 'tail_tau': 0.25, 'hiss_q': 1.4}
 DEFAULTS = FAST
 BIG = {**DEFAULTS_R2,
        'rise': 0.36, 'rise_k': 0.8, 'fall': 0.36, 'fall_k': 0.85, 'start_db': -36.0, 'track': 0.8,
@@ -231,15 +247,28 @@ PRESETS = {
         # round 4: on the airier base crisp and sleeve fell 0.9 dB apart in 1/3-octave balance (test_families_differ):
         # crisp's top is now its grains (brighter, louder, the hiss lower), sleeve's a duller, rougher fabric
         'crisp':   {'grain_db': -17.0, 'grain_rate': 1400.0, 'grain_f': 4800.0, 'hiss_db': -27.0},
-        'sleeve':  {'hiss_rustle': 0.7, 'hiss_db': -20.0, 'hiss_lo': 1200.0, 'eq_hi_db': -7.0},
+        # round 5: the three members still door-like after round 4 (AudioSet top-1 Slam / Slam / Door) each had one
+        # cue: sleeve's strong fabric AM on a leading hiss (rustle 0.7, hiss_pre 0.8: a bright 'slam' onset, on>6k
+        # -25 dB vs the forge refs' -25.5 but rough) -> rustle 0.35, the hiss no longer leads (hiss_pre 1.3); heavy's
+        # deep 14 Hz flutter on a 300 Hz body (a rattling slam) -> 0.35 at 20 Hz; reverse's hard stop (fall 0.04 at
+        # fall_k 1.5: a door shutting) -> a short soft stop (0.08 at 1.0). Probe: door-like 0.11 / 0.26 / 0.18 ->
+        # 0.07 / 0.17 / 0.11, top-1 'Whoosh' on the pick seeds of all three
+        # round 5 variety (one shared tail made the six more alike: the critic's CLAP family cosine 0.778 -> 0.875;
+        # out/forge_v2/_polish_ui/wf_family.py picks per member among tail / fix strengths, door-like held): sleeve
+        # keeps more of its fabric (0.5), whistle and heavy a slower, more resonant sweep (tail_tau 0.4, hiss_q 2.2),
+        # tight keeps round 4's tail (no sweep): 0.835. The sleeve PRESET is 3 dB duller on top (eq_hi -10) so the
+        # hand-designed base stays clearly apart from whistle's (test_families_differ: 1.37 -> 1.63 dB); the delivered
+        # sleeve is its round-4 pick (eq_hi as searched) with only rustle / hiss_pre changed
+        'sleeve':  {'hiss_rustle': 0.5, 'hiss_pre': 1.3, 'hiss_db': -20.0, 'hiss_lo': 1200.0, 'eq_hi_db': -10.0},
         'whistle': {'tone_db': -3.0, 'tone_q': 50.0, 'tone_pure': 1.0, 'tone_ratio': 1.5, 'dop_st': 12.0,
-                    'dop_w': 0.04},
+                    'dop_w': 0.04, 'tail_tau': 0.4, 'hiss_q': 2.2},
         # round 4: heavy's big dark room (wet 0.26, rt60 0.7) was the most door-like tail of the family (AudioSet door
         # 0.9 summed vs 0.2-0.6): a smaller room, the length now from the source fall
-        'heavy':   {'fall': 0.19, 'f_peak': 300.0, 'flut_depth': 0.6, 'flut_f': 14.0, 'room_wet': 0.14, 'rt60': 0.55},
-        'reverse': {'rise': 0.25, 'rise_k': 0.55, 'hold': 0.0, 'fall': 0.04, 'fall_k': 1.5, 'room_wet': 0.15},
+        'heavy':   {'fall': 0.19, 'f_peak': 300.0, 'flut_depth': 0.35, 'flut_f': 20.0, 'room_wet': 0.14, 'rt60': 0.55,
+                    'tail_tau': 0.4, 'hiss_q': 2.2},
+        'reverse': {'rise': 0.25, 'rise_k': 0.55, 'hold': 0.0, 'fall': 0.08, 'fall_k': 1.0, 'room_wet': 0.15},
         'tight':   {'fall': 0.1, 'fall_k': 0.75, 'f_peak': 750.0, 'q_air': 2.5, 'room_wet': 0.12, 'rt60': 0.35,
-                    'grain_db': -20.0, 'grain_rate': 2000.0, 'grain_f': 6000.0},
+                    'grain_db': -20.0, 'grain_rate': 2000.0, 'grain_f': 6000.0, 'tail_sweep': 0.0, 'hiss_q': 0.6},
     },
     'big': {
         # round 3: the round-2 members were near clones to CLAP (family cos 0.909, the held-out real swoops 0.495):
@@ -416,6 +445,10 @@ def render(p, r):
     lf = np.log2(p['f_peak'])
     span = np.where(dt < 0, p['up_oct'], p['down_oct'])
     f_air = 2.0 ** (lf - span * (1.0 - m)) * dop
+    sweep = p.get('tail_sweep', 0.0)
+    if sweep > 0:                            # round 5: the wake keeps receding (time-based glide after the peak), so the
+        gt = 1.0 - np.exp(-np.maximum(dt, 0.0) / p.get('tail_tau', 0.25))   # tail is air moving away, not a parked hiss
+        f_air = f_air * 2.0 ** (-0.5 * sweep * gt)
     flut = np.exp(p['flut_depth'] * _lfnoise(n, p['flut_f'], r) - 0.5 * p['flut_depth'] ** 2)
 
     # air body: three bands moving together, a cliff above
@@ -466,8 +499,15 @@ def render(p, r):
         mf = p.get('hiss_mfloor', 0.0)
         mh = m if mf <= 0 else mf + (1.0 - mf) * m      # round 4: the top stays open on the approach / in the tail
         h_lp = np.clip(p['hiss_hp'] * 2.0 ** (p['hiss_open'] * mh) * 1.5 * dop, 500, 20000)
-        h = dsp.butter(r.standard_normal(n), 'high', h_lo, order=4)
-        h = dsp.svf(h, h_lp, 0.6, 'low')
+        hq = p.get('hiss_q', 0.6)
+        if sweep > 0:                        # round 5: both band edges sink with the wake (a band that keeps moving)
+            sh = 2.0 ** (-sweep * gt)
+            h_lp = np.clip(h_lp * sh, 300, 20000)
+            h_hp = np.clip(h_lo * sh, 150, 16000)
+            h = dsp.svf(dsp.svf(r.standard_normal(n), h_hp, 0.54, 'high'), h_hp, 1.31, 'high')   # ~4th-order Butterworth
+        else:
+            h = dsp.butter(r.standard_normal(n), 'high', h_lo, order=4)
+        h = dsp.svf(h, h_lp, hq, 'low')
         if fab:                              # fabric / paper friction: fibres catch and release, a fast irregular AM
             ru = np.exp(p['hiss_rustle'] * 1.4 * _lfnoise(n, 1.8 * p['rustle_f'], r))
             h = h * ru / np.sqrt(np.mean(ru ** 2))
@@ -477,9 +517,18 @@ def render(p, r):
             w = 0.5 + 0.5 * np.tanh(dt / 0.005)
             pre, post = p.get('hiss_pre') or p['hiss_pow'], p.get('hiss_tail') or p['hiss_pow']
             he = (1 - w) * a ** pre + w * a ** post
+        if p.get('tail_gust', 0.0) > 0:      # round 5: slow gusts in the tail only (the wake's turbulence; drawn only
+            gd = p['tail_gust']              # when used, after the other hiss draws)
+            gw = np.clip(dt / 0.04, 0.0, 1.0)
+            gu = np.exp(gd * _lfnoise(n, 5.5, r) - 0.5 * gd ** 2)
+            he = he * (1.0 - gw + gw * gu)
         layers.append((p['hiss_db'], h * he * flut))
         if p.get('hiss_width', 0.0) > 0:     # round 4: a wide surface: an independent hiss of the same shape, as side
-            h2 = dsp.svf(dsp.butter(r.standard_normal(n), 'high', h_lo, order=4), h_lp, 0.6, 'low')
+            if sweep > 0:
+                h2 = dsp.svf(dsp.svf(r.standard_normal(n), h_hp, 0.54, 'high'), h_hp, 1.31, 'high')
+            else:
+                h2 = dsp.butter(r.standard_normal(n), 'high', h_lo, order=4)
+            h2 = dsp.svf(h2, h_lp, hq, 'low')
             if fab:
                 ru2 = np.exp(p['hiss_rustle'] * 1.4 * _lfnoise(n, 1.8 * p['rustle_f'], r))
                 h2 = h2 * ru2 / np.sqrt(np.mean(ru2 ** 2))

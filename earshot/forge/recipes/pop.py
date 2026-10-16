@@ -350,6 +350,16 @@ DEFAULTS_V2.update({'gdepth': -1.0, 'c_breath': -60.0, 'c_bq': 3.0, 'land_drop':
 # release (2.5 x tail_tau), dB re the tone (-60 = none, round 3)
 SPACE_V2.update({'c_air': (-60.0, -10.0)})
 DEFAULTS_V2.update({'c_air': -60.0})
+# round 5, chirp only (polish-pro; the round-4 judge: CLAP still '8-bit'): c_nat 1 = the natural pop / chirp (_natchirp:
+# a rounded sine body falling fast and settling, a tiny air puff, a natural exponential decay, a tiny room); 0 = the
+# r2-r4 chirp, unchanged
+SPACE_V2.update({'c_nat': (0.0, 1.0), 'c_ptau': (0.002, 0.03, 'log'), 'c_tau': (0.006, 0.05, 'log'),
+                 'c_h2': (0.0, 0.3), 'c_puff': (-60.0, -6.0), 'c_puff_hz': (800.0, 6000.0, 'log'),
+                 'c_puff_ms': (0.6, 6.0, 'log'), 'c_thump': (-60.0, -6.0), 'c_room': (0.0, 0.3),
+                 'c_pre': (-60.0, -3.0), 'c_pre_hz': (3000.0, 11000.0, 'log'), 'c_pre_t': (0.01, 0.04)})
+DEFAULTS_V2.update({'c_nat': 0.0, 'c_ptau': 0.008, 'c_tau': 0.018, 'c_h2': 0.1, 'c_puff': -60.0, 'c_puff_hz': 2500.0,
+                    'c_puff_ms': 2.0, 'c_thump': -60.0, 'c_room': 0.0, 'c_pre': -60.0, 'c_pre_hz': 9000.0,
+                    'c_pre_t': 0.025})   # c_pre: a soft high tick c_pre_t before the pop (the film chirp's pre-blip)
 
 
 def _v2(**kw):
@@ -417,6 +427,32 @@ R4_TRIED = {
     ],
 }
 R4_EDITS = {'pro_pop': [{}, R4_TRIED['pro_pop'][1], {}, {}, {}, {}]}
+# Round 5 (polish-pro): pro_pop = six natural pops / chirps (c_nat 1, no drive), one per character the films use: the
+# film chirp, a mouth pop, the film blip, a falling blip, a plip, a droplet. The round-3 members (the r4 finals = these
+# + R4_EDITS, in out/forge_v2/pro_pop/final_r4/) stay in FAMILY_V2_R4.
+FAMILY_V2_R4 = {'pro_pop': [dict(p) for p in FAMILY_V2['pro_pop']]}
+
+
+def _nat(**kw):
+    return _v2(**{'c_nat': 1.0, 'drive': 0.0, 'steps': 0.0, 'pre_db': -40.0, 'tick_db': -40.0, 'harm': 0.0,
+                  'c_breath': -60.0, 'hp': 150.0, 'lp': 15000.0, 'fade': 0.004, **kw})
+
+
+FAMILY_V2['pro_pop'] = [
+    _nat(f_hi=6500.0, f_lo=420.0, c_ptau=0.009, c_tau=0.02, c_h2=0.08, c_puff=-16.0, c_puff_hz=3500.0, c_puff_ms=1.2,
+         c_room=0.08, c_pre=-10.0, c_pre_hz=9500.0, c_pre_t=0.028),                                  # the film chirp
+    _nat(f_hi=1500.0, f_lo=500.0, c_ptau=0.005, c_tau=0.014, c_h2=0.12, c_puff=-9.0, c_puff_hz=1800.0, c_puff_ms=1.5,
+         c_thump=-12.0, c_room=0.12),                                                                                # a mouth pop
+    _nat(f_hi=1350.0, f_lo=1150.0, c_ptau=0.006, c_tau=0.009, c_h2=0.15, c_puff=-22.0, c_puff_hz=4000.0, c_puff_ms=0.8,
+         c_room=0.06),                                                                                # the film blip
+    _nat(f_hi=1150.0, f_lo=230.0, c_ptau=0.016, c_tau=0.018, c_h2=0.1, c_puff=-16.0, c_puff_hz=2500.0, c_room=0.1,
+         hp=120.0),                                                                                   # a falling blip
+    _nat(f_hi=2000.0, f_lo=1350.0, c_ptau=0.007, c_tau=0.015, c_h2=0.06, c_puff=-14.0, c_puff_hz=5000.0, c_puff_ms=1.0,
+         c_room=0.2),                                                                                 # a plip
+    _nat(f_hi=3200.0, f_lo=850.0, c_ptau=0.004, c_tau=0.011, c_h2=0.05, c_puff=-12.0, c_puff_hz=6000.0, c_puff_ms=0.8,
+         c_room=0.1),                                                                                 # a droplet
+]
+FAMILY_V2_NAMES = {'pro_pop': ['chirp', 'mouth', 'blip', 'drop', 'plip', 'droplet']}
 FINE_V2 = {
     'chirp': ['ease', 'duty', 'start_db', 'tail_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive',
               'fade', 'peak_at', 'c_breath', 'land_drop'],
@@ -464,7 +500,57 @@ def _click(n, db, hz, r, ms=1.5):
     return y
 
 
+def _natchirp(p, r):
+    """round 5 (polish-pro; the round-4 judge: CLAP still says '8-bit'): a natural pop / chirp. A rounded, sine-ish
+    body (a sine + a 2nd partial at c_h2 that dies 3x faster: no odd, square-ish harmonics, no drive) whose pitch falls
+    FAST and settles: f = f_lo + (f_hi - f_lo) exp(-t / c_ptau) (a membrane / lip / bubble release, not a stepped
+    exponential sweep); amplitude 0.4 ms rise then a natural exponential decay (c_tau); a tiny air puff at the onset
+    (c_puff dB: band-limited noise, ~1 ms rise, c_puff_ms decay, centred on c_puff_hz) with a low half-cycle under it
+    (c_thump dB: the monopole of the released air); a tiny room (c_room, nearly mono). Mono / stereo out like the
+    other styles (render_v2 handles drive / filters / the end fade)."""
+    tau = p['c_tau']
+    n = dsp.n_of(min(0.4, max(0.03, 7.0 * tau + 0.006)))
+    t = dsp.t_of(n)
+    f = p['f_lo'] + (p['f_hi'] - p['f_lo']) * np.exp(-t / p['c_ptau'])
+    ph = 2 * np.pi * np.cumsum(f) / SR + r.uniform(0, 2 * np.pi)
+    env = (1 - np.exp(-t / 0.0004)) * np.exp(-t / tau)
+    w2 = np.clip((18000.0 - 2 * f) / 3000.0, 0, 1)
+    y = np.sin(ph) + p['c_h2'] * w2 * np.exp(-2.0 * t / tau) * np.sin(2 * ph + 0.6)
+    y = y * env
+    if p['c_puff'] > -59:                                   # the air puff: a breath of noise at the release
+        k = min(n, dsp.n_of(max(0.004, 5 * p['c_puff_ms'] / 1000)))
+        tk = dsp.t_of(k)
+        hz = p['c_puff_hz']
+        w = dsp.butter(r.standard_normal(k), 'band', (hz / 2.2, min(hz * 2.2, 16000.0)), order=2)
+        w *= (1 - np.exp(-tk / 0.0008)) * np.exp(-tk / (p['c_puff_ms'] / 1000))
+        y[:k] += 10 ** (p['c_puff'] / 20) * w / (np.abs(w).max() + 1e-12)
+    if p['c_thump'] > -59:                                  # the puff's low half-cycle (a soft 'p' under the pop)
+        fl = max(80.0, 0.35 * p['f_lo'])
+        k = min(n, dsp.n_of(1.5 / fl))
+        tk = dsp.t_of(k)
+        th = np.sin(2 * np.pi * fl * tk) * np.exp(-tk * fl * 2.0) * (1 - np.exp(-tk / 0.0006))
+        y[:k] += 10 ** (p['c_thump'] / 20) * th / (np.abs(th).max() + 1e-12)
+    a = dsp.n_of(0.0003)
+    y[:a] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
+    k = dsp.n_of(0.004)                                     # the decay ends on zero (no step under the room)
+    y[-k:] *= np.cos(np.linspace(0, np.pi / 2, k)) ** 2
+    if p['c_pre'] > -59:                                    # the film chirp's pre-blip: a 2.5 ms Hann tone burst with a
+        kp = dsp.n_of(0.0025)                               # short ring, c_pre_t before the pop
+        tp = dsp.t_of(dsp.n_of(p['c_pre_t']))
+        pre = np.sin(2 * np.pi * p['c_pre_hz'] * tp) * np.exp(-np.maximum(tp - 0.00125, 0) / 0.002)
+        pre[:kp] *= np.hanning(kp)
+        pre[kp:] *= 1.0
+        y = np.concatenate([10 ** (p['c_pre'] / 20) * pre, y])
+    if p['c_room'] > 0.005:
+        y = fx.reverb(y, r, rt60=0.1 + 0.4 * p['c_room'], size=0.12, predelay=0.003, damp=0.6, wet=p['c_room'],
+                      stereo=True, width=0.25)
+        y = dsp.trim_tail(y, -56, 0.012)                    # an edited pop: the room's last -56 dB is cut (fade in
+    return y                                                # render_v2)
+
+
 def _chirp(p, r):
+    if p.get('c_nat', 0.0) > 0.5:                           # round 5: the natural pop / chirp (new keys only)
+        return _natchirp(p, r)
     pre = p['pre_db'] > -39.0
     t_sw0 = p['pre_t'] if pre else 0.0
     tail = p['tail_hold'] + 5.5 * p['tail_tau']            # until the landing tone is ~48 dB down

@@ -132,8 +132,8 @@ def test_sub_drops_fall_and_bloom():
 
 
 def test_stings():
-    for name, x in _members(sting, 'pro_logo_sting'):
-        m = sting.measure(x)
+    for name, p in sting.FAMILIES_R4['pro_logo_sting']:                       # the r4 chirp family (final_r4/)
+        m = sting.measure(_render(sting, p))
         assert m['corr'] > 0.99, name                                          # mono
         assert m['t40'] <= 750 and m['ridge'][0] >= 600 and m['ridge'][1] <= 300, (name, m['t40'], m['ridge'])  # chirp -> hum
     for (name, p), (_, x) in zip(sting.FAMILIES['logo_sting'], _members(sting, 'logo_sting')):
@@ -144,7 +144,9 @@ def test_stings():
         hit = x[max(0, int(SR * p['lead_s']) - 48):] if p['lead'] != 'none' else x
         assert polish.attack(hit)['onset_hf_db'] > -20, name                  # the strike owns the hit's onset
         if p['lead'] != 'none':                                                # the lead-in rises into the hit
-            assert m['attack_ms'] >= 60 and m['peak_ms'] / 1000 >= 0.8 * p['lead_s'], (name, m['attack_ms'])
+            # round 5: whoosh_glass takes its r3 searched lead (0.19 s whose last ~45 ms rise within 20 dB of the
+            # peak; r3's delivered whoosh_glass measured 40 ms): >= 40 ms, still a rise into the hit, not a cut
+            assert m['attack_ms'] >= 40 and m['peak_ms'] / 1000 >= 0.8 * p['lead_s'], (name, m['attack_ms'])
 
 
 def test_round4_sting_body_and_top():
@@ -153,13 +155,61 @@ def test_round4_sting_body_and_top():
     for name, x in _members(sting, 'logo_sting'):
         assert -30 < _band_db(x, 20, 150) < -14, (name, _band_db(x, 20, 150))
         assert sting.measure(x)['sh150'] <= sting.STUDY_STING['logo_sting']['sh150'][1], name
-    top = [_band_db(x, 4000, 12000) for _, x in _members(sting, 'pro_logo_sting')]
+    r4 = [(name, _render(sting, p)) for name, p in sting.FAMILIES_R4['pro_logo_sting']]
+    top = [_band_db(x, 4000, 12000) for _, x in r4]
     assert float(np.median(top)) > -30 and max(top) > -20, top
-    for name, x in _members(sting, 'pro_logo_sting'):
+    for name, x in r4:
         assert _band_db(x, 12000, 24000) < -25, (name, _band_db(x, 12000, 24000))
     # the gestures differ: one member has a pre-chirp (two loud events before the hum), one a zap riding the chirp
-    fam = dict(sting.FAMILIES['pro_logo_sting'])
+    fam = dict(sting.FAMILIES_R4['pro_logo_sting'])
     assert any(p.get('double', 0) > 0.3 for p in fam.values()) and any(p.get('zap', 0) > 0.3 for p in fam.values())
+
+
+def _corr(a):
+    return float(np.corrcoef(a[:, 0], a[:, 1])[0, 1]) if a[:, 0].std() > 0 and a[:, 1].std() > 0 else 1.0
+
+
+def test_round5_pro_logo_sting_five_gestures():
+    """round 5 (polish-pro; the round-4 judge: near clones, CLAP cos 0.908, 'error buzz' / 'gunshot'): five different
+    launch-reveal gestures (mode 'gesture'), each with a mono-centred head (L = R dry) and a wider tail, a clean tone
+    (no buzzy harmonic stack: the r4 hum had 12 harmonics through a formant), a top end, and no > 12 kHz hiss"""
+    fam = sting.FAMILIES['pro_logo_sting']
+    assert [p['gesture'] for _, p in fam] == sting.GESTURES and all(p['mode'] == 'gesture' for _, p in fam)
+    tops = []
+    for name, p in fam:
+        x = _render(sting, p)
+        m = x.mean(axis=1)
+        e = np.abs(m)
+        pk = int(np.argmax(e))
+        head = x[max(0, pk - dsp.n_of(0.01)):pk + dsp.n_of(0.04)]
+        tail = x[pk + dsp.n_of(0.2):]
+        assert _corr(head) > 0.9, (name, _corr(head))                        # the head is centred
+        side = lambda a: 10 * np.log10(np.mean((a[:, 0] - a[:, 1]) ** 2) / np.mean((a[:, 0] + a[:, 1]) ** 2) + 1e-12)
+        assert side(tail) > side(head) + 4, (name, side(head), side(tail))  # ... the tail is wider
+        assert _band_db(x, 12000, 24000) < -22, (name, _band_db(x, 12000, 24000))
+        tops.append(_band_db(x, 4000, 12000))
+        assert p['g_warm'] <= 0.45, name                                      # at most a 2nd / 3rd partial
+    assert max(tops) > -20 and float(np.median(tops)) > -32, tops
+    # chirp_hum's hum: the 4th-12th harmonics of the hum stay far under its first three (r4: a buzzy stack)
+    p = dict(fam)['chirp_hum']
+    q = {**p, 'g_wet': 0.0, 'g_land': 0.0, 'g_air': 0.0, 'g_lead': 0.05}
+    y = _render(sting, q).mean(axis=1)[dsp.n_of(0.2):dsp.n_of(0.6)]
+    S = np.abs(np.fft.rfft(y * np.hanning(len(y)))) ** 2
+    f = np.fft.rfftfreq(len(y), 1 / SR)
+    f0 = p['g_root']
+    low = S[(f > 0.6 * f0) & (f < 3.2 * f0)].sum()
+    high = S[(f > 3.6 * f0) & (f < 12.5 * f0)].sum()
+    assert high < 1e-3 * low, 10 * np.log10(high / low)
+
+
+def test_round5_older_sting_sets_render_exactly():
+    """the gesture mode only adds keys: r4 chirp members and the logo_sting launch family render as before (a
+    re-render of the delivered final_r4 / logo_sting finals); the r4 family stays searchable in its own space"""
+    for name, p in sting.FAMILIES_R4['pro_logo_sting'] + sting.FAMILIES['logo_sting']:
+        x = _render(sting, p)
+        assert np.isfinite(x).all() and 0.5 < np.abs(x).max() <= 1.0, name
+        assert 'g_root' not in p, name
+    assert set(sting._SEARCH_R4['pro_logo_sting']) <= set(sting.SPACE)
 
 
 def test_round4_grain_timing_is_random():
@@ -209,3 +259,54 @@ def test_round2_families_still_render():
             for name, p in fam:
                 x = _render(mod, p)
                 assert np.isfinite(x).all() and 0.5 < np.abs(x).max() <= 1.0, (cat, name)
+
+
+# ---------------------------------------------------------------------------------------------- round 5 (polish-ui)
+def _env_db(x, ms):
+    m = x.mean(axis=1) if x.ndim == 2 else x
+    n = int(SR * ms / 1000)
+    k = len(m) // n
+    return 20 * np.log10(np.sqrt((m[:k * n].reshape(k, n) ** 2).mean(1)) + 1e-9)
+
+
+def _decay_rough(x):
+    """std (dB) of the 10 ms envelope around an 80 ms-smoothed copy, from the peak to -40 dB: lumps in the decay"""
+    e = _env_db(x, 10)
+    i = int(np.argmax(e))
+    b = np.nonzero(e[i:] < e[i] - 40)[0]
+    seg = e[i + 3:i + (b[0] if len(b) else len(e) - i)]
+    k = np.hanning(9)
+    k /= k.sum()
+    return float(np.std(seg - np.convolve(np.pad(seg, 4, mode='edge'), k, 'valid')))
+
+
+def _pre_dip(x):
+    """deepest drop (dB) under the preceding 20 ms max in the 120 ms before the peak (2 ms envelope)"""
+    e = _env_db(x, 2)
+    i = int(np.argmax(e))
+    return max([e[t - 10:t].max() - e[t] for t in range(max(10, i - 60), i)] or [0.0])
+
+
+def test_round5_launch_keys_off_render_as_before():
+    """shimmer_smooth 0 / swell_trim 0 render exactly as parameter sets without them (r3 / r4 finals reproduce), and
+    DEFAULTS stays the round-4 base (no round-5 key leaks into older sets merged over it)"""
+    for name, p in sting.FAMILIES_R4['logo_sting']:
+        q = {k: v for k, v in p.items() if k not in ('shimmer_smooth', 'swell_trim')}
+        assert np.array_equal(sting.render(q, dsp.rng(2)), sting.render({**q, 'shimmer_smooth': 0.0, 'swell_trim': 0.0},
+                                                                          dsp.rng(2))), name
+    assert 'shimmer_smooth' not in sting.DEFAULTS and sting.DEFAULTS == dict(sting.FAMILIES_R4['logo_sting'][0][1])
+
+
+def test_round5_logo_sting_body_decays_smoothly():
+    """round-4 bench: logo_sting's envelope got worse. The granular shimmer's lumps stepped the bloom's decay and
+    reverse_bloom's reversed hall dipped ~15 dB just before the hit: round 5's family decays smoother than round 4's
+    (median roughness over members x 2 seeds), reverse_bloom has no pre-hit dip over 6 dB and no late start"""
+    r4 = [_decay_rough(sting.render(p, dsp.rng(s))) for _, p in sting.FAMILIES_R4['logo_sting'] for s in (0, 1)]
+    r5 = [_decay_rough(sting.render(p, dsp.rng(s))) for _, p in sting.FAMILIES['logo_sting'] for s in (0, 1)]
+    assert np.median(r5) < np.median(r4) - 0.05, (np.median(r5), np.median(r4))
+    p = dict(sting.FAMILIES['logo_sting'])['reverse_bloom']
+    for s in (0, 1, 2):
+        x = sting.render(p, dsp.rng(s))
+        assert _pre_dip(x) < 6.0, s
+        e1 = _env_db(x, 1)
+        assert np.nonzero(e1 >= e1.max() - 50)[0][0] <= 100, s     # within 100 ms: placeable on a frame

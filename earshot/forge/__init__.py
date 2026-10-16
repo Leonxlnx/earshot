@@ -315,6 +315,8 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
               'picks': [], 'ref_scores': [], 'ref_scores_loo': True}
     if space is not None:
         report['space'] = space
+    if res.get('fill_warnings'):
+        report['fill_warnings'] = res['fill_warnings']
     xs = [render(rec, h['params'], h['seed']) for h in picks]
     hold = critic.holdout([x for x in xs if x is not None]) if holdout and xs else []
     ref_x = [audio.load(p) for p in critic.refs] if critic.refs else []

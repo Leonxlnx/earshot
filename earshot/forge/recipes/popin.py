@@ -152,6 +152,15 @@ FAMILIES = {      # hold + 2.3 rel ~ t20, hold + 4.6 rel ~ t40 (ms); measured at
         # CLAP match z 1.9 -> 1.1-1.5) but loses its 4-12 kHz skirt (contact_lp_x), the tick and air are pinned quiet, a
         # top roll-off at 6-12 kHz, shorter quieter rings (12-40 ms),
         # shorter files, and a high-pass at 50-80 Hz (no 30-40 Hz sub under the body)
+        # Round 5 (polish-ui; the round-4 bench: the darker taps lost the model checks, AudioSet names 0.6 -> 0.2,
+        # typ z -1.6 -> -2.3). The forge-split critic (out/forge_v2/_polish_ui/tap_probe.py) put the loss in round 4's
+        # 6-8.5 kHz top roll-off and missing air (> 12 kHz -48 dB vs the forge refs' -38; typ z -7.0, p_real 0.42) rather
+        # than in the contact. The delivery (out/forge_v2/tap/final/, tap_deliver.py) is the round-3 picks with the
+        # contact skirt low-passed on finger / glass / table (contact_lp_x 1.5-2.2; knuckle / soft keep it, for variety),
+        # quieter ticks on glass / knuckle, glass contact 4.6 -> 3.2 kHz, shorter rings, the octave-down sub capped (0.12,
+        # table 0.3) over a 55 Hz high-pass: critic medians r4 -> r5 total -2.39 -> -1.6, match z 1.29 -> 1.6, p_real 0.42
+        # -> 0.8, typ z -7.0 -> -3.5; 4-12 kHz -23.4 -> -25.3 dB of total (forge refs -29.6; r3 -19.4), t40 70 -> 75-95 ms
+        # (forge refs 90). The boxes below are round 4's
         'finger': {'width': (0.0, 0.3), 'knock': (0.05, 0.3), 'glass': 0.0, 'body_f': (110, 160, 'log'),
                    'att_ms': (1.0, 2.0, 'log'), 'hold_ms': (0.5, 2, 'log'), 'rel_ms': (2.5, 5, 'log'),
                    'ring_db': (-30, -21), 'ring_ms': (17, 32, 'log'), 'dbl': 0.0, 'contact_db': (-6, 2), 'contact_lp_x': (1.1, 1.8),

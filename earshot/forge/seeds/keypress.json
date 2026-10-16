@@ -60,9 +60,12 @@
    "total": 7.466,
    "tone_db": 7.28,
    "passes": true,
-   "source": "r3 family final typing_key (thock)",
+   "source": "delivered final (typing_key), out/forge_v2/typing_key/final/report.json",
    "robust_mean": 7.594,
-   "robust_pass_rate": 1.0
+   "robust_pass_rate": 1.0,
+   "delivered": "typing_key",
+   "member": "typing_key_01",
+   "seed": 1826701615
   },
   {
    "params": {
@@ -123,9 +126,12 @@
    "total": 4.887,
    "tone_db": 8.65,
    "passes": true,
-   "source": "r3 family final typing_key (crisp)",
+   "source": "delivered final (typing_key), out/forge_v2/typing_key/final/report.json",
    "robust_mean": 4.347,
-   "robust_pass_rate": 0.667
+   "robust_pass_rate": 0.667,
+   "delivered": "typing_key",
+   "member": "typing_key_02",
+   "seed": 1367864807
   },
   {
    "params": {
@@ -186,9 +192,12 @@
    "total": 4.131,
    "tone_db": 6.08,
    "passes": true,
-   "source": "r3 family final typing_key (?)",
+   "source": "delivered final (typing_key), out/forge_v2/typing_key/final/report.json",
    "robust_mean": 4.115,
-   "robust_pass_rate": 0.667
+   "robust_pass_rate": 0.667,
+   "delivered": "typing_key",
+   "member": "typing_key_03",
+   "seed": 1097657232
   },
   {
    "params": {
@@ -249,9 +258,12 @@
    "total": 3.708,
    "tone_db": 9.45,
    "passes": false,
-   "source": "r3 family final typing_key (?)",
+   "source": "delivered final (typing_key), out/forge_v2/typing_key/final/report.json",
    "robust_mean": 4.061,
-   "robust_pass_rate": 0.667
+   "robust_pass_rate": 0.667,
+   "delivered": "typing_key",
+   "member": "typing_key_04",
+   "seed": 579362556
   },
   {
    "params": {
@@ -312,9 +324,12 @@
    "total": 3.348,
    "tone_db": 6.69,
    "passes": false,
-   "source": "r3 family final typing_key (?)",
+   "source": "delivered final (typing_key), out/forge_v2/typing_key/final/report.json",
    "robust_mean": 2.063,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "typing_key",
+   "member": "typing_key_05",
+   "seed": 661058652
   },
   {
    "params": {
@@ -375,9 +390,12 @@
    "total": 2.237,
    "tone_db": 8.38,
    "passes": false,
-   "source": "r3 family final typing_key (?)",
+   "source": "delivered final (typing_key), out/forge_v2/typing_key/final/report.json",
    "robust_mean": 2.155,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "typing_key",
+   "member": "typing_key_06",
+   "seed": 87989972
   },
   {
    "params": {

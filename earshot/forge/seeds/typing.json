@@ -40,9 +40,12 @@
    "total": 4.21,
    "tone_db": 5.61,
    "passes": true,
-   "source": "r3 family final pro_typing_run (blip)",
+   "source": "delivered final (pro_typing_run), out/forge_v2/pro_typing_run/final/report.json",
    "robust_mean": 3.698,
-   "robust_pass_rate": 1.0
+   "robust_pass_rate": 1.0,
+   "delivered": "pro_typing_run",
+   "member": "pro_typing_run_01",
+   "seed": 1097657232
   },
   {
    "params": {
@@ -83,9 +86,12 @@
    "total": 3.55,
    "tone_db": 4.68,
    "passes": true,
-   "source": "r3 family final pro_typing_run (glass)",
+   "source": "delivered final (pro_typing_run), out/forge_v2/pro_typing_run/final/report.json",
    "robust_mean": 3.315,
-   "robust_pass_rate": 1.0
+   "robust_pass_rate": 1.0,
+   "delivered": "pro_typing_run",
+   "member": "pro_typing_run_02",
+   "seed": 1367864807
   },
   {
    "params": {
@@ -126,9 +132,12 @@
    "total": 3.38,
    "tone_db": 4.58,
    "passes": true,
-   "source": "r3 family final pro_typing_run (standard)",
+   "source": "delivered final (pro_typing_run), out/forge_v2/pro_typing_run/final/report.json",
    "robust_mean": 3.21,
-   "robust_pass_rate": 1.0
+   "robust_pass_rate": 1.0,
+   "delivered": "pro_typing_run",
+   "member": "pro_typing_run_03",
+   "seed": 1826701615
   },
   {
    "params": {
@@ -169,9 +178,12 @@
    "total": 2.334,
    "tone_db": 4.09,
    "passes": false,
-   "source": "r3 family final pro_typing_run (tick)",
+   "source": "delivered final (pro_typing_run), out/forge_v2/pro_typing_run/final/report.json",
    "robust_mean": 2.595,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_run",
+   "member": "pro_typing_run_04",
+   "seed": 87989972
   },
   {
    "params": {
@@ -212,9 +224,12 @@
    "total": 0.694,
    "tone_db": 4.76,
    "passes": false,
-   "source": "r3 family final pro_typing_run (double)",
+   "source": "delivered final (pro_typing_run), out/forge_v2/pro_typing_run/final/report.json",
    "robust_mean": 0.888,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_run",
+   "member": "pro_typing_run_05",
+   "seed": 579362556
   },
   {
    "params": {
@@ -255,9 +270,12 @@
    "total": -0.95,
    "tone_db": 5.28,
    "passes": false,
-   "source": "r3 family final pro_typing_run (soft)",
+   "source": "delivered final (pro_typing_run), out/forge_v2/pro_typing_run/final/report.json",
    "robust_mean": -0.132,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_run",
+   "member": "pro_typing_run_06",
+   "seed": 661058652
   },
   {
    "params": {
@@ -289,9 +307,12 @@
    "total": 3.138,
    "tone_db": 2.49,
    "passes": false,
-   "source": "r3 family final pro_typing_key (glass)",
+   "source": "delivered final (pro_typing_key), out/forge_v2/pro_typing_key/final/report.json",
    "robust_mean": 3.141,
-   "robust_pass_rate": 0.333
+   "robust_pass_rate": 0.333,
+   "delivered": "pro_typing_key",
+   "member": "pro_typing_key_01",
+   "seed": 661058652
   },
   {
    "params": {
@@ -323,9 +344,12 @@
    "total": 2.199,
    "tone_db": 3.24,
    "passes": false,
-   "source": "r3 family final pro_typing_key (blip)",
+   "source": "delivered final (pro_typing_key), out/forge_v2/pro_typing_key/final/report.json",
    "robust_mean": 2.572,
-   "robust_pass_rate": 0.667
+   "robust_pass_rate": 0.667,
+   "delivered": "pro_typing_key",
+   "member": "pro_typing_key_02",
+   "seed": 87989972
   },
   {
    "params": {
@@ -357,9 +381,12 @@
    "total": 1.271,
    "tone_db": 2.69,
    "passes": false,
-   "source": "r3 family final pro_typing_key (double)",
+   "source": "delivered final (pro_typing_key), out/forge_v2/pro_typing_key/final/report.json",
    "robust_mean": 1.534,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_key",
+   "member": "pro_typing_key_03",
+   "seed": 1367864807
   },
   {
    "params": {
@@ -391,9 +418,12 @@
    "total": 0.564,
    "tone_db": 3.32,
    "passes": false,
-   "source": "r3 family final pro_typing_key (soft)",
+   "source": "delivered final (pro_typing_key), out/forge_v2/pro_typing_key/final/report.json",
    "robust_mean": -0.07,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_key",
+   "member": "pro_typing_key_04",
+   "seed": 1097657232
   },
   {
    "params": {
@@ -425,9 +455,12 @@
    "total": -0.086,
    "tone_db": 3.54,
    "passes": false,
-   "source": "r3 family final pro_typing_key (tick)",
+   "source": "delivered final (pro_typing_key), out/forge_v2/pro_typing_key/final/report.json",
    "robust_mean": -0.455,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_key",
+   "member": "pro_typing_key_05",
+   "seed": 1826701615
   },
   {
    "params": {
@@ -459,9 +492,12 @@
    "total": -1.081,
    "tone_db": 2.58,
    "passes": false,
-   "source": "r3 family final pro_typing_key (crackle)",
+   "source": "delivered final (pro_typing_key), out/forge_v2/pro_typing_key/final/report.json",
    "robust_mean": -3.871,
-   "robust_pass_rate": 0.0
+   "robust_pass_rate": 0.0,
+   "delivered": "pro_typing_key",
+   "member": "pro_typing_key_06",
+   "seed": 579362556
   }
  ]
 }

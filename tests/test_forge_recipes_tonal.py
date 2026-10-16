@@ -52,13 +52,14 @@ def test_pro_notify_hits_the_study_targets():
 
 
 def test_pro_pop_chirp_falls_about_five_octaves_and_is_mono():
+    """the round-2..4 film chirp / blip (kept in FAMILY_V2_R4: the r4 finals, final_r4/)"""
     _, pop, _ = _mods()
-    p = pop.FAMILY_V2['pro_pop'][0]
+    p = pop.FAMILY_V2_R4['pro_pop'][0]
     x = render(pop, p, 2)
     m = pop.measure(x)
     assert x.ndim == 1 and m['length_s'] < 0.17
     assert m['ridge']['sweep_oct'] < -4.0                         # 9.8 kHz -> 360 Hz
-    b = render(pop, pop.FAMILY_V2['pro_pop'][2], 2)              # the film's blip: a few ms
+    b = render(pop, pop.FAMILY_V2_R4['pro_pop'][2], 2)           # the film's blip: a few ms
     assert len(b) / SR < 0.04
 
 
@@ -154,7 +155,7 @@ def test_round3_notify_bells_are_lower_struck_and_ring():
 def test_round3_pro_notify_head_has_no_drive_comb():
     """round 3: the pro ding's head is clean (no harmonic comb from the drive), its richness is inharmonic"""
     notify, _, _ = _mods()
-    p = notify.FAMILY['pro_notify'][2]
+    p = notify.FAMILY_R3['pro_notify'][2]
     assert p['head_drive'] == 0.0 and p['p3'] > 0 and p['air'] > -40
     q = {**p, 'body_db': -60.0, 'air': -60.0, 'tick_db': -40.0, 'verb': 0.0, 'p3': 0.0, 'oct': 0.0, 'bright': 0.05}
     x = render(notify, q, 2).mean(1)
@@ -169,7 +170,7 @@ def test_round3_pro_pop_chirps_start_on_zero_without_digital_silence():
     _, pop, _ = _mods()
     from earshot.forge import polish
     for i in (0, 1, 3, 5):
-        p = pop.FAMILY_V2['pro_pop'][i]
+        p = pop.FAMILY_V2_R4['pro_pop'][i]
         x = render(pop, p, i + 1)
         m = x if x.ndim == 1 else x.mean(1)
         assert abs(m[0]) < 1e-3, i
@@ -182,8 +183,8 @@ def test_round4_new_keys_default_to_round_3():
     notify, pop, _ = _mods()
     from earshot.forge.recipes import riser
     for mod, fam, keys in ((notify, notify.FAMILY['notify'][2], {'strike_max': 20.0}),
-                           (notify, notify.FAMILY['pro_notify'][0], {'air_lo': 0.0}),
-                           (pop, pop.FAMILY_V2['pro_pop'][0], {'c_air': -60.0})):
+                           (notify, notify.FAMILY_R3['pro_notify'][0], {'air_lo': 0.0}),
+                           (pop, pop.FAMILY_V2_R4['pro_pop'][0], {'c_air': -60.0})):
         base = {k: v for k, v in fam.items() if k not in keys}
         assert np.array_equal(render(mod, base, 3), render(mod, dict(base, **keys), 3))
     bell = dict(notify.FAMILY['notify'][2], strike=-8.0)
@@ -194,3 +195,74 @@ def test_round4_new_keys_default_to_round_3():
         for cat, ed in eds.items():
             for e in (ed if isinstance(ed, list) else [ed]):
                 assert set(e) <= set(space), (cat, set(e) - set(space))
+
+
+def _band(x, c, w=0.03):
+    m = x if x.ndim == 1 else x.mean(1)
+    S = np.abs(np.fft.rfft(m)) ** 2
+    f = np.fft.rfftfreq(len(m), 1 / SR)
+    return S[(f > c * (1 - w)) & (f < c * (1 + w))].sum() + 1e-30
+
+
+def test_round5_pro_pop_is_a_natural_pop():
+    """round 5 (polish-pro; the round-4 judge: CLAP still says '8-bit'): every pro_pop member is the natural chirp
+    (c_nat): no drive, no stepped gate; a rounded body with no square-ish (odd) harmonics; the pitch falls fast and
+    settles; the level decays exponentially (straight in dB); a tiny air puff; near mono, pro_pop length"""
+    _, pop, _ = _mods()
+    from earshot.forge import polish
+    from earshot.forge.critic import study_measures
+    fam = pop.FAMILY_V2['pro_pop']
+    assert len(fam) == len(pop.FAMILY_V2_NAMES['pro_pop'])
+    for i, p in enumerate(fam):
+        assert p['c_nat'] == 1.0 and p['drive'] <= 0.2 and p['steps'] == 0.0, i
+        x = render(pop, p, i + 1)
+        m = x if x.ndim == 1 else x.mean(1)
+        assert abs(m[0]) < 1e-3 and polish.silence(x)['silence_ms'] < 2.0, i
+        sm = study_measures(x)
+        assert 0.05 <= sm['length'] <= 0.2 and sm['corr'] >= 0.95, (i, sm['length'], sm['corr'])
+        # the dry body (no puff / room / pre-blip): after the fall, no 3rd / 5th harmonic, a quiet 2nd
+        q = {**p, 'c_puff': -60.0, 'c_thump': -60.0, 'c_room': 0.0, 'c_pre': -60.0, 'f_hi': p['f_lo'] * 1.0001}
+        y = render(pop, q, 1)
+        lo = p['f_lo']
+        assert _band(y, 3 * lo) < 1e-3 * _band(y, lo) and _band(y, 5 * lo) < 1e-3 * _band(y, lo), i
+        assert _band(y, 2 * lo) < 0.05 * _band(y, lo), i
+        # an exponential decay: the 4 ms envelope from -3 to -36 dB under the peak lies on a line (r^2 > 0.95)
+        h = 4 * SR // 1000
+        k = len(y) // h
+        yy = y if y.ndim == 1 else y.mean(1)
+        e = 20 * np.log10(np.sqrt((yy[:k * h].reshape(k, h) ** 2).mean(1)) + 1e-12)
+        pk = int(np.argmax(e))
+        sel = np.nonzero((e[pk:] < e[pk] - 3) & (e[pk:] > e[pk] - 36))[0] + pk
+        sel = sel[sel < (np.nonzero(e[pk:] < e[pk] - 36)[0][0] + pk if (e[pk:] < e[pk] - 36).any() else k)]
+        cc = np.corrcoef(sel, e[sel])[0, 1]
+        assert cc ** 2 > 0.95, (i, cc)
+    # the pitch falls (start above end) in the chirps
+    for i in (0, 1, 3, 5):
+        r = pop.measure(render(pop, fam[i], 1))['ridge']
+        assert r['start_hz'] > 1.3 * r['end_hz'], (i, r)
+
+
+def test_round5_pro_notify_is_the_clean_film_ding():
+    """round 5 (polish-pro): the film's two-stage ding made clean: a 2 kHz-ish head on the semitone ladder with the
+    ~3.4x partial, no drive comb, no noise breath, no struck-bar modes; attack <= 15 ms, t20 22-45 ms, t40 150-340 ms
+    (the film dings: attack 1-15, t20 22-30 / 27-42 by the study, t40 190-330)"""
+    notify, _, _ = _mods()
+    fam = notify.FAMILY['pro_notify']
+    f0s = []
+    for i, p in enumerate(fam):
+        assert p['style'] == 'ding' and p['drive'] == 0.0 and p['head_drive'] == 0.0, i
+        assert p['air'] <= -59 and p['p3'] == 0.0, i
+        x = render(notify, p, i + 3)
+        m = notify.measure(x)
+        assert m['attack_ms'] <= 15 and 22 <= m['t20_ms'] <= 45 and 150 <= m['t40_ms'] <= 340, (i, m)
+        assert m['shares'][5] < -40, (i, m['shares'])                       # nothing up high (no breath)
+        f0 = p['f0']
+        head = x[:int(0.03 * SR)]
+        pp = _band(head, p['p2'] * f0, 0.02) / _band(head, f0, 0.02)
+        assert 10 ** (-3.2) < pp < 10 ** (-0.6), (i, 10 * np.log10(pp))      # the 3.4x partial: -32 .. -6 dB
+        assert _band(head, 3 * f0, 0.02) < 1e-3 * _band(head, f0, 0.02), i  # no odd-harmonic comb
+        f0s.append(f0)
+    steps = np.diff(np.log2(sorted(f0s))) * 12
+    assert np.allclose(steps, 1.0, atol=0.01)                                # a semitone family
+    for i, p in enumerate(notify.FAMILY_R3['pro_notify']):                   # the round-3 members still render
+        assert render(notify, p, 1) is not None, i
