@@ -97,8 +97,21 @@ search may use and a 'bench' side only the fixed benchmark (`eval/forge/bench.py
 `earshot/forge/fx.py` (reverb, saturation, transient shaping, limiter, EQ match, Doppler, filters, glitch, granular).
 In Python: `from earshot.forge import forge`.
 
-**Blind test.** A key press, a UI click, a pop, a fast whoosh and an impact were made from scratch in code and
-played blind next to real recordings of the same kind of sound. The author picked the made one correctly **8 times out
+**forge v2 (branch `forge-v2`, not merged yet).** Recipes come as families of named characters: 34 motion-design
+categories (whooshes, swishes, swipes, risers, downlifters, zips, impacts, sub drops, logo stings, clicks, taps,
+toggles, hover ticks, pops, notification dings, shimmers, glitches, key presses), 16 of them modelled on the designed
+effects of professional launch films, 4-6 variants each. A fixed benchmark scores them against held-out recordings the
+forge never heard. Against v1 on it (final round 4): variants are no longer near copies (CLAP cosine between
+variants 0.89-0.97 -> 0.71-0.85 in the five categories v1 had; real sets 0.52-0.77), tails that died too fast now
+reach the real length (click t40 0.56 -> 1.44 x the bench median, fast whoosh 0.51 -> 0.85), and the tonal balance is
+closer in 3 of those 5 (key press 8.2 -> 7.4 dB, fast whoosh 8.6 -> 6.3, impact 6.7 -> 4.4). Across all 34, the made
+balance is at least as close to the held-out recordings as a second set of real recordings in 18 of the 21
+categories that have a number. The model checks that v1 had saturated fell. Nobody had listened to the v2 sounds
+when this was written; a new blind test is built and waiting. What changed, every number, and what is still weak:
+[docs/FORGE_V2.md](docs/FORGE_V2.md).
+
+**Blind test (v1 recipes).** A key press, a UI click, a pop, a fast whoosh and an impact were made from scratch in
+code and played blind next to real recordings of the same kind of sound. The author picked the made one correctly **8 times out
 of 15**: a coin flip. Only the made impact was spotted (its tail dies too fast). One listener and 15 trials is a small
 test, not a proof; it says the made sounds are no longer easy to tell from real ones.
 
@@ -123,16 +136,22 @@ earshot gallery out/forge_v2 -o g.html --refs forge                        # + A
 earshot gallery --compare "r2:out/forge_v2/*/final_r2" "r3:out/forge_v2/*/final" -o compare.html \
   --results r2:eval/forge/results_v2r2.json                                # before / after, variant under variant
 earshot gallery out/forge_v2 -o portable.html --embed                      # audio (FLAC) + images inside the file
+earshot gallery out/forge_v2 -o share.html --embed-compressed              # one small file: MP3 previews, plays anywhere
+earshot gallery --compare "v1:old/*/final" "v2:out/forge_v2/*/final" --alias keypress=typing_key -o v1_v2.html
 ```
 
 Audio is referenced by relative path (or embedded with `--embed`); thumbnails go to `<page>_files/` next to the page
-and are cached by content. A "match loudness" switch (on by default) turns louder players down so a riser does not
-blast after a click; it changes the player volume only, never the files. Benchmark numbers are shown only for files the benchmark actually measured: a file newer
-than the results JSON, or with another length / peak, gets none (renamed files are matched by length and peak, and the
-page lists every such case). In `--compare`, files identical to an earlier version are marked `= r2`. Bench references
-never go on a page: `--refs bench` is refused, every reference passes `refsets.held_out()`, and only the benchmark's
-numbers are shown, never its file names. Forge references are licensed recordings: keep a page that plays them
-private. In Python: `from earshot.gallery import gallery`.
+and are cached by content. `--embed-compressed` makes one self-contained page to send or open on a phone: each sound
+encoded by ffmpeg (MP3 192 kbps by default; `--embed-codec opus` or `vorbis` for Ogg, `--kbps` for the rate), JPEG
+thumbnails, no links to local files; 183 sounds come to about 9 MB. The numbers on it are still measured on the WAVs.
+`--alias OLD=NEW` puts a folder under another category's card (an older recipe's `keypress` under `typing_key`).
+A "match loudness" switch (on by default) turns louder players down so a riser does not blast after a click; it
+changes the player volume only, never the files. Benchmark numbers are shown only for files the benchmark actually
+measured: a file newer than the results JSON, or with another length / peak, gets none (renamed files are matched by
+length and peak, and the page lists every such case). In `--compare`, files identical to an earlier version are marked
+`= r2`. Bench references never go on a page: `--refs bench` is refused, every reference passes `refsets.held_out()`,
+and only the benchmark's numbers are shown, never its file names. Forge references are licensed recordings: keep a
+page that plays them private. In Python: `from earshot.gallery import gallery`.
 
 ## Install
 

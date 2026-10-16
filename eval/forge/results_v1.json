@@ -7,7 +7,7 @@
   "whoosh_fast=demo/forge-test/whoosh/final/*.wav",
   "impact=demo/forge-test/impact/final/*.wav"
  ],
- "registry": "E:\\earshot\\.cache\\refsets.json",
+ "registry": "<EARSHOT_HOME>/refsets.json",
  "created": "2026-10-16 04:11",
  "phrases": {
   "click": [
@@ -97,13 +97,13 @@
    "n_forge": 8,
    "note": "",
    "bench_refs": [
-    "E:/earshot/out/refs/click/bench/mk-1124_1.wav",
-    "E:/earshot/out/refs/click/bench/mk-2364_1.wav",
-    "E:/earshot/out/refs/click/bench/fs-610524_1.wav",
-    "E:/earshot/out/refs/click/bench/fs-461799_1.wav",
-    "E:/earshot/out/refs/click/bench/fs-461799_2.wav",
-    "E:/earshot/out/refs/click/bench/fs-431419_1.wav",
-    "E:/earshot/out/refs/click/bench/fs-431419_2.wav"
+    "<refs>/click/bench/mk-1124_1.wav",
+    "<refs>/click/bench/mk-2364_1.wav",
+    "<refs>/click/bench/fs-610524_1.wav",
+    "<refs>/click/bench/fs-461799_1.wav",
+    "<refs>/click/bench/fs-461799_2.wav",
+    "<refs>/click/bench/fs-431419_1.wav",
+    "<refs>/click/bench/fs-431419_2.wav"
    ],
    "made": [
     {
@@ -292,7 +292,7 @@
    },
    "real_cross": [
     {
-     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_01.wav",
+     "file": "<refs>/click/forge/kit-ui_click_01.wav",
      "length_s": 0.096,
      "typ_z": -2.17,
      "nn_cos": 0.621,
@@ -365,7 +365,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_02.wav",
+     "file": "<refs>/click/forge/kit-ui_click_02.wav",
      "length_s": 0.118,
      "typ_z": 0.04,
      "nn_cos": 0.72,
@@ -422,7 +422,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_03.wav",
+     "file": "<refs>/click/forge/kit-ui_click_03.wav",
      "length_s": 0.159,
      "typ_z": 0.94,
      "nn_cos": 0.755,
@@ -494,7 +494,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_04.wav",
+     "file": "<refs>/click/forge/kit-ui_click_04.wav",
      "length_s": 0.072,
      "typ_z": 0.29,
      "nn_cos": 0.702,
@@ -567,7 +567,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/fs-167829_1.wav",
+     "file": "<refs>/click/forge/fs-167829_1.wav",
      "length_s": 0.072,
      "typ_z": 1.72,
      "nn_cos": 0.807,
@@ -624,7 +624,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/fs-167829_2.wav",
+     "file": "<refs>/click/forge/fs-167829_2.wav",
      "length_s": 0.074,
      "typ_z": 1.5,
      "nn_cos": 0.769,
@@ -697,7 +697,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/fs-383863_1.wav",
+     "file": "<refs>/click/forge/fs-383863_1.wav",
      "length_s": 0.165,
      "typ_z": -0.36,
      "nn_cos": 0.673,
@@ -770,7 +770,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/forge/fs-383863_2.wav",
+     "file": "<refs>/click/forge/fs-383863_2.wav",
      "length_s": 0.18,
      "typ_z": -1.1,
      "nn_cos": 0.649,
@@ -845,7 +845,7 @@
    ],
    "real_loo": [
     {
-     "file": "E:/earshot/out/refs/click/bench/mk-1124_1.wav",
+     "file": "<refs>/click/bench/mk-1124_1.wav",
      "length_s": 0.055,
      "typ_z": 0.58,
      "nn_cos": 0.699,
@@ -917,7 +917,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/mk-2364_1.wav",
+     "file": "<refs>/click/bench/mk-2364_1.wav",
      "length_s": 0.21,
      "typ_z": -2.5,
      "nn_cos": 0.699,
@@ -990,7 +990,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-610524_1.wav",
+     "file": "<refs>/click/bench/fs-610524_1.wav",
      "length_s": 0.083,
      "typ_z": -0.31,
      "nn_cos": 0.712,
@@ -1062,7 +1062,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-461799_1.wav",
+     "file": "<refs>/click/bench/fs-461799_1.wav",
      "length_s": 0.305,
      "typ_z": -0.2,
      "nn_cos": 0.68,
@@ -1125,7 +1125,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-461799_2.wav",
+     "file": "<refs>/click/bench/fs-461799_2.wav",
      "length_s": 0.109,
      "typ_z": -0.1,
      "nn_cos": 0.681,
@@ -1193,7 +1193,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-431419_1.wav",
+     "file": "<refs>/click/bench/fs-431419_1.wav",
      "length_s": 0.157,
      "typ_z": 3.25,
      "nn_cos": 0.792,
@@ -1256,7 +1256,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-431419_2.wav",
+     "file": "<refs>/click/bench/fs-431419_2.wav",
      "length_s": 0.054,
      "typ_z": 2.85,
      "nn_cos": 0.792,
@@ -1331,7 +1331,7 @@
    ],
    "real_rev": [
     {
-     "file": "E:/earshot/out/refs/click/bench/mk-1124_1.wav",
+     "file": "<refs>/click/bench/mk-1124_1.wav",
      "length_s": 0.055,
      "typ_z": -0.27,
      "nn_cos": 0.755,
@@ -1393,7 +1393,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/mk-2364_1.wav",
+     "file": "<refs>/click/bench/mk-2364_1.wav",
      "length_s": 0.21,
      "typ_z": -3.09,
      "nn_cos": 0.604,
@@ -1466,7 +1466,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-610524_1.wav",
+     "file": "<refs>/click/bench/fs-610524_1.wav",
      "length_s": 0.083,
      "typ_z": -0.82,
      "nn_cos": 0.703,
@@ -1533,7 +1533,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-461799_1.wav",
+     "file": "<refs>/click/bench/fs-461799_1.wav",
      "length_s": 0.305,
      "typ_z": -1.52,
      "nn_cos": 0.708,
@@ -1590,7 +1590,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-461799_2.wav",
+     "file": "<refs>/click/bench/fs-461799_2.wav",
      "length_s": 0.109,
      "typ_z": -1.73,
      "nn_cos": 0.713,
@@ -1647,7 +1647,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-431419_1.wav",
+     "file": "<refs>/click/bench/fs-431419_1.wav",
      "length_s": 0.157,
      "typ_z": -0.02,
      "nn_cos": 0.737,
@@ -1715,7 +1715,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/click/bench/fs-431419_2.wav",
+     "file": "<refs>/click/bench/fs-431419_2.wav",
      "length_s": 0.054,
      "typ_z": 0.61,
      "nn_cos": 0.807,
@@ -1903,7 +1903,7 @@
    "n_forge": 2,
    "note": "thin: the library has three cinematic hits (all three were the v1 impact forge refs); one is held out as bench, so v1 impact bench numbers are optimistic.",
    "bench_refs": [
-    "E:/earshot/out/refs/impact/bench/kit-impact_03.wav"
+    "<refs>/impact/bench/kit-impact_03.wav"
    ],
    "made": [
     {
@@ -2133,7 +2133,7 @@
    },
    "real_cross": [
     {
-     "file": "E:/earshot/out/refs/impact/forge/kit-impact_01.wav",
+     "file": "<refs>/impact/forge/kit-impact_01.wav",
      "length_s": 4.455,
      "nn_cos": 0.449,
      "tone_db": 7.04,
@@ -2205,7 +2205,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/impact/forge/kit-impact_02.wav",
+     "file": "<refs>/impact/forge/kit-impact_02.wav",
      "length_s": 6.5,
      "nn_cos": 0.842,
      "tone_db": 5.33,
@@ -2280,7 +2280,7 @@
    "real_loo": [],
    "real_rev": [
     {
-     "file": "E:/earshot/out/refs/impact/bench/kit-impact_03.wav",
+     "file": "<refs>/impact/bench/kit-impact_03.wav",
      "length_s": 7.92,
      "nn_cos": 0.842,
      "tone_db": 5.13,
@@ -2428,12 +2428,12 @@
    "n_forge": 7,
    "note": "",
    "bench_refs": [
-    "E:/earshot/out/refs/pop/bench/fs-202230_1.wav",
-    "E:/earshot/out/refs/pop/bench/fs-33369_1.wav",
-    "E:/earshot/out/refs/pop/bench/fs-545201_1.wav",
-    "E:/earshot/out/refs/pop/bench/fs-573152_1.wav",
-    "E:/earshot/out/refs/pop/bench/mk-3192_1.wav",
-    "E:/earshot/out/refs/pop/bench/mk-3070_1.wav"
+    "<refs>/pop/bench/fs-202230_1.wav",
+    "<refs>/pop/bench/fs-33369_1.wav",
+    "<refs>/pop/bench/fs-545201_1.wav",
+    "<refs>/pop/bench/fs-573152_1.wav",
+    "<refs>/pop/bench/mk-3192_1.wav",
+    "<refs>/pop/bench/mk-3070_1.wav"
    ],
    "made": [
     {
@@ -2661,7 +2661,7 @@
    },
    "real_cross": [
     {
-     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_01.wav",
+     "file": "<refs>/pop/forge/kit-ui_pop_01.wav",
      "length_s": 0.19,
      "typ_z": 2.12,
      "nn_cos": 0.933,
@@ -2733,7 +2733,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_02.wav",
+     "file": "<refs>/pop/forge/kit-ui_pop_02.wav",
      "length_s": 0.3,
      "typ_z": 0.54,
      "nn_cos": 0.722,
@@ -2806,7 +2806,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_03.wav",
+     "file": "<refs>/pop/forge/kit-ui_pop_03.wav",
      "length_s": 0.414,
      "typ_z": 0.32,
      "nn_cos": 0.706,
@@ -2879,7 +2879,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_04.wav",
+     "file": "<refs>/pop/forge/kit-ui_pop_04.wav",
      "length_s": 0.236,
      "typ_z": -1.91,
      "nn_cos": 0.428,
@@ -2952,7 +2952,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/forge/mk-3000_1.wav",
+     "file": "<refs>/pop/forge/mk-3000_1.wav",
      "length_s": 0.5,
      "typ_z": -0.46,
      "nn_cos": 0.604,
@@ -3025,7 +3025,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/forge/fs-543200_1.wav",
+     "file": "<refs>/pop/forge/fs-543200_1.wav",
      "length_s": 0.048,
      "typ_z": -0.09,
      "nn_cos": 0.639,
@@ -3097,7 +3097,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/forge/fs-543200_2.wav",
+     "file": "<refs>/pop/forge/fs-543200_2.wav",
      "length_s": 0.049,
      "typ_z": -0.39,
      "nn_cos": 0.609,
@@ -3171,7 +3171,7 @@
    ],
    "real_loo": [
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-202230_1.wav",
+     "file": "<refs>/pop/bench/fs-202230_1.wav",
      "length_s": 0.161,
      "typ_z": -0.66,
      "nn_cos": 0.642,
@@ -3244,7 +3244,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-33369_1.wav",
+     "file": "<refs>/pop/bench/fs-33369_1.wav",
      "length_s": 0.159,
      "typ_z": 3.39,
      "nn_cos": 0.832,
@@ -3317,7 +3317,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-545201_1.wav",
+     "file": "<refs>/pop/bench/fs-545201_1.wav",
      "length_s": 0.169,
      "typ_z": 2.92,
      "nn_cos": 0.816,
@@ -3390,7 +3390,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-573152_1.wav",
+     "file": "<refs>/pop/bench/fs-573152_1.wav",
      "length_s": 0.08,
      "typ_z": 3.55,
      "nn_cos": 0.832,
@@ -3463,7 +3463,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/mk-3192_1.wav",
+     "file": "<refs>/pop/bench/mk-3192_1.wav",
      "length_s": 0.215,
      "typ_z": -0.78,
      "nn_cos": 0.568,
@@ -3536,7 +3536,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/mk-3070_1.wav",
+     "file": "<refs>/pop/bench/mk-3070_1.wav",
      "length_s": 0.145,
      "typ_z": -1.33,
      "nn_cos": 0.642,
@@ -3611,7 +3611,7 @@
    ],
    "real_rev": [
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-202230_1.wav",
+     "file": "<refs>/pop/bench/fs-202230_1.wav",
      "length_s": 0.161,
      "typ_z": -1.02,
      "nn_cos": 0.559,
@@ -3684,7 +3684,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-33369_1.wav",
+     "file": "<refs>/pop/bench/fs-33369_1.wav",
      "length_s": 0.159,
      "typ_z": 1.53,
      "nn_cos": 0.933,
@@ -3741,7 +3741,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-545201_1.wav",
+     "file": "<refs>/pop/bench/fs-545201_1.wav",
      "length_s": 0.169,
      "typ_z": 1.02,
      "nn_cos": 0.81,
@@ -3814,7 +3814,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/fs-573152_1.wav",
+     "file": "<refs>/pop/bench/fs-573152_1.wav",
      "length_s": 0.08,
      "typ_z": 0.98,
      "nn_cos": 0.789,
@@ -3887,7 +3887,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/mk-3192_1.wav",
+     "file": "<refs>/pop/bench/mk-3192_1.wav",
      "length_s": 0.215,
      "typ_z": -0.49,
      "nn_cos": 0.706,
@@ -3960,7 +3960,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/pop/bench/mk-3070_1.wav",
+     "file": "<refs>/pop/bench/mk-3070_1.wav",
      "length_s": 0.145,
      "typ_z": -0.8,
      "nn_cos": 0.604,
@@ -4136,18 +4136,18 @@
    "n_forge": 15,
    "note": "",
    "bench_refs": [
-    "E:/earshot/out/refs/typing_key/bench/fs-378083_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-378084_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-378085_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-570754_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-766639_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-766640_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-609534_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-609534_2.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-609534_3.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-515810_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-815614_1.wav",
-    "E:/earshot/out/refs/typing_key/bench/fs-815614_2.wav"
+    "<refs>/typing_key/bench/fs-378083_1.wav",
+    "<refs>/typing_key/bench/fs-378084_1.wav",
+    "<refs>/typing_key/bench/fs-378085_1.wav",
+    "<refs>/typing_key/bench/fs-570754_1.wav",
+    "<refs>/typing_key/bench/fs-766639_1.wav",
+    "<refs>/typing_key/bench/fs-766640_1.wav",
+    "<refs>/typing_key/bench/fs-609534_1.wav",
+    "<refs>/typing_key/bench/fs-609534_2.wav",
+    "<refs>/typing_key/bench/fs-609534_3.wav",
+    "<refs>/typing_key/bench/fs-515810_1.wav",
+    "<refs>/typing_key/bench/fs-815614_1.wav",
+    "<refs>/typing_key/bench/fs-815614_2.wav"
    ],
    "made": [
     {
@@ -4380,7 +4380,7 @@
    },
    "real_cross": [
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_01.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_thock_01.wav",
      "length_s": 0.254,
      "typ_z": 1.34,
      "nn_cos": 0.926,
@@ -4453,7 +4453,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_02.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_thock_02.wav",
      "length_s": 0.281,
      "typ_z": 0.98,
      "nn_cos": 0.905,
@@ -4526,7 +4526,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_03.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_thock_03.wav",
      "length_s": 0.362,
      "typ_z": 1.25,
      "nn_cos": 0.927,
@@ -4599,7 +4599,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_04.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_thock_04.wav",
      "length_s": 0.234,
      "typ_z": 1.35,
      "nn_cos": 0.908,
@@ -4667,7 +4667,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_enter_01.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_enter_01.wav",
      "length_s": 0.4,
      "typ_z": 1.26,
      "nn_cos": 0.917,
@@ -4740,7 +4740,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_space_01.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_space_01.wav",
      "length_s": 0.33,
      "typ_z": 0.01,
      "nn_cos": 0.813,
@@ -4808,7 +4808,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_click_01.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_click_01.wav",
      "length_s": 0.254,
      "typ_z": -0.47,
      "nn_cos": 0.812,
@@ -4881,7 +4881,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_click_02.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_click_02.wav",
      "length_s": 0.284,
      "typ_z": -0.29,
      "nn_cos": 0.802,
@@ -4954,7 +4954,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_enter_02.wav",
+     "file": "<refs>/typing_key/forge/kit-kb_enter_02.wav",
      "length_s": 0.18,
      "typ_z": -0.43,
      "nn_cos": 0.783,
@@ -5017,7 +5017,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/fs-561697_1.wav",
+     "file": "<refs>/typing_key/forge/fs-561697_1.wav",
      "length_s": 0.18,
      "typ_z": 0.26,
      "nn_cos": 0.845,
@@ -5090,7 +5090,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/fs-561699_1.wav",
+     "file": "<refs>/typing_key/forge/fs-561699_1.wav",
      "length_s": 0.419,
      "typ_z": -0.98,
      "nn_cos": 0.717,
@@ -5163,7 +5163,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/fs-709460_1.wav",
+     "file": "<refs>/typing_key/forge/fs-709460_1.wav",
      "length_s": 0.278,
      "typ_z": -0.15,
      "nn_cos": 0.841,
@@ -5220,7 +5220,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/fs-709460_2.wav",
+     "file": "<refs>/typing_key/forge/fs-709460_2.wav",
      "length_s": 0.11,
      "typ_z": -0.15,
      "nn_cos": 0.782,
@@ -5283,7 +5283,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/fs-665075_1.wav",
+     "file": "<refs>/typing_key/forge/fs-665075_1.wav",
      "length_s": 0.198,
      "typ_z": 0.97,
      "nn_cos": 0.875,
@@ -5346,7 +5346,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/forge/fs-665075_2.wav",
+     "file": "<refs>/typing_key/forge/fs-665075_2.wav",
      "length_s": 0.225,
      "typ_z": 1.35,
      "nn_cos": 0.903,
@@ -5411,7 +5411,7 @@
    ],
    "real_loo": [
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-378083_1.wav",
+     "file": "<refs>/typing_key/bench/fs-378083_1.wav",
      "length_s": 0.17,
      "typ_z": 0.15,
      "nn_cos": 0.822,
@@ -5474,7 +5474,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-378084_1.wav",
+     "file": "<refs>/typing_key/bench/fs-378084_1.wav",
      "length_s": 0.367,
      "typ_z": 0.88,
      "nn_cos": 0.919,
@@ -5531,7 +5531,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-378085_1.wav",
+     "file": "<refs>/typing_key/bench/fs-378085_1.wav",
      "length_s": 0.16,
      "typ_z": 0.45,
      "nn_cos": 0.822,
@@ -5594,7 +5594,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-570754_1.wav",
+     "file": "<refs>/typing_key/bench/fs-570754_1.wav",
      "length_s": 0.151,
      "typ_z": 0.07,
      "nn_cos": 0.822,
@@ -5662,7 +5662,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-766639_1.wav",
+     "file": "<refs>/typing_key/bench/fs-766639_1.wav",
      "length_s": 0.104,
      "typ_z": 0.2,
      "nn_cos": 0.815,
@@ -5730,7 +5730,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-766640_1.wav",
+     "file": "<refs>/typing_key/bench/fs-766640_1.wav",
      "length_s": 0.194,
      "typ_z": 0.11,
      "nn_cos": 0.815,
@@ -5803,7 +5803,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_1.wav",
+     "file": "<refs>/typing_key/bench/fs-609534_1.wav",
      "length_s": 0.348,
      "typ_z": 0.93,
      "nn_cos": 0.919,
@@ -5866,7 +5866,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_2.wav",
+     "file": "<refs>/typing_key/bench/fs-609534_2.wav",
      "length_s": 0.442,
      "typ_z": 0.89,
      "nn_cos": 0.874,
@@ -5929,7 +5929,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_3.wav",
+     "file": "<refs>/typing_key/bench/fs-609534_3.wav",
      "length_s": 0.301,
      "typ_z": -0.03,
      "nn_cos": 0.809,
@@ -5986,7 +5986,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-515810_1.wav",
+     "file": "<refs>/typing_key/bench/fs-515810_1.wav",
      "length_s": 0.319,
      "typ_z": -12.68,
      "nn_cos": 0.514,
@@ -6059,7 +6059,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_1.wav",
+     "file": "<refs>/typing_key/bench/fs-815614_1.wav",
      "length_s": 0.269,
      "typ_z": 0.25,
      "nn_cos": 0.867,
@@ -6127,7 +6127,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_2.wav",
+     "file": "<refs>/typing_key/bench/fs-815614_2.wav",
      "length_s": 0.181,
      "typ_z": 0.52,
      "nn_cos": 0.867,
@@ -6192,7 +6192,7 @@
    ],
    "real_rev": [
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-378083_1.wav",
+     "file": "<refs>/typing_key/bench/fs-378083_1.wav",
      "length_s": 0.17,
      "typ_z": -1.72,
      "nn_cos": 0.748,
@@ -6255,7 +6255,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-378084_1.wav",
+     "file": "<refs>/typing_key/bench/fs-378084_1.wav",
      "length_s": 0.367,
      "typ_z": 0.49,
      "nn_cos": 0.892,
@@ -6312,7 +6312,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-378085_1.wav",
+     "file": "<refs>/typing_key/bench/fs-378085_1.wav",
      "length_s": 0.16,
      "typ_z": -1.31,
      "nn_cos": 0.789,
@@ -6369,7 +6369,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-570754_1.wav",
+     "file": "<refs>/typing_key/bench/fs-570754_1.wav",
      "length_s": 0.151,
      "typ_z": -1.82,
      "nn_cos": 0.75,
@@ -6432,7 +6432,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-766639_1.wav",
+     "file": "<refs>/typing_key/bench/fs-766639_1.wav",
      "length_s": 0.104,
      "typ_z": -1.14,
      "nn_cos": 0.789,
@@ -6505,7 +6505,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-766640_1.wav",
+     "file": "<refs>/typing_key/bench/fs-766640_1.wav",
      "length_s": 0.194,
      "typ_z": -1.32,
      "nn_cos": 0.771,
@@ -6573,7 +6573,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_1.wav",
+     "file": "<refs>/typing_key/bench/fs-609534_1.wav",
      "length_s": 0.348,
      "typ_z": 0.99,
      "nn_cos": 0.927,
@@ -6630,7 +6630,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_2.wav",
+     "file": "<refs>/typing_key/bench/fs-609534_2.wav",
      "length_s": 0.442,
      "typ_z": 0.51,
      "nn_cos": 0.903,
@@ -6687,7 +6687,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_3.wav",
+     "file": "<refs>/typing_key/bench/fs-609534_3.wav",
      "length_s": 0.301,
      "typ_z": -0.83,
      "nn_cos": 0.823,
@@ -6750,7 +6750,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-515810_1.wav",
+     "file": "<refs>/typing_key/bench/fs-515810_1.wav",
      "length_s": 0.319,
      "typ_z": -4.1,
      "nn_cos": 0.583,
@@ -6823,7 +6823,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_1.wav",
+     "file": "<refs>/typing_key/bench/fs-815614_1.wav",
      "length_s": 0.269,
      "typ_z": -1.45,
      "nn_cos": 0.764,
@@ -6896,7 +6896,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_2.wav",
+     "file": "<refs>/typing_key/bench/fs-815614_2.wav",
      "length_s": 0.181,
      "typ_z": -0.61,
      "nn_cos": 0.841,
@@ -7096,11 +7096,11 @@
    "n_forge": 5,
    "note": "",
    "bench_refs": [
-    "E:/earshot/out/refs/whoosh_fast/bench/fs-352719_1.wav",
-    "E:/earshot/out/refs/whoosh_fast/bench/fs-216675_1.wav",
-    "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_1.wav",
-    "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_2.wav",
-    "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_3.wav"
+    "<refs>/whoosh_fast/bench/fs-352719_1.wav",
+    "<refs>/whoosh_fast/bench/fs-216675_1.wav",
+    "<refs>/whoosh_fast/bench/fs-463763_1.wav",
+    "<refs>/whoosh_fast/bench/fs-463763_2.wav",
+    "<refs>/whoosh_fast/bench/fs-463763_3.wav"
    ],
    "made": [
     {
@@ -7328,7 +7328,7 @@
    },
    "real_cross": [
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_01.wav",
+     "file": "<refs>/whoosh_fast/forge/kit-whoosh_fast_01.wav",
      "length_s": 0.315,
      "typ_z": -2.82,
      "nn_cos": 0.805,
@@ -7401,7 +7401,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_02.wav",
+     "file": "<refs>/whoosh_fast/forge/kit-whoosh_fast_02.wav",
      "length_s": 0.5,
      "typ_z": 1.26,
      "nn_cos": 0.926,
@@ -7464,7 +7464,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_03.wav",
+     "file": "<refs>/whoosh_fast/forge/kit-whoosh_fast_03.wav",
      "length_s": 0.39,
      "typ_z": 1.15,
      "nn_cos": 0.908,
@@ -7537,7 +7537,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_04.wav",
+     "file": "<refs>/whoosh_fast/forge/kit-whoosh_fast_04.wav",
      "length_s": 0.395,
      "typ_z": -2.65,
      "nn_cos": 0.762,
@@ -7610,7 +7610,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/forge/fs-719636_1.wav",
+     "file": "<refs>/whoosh_fast/forge/fs-719636_1.wav",
      "length_s": 0.275,
      "typ_z": 0.57,
      "nn_cos": 0.895,
@@ -7680,7 +7680,7 @@
    ],
    "real_loo": [
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-352719_1.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-352719_1.wav",
      "length_s": 0.435,
      "typ_z": -0.1,
      "nn_cos": 0.908,
@@ -7753,7 +7753,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-216675_1.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-216675_1.wav",
      "length_s": 0.23,
      "typ_z": -0.43,
      "nn_cos": 0.908,
@@ -7826,7 +7826,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_1.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-463763_1.wav",
      "length_s": 0.435,
      "typ_z": 1.52,
      "nn_cos": 0.915,
@@ -7889,7 +7889,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_2.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-463763_2.wav",
      "length_s": 0.398,
      "typ_z": 6.7,
      "nn_cos": 0.951,
@@ -7946,7 +7946,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_3.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-463763_3.wav",
      "length_s": 0.392,
      "typ_z": 3.93,
      "nn_cos": 0.951,
@@ -8005,7 +8005,7 @@
    ],
    "real_rev": [
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-352719_1.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-352719_1.wav",
      "length_s": 0.435,
      "typ_z": 1.44,
      "nn_cos": 0.897,
@@ -8073,7 +8073,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-216675_1.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-216675_1.wav",
      "length_s": 0.23,
      "typ_z": 2.39,
      "nn_cos": 0.926,
@@ -8146,7 +8146,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_1.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-463763_1.wav",
      "length_s": 0.435,
      "typ_z": -6.16,
      "nn_cos": 0.698,
@@ -8219,7 +8219,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_2.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-463763_2.wav",
      "length_s": 0.398,
      "typ_z": -3.76,
      "nn_cos": 0.745,
@@ -8292,7 +8292,7 @@
      }
     },
     {
-     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_3.wav",
+     "file": "<refs>/whoosh_fast/bench/fs-463763_3.wav",
      "length_s": 0.392,
      "typ_z": -4.94,
      "nn_cos": 0.721,

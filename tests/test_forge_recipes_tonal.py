@@ -174,3 +174,23 @@ def test_round3_pro_pop_chirps_start_on_zero_without_digital_silence():
         m = x if x.ndim == 1 else x.mean(1)
         assert abs(m[0]) < 1e-3, i
         assert polish.silence(x)['silence_ms'] < 2.0, i
+
+
+def test_round4_new_keys_default_to_round_3():
+    """round 4 keys (notify strike_max / air_lo, pop chirp c_air) are off by default: the round-3 members render
+    sample for sample; strike_max 12 removes high strike energy; R4_EDITS keys exist in the SPACEs"""
+    notify, pop, _ = _mods()
+    from earshot.forge.recipes import riser
+    for mod, fam, keys in ((notify, notify.FAMILY['notify'][2], {'strike_max': 20.0}),
+                           (notify, notify.FAMILY['pro_notify'][0], {'air_lo': 0.0}),
+                           (pop, pop.FAMILY_V2['pro_pop'][0], {'c_air': -60.0})):
+        base = {k: v for k, v in fam.items() if k not in keys}
+        assert np.array_equal(render(mod, base, 3), render(mod, dict(base, **keys), 3))
+    bell = dict(notify.FAMILY['notify'][2], strike=-8.0)
+    hi = lambda x: np.sum(np.abs(np.fft.rfft((x if x.ndim == 1 else x.mean(1))[:dsp.n_of(0.05)]))[int(0.05 * 12000):] ** 2)
+    assert hi(render(notify, dict(bell, strike_max=12.0), 3)) < hi(render(notify, bell, 3))
+    for mod, eds, space in ((notify, notify.R4_EDITS, notify.SPACE), (pop, pop.R4_EDITS, pop.SPACE_V2),
+                            (riser, riser.R4_EDITS, riser.SPACE)):
+        for cat, ed in eds.items():
+            for e in (ed if isinstance(ed, list) else [ed]):
+                assert set(e) <= set(space), (cat, set(e) - set(space))

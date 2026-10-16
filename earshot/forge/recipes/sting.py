@@ -19,6 +19,11 @@
    a short room that hears only > 500 Hz and a clean fade; t40 ~0.8-1.0 s. The round-2 reveal family is kept in
    FAMILIES_R2. Round 3 also adds weight to the chirp idiom (`_landing`: a landing blob + a low thud; a short sub with
    `sub_db`).
+4. Round 4 (out/forge_v2/logo_sting/LOG.md, pro_logo_sting/LOG.md): the launch reveal gets a low strike under the hit
+   (`low`, `low_f`, `low_tau`: a sine falling onto 46-82 Hz that blooms in over 12 ms, after the low cut, outside the
+   room); the chirp idiom gets a top end that belongs to the gesture (`zap`: noise riding the chirp at zap_k x its
+   pitch; `ctick`: a > 5 kHz landing tick) and a second gesture (`double`: a shorter, higher pre-chirp). New keys only:
+   older parameter sets render exactly; the r3 families are kept in FAMILIES_R3.
 Character parameters: pitch (root / chord / chirp range), material (bar, glass, tubular, fm), length (bloom_decay,
 hum tails), brightness (bright, open_ms), weight (hit, sub), texture (shimmer, swell).
 """
@@ -102,6 +107,17 @@ SPACE = {
     'shimmer_tau': (0.15, 0.8, 'log'),      # decay of the granular shimmer
     'bloom_delay': (0.0, 0.03),             # the bloom enters this long after the tick (techniques doc: 0-30 ms), so
                                             # the strike owns the onset (r3 first run: 'dull onset' on 3 of 5)
+    # round 4 (new keys only: every older parameter set renders exactly; the layers draw only when used)
+    'low': (0.0, 1.0),                      # launch: a low strike under the hit (a sine falling onto low_f), bypassing
+    'low_f': (38.0, 95.0, 'log'),           # low_cut and the room (r3: < 150 Hz -52.7 dB of total, no body at all)
+    'low_tau': (0.06, 0.4, 'log'),
+    'zap': (0.0, 1.0),                      # chirp: band-passed noise riding the chirp at zap_k x its pitch (the top
+    'zap_k': (3.0, 10.0),                   # end: r3 had nothing above ~5 kHz, 4-12 kHz -41.8 vs the film's -21)
+    'ctick': (0.0, 1.0),                    # chirp: a bright > 5 kHz tick on the landing
+    'double': (0.0, 1.0),                   # chirp: a shorter, higher pre-chirp before the main one (a 'ba-dum')
+    'swell_trim': (0.0, 0.08),              # launch, swell lead: s of the hall's build-up left out (0 = r3: a dip before the hit)
+    'double_gap': (0.0, 0.12),              # gap between the pre-chirp and the main chirp (s; >= 20 ms of zeros reads
+                                            # as 'digital silence inside': palette run 1)
 }
 
 _REVEAL = {'mode': 'reveal', 'root': 880.0, 'chord': 'add9', 'material': 'bar', 'bloom_decay': 2.2, 'bright': 0.6,
@@ -187,6 +203,37 @@ FAMILIES = {
     ],
 }
 FAMILIES_R2 = {'logo_sting': FAMILIES.pop('logo_sting_r2'), 'pro_logo_sting': FAMILIES.pop('pro_logo_sting_r2')}   # round 2's reveal family (bell chords, r2 finals)
+FAMILIES_R3 = {k: list(v) for k, v in FAMILIES.items()}   # the round-3 families (the r3 finals, in final_r3/)
+# round 4. logo_sting (the judge: no body, < 150 Hz -52.7 dB of total vs the held-out -26.8): a low strike under every
+# hit, pitched / timed per member. pro_logo_sting (the judge: near clones at CLAP cos 0.943, nothing above ~5 kHz, 4-12 kHz
+# -41.8 dB vs the film's -21.0): a top end that belongs to the gesture (noise riding the chirp, a landing tick, a high
+# bell ping) and members that are different gestures, not one gesture at five pitches (a zap, a double chirp, a pure
+# chirp onto a bell, a heavy dark drop, the reference chirp-to-hum)
+FAMILIES['logo_sting'] = [
+    ('whoosh_glass', {**FAMILIES_R3['logo_sting'][0][1], 'low': 0.04, 'low_f': 55.0, 'low_tau': 0.16}),
+    ('zip_ping', {**FAMILIES_R3['logo_sting'][1][1], 'low': 0.044, 'low_f': 73.0, 'low_tau': 0.1}),
+    ('reverse_bloom', {**FAMILIES_R3['logo_sting'][2][1], 'low': 0.045, 'low_f': 46.0, 'low_tau': 0.24}),
+    # (swell_trim 0.045 removes a -20 dB dip just before the hit, also in r3; found after the bench, not delivered yet)
+    ('spark', {**FAMILIES_R3['logo_sting'][3][1], 'low': 0.03, 'low_f': 82.0, 'low_tau': 0.09}),
+    ('soft_bloom', {**FAMILIES_R3['logo_sting'][4][1], 'low': 0.041, 'low_f': 62.0, 'low_tau': 0.2}),
+]
+_CHIRP4 = {**_CHIRP3, 'zap': 0.0, 'zap_k': 6.0, 'ctick': 0.0, 'double': 0.0, 'double_gap': 0.05}
+FAMILIES['pro_logo_sting'] = [
+    ('ref', {**_CHIRP4, 'ctick': 0.4}),
+    ('zap', {**_CHIRP4, 'chirp_f0': 2600.0, 'chirp_f1': 240.0, 'chirp_ms': 70.0, 'hum_f': 98.0, 'hum_formant': 600.0,
+             'length': 0.7, 'hum_slow': 0.16, 'land_f': 1100.0, 'thud': 0.3, 'hum_buzz': 0.55, 'sub': 0.15,
+             'sub_db': 110.0, 'zap': 0.6, 'zap_k': 4.0, 'chirp_harm': 0.5, 'ctick': 0.2}),
+    ('deep', {**_CHIRP4, 'chirp_f0': 950.0, 'chirp_f1': 100.0, 'chirp_ms': 130.0, 'hum_f': 56.0, 'hum_formant': 380.0,
+              'sub': 0.35, 'length': 1.0, 'hum_slow': 0.26, 'thud': 0.7, 'land': 0.4, 'land_f': 650.0,
+              'hum_level': 1.05, 'hum_buzz': 1.0, 'sub_db': 100.0, 'ctick': 0.3, 'hum_sink': 1.0}),
+              # (palette run 2: at 1.2 kHz -> 120 Hz / 105 ms onto 62 Hz it was 'ref' an octave down, CLAP cos 0.964)
+    ('bell', {**_CHIRP4, 'shimmer': 0.1, 'root': 1100.0, 'hum_buzz': 0.3, 'hum_formant': 520.0, 'land': 0.35, 'zap': 0.2,
+              'zap_k': 8.0, 'thud': 0.4, 'bell_decay': 0.16,   # (palette run 2: a 3.15 kHz ping read 'narrow resonance +31 dB') 'chirp_f0': 1900.0, 'chirp_f1': 190.0, 'chirp_ms': 75.0, 'hum_f': 84.0,
+              'chirp_harm': 0.4, 'ctick': 0.25, 'hum_level': 0.75}),
+    ('double', {**_CHIRP4, 'hum_slow': 0.3, 'hum_mix': 0.08, 'length': 1.0, 'hum_sink': 0.8, 'chirp_harm': 0.8,
+                'land': 0.3, 'thud': 0.55, 'sub': 0.2, 'sub_db': 90.0, 'double': 0.7, 'double_gap': 0.012,
+                'zap': 0.4, 'zap_k': 7.0, 'chirp_f0': 1700.0, 'hum_f': 70.0}),
+]
 DEFAULTS = dict(FAMILIES['logo_sting'][0][1])
 TARGETS = {'logo_sting': 'a short bright logo reveal sting: a whoosh into a hit with a shimmering chime', 'pro_logo_sting': 'a designed logo sting: a falling chirp landing on a low hum'}
 STUDY_STING = {'logo_sting': {'t40': (650, 1150), 'tilt': (1.5, 10.0), 'sh150': (0.0, 0.12)},  # r3: the forge ref
@@ -264,6 +311,35 @@ def _landing(p, n, t0):
     return y
 
 
+def _zap(p, n, r):
+    """round 4: the top of the chirp (the judge: nothing above ~5 kHz, 4-12 kHz -41.8 dB of total vs the film's -21):
+    white noise through a resonant band-pass whose centre rides the chirp at zap_k x its pitch (1.5 kHz -> 150 Hz at
+    zap_k 6: 9 kHz -> 900 Hz), with the chirp's crescendo, gone with it; mono, peak 1"""
+    L = min(n, dsp.n_of(p['chirp_ms'] / 1000 * 1.25))
+    t = np.arange(L) / SR
+    T = p['chirp_ms'] / 1000
+    f = p['chirp_f0'] * (p['chirp_f1'] / p['chirp_f0']) ** np.clip(t / T, 0, 1)
+    fc = np.minimum(f * p['zap_k'], 15000.0)
+    y = dsp.svf(r.standard_normal(L), fc, 3.0, 'bandn')
+    e = (1 - np.exp(-t / 0.002)) * (0.4 + 0.6 * np.clip(t / T, 0, 1)) * np.clip((1.25 - t / T) / 0.25, 0, 1) ** 1.5
+    out = np.zeros(n)
+    out[:L] = dsp.butter(y * e, 'low', 13000.0, 2)
+    return out / (np.abs(out).max() + 1e-12)
+
+
+def _ctick(n, r, t0):
+    """round 4: a bright tick on the landing: > 5 kHz noise (rolled off above 13 kHz), (1 - u)^3 over 5 ms; mono"""
+    L = dsp.n_of(0.005)
+    u = np.arange(L) / L
+    w = dsp.butter(r.standard_normal(L) * (1 - u) ** 3 * (1 - np.exp(-np.arange(L) / (SR * 0.0002))), 'band',
+                   (5000.0, 13000.0), 2)
+    out = np.zeros(n)
+    i = dsp.n_of(t0)
+    m = min(L, n - i)
+    out[i:i + m] = w[:m] / (np.abs(w).max() + 1e-12)
+    return out
+
+
 def _render_chirp(p, r):
     n = dsp.n_of(p['length'])
     ch = _chirp(p, n, r)
@@ -272,6 +348,10 @@ def _render_chirp(p, r):
     y = ch + p['hum_level'] * hum
     if p.get('land', 0) > 0.01 or p.get('thud', 0) > 0.01:     # round 3: weight on the landing (no rng draws, so
         y = y + _landing(p, n, t0)                             # older parameter sets render exactly)
+    if p.get('zap', 0) > 0.005:                            # round 4 (drawn only when used: older sets render exactly)
+        y = y + p['zap'] * _zap(p, n, r)
+    if p.get('ctick', 0) > 0.005:
+        y = y + p['ctick'] * _ctick(n, r, t0)
     if p.get('sub', 0) > 0.01:
         sd = {**_subdrop.FAMILIES['pro_sub_drop'][0][1], 'f0': p['hum_f'], 'f1': p['hum_f'] * 0.66, 'bloom': 0.06,
               'click': 0.0, 'length': p['length'], 'decay_db': p.get('sub_db', 45.0)}
@@ -286,6 +366,15 @@ def _render_chirp(p, r):
     if p.get('verb', 0) > 0.01:
         ir = hall_ir(r, p['verb_rt'], 0.6, 0.5, 0.008)
         y = y + p['verb'] * signal.fftconvolve(y, ir)[:n]
+    if p.get('double', 0) > 0.005:                         # round 4: a shorter, higher pre-chirp ('ba-dum')
+        q = {**p, 'chirp_f0': min(3500.0, p['chirp_f0'] * 1.35), 'chirp_f1': p['chirp_f1'] * 2.5,
+             'chirp_ms': p['chirp_ms'] * 0.55}
+        k = dsp.n_of(q['chirp_ms'] / 1000 * 1.25)
+        pre = _chirp(q, k, r)
+        if q.get('zap', 0) > 0.005:
+            pre = pre + q['zap'] * _zap(q, k, r)
+        pre = np.concatenate([pre / (np.abs(pre).max() + 1e-12), np.zeros(dsp.n_of(p.get('double_gap', 0.05)))])
+        y = np.concatenate([p['double'] * np.abs(y).max() * pre, y])
     y = dsp.butter(y, 'high', 30.0, 2)
     y = dsp.fade(y, 0.0008, min(0.12, 0.2 * p['length']))
     return np.stack([y, y], axis=1)
@@ -412,7 +501,8 @@ def _lead_swell(p, n, r, bloom):
     """the bloom's own hall, reversed into the hit (the reverse-cymbal move), decorrelated"""
     from ..fx import decorrelate
     ir = hall_ir(r, max(0.6, p['lead_s'] * 1.8), 0.3, 0.7, 0.0, seconds=p['lead_s'] * 1.3 + 0.2)
-    sw = signal.fftconvolve(bloom[: dsp.n_of(0.25)], ir)[:n][::-1]
+    d = int(round(p.get('swell_trim', 0.0) * SR))          # r4: skip the hall's first ms (its build-up), which reversed
+    sw = signal.fftconvolve(bloom[: dsp.n_of(0.25)], ir)[d:n + d][::-1]   # is a -20 dB dip just before the hit
     sw = sw * (0.03 + 0.97 * np.linspace(0, 1, len(sw)) ** 2)
     ld = dsp.fade(decorrelate(sw, 0.6), 0.03, 0.0)
     return ld / (np.abs(ld).max() + 1e-12)
@@ -437,6 +527,20 @@ def _thump3(p, n, r):
     t = np.arange(n) / SR
     f = p['thump_f'] * (1 + np.exp(-t / 0.03))
     y = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.07) * (1 - np.exp(-t / 0.001))
+    return y / (np.abs(y).max() + 1e-12)
+
+
+def _low_strike(p, n):
+    """round 4 (the judge: the composed reveal has no body at all, < 150 Hz -52.7 dB of total; the techniques doc's hit
+    on the logo frame is an impact with a sub): a sine falling from 2.5 x low_f onto low_f in ~35 ms with a 2nd
+    harmonic at -12 dB (it survives small speakers), decaying with low_tau; mono, peak 1; it bypasses low_cut and the
+    room (a low tone in a room rang through the tail in r3's first runs). No rng draw."""
+    t = np.arange(n) / SR
+    f = p['low_f'] * (1 + 1.5 * np.exp(-t / 0.035))
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    rise = np.clip(t / 0.012, 0, 1) ** 2                 # blooms in over 12 ms under the tick (palette run 1: a 2 ms
+    y = (np.sin(ph) + 0.25 * np.sin(2 * ph)) * rise * np.exp(-t / p['low_tau'])   # rise read 'dull onset' -5..-12 dB)
+    y = dsp.butter(y, 'high', 25.0, 2)
     return y / (np.abs(y).max() + 1e-12)
 
 
@@ -517,6 +621,9 @@ def _render_launch(p, r):
         body = np.concatenate([np.zeros((n_lead, 2)), body])
         body[:n_lead + k] += p['lead_level'] * pk * ld
     out = dsp.butter(body, 'high', p['low_cut'], 2 if p['low_cut'] < 60 else 4)
+    if p.get('low', 0) > 0.005:                            # round 4: the low strike, under the hit, after the low cut
+        i = n_lead if n_lead > 64 else 0
+        out[i:i + n] += (p['low'] * pk * _low_strike(p, n))[:, None]
     out = dsp.butter(out, 'low', 16500.0, 4)               # r3 run E: the noise tick / whoosh ran flat to 24 kHz (energy
                                                            # > 20 kHz at -17..-29 dB; recordings and the refs roll off)
     out = dsp.trim_tail(out, -62, 0.05)

@@ -559,8 +559,10 @@ def main(argv=None):
         res['categories'][c] = bench_category(c, made.get(c, []), reg, models, real=not a.no_real)
     res['seconds'] = round(time.time() - t0, 1)
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+    from scrub_paths import scrub   # no machine paths in a results file (refs relative to named roots)
+    res = scrub(json.loads(json.dumps(res, default=lambda o: o.tolist() if hasattr(o, 'tolist') else str(o))))
     with open(a.out, 'w', encoding='utf-8') as fh:
-        json.dump(res, fh, indent=1, default=lambda o: o.tolist() if hasattr(o, 'tolist') else str(o))
+        json.dump(res, fh, indent=1)
     md = os.path.splitext(a.out)[0] + '.md'
     with open(md, 'w', encoding='utf-8') as fh:
         fh.write(table(res))

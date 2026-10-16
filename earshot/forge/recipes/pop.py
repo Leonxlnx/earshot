@@ -345,6 +345,11 @@ SPACE_V2.update({'gdepth': (-1.0, 1.0), 'c_breath': (-60.0, -6.0), 'c_bq': (1.5,
                  'land_drop': (0.0, 7.0), 's_att': (0.0, 0.5), 'pre_ring': (0.0, 8.0), 'c_in': (0.0, 1.0)})
 DEFAULTS_V2.update({'gdepth': -1.0, 'c_breath': -60.0, 'c_bq': 3.0, 'land_drop': 0.0, 's_att': 0.0, 'pre_ring': 0.0,
                     'c_in': 0.0})   # pre_ring: ms tail on the pre-blip (no digital silence in the gap); c_in: ms fade-in
+# round 4, chirp only (ui-tonal polish; the round-3 judge: pro_pop still '8-bit': noise / air in the chirp, a natural
+# decay): c_air = a broadband air layer (2.5-14 kHz noise, not pitch-following) riding the chirp's envelope with a slower
+# release (2.5 x tail_tau), dB re the tone (-60 = none, round 3)
+SPACE_V2.update({'c_air': (-60.0, -10.0)})
+DEFAULTS_V2.update({'c_air': -60.0})
 
 
 def _v2(**kw):
@@ -389,6 +394,29 @@ FAMILY_V2 = {
             length=0.22),                                                                   # a cork-like pop
     ],
 }
+# Round 4 (ui-tonal polish): edits on top of the round-3 DELIVERED pro_pop members (out/forge_v2/pro_pop/final_r3/
+# report.json 'family' members; m0 film chirp, m1 breathy glide, m2 film blip, m3 falling blip + click, m4 plip,
+# m5 droplet), applied by out/forge_v2/_uitonal_r4/fam4.py without re-tuning (round 3's tuning had pushed the chirps'
+# harmonics back up: m1 harm 0.41 / odd 0.91 = a square-ish tone, m5 harm 0.57, and m0's breath down to -45 dB):
+# near-sine chirps (harm <= 0.12, no odd emphasis), a louder, wider breath, the new air layer, m0's stepped gate halved
+# (steps 0.3, gate depth 0.25) with round 2's fast attack (start_db -2.2: the tuned -10.5 gave an 11 ms attack) and its
+# top partly back (lp 9.5 kHz, tuned 6.1: the film chirp starts at 9.8 kHz but has nothing > 12 kHz), and the plip decays (b_tau 18 ms) instead of holding a box.
+# Scored (fam4 r4, robust 3) against round 3: only m1 improved (total -2.72 -> -1.21); m0 -4.18 -> -5.78, m3 -1.71 ->
+# -5.40 (the air lengthened its tail: env pen 2.0), m4 -0.37 -> -4.45, m5 -1.90 -> -3.00, and CLAP still wrote 'cheap
+# beep' / 'square wave chiptune' on the chirps and the plip. Delivered: round 3's members with m1's edit only
+# (R4_EDITS below); the full attempt is R4_TRIED (kept in out/forge_v2/pro_pop/final_r4_tried/).
+R4_TRIED = {
+    'pro_pop': [
+        {'steps': 0.3, 'gdepth': 0.25, 'harm': 0.08, 'odd': 0.0, 'start_db': -2.2, 'c_breath': -11.0, 'c_bq': 2.0,
+         'c_air': -24.0, 'lp': 9500.0},
+        {'harm': 0.08, 'odd': 0.0, 'c_breath': -10.0, 'c_bq': 2.0, 'c_air': -20.0},
+        {},
+        {'harm': 0.06, 'odd': 0.3, 'c_breath': -12.0, 'c_air': -22.0},
+        {'b_tau': 0.018, 'harm': 0.12},
+        {'harm': 0.12, 'odd': 0.0, 'c_breath': -12.0, 'c_air': -22.0},
+    ],
+}
+R4_EDITS = {'pro_pop': [{}, R4_TRIED['pro_pop'][1], {}, {}, {}, {}]}
 FINE_V2 = {
     'chirp': ['ease', 'duty', 'start_db', 'tail_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive',
               'fade', 'peak_at', 'c_breath', 'land_drop'],
@@ -482,6 +510,16 @@ def _chirp(p, r):
         b = dsp.svf(r.standard_normal(n), np.minimum(f, 16000.0), p['c_bq'], 'band')
         b = b / (np.sqrt(np.mean(b ** 2)) + 1e-12) * np.sqrt(0.5)
         y = y + 10 ** (p['c_breath'] / 20) * b * env
+    if p.get('c_air', -60.0) > -59:                          # round 4: air (no rng draw unless used)
+        an = dsp.butter(r.standard_normal(n), 'band', (2500.0, 14000.0), order=2)
+        an = an / (np.sqrt(np.mean(an ** 2)) + 1e-12) * np.sqrt(0.5)
+        k_r = np.exp(-1.0 / (SR * 2.5 * p['tail_tau']))
+        ea = np.empty(n)
+        acc = 0.0
+        for i, v in enumerate(env):                          # peak follower with a slow release: the air outlasts
+            acc = v if v > acc else acc * k_r                # the tone a little (a natural decay, not a box)
+            ea[i] = acc
+        y = y + 10 ** (p['c_air'] / 20) * an * ea
     if pre:                                                 # the pre-blip: a 3 ms Hann-windowed tone
         k = dsp.n_of(0.003)
         y[:k] += 10 ** (p['pre_db'] / 20) * np.hanning(k) * np.sin(2 * np.pi * p['pre_hz'] * dsp.t_of(k))

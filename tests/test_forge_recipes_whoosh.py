@@ -7,7 +7,9 @@ from earshot.forge.search import render as search_render
 
 SR = 48000
 KINDS = [('whoosh', 'fast'), ('whoosh', 'big'), ('whoosh', 'pro_big'), ('swish', 'swish'), ('swipe', 'swipe')]
-LENGTH = {'fast': (0.2, 1.0), 'big': (0.6, 2.6), 'pro_big': (0.45, 1.6), 'swish': (0.12, 0.8), 'swipe': (0.3, 1.4)}
+LENGTH = {'fast': (0.2, 1.15), 'big': (0.6, 2.6), 'pro_big': (0.45, 1.6), 'swish': (0.12, 0.95), 'swipe': (0.3, 1.4)}
+# round 4: swish files run to 0.95 s, fast to 1.15 s (an accelerating approach and a tail that carries air down to
+# the -62 / -66 dB edit; t40 stays ~220-250 ms)
 
 
 def _mono(x):
@@ -196,3 +198,100 @@ def test_presets_inside_space(module, kind):
             if isinstance(spec, list) or v is None:
                 continue
             assert spec[0] - 1e-9 <= v <= spec[1] + 1e-9, (name, k, v, spec[:2])
+
+
+# ---------------------------------------------------------------------------------------------- round 4
+def _darken(x):
+    """eval/forge/bench.py texture()['darken']: log2 of the spectral centroid 20 ms at half the t40 tail over the
+    centroid 20 ms at the peak sample (< 0: the decay darkens)"""
+    m = _mono(x)
+    n = int(0.02 * SR)
+    p = int(np.argmax(np.abs(m)))
+    late = p + int(_t40(x) / 2000 * SR)
+    f = np.fft.rfftfreq(n, 1 / SR)
+
+    def cen(seg):
+        F = np.abs(np.fft.rfft(seg * np.hanning(len(seg))))
+        return float((F * f).sum() / (F.sum() + 1e-12))
+    return float(np.log2(max(cen(m[late:late + n]), 20.0) / max(cen(m[p:p + n]), 20.0)))
+
+
+def test_round4_options_off_render_as_before():
+    """the round-4 keys (hiss_pre / hiss_tail / hiss_mfloor / hiss_width, room_damp, low_width) at their off values
+    render exactly as a parameter set without them (round-1..3 reports and seed-bank entries still reproduce)"""
+    mod = load_recipe('whoosh')
+    for base in (mod.FAST_R3, mod.BIG_R3, mod.DEFAULTS_R2):
+        p = dict(base)
+        off = {**p, 'hiss_pre': None, 'hiss_tail': None, 'hiss_mfloor': 0.0, 'hiss_width': 0.0, 'room_damp': 0.55,
+               'low_width': 0.0}
+        assert np.array_equal(mod.render(p, dsp.rng(6)), mod.render(off, dsp.rng(6)))
+    assert set(k for k in mod.OPTIONAL) <= set(mod.SPACE)
+
+
+def test_round4_tails_keep_air():
+    """round-3 judge: made tails darkened far faster than real ones (bench darken whoosh_fast -0.64, swish -0.73, swipe
+    -1.96, whoosh_big -1.2; real -0.2..+0.6). Round-4 family medians (presets x seeds 3-5: one 20 ms window is a
+    noisy measure) stay above -0.45"""
+    for module, kind in (('whoosh', 'fast'), ('swish', 'swish'), ('swipe', 'swipe'), ('whoosh', 'big')):
+        mod = load_recipe(module)
+        d = [_darken(mod.render(mod.preset(kind, n), dsp.rng(s))) for n in mod.PRESETS[kind] for s in (3, 4, 5)]
+        assert np.median(d) > -0.45, (module, kind, np.round(d, 2))
+
+
+def _rise20(x):
+    """ms from the -20 dB crossing to the peak of a 25 ms-smoothed 5 ms envelope"""
+    e = np.convolve(_db_env(_mono(x)), np.ones(5) / 5, mode='same')
+    i = int(np.argmax(e))
+    below = np.nonzero(e[:i + 1] < e[i] - 20)[0]
+    return (i - (int(below[-1]) + 1 if len(below) else 0)) * 5.0
+
+
+def test_round4_fast_whoosh_approaches():
+    """round 4: a 40 ms attack into a 250 ms tail read as an impact (AudioSet Door / Slam); the fast family now
+    accelerates into its peak (median -20 dB -> peak >= 55 ms; round 3 ~40 ms) and keeps t40 >= 180 ms"""
+    mod = load_recipe('whoosh')
+    xs = [mod.render(mod.preset('fast', n), dsp.rng(3)) for n in mod.PRESETS['fast']]
+    assert np.median([_rise20(x) for x in xs]) >= 55
+    assert np.median([_t40(x) for x in xs]) >= 180
+
+
+def test_round4_swipe_bright_onset_and_wide():
+    """round-3 judge: swipe onset 11 dB dull (> 6 kHz share of the first 15 ms -22.4 vs -11.6) and narrow (L/R corr
+    0.90 vs 0.68): round-4 family medians > -21 dB and < 0.8"""
+    mod = load_recipe('swipe')
+    ons, cors = [], []
+    for n in mod.PRESETS['swipe']:
+        x = mod.render(mod.preset('swipe', n), dsp.rng(3))
+        cors.append(np.corrcoef(x[:, 0], x[:, 1])[0, 1])
+        m = _mono(x)
+        e = np.convolve(_db_env(m), np.ones(5) / 5, mode='same')
+        i = int(np.argmax(e))
+        a = int(np.nonzero(e[:i + 1] < e[i] - 20)[0][-1]) + 1
+        seg = m[a * 240:a * 240 + 720]
+        F = np.abs(np.fft.rfft(seg * np.hanning(len(seg)))) ** 2
+        f = np.fft.rfftfreq(len(seg), 1 / SR)
+        ons.append(10 * np.log10(F[f >= 6000].sum() / F.sum()))
+    assert np.median(ons) > -21 and np.median(cors) < 0.8, (np.round(ons, 1), np.round(cors, 2))
+
+
+def test_round4_side_layers_keep_the_mono_sum():
+    """hiss_width / low_width add a side signal only: L + R carries no trace of it (the side is +s on L, -s on R)"""
+    mod = load_recipe('swipe')
+    p = {**mod.preset('swipe', 'cloth'), 'room_wet': 0.0, 'drive_db': 0.0, 'pan': 0.0, 'width': 0.0}
+    x = mod.render(p, dsp.rng(2))
+    side, mid = x[:, 0] - x[:, 1], x[:, 0] + x[:, 1]
+    assert np.sqrt(np.mean(side ** 2)) > 0.3 * np.sqrt(np.mean(mid ** 2))     # the surface is wide
+    q = {**p, 'hiss_width': 0.0, 'low_width': 0.0}
+    y = mod.render(q, dsp.rng(2))
+    assert np.abs(y[:, 0] - y[:, 1]).max() < 1e-9                           # without them (and pan / width): mono
+
+
+def test_round4_wrappers_keep_older_parameter_sets():
+    """swish / swipe render DEFAULTS + p: an optional key absent from p must be OFF, not today's default (merging the
+    round-4 DEFAULTS made the round-3 finals re-render differently); a round-3 parameter set renders exactly as the
+    pass engine renders it"""
+    from earshot.forge.recipes import whoosh as W
+    for module in ('swish', 'swipe'):
+        mod = load_recipe(module)
+        p = dict(mod.DEFAULTS_R3)
+        assert np.array_equal(mod.render(p, dsp.rng(4)), W.render(p, dsp.rng(4))), module

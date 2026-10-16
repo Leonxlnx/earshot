@@ -227,6 +227,23 @@ _R3_FIX = {
     'cymbal': dict(metal_n=9, metal_glide=0.6, metal_db=-6.0, drone_db=-48.0, width=0.75),
 }
 FAMILIES_BY_CAT['riser'] = {k: {**FAMILIES[k], **_R2[k], **_R3_FIX[k]} for k in _R2}
+# Round 4 (ui-tonal polish; the round-3 judge: AudioSet hears engines, 'Car' / 'Jet engine', and the bench's closest
+# phrase was 'a jet engine starting' for all five): what reads as an engine is a low rumble that revs up (the round-3
+# drones glide up 0.6-1.0 oct as 30-80 % noise), a saw starting at 77 Hz under 6 dB of drive (tension), a resonant
+# low-pass sweep (jet spool-up) and metal partials gliding together (turbine whine). Edits on the round-3 delivered
+# members (applied by out/forge_v2/_uitonal_r4/fam4.py; order air, tension, shepard, rush, cymbal): no drone, the
+# high-pass at 180-250 Hz, gentler noise resonance, tension's supersaw from 150 Hz (not 77) with less drive, a wider
+# unison and its noise layer up (a triangle from 220 Hz, tried first, read as a siren: critic 3.65 -> 1.86), the
+# cymbal's metal glide 0.6 -> 0.2 oct (0.35 brought the turbine back: AudioSet 'Jet engine' first again, and its
+# longest steady line 0.58 s vs 0.52 s at 0.2), and every curve concave (2.2-3.1; tension's
+# 2.8 held its saw near one pitch for 0.85 s, a steady line, so 2.2 with a 1.8 oct rise).
+R4_EDITS = {'riser': [
+    dict(drone_db=-48.0, hp=220.0, nq=1.2, curve=2.6),
+    dict(drone_db=-48.0, tf0=150.0, toct=1.8, hp=200.0, sat=3.0, detune=24.0, noise_db=-5.0, curve=2.2),
+    dict(drone_db=-48.0, hp=180.0, curve=2.4),
+    dict(drone_db=-48.0, hp=220.0, nq=1.6),
+    dict(drone_db=-48.0, metal_glide=0.2),
+]}
 # pro_riser: noise-led stutter builds (round 2's tone blips and gated saw read as a chiptune arpeggio): the stepped
 # rising gesture is now carried by filtered noise (band-passed noise blips stepping up), the drones are gated noise
 # rumbles, the gate still accelerates into the cut

@@ -4,22 +4,33 @@
     earshot gallery out/forge_v2 -o gallery.html --results eval/forge/results_v2r2.json --refs forge
     earshot gallery --compare r2:out/forge_v2/*/final_r2 r3:out/forge_v2/*/final -o compare.html \\
         --results r2:eval/forge/results_v2r2.json
+    earshot gallery out/forge_v2 -o showcase.html --embed-compressed        # ONE file (MP3 inside) that plays anywhere
+    earshot gallery --compare "v1:demo/forge-test/*/final" "v2:out/forge_v2/*/final" --alias keypress=typing_key \\
+        whoosh=whoosh_fast -o v1_v2.html                                     # v1 recipe folders on the v2 cards
     from earshot.gallery import gallery; gallery('out/forge_v2', 'gallery.html')
 
 What goes in: a folder of forge outputs. `<folder>/<category>/final/*.wav` (+ report.json) per category, or one
 category folder, or one final folder. --sub picks another subfolder (final_r2). --compare takes LABEL:GLOB pairs
 (the shell must not expand them; quote them) and shows the versions as rows of one card per category, variant under
 variant, so before / after reads top to bottom. The category of a folder is its name, or its parent's name when the
-folder is called final* (out/forge_v2/click/final_r2 -> click).
+folder is called final* (out/forge_v2/click/final_r2 -> click); --alias OLD=NEW renames one (v1's keypress folder
+on the typing_key card).
 
 What comes out: one HTML file, no server, no network, no scripts from elsewhere (inline CSS and a short inline script:
 one player at a time, and a 'match loudness' switch, on by default, that turns every player louder than the page's
 10th-percentile momentary-max LUFS down to it; volume only, the files are untouched). Audio is referenced by relative
 path (file:// URL across drives), or embedded as base64 with --embed (FLAC by default, lossless and about half the
-size of the WAVs; --embed-codec wav keeps the original bytes). Spectrogram thumbnails (log frequency 30 Hz-20 kHz,
-power averaged per pixel, 72 dB range, from the onset, one time span per category card so lengths compare) are PNGs in
-`<html stem>_files/` next to the page (embedded too with --embed); they are cached by file content and stale ones are
-removed.
+size of the WAVs; --embed-codec wav keeps the original bytes). --embed-compressed makes one small self-contained page
+to send or open on a phone: every sound encoded by ffmpeg (MP3 by default, 192 kbps: plays in every current browser;
+--embed-codec opus / vorbis for Ogg, smaller per quality but not in older Safari; --kbps sets the rate), thumbnails as
+JPEG, links to local files (report.md, compare.png, LOG.md) left out because they would be dead in a sent file, and a
+note when the page passes --max-mb (25). An MP3 preview may report a few tens of ms more than the WAV (frame
+padding; 183 forge sounds at 192 kbps make a ~9 MB page). Every number on the page (length, peak, LUFS, spectrogram)
+is measured on the original WAVs, not on the previews; encodings are cached by content in `<html stem>_files/enc/`.
+When embedding, a file shown twice (an unchanged version in --compare) goes into the page once (the script copies it).
+Spectrogram thumbnails (log frequency 30 Hz-20 kHz, power averaged per pixel, 72 dB range, from the onset, one time
+span per category card so lengths compare) are PNGs in `<html stem>_files/` next to the page (embedded too with
+--embed); they are cached by file content and stale ones are removed.
 
 Per category: the category's meaning, the critic's target and mode, critic passes, the held-out benchmark summary when
 a results JSON is given (--results, from eval/forge/bench.py: variety, tail, tone, inside checks; made vs the forge refs
@@ -42,8 +53,9 @@ with earshot.forge.refsets.held_out() (the registry's bench files and the bench-
 out. The benchmark numbers are shown, never the bench file names. Reference recordings are licensed third-party
 sounds: keep a page that plays them private.
 
-Returns {'html', 'assets', 'versions', 'categories', 'sounds', 'refs', 'images', 'embedded', 'size_mb', 'warnings'}.
-Needs numpy, scipy, soundfile, matplotlib (image writing only; no pyplot).
+Returns {'html', 'assets', 'versions', 'categories', 'sounds', 'refs', 'images', 'embedded', 'codec', 'size_mb',
+'warnings'}. Needs numpy, scipy, soundfile, matplotlib (image writing only; no pyplot); --embed-compressed also needs
+ffmpeg on PATH (and Pillow for the JPEG thumbnails; PNG without it).
 """
 import base64
 import glob
@@ -54,6 +66,7 @@ import json
 import math
 import os
 import re
+import threading
 import time
 import urllib.parse
 
@@ -274,13 +287,30 @@ def discover(folder, sub='final'):
 
 
 def _split_label(s):
-    """'r2:out/x' -> ('r2', 'out/x'); 'E:/out/x' and 'out/x' -> (None, s) (a one-letter prefix is a drive)"""
+    """'r2:out/x' -> ('r2', 'out/x'); 'D:/out/x' and 'out/x' -> (None, s) (a one-letter prefix is a drive)"""
     m = re.match(r'^([A-Za-z0-9_.+-]{2,}):(.+)$', s)
     return (m.group(1), m.group(2)) if m else (None, s)
 
 
-def compare_versions(specs):
-    """[('r2', {cat: dir}), ('r3', {cat: dir})] from ['r2:GLOB', 'r3:GLOB', ...] (one label may repeat)"""
+def parse_alias(alias):
+    """{'keypress': 'typing_key'} from {'keypress': 'typing_key'} or ['keypress=typing_key', ...] (None -> {})"""
+    if not alias:
+        return {}
+    if isinstance(alias, dict):
+        return {str(k): str(v) for k, v in alias.items()}
+    out = {}
+    for a in alias:
+        if '=' not in a or not all(q.strip() for q in a.split('=', 1)):
+            raise ValueError(f'--alias needs OLD=NEW pairs (e.g. keypress=typing_key), got {a!r}')
+        k, v = a.split('=', 1)
+        out[k.strip()] = v.strip()
+    return out
+
+
+def compare_versions(specs, alias=None):
+    """[('r2', {cat: dir}), ('r3', {cat: dir})] from ['r2:GLOB', 'r3:GLOB', ...] (one label may repeat); alias renames
+    folder categories ({'keypress': 'typing_key'}: an older version's folder shown on the newer category's card)"""
+    alias = parse_alias(alias)
     out = {}
     for s in specs:
         label, pat = _split_label(s)
@@ -294,7 +324,8 @@ def compare_versions(specs):
             if not _wavs(d) and _wavs(os.path.join(d, 'final')):
                 d = os.path.join(d, 'final')
             if _wavs(d) and not category_of(d).startswith(('_', '.')):    # _judge, _tools: not categories
-                cats.setdefault(category_of(d), _norm(d))
+                c = category_of(d)
+                cats.setdefault(alias.get(c, c), _norm(d))
     if not out or not any(out.values()):
         raise FileNotFoundError(f'--compare found no folders with sounds: {specs}')
     return list(out.items())
@@ -397,6 +428,8 @@ def read_report(d):
         picks[name] = p
     crit = r.get('critic') if isinstance(r.get('critic'), dict) else {}
     recipe = r.get('recipe') or r.get('recipe_module') or ''
+    if r.get('recipe_module') and r['recipe_module'] != recipe:     # 'logo_sting' made by the sting module
+        recipe = r['recipe_module']
     if r.get('kind') and r.get('kind') != recipe:
         recipe = f"{recipe} ({r['kind']})"
     meta = {'target': r.get('target') or '', 'mode': r.get('mode') or crit.get('mode') or '',
@@ -567,16 +600,63 @@ def pair_refs(sounds, ref_paths):
 
 
 # -------------------------------------------------------------------------------------------------------- building
+# lossy codecs for --embed-compressed: ffmpeg encoder, container format, MIME type, file extension, default kbps
+LOSSY = {'mp3': ('libmp3lame', 'mp3', 'audio/mpeg', '.mp3', 192),
+         'opus': ('libopus', 'ogg', 'audio/ogg', '.opus', 128),
+         'vorbis': ('libvorbis', 'ogg', 'audio/ogg', '.ogg', 160)}
+CODECS = ('flac', 'wav') + tuple(LOSSY)
+
+
+def encode_lossy(path, codec='mp3', kbps=None):
+    """the bytes of `path` encoded by ffmpeg to MP3 / Ogg Opus / Ogg Vorbis at `kbps` (default per codec); 48 kHz
+    (Opus' own rate; MP3 and Vorbis keep 48 kHz too), the file's own channels, no metadata"""
+    import shutil
+    import subprocess
+    if codec not in LOSSY:
+        raise ValueError(f'codec must be one of {", ".join(LOSSY)}, not {codec!r}')
+    exe = shutil.which('ffmpeg')
+    if not exe:
+        raise RuntimeError('--embed-compressed needs ffmpeg on PATH (or use --embed: lossless FLAC, larger)')
+    enc, fmt, _, _, k0 = LOSSY[codec]
+    cmd = [exe, '-nostdin', '-v', 'error', '-i', os.path.abspath(path), '-map_metadata', '-1', '-vn', '-ar', str(SR),
+           '-c:a', enc, '-b:a', f'{int(kbps or k0)}k']
+    if codec == 'mp3':
+        cmd += ['-write_xing', '1']            # the LAME header carries the encoder delay, so players trim it
+    cmd += ['-f', fmt, '-']
+    r = subprocess.run(cmd, capture_output=True, timeout=120)
+    if r.returncode or not r.stdout:
+        raise RuntimeError(f'ffmpeg could not encode {os.path.basename(path)} to {codec}: '
+                           + r.stderr.decode('utf-8', 'replace').strip()[-300:])
+    return r.stdout
+
+
+def _jpeg(png_bytes, quality=90):
+    """a PNG thumbnail as JPEG bytes (smooth spectrograms compress ~2-3x), or None without Pillow"""
+    try:
+        from PIL import Image
+        im = Image.open(io.BytesIO(png_bytes)).convert('RGB')
+        buf = io.BytesIO()
+        im.save(buf, format='JPEG', quality=quality, optimize=True, progressive=True, subsampling=0)
+        return buf.getvalue()
+    except Exception:
+        return None
+
+
 class _Assets:
     """thumbnails next to the page (cached by content), media as relative URLs or data URIs"""
 
-    def __init__(self, html_path, embed=False, codec='flac'):
+    def __init__(self, html_path, embed=False, codec='flac', kbps=None):
         self.html_dir = os.path.dirname(os.path.abspath(html_path))
         stem = os.path.splitext(os.path.basename(html_path))[0]
         self.dir = os.path.join(self.html_dir, f'{stem}_files')
         self.embed, self.codec = embed, codec
+        self.lossy = bool(embed) and codec in LOSSY
+        self.kbps = int(kbps or LOSSY[codec][4]) if self.lossy else None
         self.used, self.made, self.reused, self.embedded_bytes = set(), 0, 0, 0
+        self.audio_bytes, self.image_bytes, self.encoded, self.enc_pruned = 0, 0, 0, 0
         self._decoded = {}
+        self._lock = threading.Lock()
+        self._audio_ids, self.deduped = {}, 0
 
     def url(self, path):
         if self.embed:
@@ -587,6 +667,22 @@ class _Assets:
             from pathlib import Path
             return Path(os.path.abspath(path)).as_uri()
         return urllib.parse.quote(rel, safe='/._-~')
+
+    def audio_src(self, path):
+        """the src attribute(s) of an <audio> for a sound: with embedding, an identical file (same bytes, e.g. a version
+        that did not change) is put in the page once and later players carry data-src-of (the inline script copies the
+        first player's source), so an unchanged round does not double the page"""
+        if not self.embed:
+            return f' src="{html.escape(self.url(path), quote=True)}"'
+        with open(path, 'rb') as fh:
+            sha = hashlib.sha1(fh.read()).hexdigest()
+        first = self._audio_ids.get(sha)
+        if first:
+            self.deduped += 1
+            return f' data-src-of="{first}"'
+        aid = f'a{len(self._audio_ids) + 1}'
+        self._audio_ids[sha] = aid
+        return f' id="{aid}" src="{html.escape(self.url(path), quote=True)}"'
 
     def link(self, path):
         """a plain relative link (never embedded): report.md, compare.png, LOG.md"""
@@ -600,7 +696,15 @@ class _Assets:
     def _data_uri(self, path):
         ext = os.path.splitext(path)[1].lower()
         if ext == '.png':
-            mime, data = 'image/png', open(path, 'rb').read()
+            with open(path, 'rb') as fh:
+                mime, data = 'image/png', fh.read()
+            jpg = _jpeg(data) if self.lossy else None
+            if jpg and len(jpg) < len(data):
+                mime, data = 'image/jpeg', jpg
+            self.image_bytes += len(data)
+        elif ext in ('.wav', '.flac') and self.lossy:
+            mime, data = LOSSY[self.codec][2], self.encoded_bytes(path)
+            self.audio_bytes += len(data)
         elif ext in ('.wav', '.flac') and self.codec == 'flac':
             import soundfile as sf
             x, sr = self.decode(path)
@@ -609,9 +713,45 @@ class _Assets:
             mime, data = 'audio/flac', buf.getvalue()
         else:
             mime = {'.wav': 'audio/wav', '.flac': 'audio/flac'}.get(ext, 'application/octet-stream')
-            data = open(path, 'rb').read()
+            with open(path, 'rb') as fh:
+                data = fh.read()
+        if mime.startswith('audio/') and not self.lossy:
+            self.audio_bytes += len(data)
         self.embedded_bytes += len(data)
         return f'data:{mime};base64,' + base64.b64encode(data).decode('ascii')
+
+    def _enc_path(self, path):
+        with open(path, 'rb') as fh:
+            sha = hashlib.sha1(fh.read()).hexdigest()
+        stem = re.sub(r'[^A-Za-z0-9_.-]+', '-', os.path.splitext(os.path.basename(path))[0])
+        return os.path.join(self.dir, 'enc', f'{stem}_{sha[:10]}_{self.kbps}k{LOSSY[self.codec][3]}')
+
+    def encoded_bytes(self, path):
+        """the lossy preview of a sound, from the content cache (<stem>_files/enc/) or ffmpeg"""
+        out = self._enc_path(path)
+        self.used.add(os.path.normcase(os.path.abspath(out)))
+        if os.path.exists(out) and os.path.getsize(out) > 0:
+            with open(out, 'rb') as fh:
+                return fh.read()
+        data = encode_lossy(path, self.codec, self.kbps)
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        tmp = f'{out}.{threading.get_ident()}.part'
+        with open(tmp, 'wb') as fh:
+            fh.write(data)
+        os.replace(tmp, out)
+        with self._lock:
+            self.encoded += 1
+        return data
+
+    def prefetch(self, paths, workers=3):
+        """encode the previews of many sounds in a few threads (ffmpeg processes) before the page is written"""
+        if not self.lossy:
+            return
+        todo = list(dict.fromkeys(p for p in paths if p and not os.path.exists(self._enc_path(p))))
+        if todo:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=max(1, int(workers))) as ex:
+                list(ex.map(self.encoded_bytes, todo))
 
     def decode(self, path):
         key = _norm(path)
@@ -636,7 +776,8 @@ class _Assets:
         return out
 
     def prune(self):
-        """remove thumbnails this page no longer uses (only PNGs inside the page's own _files folder)"""
+        """remove thumbnails this page no longer uses (only PNGs inside the page's own _files folder; with lossy
+        embedding also stale previews in _files/enc/); returns the number of thumbnails removed"""
         n = 0
         if os.path.isdir(self.dir):
             for f in os.listdir(self.dir):
@@ -645,6 +786,17 @@ class _Assets:
                     try:
                         os.remove(p)
                         n += 1
+                    except OSError:
+                        pass
+        enc = os.path.join(self.dir, 'enc')
+        if self.lossy and os.path.isdir(enc):
+            exts = tuple(v[3] for v in LOSSY.values()) + ('.part',)
+            for f in os.listdir(enc):
+                p = os.path.join(enc, f)
+                if f.endswith(exts) and os.path.normcase(os.path.abspath(p)) not in self.used:
+                    try:
+                        os.remove(p)
+                        self.enc_pruned += 1
                     except OSError:
                         pass
         return n
@@ -710,10 +862,11 @@ def _span(durs):
     return float(max(0.05, min(max(d), 2.5 * float(np.median(d)))))
 
 
-def build(versions, html_path, results=None, refs=None, embed=False, codec='flac', title=None, max_refs=6):
+def build(versions, html_path, results=None, refs=None, embed=False, codec='flac', title=None, max_refs=6,
+          kbps=None):
     """collect everything the page shows; returns (page dict, assets, warnings)"""
     warnings = []
-    assets = _Assets(html_path, embed, codec)
+    assets = _Assets(html_path, embed, codec, kbps)
     labels = [lab for lab, _ in versions]
     multi = len(versions) > 1
     # results: {label or None: bench index}
@@ -791,10 +944,10 @@ def build(versions, html_path, results=None, refs=None, embed=False, codec='flac
                  'bench': bench_summary(bi) if bi and matched == len(sounds) and sounds else None,
                  'bench_from': bench_from,
                  'bench_stale': bool(bi) and matched < len(sounds),
-                 'links': {k: q for k, q in (('report', os.path.join(d, 'report.md')),
-                                             ('compare sheet', os.path.join(d, 'compare.png')),
-                                             ('log', os.path.join(os.path.dirname(d), 'LOG.md')))
-                           if os.path.exists(q)}}
+                 'links': {} if embed else {      # a sent single file cannot reach the files next to it
+                     k: q for k, q in (('report', os.path.join(d, 'report.md')),
+                                       ('compare sheet', os.path.join(d, 'compare.png')),
+                                       ('log', os.path.join(os.path.dirname(d), 'LOG.md'))) if os.path.exists(q)}}
             page['n_sounds'] += len(sounds)
             crit = [s['critic'].get('passes') for s in sounds]
             page['n_pass'][lab][0] += sum(1 for c in crit if c)
@@ -834,6 +987,12 @@ def build(versions, html_path, results=None, refs=None, embed=False, codec='flac
     for key, ftitle, line, _ in FAMILIES + [('other', 'Other', 'categories outside the six families', [])]:
         if key in fam_map:
             page['families'].append({'key': key, 'title': ftitle, 'line': line, 'cards': fam_map[key]})
+    if assets.lossy:                # encode every preview now, a few ffmpeg processes at a time
+        assets.prefetch([s['path'] for f in page['families'] for c in f['cards'] for v in c['versions']
+                         for s in v['sounds']] + [r['path'] for f in page['families'] for c in f['cards']
+                                                  for r in c['refs'] if r] +
+                        [c['audition'] for f in page['families'] for c in f['cards'] if c.get('audition')])
+    page['embed'] = {'codec': codec, 'kbps': assets.kbps, 'lossy': assets.lossy} if embed else None
     return page, assets, warnings
 
 
@@ -961,10 +1120,13 @@ footer{color:var(--faint);font-size:12px;padding:48px 0 56px}
 .benchwrap>div{max-width:100%;overflow-x:auto}
 @media (max-width:760px){.wrap{padding:0 16px}.row{grid-template-columns:minmax(0,1fr)}.rlabel{padding-top:0}
 h1{font-size:24px}.bench td.h{display:none}.card{padding:16px 14px}.topgrid .ov{width:100%}
-.tiles{grid-template-columns:repeat(var(--n),minmax(200px,1fr))}}
+.tiles{grid-template-columns:repeat(var(--n),minmax(200px,1fr));scroll-snap-type:x mandatory;
+scroll-padding-left:2px}.tile{scroll-snap-align:start}}
 """
 
-JS = """document.addEventListener('play',function(e){var a=document.getElementsByTagName('audio');
+JS = """(function(){var d=document.querySelectorAll('audio[data-src-of]');for(var i=0;i<d.length;i++){
+var o=document.getElementById(d[i].getAttribute('data-src-of'));if(o)d[i].src=o.getAttribute('src');}})();
+document.addEventListener('play',function(e){var a=document.getElementsByTagName('audio');
 for(var i=0;i<a.length;i++){if(a[i]!==e.target)a[i].pause();}},true);
 (function(){var cb=document.getElementById('lm');if(!cb)return;var T=parseFloat(cb.getAttribute('data-target'));
 function set(){var a=document.querySelectorAll('audio[data-lufs]');for(var i=0;i<a.length;i++){
@@ -1026,7 +1188,7 @@ def _tile(s, assets, ref=False):
     if ref:
         head = f'<div class="tname"><span class="n" title="{_e(s["file"])}">{_e(s["file"])}</span></div>'
     lu = f' data-lufs="{s["lufs"]:.1f}"' if _num(s.get('lufs')) is not None else ''
-    audio = f'<audio controls preload="none"{lu} src="{_e(assets.url(s["path"]))}"></audio>'
+    audio = f'<audio controls preload="none"{lu}{assets.audio_src(s["path"])}></audio>'
     base = [('length', f"{s['dur_s']:.2f} s" if s['dur_s'] < 10 else f"{s['dur_s']:.1f} s", 'duration of the file'),
             ('peak', _f(s.get('peak_dbfs'), '{:.1f}'), 'sample peak, dBFS'),
             ('LUFS', _f(s.get('lufs'), '{:.1f}'), 'momentary-max loudness (K-weighted 400 ms)')]
@@ -1173,7 +1335,7 @@ def _card(card, page, assets):
     out.append('<div class="rows">' + ''.join(rows) + '</div>')
     if card.get('audition'):
         out.append(f'<div class="audition"><span>audition reel (made, nearest ref, ...)</span>'
-                   f'<audio controls preload="none" src="{_e(assets.url(card["audition"]))}"></audio></div>')
+                   f'<audio controls preload="none"{assets.audio_src(card["audition"])}></audio></div>')
     out.append(_params_table(card))
     out.append('</article>')
     return ''.join(out)
@@ -1236,6 +1398,11 @@ def render_html(page, assets, warnings):
                     f'({_e(b.get("created") or "")}, {_e(os.path.basename(b["file"]))})</span>')
     if page['n_refs']:
         meta.append(f'<span><b>{page["n_refs"]}</b> forge references (licensed: keep this page private)</span>')
+    emb = page.get('embed') or {}
+    if emb.get('lossy'):
+        meta.append(f'<span title="the players play compressed previews; every number and spectrogram on the page is '
+                    f'measured on the original WAV files">audio <b>{_e(emb["codec"].upper())} {emb["kbps"]} kbps</b> '
+                    f'previews (numbers from the WAVs)</span>')
     meta.append(f'<span>built {_e(time.strftime("%Y-%m-%d %H:%M"))}</span>')
     lede = ('Every sound on this page was computed by a recipe of code (no recorded audio inside) and tuned by the '
             'forge, which listens to its own renders with earshot and compares them to reference recordings. ')
@@ -1261,8 +1428,8 @@ def render_html(page, assets, warnings):
                    ('-', 'no benchmark number: the category has no bench split for it, or the files changed after the '
                     'benchmark ran (the notes at the end list them)')]
     if multi:
-        legend += [('= r2', 'a row or sound marked like this holds the same files as that version (identical bytes, or '
-                    'unchanged at the path its benchmark measured): not redone yet')]
+        legend += [(f'= {labels[0]}', 'a row or sound marked like this holds the same files as that version '
+                    '(identical bytes, or unchanged at the path its benchmark measured): not redone yet')]
     legend += [('spectrogram', f'log frequency 30 Hz to 20 kHz (bottom to top; faint lines at 100 Hz, 1 kHz, 10 kHz), '
                 f'{FLOOR_DB:.0f} dB range, from the onset; one time span per card so lengths compare')]
     leg = ('<h4 class="legh">How to read it</h4><dl class="legend">'
@@ -1281,6 +1448,8 @@ def render_html(page, assets, warnings):
                     + ''.join(f'<li>{_e(w)}</li>' for w in warnings) + '</ul></details>')
     body.append('<footer>Made with earshot gallery. Audio: computed by forge recipes'
                 + (', plus licensed forge-side reference recordings for A/B' if page['n_refs'] else '')
+                + (f' (played as {emb["codec"].upper()} {emb["kbps"]} kbps previews of the WAV files)'
+                   if emb.get('lossy') else '')
                 + '. Bench references are never shown here.</footer></main>')
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -1289,42 +1458,70 @@ def render_html(page, assets, warnings):
 
 
 def gallery(folder=None, out='gallery.html', results=None, refs=None, compare=None, embed=False, codec='flac',
-            sub='final', title=None, max_refs=6):
-    """build the page; `folder` (a forge output tree) or `compare` (['r2:GLOB', 'r3:GLOB']); returns a summary dict"""
+            sub='final', title=None, max_refs=6, compressed=False, kbps=None, max_mb=25.0, alias=None):
+    """build the page; `folder` (a forge output tree) or `compare` (['r2:GLOB', 'r3:GLOB']); returns a summary dict.
+    compressed=True: one self-contained page with lossy previews (codec 'mp3' unless codec is 'opus' / 'vorbis')"""
     t0 = time.time()
     if isinstance(results, str):
         results = [results]
+    codec = codec or 'flac'
+    if codec not in CODECS:
+        raise ValueError(f'codec must be one of {", ".join(CODECS)}, not {codec!r}')
+    if compressed:
+        embed = True
+        codec = codec if codec in LOSSY else 'mp3'
+    if kbps is not None and not (codec in LOSSY and embed):
+        raise ValueError('kbps applies to a lossy embedded codec only (--embed-compressed, or --embed-codec mp3 / opus '
+                         '/ vorbis with --embed)')
+    if kbps is not None and not 16 <= int(kbps) <= 320:
+        raise ValueError(f'kbps must be between 16 and 320, not {kbps}')
     if compare:
-        versions = compare_versions(compare)
+        versions = compare_versions(compare, alias)
     elif folder:
-        versions = [(sub, discover(folder, sub))]
+        al = parse_alias(alias)
+        versions = [(sub, {al.get(c, c): d for c, d in discover(folder, sub).items()})]
     else:
         raise ValueError('give a folder of forge results or --compare LABEL:GLOB ...')
     if refs == 'bench':
         raise ValueError("bench references are held out: they never go on a page (use --refs forge)")
     out = os.path.abspath(out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    page, assets, warnings = build(versions, out, results, refs, embed, codec, title, max_refs)
+    page, assets, warnings = build(versions, out, results, refs, embed, codec, title, max_refs, kbps)
+    if embed and page['n_refs']:
+        warnings.insert(0, f"this single file carries {page['n_refs']} licensed forge reference recording(s) inside "
+                           f"it: keep it private (build it without --refs to share it)")
     doc = render_html(page, assets, warnings)
     with open(out, 'w', encoding='utf-8') as fh:
         fh.write(doc)
     pruned = assets.prune()
     size = os.path.getsize(out) / 1e6
+    if embed and max_mb and size > max_mb:
+        warnings.append(f'the page is {size:.1f} MB, over {max_mb:g} MB: lower --kbps, use --embed-codec opus, or '
+                        f'build fewer categories')
     res = {'html': out.replace(chr(92), '/'), 'assets': assets.dir.replace(chr(92), '/'),
            'versions': {lab: len(m) for lab, m in versions},
            'categories': sum(len(f['cards']) for f in page['families']), 'sounds': page['n_sounds'],
            'refs': page['n_refs'], 'images': {'made': assets.made, 'reused': assets.reused, 'pruned': pruned},
-           'embedded': bool(embed), 'size_mb': round(size, 2), 'critic_pass': page['n_pass'],
+           'embedded': bool(embed), 'codec': (f'{codec} {assets.kbps} kbps' if assets.lossy else codec) if embed
+           else None, 'size_mb': round(size, 2), 'critic_pass': page['n_pass'],
            'seconds': round(time.time() - t0, 1), 'warnings': warnings}
     from pathlib import Path
     res['url'] = Path(out).as_uri()
     nc, ns = res['categories'], res['sounds']
     lines = [f"gallery: {nc} {'category' if nc == 1 else 'categories'}, {ns} sound{'' if ns == 1 else 's'}"
              + (f", {res['refs']} refs" if res['refs'] else '')
-             + f" -> {res['html']} ({res['size_mb']} MB{', embedded' if embed else ''}, {res['seconds']} s)",
+             + f" -> {res['html']} ({res['size_mb']} MB{', embedded ' + res['codec'] if embed else ''}, "
+             f"{res['seconds']} s)",
              f"  versions: {', '.join(f'{k} ({v})' for k, v in res['versions'].items())}",
-             f"  thumbnails: {assets.made} new, {assets.reused} cached, {pruned} pruned in {res['assets']}",
-             f"  open: {res['url']}"]
+             f"  thumbnails: {assets.made} new, {assets.reused} cached, {pruned} pruned in {res['assets']}"]
+    if embed:
+        res['embedded_mb'] = {'audio': round(assets.audio_bytes * 4 / 3 / 1e6, 2),
+                              'images': round(assets.image_bytes * 4 / 3 / 1e6, 2)}
+        lines.append(f"  embedded (base64): audio {res['embedded_mb']['audio']} MB, images "
+                     f"{res['embedded_mb']['images']} MB"
+                     + (f"; {assets.deduped} identical file(s) embedded once" if assets.deduped else '')
+                     + (f"; previews {assets.encoded} encoded, the rest from the cache" if assets.lossy else ''))
+    lines.append(f"  open: {res['url']}")
     lines += [f'  note: {w}' for w in warnings[:12]] + ([f'  ... {len(warnings) - 12} more notes'] if len(warnings) > 12
                                                           else [])
     res['text'] = '\n'.join(lines)
@@ -1347,9 +1544,17 @@ def add_cli(sub):
     p.add_argument('--compare', nargs='+', metavar='LABEL:GLOB', help='versions as rows, e.g. '
                    'r2:out/forge_v2/*/final_r2 r3:out/forge_v2/*/final (quote the globs)')
     p.add_argument('--sub', default='final', help='subfolder per category (default final; e.g. final_r2)')
+    p.add_argument('--alias', nargs='+', metavar='OLD=NEW', help='show folder category OLD as NEW (e.g. v1 recipe '
+                   'folders: keypress=typing_key whoosh=whoosh_fast)')
     p.add_argument('--embed', action='store_true', help='embed audio and images as base64 (one portable file)')
-    p.add_argument('--embed-codec', dest='codec', choices=['flac', 'wav'], default='flac',
-                   help='codec of embedded audio (default flac: lossless, about half the size)')
+    p.add_argument('--embed-compressed', dest='compressed', action='store_true',
+                   help='one small self-contained page: lossy previews via ffmpeg (MP3 192 kbps by default), JPEG '
+                   'thumbnails, no links to local files')
+    p.add_argument('--embed-codec', dest='codec', choices=list(CODECS), default=None,
+                   help='codec of embedded audio: flac (default with --embed: lossless, about half the size), wav, or '
+                   'with --embed-compressed mp3 (default: plays everywhere), opus or vorbis (Ogg)')
+    p.add_argument('--kbps', type=int, help='bit rate of lossy previews (default mp3 192, opus 128, vorbis 160)')
+    p.add_argument('--max-mb', type=float, default=25.0, help='note when an embedded page is larger (default 25)')
     p.add_argument('--title', help='page title')
     p.add_argument('--max-refs', type=int, default=6, help='at most this many A/B references per category')
     common(p)
@@ -1358,7 +1563,7 @@ def add_cli(sub):
         if not a.folder and not a.compare:
             raise ValueError('give a folder of forge results or --compare LABEL:GLOB ...')
         return emit(gallery(a.folder, a.html, a.results, a.refs, a.compare, a.embed, a.codec, a.sub, a.title,
-                            a.max_refs), a) and 0
+                            a.max_refs, a.compressed, a.kbps, a.max_mb, a.alias), a) and 0
     p.set_defaults(func=run)
 
 

@@ -130,8 +130,17 @@ SPACE = {
     'eq_hi_db': (-15.0, 12.0),          # high shelf at eq_hi_f (hiss / brightness)
     'eq_hi_f': (1500.0, 9000.0, 'log'),
     'low_lag': (0.0, 0.08),             # the low band's envelope arrives this much later (s): no thump on the onset
+    # round 4 (optional, off = absent: renders exactly as before)
+    'hiss_pre': (0.3, 3.0),             # hiss envelope exponent before the peak (default hiss_pow): < 1 = the brush leads
+    'hiss_tail': (0.3, 3.0),            # hiss envelope exponent after the peak (default hiss_pow): < 1 = air stays in the tail
+    'hiss_mfloor': (0.0, 1.0),          # floor of the hiss low-pass motion: the top stays open on the approach / in the tail
+    'hiss_width': (0.0, 1.0),           # decorrelated hiss side (L +, R -; mono sum unchanged): a wide surface
+    'room_damp': (0.1, 0.8),            # room high damping (default 0.55): lower = a brighter, airier tail
+    'low_width': (0.0, 1.0),            # decorrelated low band side (L +, R -; mono sum unchanged): a wide surface
 }
-OPTIONAL = {'low_lag': 0.0, 'hiss_rustle': 0.0, 'hiss_lo': None, 'eq_lo_db': 0.0, 'eq_lo_f': 150.0, 'eq_hi_db': 0.0, 'eq_hi_f': 4000.0}
+OPTIONAL = {'low_lag': 0.0, 'hiss_rustle': 0.0, 'hiss_lo': None, 'eq_lo_db': 0.0, 'eq_lo_f': 150.0, 'eq_hi_db': 0.0, 'eq_hi_f': 4000.0,
+            'hiss_pre': None, 'hiss_tail': None, 'hiss_mfloor': 0.0, 'hiss_width': 0.0, 'room_damp': 0.55,
+            'low_width': 0.0}
 
 # whoosh_fast 'crisp' of round 2 (the base the big / pro_big families and swish / swipe derive from)
 DEFAULTS_R2 = {
@@ -165,6 +174,23 @@ FAST = {**DEFAULTS_R2,
         'hiss_db': -24.0, 'hiss_hp': 2000.0, 'hiss_open': 0.9, 'hiss_pow': 1.2,
         'room_wet': 0.22, 'rt60': 0.58, 'end_fade': 0.06,
         'eq_lo_db': -7.0, 'eq_lo_f': 145.0, 'eq_hi_db': -4.0, 'eq_hi_f': 6000.0}
+FAST_R3 = FAST
+# round 4 (judge, eval/forge/results_v2r3.md: AudioSet hears Door / Knock / Slam first; made tails darken much faster
+# than real ones, whoosh_fast darken -0.64 vs -0.2). Measured cause (out/forge_v2/whoosh_fast/LOG.md, round 4): the
+# TAIL, not the onset. AudioSet on the tail alone (peak + 30 ms on) says Door / Knock at 0.8-1.2 summed, on the head
+# alone 0.02-0.10 (forge refs' tails 0.01-0.12). Model-free, the made tail was a dark ring of the peak's mid band:
+# 4-12 kHz share of the tail -32.7 dB (forge refs -24.7), 0.5-1 kHz -8.0 (refs -16.3), spectral flatness 0.001 (refs
+# 0.01): round 3 got its long tail from a long dark room (wet 0.22, damp 0.55) while the hiss died with the level
+# (hiss_pow 1.2) and its low-pass closed. Now the tail is the wake itself: a longer source fall (0.2 s), the hiss
+# decays slower than the body after the peak (hiss_tail 0.75) with its top kept open (hiss_mfloor 0.35), a smaller,
+# brighter room (wet 0.1, damp 0.3), and the hiss leads a little on the approach (hiss_pre 0.8: onset > 6 kHz -40 ->
+# -30 dB, forge refs -25.5). Second cause, the envelope: a 40 ms attack into a 250 ms tail (peak at 8-11 % of the file)
+# is an impact's shape; the study puts a whoosh's peak at 50-70 % after an accelerating approach, the held-out bench
+# attack runs 2-3x longer than the made one (published attack ratio 0.34-0.48), and the one member with a long rise
+# (reverse) was the one AudioSet called a whoosh. Probe (r4/door_probe2.py, 5 members x 2 seeds): an accelerating
+# 130 ms approach (rise 0.13 at rise_k 0.7) cut the door-like labels 0.43 -> 0.13 and lifted 'Whoosh' 0.07 -> 0.25
+FAST = {**FAST_R3, 'rise': 0.13, 'rise_k': 0.7, 'fall': 0.2, 'room_wet': 0.1, 'room_damp': 0.3,
+        'hiss_tail': 0.75, 'hiss_mfloor': 0.35, 'hiss_pre': 0.8}
 DEFAULTS = FAST
 BIG = {**DEFAULTS_R2,
        'rise': 0.36, 'rise_k': 0.8, 'fall': 0.36, 'fall_k': 0.85, 'start_db': -36.0, 'track': 0.8,
@@ -173,7 +199,13 @@ BIG = {**DEFAULTS_R2,
        'sub_db': -6.0, 'sub_f': 55.0, 'sub_glide': 0.5, 'sub_drive': 1.0,
        'hiss_db': -16.0, 'hiss_hp': 2000.0, 'hiss_open': 0.8, 'hiss_pow': 1.3,
        'room_wet': 0.22, 'rt60': 0.9, 'pan': 0.12, 'width': 0.2, 'drive_db': 3.0, 'end_db': -66.0, 'end_fade': 0.08}
-PRO_BIG = {**BIG,
+BIG_R3 = BIG
+# round 4 (judge: made tails darken much faster than real ones, whoosh_big darken -1.2 vs the held-out swoops' +0.28;
+# forge refs -0.11): the hiss outlives the body after the peak with its top kept open and the room is brighter (the
+# fast family's tail fix, recipes/whoosh.py FAST); design check (r4/design_r4.py, 6 members): darken -1.02 -> +0.03,
+# tail 4-12 kHz share -27.7 -> -21.5 dB (forge refs -21.7), band shares within 1 dB
+BIG = {**BIG_R3, 'hiss_tail': 0.75, 'hiss_mfloor': 0.35, 'room_damp': 0.35}
+PRO_BIG = {**BIG_R3,
            'rise': 0.24, 'rise_k': 0.8, 'hold': 0.02, 'fall': 0.165, 'fall_k': 0.8, 'start_db': -34.0,
            'f_peak': 90.0, 'up_oct': 0.8, 'down_oct': 1.5, 'dop_st': 2.0, 'q_air': 0.8, 'lp_ratio': 3.0,
            'low_db': 0.0, 'low_f': 90.0, 'low_smooth': 0.03, 'sub_db': 2.0, 'sub_f': 46.0, 'sub_glide': 0.5,
@@ -196,11 +228,15 @@ PRESETS = {
         # (fabric friction on the hiss), a tonal sweep (a pure Doppler-gliding tone, the designed motion-graphics
         # whoosh), a heavy fluttering swing, a reverse 'suck' that accelerates into the cut and stops, and a short
         # thin zip (out/forge_v2/whoosh_fast/LOG.md, round 3)
-        'crisp':   {'grain_db': -20.0, 'grain_rate': 1200.0, 'grain_f': 3500.0},
-        'sleeve':  {'hiss_rustle': 0.6, 'hiss_db': -20.0, 'hiss_lo': 1500.0},
+        # round 4: on the airier base crisp and sleeve fell 0.9 dB apart in 1/3-octave balance (test_families_differ):
+        # crisp's top is now its grains (brighter, louder, the hiss lower), sleeve's a duller, rougher fabric
+        'crisp':   {'grain_db': -17.0, 'grain_rate': 1400.0, 'grain_f': 4800.0, 'hiss_db': -27.0},
+        'sleeve':  {'hiss_rustle': 0.7, 'hiss_db': -20.0, 'hiss_lo': 1200.0, 'eq_hi_db': -7.0},
         'whistle': {'tone_db': -3.0, 'tone_q': 50.0, 'tone_pure': 1.0, 'tone_ratio': 1.5, 'dop_st': 12.0,
                     'dop_w': 0.04},
-        'heavy':   {'fall': 0.18, 'f_peak': 300.0, 'flut_depth': 0.6, 'flut_f': 14.0, 'room_wet': 0.26, 'rt60': 0.7},
+        # round 4: heavy's big dark room (wet 0.26, rt60 0.7) was the most door-like tail of the family (AudioSet door
+        # 0.9 summed vs 0.2-0.6): a smaller room, the length now from the source fall
+        'heavy':   {'fall': 0.19, 'f_peak': 300.0, 'flut_depth': 0.6, 'flut_f': 14.0, 'room_wet': 0.14, 'rt60': 0.55},
         'reverse': {'rise': 0.25, 'rise_k': 0.55, 'hold': 0.0, 'fall': 0.04, 'fall_k': 1.5, 'room_wet': 0.15},
         'tight':   {'fall': 0.1, 'fall_k': 0.75, 'f_peak': 750.0, 'q_air': 2.5, 'room_wet': 0.12, 'rt60': 0.35,
                     'grain_db': -20.0, 'grain_rate': 2000.0, 'grain_f': 6000.0},
@@ -394,6 +430,7 @@ def render(p, r):
     air = air * a * flut
 
     layers = [(0.0, air)]
+    low_side = None
     # low weight
     if p['low_db'] > -39.5:
         al = _smooth(a, p['low_smooth'])
@@ -404,6 +441,10 @@ def render(p, r):
         low = dsp.svf(_brown(n, r), np.clip(p['low_f'] * (0.6 + 0.4 * m), 25, 2000), 0.75, 'low')
         low = dsp.butter(low, 'high', max(28.0, p['low_f'] / 2.5), order=2) * al   # a band, not a rumble floor
         layers.append((p['low_db'], low))
+        if p.get('low_width', 0.0) > 0:      # round 4: a wide surface shoves air unevenly at the two ears: an
+            lo2 = dsp.svf(_brown(n, r), np.clip(p['low_f'] * (0.6 + 0.4 * m), 25, 2000), 0.75, 'low')   # independent
+            lo2 = dsp.butter(lo2, 'high', max(28.0, p['low_f'] / 2.5), order=2) * al        # low band as side
+            low_side = (p['low_width'], low, lo2)
     # sub swell
     if p['sub_db'] > -49.5:
         al = _smooth(a, max(p['low_smooth'], 0.02))
@@ -418,15 +459,31 @@ def render(p, r):
         sub = dsp.butter(sub, 'low', 600, order=2) * al
         layers.append((p['sub_db'], sub))
     # hiss top
+    h_side = None
     if p['hiss_db'] > -44.5:
         fab = p.get('hiss_rustle', 0.0) > 0
         h_lo = p.get('hiss_lo') or p['hiss_hp'] if fab else p['hiss_hp']
+        mf = p.get('hiss_mfloor', 0.0)
+        mh = m if mf <= 0 else mf + (1.0 - mf) * m      # round 4: the top stays open on the approach / in the tail
+        h_lp = np.clip(p['hiss_hp'] * 2.0 ** (p['hiss_open'] * mh) * 1.5 * dop, 500, 20000)
         h = dsp.butter(r.standard_normal(n), 'high', h_lo, order=4)
-        h = dsp.svf(h, np.clip(p['hiss_hp'] * 2.0 ** (p['hiss_open'] * m) * 1.5 * dop, 500, 20000), 0.6, 'low')
+        h = dsp.svf(h, h_lp, 0.6, 'low')
         if fab:                              # fabric / paper friction: fibres catch and release, a fast irregular AM
             ru = np.exp(p['hiss_rustle'] * 1.4 * _lfnoise(n, 1.8 * p['rustle_f'], r))
             h = h * ru / np.sqrt(np.mean(ru ** 2))
-        layers.append((p['hiss_db'], h * a ** p['hiss_pow'] * flut))
+        if p.get('hiss_pre') is None and p.get('hiss_tail') is None:
+            he = a ** p['hiss_pow']
+        else:                                # round 4: own exponents before / after the peak, blended over ~10 ms
+            w = 0.5 + 0.5 * np.tanh(dt / 0.005)
+            pre, post = p.get('hiss_pre') or p['hiss_pow'], p.get('hiss_tail') or p['hiss_pow']
+            he = (1 - w) * a ** pre + w * a ** post
+        layers.append((p['hiss_db'], h * he * flut))
+        if p.get('hiss_width', 0.0) > 0:     # round 4: a wide surface: an independent hiss of the same shape, as side
+            h2 = dsp.svf(dsp.butter(r.standard_normal(n), 'high', h_lo, order=4), h_lp, 0.6, 'low')
+            if fab:
+                ru2 = np.exp(p['hiss_rustle'] * 1.4 * _lfnoise(n, 1.8 * p['rustle_f'], r))
+                h2 = h2 * ru2 / np.sqrt(np.mean(ru2 ** 2))
+            h_side = (p['hiss_width'], h * he * flut, h2 * he * flut)
     # tonal / whistle
     if p['tone_db'] > -49.5:
         ft = np.clip(f_air * p['tone_ratio'], 40, 16000)
@@ -455,10 +512,16 @@ def render(p, r):
         s = p['width'] * s * (_lvl(x) / _lvl(s)) * 0.5
     else:
         s = 0.0
+    if h_side is not None:                   # round 4: the hiss side at the hiss's own mix scale (mono sum unchanged)
+        hw, hm, h2 = h_side
+        s = s + hw * 10 ** (p['hiss_db'] / 20) * h2 / _lvl(hm)
+    if low_side is not None:                 # round 4: the low side at the low band's own mix scale
+        lw, lm, l2 = low_side
+        s = s + lw * 10 ** (p['low_db'] / 20) * l2 / _lvl(lm)
     y = np.stack([x * (1 + pan) + s, x * (1 - pan) - s], axis=1)
     if p['room_wet'] > 0.005:
         from .. import fx
-        kw = dict(rt60=p['rt60'], size=0.45, predelay=0.006, damp=0.55, wet=p['room_wet'],
+        kw = dict(rt60=p['rt60'], size=0.45, predelay=0.006, damp=p.get('room_damp', 0.55), wet=p['room_wet'],
                   width=min(1.0, 0.3 + p['width'] * 1.5), lowcut=120.0, stereo=True, tail=max(0.2, 1.1 * p['rt60']))
         yr = fx.reverb(y, r, lines=8, **kw)
         if not np.isfinite(yr).all():          # fx.reverb with 8 lines returns NaN for ~3 % of seeds (4 of 150 measured,

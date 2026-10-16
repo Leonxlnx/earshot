@@ -102,10 +102,15 @@ SPACE = {
     'air': (-60.0, -10.0),            # ding: a breath of band noise (3-14 kHz) under the head, dB re head: the
                                       # films' upper bands are full, but with noise, not a harmonic comb
     'air_tau': (0.02, 0.2, 'log'),
+    'air_lo': (0.0, 12000.0),         # round 4: the breath's lower band edge in Hz (0 = min(3 kHz, 1.4 f0), as round 3):
+                                      # 8-10 kHz puts it where the film dings' noise sits (> 12 kHz -17 dB) without the
+                                      # 3-9 kHz hiss CLAP heard as 'crisp hi-hats'
     'p3': (0.0, 0.5),                 # ding: extra inharmonic head partials (2.76x, 5.4x: a struck bar's modes)
     'p3_tau': (0.008, 0.06, 'log'),   # ... that die fast (a natural strike, not a static beep)
     'strike': (-60.0, -4.0),          # bell: strike modes (high inharmonic partials dying in 10-40 ms), dB re ring
     'strike_tau': (0.006, 0.04, 'log'),
+    'strike_max': (6.0, 20.0),        # round 4: bell strike modes above this ratio are left out (20 = all five, as round 3;
+                                      # 12 = 6.1 / 8.7 / 11.9 only: fewer inharmonic partials up high, less 'clang')
 }
 
 PARTIALS = {   # ratios, amplitudes
@@ -123,7 +128,7 @@ DEFAULTS = {'style': 'ding', 'f0': 1822.0, 'att': 0.003, 'step_db': -30.0, 'hold
             'verb': 0.12, 'rt60': 0.3, 'width': 0.8, 'head_width': 0.15, 'length': 0.26, 'fade': 0.07, 'hp': 550.0, 'interval': 7,
             'gap': 0.085, 'second_db': -2.0, 'partials': 'celesta', 'decay': 0.8, 'slope': 0.8, 'hard': 0.4,
             'beat': 1.0, 'room': 0.12, 'early_db': 0.0, 'early_tau': 0.05, 'strike': -60.0, 'strike_tau': 0.015, 'head_drive': -1.0, 'air': -60.0,
-            'air_tau': 0.06, 'p3': 0.0, 'p3_tau': 0.02}
+            'air_tau': 0.06, 'p3': 0.0, 'p3_tau': 0.02, 'strike_max': 20.0, 'air_lo': 0.0}
 
 
 def _fam(**kw):
@@ -196,6 +201,32 @@ FINE = {
 }
 FINE['success'] = FINE['ding'] + ['gap', 'second_db']
 
+# Round 4 (ui-tonal polish): edits on top of the round-3 DELIVERED members (out/forge_v2/<cat>/final_r3/report.json,
+# 'family' members), applied by out/forge_v2/_uitonal_r4/fam4.py.
+# notify (the round-3 judge: AudioSet hears 'Clang' first on 4 of 6, round 2 'Ding'; keep the strike and the early decay,
+# keep the lower notes): a softer mallet (hard 0.15 lower: q^1.5(hard-0.5) lifts the upper partials less), upper partials
+# die a little faster (slope 1.1), strike modes only up to 12x f0 and 6 dB softer (r4a = delivered). Softer again on the
+# three low members (C5, A4, D5; hard 0.4-0.45, strike modes to 9x: r4b) gave dull onsets (polish 1.3-1.4, onset > 6 kHz
+# -42..-49 dB) and changed nothing else, so r4a stays. (A first try at hard 0.38-0.5 and
+# strike -22..-26 went too dark: 4-12 kHz -30 dB of total vs the forge refs' -15, onset > 6 kHz -29 vs -14.)
+# pro_notify (the judge: closer to the film dings, 2 kHz + ~3.4x, clean; CLAP heard 'crisp hi-hats' / 'triangle hit'):
+# the head's noise breath moved above 9 kHz (air_lo; the films' > 12 kHz sits at -17 dB of total, their 4-12 kHz at -14
+# where round 3 had -9: the 3-9 kHz hiss and a loud 3.4x partial), the struck-bar modes nearly gone (p3 0.06), a quieter
+# tick (the films' onset > 6 kHz -18.7 dB vs round 3's -9.8), the 3.4x partial kept at ~60 % of round 3, a faint octave
+# (the 4 kHz band stood 9 dB over the films) and a louder body (the films' 1 kHz octave is -6 dB re total next to 2 kHz
+# -5: round 3's body sat 10-13 dB under them at 315 Hz-1.26 kHz). NOT delivered: the critic scored every member lower
+# than round 3 (-5.9..-10.4 vs -5.1..-8.5, CLAP 'a cheap synthesized beep' on all five), so pro_notify/final = round 3.
+# That attempt (r4a) was: [{'air': -22.0, 'air_lo': 9000.0, 'p3': 0.06, 'tick_db': -32.0, 'bright': b, 'oct': 0.04,
+# 'body_db': -12.0} for b in (0.2, 0.15, 0.22, 0.3, 0.4)]. r4b keeps round 3's head and breath and only raises the body
+# (-18..-20 -> -13 dB re head: the measured gap to the films is at 315 Hz-1.26 kHz). Also NOT delivered: the critic was
+# mixed (median -5.97 -> -6.14: two members up, three down). pro_notify/final stays round 3 (fam3 members, no R4 edit).
+R4_EDITS = {
+    'notify': [{'hard': h, 'strike': s, 'strike_max': 12.0, 'slope': 1.1}
+               for h, s in ((0.55, -20.0), (0.6, -18.0), (0.65, -17.0), (0.48, -22.0), (0.5, -24.0), (0.62, -18.0))],
+    'pro_notify': [{'body_db': -13.0}] * 5,      # r4b (NOT delivered, see below): round 3 + a louder body
+
+}
+
 
 def family_space(params, style=None):
     """the search space for one family member: its FINE keys free (full SPACE ranges), every other key fixed to its
@@ -265,7 +296,8 @@ def _ding(p, r, n):
                 head += p['p3'] * a * np.exp(-t / (p['p3_tau'] * (2.756 / q))) * _partial(t, f0 * q, 1.0, r, 1.5)
     head *= _head_env(t, p)
     if p['air'] > -59:                                                     # round 3: noise, not a harmonic comb
-        w = dsp.butter(r.standard_normal(n), 'band', (min(3000.0, 1.4 * f0), 16000.0), order=2)
+        lo = p.get('air_lo', 0.0) or min(3000.0, 1.4 * f0)
+        w = dsp.butter(r.standard_normal(n), 'band', (lo, 16000.0), order=2 if lo < 6000 else 4)
         w /= np.sqrt(np.mean(w ** 2)) + 1e-12
         ea = np.exp(-t / p['air_tau'])
         k1 = dsp.n_of(0.001)
@@ -315,7 +347,7 @@ def _bell(p, r, n):
         ys = np.zeros(n)
         for q in (6.1, 8.7, 11.9, 15.3, 19.6):
             f = p['f0'] * q * r.uniform(0.98, 1.02)
-            if f > 17000:
+            if f > 17000 or q > p.get('strike_max', 20.0):
                 continue
             ys += r.uniform(0.5, 1.0) * np.exp(-t / (p['strike_tau'] * (6.1 / q) ** 0.5)) *                 np.sin(2 * np.pi * f * t + r.uniform(0, 6.3))
         y += 10 ** (p['strike'] / 20) * ys

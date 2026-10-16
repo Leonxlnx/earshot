@@ -4,7 +4,7 @@
     python eval/forge/build_refsets.py --cats click tap     # only these (merged into the existing manifest)
     python eval/forge/build_refsets.py --plan               # print the plan (sources per split), no audio work
 
-Sources: demo/launch-sfx-kit/sources.json (licences, paths into E:/clawd animation/audio/assets/) and the kit WAVs'
+Sources: demo/launch-sfx-kit/sources.json (licences, paths into the local licensed library) and the kit WAVs'
 own trims (kit.json: the source file + trim of every kit sound; re-cut here from the source with trim + fade only, no
 high-pass). Each source entry is cut one of four ways:
   kit    the kit's trim of the source (its fades)
@@ -24,7 +24,7 @@ any category; the build refuses to write a registry that breaks this. Sources th
 kit WAVs named in earshot/forge/recipes/*.py) are on the forge side, so the bench is held out from v1 too, except
 where a category has nothing else (noted).
 
-Outputs: E:/earshot/out/refs/<category>/{forge,bench}/*.wav, out/refs/manifest.json (source, trim, licence, earshot
+Outputs: <repo>/out/refs/<category>/{forge,bench}/*.wav, out/refs/manifest.json (source, trim, licence, earshot
 evidence, rejected candidates and why) and the registry <EARSHOT_HOME>/refsets.json (earshot.forge.refsets).
 """
 import argparse

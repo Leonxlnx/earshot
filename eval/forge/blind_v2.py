@@ -1,7 +1,7 @@
 """Clean blind test (forge v2 finals vs held-out REAL recordings) + the v1 -> v2 progress listening file.
 
-    E:/earshot/.venv/Scripts/python.exe eval/forge/blind_v2.py --out out/showcase/blind_v2 --seed 2026
-    E:/earshot/.venv/Scripts/python.exe out/showcase/blind_v2/score_answers.py A B B A ...      (after listening)
+    python eval/forge/blind_v2.py --out out/showcase/blind_v2 --seed 2026
+    python out/showcase/blind_v2/score_answers.py A B B A ...      (after listening)
 
 One command rebuilds both from whatever is in out/forge_v2/<category>/final/ now (rerun it after a polish round).
 Nothing is synthesised here: every sound is a file that already exists (forge finals, v1 finals, licensed bench refs),
@@ -74,7 +74,8 @@ LEAD, GAP, BETWEEN, TAIL = 1.0, 1.2, 2.5, 1.0
 SHORT_S = 1.0
 COMPAT = 1.3                 # made finals whose audible extent is within this factor of an available bench ref
 
-# (category, answer-sheet name, trials at N = 20, tier from the round-3 verdicts in OVERNIGHT.md / results_v2r3.md)
+# (category, answer-sheet name, trials at N = 20, tier from the round-3 verdicts in OVERNIGHT.md / results_v2r3.md;
+#  round 4 moved toggle from weak to middle: tone 10.4 -> 7.8 dB, curve 14.6 -> 10.1 dB, ring lines gone, v2r4.md)
 PLAN = [
     ('whoosh_big', 'big whoosh', 2, 'strong'),
     ('whoosh_fast', 'fast whoosh', 2, 'strong'),
@@ -87,7 +88,7 @@ PLAN = [
     ('impact', 'impact', 1, 'strong'),
     ('hover_tick', 'hover tick', 1, 'middle'),
     ('tap', 'tap', 1, 'weak'),
-    ('toggle', 'toggle', 1, 'weak'),
+    ('toggle', 'toggle', 1, 'middle'),
     ('notify', 'notification ding', 1, 'weak'),
     ('riser', 'riser', 1, 'weak'),
 ]
@@ -373,7 +374,7 @@ def pick_trials(n, seed):
 SCORE_PY = r'''"""Score the blind test: python score_answers.py A B B A ...   (one letter per trial, in trial order: which one
 was the REAL recording). Use ? for a trial you could not decide (it is left out of the count).
 
-Prints per trial right / wrong, per sound, per tier (the round-3 verdict of the category: strong / middle / weak) and
+Prints per trial right / wrong, per sound, per tier (the round-3 / round-4 verdict of the category: strong / middle / weak) and
 overall, with the chance of doing at least that well by pure guessing (one-sided binomial p). Reads
 KEY_open_after.json next to this file.
 """

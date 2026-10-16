@@ -21,6 +21,12 @@ a swell that rises straight in dB from -34 dB); `pro_impact` gets a straight-in-
 `gate_fall`) and sparser, sharper high grains (`air_div`, `grain_sharp`); measure() reports `pre_gate`. Every new key's
 neutral value reproduces round 2, and the round-2 families are kept in FAMILIES_R2. Every key a family member sets
 must be inside SPACE: forge's final scoring pass decodes through SPACE and fills keys outside it from the first member.
+Round 4 (out/forge_v2/impact/LOG.md, pro_impact/LOG.md): the r3 contact sheen overshot, so `impact` gets a quieter, longer,
+band-limited sheen (`sheen_top`), a darker crack, a 2nd-order roll-off of the whole hit (`top`) and members that are
+different kinds of boom: a struck metal `plate` layer (metal) and falling debris (`scatter`, the blast member);
+`pro_impact` gets random grain timing / levels (`grain_jit`) and complete parameter sets (the r3 finals carried a
+snap + sheen click that forge's final pass filled in at mid-range). Neutral values render round 3 exactly; the r3
+families are kept in FAMILIES_R3.
 
 v2 (rounds 1-8, the forge test and the launch film), what a trailer boom is, physically:
   * a big, slack drum-like body (a large membrane / a heavy panel) struck hard: its fundamental starts high and SLIDES
@@ -614,6 +620,16 @@ SPACE = {
     'gate_fall': (0.08, 0.6, 'log'),        # round 3: s of straight-in-dB fall before the gate ...
     'gate_db': (0.0, 30.0),                 # ... by this many dB (0 = none: r2 parameter sets render as before)
     'floor_db': (-110.0, -70.0),            # microphone floor (<= -105: none, a designed file)
+    # round 4 (every neutral value renders round 3 exactly; new layers draw only when used)
+    'sheen_top': (7000, 20000, 'log'),      # low-pass on the sheen (>= 19 kHz: none = r3; the r3 sheen ran flat to 24 kHz:
+                                            # > 12 kHz share of the onset -10..-14 dB vs the forge refs' -31..-48)
+    'top': (6000, 20000, 'log'),            # 2nd-order low-pass on the whole hit (>= 19 kHz: none; real booms roll off)
+    'plate': (0.0, 1.0),                    # a struck metal plate / panel: an inharmonic mode cloud at 48 kHz
+    'plate_f': (150, 900, 'log'),           # its lowest mode (modes up to ~16x, <= 9 kHz)
+    'plate_tau': (0.2, 2.0, 'log'),         # decay of the lowest mode (higher modes die faster)
+    'scatter': (0.0, 1.0),                  # debris / rubble falling after the hit (diffuse crackle over scatter_s)
+    'scatter_s': (0.3, 2.5),
+    'grain_jit': (0.0, 1.0),                # random grain timing / level (0 = r3's even ~28 / 55 ms stripes)
 }
 
 # the cinematic boom (family 'impact', preset 'classic'); FAMILIES has the palettes
@@ -625,7 +641,8 @@ DEFAULTS = {'pre': 0.35, 'pre_level': 0.12, 'crack': 0.35, 'crack_f': 2200.0, 'c
             'air_f': 7000.0, 'hall_wet': 0.45, 'hall_rt': 3.2, 'hall_damp': 0.4, 'width': 0.55, 'gate': 0.0,
             'gate_ms': 20.0, 'floor_db': -90.0, 'snap': 0.0, 'hall_tone': 5000.0, 'sheen': 0.0, 'sheen_ms': 9.0,
             'sheen_f': 6000.0, 'pre_shape': 0, 'gate_fall': 0.25, 'gate_db': 0.0, 'air_div': 1.0, 'grain_sharp': 3.0,
-            'air_q': 0.8}
+            'air_q': 0.8, 'sheen_top': 20000.0, 'top': 20000.0, 'plate': 0.0, 'plate_f': 400.0, 'plate_tau': 0.8,
+            'scatter': 0.0, 'scatter_s': 1.2, 'grain_jit': 0.0}
 
 
 def _crack3(p, n, r):
@@ -678,7 +695,56 @@ def _sheen(p, n, r):
     y = np.zeros((n, 2))
     for ch in range(2):
         w = dsp.butter((0.7 * c + 0.3 * r.standard_normal(L)) * env, 'high', p['sheen_f'], 4)
+        if p.get('sheen_top', 20000.0) < 19000:          # round 4: a band, not white to 24 kHz (no rng draw)
+            w = _lp(w, p['sheen_top'], 2)
         y[:L, ch] = w
+    return y / (np.abs(y).max() + 1e-12)
+
+
+def _plate(p, n, r):
+    """round 4 (the judge: the six booms are near clones to CLAP, 0.905): a struck metal plate / panel, the 'metal'
+    member's ring. 40 inharmonic modes log-spread from plate_f up to ~16 x plate_f (<= 9 kHz), amplitude ~ f^-0.6,
+    decay plate_tau x (f / plate_f)^-0.55 (the top dies first), a 0.8 ms strike rise and a slight downward pitch glide
+    in the first 100 ms (a big plate's nonlinear 'bwang'); L / R share the modes with different phases (a little
+    width). Stereo, peak 1, zero after its ring."""
+    m = min(n, dsp.n_of(min(4.0, 5.0 * p['plate_tau'] + 0.1)))
+    t = _t(m)
+    cnt = 40
+    f0 = p['plate_f']
+    f = np.sort(f0 * np.exp(r.uniform(0, np.log(min(16.0, 9000.0 / f0)), cnt)))
+    a = (f / f0) ** -0.6 * r.uniform(0.3, 1.0, cnt)
+    tau = p['plate_tau'] * (f / f0) ** -0.55
+    ph = r.uniform(0, 2 * np.pi, (cnt, 2))
+    glide = 0.012 * 0.1 * (1 - np.exp(-t / 0.1))            # integral of 1.2 % * exp(-t / 0.1): phase of the glide
+    y = np.zeros((n, 2))
+    on = 1 - np.exp(-t / 0.0008)
+    for k in range(cnt):
+        arg = 2 * np.pi * f[k] * (t + glide)
+        e = a[k] * np.exp(-t / tau[k]) * on
+        y[:m, 0] += e * np.sin(arg + ph[k, 0])
+        y[:m, 1] += e * np.sin(arg + ph[k, 1])
+    return y / (np.abs(y).max() + 1e-12)
+
+
+def _scatter(p, n, r):
+    """round 4: debris / rubble falling after the hit (the 'blast' member): a diffuse crackle of small impacts (Poisson,
+    thinning out) over scatter_s, each a click band-passed 700 Hz - 6 kHz with a few heavier, darker pieces; the first
+    pieces land ~30 ms after the contact. Independent per channel, stereo, peak 1."""
+    T = p['scatter_s']
+    L = min(n, dsp.n_of(T + 0.25))
+    y = np.zeros((n, 2))
+    for c in range(2):
+        cnt = int(60 + 260 * T)
+        ts = 0.03 + r.exponential(T * 0.4, cnt)
+        ts = ts[ts < T]
+        cl = np.zeros(L)
+        amp = r.standard_normal(len(ts)) * np.exp(-ts / (0.5 * T)) * r.uniform(0.2, 1.0, len(ts)) ** 2
+        np.add.at(cl, np.minimum((ts * SR).astype(int), L - 1), amp)
+        k = dsp.n_of(0.004)                              # each piece a 2-4 ms decaying noise grain, not one sample
+        cl = signal.fftconvolve(cl, r.standard_normal(k) * np.exp(-np.arange(k) / (SR * 0.0012)))[:L]
+        hi = dsp.butter(cl, 'band', (700.0, 6000.0), 2)
+        lo = dsp.butter(cl, 'band', (250.0, 1400.0), 2)
+        y[:L, c] = hi / (np.abs(hi).max() + 1e-12) + 0.6 * lo / (np.abs(lo).max() + 1e-12)
     return y / (np.abs(y).max() + 1e-12)
 
 
@@ -718,9 +784,11 @@ def _sub3(p, t, r):
     return _glide(t, f0, f1, 0.09, r) * _rise(t, a) * np.exp(-np.maximum(t - a, 0) / p['sub_tau'])
 
 
-def _grains(t, rate, depth, r, slow=0.18):
+def _grains(t, rate, depth, r, slow=0.18, jit=0.0):
     """a granular amplitude pattern: pulses every 1 / rate s, the spacing growing by `slow` over 1.2 s (the rumble
-    slows down), level and timing jittered; returns a gain curve around 1 (depth 0 = flat)"""
+    slows down), level and timing jittered; returns a gain curve around 1 (depth 0 = flat). Round 4: jit > 0 makes the
+    spacing random (each step x (1 + jit * U(-0.6, 0.9))) and the levels more uneven (r3's even stripes read as a
+    snare roll); jit 0 draws exactly as round 3."""
     if depth <= 0.01:
         return np.ones_like(t)
     g = np.zeros_like(t)
@@ -732,8 +800,8 @@ def _grains(t, rate, depth, r, slow=0.18):
         L = min(len(t) - i0, int(sp * 1.6 * SR))
         if L > 8:
             u = np.arange(L) / SR
-            g[i0:i0 + L] += r.uniform(0.55, 1.0) * (1 - np.exp(-u / 0.0025)) * np.exp(-u / (sp * 0.32))
-        tk += sp
+            g[i0:i0 + L] += r.uniform(0.55 - 0.4 * jit, 1.0) * (1 - np.exp(-u / 0.0025)) * np.exp(-u / (sp * 0.32))
+        tk += sp * (1 + jit * r.uniform(-0.6, 0.9)) if jit > 0 else sp
     g /= np.percentile(g, 95) + 1e-9
     return (1 - depth) + depth * np.clip(g, 0, 1.6)
 
@@ -752,7 +820,7 @@ def _roll3(p, n, r):
     e = (1 - np.exp(-tl / 0.08)) * np.exp(-tl / (hold * 2.5))
     e *= np.where(tl > hold, np.exp(-(tl - hold) / fall), 1.0)
     y = _up(w * e * np.exp(p['roll_depth'] * lf - 0.5 * p['roll_depth'] ** 2), n)
-    y *= _grains(_t(n), p['grain_rate'], p['grain_depth'], r)
+    y *= _grains(_t(n), p['grain_rate'], p['grain_depth'], r, jit=p.get('grain_jit', 0.0))   # r4: grain_jit
     return y / (np.abs(y).max() + 1e-12)
 
 
@@ -762,7 +830,8 @@ def _air3(p, n, r, a):
     y = dsp.svf(_noise(n, r, 'pink'), p['air_f'], p.get('air_q', 0.8), 'bandn')     # r3: air_q (0.8 = r2)
     e = _rise(t, max(a, 0.02)) * np.exp(-np.maximum(t - a, 0) / max(0.25, 0.5 * p['roll_hold'] + p['roll_fall']))
     if p['grain_depth'] > 0.01:                          # the grains reach up here too (ref_2 4.71: 1-10 kHz stripes)
-        g = _grains(t, p['grain_rate'] * p.get('air_div', 1.0), min(1.0, 1.5 * p['grain_depth']), r)  # r3: air_div
+        g = _grains(t, p['grain_rate'] * p.get('air_div', 1.0), min(1.0, 1.5 * p['grain_depth']), r,  # r3: air_div
+                    jit=p.get('grain_jit', 0.0))
         e = e * g ** p.get('grain_sharp', 3.0)          # sharper than the low rumble's: distinct high grains (r3: grain_sharp)
     return y * e / (np.abs(y * e).max() + 1e-12)
 
@@ -811,6 +880,8 @@ def render(p, r):
     if p['snap'] > 0.005:                                # drawn only when used: older parameter sets stay exact
         direct = direct + p['snap'] * _snap(n, r)
     shn = _sheen(p, n, r) if p.get('sheen', 0.0) > 0.005 else None     # round 3 (drawn only when used, as snap)
+    pl = _plate(p, n, r) if p.get('plate', 0.0) > 0.005 else None      # round 4 (drawn only when used)
+    sc = _scatter(p, n, r) if p.get('scatter', 0.0) > 0.005 else None  # round 4 (drawn only when used)
     # diffuse layers: roll (+ grains) and air, partly independent per channel
     wd = p['width']
     rc = _roll3(p, n, r) if p['roll'] > 0.01 else None
@@ -827,6 +898,10 @@ def render(p, r):
         dry = direct.copy()
         if shn is not None:
             dry += p['sheen'] * shn[:, c]
+        if pl is not None:
+            dry += p['plate'] * pl[:, c]
+        if sc is not None:
+            dry += p['scatter'] * pk_d * sc[:, c]
         if rc is not None:
             rl = (1 - wd) * rc + wd * _roll3(p, n, r) if wd > 0.01 else rc
             dry += p['roll'] * pk_d * rl
@@ -860,6 +935,8 @@ def render(p, r):
             sw = dsp.fade(sw, 0.01, 0.002)
             out[:n_pre, c] += sw * p['pre_level'] * pk / (np.abs(sw).max() + 1e-12)
     out = _hp(out, 24, 2)
+    if p.get('top', 20000.0) < 19000:                   # round 4: the whole hit rolls off on top (r3: > 12 kHz share
+        out = _lp(out, p['top'], 2)                      # -22..-31 dB of total, forge refs -39 / -62)
     if p['floor_db'] > -105:
         out = _mic(out, r, p['floor_db'], low_cut=22.0, air_db=-0.5)
     if gate > 0:
@@ -964,6 +1041,79 @@ FAMILIES_R2['pro_impact'] = [
                   'roll_cut': 150.0, 'roll_hold': 0.9, 'air': 0.06}),
         ('swell', {**_PRO, 'pre': 0.18, 'pre_level': 0.3, 'body_attack': 0.2, 'gate': 0.9, 'grain_rate': 32.0}),
     ]
+FAMILIES_R3 = {k: list(v) for k, v in FAMILIES.items()}   # the round-3 families (the r3 finals, in final_r3/)
+# round 4 (the round-3 judge: the contact sheen overshot, onset > 6 kHz share -10.9 dB vs the held-out hit's -21.6 and
+# the forge refs' -23 / -27 by the judge's measure, > 12 kHz of that window -10..-14 vs -31..-48; variety 0.905, the
+# deep / classic / thunder trio at CLAP cos 0.94-0.97): the sheen ~9 dB down and band-limited (sheen_top), the whole
+# hit rolled off on top (top), and members that are different KINDS of boom: a struck metal plate (metal), a blast
+# with falling debris (blast, was thunder), a darker sub boom (deep), a tight drum hit (punch)
+_CINE4 = {**_CINE3, 'sheen': 0.3, 'sheen_ms': 14.0, 'sheen_top': 11000.0, 'top': 13000.0, 'crack_f': 1600.0, 'crack': 0.95}
+# (palette run 1: a 7 ms sheen put the top before the body's peak, so polish's onset window (from the 10 % point before
+# the peak) read 'dull onset' -27 dB (forge refs -16 / -23) while the judge's window read -16..-19; a 14 ms sheen at
+# the same level reads -19..-20 on both)
+# (probe4, seeds 3 / 11: without any sheen the r3 crack alone gave onset > 6 kHz -15..-17 dB: crack 1.4 at 2.5 kHz
+# reaches 7.5 kHz; at 1.8 kHz / 1.25 the 1-4 kHz body stays at -14..-15 dB and the onset falls to -19..-20)
+FAMILIES['impact'] = [
+    ('classic', dict(_CINE4)),
+    ('deep', {**_CINE4, 'body_f0': 95.0, 'body_f1': 38.0, 'body': 0.8, 'sub': 0.55, 'sub_f': 34.0, 'sub_tau': 1.0,
+              'roll': 0.55, 'roll_cut': 110.0, 'roll_hold': 2.1, 'crack': 1.1, 'crack_f': 1500.0, 'blast': 0.9,
+              'blast_f': 600.0, 'blast_tau': 0.45, 'shell': 0.7, 'hall_rt': 4.5, 'hall_damp': 0.6, 'hall_tone': 4000.0,
+              'sheen': 0.45, 'sheen_ms': 16.0, 'top': 11000.0}),   # (palette run 1: top 9 kHz / sheen 0.25: 'dull onset' -40 dB)
+              # r4: a darker, bigger sub boom (sub 0.8 / top 7 kHz went 98 % < 150 Hz: past the forge refs' 72-82 %)
+    ('punch', {**_CINE4, 'body_f0': 230.0, 'body_f1': 66.0, 'drop_tau': 0.03, 'body_tau': 0.22, 'crack': 0.95,
+               'modes': 0.5, 'shell': 0.5, 'roll': 0.25,   # r4: a big struck drum (taiko-like), drier
+               'crack_f': 1800.0, 'crack_ms': 7.0, 'blast_tau': 0.12, 'roll_hold': 0.9, 'roll_fall': 0.4,
+               'hall_rt': 2.1, 'hall_wet': 0.45, 'sub': 0.15, 'sub_tau': 0.45, 'sheen': 0.35, 'sheen_ms': 10.0}),
+    ('metal', {**_CINE4, 'shell': 0.8, 'shell_lo': 260.0, 'modes': 0.5, 'crack_f': 2200.0, 'debris': 0.4,
+               'air': 0.0, 'air_f': 6500.0, 'hall_damp': 0.35, 'hall_rt': 3.6, 'blast_f': 2000.0, 'sheen': 0.35,
+               'sheen_ms': 12.0, 'sheen_f': 7000.0, 'crack': 0.95, 'body_attack': 0.001, 'hall_tone': 5500.0,
+               'plate': 0.7, 'plate_f': 380.0, 'plate_tau': 0.9, 'top': 11000.0}),
+               # (palette run 1, plate 1.0 / tau 1.3: late 630-1250 Hz +20 dB beyond every ref, +13 dB at 12.7 kHz)
+    ('swell', {**_CINE4, 'pre': 0.5, 'pre_level': 0.35, 'pre_shape': 1, 'body_attack': 0.03, 'roll_hold': 2.0,
+               'sheen': 0.3, 'roll': 0.45, 'hall_rt': 3.8}),
+    ('blast', {**_CINE4, 'body': 0.5, 'body_f0': 130.0, 'body_f1': 48.0, 'debris': 0.6, 'crack_f': 1400.0,
+               'blast': 1.0, 'blast_f': 900.0, 'blast_tau': 0.5, 'roll': 0.7, 'roll_hold': 1.9,
+               'roll_depth': 0.35, 'roll_rate': 1.2, 'roll_cut': 260.0, 'sheen': 0.3, 'sheen_ms': 12.0,
+               'crack': 1.1, 'hall_rt': 3.4, 'scatter': 0.5, 'scatter_s': 2.0}),
+               # (palette run 1: single-sample debris impulses at 0.8 read as '5 clicks' (art 2.0): now 2-4 ms grains)
+]
+# round 4 (the judge: r3's high grains are evenly spaced stripes, one every ~55 ms, and the bench margin fell 0.60 ->
+# -0.07: CLAP hears 'a snare roll'): random grain timing and uneven grain levels (grain_jit) on every member
+# The r3 pro presets did not set snap / sheen / sheen_ms / sheen_f / hall_tone / pre_shape (_PRO is not built on
+# DEFAULTS), and the final scoring pass decodes every SPACE key: missing keys came back at mid-range (the r3 finals carry
+# snap 0.75 + sheen 1.0: a bright click at the onset, > 6 kHz share of the first 15 ms -0.4..-1.7 dB vs the forge refs'
+# -14 / -33). Round 4 members are complete parameter sets (DEFAULTS underneath: no snap, no sheen)
+# and a darker contact (crack_f 3 -> 1.8 kHz: onset > 6 kHz -10..-17 dB on seeds 3 / 11, refs -14 / -33)
+_PRO4 = {**DEFAULTS, **_PRO3, 'grain_jit': 0.7, 'crack_f': 1800.0, 'snap': 0.0, 'sheen': 0.0}
+# The members start from the r3 FINALS' searched parameters (out/forge_v2/pro_impact/final_r3/report.json; the first
+# r4 palette of the bare presets lost the search's gains), with the fill-bug keys put right (snap / sheen 0; pre_shape,
+# hall_tone, sheen_ms / sheen_f as delivered, inert without a sheen), crack_f 1.8 kHz and grain_jit 0.7.
+FAMILIES['pro_impact'] = [
+    ('rumble', {**_PRO4, **dict(FAMILIES_R3['pro_impact'])['rumble'], 'crack_f': 1800.0, 'crack': 0.5122,
+        'body_f1': 39.5286, 'body_attack': 0.1351, 'body': 0.1221, 'sub': 0.0082, 'roll': 1.264,
+        'roll_cut': 101.7411, 'roll_hold': 0.6747, 'roll_fall': 0.3832, 'grain_rate': 22.7054, 'grain_depth': 0.9699,
+        'air': 0.4949, 'gate': 0.955, 'gate_db': 20.3501, 'pre_shape': 1, 'hall_tone': 6000.0, 'sheen_ms': 8.0,
+        'sheen_f': 6363.961}),
+    ('air', {**_PRO4, **dict(FAMILIES_R3['pro_impact'])['air'], 'crack_f': 1800.0, 'crack': 0.3841,
+        'body_f1': 42.8117, 'body_attack': 0.0444, 'body': 0.3126, 'sub': 0.6875, 'roll': 1.4018,
+        'roll_cut': 255.8402, 'roll_hold': 0.7123, 'roll_fall': 0.4128, 'grain_rate': 22.3646, 'grain_depth': 0.8043,
+        'air': 0.6265, 'gate': 0.8096, 'gate_db': 15.4599, 'pre_shape': 1, 'hall_tone': 6000.0, 'sheen_ms': 8.0,
+        'sheen_f': 6363.961}),
+    ('short', {**_PRO4, **dict(FAMILIES_R3['pro_impact'])['short'], 'crack_f': 1800.0, 'crack': 0.4808,
+        'body_f1': 75.0, 'body_attack': 0.0464, 'body': 0.5303, 'sub': 0.1124, 'roll': 1.4651, 'roll_cut': 194.2516,
+        'roll_hold': 0.4826, 'roll_fall': 0.2785, 'grain_rate': 39.6209, 'grain_depth': 1.0, 'air': 0.6444,
+        'gate': 0.6288, 'gate_db': 14.1698, 'pre_shape': 1, 'hall_tone': 6000.0, 'sheen_ms': 8.0,
+        'sheen_f': 6363.961}),
+    ('deep', {**_PRO4, **dict(FAMILIES_R3['pro_impact'])['deep'], 'crack_f': 1800.0, 'crack': 0.1025,
+        'body_f1': 50.8261, 'body_attack': 0.0534, 'body': 0.2825, 'sub': 0.4785, 'roll': 1.3857,
+        'roll_cut': 109.0885, 'roll_hold': 0.3807, 'roll_fall': 0.601, 'grain_rate': 18.6677, 'grain_depth': 0.6976,
+        'air': 0.7944, 'gate': 1.2768, 'gate_db': 16.8876, 'pre_shape': 1, 'hall_tone': 6000.0, 'sheen_ms': 8.0,
+        'sheen_f': 6363.961}),
+    ('swell', {**_PRO4, **dict(FAMILIES_R3['pro_impact'])['swell'], 'crack_f': 1800.0, 'crack': 0.3, 'body_f1': 75.0,
+        'body_attack': 0.2, 'body': 0.35, 'sub': 0.15, 'roll': 1.5, 'roll_cut': 200.0, 'roll_hold': 0.7,
+        'roll_fall': 0.5, 'grain_rate': 32.0, 'grain_depth': 1.0, 'air': 0.7, 'gate': 0.9, 'gate_db': 15.0,
+        'pre_shape': 1, 'hall_tone': 6000.0, 'sheen_ms': 8.0, 'sheen_f': 6363.961}),
+]
 TARGETS = {'impact': TARGET,
            'pro_impact': 'a deep designed sub impact with a granular rumble tail, gated'}
 # per category: the parameters the forge may move (everything else stays at the family preset)

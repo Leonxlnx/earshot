@@ -74,13 +74,16 @@ SPACE = {
     'contact_f': (800.0, 6000.0, 'log'),  # ~7 ms from a 1 ms attack (the contact), then ring on quietly (the body)
     'ring_db': (-60.0, -10.0),          # round 3: a second, quiet, long body under the short one (the two-stage decay
     'ring_ms': (10.0, 90.0, 'log'),     # of real taps: -20..-25 dB in ~10 ms, then a ring); -60 = none
+    'contact_lp_x': (0.0, 2.5),         # round 4: 0 = off; else a 4th-order low-pass on the contact at contact_f x this
+                                        # (the round-3 contact's 2nd-order skirt and 0.2 ms onset WERE the taps' 4-12 kHz:
+                                        # muting it moved 4-12 kHz -18.4 -> -36.9 dB; so keep the contact, darken its skirt)
 }
 DEFAULTS = {'body_f': 105.0, 'drop': 0.35, 'att_ms': 12.0, 'hold_ms': 6.0, 'sag_db': 0.0, 'rel_ms': 8.0, 'harm': 0.12,
             'sub': 0.2, 'sat': 2.0, 'tick_db': -12.0, 'tick_f': 3500.0, 'tick_bw': 2.5, 'tick_ms': 12.0, 'glass': 0.0,
             'air_db': -60.0, 'air_tilt': 0.0, 'glass_f': 3200.0, 'dbl': 0.0, 'dbl_dt': 0.065, 'dbl_ratio': 1.0,
             'width': 0.6, 'knock': 0.0, 'knock_f': 500.0, 'tick_width': 0.6, 'hp': 45.0, 'lp': 9000.0, 'length': 0.18,
             'release_ms': 15.0, 'contact_db': -60.0, 'contact_ms': 0.8, 'contact_f': 2500.0, 'ring_db': -60.0,
-            'ring_ms': 40.0}
+            'ring_ms': 40.0, 'contact_lp_x': 0.0}
 
 FAMILIES = {      # hold + 2.3 rel ~ t20, hold + 4.6 rel ~ t40 (ms); measured attack ~ 0.8 att_ms
     'pro_pop_in': {   # the pro shape: attack 6-19 ms, a sagging hold, a fast stop (t20 10-18, t40 25-105 ms in the forge
@@ -112,56 +115,73 @@ FAMILIES = {      # hold + 2.3 rel ~ t20, hold + 4.6 rel ~ t40 (ms); measured at
     'pro_tap': {   # the pro tap (ref_2): 150 Hz thump, attack ~11 ms, a faint broadband texture over the body, gated.
         # Round 3: brighter contact layers so it reads as a tap (the forge ref has > 12 kHz at -37 dB of total where the
         # round-2 taps had -58): a contact burst on the onset in every family, more air texture; holds ~30 % shorter
-        # (r3 first run: t20 18 / t40 35 ms vs the ref's 11 / 25)
-        'finger': {'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (135, 165, 'log'),
+        # (r3 first run: t20 18 / t40 35 ms vs the ref's 11 / 25).
+        # Round 4 (the round-3 judge: more recognisable as a fingertip tap; CLAP heard 'a punchy kick drum pattern' first
+        # on all five): the kick-drum cue is the body's pitch drop and the octave-down sub, so drop <= 0.15 and sub <= 0.2
+        # (the ref's ridge holds at 130-160 Hz), and the contact a few dB up (the fingertip)
+        'finger': {'drop': (0.0, 0.15), 'sub': (0.0, 0.2), 'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (135, 165, 'log'),
                    'att_ms': (8, 13, 'log'), 'hold_ms': (5, 12, 'log'), 'sag_db': (3, 9), 'rel_ms': (2.5, 5, 'log'),
-                   'air_db': (-40, -30), 'air_tilt': (0.0, 0.8), 'dbl': 0.0, 'contact_db': (-14, -6),
+                   'air_db': (-40, -30), 'air_tilt': (0.0, 0.8), 'dbl': 0.0, 'contact_db': (-11, -3),
                    'contact_ms': (0.4, 1.2, 'log'), 'contact_f': (1500, 3500, 'log'), 'lp': (9000, 16000, 'log'),
                    'length': (0.07, 0.1)},
-        'glass': {'width': (0.7, 1.1), 'knock': 0.0, 'body_f': (140, 170, 'log'), 'att_ms': (6, 11, 'log'),
+        'glass': {'drop': (0.0, 0.15), 'sub': (0.0, 0.2), 'width': (0.7, 1.1), 'knock': 0.0, 'body_f': (140, 170, 'log'), 'att_ms': (6, 11, 'log'),
                   'glass': (0.4, 0.8), 'glass_f': (2500, 5000, 'log'), 'tick_db': (-14, -6),
                   'hold_ms': (4, 11, 'log'), 'sag_db': (3, 9), 'rel_ms': (2.5, 5, 'log'), 'air_db': (-44, -32),
-                  'air_tilt': (0.0, 1.0), 'dbl': 0.0, 'contact_db': (-12, -4), 'contact_ms': (0.3, 0.8, 'log'),
+                  'air_tilt': (0.0, 1.0), 'dbl': 0.0, 'contact_db': (-9, -1), 'contact_ms': (0.3, 0.8, 'log'),
                   'contact_f': (3000, 6000, 'log'), 'lp': (11000, 16000, 'log'), 'length': (0.07, 0.1)},
-        'soft': {'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (110, 140, 'log'),
+        'soft': {'drop': (0.0, 0.15), 'sub': (0.0, 0.2), 'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (110, 140, 'log'),
                  'att_ms': (10, 18, 'log'), 'tick_db': (-24, -14), 'hold_ms': (7, 15, 'log'), 'sag_db': (4, 10),
-                 'rel_ms': (3, 6, 'log'), 'air_db': (-46, -36), 'dbl': 0.0, 'contact_db': (-20, -12),
+                 'rel_ms': (3, 6, 'log'), 'air_db': (-46, -36), 'dbl': 0.0, 'contact_db': (-17, -9),
                  'contact_ms': (0.8, 2.0, 'log'), 'contact_f': (1200, 2500, 'log'), 'length': (0.08, 0.11)},
-        'knock': {'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (150, 210, 'log'),
+        'knock': {'drop': (0.0, 0.15), 'sub': (0.0, 0.2), 'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (150, 210, 'log'),
                   'att_ms': (3, 7, 'log'), 'tick_db': (-10, -2), 'hold_ms': (3, 9, 'log'), 'sag_db': (3, 9),
                   'rel_ms': (2.5, 5, 'log'), 'air_db': (-38, -28), 'air_tilt': (0.0, 1.0), 'dbl': 0.0,
-                  'contact_db': (-8, 0), 'contact_ms': (0.4, 1.0, 'log'), 'contact_f': (2000, 4500, 'log'),
+                  'contact_db': (-5, 3), 'contact_ms': (0.4, 1.0, 'log'), 'contact_f': (2000, 4500, 'log'),
                   'lp': (11000, 16000, 'log'), 'length': (0.06, 0.09)},
-        'double': {'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (130, 165, 'log'),
+        'double': {'drop': (0.0, 0.15), 'sub': (0.0, 0.2), 'width': (0.7, 1.1), 'knock': 0.0, 'glass': 0.0, 'body_f': (130, 165, 'log'),
                    'att_ms': (6, 12, 'log'), 'dbl': (0.3, 0.6), 'dbl_dt': (0.05, 0.065), 'hold_ms': (4, 10, 'log'),
-                   'sag_db': (3, 9), 'rel_ms': (2.5, 5, 'log'), 'air_db': (-42, -32), 'contact_db': (-14, -6),
+                   'sag_db': (3, 9), 'rel_ms': (2.5, 5, 'log'), 'air_db': (-42, -32), 'contact_db': (-11, -3),
                    'contact_ms': (0.4, 1.2, 'log'), 'contact_f': (1500, 3500, 'log'), 'length': (0.11, 0.14)},
     },
     'tap': {   # real finger / knuckle taps: mono, sharp attack, a hollow surface mode, a longer tail. Round 3: the round-2
         # taps did not read as taps (phrase z 0.52 vs real 1.6-1.9): the real ones fall ~20 dB in ~7 ms from a 1 ms
         # attack and then ring on quietly. So: a short loud body (att 1-2 ms, rel 2.5-5 ms) over a quiet long ring
-        # (ring_db, ring_ms: the two-stage decay) and a contact burst on the onset (the fingertip / nail)
+        # (ring_db, ring_ms: the two-stage decay) and a contact burst on the onset (the fingertip / nail).
+        # Round 4 (the round-3 judge: 4-12 kHz 8 dB over, t40 1.8x long; forge refs 4-12 kHz -29.6, > 12 kHz -38 dB of
+        # total, t40 50-110 ms): the contact keeps round 3's level and band (r4a: 4 dB quieter contacts read less as taps:
+        # CLAP match z 1.9 -> 1.1-1.5) but loses its 4-12 kHz skirt (contact_lp_x), the tick and air are pinned quiet, a
+        # top roll-off at 6-12 kHz, shorter quieter rings (12-40 ms),
+        # shorter files, and a high-pass at 50-80 Hz (no 30-40 Hz sub under the body)
         'finger': {'width': (0.0, 0.3), 'knock': (0.05, 0.3), 'glass': 0.0, 'body_f': (110, 160, 'log'),
                    'att_ms': (1.0, 2.0, 'log'), 'hold_ms': (0.5, 2, 'log'), 'rel_ms': (2.5, 5, 'log'),
-                   'ring_db': (-28, -18), 'ring_ms': (25, 50, 'log'), 'dbl': 0.0, 'contact_db': (-6, 2),
-                   'contact_ms': (0.4, 1.2, 'log'), 'contact_f': (1200, 2800, 'log'), 'length': (0.1, 0.16)},
+                   'ring_db': (-30, -21), 'ring_ms': (17, 32, 'log'), 'dbl': 0.0, 'contact_db': (-6, 2), 'contact_lp_x': (1.1, 1.8),
+                   'contact_ms': (0.4, 1.2, 'log'), 'contact_f': (1200, 2800, 'log'), 'tick_db': (-24, -14),
+                   'air_db': (-60, -42), 'lp': (7000, 12000, 'log'), 'hp': (50, 75, 'log'), 'sub': (0.0, 0.15),
+                   'length': (0.08, 0.12)},
         'glass': {'width': (0.0, 0.3), 'knock': (0.05, 0.25), 'body_f': (120, 180, 'log'), 'att_ms': (1.0, 2.0, 'log'),
-                  'glass': (0.5, 1.0), 'tick_db': (-12, -4), 'dbl': 0.0, 'hold_ms': (0.5, 2, 'log'),
-                  'rel_ms': (2.5, 5, 'log'), 'ring_db': (-30, -20), 'ring_ms': (20, 45, 'log'), 'contact_db': (-2, 4),
-                  'contact_ms': (0.3, 0.8, 'log'), 'contact_f': (2500, 5000, 'log'), 'length': (0.1, 0.16)},
-        'table': {'width': (0.0, 0.3), 'knock': (0.05, 0.4), 'glass': 0.0, 'body_f': (75, 105, 'log'),
-                  'att_ms': (1.2, 3, 'log'), 'hold_ms': (0.5, 3, 'log'), 'dbl': 0.0, 'sub': (0.0, 0.4),
-                  'rel_ms': (3, 6, 'log'), 'ring_db': (-26, -16), 'ring_ms': (35, 70, 'log'), 'contact_db': (-8, 0),
-                  'contact_ms': (0.8, 2.0, 'log'), 'contact_f': (900, 2000, 'log'), 'length': (0.13, 0.22)},
+                  'glass': (0.3, 0.6), 'glass_f': (1800, 3200, 'log'), 'tick_db': (-18, -10), 'tick_f': (1500, 3500, 'log'),
+                  'dbl': 0.0, 'hold_ms': (0.5, 2, 'log'), 'tick_ms': (2, 8, 'log'),
+                  'rel_ms': (2.5, 5, 'log'), 'ring_db': (-30, -22), 'ring_ms': (18, 35, 'log'), 'contact_db': (-2, 4), 'contact_lp_x': (1.1, 1.8),
+                  'contact_ms': (0.3, 0.8, 'log'), 'contact_f': (2000, 4000, 'log'), 'air_db': (-60, -40),
+                  'lp': (8000, 12000, 'log'), 'hp': (50, 75, 'log'), 'sub': (0.0, 0.15), 'length': (0.08, 0.12)},
+        'table': {'width': (0.0, 0.3), 'knock': (0.05, 0.4), 'glass': 0.0, 'body_f': (80, 110, 'log'),
+                  'att_ms': (1.2, 3, 'log'), 'hold_ms': (0.5, 3, 'log'), 'dbl': 0.0, 'sub': 0.0,
+                  'rel_ms': (3, 6, 'log'), 'ring_db': (-29, -20), 'ring_ms': (15, 30, 'log'), 'contact_db': (-8, 0), 'contact_lp_x': (1.1, 1.8),
+                  'contact_ms': (0.8, 2.0, 'log'), 'contact_f': (900, 2000, 'log'), 'tick_db': (-26, -16),
+                  'air_db': (-60, -46), 'lp': (6000, 10000, 'log'), 'hp': (55, 80, 'log'), 'length': (0.09, 0.14)},
         'knuckle': {'width': (0.0, 0.3), 'knock': (0.1, 0.5), 'glass': 0.0, 'body_f': (150, 220, 'log'),
-                    'att_ms': (0.8, 1.6, 'log'), 'tick_db': (-10, -2), 'dbl': 0.0, 'hold_ms': (0.5, 1.5, 'log'),
-                    'rel_ms': (2.5, 4.5, 'log'), 'ring_db': (-24, -15), 'ring_ms': (30, 55, 'log'),
-                    'contact_db': (-2, 4), 'contact_ms': (0.4, 1.0, 'log'), 'contact_f': (1500, 3500, 'log'),
-                    'length': (0.1, 0.15)},
-        'soft': {'width': (0.0, 0.3), 'knock': (0.05, 0.25), 'glass': 0.0, 'body_f': (90, 130, 'log'),
-                 'att_ms': (1.5, 4, 'log'), 'tick_db': (-22, -14), 'dbl': 0.0, 'hold_ms': (1, 4, 'log'),
-                 'rel_ms': (3.5, 7, 'log'), 'ring_db': (-24, -15), 'ring_ms': (30, 60, 'log'), 'contact_db': (-12, -4),
-                 'contact_ms': (0.8, 2.0, 'log'), 'contact_f': (900, 2200, 'log'), 'length': (0.12, 0.2)},
+                    'att_ms': (0.8, 1.6, 'log'), 'tick_db': (-16, -8), 'tick_f': (1500, 3500, 'log'), 'dbl': 0.0,
+                    'hold_ms': (0.5, 1.5, 'log'), 'tick_ms': (2, 8, 'log'),
+                    'rel_ms': (2.5, 4.5, 'log'), 'ring_db': (-27, -19), 'ring_ms': (18, 35, 'log'),
+                    'contact_db': (-2, 4), 'contact_ms': (0.4, 1.0, 'log'), 'contact_f': (1500, 3200, 'log'),
+                    'contact_lp_x': (1.1, 1.8),
+                    'air_db': (-60, -46), 'lp': (7000, 11000, 'log'), 'hp': (55, 80, 'log'), 'sub': (0.0, 0.1),
+                    'length': (0.08, 0.12)},
+        'soft': {'width': (0.0, 0.3), 'knock': (0.05, 0.25), 'glass': 0.0, 'body_f': (95, 130, 'log'),
+                 'att_ms': (1.5, 4, 'log'), 'tick_db': (-28, -18), 'dbl': 0.0, 'hold_ms': (1, 4, 'log'),
+                 'rel_ms': (3.5, 7, 'log'), 'ring_db': (-28, -19), 'ring_ms': (15, 30, 'log'), 'contact_db': (-12, -4), 'contact_lp_x': (1.1, 1.8),
+                 'contact_ms': (0.8, 2.0, 'log'), 'contact_f': (900, 2200, 'log'), 'air_db': (-60, -44),
+                 'lp': (6000, 10000, 'log'), 'hp': (50, 75, 'log'), 'sub': (0.0, 0.15), 'length': (0.09, 0.14)},
     },
 }
 
@@ -205,6 +225,9 @@ def render(p, r):
     if p.get('contact_db', -60.0) > -59.5:                       # the contact: mono (L = R, after the body's Haas
         f_c = p['contact_f']                                      # offset), on the onset, its own band
         c = burst(p['contact_ms'] * 1e-3, r, f_c / 2.5, min(18000.0, f_c * 2.5), att_s=0.0002)
+        if p.get('contact_lp_x', 0.0) > 0.05:                     # round 4: no 4-12 kHz skirt (no rng draw)
+            c = dsp.butter(c, 'low', min(18000.0, f_c * max(1.0, p['contact_lp_x'])), order=4)
+            c = c / (np.abs(c).max() + 1e-12)
         dsp.place(ct, c * np.abs(body).max() * 10 ** (p['contact_db'] / 20), pre)
     body = dsp.butter(body, 'high', p['hp'], order=2)
     # tick: noise burst (+ optional glassy partial) on the onset, tick_db under the body peak

@@ -6,7 +6,8 @@ ref_1..ref_8 are anonymous ids. The mapping to the local video files lives only 
 import json
 import os
 
-OUT = os.environ.get('EARSHOT_REFS_PRO', 'E:/earshot/out/refs_pro').replace(chr(92), '/')
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+OUT = os.environ.get('EARSHOT_REFS_PRO', os.path.join(REPO, 'out', 'refs_pro')).replace(chr(92), '/')   # local data
 WORK = OUT + '/_work'
 _MAP = OUT + '/films_map.json'
 

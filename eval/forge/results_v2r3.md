@@ -1,6 +1,6 @@
 # forge benchmark: v2r3
 
-made: out/forge_v2; refs: E:\earshot\.cache\refsets.json; 2026-10-16 11:15
+made: out/forge_v2; refs: <EARSHOT_HOME>/refsets.json; 2026-10-16 11:15
 
 Medians per set. made = the made sounds vs the bench refs; real x = the forge refs (real, never in the bench) vs the bench refs; real loo = each bench ref vs the other bench refs. typ z, phrase z, margin, AS names: higher is better; tone dB, env oct (octaves off in attack / t40 / length), curve dB: lower is better; t40 x = tail length / bench median (1 = same). inside = checks (of n) a made sound lands inside the real 80% limit, median over the made sounds (real = the same count for the real rows). var cos = mean pairwise CLAP cosine within the set (made variants / forge refs / bench refs): high = the variants are near clones.
 

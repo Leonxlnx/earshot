@@ -41,6 +41,15 @@ DEFAULTS = {**DEFAULTS_R2,
             'low_db': -24.0, 'low_f': 220.0, 'hiss_db': -24.0, 'hiss_hp': 2400.0, 'hiss_pow': 1.2,
             'room_wet': 0.22, 'rt60': 0.5, 'end_fade': 0.05,
             'eq_lo_db': -10.0, 'eq_lo_f': 150.0, 'eq_hi_db': -4.0, 'eq_hi_f': 6000.0}
+DEFAULTS_R3 = DEFAULTS
+# round 4 (judge, eval/forge/results_v2r3.md: AudioSet Door / Slam / Whack first on 4 of 5, tail darken -0.73 vs the
+# forge refs' -0.16): the same cause and fix as whoosh_fast (recipes/whoosh.py FAST, out/forge_v2/swish/LOG.md round 4):
+# the tail was a dark room ring of the peak's mid band (tail 4-12 kHz -35.1 dB vs forge refs -24.1, 0.5-1 kHz -5.8 vs
+# -16.7). Now the wake carries the tail: source fall 0.21 s, hiss decaying slower than the body after the peak with its
+# top kept open, a smaller brighter room, and a hiss that leads a little on the approach (onset > 6 kHz -38 -> ~-28 dB,
+# forge refs -24.4)
+DEFAULTS = {**DEFAULTS_R3, 'fall': 0.21, 'room_wet': 0.1, 'room_damp': 0.3, 'end_db': -62.0,
+            'hiss_tail': 0.85, 'hiss_mfloor': 0.3, 'hiss_pre': 0.8}
 
 # round 2 (06:30): rounds 1's short rises (16-30 ms) read as hits to CLAP ('a wooden block hit', 'a punchy impact');
 # the refs rise in 25-87 ms (median 34 ms -20 dB -> peak) and keep a long low tail (t40 109-286 ms). Round 3: the
@@ -58,12 +67,12 @@ PRESETS = {
                    'room_wet': 0.1, 'rt60': 0.3},
         'stick':  {'rise': 0.08, 'fall': 0.17, 'fall_k': 0.55, 'end_db': -60.0, 'f_peak': 380.0, 'q_air': 1.3,
                    'low_db': -16.0, 'low_f': 180.0, 'flut_depth': 0.5, 'flut_f': 9.0, 'tone_db': -30.0,
-                   'hiss_db': -27.0, 'room_wet': 0.28, 'rt60': 0.6},
+                   'hiss_db': -27.0, 'room_wet': 0.14, 'rt60': 0.5},
         'zing':   {'rise': 0.06, 'rise_k': 0.8, 'fall': 0.13, 'f_peak': 700.0, 'tone_db': -3.0, 'tone_q': 50.0,
                    'tone_ratio': 1.2, 'tone_pure': 0.9, 'dop_st': 9.0, 'dop_w': 0.015, 'hiss_db': -25.0},
         'soft':   {'rise': 0.08, 'f_peak': 560.0, 'q_air': 1.0, 'tone_db': -40.0, 'rustle': 0.6, 'rustle_f': 120.0,
                    'hiss_rustle': 0.6, 'hiss_lo': 1500.0, 'hiss_db': -21.0, 'grain_db': -26.0, 'grain_rate': 900.0,
-                   'grain_f': 3500.0, 'width': 0.35, 'room_wet': 0.28, 'rt60': 0.6, 'pan': 0.3},
+                   'grain_f': 3500.0, 'width': 0.35, 'room_wet': 0.14, 'rt60': 0.5, 'pan': 0.3},
     },
 }
 BASES = {'swish': DEFAULTS}
@@ -90,4 +99,7 @@ def recipe(kind='swish', defaults=None):
 
 
 def render(p, r):
-    return _w.render({**DEFAULTS, **p}, r)
+    """the pass engine on DEFAULTS + p, except that whoosh.OPTIONAL keys absent from p are OFF (round 4 fix: merging
+    today's DEFAULTS let each round's new optional keys leak into older parameter sets, so the round-2 / round-3 finals
+    and seed-bank entries no longer re-rendered; full parameter sets, as forge() and preset() pass, are unchanged)"""
+    return _w.render({**DEFAULTS, **_w.OPTIONAL, **p}, r)

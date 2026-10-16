@@ -226,3 +226,37 @@ def test_families_of_a_category_differ():
             rows = np.array(rows)
             d = [np.linalg.norm(rows[i] - rows[j]) for i in range(len(rows)) for j in range(i + 1, len(rows))]
             assert min(d) > 0.1, (rec_name, cat, round(min(d), 3))
+
+
+def _share(x, lo, hi):
+    m = _mono(x)
+    P = np.abs(np.fft.rfft(m)) ** 2
+    f = np.fft.rfftfreq(len(m), 1 / SR)
+    return 10 * np.log10(P[(f >= lo) & (f < hi)].sum() / (P.sum() + 1e-30) + 1e-12)
+
+
+def test_round4_toggle_spring_is_a_rattle_not_a_ring():
+    """round 4: the 18 ms tonal spring rang as a narrow line after B (round-3 toggle_01 / 03); hp_steep 1 makes it a
+    5 ms rattle, so the energy 40 ms after B is far lower; hp_steep 0 keeps round 3's render sample for sample"""
+    rec = load_recipe('toggle')
+    p = dict(rec.family_params('toggle', 'on'), spring=0.08, spring_f=2600.0, tail=0.12, verb=0.0, room=0.0)
+    ring = np.asarray(render(rec, dict(p, hp_steep=0), 3))
+    ratt = np.asarray(render(rec, dict(p, hp_steep=1), 3))
+    b = int((0.002 + p['gap'] + 0.04) * SR)                       # 40 ms after contact B (gap jitter is +-4 %)
+    late = lambda x: 10 * np.log10(np.mean(_mono(x)[b:b + int(0.03 * SR)] ** 2) / np.max(_mono(x) ** 2) + 1e-20)
+    assert late(ratt) < late(ring) - 10
+    q = {k: v for k, v in p.items() if k != 'hp_steep'}
+    assert np.array_equal(np.asarray(render(rec, q, 3)), ring)    # the default is round 3
+
+
+def test_round4_tap_contact_lowpass_darkens_only_the_top():
+    """round 4: the contact's 2nd-order skirt was the taps' 4-12 kHz; contact_lp_x keeps the contact (1-4 kHz) and
+    removes the skirt; 0 (default) is round 3"""
+    rec = load_recipe('popin')
+    p = dict(rec.family_params('tap', 'table'), contact_db=0.0, contact_f=1600.0)
+    a = np.asarray(render(rec, dict(p, contact_lp_x=0.0), 2))
+    b = np.asarray(render(rec, dict(p, contact_lp_x=1.3), 2))
+    assert _share(b, 4000, 12000) < _share(a, 4000, 12000) - 6
+    assert _share(b, 1000, 4000) > _share(a, 1000, 4000) - 3
+    q = {k: v for k, v in p.items() if k != 'contact_lp_x'}
+    assert np.array_equal(np.asarray(render(rec, dict(q, contact_lp_x=0.0), 2)), np.asarray(render(rec, q, 2)))
