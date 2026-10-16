@@ -31,6 +31,20 @@ their waveforms / spectrograms), and how each part is modelled here:
 The modal layout and the mic / room geometry belong to the board and the session, so they come from the `key`
 parameter (fixed per key); each press only varies force, timing and noise - the same key sounds the same twice.
 
+v2 (forge v2, overnight 2026-10-16; the thock model above is unchanged): the v1 finals were clones (CLAP cosine
+0.965 between variants, real sets 0.67-0.72), their tails ran long (t40 1.67 x the held-out median) and their onset
+was soft and their top dull (4-12 kHz -18 dB re total where the clicky forge refs sit at -3..-14 dB; the loudest moment
+was the low thock, not the contact). New keys, only read when present (parameter sets without them render exactly the
+v1 sound):
+  top_lvl / top_lo / top_tau   the keycap's broadband rattle at the contact: a 2-12 kHz noise burst (the refs' onset is
+                               a vertical line with most of its energy at 2-10 kHz), energy relative to the cap modes
+  jacket_lvl / jacket_dt       a clicky switch's click jacket: a bright pre-click 3-12 ms before the bottom-out (the
+                               clicky refs show two onsets ~10 ms apart); 0 = a linear / tactile switch
+  pre_gap                      the lead before the key travel (v1: a random 3-20 ms): the file starts on the attack
+  clip                         down to 0.12 s (the clicky refs are 0.11-0.28 s)
+Character for families: thock_lvl + case_lvl (deep thock vs light clack), cap_f (pitch), top_lvl + click_lvl (crisp
+top), jacket_lvl (clicky vs linear), up_lvl (release), clip + thock_tau (length), room_wet (dry vs roomy).
+
 No recorded audio is used: every sample is computed.
 """
 import numpy as np
@@ -40,7 +54,7 @@ from .. import dsp
 from . import REF_ROOT
 
 SR = dsp.SR
-TARGET = 'a single deep thocky mechanical keyboard key press'
+TARGET = 'a single mechanical keyboard key press with a crisp click and a short thock'
 ALTS = ['a wooden knock', 'a computer mouse click', 'a typewriter key', 'a cork pop']
 _K = REF_ROOT + '/keyboard/'
 REFSET = 'typing_key'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
@@ -92,10 +106,19 @@ SPACE = {
     'room_model': ['sparse', 'diffuse'],    # dsp.room (6 discrete early echoes + tail) or a diffuse field
     'floor_db': (-78.0, -55.0),             # (refs: tails at -53..-77 dB re peak)
     'rumble': (0.0, 0.7),                   # low-frequency share of the noise floor
-    'clip': (0.2, 0.4),                     # clip length after the hit (the kit's edits: 0.2-0.39 s)
+    'clip': (0.12, 0.4),                    # clip length after the hit (the kit's edits: 0.2-0.39 s; v2: clicky refs
+                                            #  0.11-0.28 s)
     'hpf': (36, 46, 'log'),                 # the session's high-pass (round 13: the refs are -38 / -47 dB at 39 /
     'key': (0, 999, 'int'),                 #  31 Hz; the slow push and the rumble put +16-39 dB there). key: see below
+    # v2 (only read when present)
+    'top_lvl': (0.0, 2.5),                  # keycap rattle at the contact, 2-12 kHz band noise (energy re the cap)
+    'top_lo': (1800, 4500, 'log'),
+    'top_tau': (0.0006, 0.004, 'log'),
+    'jacket_lvl': (0.0, 0.9),               # click jacket pre-click (0 = linear / tactile switch)
+    'jacket_dt': (0.003, 0.012, 'log'),
+    'pre_gap': (0.0005, 0.006, 'log'),      # lead before the key travel (v1: 3-20 ms)
 }
+V1_DEFAULTS = None   # set below: the v1 final (round 15 pick 4), kept for reference / the seed bank
 # the most reliable sound after the judge (round 15 pick 4 = final keypress_01, parameters rounded to 6 digits): 8 new
 # seeds -> critic mean 6.74 with the model-free tone check in the total (Critic tone=1.5), 7/8 pass, 5.6 dB from the
 # real keys' median balance
@@ -109,6 +132,10 @@ DEFAULTS = {'click_tc': 7.62977e-05, 'click_tau': 0.000400034, 'click_lvl': 0.19
             'pre_lvl': 0.0207414, 'ping_f': 9083.43, 'ping_tau': 0.00578368, 'ping_lvl': 0.122274,
             'room_wet': 0.261726, 'rt60': 0.113685, 'room_size': 0.212985, 'room_damp': 0.95, 'room_model': 'sparse',
             'floor_db': -55.0, 'rumble': 0.0177183, 'clip': 0.38353, 'hpf': 44.5337, 'key': 999}
+V1_DEFAULTS = dict(DEFAULTS)
+# v2 start: the v1 key with a crisp top, a short edit and the file starting on the attack (the search tunes from here)
+DEFAULTS = {**V1_DEFAULTS, 'click_lvl': 0.6, 'thock_tau': 0.05, 'clip': 0.24, 'top_lvl': 0.8, 'top_lo': 2500.0,
+            'top_tau': 0.0015, 'jacket_lvl': 0.0, 'jacket_dt': 0.008, 'pre_gap': 0.002, 'pre_len': 0.006}
 
 
 # ------------------------------------------------------------------------------------------------ helpers
@@ -211,6 +238,9 @@ def _contact(p, r, n, part, pitch=1.0, bright=1.0):
     snap = np.zeros(n)
     snap[:k] = -np.hanning(k)
     x = bright * p['click_lvl'] * _en(_unit(hf) + p['crack'] * crack) + _en(cap) + p['mid_lvl'] * _en(mid)
+    if p.get('top_lvl', 0.0) > 0:      # v2: the keycap's broadband rattle (2-12 kHz) at the contact
+        top = _drive(_hiss(p['top_lo'], 12000, p['top_tau'], n, r, order=2), tc)
+        x = x + bright * p['top_lvl'] * _en(top)
     return _unit(_unit(x) + p['snap'] * snap)
 
 
@@ -308,13 +338,19 @@ def _floor(n, r, rumble, rum_lo=25):
 
 # ------------------------------------------------------------------------------------------------ render
 def render(p, r):
-    pre = p['pre_len'] + r.uniform(0.003, 0.02)
+    v2 = 'top_lvl' in p
+    pre = p['pre_len'] + (p['pre_gap'] * float(np.exp(0.2 * r.standard_normal())) if v2 else r.uniform(0.003, 0.02))
+    if v2 and p['jacket_lvl'] > 0.005:
+        pre += p['jacket_dt']
     dur = pre + p['clip'] * (1 + 0.05 * r.standard_normal())      # the kit's clips are edited and faded
     n = dsp.n_of(dur + 0.05)
     nh = dsp.n_of(0.12)
     force = float(np.exp(0.1 * r.standard_normal()))        # this press's strength (brightness follows force)
     x = np.zeros(n)
     dsp.place(x, _pretravel(p, r, dsp.n_of(p['pre_len'])), pre - p['pre_len'], p['pre_lvl'])
+    if v2 and p['jacket_lvl'] > 0.005:  # a clicky switch: the click jacket snaps a few ms before the bottom-out
+        jk = _drive(_unit(_cloud(2500, 15000, 24, 0.0012, 0.0004, nh, _key_rng(p, 6), r, tilt=0.0)), 0.00004)
+        dsp.place(x, jk, max(0.0, pre - p['jacket_dt'] * (1 + 0.06 * r.standard_normal())), p['jacket_lvl'])
     dsp.place(x, _contact(p, r, nh, 0, bright=force), pre)
     dsp.place(x, _ping(p, r, nh), pre, p['ping_lvl'])
     dsp.place(x, _low(p, r, n - dsp.n_of(pre)), pre, p['thock_lvl'] * force)
@@ -338,3 +374,38 @@ def render(p, r):
         st = dsp.butter(st, 'high', hpf, order=8)
     st = st[: dsp.n_of(dur)]
     return dsp.fade(st, 0.002, r.uniform(0.025, 0.05))
+
+
+# ------------------------------------------------------------------------------------------------ v2 checks
+def key_stats(x):
+    """model-free numbers for the v2 fixes: onset (ms from the first 1 ms frame within 20 dB of the 2-12 kHz band's
+    peak to that peak: a crisp contact is 0-2 ms), top (2-12 kHz share, dB re total), t40 (ms, peak -> -40 dB, 5 ms
+    frames)"""
+    m = np.asarray(x, np.float64)
+    m = m.mean(1) if m.ndim == 2 else m
+    hi = dsp.butter(m, 'band', (2000, 12000), 4)
+    k = SR // 1000
+    n = len(hi) // k
+    e = 10 * np.log10((hi[:n * k].reshape(n, k) ** 2).mean(1) + 1e-14)
+    ip = int(np.argmax(e))
+    i20 = int(np.nonzero(e[:ip + 1] >= e[ip] - 20)[0][0])
+    P = np.abs(np.fft.rfft(m)) ** 2
+    f = np.fft.rfftfreq(len(m), 1 / SR)
+    top = 10 * np.log10(P[(f >= 2000) & (f < 12000)].sum() / (P.sum() + 1e-14) + 1e-14)
+    k5 = 5 * k
+    n5 = len(m) // k5
+    e5 = 10 * np.log10((m[:n5 * k5].reshape(n5, k5) ** 2).mean(1) + 1e-14)
+    j = int(np.argmax(e5))
+    below = np.nonzero(e5[j:] <= e5[j] - 40)[0]
+    return {'onset_ms': float(ip - i20), 'top_db': round(float(top), 1),
+            't40_ms': float(below[0] * 5) if len(below) else float((n5 - j) * 5)}
+
+
+def key_extra(x, row=None):
+    """Critic(extra=...) for typing_key v2: a top that is not dull (2-12 kHz share >= -5 dB re total; the forge refs
+    sit at -11..-0.3, median -2.8, the v1 finals at -8..-4) and a tail that is not long (t40 <= 200 ms; v1 ran 1.67 x
+    the held-out median). The onset number is reported only: the clicky refs have two onsets 8-35 ms apart (a click
+    jacket / a touch, then the hit), so a 'crisp onset' rule would fail real keys. At most -1.5"""
+    s = key_stats(x)
+    pen = min(1.0, max(0.0, -5 - s['top_db']) / 6) + min(1.0, max(0.0, s['t40_ms'] - 200) / 100)
+    return -0.75 * pen

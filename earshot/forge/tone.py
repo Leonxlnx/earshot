@@ -143,6 +143,8 @@ class ToneRef:
         if self.n == 0:
             return {}
         keep = [j for j in range(self.n) if j != exclude]
+        if not keep:                       # a single ref scored leave-one-out: nothing left to compare with
+            return {}
         P = self.P[keep]
         med, lo, hi = np.median(P, 0), P.min(0), P.max(0)
         p = profile(x)

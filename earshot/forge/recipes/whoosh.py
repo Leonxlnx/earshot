@@ -1,199 +1,485 @@
-"""A fast air whoosh: an object (stick, cane, arm, cloth edge) swung fast past a close microphone, from aeroacoustics.
+"""Whooshes v2: designed motion-design pass-bys (fast air whooshes, big deep transition whooshes), built in layers.
 
-Every sample is computed; no recorded audio is loaded, sampled or convolved. Physics modelled:
-  * Speed profile. The swing accelerates, peaks at the bottom of the arc (near the mic) and decelerates: U(t) is an
-    asymmetric generalised bell exp(-|dt/s|^beta / 2) around the pass time tc (rise width s_rise, fall width s_fall;
-    beta > 2 is a flatter top with sharper edges, beta < 2 a pointed peak).
-  * Vortex shedding (the body of a whoosh). A bluff object sheds vortices at f = St * U / d (Strouhal ~0.2); at high
-    Reynolds numbers the Aeolian tone smears into a band of width f/Q. A swung object has a speed gradient along its
-    length (the tip moves fastest), so each strip sheds at its own frequency: K strips from ROOT to the tip give K bands
-    at f_peak * U(t)^f_track * s_k (f_track < 1 lets the ridge hold steadier, as a body / cavity resonance does). A
-    dipole radiates intensity ~ U^6, so each strip's amplitude goes ~ (s_k U)^3 and the tip band dominates: energy
-    piles up below a resonant ridge at the tip frequency, as in real recordings. Loudness ~ U^a_pow / r(t). Each band
-    falls steeply above its peak (`steep`, a second low-pass stage), as a turbulent cylinder wake's spectrum does
-    above its Strouhal peak: the real recordings show a -23..-31 dB/oct cliff above the ridge.
-  * Wake. Behind the object the shed vortices keep turning over as a decaying turbulent wake: a narrow noise band
-    (wake_q) that starts at the pass, stays where the object passed (no Doppler), decays with wake_tau and darkens as
-    it decays (large eddies outlive small ones, so the highs die first and the centre sinks: f ~ (1 + dt /
-    wake_tau)^-wake_dark). This is the flat ridge that outlasts the hiss in real whooshes. It is bounded below the
-    shedding level (a wake cannot out-radiate the shedding at full speed).
-  * Proximity and Doppler. Distance r(t) = sqrt(1 + ((t - tc) / prox_w)^2) (prox_w = closest distance / pass speed);
-    amplitude ~ 1/r; frequencies scaled by 1 - doppler * radial speed (higher on approach, lower after the pass).
-  * Hiss. Small-scale trailing-edge turbulence: white + pink noise above a steep edge (hiss_hp) under a low-pass that
-    opens with U; level ~ U^hiss_pow (a steep power makes the crisp, short top of a fast pass). Real recordings keep
-    a dark valley between the ridge and ~2 kHz, so the hiss starts above it.
-  * Wake hiss tail. The small eddies of the wake die fastest but not instantly: a broadband tail above the same edge,
-    decaying with 0.4 * wake_tau, at wake_hiss_db.
-  * Push. A close pass shoves the air at the diaphragm: a short sub-bass pressure gust centred on the pass (low-passed
-    turbulence under a window of width push_w plus the smooth bipolar pressure pulse of the displaced air).
-  * Buffet. The passing pressure field and the wake gust hit the diaphragm: random low-frequency pressure
-    (< buffet_f), arriving buffet_delay after the pass and dying with buffet_tau.
-  * Turbulence flutter. Random log-normal amplitude modulation (bandwidth flut_f) on the shedding and hiss.
-  * Whip tone. A thin, smooth object keeps a narrower Aeolian tone (Q whip_q) at whip_ratio * tip frequency.
-  * Stereo. The source moves across the mic: a mono-compatible balance pan follows tanh((t - tc) / prox_w) plus a
-    little decorrelated side signal (the mono sum is unchanged, so stereo cannot game a mono critic); ranges follow
-    the real references (balance swings of a few dB, L/R correlation ~0.9).
-  * A small room (independent reflections per channel) and a microphone (low cut, top roll-off air_db, noise floor,
-    recorder low-pass at 19 kHz).
+Every sample is computed; no recorded audio is loaded, sampled or convolved (references only judge).
 
-  * The edit (round 12, after the judge). The kit's fast whooshes are edited files of 0.32-0.5 s that fall 40 dB in
-    90-180 ms after the pass; rounds 1-11 ran 0.68-0.9 s with t40 230-285 ms ('medium' whooshes: their critic also
-    compared them with the three medium refs). `cut_db`: the file is cut once the envelope has fallen that far under
-    its peak, with a `cut_fade` fade. Parameters without these keys (rounds 1-11) render exactly as before.
+Why v2 (forge v2, overnight round 2). The v1 recipe (kept below as `render_v1`, still rendering every old parameter
+set) was a physical model of a stick swung past a microphone. Its variants were clones (CLAP cosine 0.96 between
+them, real sets 0.5-0.8) and its edit chopped the tail at -46 dB (t40 0.51x the held-out median). A launch-video
+whoosh is a designed sound (docs/motion-sfx-techniques.md section 1, docs/motion-sfx-study.md): a few layers that
+each own a band and share one peak, moving together along curves that accelerate into the cut, a tail that dies
+smoothly instead of being chopped, and families of variants that differ in character but share a palette.
 
-What the listening loop taught (demo/forge-test/whoosh/LOG.md): the critic's description match rewards longer,
-fuller tails than the real fast whooshes have; when the wake was unbounded it grew as loud as the pass itself and
-doubled the tail (found by muting components one at a time), hence the physical bounds on wake level and Q.
+The pass engine (`render`, shared by recipes/swish.py and recipes/swipe.py):
+  * Level envelope in dB around the pass time tp: L = -30 dB * (|t - tp| / rise)^rise_k before the peak and
+    -30 dB * (max(0, t - tp - hold) / fall)^fall_k after it. rise_k < 1 accelerates into the peak (the pro rise),
+    fall_k > 1 holds then drops (the pro 'convex' gate), fall_k < 1 drops fast into a long tail (a real pass). The
+    file starts where L = start_db (no leading silence, no click: a 1.5 ms ramp), so the onset is frame-accurate.
+  * Motion m = amplitude^track drives every filter: the air band rises up_oct to f_peak on the approach and sinks
+    down_oct after it (down_oct > up_oct: the centroid falls across the pass, as in the pro whooshes), times a
+    Doppler glide of dop_st semitones (high before the pass, low after, over dop_w seconds).
+  * Layers, each normalised to its own 10 ms peak and mixed in dB against the air body:
+      air    pink noise through three band-passes at f, 1.6 f, 2.5 f (Q q_air), under a low-pass at lp_ratio x f
+             (the cliff above the ridge that real whooshes show); flutter = log-normal turbulence AM (flut_depth at
+             flut_f), rustle = fast AM (cloth / paper texture)
+      low    weight: brown noise low-passed at low_f (it opens a little with the motion), envelope smoothed by
+             low_smooth (a big object shoves air for longer than its hiss lasts), level low_db
+      sub    a sine at sub_f with 2nd / 3rd harmonics from tanh drive (survives small speakers), sinking sub_glide
+             octaves after the peak; level sub_db (the pro designed whoosh: almost all energy under 150 Hz)
+      hiss   white noise above hiss_hp, under a low-pass opening hiss_open octaves with the motion, envelope
+             amplitude^hiss_pow (a sharp, crisp top); level hiss_db
+      tone   an aeolian whistle / designed tonal layer: narrow-band noise (Q tone_q) blended with a sine (tone_pure)
+             at tone_ratio x the air centre, Doppler-shifted; level tone_db
+      grain  sparse crackle (Poisson 3 ms bumps of band noise at grain_f: soft grains, not sample-edge clicks, which
+             the polish click detector rightly flags), density grain_rate x amplitude: cloth, paper, brush; grain_db
+  * Space: a short smooth reverb (fx.reverb, the sub kept dry) for the tail (room_wet, rt60); stereo = a balance pan
+    of pan (tanh across the pass, mono sum unchanged) plus decorrelated hiss / air of `width` (the pro whooshes are
+    mono or near mono; textures can be wider).
+  * Finish: light tape saturation (drive_db), 25 Hz high-pass, 19 kHz low-pass, then the edit: the file ends where
+    the envelope has fallen end_db under its peak, with an end_fade raised-cosine fade (a tail that fades out, not
+    a chop), peak-normalised.
+
+Families. `PRESETS[kind]` holds hand-designed characters per category (length, brightness, pitch / sweep range,
+weight, texture); a forge run tunes each one inside a narrow box around it (`local_space`), so the finals are a
+palette: one engine, audibly different members. `recipe(kind)` returns a recipe object (TARGET, ALTS, REFSET, SPACE,
+DEFAULTS, render) for forge(): 'fast' (this module's defaults, whoosh_fast), 'big' (whoosh_big), 'pro_big'
+(pro_whoosh_big, designed mode).
 """
+import types
+
 import numpy as np
 
 from .. import dsp
 from . import REF_ROOT
 
+SR = dsp.SR
+
 TARGET = 'a fast crisp air whoosh'
 ALTS = ['a wind gust', 'rain', 'a sword swing', 'a jet engine']
-# round 12: the fast references only (the target is a FAST whoosh; rounds 1-11 also used whoosh_med_01-03, whose
-# longer tails the critic then rewarded). REFS_ROUNDS_1_11 is the old set, kept for reproducing those reports.
 REFSET = 'whoosh_fast'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
 REFS = [f'{REF_ROOT}/whoosh/whoosh_fast_0{i}.wav' for i in range(1, 5)]
 REFS_ROUNDS_1_11 = REFS + [f'{REF_ROOT}/whoosh/whoosh_med_0{i}.wav' for i in range(1, 4)]
 
+# ---------------------------------------------------------------------------------------------- v2 parameter space
 SPACE = {
-    'tc': (0.06, 0.2),                    # pass time (s)
-    's_rise': (0.012, 0.08, 'log'),       # speed bell widths (s)
-    's_fall': (0.015, 0.1, 'log'),
-    'beta': (1.2, 3.5),                   # bell shape
-    'prox_w': (0.004, 0.06, 'log'),       # closest distance / speed (s)
-    'f_peak': (150, 1500, 'log'),         # tip shedding frequency at full speed (Hz)
-    'f_track': (0.0, 1.0),                # ridge frequency ~ U^f_track (1: pure Strouhal, 0: fixed resonance)
-    'q_shed': (1.5, 12.0, 'log'),
-    'steep': (0.0, 1.0),                  # 4-pole skirt above the shedding peak (0: plain 2-pole band)
-    'a_pow': (1.0, 4.0),                  # loudness ~ U^a_pow
-    'doppler': (0.0, 0.08),               # pass speed / speed of sound
-    'wake_db': (-24, -6),                 # round 9: a wake cannot out-radiate the shedding at full speed
-    'wake_tau': (0.03, 0.15, 'log'),
-    'wake_q': (4.0, 16.0, 'log'),         # the wake ridge is narrow and steady in real recordings (Q 5-10)
-    'wake_dark': (0.0, 1.0),
-    'wake_hiss_db': (-36, -16),           # broadband wake tail vs shedding
-    'hiss_db': (-38, -14),
-    'hiss_hp': (800, 3000, 'log'),        # lower edge of the small-scale hiss
-    'hiss_f': (1500, 14000, 'log'),
-    'hiss_pow': (2.0, 7.0),
-    'push_db': (-24, 6),                  # close-pass pressure gust vs shedding
-    'push_w': (0.006, 0.04, 'log'),
-    'push_f': (40, 250, 'log'),
-    'buffet_db': (-30, 3),
-    'buffet_f': (60, 500, 'log'),
-    'buffet_delay': (0.0, 0.04),
-    'buffet_tau': (0.015, 0.08, 'log'),
-    'flut_depth': (0.0, 0.4),
-    'flut_f': (8, 60, 'log'),
-    'whip_db': (-45, -15),
-    'whip_q': (8, 60, 'log'),
-    'whip_ratio': (1.0, 3.0),
-    'pan_w': (0.05, 0.25),                # real refs: balance swings of 1-6 dB, L/R correlation mostly 0.9-1.0
-    'width': (0.0, 0.12),
-    'room_wet': (0.0, 0.35),
-    'rt60': (0.1, 0.5, 'log'),
-    'air_db': (-12, 0),                   # mic / recorder top roll-off at 10 kHz
-    'floor_db': (-95, -70),               # mic / preamp noise floor relative to the peak
-    'cut_db': (-52, -38),                 # round 12: the edit, once the envelope has fallen this far under its peak
-    'cut_fade': (0.015, 0.06, 'log'),     #  (the kit's fast whooshes: 0.32-0.5 s files, t40 90-180 ms)
+    # timing / envelope
+    'rise': (0.02, 0.6, 'log'),         # -30 dB -> peak (s)
+    'rise_k': (0.45, 1.6),              # < 1 accelerates into the peak
+    'hold': (0.0, 0.25),                # plateau at the peak (s)
+    'fall': (0.03, 0.8, 'log'),         # peak -> -30 dB (s), after the hold
+    'fall_k': (0.5, 2.2),               # > 1 holds then drops, < 1 long tail
+    'start_db': (-44.0, -22.0),         # level at the first sample re peak
+    # motion
+    'track': (0.3, 1.2),                # filter motion = amplitude^track
+    'f_peak': (60.0, 4000.0, 'log'),    # air band centre at the peak (Hz)
+    'up_oct': (0.0, 3.0),               # octaves below f_peak at the start
+    'down_oct': (0.0, 3.5),             # octaves below f_peak at the end
+    'dop_st': (0.0, 12.0),              # Doppler glide, semitones
+    'dop_w': (0.005, 0.15, 'log'),      # Doppler glide width (s)
+    # air body
+    'q_air': (0.6, 5.0, 'log'),
+    'lp_ratio': (1.2, 8.0, 'log'),      # cliff above the ridge (x f)
+    'flut_depth': (0.0, 0.6),
+    'flut_f': (6.0, 60.0, 'log'),
+    'rustle': (0.0, 0.9),               # fast AM depth (cloth / paper)
+    'rustle_f': (40.0, 260.0, 'log'),
+    # low weight
+    'low_db': (-40.0, 6.0),
+    'low_f': (50.0, 400.0, 'log'),
+    'low_smooth': (0.002, 0.08, 'log'),
+    # sub swell
+    'sub_db': (-50.0, 10.0),
+    'sub_f': (32.0, 110.0, 'log'),
+    'sub_glide': (0.0, 1.5),            # octaves the sub sinks after the peak
+    'sub_drive': (0.0, 3.0),            # tanh drive: harmonics 2 / 3
+    # hiss top
+    'hiss_db': (-45.0, 0.0),
+    'hiss_hp': (1200.0, 8000.0, 'log'),
+    'hiss_open': (0.0, 2.5),            # octaves the hiss low-pass opens with the motion
+    'hiss_pow': (1.0, 4.0),
+    # tonal / whistle
+    'tone_db': (-50.0, -3.0),
+    'tone_q': (6.0, 60.0, 'log'),
+    'tone_ratio': (0.5, 4.0, 'log'),
+    'tone_pure': (0.0, 1.0),
+    # texture grains
+    'grain_db': (-50.0, -3.0),
+    'grain_rate': (50.0, 3000.0, 'log'),
+    'grain_f': (800.0, 9000.0, 'log'),
+    # space / stereo / finish
+    'room_wet': (0.0, 0.5),
+    'rt60': (0.15, 2.0, 'log'),
+    'pan': (0.0, 0.5),
+    'width': (0.0, 0.6),
+    'drive_db': (0.0, 9.0),
+    'end_db': (-75.0, -50.0),
+    'end_fade': (0.02, 0.15, 'log'),
 }
-# = final/whoosh_01 after the judge (round 12 pick 1, parameters rounded to 6 digits): fast refs only, tone check in
-# the objective; 8 new seeds -> critic mean 8.02, 8/8 pass; t40 125 ms, 0.31 s
-DEFAULTS = {'tc': 0.0706346, 's_rise': 0.0380857, 's_fall': 0.0578346, 'beta': 1.49847, 'prox_w': 0.0243735,
-            'f_peak': 398.391, 'f_track': 0.108498, 'q_shed': 7.05767, 'steep': 0.23086, 'a_pow': 2.90371,
-            'doppler': 0.00143736, 'wake_db': -14.0966, 'wake_tau': 0.0532322, 'wake_q': 4.45435,
-            'wake_dark': 0.613911, 'wake_hiss_db': -16.0, 'hiss_db': -19.345, 'hiss_hp': 1671.88, 'hiss_f': 9908.19,
-            'hiss_pow': 2.57151, 'push_db': -4.56985, 'push_w': 0.0251241, 'push_f': 125.898, 'buffet_db': -9.18542,
-            'buffet_f': 95.0096, 'buffet_delay': 0.0219106, 'buffet_tau': 0.0262978, 'flut_depth': 0.0178753,
-            'flut_f': 30.2817, 'whip_db': -16.8109, 'whip_q': 22.6043, 'whip_ratio': 1.75668, 'pan_w': 0.102279,
-            'width': 0.0730709, 'room_wet': 0.158579, 'rt60': 0.138233, 'air_db': -12.0, 'floor_db': -75.3278,
-            'cut_db': -46.4213, 'cut_fade': 0.0281062}
 
-LEN = 0.8
-K = 6
-ROOT = 0.45          # innermost shedding strip (fraction of tip speed); no effect on the score in round 2, fixed
-WAKE_RATIO = 0.9     # wake centre / tip shedding frequency at the pass
-HISS_PINK = 0.5
+# whoosh_fast 'crisp' (the first member of the fast family: forge v2 tunes it, see out/forge_v2/whoosh_fast/LOG.md)
+DEFAULTS = {
+    'rise': 0.065, 'rise_k': 0.9, 'hold': 0.0, 'fall': 0.075, 'fall_k': 0.75, 'start_db': -34.0,
+    'track': 0.45, 'f_peak': 420.0, 'up_oct': 1.5, 'down_oct': 1.8, 'dop_st': 2.0, 'dop_w': 0.03,
+    'q_air': 1.1, 'lp_ratio': 3.0, 'flut_depth': 0.18, 'flut_f': 24.0, 'rustle': 0.0, 'rustle_f': 90.0,
+    'low_db': -9.0, 'low_f': 130.0, 'low_smooth': 0.03,
+    'sub_db': -40.0, 'sub_f': 60.0, 'sub_glide': 0.3, 'sub_drive': 0.5,
+    'hiss_db': -13.0, 'hiss_hp': 2500.0, 'hiss_open': 1.2, 'hiss_pow': 1.8,
+    'tone_db': -40.0, 'tone_q': 20.0, 'tone_ratio': 1.7, 'tone_pure': 0.0,
+    'grain_db': -50.0, 'grain_rate': 300.0, 'grain_f': 3000.0,
+    'room_wet': 0.12, 'rt60': 0.35, 'pan': 0.15, 'width': 0.12, 'drive_db': 2.0, 'end_db': -66.0, 'end_fade': 0.04,
+}
+
+# the families: per kind, member name -> overrides of the kind's base (character: length, brightness, sweep, weight,
+# texture). Hand-designed from the forge refs' measurements and the pro study's targets (LOG.md per category).
+FAST = dict(DEFAULTS)
+BIG = {**DEFAULTS,
+       'rise': 0.36, 'rise_k': 0.8, 'fall': 0.36, 'fall_k': 0.85, 'start_db': -36.0, 'track': 0.8,
+       'f_peak': 380.0, 'up_oct': 1.4, 'down_oct': 2.3, 'dop_st': 3.0, 'dop_w': 0.08, 'q_air': 1.2, 'lp_ratio': 4.5,
+       'flut_depth': 0.25, 'flut_f': 12.0, 'low_db': -2.0, 'low_f': 120.0, 'low_smooth': 0.04,
+       'sub_db': -6.0, 'sub_f': 55.0, 'sub_glide': 0.5, 'sub_drive': 1.0,
+       'hiss_db': -16.0, 'hiss_hp': 2000.0, 'hiss_open': 0.8, 'hiss_pow': 1.3,
+       'room_wet': 0.22, 'rt60': 0.9, 'pan': 0.12, 'width': 0.2, 'drive_db': 3.0, 'end_db': -66.0, 'end_fade': 0.08}
+PRO_BIG = {**BIG,
+           'rise': 0.24, 'rise_k': 0.8, 'hold': 0.02, 'fall': 0.165, 'fall_k': 0.8, 'start_db': -34.0,
+           'f_peak': 90.0, 'up_oct': 0.8, 'down_oct': 1.5, 'dop_st': 2.0, 'q_air': 0.8, 'lp_ratio': 3.0,
+           'low_db': 0.0, 'low_f': 90.0, 'low_smooth': 0.03, 'sub_db': 2.0, 'sub_f': 46.0, 'sub_glide': 0.5,
+           'sub_drive': 0.8, 'hiss_db': -26.0, 'hiss_hp': 6000.0, 'hiss_open': 0.5, 'hiss_pow': 1.2,
+           'room_wet': 0.1, 'rt60': 0.5,
+           'pan': 0.0, 'width': 0.03, 'drive_db': 2.0, 'end_db': -64.0, 'end_fade': 0.06}
+
+PRESETS = {
+    'fast': {
+        'crisp':   {},
+        'tight':   {'rise': 0.045, 'fall': 0.05, 'f_peak': 700.0, 'low_db': -16.0, 'hiss_db': -10.0,
+                    'hiss_hp': 3200.0, 'room_wet': 0.08, 'rt60': 0.25, 'dop_st': 1.0, 'up_oct': 2.0},
+        'heavy':   {'rise': 0.09, 'fall': 0.11, 'f_peak': 300.0, 'down_oct': 2.0, 'low_db': -4.0, 'low_f': 110.0,
+                    'low_smooth': 0.045, 'sub_db': -16.0, 'hiss_db': -18.0, 'room_wet': 0.15, 'rt60': 0.45},
+        'whistle': {'f_peak': 520.0, 'tone_db': -12.0, 'tone_q': 26.0, 'tone_ratio': 2.0, 'tone_pure': 0.3,
+                    'dop_st': 6.0, 'dop_w': 0.025, 'low_db': -9.0},
+        'airy':    {'rise': 0.07, 'rise_k': 1.0, 'fall': 0.09, 'f_peak': 900.0, 'q_air': 0.9, 'hiss_db': -9.0,
+                    'hiss_hp': 2000.0, 'low_db': -12.0, 'width': 0.35, 'room_wet': 0.25, 'rt60': 0.6, 'pan': 0.3},
+    },
+    'big': {
+        'swell':   {},
+        'sweep':   {'f_peak': 650.0, 'up_oct': 2.0, 'down_oct': 3.0, 'dop_st': 5.0, 'hiss_db': -13.0,
+                    'low_db': -6.0, 'sub_db': -12.0, 'rise': 0.3, 'fall': 0.28},
+        'deep':    {'rise': 0.45, 'fall': 0.45, 'f_peak': 280.0, 'down_oct': 2.0, 'low_db': 2.0, 'sub_db': 0.0,
+                    'sub_f': 48.0, 'sub_glide': 0.7, 'hiss_db': -20.0, 'rt60': 1.2, 'room_wet': 0.25},
+        # round 2 tried a darker deep (f_peak 200, sub +4 dB, hiss -26 dB) and a shorter, fluttering rush (rise 0.16 s,
+        # hold 0.08 s, flutter 0.5, rustle): more distinct, but both failed the critic (tone 9.8 dB / robust 2.2), so
+        # the final family keeps these round-1 members (out/forge_v2/whoosh_big/LOG.md)
+        'rush':    {'rise': 0.24, 'rise_k': 0.6, 'fall': 0.3, 'fall_k': 1.1, 'hold': 0.06, 'f_peak': 480.0,
+                    'flut_depth': 0.4, 'flut_f': 18.0, 'hiss_db': -14.0, 'width': 0.35, 'pan': 0.25},
+        'tonal':   {'tone_db': -5.0, 'tone_q': 40.0, 'tone_ratio': 1.0, 'tone_pure': 0.85, 'dop_st': 12.0,
+                    'dop_w': 0.12, 'f_peak': 500.0, 'up_oct': 1.0, 'down_oct': 2.5, 'sub_db': -10.0, 'hiss_db': -18.0},
+    },
+    'pro_big': {
+        'swell':   {},
+        'short':   {'rise': 0.17, 'fall': 0.12, 'hold': 0.01, 'sub_f': 54.0, 'f_peak': 120.0},
+        'long':    {'rise': 0.36, 'fall': 0.22, 'hold': 0.05, 'sub_f': 42.0, 'sub_glide': 0.7, 'rt60': 0.8},
+        'air':     {'hiss_db': -20.0, 'hiss_hp': 4500.0, 'f_peak': 160.0, 'low_db': -3.0, 'sub_db': 0.0,
+                    'width': 0.1},
+        'tonal':   {'sub_db': 6.0, 'low_db': -6.0, 'sub_drive': 1.6, 'sub_f': 58.0, 'sub_glide': 0.9},
+    },
+}
+BASES = {'fast': FAST, 'big': BIG, 'pro_big': PRO_BIG}
+KINDS = {
+    'fast': dict(TARGET=TARGET, ALTS=ALTS, REFSET='whoosh_fast'),
+    'big': dict(TARGET='a big deep whoosh transition', ALTS=['a strong wind', 'a jet plane flying over', 'waves',
+                                                              'a car passing'], REFSET='whoosh_big'),
+    'pro_big': dict(TARGET='a deep low designed whoosh swell', ALTS=['a strong wind', 'a jet plane flying over',
+                                                                     'a car passing', 'a bass drum'],
+                    REFSET='pro_whoosh_big'),
+}
+# the character parameters: kept inside a narrow box when a forge run tunes one family member (local_space)
+CHARACTER = ('rise', 'fall', 'hold', 'f_peak', 'up_oct', 'down_oct', 'dop_st', 'low_db', 'sub_db', 'sub_f',
+             'hiss_db', 'tone_db', 'tone_ratio', 'grain_db', 'grain_f', 'width', 'pan')
 
 
+def preset(kind, name):
+    """the full parameter dict of one family member"""
+    return {**BASES[kind], **PRESETS[kind][name]}
+
+
+def local_space(params, space=None, keys=None, char_w=0.12, free_w=0.3, character=None):
+    """a narrow search box around a parameter set, in the unit cube of `space` (default SPACE): character parameters
+    (`character`, default CHARACTER) move at most char_w of their range each way, the rest free_w; `keys` limits which
+    parameters are searched"""
+    space = space or SPACE
+    character = CHARACTER if character is None else character
+    out = {}
+    for k, spec in space.items():
+        if keys is not None and k not in keys:
+            continue
+        if isinstance(spec, list) or k not in params:
+            continue
+        lo, hi = spec[0], spec[1]
+        log = len(spec) > 2 and spec[2] == 'log'
+        w = char_w if k in character else free_w
+        v = float(np.clip(params[k], lo, hi))
+        if log:
+            a, b, c = np.log(lo), np.log(hi), np.log(v)
+            out[k] = (float(np.exp(max(a, c - w * (b - a)))), float(np.exp(min(b, c + w * (b - a)))), 'log')
+        else:
+            out[k] = (float(max(lo, v - w * (hi - lo))), float(min(hi, v + w * (hi - lo))))
+        if out[k][1] - out[k][0] < 1e-9:
+            del out[k]
+    return out
+
+
+def recipe(kind='fast', defaults=None, module_name=__name__):
+    """a recipe object for forge(): the kind's TARGET / ALTS / REFSET, SPACE, DEFAULTS (default: the kind's base) and
+    this module's render; its name stays this module's, so the seed bank is this recipe's"""
+    ns = types.SimpleNamespace(**KINDS[kind])
+    ns.__name__ = module_name
+    ns.SPACE = SPACE
+    ns.DEFAULTS = dict(defaults if defaults is not None else BASES[kind])
+    ns.render = render
+    ns.KIND = kind
+    return ns
+
+
+# ---------------------------------------------------------------------------------------------- helpers
 def _lvl(x):
     """peak of a 10 ms RMS envelope (component level for mixing)"""
     n = dsp.n_of(0.01)
     k = len(x) // n
+    if k == 0:
+        return float(np.sqrt(np.mean(x ** 2))) + 1e-12
     return float(np.sqrt((x[:k * n].reshape(k, n) ** 2).mean(1)).max()) + 1e-12
 
 
 def _lfnoise(n, fc, r):
-    """unit-std random control signal band-limited to fc (for flutter / jitter)"""
+    """unit-std random control signal band-limited to fc"""
     w = dsp.butter(r.standard_normal(n), 'low', fc, order=2)
     return w / (w.std() + 1e-12)
 
 
-def _band(n, fc, q, r, steep=0.0):
-    """white noise through a moving band-pass, scaled to unity peak gain (power ~ bandwidth). steep 0..1 blends in a
-    second, low-pass stage tuned just above fc: the skirt above the peak falls at 18-24 dB/oct instead of 6, as the
-    spectrum of a turbulent cylinder wake does above its Strouhal peak"""
+def _smooth(x, sec):
+    """moving Hann smoothing (zero phase)"""
+    from scipy.signal import oaconvolve
+    k = max(3, int(sec * SR) | 1)
+    w = np.hanning(k)
+    w /= w.sum()
+    h = k // 2
+    return oaconvolve(np.pad(x, (h, h), mode='edge'), w, mode='valid')[:len(x)]
+
+
+def _colored(n, r, power):
+    """noise with a 1/f^power spectrum (pink 0.5, brown 1), FFT at a fast length, unit std"""
+    from scipy.fft import next_fast_len
+    m = next_fast_len(n + 256, real=True)
+    F = np.fft.rfft(r.standard_normal(m))
+    f = np.maximum(np.fft.rfftfreq(m, 1 / SR), 15.0)
+    w = np.fft.irfft(F / f ** power, m)[128:128 + n]
+    return w / (w.std() + 1e-12)
+
+
+def _pink(n, r):
+    return _colored(n, r, 0.5)
+
+
+def _brown(n, r):
+    return _colored(n, r, 1.0)
+
+
+def envelope(p):
+    """(t, amplitude 0..1, tp, n) of the pass for parameters p (the level curve every layer shares)"""
+    rise, fall = p['rise'], p['fall']
+    rk, fk = p['rise_k'], p['fall_k']
+    hold = p.get('hold', 0.0)
+    tp = rise * (max(-p['start_db'], 1.0) / 30.0) ** (1.0 / rk)
+    t_end = tp + hold + fall * (95.0 / 30.0) ** (1.0 / fk) + 0.9 * p['rt60'] * min(1.0, 4 * p['room_wet'] + 0.2) + 0.05
+    n = dsp.n_of(min(tp + max(t_end - tp, 0.1), 4.5))
+    t = dsp.t_of(n)
+    dt = t - tp
+    x = np.where(dt < 0, -dt / rise, np.maximum(dt - hold, 0.0) / fall)
+    k = np.where(dt < 0, rk, fk)
+    L = -30.0 * np.power(np.maximum(x, 0.0), k)
+    a = 10 ** (np.maximum(L, -140.0) / 20)
+    a = _smooth(a, float(np.clip(0.3 * min(rise, fall + hold), 0.004, 0.1)))   # a rounded peak, not a needle
+    return t, a / (a.max() + 1e-12), tp, n
+
+
+# ---------------------------------------------------------------------------------------------- v2 render
+def render(p, r):
+    if 'rise' not in p:                      # a v1 parameter set (rounds 1-12 of the forge test): unchanged
+        return render_v1(p, r)
+    t, a, tp, n = envelope(p)
+    dt = t - tp
+    m = a ** p['track']
+    dop = 2.0 ** (-(p['dop_st'] / 12.0) * 0.5 * np.tanh(dt / p['dop_w']))
+    lf = np.log2(p['f_peak'])
+    span = np.where(dt < 0, p['up_oct'], p['down_oct'])
+    f_air = 2.0 ** (lf - span * (1.0 - m)) * dop
+    flut = np.exp(p['flut_depth'] * _lfnoise(n, p['flut_f'], r) - 0.5 * p['flut_depth'] ** 2)
+
+    # air body: three bands moving together, a cliff above
+    src = _pink(n, r)
+    air = np.zeros(n)
+    for ratio, g in ((1.0, 1.0), (1.6, 0.55), (2.5, 0.3)):
+        air += g * dsp.svf(src if ratio == 1.0 else _pink(n, r), np.clip(f_air * ratio, 30, 20000), p['q_air'], 'bandn')
+    air = dsp.svf(air, np.clip(f_air * p['lp_ratio'], 60, 20000), 0.7, 'low')
+    if p['rustle'] > 0:
+        rus = np.exp(p['rustle'] * 1.2 * _lfnoise(n, p['rustle_f'], r))
+        air = air * rus / np.sqrt(np.mean(rus ** 2))
+    air = air * a * flut
+
+    layers = [(0.0, air)]
+    # low weight
+    if p['low_db'] > -39.5:
+        al = _smooth(a, p['low_smooth'])
+        al /= al.max() + 1e-12
+        low = dsp.svf(_brown(n, r), np.clip(p['low_f'] * (0.6 + 0.4 * m), 25, 2000), 0.75, 'low')
+        low = dsp.butter(low, 'high', max(28.0, p['low_f'] / 2.5), order=2) * al   # a band, not a rumble floor
+        layers.append((p['low_db'], low))
+    # sub swell
+    if p['sub_db'] > -49.5:
+        al = _smooth(a, max(p['low_smooth'], 0.02))
+        al /= al.max() + 1e-12
+        s = 0.5 + 0.5 * np.tanh(dt / (0.5 * p['fall'] + 0.02))
+        f_sub = p['sub_f'] * 2.0 ** (-p['sub_glide'] * s)
+        ph = 2 * np.pi * np.cumsum(f_sub) / SR + r.uniform(0, 2 * np.pi)
+        sub = np.sin(ph)
+        if p['sub_drive'] > 0:
+            g = 1 + 2 * p['sub_drive']
+            sub = np.tanh(g * sub + 0.15 * p['sub_drive']) - np.tanh(0.15 * p['sub_drive'])
+        sub = dsp.butter(sub, 'low', 600, order=2) * al
+        layers.append((p['sub_db'], sub))
+    # hiss top
+    if p['hiss_db'] > -44.5:
+        h = dsp.butter(r.standard_normal(n), 'high', p['hiss_hp'], order=4)
+        h = dsp.svf(h, np.clip(p['hiss_hp'] * 2.0 ** (p['hiss_open'] * m) * 1.5 * dop, 500, 20000), 0.6, 'low')
+        layers.append((p['hiss_db'], h * a ** p['hiss_pow'] * flut))
+    # tonal / whistle
+    if p['tone_db'] > -49.5:
+        ft = np.clip(f_air * p['tone_ratio'], 40, 16000)
+        nb = dsp.svf(r.standard_normal(n), ft, p['tone_q'], 'bandn')
+        nb /= nb.std() + 1e-12
+        sn = np.sin(2 * np.pi * np.cumsum(ft) / SR) * np.sqrt(2)
+        tone = (1 - p['tone_pure']) * nb + p['tone_pure'] * sn
+        layers.append((p['tone_db'], tone * a ** 1.5))
+    # texture grains
+    if p['grain_db'] > -49.5:
+        rate = p['grain_rate'] * a                  # soft grains: 3 ms bumps of band noise (no sample-edge clicks)
+        ev = (r.uniform(size=n) < rate / SR) * r.lognormal(0, 0.5, n)
+        gr = dsp.svf(r.standard_normal(n), np.clip(p['grain_f'] * dop, 200, 18000), 1.2, 'bandn') * _smooth(ev, 0.003) * a
+        layers.append((p['grain_db'], gr))
+
+    x = np.zeros(n)
+    for db, y in layers:
+        x += 10 ** (db / 20) * y / _lvl(y)
+
+    # stereo: balance pan (mono sum unchanged) + decorrelated air / hiss
+    side_dir = 1.0 if r.uniform() < 0.5 else -1.0
+    pan = side_dir * p['pan'] * np.tanh(dt / max(p['dop_w'], 0.01))
+    if p['width'] > 0:
+        s = dsp.svf(r.standard_normal(n), np.clip(f_air * 2.0, 200, 18000), 0.8, 'bandn') * a * flut
+        s = dsp.butter(s, 'high', 300, order=2)
+        s = p['width'] * s * (_lvl(x) / _lvl(s)) * 0.5
+    else:
+        s = 0.0
+    y = np.stack([x * (1 + pan) + s, x * (1 - pan) - s], axis=1)
+    if p['room_wet'] > 0.005:
+        from .. import fx
+        kw = dict(rt60=p['rt60'], size=0.45, predelay=0.006, damp=0.55, wet=p['room_wet'],
+                  width=min(1.0, 0.3 + p['width'] * 1.5), lowcut=120.0, stereo=True, tail=max(0.2, 1.1 * p['rt60']))
+        yr = fx.reverb(y, r, lines=8, **kw)
+        if not np.isfinite(yr).all():          # fx.reverb with 8 lines returns NaN for ~3 % of seeds (4 of 150 measured,
+            yr = fx.reverb(y, r, lines=16, **kw)  # 0 of 150 with 16): fall back; finite renders are unchanged
+        y = yr
+    if p['drive_db'] > 0.05:
+        from .. import fx
+        y = fx.saturate(y / (np.abs(y).max() + 1e-12), drive_db=p['drive_db'], mode='tape', os=2)
+    y = dsp.butter(y, 'high', 25, order=4)
+    y = dsp.butter(y, 'low', 19000, order=4)
+    return _edit(y, p['end_db'], p['end_fade'])
+
+
+def _edit(y, end_db, end_fade, fin=0.0015):
+    """the edit: start ramp (no click), end where the 5 ms envelope has fallen end_db under its peak, plus a
+    raised-cosine fade of end_fade"""
+    h = dsp.n_of(0.005)
+    mono = y.mean(axis=1) if y.ndim == 2 else y
+    k = len(mono) // h
+    e = 20 * np.log10(np.sqrt((mono[:k * h].reshape(k, h) ** 2).mean(1)) + 1e-12)
+    e = np.convolve(e, np.ones(4) / 4, mode='same')
+    i = int(np.argmax(e))
+    below = np.nonzero(e[i:] < e[i] + end_db)[0]
+    end = min(len(y), (i + (below[0] if len(below) else k - i)) * h + dsp.n_of(end_fade * 0.5))
+    y = y[:end].copy()
+    nf = min(dsp.n_of(end_fade), len(y) - 1)
+    w = 0.5 + 0.5 * np.cos(np.linspace(0, np.pi, nf))
+    y[-nf:] *= w[:, None] if y.ndim == 2 else w
+    ni = dsp.n_of(fin)
+    ramp = np.sin(np.linspace(0, np.pi / 2, ni)) ** 2
+    y[:ni] *= ramp[:, None] if y.ndim == 2 else ramp
+    return y
+
+
+# ---------------------------------------------------------------------------------------------- v1 (kept rendering)
+# The v1 physical model (forge test rounds 1-12): a stick swung past a close microphone. Unchanged; render() sends
+# every parameter set without the v2 key 'rise' here, so earlier reports and seed-bank entries still reproduce.
+DEFAULTS_V1 = {'tc': 0.0706346, 's_rise': 0.0380857, 's_fall': 0.0578346, 'beta': 1.49847, 'prox_w': 0.0243735,
+               'f_peak': 398.391, 'f_track': 0.108498, 'q_shed': 7.05767, 'steep': 0.23086, 'a_pow': 2.90371,
+               'doppler': 0.00143736, 'wake_db': -14.0966, 'wake_tau': 0.0532322, 'wake_q': 4.45435,
+               'wake_dark': 0.613911, 'wake_hiss_db': -16.0, 'hiss_db': -19.345, 'hiss_hp': 1671.88,
+               'hiss_f': 9908.19, 'hiss_pow': 2.57151, 'push_db': -4.56985, 'push_w': 0.0251241, 'push_f': 125.898,
+               'buffet_db': -9.18542, 'buffet_f': 95.0096, 'buffet_delay': 0.0219106, 'buffet_tau': 0.0262978,
+               'flut_depth': 0.0178753, 'flut_f': 30.2817, 'whip_db': -16.8109, 'whip_q': 22.6043,
+               'whip_ratio': 1.75668, 'pan_w': 0.102279, 'width': 0.0730709, 'room_wet': 0.158579, 'rt60': 0.138233,
+               'air_db': -12.0, 'floor_db': -75.3278, 'cut_db': -46.4213, 'cut_fade': 0.0281062}
+LEN_V1 = 0.8
+K_V1 = 6
+ROOT_V1 = 0.45
+WAKE_RATIO_V1 = 0.9
+HISS_PINK_V1 = 0.5
+
+
+def _band_v1(n, fc, q, r, steep=0.0):
     y = dsp.svf(r.standard_normal(n), fc, q, 'band') / q
     if steep > 0:
         y = (1 - steep) * y + steep * dsp.svf(y, np.asarray(fc) * 1.08, 0.9, 'low')
     return y
 
 
-def render(p, r):
+def render_v1(p, r):
+    LEN, K, ROOT, WAKE_RATIO, HISS_PINK = LEN_V1, K_V1, ROOT_V1, WAKE_RATIO_V1, HISS_PINK_V1
     n = dsp.n_of(LEN)
     t = dsp.t_of(n)
     tc = p['tc']
     dt = t - tc
     s = np.where(dt < 0, p['s_rise'], p['s_fall'])
-    U = np.exp(-0.5 * np.abs(dt / s) ** p['beta'])                # speed / max speed
-    rr = np.sqrt(1 + (dt / p['prox_w']) ** 2)                      # distance / closest distance
-    v_rad = (dt / p['prox_w']) / rr * U                            # radial speed fraction (+ receding)
+    U = np.exp(-0.5 * np.abs(dt / s) ** p['beta'])
+    rr = np.sqrt(1 + (dt / p['prox_w']) ** 2)
+    v_rad = (dt / p['prox_w']) / rr * U
     dop = 1.0 - p['doppler'] * v_rad
     amp = U ** p['a_pow'] / rr
     flut = np.exp(p['flut_depth'] * _lfnoise(n, p['flut_f'], r) - 0.5 * p['flut_depth'] ** 2)
-
-    # vortex shedding along the span
     f_tip = np.maximum(p['f_peak'] * np.maximum(U, 1e-3) ** p['f_track'] * dop, 30.0)
     shed = np.zeros(n)
     for k in range(1, K + 1):
         sk = ROOT + (1 - ROOT) * k / K
-        shed += sk ** 3 * _band(n, np.maximum(f_tip * sk, 25.0), p['q_shed'], r, p['steep'])
+        shed += sk ** 3 * _band_v1(n, np.maximum(f_tip * sk, 25.0), p['q_shed'], r, p['steep'])
     shed *= amp * flut
-
-    # decaying, darkening wake behind the object
     after = np.maximum(dt, 0.0)
     w_on = 0.5 + 0.5 * np.tanh(dt / max(0.25 * p['s_rise'], 0.003))
     w_env = w_on * np.exp(-after / p['wake_tau'])
     f_w = np.maximum(p['f_peak'] * WAKE_RATIO * (1 + after / p['wake_tau']) ** (-p['wake_dark']), 40.0)
-    wake = _band(n, f_w, p['wake_q'], r, p['steep']) * w_env          # stationary in space: no Doppler
-
-    # small-scale wake hiss
+    wake = _band_v1(n, f_w, p['wake_q'], r, p['steep']) * w_env
     w = (1 - HISS_PINK) * r.standard_normal(n) + HISS_PINK * dsp.noise(LEN, r, 'pink')[:n] * 3.0
     hiss = dsp.svf(w, np.maximum(p['hiss_f'] * U ** 0.7 * dop, 400.0), 0.6, 'low')
     hiss = dsp.butter(hiss, 'high', p['hiss_hp'], order=4) * U ** p['hiss_pow'] / rr * flut
-
-    # wake hiss tail
     wh = dsp.butter(dsp.butter(dsp.noise(LEN, r, 'pink')[:n], 'high', p['hiss_hp'], order=4), 'low', 9000, order=2)
     wh = wh * w_on * np.exp(-after / (0.4 * p['wake_tau']))
-
-    # push: the close pass shoves air at the diaphragm
     pw = p['push_w']
     win = np.exp(-0.5 * (dt / pw) ** 2)
     ricker = (1 - (dt / (0.35 * pw)) ** 2) * np.exp(-0.5 * (dt / (0.35 * pw)) ** 2)
     push = dsp.butter(dsp.noise(LEN, r, 'brown')[:n], 'low', p['push_f'], order=2) * win
     push = push / _lvl(push) + 0.7 * dsp.butter(ricker, 'low', p['push_f'] * 2, order=2) / _lvl(ricker)
-
-    # buffet: wake gust on the diaphragm
     tb = t - (tc + p['buffet_delay'])
     benv = np.where(tb < 0, np.exp(-0.5 * (tb / max(p['s_rise'] * 0.5, 0.004)) ** 2), np.exp(-tb / p['buffet_tau']))
     buf = dsp.butter(dsp.noise(LEN, r, 'brown')[:n], 'low', p['buffet_f'], order=2) * benv
-
-    # whip tone
-    whip = _band(n, np.minimum(f_tip * p['whip_ratio'], 16000), p['whip_q'], r) * U ** 4 / rr
-
+    whip = _band_v1(n, np.minimum(f_tip * p['whip_ratio'], 16000), p['whip_q'], r) * U ** 4 / rr
     x = shed / _lvl(shed)
     x += 10 ** (p['wake_db'] / 20) * wake / _lvl(wake)
     x += 10 ** (p['hiss_db'] / 20) * hiss / _lvl(hiss)
@@ -201,15 +487,13 @@ def render(p, r):
     x += 10 ** (p['push_db'] / 20) * push / _lvl(push)
     x += 10 ** (p['buffet_db'] / 20) * buf / _lvl(buf)
     x += 10 ** (p['whip_db'] / 20) * whip / _lvl(whip)
-
-    # moving source -> stereo
     side_dir = 1.0 if r.uniform() < 0.5 else -1.0
     pan = side_dir * p['pan_w'] * np.tanh(dt / p['prox_w'])
     d1 = int(r.uniform(0.2, 0.9) * 1e-3 * dsp.SR)
     side = np.zeros(n)
     side[d1:] = x[:n - d1]
     side = dsp.butter(side - x, 'high', 300) * p['width']
-    L = x * (1 + pan) + side                                       # L + R = 2x: mono sum unchanged
+    L = x * (1 + pan) + side
     R = x * (1 - pan) - side
     out = []
     for ch in (L, R):
@@ -219,9 +503,9 @@ def render(p, r):
         out.append(y[:n + dsp.n_of(0.1)])
     m = min(len(o) for o in out)
     y = np.stack([o[:m] for o in out], axis=1)
-    if p.get('cut_db') is None:                                    # rounds 1-11: unchanged
+    if p.get('cut_db') is None:
         return dsp.fade(dsp.trim_tail(y, -62, 0.03), 0.002, 0.06)
-    h = dsp.n_of(0.005)                                            # round 12: the edit
+    h = dsp.n_of(0.005)
     mono = y.mean(axis=1)
     k = len(mono) // h
     e = 20 * np.log10(np.sqrt((mono[:k * h].reshape(k, h) ** 2).mean(1)) + 1e-12)

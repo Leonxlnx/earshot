@@ -103,6 +103,58 @@ AS_LABELS = {   # AudioSet classes that name the category (riser / downlifter / 
     'glitch': ['Static', 'Noise', 'Beep, bleep', 'White noise', 'Crackle'],
     'logo_sting': ['Chime', 'Bell', 'Ding', 'Jingle, tinkle', 'Gong', 'Cymbal', 'Glockenspiel'],
 }
+# Round 2 additions (2026-10-16): the PRO designed categories measured from the reference launch films
+# (docs/motion-sfx-study.md). Additions only: the 18 rows above are unchanged. Phrasings written for the benchmark,
+# independent of the recipes' TARGET / ALTS (checked at start); pro_riser / pro_zip phrasings from the sweep area's
+# wrapper (out/forge_v2/pro_zip/bench_pro.py). Categories without a bench split still get phrase / AudioSet /
+# artifact / diversity rows.
+PRO_PHRASES = {
+    'pro_click': ['a crisp bright digital click', 'a tiny sharp interface click'],
+    'pro_tap': ['a soft muted tap on a screen', 'a short dull interface tap'],
+    'pro_pop_in': ['a soft round thump as something appears on screen', 'a short muffled pop of an element appearing'],
+    'pro_hover_tick': ['a tiny bright tick of a cursor', 'a faint high interface tick'],
+    'pro_pop': ['a quick electronic blip', 'a tiny synthetic pop'],
+    'pro_notify': ['a soft digital notification ding', 'a short pure alert tone'],
+    'pro_shimmer': ['a glittering digital sparkle', 'a shimmering burst of tiny tones'],
+    'pro_typing_key': ['a light clean keystroke', 'a soft tick of a keyboard key'],
+    'pro_typing_run': ['someone typing a short line quickly', 'a rapid run of keystrokes'],
+    'pro_glitch': ['a short burst of digital stutter', 'a crackling data glitch that cuts off'],
+    'pro_whoosh_big': ['a deep heavy swoosh with a low rumble', 'a slow powerful whoosh of air'],
+    'pro_riser': ['a rising stutter effect that speeds up', 'a pulsing electronic build-up'],
+    'pro_zip': ['a fast rising electronic tone', 'a quick swooping synth glide'],
+    'pro_impact': ['a deep designed boom that cuts off', 'a heavy low rumble hit in a launch video'],
+    'pro_sub_drop': ['a deep sub bass boom that sinks', 'a low electronic bass drop'],
+    'pro_logo_sting': ['a short electronic logo sound', 'a falling synth tone landing on a hum'],
+}
+PRO_CONFUSIONS = {
+    'pro_click': CONFUSIONS['click'], 'pro_tap': CONFUSIONS['tap'],
+    'pro_pop_in': ['a kick drum', 'a knock on a door', 'a ball bouncing', 'a hand clap'],
+    'pro_hover_tick': CONFUSIONS['hover_tick'],
+    'pro_pop': ['a microwave beep', 'a bird chirp', 'a tongue click', 'a kiss'],
+    'pro_notify': CONFUSIONS['notify'], 'pro_shimmer': CONFUSIONS['shimmer'],
+    'pro_typing_key': CONFUSIONS['typing_key'],
+    'pro_typing_run': ['rain on a roof', 'a clock ticking', 'popcorn popping', 'a horse galloping'],
+    'pro_glitch': CONFUSIONS['glitch'], 'pro_whoosh_big': CONFUSIONS['whoosh_big'],
+    'pro_riser': ['a helicopter', 'a machine gun', 'a dial-up modem', 'a ticking clock'],
+    'pro_zip': ['a whistle', 'a bird singing', 'a mosquito buzzing', 'a slide whistle'],
+    'pro_impact': CONFUSIONS['impact'], 'pro_sub_drop': CONFUSIONS['sub_drop'],
+    'pro_logo_sting': ['a doorbell', 'a car horn', 'an error buzzer', 'a church bell'],
+}
+PRO_AS = {
+    'pro_click': AS_LABELS['click'], 'pro_tap': AS_LABELS['tap'], 'pro_pop_in': ['Thump, thud', 'Burst, pop', 'Plop'],
+    'pro_hover_tick': AS_LABELS['hover_tick'], 'pro_pop': ['Burst, pop', 'Plop', 'Beep, bleep', 'Chirp tone'],
+    'pro_notify': AS_LABELS['notify'] + ['Beep, bleep'], 'pro_shimmer': AS_LABELS['shimmer'],
+    'pro_typing_key': AS_LABELS['typing_key'], 'pro_typing_run': AS_LABELS['typing_key'],
+    'pro_glitch': AS_LABELS['glitch'], 'pro_whoosh_big': AS_LABELS['whoosh_big'],
+    'pro_riser': ['Whoosh, swoosh, swish', 'Drum roll', 'Beep, bleep'],
+    'pro_zip': ['Chirp tone', 'Sine wave', 'Beep, bleep', 'Whoosh, swoosh, swish'],
+    'pro_impact': AS_LABELS['impact'] + ['Rumble'], 'pro_sub_drop': AS_LABELS['sub_drop'],
+    'pro_logo_sting': AS_LABELS['logo_sting'] + ['Beep, bleep', 'Synthesizer'],
+}
+for _c in PRO_PHRASES:
+    PHRASES.setdefault(_c, PRO_PHRASES[_c])
+    CONFUSIONS.setdefault(_c, PRO_CONFUSIONS[_c])
+    AS_LABELS.setdefault(_c, PRO_AS[_c])
 METRICS = (('typ_z', 'high'), ('tone_db', 'low'), ('env_oct', 'low'), ('curve_db', 'low'), ('phrase_z', 'high'),
            ('margin', 'high'), ('as_p', 'high'))
 
@@ -170,7 +222,7 @@ class EnvRef:
                 'active_ratio': round(2 ** logs['active_s'], 3), 'ref_median': {k: round(v, 3) for k, v in med.items()}}
 
 
-ENDS_ON_PEAK = ('riser',)     # a riser grows out of silence and stops on its peak: no late-start / tail-cut flags
+ENDS_ON_PEAK = ('riser', 'pro_riser')   # grows out of silence and stops on its peak: no late-start / tail-cut flags
 
 
 def artifacts(x, cat=None):
@@ -392,13 +444,21 @@ def gather(made=None, files=None):
         for c in sorted(os.listdir(made)):
             d = os.path.join(made, c)
             if os.path.isdir(d):
-                ps = sorted(glob.glob(os.path.join(d, '*.wav')))
+                if os.path.isdir(os.path.join(d, 'final')):     # forge v2 layout: <category>/final/<category>_NN.wav
+                    d = os.path.join(d, 'final')
+                ps = [p for p in sorted(glob.glob(os.path.join(d, '*.wav'))) if not _skip(p)]
                 if ps:
                     out[c] = [p.replace(chr(92), '/') for p in ps]
     for spec in files or []:
         c, g = spec.split('=', 1)
-        out.setdefault(c, []).extend(sorted(p.replace(chr(92), '/') for p in glob.glob(g)))
+        out.setdefault(c, []).extend(sorted(p.replace(chr(92), '/') for p in glob.glob(g) if not _skip(p)))
     return out
+
+
+def _skip(p):
+    """forge's audition.wav (made and refs interleaved) and _-prefixed scratch files are never made sounds"""
+    b = os.path.basename(p).lower()
+    return b.startswith('audition') or b.startswith('_')
 
 
 def table(res):
@@ -456,7 +516,7 @@ def table(res):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('--made', help='folder with <category>/*.wav')
+    ap.add_argument('--made', help='folder with <category>/*.wav (or <category>/final/*.wav; audition*.wav skipped)')
     ap.add_argument('--files', nargs='*', help='category=glob (quote the glob)')
     ap.add_argument('--out', required=True, help='results JSON (a .md table is written next to it)')
     ap.add_argument('--tag', help='name in the report (default: from --out)')

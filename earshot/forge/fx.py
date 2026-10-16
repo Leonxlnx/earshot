@@ -208,6 +208,8 @@ def reverb_ir(r, rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0,
                 x = _allpass(np.ascontiguousarray(x), int(d + 3 * c + j), min(0.8, diffuse))
         B = r.choice([-1.0, 1.0], (1, nl)) / np.sqrt(nl)
         Cm = r.choice([-1.0, 1.0], (nl, 2))
+        if abs(Cm[:, 0] @ Cm[:, 1]) >= nl:                     # equal / opposite columns (p = 2 / 2^nl): Gram-Schmidt
+            Cm[nl // 2:, 1] *= -1.0                            # would zero column 1 (NaN IR); no extra rng draw
         Cm[:, 1] -= Cm[:, 0] * (Cm[:, 0] @ Cm[:, 1]) / nl      # Gram-Schmidt: decorrelated L / R taps
         Cm /= np.linalg.norm(Cm, axis=0, keepdims=True)
         depth = mod * (3 + 9 * r.uniform(0, 1, nl)) * (0.5 + 0.5 * size)

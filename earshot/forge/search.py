@@ -189,7 +189,8 @@ def artifacts(x):
     m = _mono(x)
     flags, pen = {}, 0.0
     pk = np.abs(m).max() + 1e-12
-    hot = np.abs(m) > 0.98 * pk
+    flat = np.concatenate([[False], np.abs(np.diff(m)) <= 1e-6 * pk])   # clipped samples repeat exactly; a 60 Hz
+    hot = (np.abs(m) > 0.98 * pk) & flat                                  # sine near its crest does not
     if hot.sum() >= 4:
         d = np.diff(np.concatenate([[0], hot.astype(np.int8), [0]]))
         runs = np.nonzero(d == -1)[0] - np.nonzero(d == 1)[0]
@@ -424,11 +425,9 @@ def optimize(recipe, critic, budget=160, pop=16, elite=4, seed=0, init=None, sig
     them model-free against the critic's refs (`pre=` a prebuilt Prescreen) and score only the best pop.
     workers: render threads (default EARSHOT_THREADS or 2). patience / sigma_stop: CMA restart triggers; cma= {'sigma0':
     0.15 initial / restart step, 'mu': 0.5 parent fraction, 'elite': 0 share of samples around the best so far}."""
-    base = {}
-    if space is None:
+    base = dict(getattr(recipe, 'DEFAULTS', {}) or {})   # keys outside the searched space keep their DEFAULTS
+    if space is None:                                     # (also for a recipe object whose SPACE is narrower)
         space = recipe.SPACE
-    else:
-        base = dict(getattr(recipe, 'DEFAULTS', {}) or {})
     full = space is recipe.SPACE
     R = np.random.default_rng(seed)
     d = len(space)
@@ -633,10 +632,11 @@ def load_seeds(recipe, target=None, refs=None, n=6, folder=None):
     return [dict(e['params']) for e in ents[:n]]
 
 
-def save_seeds(recipe, picks, target=None, refs=None, source='', folder=None, per_context=6, cap=12):
+def save_seeds(recipe, picks, target=None, refs=None, source='', folder=None, per_context=6, cap=48):
     """merge picks ({params, score[, robust]} dicts) into the recipe's seed bank; ranked by the robust mean when there
     is one, else the total. Keeps it small: per_context entries per target + refs, cap in all (the newest contexts
-    win), near-duplicate parameter sets merged. Atomic write. Returns the bank dict."""
+    win; 48 leaves room for one recipe serving several categories, e.g. whoosh: fast / big / pro_big), near-duplicate
+    parameter sets merged. Atomic write. Returns the bank dict."""
     path = seeds_path(recipe, folder)
     bank = {'recipe': os.path.basename(path)[:-5], 'entries': []}
     if os.path.exists(path):

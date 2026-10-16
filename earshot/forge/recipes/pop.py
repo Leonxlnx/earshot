@@ -1,4 +1,31 @@
-"""A small bubble pop, built from physics (no recorded audio anywhere: every sample is computed).
+"""Pops, built in code (no recorded audio anywhere: every sample is computed): v2 designed motion-design pops
+(chirp / blip / bubble, below) and the v1 physical bubble pop (further below, unchanged).
+
+v2 (forge v2, round 2): what a pop is in a pro launch film (docs/motion-sfx-study.md, ref_2 trims looked at in
+spectrograms) and what the v1 pop got wrong:
+  * The film's chirp pop is a FALLING tone, 9.8 kHz -> 350 Hz in about 110 ms (-43 oct/s): a 3 ms blip at ~10 kHz,
+    ~30 ms of silence, then a stepped descent (4-5 ms tone bursts every 6-13 ms at 7.5, 6, 3, 1.5, 1 kHz) that lands on
+    a short 350-500 Hz tone with a few harmonics, falling 12 -> 40 dB in ~30 ms, hard cut; mono.
+  * The film's blip pop is a 5 ms tone burst at ~1.2 kHz with harmonics to 5 kHz. Over music (held-out film) a tonal
+    blip falls 1.1 kHz -> 100 Hz with a click.
+  * v1 (a bubble model fitted to raw bubble recordings) rang a fixed second formant (f2 = 3.8 x 440 Hz, Q 25) inside a
+    0.25 s room at -10 dB: a hollow, boxy cavity tone that no designed pop has.
+Styles (`style`):
+  'chirp'   falling sweep f_hi -> f_lo in `sweep` s (ease = time warp), optionally stepped (sample-and-hold + gate,
+            `steps` 0..1, `step_ms`, `duty`), an optional pre-blip (`pre_db`, `pre_hz`, `pre_t` lead), loudest point at
+            `peak_at` of the sweep, then a landing tone at f_lo (tail_db, tail_hold, tail_tau) and a hard cut
+  'blip'    a gated tone burst (f_blip, box, b_att, b_rel) with harmonics and an optional pitch drop (b_drop st)
+  'bubble'  the motion-design bubble / pop-in: a clean sine whose pitch RISES (f0 -> f0 (1 + rise)), a 1-2 ms tick,
+            an optional daughter ring, a breathy band that follows the pitch, a tiny room; every resonance follows
+            the pitch (no fixed cavity formant: the v1 hollow tone)
+CHARACTER keys (what a family varies on purpose): style, f_hi / f_lo / sweep / steps (chirp), f_blip / box / b_drop
+(blip), f0 / rise / q_tau (bubble), length. FAMILY_V2[refset] = 5 palette members per refset (pro_pop: the film chirp,
+a smooth glide, the film blip, a falling blip with a click, a plip; pop: five bubble sizes / kinds); V2 is a recipe
+object (SPACE_V2 / DEFAULTS_V2 / render) to hand to forge(): forge(pop.V2, refset='pro_pop', mode='designed').
+The module-level SPACE / DEFAULTS / FAMILIES stay the v1 ones (tests and demo/forge-test/pop scripts pin them);
+render() dispatches on the 'style' key (v2) and renders every v1 parameter set exactly as before.
+
+v1: a small bubble pop, built from physics.
 
 What happens when a small bubble pops, and how each part is modelled:
  0. Leak before the release. A lip / film seal does not open in zero time: for a few ms before the main release
@@ -172,7 +199,7 @@ def gliding_ring(f0, q, rise, rise_tau, att, h2, n, r, wob=None):
     return env * np.sin(ph) + h2 * env ** 2 * np.sin(2 * ph + 0.5)
 
 
-def render(p, r):
+def render_v1(p, r):
     n = dsp.n_of(DUR)
     t = dsp.t_of(n)
     x = np.zeros(n)
@@ -239,3 +266,276 @@ def render(p, r):
         died = (i + (below[0] if len(below) else k - i)) * h + dsp.n_of(p['cut_fade'])
         end = min(len(x), max(end, died), dsp.n_of(p['pre']) + lead + dsp.n_of(0.42))
     return dsp.fade(x[:end], 0.001, p['cut_fade'])
+
+
+# ================================================================================================ v2 (designed pops)
+import types as _types  # noqa: E402
+
+from .. import fx  # noqa: E402
+
+SR = dsp.SR
+SPACE_V2 = {
+    'style': ['chirp', 'blip', 'bubble'],
+    # chirp
+    'f_hi': (3000.0, 11500.0, 'log'),   # sweep start
+    'f_lo': (90.0, 900.0, 'log'),       # sweep end / landing tone
+    'sweep': (0.025, 0.14),             # sweep time
+    'ease': (0.5, 2.0),                 # time warp of the exponential sweep (< 1 fast first, > 1 slow first)
+    'steps': (0.0, 1.0),                # 0 smooth glide .. 1 stepped (sample-and-hold pitch + gate)
+    'step_ms': (4.0, 13.0),
+    'duty': (0.45, 1.0),
+    'pre_db': (-40.0, 0.0),             # pre-blip level (-40 = none)
+    'pre_hz': (2500.0, 11000.0, 'log'),
+    'pre_t': (0.008, 0.04),             # pre-blip lead before the sweep
+    'peak_at': (0.1, 0.8),              # loudest point, as a fraction of the sweep
+    'start_db': (-12.0, 0.0),           # level at the sweep start re the peak
+    'tail_db': (-20.0, -3.0),           # landing tone level re the peak
+    'tail_hold': (0.0, 0.035),
+    'tail_tau': (0.006, 0.05, 'log'),
+    'harm': (0.0, 0.7),                 # 2nd / 3rd harmonics (alias-safe: faded out towards 18 kHz)
+    'odd': (0.0, 1.0),                  # share of the harmonics that is odd (3rd) vs even (2nd)
+    # blip
+    'f_blip': (700.0, 2200.0, 'log'),
+    'box': (0.003, 0.07, 'log'),
+    'b_att': (0.0004, 0.004, 'log'),
+    'b_rel': (0.002, 0.014, 'log'),
+    'b_drop': (0.0, 5.0),               # pitch drop in semitones across the blip
+    'b_tau': (0.006, 0.3, 'log'),       # decay inside the box (0.3 = flat, the film's gated blip; short = a plip)
+    # bubble
+    'f0': (280.0, 1400.0, 'log'),
+    'rise': (0.1, 1.6),
+    'rise_tau': (0.003, 0.04, 'log'),
+    'q_tau': (0.01, 0.09, 'log'),       # ring decay time constant
+    'att': (0.0004, 0.004, 'log'),
+    'h2': (0.0, 0.3),
+    'daughter': (0.0, 0.6),
+    'd_ratio': (1.3, 2.4),
+    'd_delay': (0.004, 0.016),
+    'tick_db': (-40.0, -6.0),           # (all styles) a short band-passed click on the onset (-40 = none)
+    'tick_hz': (1800.0, 9000.0, 'log'),
+    'breath': (0.0, 0.5),
+    'room': (0.0, 0.25),
+    'floor_db': (-110.0, -62.0),        # -110 = digital silence (designed); higher = a recording floor
+    # common
+    'hp': (60.0, 400.0, 'log'),
+    'lp': (4500.0, 18000.0, 'log'),
+    'drive': (0.0, 8.0),
+    'length': (0.03, 0.4),              # blip / bubble edit length (a chirp ends after its landing tone)
+    'fade': (0.002, 0.03, 'log'),
+    'width': (0.0, 0.4),                # bubble only (its room); chirps and blips are mono like the films'
+}
+
+DEFAULTS_V2 = {'style': 'chirp', 'f_hi': 9800.0, 'f_lo': 360.0, 'sweep': 0.055, 'ease': 1.0, 'steps': 1.0,
+               'step_ms': 9.0, 'duty': 0.62, 'pre_db': -2.0, 'pre_hz': 9800.0, 'pre_t': 0.032, 'peak_at': 0.3,
+               'start_db': -2.0, 'tail_db': -11.0, 'tail_hold': 0.006, 'tail_tau': 0.009, 'harm': 0.35, 'odd': 0.6,
+               'f_blip': 1220.0, 'box': 0.005, 'b_att': 0.0008, 'b_rel': 0.003, 'b_drop': 0.0, 'b_tau': 0.3, 'f0': 520.0,
+               'rise': 0.9, 'rise_tau': 0.012, 'q_tau': 0.035, 'att': 0.0008, 'h2': 0.08, 'daughter': 0.15,
+               'd_ratio': 1.8, 'd_delay': 0.008, 'tick_db': -30.0, 'tick_hz': 3500.0, 'breath': 0.12, 'room': 0.06,
+               'floor_db': -110.0, 'hp': 150.0, 'lp': 16000.0, 'drive': 1.5, 'length': 0.16, 'fade': 0.004,
+               'width': 0.15}
+
+
+def _v2(**kw):
+    return {**DEFAULTS_V2, **kw}
+
+
+FAMILY_V2 = {
+    'pro_pop': [
+        _v2(),                                                                      # the film's stepped chirp
+        _v2(f_hi=6500.0, f_lo=300.0, sweep=0.075, steps=0.0, pre_db=-40.0, peak_at=0.55, start_db=-6.0,
+            tail_db=-14.0, tail_hold=0.003, tail_tau=0.008, harm=0.2),                             # a smooth falling glide
+        _v2(style='blip', f_blip=1220.0, box=0.005, harm=0.5, odd=0.7, length=0.03),   # the film's blip
+        _v2(f_hi=1150.0, f_lo=140.0, sweep=0.06, steps=0.0, pre_db=-40.0, peak_at=0.3, start_db=-3.0,
+            tail_db=-12.0, tail_hold=0.003, tail_tau=0.009, harm=0.5, tick_db=-14.0, tick_hz=4000.0, hp=90.0),   # falling blip + click
+        _v2(style='blip', f_blip=1600.0, box=0.06, b_drop=4.0, b_tau=0.016, harm=0.25, b_rel=0.008,
+            length=0.08),                                                           # a plip (decaying, pitch drop)
+    ],
+    'pop': [   # the kit's pops: a ~2-10 ms swell, a fast first drop (t20 ~15-25 ms), then a quiet room tail
+        _v2(style='bubble', f0=520.0, rise=0.9, q_tau=0.014, att=0.002, room=0.15, length=0.2),   # a round bubble
+        _v2(style='bubble', f0=1100.0, rise=0.55, rise_tau=0.006, q_tau=0.009, tick_db=-18.0, daughter=0.3,
+            room=0.1, length=0.15),                                                         # small, high
+        _v2(style='bubble', f0=330.0, rise=1.3, rise_tau=0.03, q_tau=0.03, att=0.005, tick_db=-40.0,
+            daughter=0.0, room=0.08, length=0.25),                                          # a slow bloop
+        _v2(style='bubble', f0=720.0, rise=0.25, q_tau=0.008, breath=0.45, tick_db=-20.0, daughter=0.0,
+            room=0.12, length=0.16),                                                        # a lip / mouth pop
+        _v2(style='bubble', f0=450.0, rise=0.15, q_tau=0.01, tick_db=-8.0, tick_hz=2500.0, room=0.22,
+            length=0.22),                                                                   # a cork-like pop
+    ],
+}
+FINE_V2 = {
+    'chirp': ['ease', 'duty', 'start_db', 'tail_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive',
+              'fade', 'peak_at'],
+    'blip': ['b_att', 'b_rel', 'b_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive', 'fade'],
+    'bubble': ['rise_tau', 'att', 'h2', 'd_ratio', 'd_delay', 'tick_db', 'tick_hz', 'breath', 'room', 'hp', 'lp',
+               'drive', 'fade', 'width', 'floor_db'],
+}
+
+
+def family_space(params, style=None):
+    """the search space for one v2 family member: its style's FINE_V2 keys free, every other key pinned (a
+    one-element choice list)"""
+    free = set(FINE_V2.get(style or params.get('style', 'chirp'), []))
+    return {k: (spec if k in free else [params.get(k, DEFAULTS_V2.get(k))]) for k, spec in SPACE_V2.items()}
+
+
+def _harmonics(ph, f, harm, odd):
+    """sine + alias-safe 2nd / 3rd harmonics (each faded out as it nears 18 kHz)"""
+    y = np.sin(ph)
+    for k, a in ((2, harm * (1 - odd)), (3, harm * odd)):
+        if a > 0:
+            w = np.clip((18000.0 - k * f) / 3000.0, 0, 1)
+            y = y + a * w * np.sin(k * ph)
+    return y
+
+
+def _click(n, db, hz, r, ms=1.5):
+    k = min(n, dsp.n_of(ms / 1000 * 3))
+    w = dsp.butter(r.standard_normal(k), 'band', (hz / 1.5, min(hz * 1.5, 20000)), order=2)
+    w *= np.exp(-dsp.t_of(k) / (ms / 1000 / 2.5))
+    y = np.zeros(n)
+    y[:k] = w / (np.abs(w).max() + 1e-12) * 10 ** (db / 20)
+    return y
+
+
+def _chirp(p, r):
+    pre = p['pre_db'] > -39.0
+    t_sw0 = p['pre_t'] if pre else 0.0
+    tail = p['tail_hold'] + 5.5 * p['tail_tau']            # until the landing tone is ~48 dB down
+    n = dsp.n_of(t_sw0 + p['sweep'] + tail + p['fade'] + 0.002)
+    t = dsp.t_of(n)
+    ts = t - t_sw0                                         # time from the sweep start
+    u = np.clip(ts / p['sweep'], 0, 1)
+    l_hi, l_lo = np.log(p['f_hi']), np.log(p['f_lo'])
+    lf = l_hi + (l_lo - l_hi) * u ** p['ease']
+    gate = np.ones(n)
+    if p['steps'] > 0:                                     # sample-and-hold pitch in blocks + a gate per block
+        blk = p['step_ms'] / 1000
+        idx = np.floor(np.maximum(ts, 0) / blk)
+        u_h = np.clip(idx * blk / p['sweep'], 0, 1)
+        lf_h = l_hi + (l_lo - l_hi) * u_h ** p['ease']
+        lf = np.where(ts < p['sweep'], (1 - p['steps']) * lf + p['steps'] * lf_h, lf)
+        sw_q = np.ceil(p['sweep'] / blk - 1e-9) * blk      # the landing tone starts on a block boundary
+        ph_b = np.mod(np.maximum(ts, 0), blk) / blk
+        edge = 0.0007 / blk
+        g = np.clip(np.minimum(ph_b / edge, (p['duty'] - ph_b) / edge), 0, 1)
+        land = np.clip((ts - sw_q) / 0.0007, 0, 1)
+        g = np.where(ts < sw_q, g, land)
+        g = 0.5 - 0.5 * np.cos(np.pi * g)
+        gate = np.where(ts >= 0, 1 - p['steps'] * (1 - g), 1.0)
+    f = np.exp(lf)
+    ph = 2 * np.pi * np.cumsum(f) / SR + r.uniform(0, 2 * np.pi)
+    y = _harmonics(ph, f, p['harm'], p['odd'])
+    # level in dB: start_db -> 0 at peak_at -> tail_db at the landing, then hold, then a straight-in-dB decay
+    pa = p['peak_at']
+    db = np.where(u < pa, p['start_db'] * (1 - u / max(pa, 1e-3)), p['tail_db'] * (u - pa) / max(1 - pa, 1e-3))
+    after = np.maximum(ts - p['sweep'] - p['tail_hold'], 0)
+    db = db - 8.686 * after / p['tail_tau']
+    env = 10 ** (db / 20) * gate * (ts >= 0)
+    i0 = dsp.n_of(t_sw0) if t_sw0 > 0 else 0
+    a = min(dsp.n_of(0.0008), n - i0)
+    env[i0:i0 + a] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
+    y = y * env
+    if pre:                                                 # the pre-blip: a 3 ms Hann-windowed tone
+        k = dsp.n_of(0.003)
+        y[:k] += 10 ** (p['pre_db'] / 20) * np.hanning(k) * np.sin(2 * np.pi * p['pre_hz'] * dsp.t_of(k))
+    if p['tick_db'] > -39.0:
+        y += np.roll(_click(n, p['tick_db'], p['tick_hz'], r), i0)
+    return y
+
+
+def _blip(p, r):
+    n = dsp.n_of(p['box'] + p['b_rel'] + p['fade'] + 0.004)
+    t = dsp.t_of(n)
+    f = p['f_blip'] * 2 ** (-p['b_drop'] / 12 * np.clip(t / max(p['box'], 1e-3), 0, 1))
+    ph = 2 * np.pi * np.cumsum(f) / SR + r.uniform(0, 2 * np.pi)
+    y = _harmonics(ph, f, p['harm'], p['odd'])
+    a = np.clip(t / p['b_att'], 0, 1)
+    rel = np.clip((t - p['box']) / p['b_rel'], 0, 1)
+    y = y * (0.5 - 0.5 * np.cos(np.pi * a)) * (0.5 + 0.5 * np.cos(np.pi * rel)) * np.exp(-t / p['b_tau'])
+    if p['tick_db'] > -39.0:
+        y += _click(n, p['tick_db'], p['tick_hz'], r)
+    return y
+
+
+def _bubble(p, r):
+    n = dsp.n_of(max(p['length'], 0.06) + 0.05)
+    t = dsp.t_of(n)
+    trk = p['f0'] * (1 + p['rise'] * (1 - np.exp(-t / p['rise_tau'])))
+    ph = 2 * np.pi * np.cumsum(trk) / SR + r.uniform(-0.3, 0.3)
+    env = (1 - np.exp(-t / p['att'])) * np.exp(-t / p['q_tau'])
+    y = env * np.sin(ph) + p['h2'] * env ** 2 * np.sin(2 * ph + 0.4)
+    if p['daughter'] > 0.01:                               # a smaller, higher, shorter ring a few ms later
+        d = p['f0'] * p['d_ratio'] * (1 + 0.4 * p['rise'] * (1 - np.exp(-t / (0.6 * p['rise_tau']))))
+        dph = 2 * np.pi * np.cumsum(d) / SR
+        de = (1 - np.exp(-t / max(p['att'], 0.0003))) * np.exp(-t / (0.6 * p['q_tau']))
+        dsp.place(y, p['daughter'] * de * np.sin(dph), p['d_delay'])
+    if p['breath'] > 0.01:                                 # air through the opening: a band that follows the pitch
+        b = dsp.svf(r.standard_normal(n), trk, 4.0, 'band')
+        b *= (1 - np.exp(-t / 0.0006)) * np.exp(-t / 0.006)
+        y += p['breath'] * b / (np.abs(b).max() + 1e-9)
+    if p['tick_db'] > -39.0:
+        y += _click(n, p['tick_db'], p['tick_hz'], r)
+    return y
+
+
+def render_v2(p, r):
+    p = {**DEFAULTS_V2, **p}
+    st = p['style']
+    y = _chirp(p, r) if st == 'chirp' else _blip(p, r) if st == 'blip' else _bubble(p, r)
+    if p['drive'] > 0.2:
+        y = fx.saturate(y, p['drive'], mix=0.5)
+    y = dsp.butter(y, 'high', p['hp'], order=4)
+    if p['lp'] < 17500:
+        y = dsp.butter(y, 'low', p['lp'], order=2)
+    if st == 'bubble':
+        if p['room'] > 0.005:
+            y = fx.reverb(y, r, rt60=0.12 + 0.5 * p['room'], size=0.15, predelay=0.004, damp=0.6, wet=p['room'],
+                          stereo=True, width=0.3 + p['width'])
+        else:
+            y = np.stack([y, y], 1)
+        if p['floor_db'] > -100:
+            y = dsp.mic(y, r, floor_db=p['floor_db'])
+        y = y[:dsp.n_of(p['length'])]
+    elif st == 'blip':
+        y = y[:min(len(y), max(dsp.n_of(p['length']), dsp.n_of(p['box'] + p['b_rel'] + 0.002)))]
+    y = np.array(y, np.float64)
+    k = min(len(y), dsp.n_of(p['fade']))
+    w = np.cos(np.linspace(0, np.pi / 2, k)) ** 2           # convex end: hold, then stop
+    y[-k:] *= w[:, None] if y.ndim == 2 else w
+    return y
+
+
+def render(p, r):
+    """v2 parameters (they carry 'style') -> render_v2; v1 parameters -> the v1 bubble model, unchanged"""
+    if 'style' in p:
+        return render_v2(p, r)
+    return render_v1(p, r)
+
+
+V2 = _types.SimpleNamespace(__name__='earshot.forge.recipes.pop', SPACE=SPACE_V2, DEFAULTS=DEFAULTS_V2,
+                            render=render_v2, TARGET='a short tonal pop',
+                            ALTS=['a mouse click', 'a laser zap', 'a synth beep', 'a finger snap'], REFSET='pro_pop')
+
+
+def measure(x):
+    """the pro-study measurements (shared with notify: earshot.forge.recipes.notify.measure)"""
+    from .notify import measure as _m
+    return _m(x)
+
+
+TARGETS_V2 = {   # (key, lo, hi, scale): docs/motion-sfx-study.md pop rows, measured on the film trims with measure()
+    'pro_pop': [('length_s', 0.025, 0.16, 0.05), ('t40_ms', 4.0, 70.0, 25.0), ('low_db', -200.0, -10.0, 6.0),
+                ('corr', 0.95, 1.0, 0.1)],
+    'pop': [('length_s', 0.12, 0.42, 0.1), ('t40_ms', 25.0, 160.0, 40.0), ('low_db', -200.0, -18.0, 6.0)],
+}
+
+
+def pro_penalty(x, cat):
+    from .notify import _outside
+    m = measure(x)
+    m['low_db'] = 10 * np.log10(10 ** (m['shares'][0] / 10) + 1e-12)
+    return sum(min(2.0, _outside(m.get(k), lo, hi, sc)) for k, lo, hi, sc in TARGETS_V2.get(cat, []))
+
+
+def extra_for(cat, weight=1.0):
+    return lambda x, row: -weight * pro_penalty(x, cat)

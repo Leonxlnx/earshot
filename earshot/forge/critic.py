@@ -221,8 +221,8 @@ class Critic:
                        total=round(float(total), 3), passes=passes, sounds_like=[t[0] for t in top], mode=self.mode)
             if ex is not None:
                 row['left_out'] = os.path.basename(self.refs[ex])
-            if self.tone_ref is not None and self.tone_ref.n:
-                tm = self.tone_ref.check(x, exclude=ex)
+            tm = self.tone_ref.check(x, exclude=ex) if self.tone_ref is not None and self.tone_ref.n else {}
+            if tm:                            # {} when the only ref is the one left out (score_refs with 1 ref)
                 if self.tone_target is not None:
                     tm['tone_ratio'] = round(tm['tone_db'] / float(self.tone_target), 2)
                 row['tone'] = {k: tm[k] for k in ('tone_db', 'tone_ratio', 'outside', 't40_ms', 't40_ref', 'length_s',

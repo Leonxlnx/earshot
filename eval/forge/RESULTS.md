@@ -145,6 +145,24 @@ So for the overnight rounds, progress is shown by: lower var cos (towards 0.5-0.
 t40 x moving towards 1 (clicks, whooshes); tone / curve distances at or under real x; zero artifacts; and the new
 categories getting rows at all. The final word is the blind test.
 
+## Round 2: forge v2 families (`results_v2r2.json`, `results_v2r2.md`)
+
+168 made sounds in 34 categories (18 real-recording + 16 pro designed), 4-6 variants each, from
+`out/forge_v2/<category>/final/`. The full table, per-category verdicts and v1 comparison are in `results_v2r2.md`.
+In short:
+- **Clones fixed.** var cos v1 -> v2: click 0.886 -> 0.681, typing_key 0.965 -> 0.705, pop 0.917 -> 0.735, impact
+  0.931 -> 0.881, whoosh_fast 0.957 -> 0.856 (real sets 0.48-0.86). Still clone-like: pro_whoosh_big 0.931,
+  pro_typing_run 0.930, pro_typing_key 0.926, whoosh_big 0.909, pro_pop_in 0.895.
+- **Tails fixed for clicks and keys, not for fast whooshes.** t40 x v1 -> v2: click 0.56 -> 1.22, typing_key 1.67
+  -> 1.29 (real x 1.29), impact 0.50 -> 0.62, whoosh_fast 0.51 -> 0.49 (real 0.60 / 1.08). Shimmer 0.48 and notify
+  0.63 are short; logo_sting 2.48 is long.
+- **Model checks back to real level.** typ z fell from above real (v1 prototypes) to real-like (click -0.25,
+  typing_key -0.15, pop -0.02), except whoosh_fast -4.85 and swish -2.8 (below real).
+- **Artifacts:** 3 flags in 168 sounds, all deliberate (two pre-swells, one end-on-cut).
+- **inside the real 80% limits** (made median vs a real recording): whoosh_big 7/7 (5), notify 7/7 (5.5), pop 7/7
+  (6), typing_key 6/7 (6), hover_tick 6/7 (5), shimmer 6/7 (6), click 5/7 (6), toggle 5/7 (6), impact 5/6 (3),
+  pro_zip 5/7 (5), whoosh_fast 4/7 (6.5; v1 7/7), swish 4/7 (6), swipe 4/7 (6), tap 3/7 (6), riser 3/6 (4).
+
 ## Limits
 
 - The sets are small: 1-15 refs per split, and 1-3 source files in several categories. Real-limit quantiles from 2-3
@@ -163,3 +181,4 @@ categories getting rows at all. The final word is the blind test.
 | when | change |
 |---|---|
 | 2026-10-16 round 0 | refsets v1 (18 categories, 152 refs); bench.py v1 (checks above); frozen_tone.py from git 108763c; baseline results_v1 + results_real |
+| 2026-10-16 round 2 | additions only: PHRASES / CONFUSIONS / AS_LABELS for the 16 pro_* categories (pro refsets from the reference films; the 18 original rows unchanged); `pro_riser` in ENDS_ON_PEAK; `gather()` reads `<category>/final/` when present and skips `audition*.wav` / `_*.wav` (forge's made+ref audition file had polluted four areas' first runs); results_v2r2 |
