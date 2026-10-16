@@ -88,7 +88,7 @@ def test_zips_are_fast_exponential_sweeps(renders):
         m = rec.measure(x)
         assert m['length_s'] < 0.5, (fam, m)
         assert m['oct_span'] >= 1.3, (fam, m)
-        if rec.FAMILIES[fam]['shape'] != 'arc':
+        if families(rec)[fam]['shape'] != 'arc':
             assert 15 <= abs(m['oct_per_s']) <= 75, (fam, m)      # pro zips: 20-60 oct/s
         assert m['side_db'] < -12, (fam, m)                       # near mono
     f = rec.trajectory({**rec.DEFAULTS, 'shape': 'up', 'f0': 100.0, 'f1': 1600.0, 'bend': 0.0}, 4801)
@@ -112,3 +112,33 @@ def _differ(name, xs, keys):
     for i, a in enumerate(keys):
         for b in keys[i + 1:]:
             assert sound_dist(D[a], D[b]) >= 2.0, (name, a, b, sound_dist(D[a], D[b]))
+
+
+def test_round3_no_steady_lines_and_air(renders):
+    """round 3 (the judge: riser_05's steady 2.5 kHz metal line, riser_02's sub drone line; pro_riser heard as a
+    chiptune arpeggio; pro_zip a toy 'boing'): drones glide up with the build or become a noise rumble, the cymbal's
+    metal glides, the pro stutter builds carry their steps in filtered noise, the pro zips ride a noise band"""
+    rec = load_recipe('riser')
+    for k, p in rec.FAMILIES_BY_CAT['riser'].items():
+        assert p['drone_oct'] >= 0.5 or p['drone_db'] <= -40, k
+    assert rec.FAMILIES_BY_CAT['riser']['cymbal']['metal_glide'] >= 0.3
+    pro = rec.FAMILIES_BY_CAT['pro_riser']
+    assert sum(p['tmode'] == 'nblips' for p in pro.values()) >= 2
+    assert all(p['tmode'] != 'blips' and p.get('wave') != 'saw' or p['tone_db'] <= -12 for p in pro.values())
+    for k in pro:
+        x = renders['riser'][f'pro_riser:{k}']
+        assert rec.measure(x)['end_db'] > -6, k                    # still stops on its peak (the cut)
+    # the drone pitch really moves: its strongest low partial in the last fifth sits >= 0.4 oct above the first fifth
+    p = {**rec.FAMILIES_BY_CAT['riser']['tension'], 'noise_db': -36.0, 'tone_db': -36.0, 'oct_db': -36.0,
+         'drone_db': -3.0, 'drone_noise': 0.0, 'verb': 0.0}
+    x = render(rec, p, 3).mean(axis=1)
+    n = len(x) // 5
+
+    def lowpk(seg):
+        S = np.abs(np.fft.rfft(seg * np.hanning(len(seg))))
+        f = np.fft.rfftfreq(len(seg), 1 / SR)
+        sel = (f > 30) & (f < 200)
+        return f[sel][np.argmax(S[sel])]
+    assert np.log2(lowpk(x[-n:]) / lowpk(x[:n])) >= 0.4
+    z = load_recipe('zip')
+    assert all(v['noise_db'] > -20 for v in z.FAMILIES_BY_CAT['pro_zip'].values())

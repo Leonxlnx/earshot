@@ -49,6 +49,23 @@ penalties; why each weight:
 `weights=` overrides any W2 entry (weights={'tone': 0} to drop the tone term); tone= > 0 sets the tone weight (v1
 callers keep their meaning).
 
+Thin ref sets (category= / study=). Tone and envelope penalties are relative to the refs' own spread, which needs 3
+refs: with 0-2 (impact, logo_sting, riser, sub_drop, glitch, downlifter and most pro_* categories) tone_pen / env_pen
+were 0 and polish had no range, so the search was steered by CLAP and the artifact rules alone. Critic(category=...)
+adds absolute fallback targets for those categories (STUDY_TARGETS: docs/motion-sfx-study.md "Targets for synthesis
+recipes"; downlifter / glitch / logo_sting / riser / impact / sub_drop from the category definitions in refsets.py and
+the recipes' study rows), measured by study_measures(): band shares (tone.shares regions, dB of the total) go into
+tone_pen (1 per 6 dB outside the range, each capped at 2, sum at 3) when the row has no tone_ratio; length / attack /
+t20 / t40 (log2 octaves outside the range) and the peak position (1 per 25 % outside), each capped at 1.5, sum at 2,
+go into env_pen when the row has no env_ratio; stereo correlation (1 per 0.3 outside, capped at 1.5) goes into
+polish_pen when there are fewer than 3 refs. With 1-2 refs every range is first widened to take in the refs' own
+values (widen_targets; the other refs only when a ref is scored leave-one-out): the forge refs disagree with the
+films the study measured in places (pro_whoosh_big refs fall 20 dB in 16 ms, pro_click / riser refs are wide stereo
+trims). row['study'] keeps the measures, the targets used, the penalties and words. study= a {key: (lo, hi)} dict
+overrides the table (study={} switches the fallback off); without category= / study= nothing changes (round-2
+behaviour). gated= (default: category in GATED, designed mode only) lets a designed sound stop on a hard gate
+(polish.GATE_DB). forge() passes its refset category when it builds the critic itself.
+
 Fair comparison with the references: `score_refs()` scores every reference leave-one-out (its typicality, feature
 spread, tone, envelope and polish ranges are computed from the OTHER references), so a real recording is not its own
 nearest neighbour. With fewer than 3 other references there is no spread to compare with, and ref_typ_z / env_ratio
@@ -78,6 +95,107 @@ DESIGNED_WORDS = ('glitch', 'stutter', 'sub drop', 'sub-drop', 'subdrop', 'blip'
                   'downlifter', 'uplifter', 'stinger', 'logo sting', 'braam', 'laser', 'zap', 'notification', 'shimmer',
                   'bitcrush', 'digital')
 ENV_PASS, POLISH_PASS, TONE_PASS = 1.5, 1.5, 1.25
+GATED = ('glitch', 'pro_glitch', 'riser', 'pro_riser', 'zip', 'pro_zip', 'pro_impact')   # the stop is the design
+
+# absolute fallback targets per category (used only where the refs give no spread, see the module doc). Keys:
+# length s (active: first to last 10 ms frame within 50 dB of the loudest), attack / t20 / t40 ms (envelope_stats:
+# onset at -30 dB to the peak; peak to -20 / -40 dB), peak_frac (peak time / active length), sh150 / sh1k / sh4k /
+# sh12k / shhi (tone.shares '<150', '150-1k', '1-4k', '4-12k', '>12k' in dB of the total), corr (L/R correlation, 1 =
+# mono). Ranges are the study's numbers widened by about a third (one or two films measured per row).
+STUDY_TARGETS = {
+    'pro_whoosh_big': {'length': (0.5, 1.2), 'attack': (100, 350), 't20': (60, 160), 't40': (180, 400),
+                       'sh150': (-1.5, 0.0), 'corr': (0.8, 1.0)},
+    'riser': {'length': (1.0, 6.0), 'peak_frac': (0.7, 1.0), 't40': (0, 400), 'corr': (0.5, 1.0)},
+    'pro_riser': {'length': (0.8, 2.5), 'peak_frac': (0.75, 1.0), 't40': (0, 300), 'corr': (0.8, 1.0)},
+    'impact': {'length': (1.0, 8.0), 't40': (1000, 3000), 'sh150': (-2.5, -0.2)},
+    'pro_impact': {'length': (0.6, 1.3), 'attack': (40, 300), 't40': (250, 1100), 'sh150': (-1.25, 0.0),
+                   'corr': (-0.1, 0.6)},
+    'sub_drop': {'length': (0.8, 3.0), 'attack': (0, 450), 'sh150': (-1.0, 0.0), 'corr': (0.8, 1.0)},
+    'pro_sub_drop': {'length': (0.8, 1.6), 'attack': (250, 460), 't40': (600, 1600), 'sh150': (-0.7, 0.0),
+                     'corr': (0.8, 1.0)},
+    'logo_sting': {'length': (0.8, 2.5), 't40': (250, 1200), 'corr': (0.6, 1.0)},
+    'pro_logo_sting': {'length': (0.5, 1.5), 'attack': (0, 90), 't20': (30, 110), 't40': (150, 450),
+                       'corr': (0.9, 1.0)},
+    'glitch': {'length': (0.2, 1.5), 'sh150': (-200.0, -10.0), 'corr': (-0.3, 0.6)},
+    'pro_glitch': {'length': (0.3, 1.0), 'sh150': (-200.0, -12.0), 'sh12k': (-8.0, 0.0), 'corr': (-0.3, 0.4)},
+    'pro_shimmer': {'length': (1.4, 2.6), 'attack': (150, 800), 'sh150': (-200.0, -30.0), 'corr': (-0.2, 0.45)},
+    'pro_pop': {'length': (0.05, 0.2), 'attack': (0, 60), 't20': (3, 30), 'corr': (0.9, 1.0)},
+    'pro_tap': {'length': (0.06, 0.2), 'attack': (2, 15), 't20': (10, 30), 't40': (18, 50), 'corr': (0.85, 1.0)},
+    'pro_click': {'length': (0.02, 0.08), 'attack': (0, 4), 't20': (4, 20), 'sh150': (-200.0, -20.0),
+                  'sh12k': (-10.0, 0.0), 'corr': (0.9, 1.0)},
+    'pro_typing_run': {'sh150': (-200.0, -25.0), 'sh1k': (-200.0, -20.0), 'corr': (0.9, 1.0)},
+    'pro_zip': {'length': (0.12, 0.4), 'attack': (10, 50), 'corr': (0.85, 1.0)},
+    'downlifter': {'length': (1.0, 4.0), 'attack': (0, 80), 't40': (500, 3500), 'corr': (0.3, 1.0)},
+}
+STUDY_TARGETS['zip'] = STUDY_TARGETS['pro_zip']
+SHARE_KEYS = {'sh150': '<150', 'sh1k': '150-1k', 'sh4k': '1-4k', 'sh12k': '4-12k', 'shhi': '>12k'}
+
+
+def study_measures(x):
+    """the measures STUDY_TARGETS speaks in, for one 48 kHz sound (mono or stereo)"""
+    from .search import envelope_stats
+    from .tone import shares
+    xa = np.asarray(x, np.float64)
+    m = xa.mean(axis=1) if xa.ndim == 2 else xa
+    k = len(m) // 480
+    out = {}
+    if k >= 2:
+        e = 10 * np.log10((m[:k * 480].reshape(k, 480) ** 2).mean(1) + 1e-24)
+        act = np.nonzero(e > e.max() - 50)[0]
+        out['length'] = round(float((act[-1] - act[0] + 1) * 0.01), 3)
+        out['peak_frac'] = round(float((int(np.argmax(e)) - act[0] + 0.5) / (act[-1] - act[0] + 1)), 3)
+    env = envelope_stats(m)
+    out.update(attack=round(env['attack_ms'], 1), t20=round(env['t20_ms'], 1), t40=round(env['t40_ms'], 1))
+    sh = shares(m)
+    out.update({kk: sh[v] for kk, v in SHARE_KEYS.items()})
+    if xa.ndim == 2 and xa.shape[1] == 2:
+        a, b = xa[:, 0] - xa[:, 0].mean(), xa[:, 1] - xa[:, 1].mean()
+        den = float(np.sqrt((a * a).sum() * (b * b).sum()))
+        out['corr'] = round(float((a * b).sum() / den), 3) if den > 0 else 1.0
+    else:
+        out['corr'] = 1.0
+    return out
+
+
+def widen_targets(targets, ref_measures):
+    """the targets widened to take in every ref's own value (a trait the refs share is not a defect)"""
+    out = {}
+    for key, (lo, hi) in targets.items():
+        vals = [s[key] for s in ref_measures if s.get(key) is not None]
+        out[key] = (min([lo] + vals), max([hi] + vals))
+    return out
+
+
+def study_penalties(sm, targets):
+    """({'tone', 'env', 'polish'} fallback penalties, {key: penalty} off target, words) for measures sm"""
+    pen = {'tone': 0.0, 'env': 0.0, 'polish': 0.0}
+    off, words = {}, []
+    for key, (lo, hi) in targets.items():
+        v = sm.get(key)
+        if v is None:
+            continue
+        if key in SHARE_KEYS:
+            p, part = min(2.0, max(lo - v, v - hi, 0.0) / 6.0), 'tone'
+            say = f'{SHARE_KEYS[key]} share {v:+.1f} dB (target {lo:g}..{hi:g})'
+        elif key == 'corr':
+            p, part = min(1.5, max(lo - v, v - hi, 0.0) / 0.3), 'polish'
+            say = f'stereo corr {v:.2f} (target {lo:g}..{hi:g})'
+        elif key == 'peak_frac':
+            p, part = min(1.5, max(lo - v, v - hi, 0.0) / 0.25), 'env'
+            say = f'peak at {v:.0%} of the sound (target {lo:.0%}..{hi:.0%})'
+        else:
+            fl = 1e-3 if key == 'length' else 1.0                     # log ratios; ms below 1 count as 1
+            vv, lo_, hi_ = max(v, fl), max(lo, fl), max(hi, lo, fl)
+            p, part = min(1.5, max(np.log2(lo_ / vv), np.log2(vv / hi_), 0.0)), 'env'
+            u = ' s' if key == 'length' else ' ms'
+            say = f'{key} {v:g}{u} (target {lo:g}..{hi:g})'
+        if p > 0:
+            off[key] = round(float(p), 3)
+            pen[part] += float(p)
+            words.append(say)
+    pen = {'tone': round(min(3.0, pen['tone']), 3), 'env': round(min(2.0, pen['env']), 3),
+           'polish': round(min(1.5, pen['polish']), 3)}
+    return pen, off, ('study targets: ' + ', '.join(words)) if words else 'study targets met'
 
 
 def _mono(x):
@@ -92,6 +210,53 @@ def _stereo(x):
 
 def _fv(k, v):
     return np.log(max(v, 1e-3)) if k in LOG else float(v)
+
+
+_HOLD = {}
+
+
+def holdout_key(mono):
+    """cache key of one sound for Critic.holdout: sha1 of its mono float32 samples + the AudioSet model id"""
+    import hashlib
+    from .. import config
+    m = np.ascontiguousarray(mono, np.float32)
+    return config.AST_MODEL.replace('/', '--') + '/' + hashlib.sha1(m.tobytes()).hexdigest()
+
+
+def _holdout_dir():
+    from .. import config
+    return os.path.join(config.EMB_CACHE, 'forge_holdout')
+
+
+def _holdout_get(key):
+    if key in _HOLD:
+        return _HOLD[key]
+    p = os.path.join(_holdout_dir(), key + '.json')
+    if os.path.exists(p):
+        import json
+        try:
+            with open(p, encoding='utf-8') as fh:
+                v = json.load(fh)
+            v['audioset_top'] = [tuple(a) if isinstance(a, list) else a for a in v['audioset_top']]
+            _HOLD[key] = v
+            return v
+        except (OSError, ValueError, KeyError):
+            return None
+    return None
+
+
+def _holdout_put(key, v):
+    import json
+    _HOLD[key] = v
+    p = os.path.join(_holdout_dir(), key + '.json')
+    try:
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        tmp = p + f'.tmp{os.getpid()}'
+        with open(tmp, 'w', encoding='utf-8') as fh:
+            json.dump(v, fh)
+        os.replace(tmp, p)
+    except OSError:
+        pass
 
 
 def resolve_mode(mode, target, refs):
@@ -119,7 +284,7 @@ def total_v2(r, W=None, mode='real'):
 
 class Critic:
     def __init__(self, target, alts=(), refs=None, k=3, extra=None, tone=0.0, tone_target=None, mode='auto',
-                 version=2, weights=None):
+                 version=2, weights=None, category=None, study=None, gated=None):
         self.target, self.alts = target, list(alts or [])
         self.extra = extra
         self.tone, self.tone_target = float(tone), tone_target
@@ -133,6 +298,9 @@ class Critic:
         self.k = k
         self.refs = audio.list_media(refs, exts=audio.AUDIO_EXTS) if refs else []
         self.mode = resolve_mode(mode, target, self.refs)
+        self.category = category
+        self.study = dict(STUDY_TARGETS.get(category) or {}) if study is None else dict(study)
+        self.gated = (category in GATED) if gated is None else bool(gated)
         self.A_r, self.ref_feats, self.ref_stats, self.tone_ref, self.env_ref = None, [], {}, None, None
         xs = []
         if self.refs:
@@ -144,7 +312,8 @@ class Critic:
             self.ref_stats = self._stats(self.ref_feats)
             self.tone_ref = ToneRef(xs)
             self.env_ref = EnvRef(xs, names=self.refs)
-        self.polish_ref = polish.PolishRef(xs, designed=self.mode == 'designed')
+        self.polish_ref = polish.PolishRef(xs, designed=self.mode == 'designed',
+                                           gated=self.gated and self.mode == 'designed')
 
     @staticmethod
     def _stats(ref_feats):
@@ -268,6 +437,29 @@ class Critic:
         row['measures'] = {k: v for k, v in pm['measures'].items() if k not in ('res_peaks',)}
         row['art_pen'], row['polish_pen'], row['hard'] = pm['art_pen'], pm['polish_pen'], pm['hard']
         row['polish_words'] = pm['words']
+        self._study(x, row, ex)
+
+    def _study(self, x, row, ex):
+        """absolute fallback targets where the refs give no spread (module doc: thin ref sets), in place"""
+        n_refs = len(self.refs) - (ex is not None)
+        if not self.study or n_refs >= 3:
+            return
+        if getattr(self, '_ref_sm', None) is None:
+            self._ref_sm = [study_measures(audio.load(p)) for p in self.refs]
+        tg = widen_targets(self.study, [s for j, s in enumerate(self._ref_sm) if j != ex])
+        sm = study_measures(x)
+        pen, off, words = study_penalties(sm, tg)
+        used = {}
+        if row.get('tone_ratio') is None and pen['tone'] > 0:
+            row['tone_pen'] = round(row.get('tone_pen', 0.0) + pen['tone'], 3)
+            used['tone'] = pen['tone']
+        if row.get('env_ratio') is None and pen['env'] > 0:
+            row['env_pen'] = round(row.get('env_pen', 0.0) + pen['env'], 3)
+            used['env'] = pen['env']
+        if pen['polish'] > 0:
+            row['polish_pen'] = round(row.get('polish_pen', 0.0) + pen['polish'], 3)
+            used['polish'] = pen['polish']
+        row['study'] = {'measures': sm, 'targets': tg, 'off': off, 'pen': used, 'words': words}
 
     def _summary(self, r):
         bits = [f"match z {r['match_z']:+.2f}" + (f" (best alternative {r['alt_z']:+.2f})" if r['alt_z'] is not None else ''),
@@ -284,6 +476,8 @@ class Critic:
             bits.append(r['env']['words'])
         if r.get('polish_words'):
             bits.append(r['polish_words'])
+        if r.get('study') and r['study'].get('off'):
+            bits.append(r['study']['words'])
         return ('PASS ' if r['passes'] else '') + f"total {r['total']:.2f}: " + '; '.join(bits)
 
     def score_files(self, paths):
@@ -291,9 +485,18 @@ class Critic:
 
     def score_refs(self, loo=True):
         """the same critic's scores of the real references, in self.refs order. loo=True (fair): each reference is
-        compared with the OTHER references only; loo=False counts it as its own nearest neighbour (inflated)"""
+        compared with the OTHER references only; loo=False counts it as its own nearest neighbour (inflated).
+        Memoised per critic (a family run calls forge() once per member with one critic: the refs were re-embedded
+        and re-scored every time); the memo is keyed by loo, the weights, mode, version and the extra term"""
+        import copy
+        key = (bool(loo), tuple(sorted(self.W.items())), self.mode, self.version, id(self.extra), tuple(self.refs))
+        memo = getattr(self, '_ref_memo', None)
+        if memo is not None and memo[0] == key:
+            return copy.deepcopy(memo[1])
         xs = [audio.load(p) for p in self.refs]
-        return self.score(xs, exclude=list(range(len(xs))) if loo else None)
+        rows = self.score(xs, exclude=list(range(len(xs))) if loo else None)
+        self._ref_memo = (key, copy.deepcopy(rows))
+        return rows
 
     def consistency(self, xs):
         """loudness consistency of variants meant to be swapped in an edit: momentary-max LUFS per variant at its own
@@ -303,14 +506,25 @@ class Critic:
             out['refs'] = polish.loudness_spread(self.refs)
         return out
 
-    def holdout(self, xs):
+    def holdout(self, xs, cache=True):
         """checks that are NOT in the objective: AudioSet top labels and its synth-class probability (held out only
-        while they decide nothing: fix the selection rule before reading them)"""
-        from ..models import ast
-        t = ast.get()
-        P = t.probs([_mono(x) for x in xs])
-        out = []
-        for p in P:
-            synth = max(t.prob_of(p, lab) for lab in realness.AST_SYNTH if lab in t.index)
-            out.append({'audioset_top': t.top(p, 3), 'audioset_synth_max': round(float(synth), 3)})
-        return out
+        while they decide nothing: fix the selection rule before reading them). cache=True keeps each result by a
+        hash of the exact mono float32 samples (in memory and under EARSHOT_HOME/emb/forge_holdout/<model>/), so the
+        refs' tags, which every forge() call used to recompute, cost nothing after the first run"""
+        out = [None] * len(xs)
+        monos = [np.ascontiguousarray(_mono(x), np.float32) for x in xs]
+        keys = [holdout_key(m) for m in monos] if cache else [None] * len(xs)
+        for i, k in enumerate(keys):
+            if k is not None:
+                out[i] = _holdout_get(k)
+        todo = [i for i, o in enumerate(out) if o is None]
+        if todo:
+            from ..models import ast
+            t = ast.get()
+            P = t.probs([monos[i] for i in todo])
+            for i, p in zip(todo, P):
+                synth = max(t.prob_of(p, lab) for lab in realness.AST_SYNTH if lab in t.index)
+                out[i] = {'audioset_top': t.top(p, 3), 'audioset_synth_max': round(float(synth), 3)}
+                if keys[i] is not None:
+                    _holdout_put(keys[i], out[i])
+        return [dict(o) for o in out]

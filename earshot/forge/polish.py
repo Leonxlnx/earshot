@@ -22,9 +22,16 @@ Artifacts (`measure` keys):
               that starts or ends off zero clicks when played)
   fold        aliasing / foldover: in clearly harmonic frames (4096-point STFT; >= 70 % of the 60 Hz - 4 kHz energy
               within +-2 bins of one harmonic grid, f0 150 Hz - 3 kHz, refined by least squares on the low partials),
-              the share of the 4-20 kHz energy that lies off the grid. Each harmonic's window is widened by its sweep
-              smear (from the f0 change between frames); harmonics whose window would exceed half the spacing are not
-              judged. A naive (non band-limited) oscillator folds its upper partials back between the harmonics.
+              the share of the 4-20 kHz energy in spectral PEAKS where a naive oscillator's partials above Nyquist fold
+              back (k f0 mirrored at multiples of 48 kHz, off the grid). A peak counts when it stands 10 dB over the
+              local floor (median over ~750 Hz) and over the neighbouring harmonic's window leakage, is no louder than
+              6 dB over the grid's strongest partial in the band's top half (an alias of partial k is weaker than the
+              partials below it), and when half of the first-fold positions in that frame show one (a family). Each
+              window is widened by its sweep smear (from the f0 change between frames); harmonics whose window would
+              exceed half the spacing are not judged. Round 2 counted ALL off-grid energy (aliasing(legacy=True)): a
+              noise layer under a harmonic tone (downlifter synth_fall 0.47) and inharmonic bell partials over a
+              chance grid (notify / shimmer / logo_sting 0.4-0.99) read as aliasing; they now measure 0-0.08 while a
+              naive 440 Hz saw keeps 0.057 (FM run without oversampling, logo_sting_01, still 0.53: real foldover).
               Noise, modal and inharmonic sounds have no grid and are not judged.
               nyq_db: energy share above 20 kHz (recordings roll off; naive oscillators and white noise do not)
   dc_db       |mean| re the peak; infra_db: energy share below 15 Hz (a one-sided puff, an offset, drift)
@@ -38,10 +45,16 @@ Artifacts (`measure` keys):
               median where the refs move (median >= 1.5 dB); penalty 2 x the relative shortfall
   ring_z      comb-like metallic ringing in the tail (from 30 ms after the peak to -50 dB): cepstral peak of the
               tail's log spectrum (300 Hz - 12 kHz, trend removed) at 2-40 ms quefrency, as a robust z against the
-              rest of that range; ring_ms its delay. A dense natural tail has no repeating delay
+              rest of that range; ring_ms its delay. A dense natural tail has no repeating delay. Not judged (None,
+              ring_src 'narrow' / 'pitch', ring_raw_z the raw z): a tail narrower than 2 kHz (a sub drop's few low
+              partials over an empty band put z 120-390 at the 2 ms edge) and a tail whose delay is the sound's own
+              pitch (its partial levels are smooth, median 2nd difference <= 2 dB, where noise-fed comb teeth scatter
+              6-7 dB; or a body around the peak periodic at the same delay, z >= 100: buzzy hums z 35-1000 before)
   trunc_db    a truncated tail: the level re the peak at which the decay was cut (the last 10 ms if the sound was
               still decaying there, or the level before a final fade that falls much faster than the decay before
-              it); None when the sound reaches -55 dB or its own floor
+              it); None when the sound reaches -55 dB or its own floor. Designed mode allows a gate once the level
+              is 30 dB down (GATE_DB); gated=True (glitch, riser, zip, pro_impact: the stop is the design) allows it
+              from 12 dB down and never makes it hard
   silence_ms  digital silence inside the sound (runs of |x| < 1e-6 of >= 2 ms between the first and last audible
               sample), total ms; a recording always has a floor, a gap of exact zeros is an edit or a gate
   clip_runs   runs of >= 3 equal samples at the peak (flat tops), per channel; overs: samples beyond 1.0
@@ -59,7 +72,9 @@ recordings share is not a defect), or for the relative-only measures (attack, on
 the refs alone (dB margins widen to a quarter of the refs' own range: 3-6 diverse refs pin a range down loosely);
 penalty = min(cap, excess / scale) (log2 ratios for times). 'hard' artifacts at penalty >= 0.5 are listed
 in check()['hard'] and fail the critic's `passes`; designed=True (glitch, stutter) makes clicks and digital silence
-soft at half weight. art_pen = sum of artifact penalties; polish_pen = sum of polish penalties.
+soft at half weight and allows gates (trunc_db, GATE_DB); gated=True loosens the gate further. targets= {polish key:
+(lo, hi)} stands in for the refs' range of a relative polish measure when fewer than 2 refs carry it (the critic's
+absolute STUDY_TARGETS). art_pen = sum of artifact penalties; polish_pen = sum of polish penalties.
 """
 import numpy as np
 
@@ -158,9 +173,18 @@ def _f0(P, Pw, f, c0, low, G):
     return float((ws * hs * fs).sum() / (ws * hs * hs).sum()), float(on[i])
 
 
-def aliasing(x, nfft=4096, hop=1024, frames=64):
-    """fold: in clearly harmonic frames, the share of the 4-20 kHz energy that lies OFF the harmonic grid (each
-    harmonic's window widened by its sweep smear); nyq_db: energy share above 20 kHz"""
+ALIAS_PEAK_DB = 10.0       # an alias line must stand this far above the local floor (median over ~750 Hz)
+ALIAS_FAMILY = 0.5         # ... and this share of the judged alias positions must show one (a family, not a partial)
+ALIAS_LOUDEST = 4.0        # ... and be no louder than 6 dB over the grid's strongest partial in the band's top half
+
+
+def aliasing(x, nfft=4096, hop=1024, frames=64, legacy=False):
+    """fold: in clearly harmonic frames, the share of the 4-20 kHz energy in spectral PEAKS at the positions where a
+    naive oscillator's partials above Nyquist fold back (k f0 mirrored at multiples of 48 kHz, off the harmonic grid,
+    each window widened by its sweep smear); nyq_db: energy share above 20 kHz. A peak counts only when it stands
+    ALIAS_PEAK_DB over the local floor and at least ALIAS_FAMILY of the judged alias positions in that frame show one:
+    a noise layer under a harmonic tone (no lines) or an inharmonic bell partial that happens to sit near one alias
+    position (no family) is not aliasing. legacy=True: the round-2 measure (all off-grid 4-20 kHz energy)."""
     m = _mono(x)
     S = _stft(m, nfft, hop)
     f = np.fft.rfftfreq(nfft, 1 / SR)
@@ -178,14 +202,16 @@ def aliasing(x, nfft=4096, hop=1024, frames=64):
     C = np.cumsum(S, axis=1)
     num = den = 0.0
     harm = 0
+    from scipy.ndimage import median_filter
     for t, r in f0.items():
         if r is None:
             continue
         nb = [f0.get(t + d) for d in (-1, 1)]
         rates = [abs(q[0] - r[0]) / (hop / SR) for q in nb if q is not None]
         rate = max(rates) if rates else 0.0                               # Hz / s of the fundamental
+        smear = 0.5 * rate * (nfft / SR) / df                              # extra half-width in bins per harmonic
         hs = np.arange(int(np.ceil(4000 / r[0])), int(20000 / r[0]) + 1)
-        hw = 2 + 0.5 * hs * rate * (nfft / SR) / df                        # half-width in bins, with smear
+        hw = 2 + hs * smear                                                # half-width in bins, with smear
         ok = 2 * hw * df < 0.5 * r[0]
         if not ok.any() or not ok[0]:
             continue
@@ -198,12 +224,57 @@ def aliasing(x, nfft=4096, hop=1024, frames=64):
         th = C[t, b1] - C[t, b0]
         if b1 - b0 < 20 or th < 1e-3 * C[t, -1]:
             continue
-        k = hs * r[0] / df
-        lo = np.clip(np.floor(k - hw).astype(int), b0, b1)
-        hi = np.clip(np.ceil(k + hw).astype(int), b0, b1)
-        on = float((C[t, hi] - C[t, lo]).sum())
+        if legacy:
+            k = hs * r[0] / df
+            lo = np.clip(np.floor(k - hw).astype(int), b0, b1)
+            hi = np.clip(np.ceil(k + hw).astype(int), b0, b1)
+            on = float((C[t, hi] - C[t, lo]).sum())
+            harm += 1
+            num += (1.0 - min(1.0, on / th)) * th
+            den += th
+            continue
+        ka = np.arange(int(SR / 2 / r[0]) + 1, int(4 * SR / r[0]) + 1)    # partials above Nyquist (to 4 x SR)
+        fa = np.abs(np.mod(ka * r[0] + SR / 2, SR) - SR / 2)               # where they fold back to
+        aw = 1 + ka * smear
+        sel = (fa >= 4000) & (fa <= top)
+        ka, fa, aw = ka[sel], fa[sel], aw[sel]
+        hn = np.maximum(1, np.rint(fa / r[0]))                             # nearest harmonic and its window
+        hwn = 2 + hn * smear
+        gap = np.abs(fa - hn * r[0]) / df
+        judge = gap >= hwn + 1.0                                           # the alias centre is off the grid window
+        first = ka < SR / r[0]                                             # the first fold: the strongest aliases
+        if (judge & first).sum() < 4:
+            continue
+        ka, fa, hn, hwn, gap, first = ka[judge], fa[judge], hn[judge], hwn[judge], gap[judge], first[judge]
+        aw = np.minimum(aw[judge], np.maximum(0.5, gap - hwn - 0.5))      # never reach into the harmonic window
+        seg = S[t, b0:b1 + 1]
+        fl = median_filter(seg, size=65, mode='nearest')                  # the local floor
+        kb = fa / df - b0
+        lo = np.clip(np.ceil(kb - aw).astype(int), 0, b1 - b0)
+        hi = np.clip(np.floor(kb + aw).astype(int), 0, b1 - b0)
+        kh = hn * r[0] / df - b0                                           # the neighbouring harmonic's own peak
+        hlo = np.clip(np.floor(kh - hwn).astype(int), 0, b1 - b0)
+        hhi = np.clip(np.ceil(kh + hwn).astype(int), 0, b1 - b0)
+        up = hs * r[0] >= 0.5 * top                                       # an alias is never louder than the
+        kk = hs[up] * r[0] / df - b0                                      # grid's own partials near the top
+        href = max([float(seg[max(0, int(np.floor(c - w))):int(np.ceil(c + w)) + 1].max(initial=0.0))
+                    for c, w in zip(kk, hw[up])], default=0.0)
+        exc, peaks, nf = 0.0, 0, 0
+        for j in range(len(lo)):
+            a, b = int(lo[j]), int(max(lo[j], hi[j]))
+            w = seg[a:b + 1]
+            hp = float(seg[hlo[j]:hhi[j] + 1].max()) if hhi[j] >= hlo[j] else 0.0
+            d = max(2.5, gap[j] - hwn[j] + 2.0)                            # Hann sidelobes: -31.5 dB at 2.5 bins,
+            leak = hp * 10 ** ((-31.5 - 18 * np.log2(d / 2.5)) / 10)       # -18 dB / octave beyond
+            thr = 10 ** (ALIAS_PEAK_DB / 10) * max(float(fl[(a + b) // 2]), leak)
+            hit = bool(len(w)) and thr < float(w.max()) <= ALIAS_LOUDEST * href
+            if first[j]:
+                nf += 1
+                peaks += int(hit)
+            if hit:
+                exc += max(0.0, float(w.sum()) - float(fl[(a + b) // 2]) * len(w))
         harm += 1
-        num += (1.0 - min(1.0, on / th)) * th
+        num += min(th, exc) * min(1.0, peaks / max(1, nf) / ALIAS_FAMILY)
         den += th
     fold = num / den if den > 0 and harm >= 2 else 0.0
     return {'fold': round(float(fold), 3), 'harmonic_frames': harm, 'nyq_db': round(float(nyq), 1)}
@@ -271,8 +342,45 @@ def evolution(x, G=None):
     return {'evolution_db': round(float((ch * w).sum() / w.sum()), 2), 'centroid_oct': round(float(hi - lo), 2)}
 
 
-def ring(x):
-    """comb-like periodicity of the tail: cepstral peak z at 2-40 ms quefrency (None when the tail is too short)"""
+RING_SPAN_HZ = 2000.0      # a comb needs this much tail bandwidth (within 40 dB of its loudest, 300 Hz - 12 kHz)
+RING_PITCH_Z = 100.0       # a body this periodic at the tail's delay (+-30 %, or 2x / 3x) is the sound's own pitch
+RING_SMOOTH_DB = 2.0       # tail partials this smooth (median 2nd difference of their levels) are an oscillator
+
+
+def _cepstrum_peak(seg, span=False):
+    """robust z (and quefrency in ms) of the largest cepstral peak at 2-40 ms of one segment's log spectrum (300 Hz -
+    12 kHz, 2 kHz trend removed); with span=True also the bandwidth (Hz) where the 2 kHz-smoothed spectrum lies within
+    40 dB of its loudest. None when the segment is too short to resolve the range"""
+    N = 8192 if len(seg) <= 8192 else 16384
+    L = 10 * np.log10(np.abs(np.fft.rfft(seg * np.hanning(len(seg)), N)) ** 2 + 1e-30)
+    f = np.fft.rfftfreq(N, 1 / SR)
+    sel = (f >= 300) & (f <= 12000)
+    df = f[1]
+    from scipy.ndimage import uniform_filter1d
+    Lc = np.maximum(L[sel], L[sel].max() - 60)
+    trend = uniform_filter1d(Lc, max(3, int(2000 / df)), mode='nearest')
+    r = Lc - trend
+    C = np.abs(np.fft.rfft(r * np.hanning(len(r))))
+    q = np.arange(len(C)) / (len(r) * df)
+    band = (q >= 0.002) & (q <= 0.04)
+    if band.sum() < 8:
+        return None
+    c = C[band]
+    mad = np.median(np.abs(c - np.median(c))) * 1.4826 + 1e-12
+    j = int(np.argmax(c))
+    out = (float((c[j] - np.median(c)) / mad), float(q[band][j] * 1000))
+    if span:
+        sm = uniform_filter1d(L[sel], max(3, int(2000 / df)), mode='nearest')
+        out += (float((sm > sm.max() - 40).sum() * df),)
+    return out
+
+
+def ring(x, legacy=False):
+    """comb-like periodicity of the tail: cepstral peak z at 2-40 ms quefrency (None when the tail is too short).
+    Not judged (ring_z None, ring_src says why): a tail narrower than RING_SPAN_HZ ('narrow': a sub drop's few low
+    partials over an empty band put a huge z at the 2 ms edge) or a tail whose delay is the sound's own pitch ('pitch':
+    the body around the peak is periodic at the same delay, z >= RING_PITCH_Z: a buzzy hum, a pitched tone). A comb
+    on a noise burst's tail, or on a pitched body at another delay, is still flagged. legacy=True: round 2."""
     m = _mono(x)
     e = _fdb(m, 480)
     ip = int(np.argmax(e))
@@ -282,23 +390,40 @@ def ring(x):
     if end - s < 6:
         return {'ring_z': None, 'ring_ms': None}
     seg = m[s * 480:end * 480][:16384]
-    N = 8192 if len(seg) <= 8192 else 16384
-    L = 10 * np.log10(np.abs(np.fft.rfft(seg * np.hanning(len(seg)), N)) ** 2 + 1e-30)
-    f = np.fft.rfftfreq(N, 1 / SR)
-    sel = (f >= 300) & (f <= 12000)
-    Lc = np.maximum(L[sel], L[sel].max() - 60)
-    df = f[1]
-    from scipy.ndimage import uniform_filter1d
-    r = Lc - uniform_filter1d(Lc, max(3, int(2000 / df)), mode='nearest')
-    C = np.abs(np.fft.rfft(r * np.hanning(len(r))))
-    q = np.arange(len(C)) / (len(r) * df)
-    band = (q >= 0.002) & (q <= 0.04)
-    if band.sum() < 8:
+    got = _cepstrum_peak(seg, span=True)
+    if got is None:
         return {'ring_z': None, 'ring_ms': None}
-    c = C[band]
-    mad = np.median(np.abs(c - np.median(c))) * 1.4826 + 1e-12
-    j = int(np.argmax(c))
-    return {'ring_z': round(float((c[j] - np.median(c)) / mad), 1), 'ring_ms': round(float(q[band][j] * 1000), 2)}
+    z, ms, bw = got
+    out = {'ring_z': round(z, 1), 'ring_ms': round(ms, 2)}
+    if legacy or z < 8.0:
+        return out
+    if bw < RING_SPAN_HZ:
+        return {'ring_z': None, 'ring_ms': round(ms, 2), 'ring_raw_z': round(z, 1), 'ring_src': 'narrow'}
+    pitch = _teeth_roughness(seg, ms) <= RING_SMOOTH_DB                  # deterministic partials, not noisy teeth
+    if not pitch:
+        body = m[max(0, (ip - 2) * 480):(ip + 6) * 480]
+        bp = _cepstrum_peak(body) if len(body) >= 1920 else None
+        if bp is not None and bp[0] >= RING_PITCH_Z:
+            ratio = ms / bp[1]
+            pitch = any(abs(ratio / k - 1) < (0.3 if k == 1 else 0.1) for k in (1, 2, 3, 0.5, 1 / 3))
+    if pitch:
+        return {'ring_z': None, 'ring_ms': round(ms, 2), 'ring_raw_z': round(z, 1), 'ring_src': 'pitch'}
+    return out
+
+
+def _teeth_roughness(seg, ms, N=16384):
+    """median |2nd difference| (dB) of the peak levels at the multiples of 1 / delay (300 Hz - 12 kHz, within 50 dB
+    of the loudest bin): an oscillator's partials follow a smooth envelope (0.1-1.4 dB on buzzy hums), the teeth of a
+    comb fed with noise scatter like the noise (6-7 dB); inf with fewer than 8 teeth"""
+    L = 10 * np.log10(np.abs(np.fft.rfft(seg * np.hanning(len(seg)), N)) ** 2 + 1e-30)
+    df = SR / N
+    f0 = 1000.0 / ms
+    ks = np.arange(max(1, int(np.ceil(300 / f0))), int(12000 / f0) + 1)
+    lv = np.array([L[max(0, int(k * f0 / df) - 2):int(k * f0 / df) + 3].max() for k in ks])
+    lv = lv[lv > L.max() - 50]
+    if len(lv) < 8:
+        return np.inf
+    return float(np.median(np.abs(np.diff(lv, 2))))
 
 
 def truncated(x):
@@ -469,15 +594,20 @@ POLISH = (('attack_ms',  +1,  'log', 1.5, 1.0),                   # slower than 
           ('t40_ms',     -1,  'log', 0.6, 1.0),                   # tail shorter than 0.6 x the refs' shortest
           ('crest_db',   +1,  'db', 2.0, 4.0))                    # thinner than the refs' thinnest + 2 dB
 HARD_AT = 0.5
+GATE_DB = {'designed': -30.0, 'gated': -12.0}   # designed mode: a tail may stop once it is 30 dB down (a gate, not a
+                                                # cut); gated categories (glitch, riser, zip, pro_impact): a gate
+                                                # anywhere 12 dB under the peak is the design, soft at most
 
 
 class PolishRef:
     """the refs' artifact and polish numbers, and a check of any sound against them (or absolute limits alone)"""
 
-    def __init__(self, refs=(), designed=False):
+    def __init__(self, refs=(), designed=False, gated=False, targets=None):
         self.M = [measure(_load(r)) for r in refs]
         self.n = len(self.M)
         self.designed = designed
+        self.gated = bool(gated)
+        self.targets = dict(targets or {})          # {polish key: (lo, hi)}: stands in for refs when < 2 refs
 
     def _vals(self, key, keep):
         v = [self.M[j].get(key) for j in keep]
@@ -503,6 +633,11 @@ class PolishRef:
                 p = min(cap, max(0.0, (v - lim) / scale))
             if self.designed and key in ('clicks', 'silence_ms'):
                 kind, p = 'soft', 0.5 * p
+            if self.designed and key == 'trunc_db':       # a gate after the level has already fallen is a choice
+                lim = max(lim, GATE_DB['gated' if self.gated else 'designed'])
+                p = min(cap, max(0.0, (v - lim) / scale))
+                if self.gated:
+                    kind = 'soft'
             limits[key] = round(lim, 2)
             if p > 0:
                 pens[key] = round(p, 3)
@@ -515,6 +650,8 @@ class PolishRef:
             rv = self._vals(key, keep)
             if v is None:
                 continue
+            if key != 'bump_db' and len(rv) < 2 and key in self.targets:    # absolute fallback (critic
+                rv = [float(a) for a in self.targets[key]]                       # STUDY_TARGETS) for < 2 refs
             if key == 'bump_db':
                 lim = max(4.0, max(rv) + margin) if rv else 4.0
                 p = (v - lim) / scale

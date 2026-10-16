@@ -22,11 +22,15 @@ Styles (`style`):
   'bell'     a struck modal bell / glass / celesta / glock bar ringing out (`partials`), 0.6-1.8 s
 CHARACTER parameters (what a family varies on purpose): f0 (the note), hold (head length), body_db / body_ratio /
 trem_hz (the body), bright (the 3.4x partial), length, width; for 'bell': partials, decay, hardness.
-FAMILY[refset] = 5 hand-designed palette members (pro_notify: the semitone ladder + a success + a glass variant;
-notify: celesta / glass / glock / bowl / two-note bell). The forge tunes the fine parameters of each member with the
-character ones fixed (family_space()). The delivered (round-2) tuned members are in out/forge_v2/<refset>/final/
-report.json (picks[i]['family_params']) and in the seed bank; FAMILY['notify'] already holds the round-3 proposal
-(shorter decays, harder mallets) that no forge run has scored yet.
+FAMILY[refset] = the hand-designed palette members (pro_notify: the semitone ladder + a success + a glassy variant;
+notify: celesta / glass / glock bar / small bell / kalimba tine / high celesta). The forge tunes the fine parameters of
+each member with the character ones fixed (family_space()). Round 3 (forge v2, after the round-2 judge): the pro ding's
+head is clean (`head_drive` 0: round 2's drive made a harmonic comb that CLAP heard as 'a cheap synthesized beep') and
+gets a struck bar's fast upper modes (`p3`), a breath of band noise (`air`) and a louder body that rings down; the
+real-style bells are an octave or two lower (440-1319 Hz), with strike modes (`strike`) and an early fast decay
+(`early_db`) over a ring that decays on its own (t40 1.3-2.0 s). The delivered members (tuned where a run tuned them)
+are in out/forge_v2/<refset>/final/report.json (picks[i]['family_params']) and in the seed bank; round 2's in
+final_r2/.
 
 Helpers shared with the other tonal recipes (pop, shimmer): measure(x) = the pro-study measurements (attack, t20 / t40,
 band shares, tilt, stereo correlation, head pitch, ridge sweep) and pro_penalty(x, targets) = how far a render falls
@@ -90,6 +94,18 @@ SPACE = {
     'hard': (0.0, 1.0),               # mallet hardness (strike brightness)
     'beat': (0.3, 4.0, 'log'),
     'room': (0.0, 0.3),
+    # round 3 (the judge: no strike transient, the ring decays too evenly, members 1-2 octaves too high)
+    'early_db': (0.0, 18.0),          # bell: an early fast decay (dB lost in the first ~0.1 s on top of the ring)
+    'early_tau': (0.02, 0.12, 'log'),
+    'head_drive': (-1.0, 9.0),        # ding: drive on the head alone (< 0: the same as `drive`, as in round 2); the
+                                      # round-2 drive made a comb of harmonics up to 20 kHz: CLAP's 'cheap beep'
+    'air': (-60.0, -10.0),            # ding: a breath of band noise (3-14 kHz) under the head, dB re head: the
+                                      # films' upper bands are full, but with noise, not a harmonic comb
+    'air_tau': (0.02, 0.2, 'log'),
+    'p3': (0.0, 0.5),                 # ding: extra inharmonic head partials (2.76x, 5.4x: a struck bar's modes)
+    'p3_tau': (0.008, 0.06, 'log'),   # ... that die fast (a natural strike, not a static beep)
+    'strike': (-60.0, -4.0),          # bell: strike modes (high inharmonic partials dying in 10-40 ms), dB re ring
+    'strike_tau': (0.006, 0.04, 'log'),
 }
 
 PARTIALS = {   # ratios, amplitudes
@@ -106,7 +122,8 @@ DEFAULTS = {'style': 'ding', 'f0': 1822.0, 'att': 0.003, 'step_db': -30.0, 'hold
             'body_tau': 0.3, 'body_p3': 0.45, 'body_p7': 0.6, 'trem_hz': 24.0, 'trem': 0.55, 'drive': 3.0,
             'verb': 0.12, 'rt60': 0.3, 'width': 0.8, 'head_width': 0.15, 'length': 0.26, 'fade': 0.07, 'hp': 550.0, 'interval': 7,
             'gap': 0.085, 'second_db': -2.0, 'partials': 'celesta', 'decay': 0.8, 'slope': 0.8, 'hard': 0.4,
-            'beat': 1.0, 'room': 0.12}
+            'beat': 1.0, 'room': 0.12, 'early_db': 0.0, 'early_tau': 0.05, 'strike': -60.0, 'strike_tau': 0.015, 'head_drive': -1.0, 'air': -60.0,
+            'air_tau': 0.06, 'p3': 0.0, 'p3_tau': 0.02}
 
 
 def _fam(**kw):
@@ -116,30 +133,66 @@ def _fam(**kw):
 _LADDER = [1822.0 * SEMI ** k for k in range(5)]      # 1822, 1930, 2045, 2167, 2296 Hz
 FAMILY = {
     # the pro palette: one patch, five members a listener can tell apart (pitch step, head length, body, motif)
-    'pro_notify': [
-        _fam(f0=_LADDER[0]),                                                            # the film ding
-        _fam(f0=_LADDER[1], hold=0.022, body_ratio=1.0, body_db=-25.0, trem=0.2, bright=0.55, length=0.22),
-        _fam(style='success', f0=_LADDER[0], interval=7, hold=0.026, length=0.38, body_db=-25.0),
-        _fam(f0=_LADDER[2], hold=0.04, bright=0.15, body_db=-21.0, body_tau=0.4, width=1.0, length=0.33,
-             trem_hz=18.0),
-        _fam(f0=_LADDER[3], hold=0.018, bright=0.8, p2=3.5, body_ratio=1.5, trem=0.7, trem_hz=30.0, length=0.2),
+    'pro_notify': [   # round 3: from the round-2 tuned members, minus the 'cheap beep': a clean head (no drive
+                      # comb) with a struck bar's fast upper modes, a breath of noise, a tiny strike, a louder body
+                      # that rings down naturally (exponential, not flat-then-gated)
+        _fam(style='success', f0=_LADDER[0], interval=7, att=0.002, step_db=-28.0, hold=0.026, hold_tau=0.05,
+             drop_db=-12.0, drop_ms=12.0, ring_tau=0.07, bright=0.3, p2=3.4, oct=0.12, detune=0.6, tick_db=-26.0,
+             tick_f=9000.0, body_db=-20.0, body_ratio=0.5, body_in=0.02, body_tau=0.14, body_p3=0.5, body_p7=0.3,
+             trem=0.45, trem_hz=24.0, drive=2.0, head_drive=0.0, air=-19.0, air_tau=0.05, p3=0.3, p3_tau=0.02,
+             verb=0.22, rt60=0.3, width=0.8, head_width=0.25, length=0.4, fade=0.05, hp=500.0, gap=0.06,
+             second_db=-1.5),                                                               # success: root + fifth
+        _fam(f0=_LADDER[2], att=0.002, step_db=-30.0, hold=0.036, hold_tau=0.1, drop_db=-14.0, drop_ms=8.0,
+             ring_tau=0.06, bright=0.2, p2=3.55, oct=0.15, detune=2.0, tick_db=-24.0, tick_f=9000.0, body_db=-18.0,
+             body_ratio=0.5, body_in=0.015, body_tau=0.16, body_p3=0.7, body_p7=0.45, trem=0.5, trem_hz=18.0,
+             drive=3.0, head_drive=0.0, air=-18.0, air_tau=0.06, p3=0.25, p3_tau=0.025, verb=0.22, rt60=0.3,
+             width=1.0, head_width=0.3, length=0.34, fade=0.06, hp=450.0),                  # 2045 Hz, long body
+        _fam(f0=_LADDER[0], att=0.0015, step_db=-22.0, hold=0.03, hold_tau=0.1, drop_db=-13.0, drop_ms=6.0,
+             ring_tau=0.05, bright=0.35, p2=3.44, oct=0.05, detune=1.0, tick_db=-22.0, tick_f=7000.0,
+             body_db=-19.0, body_ratio=0.5, body_in=0.006, body_tau=0.13, body_p3=0.45, body_p7=0.3, trem=0.55,
+             trem_hz=24.0, drive=3.0, head_drive=0.0, air=-17.0, air_tau=0.04, p3=0.35, p3_tau=0.018, verb=0.12,
+             rt60=0.35, width=0.8, head_width=0.2, length=0.28, fade=0.05, hp=600.0),        # the film ding 1822 Hz
+        _fam(f0=_LADDER[1], att=0.002, step_db=-34.0, hold=0.022, hold_tau=0.2, drop_db=-12.0, drop_ms=8.0,
+             ring_tau=0.045, bright=0.5, p2=3.46, oct=0.05, detune=0.5, tick_db=-25.0, tick_f=9500.0,
+             body_db=-20.0, body_ratio=1.0, body_in=0.02, body_tau=0.12, body_p3=0.7, body_p7=0.2, trem=0.25,
+             trem_hz=24.0, drive=3.0, head_drive=0.0, air=-19.0, air_tau=0.05, p3=0.2, p3_tau=0.015, verb=0.3,
+             rt60=0.3, width=0.8, head_width=0.2, length=0.26, fade=0.06, hp=520.0),        # 1930 Hz, same-pitch body
+        _fam(f0=_LADDER[3], att=0.003, step_db=-20.0, hold=0.018, hold_tau=0.05, drop_db=-12.0, drop_ms=5.0,
+             ring_tau=0.04, bright=0.7, p2=3.3, oct=0.08, detune=0.8, tick_db=-26.0, tick_f=8000.0, body_db=-20.0,
+             body_ratio=1.5, body_in=0.011, body_tau=0.12, body_p3=0.6, body_p7=0.4, trem=0.6, trem_hz=30.0,
+             drive=3.0, head_drive=0.0, air=-18.0, air_tau=0.035, p3=0.25, p3_tau=0.012, verb=0.16, rt60=0.5,
+             width=0.8, head_width=0.25, length=0.24, fade=0.05, hp=450.0),                 # 2167 Hz, glassy
     ],
     # real-style notification bells: struck, ringing out
-    'notify': [   # round 3: a bright strike that dies fast over a shorter ring (round 2 rang flat, then faded)
-        _fam(style='bell', f0=1568.0, partials='celesta', decay=0.45, slope=1.1, hard=0.75, length=1.2, room=0.12),
-        _fam(style='bell', f0=1175.0, partials='glass', decay=0.55, slope=1.1, hard=0.8, length=1.4, room=0.15),
-        _fam(style='bell', f0=2093.0, partials='bar', decay=0.35, slope=1.0, hard=0.85, length=0.9, room=0.1),
-        _fam(style='bell', f0=659.0, partials='bowl', decay=0.8, slope=0.9, hard=0.6, length=1.7, room=0.15,
-             hp=200.0),
-        _fam(style='bell', f0=1319.0, partials='tine', decay=0.4, slope=1.1, hard=0.7, length=1.1, room=0.1,
-             hp=300.0),
+    'notify': [   # round 3: lower notes (the bench bells sit 150 Hz-1 kHz; round 2 rang 1-2 octaves above), a
+                  # strike transient, an early fast decay over a longer ring (t40 x 0.63 in round 2)
+        _fam(style='bell', f0=523.25, partials='celesta', decay=0.5, slope=1.0, hard=0.7, early_db=8.0,
+             early_tau=0.05, strike=-14.0, strike_tau=0.015, beat=0.8, length=2.3, room=0.12, hp=180.0,
+             tick_db=-26.0, drive=1.0, width=0.2),                                          # celesta C5
+        _fam(style='bell', f0=880.0, partials='glass', decay=0.42, slope=1.1, hard=0.75, early_db=7.0,
+             early_tau=0.04, strike=-12.0, strike_tau=0.012, beat=1.6, length=2.0, room=0.15, hp=300.0,
+             tick_db=-24.0, drive=1.0, width=0.2),                                          # glass clink A5
+        _fam(style='bell', f0=783.99, partials='bar', decay=0.38, slope=1.0, hard=0.85, early_db=8.0,
+             early_tau=0.035, strike=-10.0, strike_tau=0.01, beat=1.0, length=1.8, room=0.1, hp=300.0,
+             tick_db=-22.0, drive=1.5, width=0.2),                                          # glock bar G5
+        _fam(style='bell', f0=440.0, partials='bowl', decay=0.6, slope=0.9, hard=0.6, early_db=10.0,
+             early_tau=0.07, strike=-16.0, strike_tau=0.02, beat=1.2, length=2.5, room=0.15, hp=150.0,
+             tick_db=-30.0, drive=1.0, width=0.25),                                         # small bell A4
+        _fam(style='bell', f0=587.33, partials='tine', decay=0.36, slope=1.1, hard=0.65, early_db=5.0,
+             early_tau=0.04, strike=-18.0, strike_tau=0.012, beat=0.6, length=1.8, room=0.1, hp=150.0,
+             tick_db=-26.0, drive=1.0, width=0.15),                                         # kalimba tine D5
+        _fam(style='bell', f0=1318.5, partials='celesta', decay=0.34, slope=1.0, hard=0.8, early_db=7.0,
+             early_tau=0.03, strike=-12.0, strike_tau=0.01, beat=0.9, length=1.7, room=0.12, hp=300.0,
+             tick_db=-22.0, drive=1.0, width=0.2),                                          # a high celesta E6
     ],
 }
 # what each style lets the forge tune (the character keys stay fixed per family member)
 FINE = {
     'ding': ['att', 'step_db', 'head_width', 'hold_tau', 'drop_db', 'drop_ms', 'ring_tau', 'p2', 'oct', 'detune', 'tick_db',
-             'tick_f', 'body_in', 'body_tau', 'body_p3', 'body_p7', 'drive', 'verb', 'rt60', 'fade', 'hp'],
-    'bell': ['slope', 'hard', 'beat', 'room', 'tick_db', 'tick_f', 'drive', 'fade', 'att'],
+             'tick_f', 'body_in', 'body_tau', 'body_p3', 'body_p7', 'drive', 'verb', 'rt60', 'fade', 'hp', 'air',
+             'air_tau', 'p3', 'p3_tau'],
+    'bell': ['slope', 'hard', 'beat', 'room', 'tick_db', 'tick_f', 'drive', 'fade', 'att', 'early_db', 'early_tau',
+             'strike', 'strike_tau'],
 }
 FINE['success'] = FINE['ding'] + ['gap', 'second_db']
 
@@ -206,7 +259,18 @@ def _ding(p, r, n):
         head += hp2 * _partial(t, f0 * p['p2'], 1.0, r)
     if p['oct'] > 0:
         head += p['oct'] * _partial(t, 2 * f0, 1.0, r)
+    if p['p3'] > 0:                                                        # round 3: a struck bar's upper modes
+        for q, a in ((2.756, 1.0), (5.404, 0.6)):
+            if f0 * q < 0.4 * SR:
+                head += p['p3'] * a * np.exp(-t / (p['p3_tau'] * (2.756 / q))) * _partial(t, f0 * q, 1.0, r, 1.5)
     head *= _head_env(t, p)
+    if p['air'] > -59:                                                     # round 3: noise, not a harmonic comb
+        w = dsp.butter(r.standard_normal(n), 'band', (min(3000.0, 1.4 * f0), 16000.0), order=2)
+        w /= np.sqrt(np.mean(w ** 2)) + 1e-12
+        ea = np.exp(-t / p['air_tau'])
+        k1 = dsp.n_of(0.001)
+        ea[:k1] *= np.linspace(0, 1, k1)
+        head += 0.7 * 10 ** (p['air'] / 20) * w * ea
     head += _tick(n, p, r)
     # body: a quieter tone under / beside the head, swelling in during the hold, tremolo, slow decay
     F = f0 * p['body_ratio']
@@ -227,10 +291,12 @@ def _ding(p, r, n):
 
 def _bell(p, r, n):
     """a struck modal bell: partials whose highs die first, doublet beating, a mallet whose hardness sets how much
-    of the upper partials it excites"""
+    of the upper partials it excites; round 3: an early fast decay (early_db over early_tau: the strike energy that
+    real bells shed in the first ~0.1 s) and strike modes (inharmonic high partials dying in 10-40 ms)"""
     t = dsp.t_of(n)
     ratios, amps = PARTIALS[p['partials']]
     y = np.zeros(n)
+    g_e = 10 ** (p['early_db'] / 20) - 1.0
     for q, a in zip(ratios, amps):
         f = p['f0'] * q
         if f > 0.45 * SR:
@@ -239,7 +305,20 @@ def _bell(p, r, n):
         tau = max(p['decay'] * q ** -p['slope'], 0.004)
         b = p['beat'] * r.uniform(0.5, 1.5)                      # doublet beating as a slow AM, loudest at the strike
         am = 1 - 0.35 * (0.5 - 0.5 * np.cos(2 * np.pi * b * t))
-        y += a * np.exp(-t / tau) * am * np.sin(2 * np.pi * f * t + r.uniform(0, 6.3))
+        env = np.exp(-t / tau)
+        if g_e > 0:                                              # higher partials shed more of their strike energy
+            env = env * (1 + g_e * min(1.0, 0.5 + 0.25 * q) * np.exp(-t / p['early_tau']))
+        y += a * env * am * np.sin(2 * np.pi * f * t + r.uniform(0, 6.3))
+    if g_e > 0:
+        y /= 1 + g_e * 0.75
+    if p['strike'] > -59:
+        ys = np.zeros(n)
+        for q in (6.1, 8.7, 11.9, 15.3, 19.6):
+            f = p['f0'] * q * r.uniform(0.98, 1.02)
+            if f > 17000:
+                continue
+            ys += r.uniform(0.5, 1.0) * np.exp(-t / (p['strike_tau'] * (6.1 / q) ** 0.5)) *                 np.sin(2 * np.pi * f * t + r.uniform(0, 6.3))
+        y += 10 ** (p['strike'] / 20) * ys
     a = dsp.n_of(max(p['att'] * 0.5, 0.0005))
     y[:a] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
     # mallet: low-passed noise pulse, brighter when hard
@@ -250,10 +329,11 @@ def _bell(p, r, n):
     return y
 
 
-def _finish(x, p, r, n_len):
-    """glue, space, stereo, band limit, edit"""
-    if p['drive'] > 0.2:
-        x = fx.saturate(x, p['drive'], mix=0.6)
+def _finish(x, p, r, n_len, drive=None):
+    """glue, space, stereo, band limit, edit (drive: the head's own drive when >= 0, else p['drive'])"""
+    drive = p['drive'] if drive is None or drive < 0 else drive
+    if drive > 0.2:
+        x = fx.saturate(x, drive, mix=0.6)
     x = dsp.butter(x, 'high', p['hp'], order=4)
     return x
 
@@ -284,6 +364,8 @@ def render(p, r):
         if p['room'] > 0:
             y = fx.reverb(y, r, rt60=0.35 + 1.5 * p['room'], size=0.35, predelay=0.008, damp=0.55, wet=p['room'],
                           stereo=True, width=0.8)
+        if p['early_db'] > 0 or p['strike'] > -59:          # round 3: the ring decays on its own, a short end fade
+            return _end(y, p, n_len, fade=max(p['fade'], 0.25))
         return _end(y, p, n_len, fade=max(p['fade'], 0.4 * n_len / SR))
     head, body = _ding(p, r, n)
     if st == 'success':
@@ -295,7 +377,7 @@ def render(p, r):
         b2 = np.concatenate([np.zeros(off), b2])[:n] * g
         body = body * np.clip(1 - dsp.t_of(n) / (p['gap'] + 0.03), 0.25, 1) + b2   # the first body ducks under
         head = head + h2
-    head = _finish(head, p, r, n_len)    # round 3 tried a clean head (no drive): every critic number got worse
+    head = _finish(head, p, r, n_len, p['head_drive'])    # round 3 tried a clean head (no drive): every critic number got worse
     body = _finish(body, p, r, n_len)    # (totals -5.7..-7.2 -> -10.0..-12.9, tone 8-11 -> 16-18 dB), so it stays
     st_body = fx.decorrelate(body, p['width'], cut=600.0)
     y = fx.decorrelate(head, p['head_width'], cut=1500.0) + st_body
@@ -391,7 +473,9 @@ TARGETS = {
     'pro_notify': [('length_s', 0.2, 0.42, 0.1), ('attack_ms', 0.0, 15.0, 10.0), ('t20_ms', 20.0, 45.0, 20.0),
                    ('t40_ms', 150.0, 340.0, 80.0), ('head_hz', 1700.0, 2400.0, 400.0), ('low_db', -200.0, -38.0, 8.0),
                    ('corr', 0.6, 0.97, 0.2)],
-    'notify': [('length_s', 0.5, 2.0, 0.4), ('attack_ms', 0.0, 10.0, 10.0), ('low_db', -200.0, -20.0, 8.0)],
+    # round 3: low_db (< 500 Hz) contradicted the forge refs themselves (kalimba notes at 392-659 Hz put -0.2..-4 dB
+    # there); the real-bell target only keeps rumble out (< 150 Hz) and allows rings to 2.6 s
+    'notify': [('length_s', 0.5, 2.6, 0.4), ('attack_ms', 0.0, 10.0, 10.0), ('sub_db', -200.0, -20.0, 8.0)],
 }
 
 
@@ -400,6 +484,7 @@ def pro_penalty(x, cat):
     each capped at 2); 0 = every pro target met"""
     m = measure(x)
     m['low_db'] = 10 * np.log10(sum(10 ** (s / 10) for s in m['shares'][:2]) + 1e-12)
+    m['sub_db'] = m['shares'][0]
     if 'ridge' in m:
         m['sweep_oct'] = m['ridge']['sweep_oct']
     pen = 0.0

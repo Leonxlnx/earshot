@@ -19,6 +19,7 @@ branch; the user verifies before anything reaches `main`.
 | 0 | 02:40 | branch, plan | |
 | 1 | 02:50-05:15 | **forge v2 tooling.** Refsets: 18 motion-design categories, 81 forge / 71 bench refs, split by source family, 0 leaks (`earshot/forge/refsets.py`, `eval/forge/build_refsets.py`). Fixed benchmark `eval/forge/bench.py` + baseline. Critic v2: model-free envelope (EnvRef), artifact detectors and polish (`polish.py`), designed mode; `version=1` reproduces v1. Search v2: model-free pre-screen (tone + envelope + polish, CLAP only on the best), CMA-ES option, threaded renders, robust shortlist, seed bank, report.md / compare.png / audition.wav. DSP v2: `dsp.py` sources (air, shepard, sub_drop, bell, fm, sweeps, stack) + `fx.py` (hybrid FDN / noise-tail reverb, saturation, transient, limiter, eq_match, doppler, glitch, granular). Integration: recipes get `REFSET` (CLI default refs = its forge split), held-out guard (`refsets.held_out`: bench files and the 8 bench-source kit WAVs never reach a search), v2 components in report history / ref rows / report.md, CLI `--mode`, `--tone` default = critic v2 weight (0 = report only), critic typicality needs >= 3 refs (2 refs gave z ~1e5), compare.png envelopes smoothed for long sounds. | Tests: 236 passed, 15 skipped (full fast suite, 197 s). Smoke (critic v2 + pre-screen + forge refsets, budget 24-32): whoosh 0.7 min, impact 2.4 min; all outputs written. Baseline (v1 finals vs bench, `eval/forge/results_v1.md`): variety (CLAP cos between variants) 0.89-0.97 vs real 0.50-0.83; tail t40 x click 0.56 / whoosh 0.51 (real 0.86-1.33 / 0.60-1.08); tone dB click 7.6, pop 8.6, key 8.2, whoosh 8.6, impact 6.7 (real forge-vs-bench 11.3 / 16.1 / 8.9 / 10.3 / 6.2); model checks saturated (typ z, phrasings above real everywhere). |
 | 2 | 05:20-08:55 | **forge v2 families.** Six maker areas (whoosh, sweep, impact, ui, tonal, digital) rewrote or added 22 recipes with CHARACTER parameters (length, brightness, sweep / pitch range, weight, texture) and FAMILIES of presets per category: 34 categories (18 real + 16 pro designed), 168 finals, 4-6 variants each, every member searched inside a narrow box around its preset, then one final run scoring the members together with robust re-renders; per-recipe model-free study checks (`measure` / `target_check` / `study_extra`) from docs/motion-sfx-study.md. Judge / integrator: benchmark additions (pro_* phrasings, `<cat>/final/` layout, audition.wav skipped), five core fixes (8-line reverb IR NaN, single-ref `score_refs` crash, flat_top false positive on subs, seed-bank cap 12 -> 48, `optimize` keeps DEFAULTS outside a narrow recipe SPACE), notify_04 start click re-rendered away, logo_sting audition rebuilt without the rejected variants. | Tests: 355 passed, 15 skipped (full fast suite, 416 s). Held-out bench `eval/forge/results_v2r2.md`: clones fixed (var cos v1 -> v2: click 0.886 -> 0.681, typing_key 0.965 -> 0.705, pop 0.917 -> 0.735, impact 0.931 -> 0.881, whoosh_fast 0.957 -> 0.856; real 0.48-0.86); tails fixed for click (t40 x 0.56 -> 1.22) and typing_key (1.67 -> 1.29 = real x), not for whoosh_fast (0.51 -> 0.49); 3 artifact flags in 168 sounds, all deliberate; critic passes 60 / 168. Best: whoosh_big (inside 7/7, real 5; AudioSet 'Whoosh' 5/5), typing_key, pro_pop_in. Worst: swipe (4-12 kHz 17 dB under the bench cloth), whoosh_fast + swish (tail 2x short, 8 dB boom, 15 dB hiss), logo_sting (rings 2.5x long). |
+| 3 | 08:55-11:30 | **forge v2 fixes + core r3.** Five maker areas fixed the round-2 judge's faults in 29 categories (183 finals, round-2 finals kept in `<category>/final_r2/`): whoosh engine (continuous hiss band, long concave tail, `low_lag`, shelves, fabric rustle) for whoosh_fast / swish / swipe / whoosh_big / pro_whoosh_big; logo_sting redefined as a composed reveal (lead-in -> strike -> note / dyad -> short tail); impact contact sheen; UI (click room fed only the transient, toggle first contact loudest, tap contact + two-stage body, pro_click bodies, pro_hover_tick spike + grains, pro_pop_in families, pop snap); tonal (shimmer / notify free rings, pro_notify head, pro_pop chirp controls, riser / pro_riser / pro_zip noise layers); digital (typing_key width + thock, pro_typing grain / blip members, pro_glitch burst drama). Core: polish false flags (aliasing on the fold grid, ring narrow / pitch guards, designed / gated gates), critic thin-ref fallback (`Critic(category=)`, STUDY_TARGETS), reverb IR cache + fixed rooms, holdout / score_refs caches, `palette()` and `forge(families=)`. New: `earshot gallery` (static listening page, compare mode). Judge: full bench, own spectrogram sheets, round-2 finals put back for pop and pro_zip (r3 worse on the bench; r3 kept in `final_r3/`). | Tests: 400 passed, 15 skipped (full fast suite, 316 s). Held-out bench `eval/forge/results_v2r3.md`: swipe tone 13.5 -> 6.1 dB (4-12 kHz -35.9 -> -20.7, bench -19.2); whoosh_fast t40 x 0.49 -> 0.90, tone 9.4 -> 5.8 dB; swish t40 x 0.68 -> 1.04; logo_sting t40 x 2.48 -> 1.03, inside 3.5 -> 6 of 6; shimmer t40 x 0.48 -> 0.97, curve 14.1 -> 4.1 dB; typing_key stereo corr 0.34 -> 0.96; pro_click tone 25.8 -> 15.4 dB; clones fixed in pro_typing_key / run (0.93 -> 0.81) and pro_pop_in (0.90 -> 0.75); 0 artifact flags in 183 (r2: 3). Costs: AudioSet still hears door / knock in whoosh_fast / swish, impact contact now 11 dB brighter than the bench, model checks fell in typing_key / notify. |
 
 ### Round 1 notes (integrator)
 - What works end to end: `earshot forge <recipe> [--refset CAT]` -> critic v2 inside search v2 (pre-screen reuses the
@@ -124,3 +125,59 @@ recipe object's narrower SPACE leaves out), bench `gather()` / pro rows. Deferre
   for the 8 pro categories without a bench split, brighter (bench-like) cloth / paper swipes and designed fast
   whooshes on the forge side, a composed logo-sting definition; doc: pro_pop_in's 0.14-0.27 s is the trim window, the
   sound is 50-80 ms.
+
+### Round 3 notes (judge + integrator, 11:00-11:30)
+Full table and per-category verdicts: `eval/forge/results_v2r3.md` (Judge notes). Made medians on the held-out bench,
+r2 -> r3; the judge's own model-free measurements and r2 / r3 / forge-ref spectrogram sheets decided (sheets in
+`out/forge_v2/_judge/r3/`, not committed). Nobody has listened yet.
+
+| category | verdict | key numbers (r2 -> r3, reference) |
+|---|---|---|
+| swipe | fixed | 4-12 kHz -35.9 -> -20.7 dB (bench -19.2); tone 13.47 -> 6.06 dB; onset still 11 dB dull |
+| whoosh_fast | fixed (model-free) | t40 130 -> 238 ms (bench 265); <150 Hz -9.7 -> -14.4; 4-12 kHz -17.4 -> -26.4; tone 9.43 -> 5.79; AudioSet still 'Door' |
+| swish | fixed (model-free) | t40 150 -> 230 ms (bench 220); <150 Hz -15.8 -> -23.4; 4-12 kHz -18.2 -> -29.1; AudioSet 'Door' / 'Whack' |
+| logo_sting | fixed | t40 2135 -> 885 ms (bench 862); inside 3.5 -> 6 of 6; no body under ~800 Hz |
+| whoosh_big | kept best | inside 7 of 7; variety 0.909 -> 0.854; curve 5.8 -> 9.0 dB |
+| pro_whoosh_big | better | variety 0.931 -> 0.882; air fused (1-4 kHz -46.5 -> -34.8, film -38.0) |
+| impact | better, overshoot | onset >6 kHz -28.9 -> -10.9 dB (bench -21.6: a bright contact tick now); tone 6.29 -> 5.31; inside 6 of 6 |
+| pro_impact | mixed | 4-12 kHz -30.4 -> -17.7 (film -15.4); margin 0.60 -> -0.07 |
+| pro_logo_sting | still weak | clones 0.943; nothing above ~5 kHz (4-12 kHz -41.8 vs film -21.0) |
+| click | fixed | 1-4 kHz -14.0 -> -5.3 dB (bench -4.9); inside 5 -> 7 of 7; variety 0.681 -> 0.723 |
+| toggle | mixed | env oct 2.58 -> 0.62; tone 8.82 -> 10.36; ringing lines in 01 / 03 |
+| tap | better, bright | phrase z 0.52 -> 1.13; inside 3 -> 5 of 7; 4-12 kHz 8 dB over the bench; t40 x 1.82 |
+| pro_tap | flat | phrase z 1.73 -> 1.65; variety 0.854 -> 0.872 |
+| pro_click | fixed | tone 25.8 -> 15.4 dB; 150 Hz-1 kHz -41.2 -> -6.8 (bench -6.2) |
+| pro_hover_tick | fixed | phrase z 0.85 -> 1.61 (loo 1.79); inside 4 -> 6 of 7 |
+| pro_pop_in | fixed | variety 0.895 -> 0.750 |
+| pop | **r2 kept** | r3: tone 11.42 -> 12.38, t40 x 0.82 -> 0.55, phrase z 2.32 -> 1.83 |
+| pro_pop | flat | inside 4 -> 3 of 6 (real 3); CLAP still '8-bit' |
+| notify | better, model checks fell | t40 x 0.63 -> 0.85; curve 21.8 -> 13.6; phrase z 2.21 -> 1.40; AudioSet 'Clang' |
+| pro_notify | better, still far | >12 kHz -29.6 -> -19.6 (films -17.3); variety 0.882 -> 0.822 |
+| shimmer | fixed | t40 x 0.48 -> 0.97; curve 14.1 -> 4.1 dB; inside 7 of 7 |
+| riser | mixed | tone 12.5 -> 11.3; AudioSet names 0.8 -> 0.4 |
+| pro_riser | better | tone 20.8 -> 17.9; phrase z 2.00 -> 2.71; inside 3 -> 4 of 6 |
+| pro_zip | **r2 kept** | r3: tone 11.89 -> 12.72, env 0.71 -> 0.97, t40 x 0.84 -> 0.63 |
+| typing_key | fixed (model-free) | stereo corr 0.34 -> 0.96; <150 Hz -5.5 -> -10.2 (bench -10.9); inside 6 -> 4 of 7 (model checks) |
+| pro_typing_key / run | fixed | variety 0.926 -> 0.815 / 0.930 -> 0.813 |
+| glitch | mixed | variety 0.799 -> 0.728; AudioSet names 0.5 -> 0 |
+| pro_glitch | fixed | median 2 ms level -22 -> -36 dB re peak (film -33); accelerating stutter 6 of 6 |
+| downlifter, hover_tick, sub_drop, pro_sub_drop, pro_shimmer | unchanged | (round 2 finals) |
+
+Showcase-ready (measured): whoosh_big, pro_whoosh_big, shimmer, click, typing_key, pro_typing_key / run, pro_pop_in,
+pro_hover_tick, pro_click, logo_sting, swipe, impact, whoosh_fast, swish, pop (r2), pro_zip (r2), downlifter, sub_drop,
+pro_glitch, pro_riser. Weakest: pro_logo_sting, pro_tap, pro_pop, toggle, tap, notify, riser, glitch, pro_notify.
+
+Integration this round (judge): bench run on all finals (`eval/forge/results_v2r3.json` / `.md`); pop / pro_zip
+`final/` = the round-2 delivery again (`KEPT_R2.txt`; round-3 attempt in `final_r3/`, `NOT_DELIVERED.txt`; pro_zip
+re-renders from today's zip.py at max error 1.4e-7); gallery pages `out/showcase/gallery.html` and
+`out/showcase/compare.html` (r2 / r3 / r3x rows; private: they play licensed forge refs; checked in headless Chrome at
+1440 px). Process notes: the ui area ran bench.py 4 times (numbers seen between fix rounds); the core critic changed
+under the fixers mid-round, so critic totals are not comparable across areas or rounds (55 / 183 pass vs r2 60 / 168).
+
+Round 4 (next): impact contact sheen -8..10 dB; logo_sting body (a low strike or sub under the note); pro_logo_sting
+top end + distinct members; whoosh_fast / swish AudioSet 'door' reading (onset shape, not balance) and variety; made
+tails darken faster than real ones (whoosh_fast -0.64 vs -0.2, swipe -1.96 vs +0.61); swipe onset brightness (>6 kHz
+-22 vs -12 dB) and width (corr 0.90 vs 0.70); toggle ring lines; tap 4-12 kHz; notify 'Clang'; core: fx.saturate
+(level='peak') normalise before the curve, fx.limit release between hits, polish.tail false 'bumpy tail' on
+louder-first toggles, the deferred real-mode ref_typ_z >= -2 pass rule. Human listening (blind, loudness-matched) is
+still the deciding test.

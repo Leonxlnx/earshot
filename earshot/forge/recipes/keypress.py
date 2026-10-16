@@ -45,6 +45,11 @@ v1 sound):
 Character for families: thock_lvl + case_lvl (deep thock vs light clack), cap_f (pitch), top_lvl + click_lvl (crisp
 top), jacket_lvl (clicky vs linear), up_lvl (release), clip + thock_tau (length), room_wet (dry vs roomy).
 
+v2 round 3: `width` (read only when present) folds the spaced pair towards mono, mid + width x side: the r2 finals'
+pair decorrelated the 2-12 kHz layer to corr 0.04-0.47 where the forge refs sit at 0.53-1.0 (median 0.76) and the
+held-out keys are mono; DEFAULTS use 0.2 (corr ~0.9-0.98). The round-3 family also runs ~5 dB less thock (thock_lvl
+x0.45-0.5: < 150 Hz share median -10.2 dB, refs -12.6, r2 -5.5).
+
 No recorded audio is used: every sample is computed.
 """
 import numpy as np
@@ -117,6 +122,8 @@ SPACE = {
     'jacket_lvl': (0.0, 0.9),               # click jacket pre-click (0 = linear / tactile switch)
     'jacket_dt': (0.003, 0.012, 'log'),
     'pre_gap': (0.0005, 0.006, 'log'),      # lead before the key travel (v1: 3-20 ms)
+    # v2 round 3 (only read when present)
+    'width': (0.0, 0.6),                    # side level of the spaced pair (1 = the v1 / r2 pair as recorded)
 }
 V1_DEFAULTS = None   # set below: the v1 final (round 15 pick 4), kept for reference / the seed bank
 # the most reliable sound after the judge (round 15 pick 4 = final keypress_01, parameters rounded to 6 digits): 8 new
@@ -135,7 +142,8 @@ DEFAULTS = {'click_tc': 7.62977e-05, 'click_tau': 0.000400034, 'click_lvl': 0.19
 V1_DEFAULTS = dict(DEFAULTS)
 # v2 start: the v1 key with a crisp top, a short edit and the file starting on the attack (the search tunes from here)
 DEFAULTS = {**V1_DEFAULTS, 'click_lvl': 0.6, 'thock_tau': 0.05, 'clip': 0.24, 'top_lvl': 0.8, 'top_lo': 2500.0,
-            'top_tau': 0.0015, 'jacket_lvl': 0.0, 'jacket_dt': 0.008, 'pre_gap': 0.002, 'pre_len': 0.006}
+            'top_tau': 0.0015, 'jacket_lvl': 0.0, 'jacket_dt': 0.008, 'pre_gap': 0.002, 'pre_len': 0.006,
+            'width': 0.2}        # r3: near-mono (the r2 pair without `width` sat at corr 0.04-0.47; refs 0.53-1.0)
 
 
 # ------------------------------------------------------------------------------------------------ helpers
@@ -365,6 +373,10 @@ def render(p, r):
     dsp.place(x, _ping(p, r, nh, 1.0 + 0.01 * r.standard_normal()), tu, p['ping_lvl'] * p['up_lvl'] * 0.7)
     dsp.place(x, _low(p, r, n - dsp.n_of(tu)), tu, p['thock_lvl'] * p['up_lvl'] * 0.3)
     st = _spaced_pair(x, p, r)
+    if 'width' in p:                   # v2 r3: the pair folded towards mono (mid + width x side); the r2 finals' pair
+        mid = 0.5 * (st[:, 0] + st[:, 1])  # decorrelated the 2-12 kHz layer to corr 0.04-0.47 (refs 0.53-1.0, median
+        side = 0.5 * (st[:, 0] - st[:, 1])  # 0.76; the held-out keys are mono)
+        st = np.stack([mid + p['width'] * side, mid - p['width'] * side], axis=1)
     st = dsp.butter(st, 'high', 22, order=2)
     pk = np.abs(st).max()
     hpf = p.get('hpf')                 # absent in the forge test's round 1-12 params: their sound is unchanged

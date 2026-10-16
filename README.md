@@ -108,6 +108,32 @@ stop telling made from real; the 1/3-octave measurement still can. The realness 
 resonator plus a room and a noise floor reads "real"). Judge a made sound by the model-free measurements,
 spectrograms next to the references, robust re-renders, and a human blind test.
 
+## Gallery
+
+`earshot gallery` turns forge outputs into one static HTML page for people with ears: no server, no network, no
+external scripts, inline CSS. One card per category, grouped by family (whooshes, sweeps, impacts, UI, tonal,
+digital); per sound a player, a spectrogram thumbnail (log frequency, one time span per card so lengths compare),
+duration, peak and momentary-max LUFS, the critic's total / pass, and the recipe parameters of every variant in a
+collapsible table.
+
+```bash
+earshot gallery out/forge_v2 -o out/gallery/gallery.html                  # <category>/final/*.wav (+ report.json)
+earshot gallery out/forge_v2 -o g.html --results eval/forge/results_v2r2.json   # + held-out benchmark numbers
+earshot gallery out/forge_v2 -o g.html --refs forge                        # + A/B row: each sound's nearest forge ref
+earshot gallery --compare "r2:out/forge_v2/*/final_r2" "r3:out/forge_v2/*/final" -o compare.html \
+  --results r2:eval/forge/results_v2r2.json                                # before / after, variant under variant
+earshot gallery out/forge_v2 -o portable.html --embed                      # audio (FLAC) + images inside the file
+```
+
+Audio is referenced by relative path (or embedded with `--embed`); thumbnails go to `<page>_files/` next to the page
+and are cached by content. A "match loudness" switch (on by default) turns louder players down so a riser does not
+blast after a click; it changes the player volume only, never the files. Benchmark numbers are shown only for files the benchmark actually measured: a file newer
+than the results JSON, or with another length / peak, gets none (renamed files are matched by length and peak, and the
+page lists every such case). In `--compare`, files identical to an earlier version are marked `= r2`. Bench references
+never go on a page: `--refs bench` is refused, every reference passes `refsets.held_out()`, and only the benchmark's
+numbers are shown, never its file names. Forge references are licensed recordings: keep a page that plays them
+private. In Python: `from earshot.gallery import gallery`.
+
 ## Install
 
 Python 3.10+ and ffmpeg / ffprobe on PATH. CPU only; no GPU is used.

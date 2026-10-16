@@ -18,6 +18,9 @@ air), weight (h2 / sub octave), attack and end. FAMILIES are presets after the f
 The pro_zip refset has no forge refs (the four pro zips are all bench, held out), so the forge runs in designed mode
 and `target_check()` adds the study targets as the critic's `extra` (sweep rate 15-70 oct/s on the ridge, length,
 attack, near mono).
+Round 3 (after the round-2 judge: AudioSet heard 'Boing' / 'Plop' on 2 of 5, a toy-like pure tone): a wide noise band
+rides the sweep (`noise_db`, `noise_ratio`, `noise_q`) and zipper teeth roughen it (`teeth`, `teeth_hz`);
+FAMILIES_BY_CAT['pro_zip'] = round 2's family bests + that air, plus an 'air_up' member led by the noise.
 """
 import numpy as np
 
@@ -54,6 +57,14 @@ SPACE = {
     'verb': (0.0, 0.3),
     'width': (0.0, 0.35),
     'sat': (0.0, 9.0),
+    # round 3 (the judge: AudioSet hears 'Boing' / 'Plop' on 2 of 5: a toy-like pure tone): a wide noise band that
+    # rides the sweep (noise_db re the tone, -60 = none; centre = pitch x noise_ratio, Q noise_q) and zipper 'teeth'
+    # (an amplitude roughness at teeth_hz, rising with the pitch, depth teeth)
+    'noise_db': (-60.0, -4.0),
+    'noise_ratio': (0.7, 3.0, 'log'),
+    'noise_q': (0.5, 2.0, 'log'),
+    'teeth': (0.0, 0.7),
+    'teeth_hz': (40.0, 260.0, 'log'),
 }
 
 FAMILIES = {
@@ -94,7 +105,45 @@ FAMILIES['up_hi'].update({'saw_db': -10.0, 'saw_lp': 2.5, 'tilt_db': 4.0, 'detun
 FAMILIES['down'].update({'saw_db': -8.0, 'saw_lp': 3.5, 'tilt_db': -6.0})
 FAMILIES['arc'].update({'saw_db': -14.0, 'saw_lp': 2.0, 'tilt_db': -3.0})
 FAMILIES['down_warm'].update({'saw_db': -2.0, 'saw_lp': 2.2, 'tilt_db': -8.0})
+for _v in FAMILIES.values():
+    _v.update({'noise_db': -60.0, 'noise_ratio': 1.5, 'noise_q': 1.0, 'teeth': 0.0, 'teeth_hz': 120.0})
 DEFAULTS = dict(FAMILIES['up'])
+
+# round 3, pro_zip: the round-2 family bests (out/forge_v2/pro_zip/fam/best.json) plus air: a wide noise band riding
+# the sweep and a little zipper roughness, so the sweep reads as a designed zip, not a toy 'boing'
+_R2_BEST = {
+    'up': {'length': 0.178, 'f0': 126.06, 'f1': 1707.5, 'fpk': 2405.7, 'pk_at': 0.506, 'arc_back': 0.957, 'bend': 0.027,
+           'h2_db': -11.4, 'h3_db': -23.0, 'h5_db': -26.0, 'sub_db': -46.1, 'fm': 0.319, 'fm_ratio': 1.0,
+           'saw_db': -1.99, 'saw_lp': 2.67, 'air_db': -28.7, 'air_q': 4.59, 'detune': 4.36, 'att_ms': 34.2,
+           'rel_ms': 9.54, 'tilt_db': 7.43, 'verb': 0.025, 'width': 0.109, 'sat': 2.09},
+    'up_hi': {'length': 0.236, 'f0': 176.5, 'f1': 8869.0, 'fpk': 1800.9, 'pk_at': 0.521, 'arc_back': 0.969,
+              'bend': 0.382, 'h2_db': -13.75, 'h3_db': -21.3, 'h5_db': -38.1, 'sub_db': -47.2, 'fm': 0.066,
+              'fm_ratio': 2.0, 'saw_db': -9.86, 'saw_lp': 2.26, 'air_db': -22.0, 'air_q': 5.65, 'detune': 6.34,
+              'att_ms': 29.8, 'rel_ms': 6.32, 'tilt_db': 4.96, 'verb': 0.025, 'width': 0.082, 'sat': 2.5},
+    'down': {'length': 0.103, 'f0': 6706.8, 'f1': 477.6, 'fpk': 2160.3, 'pk_at': 0.486, 'arc_back': 0.948,
+             'bend': -0.15, 'h2_db': -17.95, 'h3_db': -27.9, 'h5_db': -40.3, 'sub_db': -43.7, 'fm': 0.362,
+             'fm_ratio': 1.0, 'saw_db': -7.4, 'saw_lp': 3.29, 'air_db': -25.5, 'air_q': 3.82, 'detune': 2.62,
+             'att_ms': 7.96, 'rel_ms': 10.07, 'tilt_db': -5.4, 'verb': 0.051, 'width': 0.127, 'sat': 2.67},
+    'arc': {'length': 0.277, 'f0': 623.3, 'f1': 1000.0, 'fpk': 3470.1, 'pk_at': 0.419, 'arc_back': 0.887,
+            'bend': -0.115, 'h2_db': -14.16, 'h3_db': -25.4, 'h5_db': -36.9, 'sub_db': -43.6, 'fm': 0.24,
+            'fm_ratio': 1.0, 'saw_db': -10.94, 'saw_lp': 2.3, 'air_db': -32.7, 'air_q': 4.34, 'detune': 3.45,
+            'att_ms': 27.7, 'rel_ms': 19.4, 'tilt_db': -3.0, 'verb': 0.046, 'width': 0.135, 'sat': 1.61},
+    'down_warm': {'length': 0.187, 'f0': 2505.5, 'f1': 149.4, 'fpk': 2586.2, 'pk_at': 0.456, 'arc_back': 0.984,
+                  'bend': -0.27, 'h2_db': -13.85, 'h3_db': -14.2, 'h5_db': -32.2, 'sub_db': -17.4, 'fm': 0.505,
+                  'fm_ratio': 1.0, 'saw_db': -7.25, 'saw_lp': 2.47, 'air_db': -35.1, 'air_q': 2.85, 'detune': 7.75,
+                  'att_ms': 13.4, 'rel_ms': 22.8, 'tilt_db': -8.2, 'verb': 0.081, 'width': 0.183, 'sat': 3.41},
+}
+_AIR_R3 = {'up': dict(noise_db=-8.0, noise_ratio=1.6, noise_q=0.9, teeth=0.3, teeth_hz=90.0),
+           'up_hi': dict(noise_db=-10.0, noise_ratio=1.3, noise_q=0.8, teeth=0.2, teeth_hz=120.0),
+           'down': dict(noise_db=-12.0, noise_ratio=1.4, noise_q=0.9, teeth=0.15, teeth_hz=150.0),
+           'arc': dict(noise_db=-8.0, noise_ratio=1.6, noise_q=0.9, teeth=0.35, teeth_hz=70.0),
+           'down_warm': dict(noise_db=-12.0, noise_ratio=2.2, noise_q=0.8, teeth=0.3, teeth_hz=60.0)}
+FAMILIES_BY_CAT = {'pro_zip': {k: {**FAMILIES[k], **_R2_BEST[k], **_AIR_R3[k]} for k in FAMILIES}}
+# a sixth member: an air zip, the noise leading and the tone under it (a quick 'zzip' up into a cut)
+FAMILIES_BY_CAT['pro_zip']['air_up'] = {**FAMILIES['up'], **_R2_BEST['up'], 'length': 0.2, 'f0': 300.0, 'f1': 4500.0,
+                                        'h2_db': -20.0, 'h3_db': -30.0, 'saw_db': -12.0, 'noise_db': -4.0,
+                                        'noise_ratio': 1.2, 'noise_q': 1.4, 'teeth': 0.35, 'teeth_hz': 110.0,
+                                        'att_ms': 25.0, 'tilt_db': 6.0}
 
 
 def trajectory(p, n):
@@ -211,12 +260,19 @@ def render(p, r):
     air = dsp.svf(nz, np.clip(f * 1.5, 200, 16000), p['air_q'], 'bandn')
     air = stereo_of(air) / lvl(air)
     y = tone + 10 ** (p['air_db'] / 20) * air
+    if p['noise_db'] > -59:                                      # round 3: a wide noise band riding the sweep
+        nb = dsp.svf(r.standard_normal(n), np.clip(f * p['noise_ratio'], 250, 15000), p['noise_q'], 'band')
+        nb = dsp.butter(nb, 'low', 16000, order=4)
+        y = y + 10 ** (p['noise_db'] / 20) * stereo_of(nb) / lvl(nb)
 
     # envelope: raised-cosine attack, level tilt, short release (the zip ends on the cut)
     t = dsp.t_of(n)
     a = np.clip(t / (p['att_ms'] / 1000.0), 0, 1)
     rl = np.clip((L - t) / (p['rel_ms'] / 1000.0), 0, 1)
     env = (0.5 - 0.5 * np.cos(np.pi * a)) * (0.5 - 0.5 * np.cos(np.pi * rl)) * 10 ** (p['tilt_db'] * (t / L) / 20)
+    if p['teeth'] > 0.01:                                        # round 3: zipper teeth (roughness, not a pure tone)
+        rate = p['teeth_hz'] * np.sqrt(f / np.exp(np.mean(np.log(f))))
+        env = env * (1 - p['teeth'] * (0.5 - 0.5 * np.cos(2 * np.pi * np.cumsum(rate) / dsp.SR)))
     y = y * env[:, None]
     y = dsp.butter(y, 'high', 40, order=2)
     if p['sat'] > 0.1:

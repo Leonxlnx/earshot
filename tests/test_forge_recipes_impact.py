@@ -1,13 +1,34 @@
-"""forge v2 round 2, impact area: impact v3 (cinematic + designed), subdrop, sting. Model-free checks only (fast, no
+"""forge v2 rounds 2-3, impact area: impact v3 (cinematic + designed), subdrop, sting. Model-free checks only (fast, no
 CLAP): every family preset renders deterministically and hits the pro study's measured targets it was designed for
-(docs/motion-sfx-study.md), the families are audibly different, and v2 impact parameter sets still render."""
+(docs/motion-sfx-study.md), the families are audibly different, and v2 impact parameter sets still render.
+Round 3 adds the judge's fixes as checks: the cinematic onset sheen and 1-4 kHz body, the designed hits' fall into the
+gate and 4-12 kHz grain band, and the composed launch sting (lead-in -> bright strike -> short bloom, t40 ~0.9 s)."""
 import numpy as np
 import pytest
+from scipy import signal
 
-from earshot.forge import dsp
+from earshot.forge import dsp, polish
 from earshot.forge.recipes import impact, sting, subdrop
 
 SR = dsp.SR
+
+
+def _band_db(x, lo, hi):
+    m = x.mean(axis=1)
+    f, P = signal.welch(m, SR, nperseg=8192)
+    return 10 * np.log10(P[(f >= lo) & (f < hi)].sum() / P.sum() + 1e-12)
+
+
+def _onset6k_db(x, ms=15):
+    """share > 6 kHz in the first `ms` after the onset (first 1 ms frame within 20 dB of the loudest)"""
+    m = x.mean(axis=1)
+    k = len(m) // 48
+    e = 20 * np.log10(np.sqrt(np.mean(m[:k * 48].reshape(k, 48) ** 2, 1)) + 1e-12)
+    i = int(np.argmax(e >= e.max() - 20)) * 48
+    seg = m[i:i + int(SR * ms / 1000)]
+    F = np.abs(np.fft.rfft(seg * np.hanning(len(seg)), 4096)) ** 2
+    f = np.fft.rfftfreq(4096, 1 / SR)
+    return 10 * np.log10(F[f >= 6000].sum() / F.sum() + 1e-12)
 
 
 def _render(mod, p, seed=3):
@@ -48,14 +69,22 @@ def test_cinematic_impacts_have_long_natural_tails():
         assert 1000 <= m['t40'] <= 3500, (name, m['t40'])
         assert -25 <= m['slope_dBs'] <= -7, (name, m['slope_dBs'])
         assert m['gate_db40ms'] < 6, name                                      # rings out, no gate
-        assert m['sh150'] > 0.6 and m['tilt'] < -2.5, name
+        assert m['sh150'] > 0.6 and m['tilt'] < -1.5, name
+        # round 3: a bright onset (r2: > 6 kHz share of the first 15 ms -20..-52 dB, the held-out hit about -22) and
+        # body at 1-4 kHz (r2: -20..-25 dB re total, the forge refs -16 / -18)
+        hit = x[int(SR * dict(impact.FAMILIES['impact'])[name]['pre']):]       # (the swell member: from the contact)
+        assert _onset6k_db(hit) > -26, (name, _onset6k_db(hit))
+        assert _band_db(x, 1000, 4000) > -21, (name, _band_db(x, 1000, 4000))
 
 
 def test_designed_impacts_are_gated_sub_heavy_and_grainy():
     for name, x in _members(impact, 'pro_impact'):
         m = impact.measure(x)
         assert 0.5 <= m['len50'] <= 1.4, (name, m['len50'])
-        assert m['gate_db40ms'] >= 10, (name, m['gate_db40ms'])               # a hard gate, not a ring-out
+        assert m['gate_db40ms'] >= 10 or m['pre_gate'] <= -22, (name, m['gate_db40ms'], m['pre_gate'])  # a gate
+        # round 3: the tail falls before the gate (refs -30 / -27.5 dB 60 ms before the end; r2 held at -14..-21 dB)
+        assert m['pre_gate'] <= -18, (name, m['pre_gate'])
+        assert _band_db(x, 4000, 12000) > -29, (name, _band_db(x, 4000, 12000))   # the grain / air sparkle
         assert m['sh150'] >= 0.75, (name, m['sh150'])
         assert m['corr'] < 0.7, (name, m['corr'])                              # decorrelated rumble / air tail
     # the granular rumble: the envelope of the 'rumble' preset pulses at ~25-45 per second
@@ -87,9 +116,15 @@ def test_stings():
         m = sting.measure(x)
         assert m['corr'] > 0.99, name                                          # mono
         assert m['t40'] <= 750 and m['ridge'][0] >= 600 and m['ridge'][1] <= 300, (name, m['t40'], m['ridge'])  # chirp -> hum
-    for name, x in _members(sting, 'logo_sting'):
+    for (name, p), (_, x) in zip(sting.FAMILIES['logo_sting'], _members(sting, 'logo_sting')):
         m = sting.measure(x)
-        assert m['tilt'] > -1.5 and 0.6 <= m['t40'] / 1000 <= 5.0, (name, m['tilt'], m['t40'])   # a bright ring-out
+        # round 3: a composed launch reveal, not a bell chord ringing 2 s: bright, short tail (r2 t40 1.9-2.2 s)
+        assert p['mode'] == 'launch' and len(sting.DYADS[p['notes']]) <= 2, name
+        assert m['tilt'] > 1.0 and 0.6 <= m['t40'] / 1000 <= 1.3, (name, m['tilt'], m['t40'])
+        hit = x[max(0, int(SR * p['lead_s']) - 48):] if p['lead'] != 'none' else x
+        assert polish.attack(hit)['onset_hf_db'] > -20, name                  # the strike owns the hit's onset
+        if p['lead'] != 'none':                                                # the lead-in rises into the hit
+            assert m['attack_ms'] >= 60 and m['peak_ms'] / 1000 >= 0.8 * p['lead_s'], (name, m['attack_ms'])
 
 
 def test_families_are_not_clones():
@@ -108,3 +143,12 @@ def test_families_are_not_clones():
 def test_v2_parameter_sets_still_render():
     x = _render(impact, impact.DEFAULTS_V2, seed=1)
     assert x.ndim == 2 and np.isfinite(x).all() and len(x) / SR > 2.0
+
+
+def test_round2_families_still_render():
+    """the r2 finals' families are kept (FAMILIES_R2) so the showcase can re-render r2 next to r3"""
+    for mod in (impact, sting):
+        for cat, fam in mod.FAMILIES_R2.items():
+            for name, p in fam:
+                x = _render(mod, p)
+                assert np.isfinite(x).all() and 0.5 < np.abs(x).max() <= 1.0, (cat, name)

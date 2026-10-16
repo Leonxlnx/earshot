@@ -43,6 +43,15 @@ weight, texture); a forge run tunes each one inside a narrow box around it (`loc
 palette: one engine, audibly different members. `recipe(kind)` returns a recipe object (TARGET, ALTS, REFSET, SPACE,
 DEFAULTS, render) for forge(): 'fast' (this module's defaults, whoosh_fast), 'big' (whoosh_big), 'pro_big'
 (pro_whoosh_big, designed mode).
+
+Round 3 (overnight round 3, the round-2 judge's fix list, eval/forge/results_v2r2.md): optional keys `hiss_rustle` /
+`hiss_lo` (fabric friction: the hiss top from its own low edge, roughened by fast irregular AM), `eq_lo_*` / `eq_hi_*`
+(RBJ shelves after the mix), `low_lag` (the low band arrives after the surface's brush: no thump on the onset); a
+parameter set without them renders bit-identically (OPTIONAL holds their off values), so round-1/2 reports and seed
+entries reproduce. `DEFAULTS_R2` is the round-2 base; `DEFAULTS` / FAST is the round-3 fast base (long concave tail,
+less boom, a lower hiss that follows the level curve). Families were rebuilt so each member owns a texture or a tail
+shape (CLAP hears single-parameter moves as the same sound: 0.94-0.98); per-category notes in out/forge_v2/<category>/
+LOG.md, round 3.
 """
 import types
 
@@ -93,7 +102,7 @@ SPACE = {
     'sub_drive': (0.0, 3.0),            # tanh drive: harmonics 2 / 3
     # hiss top
     'hiss_db': (-45.0, 0.0),
-    'hiss_hp': (1200.0, 8000.0, 'log'),
+    'hiss_hp': (800.0, 8000.0, 'log'),   # round 3: from 1.2 kHz down to 800 Hz (pro_big's fused air band)
     'hiss_open': (0.0, 2.5),            # octaves the hiss low-pass opens with the motion
     'hiss_pow': (1.0, 4.0),
     # tonal / whistle
@@ -113,10 +122,19 @@ SPACE = {
     'drive_db': (0.0, 9.0),
     'end_db': (-75.0, -50.0),
     'end_fade': (0.02, 0.15, 'log'),
+    # round 3 (optional: a parameter set without these keys renders exactly as before)
+    'hiss_rustle': (0.0, 1.0),          # fabric friction: fast irregular AM of the hiss top (cloth / paper)
+    'hiss_lo': (600.0, 4000.0, 'log'),  # with hiss_rustle: the fabric layer's own low edge (replaces hiss_hp there)
+    'eq_lo_db': (-18.0, 3.0),           # low shelf at eq_lo_f (the boom / thump under a pass)
+    'eq_lo_f': (80.0, 300.0, 'log'),
+    'eq_hi_db': (-15.0, 12.0),          # high shelf at eq_hi_f (hiss / brightness)
+    'eq_hi_f': (1500.0, 9000.0, 'log'),
+    'low_lag': (0.0, 0.08),             # the low band's envelope arrives this much later (s): no thump on the onset
 }
+OPTIONAL = {'low_lag': 0.0, 'hiss_rustle': 0.0, 'hiss_lo': None, 'eq_lo_db': 0.0, 'eq_lo_f': 150.0, 'eq_hi_db': 0.0, 'eq_hi_f': 4000.0}
 
-# whoosh_fast 'crisp' (the first member of the fast family: forge v2 tunes it, see out/forge_v2/whoosh_fast/LOG.md)
-DEFAULTS = {
+# whoosh_fast 'crisp' of round 2 (the base the big / pro_big families and swish / swipe derive from)
+DEFAULTS_R2 = {
     'rise': 0.065, 'rise_k': 0.9, 'hold': 0.0, 'fall': 0.075, 'fall_k': 0.75, 'start_db': -34.0,
     'track': 0.45, 'f_peak': 420.0, 'up_oct': 1.5, 'down_oct': 1.8, 'dop_st': 2.0, 'dop_w': 0.03,
     'q_air': 1.1, 'lp_ratio': 3.0, 'flut_depth': 0.18, 'flut_f': 24.0, 'rustle': 0.0, 'rustle_f': 90.0,
@@ -130,8 +148,25 @@ DEFAULTS = {
 
 # the families: per kind, member name -> overrides of the kind's base (character: length, brightness, sweep, weight,
 # texture). Hand-designed from the forge refs' measurements and the pro study's targets (LOG.md per category).
-FAST = dict(DEFAULTS)
-BIG = {**DEFAULTS,
+# round 3 (judge, eval/forge/results_v2r2.md): the round-2 fast family died twice too fast (t40 130 ms, forge refs 160,
+# held-out 265), carried 8 dB too much under 150 Hz and 10-15 dB too much 4-12 kHz hiss, and its pointed onset read as a
+# knock (AudioSet Knock / Door / Whack). Now: a round, slower-shaped peak (rise_k 1, a 5 ms hold), a fast drop into a
+# long concave tail (fall 0.15 s at fall_k 0.58: -20 dB in ~70 ms, -40 dB in ~240 ms) with a longer room, the low band
+# moved up and down (low_f 170 Hz, -15 dB, a -7 dB shelf under 145 Hz) and the hiss lower and darker (-24 dB, a -4 dB
+# shelf over 6 kHz). The first round-3 run showed the hiss as a separate 5-15 kHz streak at the peak (hiss_pow 2: a
+# transient-like burst, likely the knock reading) over a 2-4 kHz hole: the hiss now starts at 2 kHz and follows the
+# level curve (hiss_pow 1.2) under a higher air cliff (lp_ratio 4), one continuous band. Round 3.2 tried the forge
+# refs' peak shape (they rise 9.4 dB in the 20 ms before the 10 ms-envelope peak and drop 4.5 dB in the 20 ms after;
+# the made 4.7 / 7.9): rise_k 0.8, a 20 ms hold, fall 0.13 s at fall_k 0.7. It shortened the tail (t40 205 vs 230 ms)
+# and the critic's CLAP heard 'a punchy impact hit' on 2 of 6 (1 of 5 before), AudioSet unchanged: reverted (3.3)
+FAST = {**DEFAULTS_R2,
+        'rise': 0.075, 'rise_k': 1.0, 'hold': 0.005, 'fall': 0.15, 'fall_k': 0.58, 'track': 0.5, 'down_oct': 2.0,
+        'q_air': 1.0, 'lp_ratio': 4.0, 'low_db': -15.0, 'low_f': 170.0, 'low_smooth': 0.04,
+        'hiss_db': -24.0, 'hiss_hp': 2000.0, 'hiss_open': 0.9, 'hiss_pow': 1.2,
+        'room_wet': 0.22, 'rt60': 0.58, 'end_fade': 0.06,
+        'eq_lo_db': -7.0, 'eq_lo_f': 145.0, 'eq_hi_db': -4.0, 'eq_hi_f': 6000.0}
+DEFAULTS = FAST
+BIG = {**DEFAULTS_R2,
        'rise': 0.36, 'rise_k': 0.8, 'fall': 0.36, 'fall_k': 0.85, 'start_db': -36.0, 'track': 0.8,
        'f_peak': 380.0, 'up_oct': 1.4, 'down_oct': 2.3, 'dop_st': 3.0, 'dop_w': 0.08, 'q_air': 1.2, 'lp_ratio': 4.5,
        'flut_depth': 0.25, 'flut_f': 12.0, 'low_db': -2.0, 'low_f': 120.0, 'low_smooth': 0.04,
@@ -145,40 +180,73 @@ PRO_BIG = {**BIG,
            'sub_drive': 0.8, 'hiss_db': -26.0, 'hiss_hp': 6000.0, 'hiss_open': 0.5, 'hiss_pow': 1.2,
            'room_wet': 0.1, 'rt60': 0.5,
            'pan': 0.0, 'width': 0.03, 'drive_db': 2.0, 'end_db': -64.0, 'end_fade': 0.06}
+# round 3 (judge): the round-2 air layer was a detached 5-15 kHz island (hiss from 6 kHz) over a 1-4 kHz hole (1-4k
+# share -46.5 dB vs the film refs' -38): the hiss now starts at 1 kHz and opens with the motion (one fused air band
+# from the swell's top up, 4-12k ~-44 dB), the air body's cliff sits higher (lp_ratio 5), and the rise follows the
+# study (-20 dB -> peak 150-250 ms, rise_k 1.2: straight-to-concave in dB instead of a pointed peak)
+PRO_BIG_R2 = PRO_BIG
+PRO_BIG = {**PRO_BIG_R2, 'rise': 0.3, 'rise_k': 1.2, 'lp_ratio': 5.0,
+           'hiss_db': -30.0, 'hiss_hp': 1000.0, 'hiss_open': 1.4, 'hiss_pow': 1.2}
 
 PRESETS = {
     'fast': {
-        'crisp':   {},
-        'tight':   {'rise': 0.045, 'fall': 0.05, 'f_peak': 700.0, 'low_db': -16.0, 'hiss_db': -10.0,
-                    'hiss_hp': 3200.0, 'room_wet': 0.08, 'rt60': 0.25, 'dop_st': 1.0, 'up_oct': 2.0},
-        'heavy':   {'rise': 0.09, 'fall': 0.11, 'f_peak': 300.0, 'down_oct': 2.0, 'low_db': -4.0, 'low_f': 110.0,
-                    'low_smooth': 0.045, 'sub_db': -16.0, 'hiss_db': -18.0, 'room_wet': 0.15, 'rt60': 0.45},
-        'whistle': {'f_peak': 520.0, 'tone_db': -12.0, 'tone_q': 26.0, 'tone_ratio': 2.0, 'tone_pure': 0.3,
-                    'dop_st': 6.0, 'dop_w': 0.025, 'low_db': -9.0},
-        'airy':    {'rise': 0.07, 'rise_k': 1.0, 'fall': 0.09, 'f_peak': 900.0, 'q_air': 0.9, 'hiss_db': -9.0,
-                    'hiss_hp': 2000.0, 'low_db': -12.0, 'width': 0.35, 'room_wet': 0.25, 'rt60': 0.6, 'pan': 0.3},
+        # round 3: the members on one balance were near clones to CLAP (family cos 0.94-0.95 after the search); single
+        # parameter moves change CLAP little (0.94-0.98), texture and envelope change it most, so each member owns one
+        # (round 3.2, probe r3/divers_ov.py: 0.84-0.93 between these): gritty air (soft crackle grains), a sleeve
+        # (fabric friction on the hiss), a tonal sweep (a pure Doppler-gliding tone, the designed motion-graphics
+        # whoosh), a heavy fluttering swing, a reverse 'suck' that accelerates into the cut and stops, and a short
+        # thin zip (out/forge_v2/whoosh_fast/LOG.md, round 3)
+        'crisp':   {'grain_db': -20.0, 'grain_rate': 1200.0, 'grain_f': 3500.0},
+        'sleeve':  {'hiss_rustle': 0.6, 'hiss_db': -20.0, 'hiss_lo': 1500.0},
+        'whistle': {'tone_db': -3.0, 'tone_q': 50.0, 'tone_pure': 1.0, 'tone_ratio': 1.5, 'dop_st': 12.0,
+                    'dop_w': 0.04},
+        'heavy':   {'fall': 0.18, 'f_peak': 300.0, 'flut_depth': 0.6, 'flut_f': 14.0, 'room_wet': 0.26, 'rt60': 0.7},
+        'reverse': {'rise': 0.25, 'rise_k': 0.55, 'hold': 0.0, 'fall': 0.04, 'fall_k': 1.5, 'room_wet': 0.15},
+        'tight':   {'fall': 0.1, 'fall_k': 0.75, 'f_peak': 750.0, 'q_air': 2.5, 'room_wet': 0.12, 'rt60': 0.35,
+                    'grain_db': -20.0, 'grain_rate': 2000.0, 'grain_f': 6000.0},
     },
     'big': {
+        # round 3: the round-2 members were near clones to CLAP (family cos 0.909, the held-out real swoops 0.495):
+        # swell / sweep / deep / rush / tonal all shared one smooth air texture. Now each member owns a texture: a
+        # smooth air swell (kept), a flapping cape / sail (flutter + fabric friction, wide), a jet-like tonal pass (a
+        # Doppler-gliding whistle over a thin air bed), a deep sub swell (pro-style boom, dark), and a bright
+        # reverberant gust (high air, no low, a long room)
         'swell':   {},
-        'sweep':   {'f_peak': 650.0, 'up_oct': 2.0, 'down_oct': 3.0, 'dop_st': 5.0, 'hiss_db': -13.0,
-                    'low_db': -6.0, 'sub_db': -12.0, 'rise': 0.3, 'fall': 0.28},
-        'deep':    {'rise': 0.45, 'fall': 0.45, 'f_peak': 280.0, 'down_oct': 2.0, 'low_db': 2.0, 'sub_db': 0.0,
-                    'sub_f': 48.0, 'sub_glide': 0.7, 'hiss_db': -20.0, 'rt60': 1.2, 'room_wet': 0.25},
-        # round 2 tried a darker deep (f_peak 200, sub +4 dB, hiss -26 dB) and a shorter, fluttering rush (rise 0.16 s,
-        # hold 0.08 s, flutter 0.5, rustle): more distinct, but both failed the critic (tone 9.8 dB / robust 2.2), so
-        # the final family keeps these round-1 members (out/forge_v2/whoosh_big/LOG.md)
-        'rush':    {'rise': 0.24, 'rise_k': 0.6, 'fall': 0.3, 'fall_k': 1.1, 'hold': 0.06, 'f_peak': 480.0,
-                    'flut_depth': 0.4, 'flut_f': 18.0, 'hiss_db': -14.0, 'width': 0.35, 'pan': 0.25},
-        'tonal':   {'tone_db': -5.0, 'tone_q': 40.0, 'tone_ratio': 1.0, 'tone_pure': 0.85, 'dop_st': 12.0,
-                    'dop_w': 0.12, 'f_peak': 500.0, 'up_oct': 1.0, 'down_oct': 2.5, 'sub_db': -10.0, 'hiss_db': -18.0},
+        'cape':    {'rise': 0.26, 'rise_k': 0.9, 'fall': 0.32, 'hold': 0.05, 'f_peak': 330.0, 'q_air': 0.9,
+                    'flut_depth': 0.6, 'flut_f': 13.0, 'rustle': 0.6, 'rustle_f': 70.0, 'hiss_db': -14.0,
+                    'hiss_lo': 1400.0, 'hiss_rustle': 0.6, 'grain_db': -24.0, 'grain_rate': 700.0, 'grain_f': 3500.0,
+                    'low_db': -4.0, 'sub_db': -24.0, 'width': 0.45, 'pan': 0.25, 'room_wet': 0.18},
+        'jet':     {'tone_db': -3.0, 'tone_q': 50.0, 'tone_ratio': 1.4, 'tone_pure': 0.9, 'dop_st': 12.0,
+                    'dop_w': 0.1, 'f_peak': 700.0, 'up_oct': 1.0, 'down_oct': 2.6, 'q_air': 1.4, 'sub_db': -18.0,
+                    'low_db': -8.0, 'hiss_db': -20.0, 'rise': 0.42, 'fall': 0.36, 'pan': 0.3},
+        'deep':    {'rise': 0.5, 'fall': 0.45, 'f_peak': 260.0, 'up_oct': 0.9, 'down_oct': 1.8, 'low_db': -1.0,
+                    'low_f': 90.0, 'sub_db': -2.0, 'sub_f': 46.0, 'sub_glide': 0.8, 'sub_drive': 1.4,
+                    'flut_depth': 0.55, 'flut_f': 6.0, 'drive_db': 7.0, 'grain_db': -26.0, 'grain_rate': 200.0,
+                    'grain_f': 1200.0, 'hiss_db': -22.0, 'rt60': 1.3, 'room_wet': 0.28, 'width': 0.08, 'pan': 0.0},
+        # round 3.2: the first gust (bright, reverberant) was a near clone of the swell to CLAP (0.98): it now gusts
+        # (a slow 6 Hz flutter, the SPACE edge, depth 0.6; longer rise / fall); a sixth member, reverse, accelerates into the cut and stops (a
+        # suck-in, the motion-design reverse whoosh)
+        'gust':    {'rise': 0.45, 'rise_k': 1.1, 'fall': 0.45, 'f_peak': 700.0, 'up_oct': 1.8, 'down_oct': 2.4,
+                    'q_air': 0.8, 'lp_ratio': 3.5, 'low_db': -12.0, 'sub_db': -50.0, 'hiss_db': -14.0,
+                    'hiss_hp': 2200.0, 'flut_depth': 0.6, 'flut_f': 6.0, 'width': 0.5, 'room_wet': 0.35, 'rt60': 1.0},
+        'reverse': {'rise': 0.6, 'rise_k': 0.55, 'hold': 0.0, 'fall': 0.06, 'fall_k': 1.4, 'room_wet': 0.2,
+                    'rt60': 0.6},
     },
     'pro_big': {
+        # round 3: five low booms were near clones to CLAP (0.931 in round 2, 0.953 after the first round-3 run with
+        # the fused air layer). Round 3.2 (probe r3/divers_ov.py on the swell: tail shape and texture separate, length
+        # does not): the fused swell, a reverse swell that accelerates into the cut and stops, a long rolling swell
+        # (6 Hz flutter), a windy swell (fabric air over a lighter sub), a tonal sub sweep (a 70 Hz sub gliding 1.5 oct
+        # with a pure whistle on top) and a gritty driven swell (saturated sub, sparse low grains)
         'swell':   {},
-        'short':   {'rise': 0.17, 'fall': 0.12, 'hold': 0.01, 'sub_f': 54.0, 'f_peak': 120.0},
-        'long':    {'rise': 0.36, 'fall': 0.22, 'hold': 0.05, 'sub_f': 42.0, 'sub_glide': 0.7, 'rt60': 0.8},
-        'air':     {'hiss_db': -20.0, 'hiss_hp': 4500.0, 'f_peak': 160.0, 'low_db': -3.0, 'sub_db': 0.0,
-                    'width': 0.1},
-        'tonal':   {'sub_db': 6.0, 'low_db': -6.0, 'sub_drive': 1.6, 'sub_f': 58.0, 'sub_glide': 0.9},
+        'reverse': {'rise': 0.5, 'rise_k': 0.55, 'hold': 0.0, 'fall': 0.05, 'fall_k': 1.4},
+        'long':    {'rise': 0.42, 'fall': 0.24, 'hold': 0.05, 'sub_f': 42.0, 'sub_glide': 0.7, 'rt60': 0.8,
+                    'flut_depth': 0.6, 'flut_f': 6.0},
+        'windy':   {'f_peak': 200.0, 'q_air': 0.7, 'lp_ratio': 3.0, 'hiss_db': -27.0, 'hiss_rustle': 0.5,
+                    'hiss_lo': 1200.0, 'rustle': 0.5, 'rustle_f': 50.0, 'sub_db': -2.0},
+        'tonal':   {'sub_db': 8.0, 'low_db': -10.0, 'sub_f': 70.0, 'sub_glide': 1.5, 'sub_drive': 0.3,
+                    'tone_db': -6.0, 'tone_q': 50.0, 'tone_ratio': 4.0, 'tone_pure': 1.0, 'dop_st': 12.0},
+        'gritty':  {'drive_db': 9.0, 'sub_drive': 3.0, 'grain_db': -20.0, 'grain_rate': 300.0, 'grain_f': 1500.0},
     },
 }
 BASES = {'fast': FAST, 'big': BIG, 'pro_big': PRO_BIG}
@@ -192,7 +260,8 @@ KINDS = {
 }
 # the character parameters: kept inside a narrow box when a forge run tunes one family member (local_space)
 CHARACTER = ('rise', 'fall', 'hold', 'f_peak', 'up_oct', 'down_oct', 'dop_st', 'low_db', 'sub_db', 'sub_f',
-             'hiss_db', 'tone_db', 'tone_ratio', 'grain_db', 'grain_f', 'width', 'pan')
+             'hiss_db', 'tone_db', 'tone_ratio', 'grain_db', 'grain_f', 'width', 'pan',
+             'fall_k', 'flut_depth', 'rustle', 'hiss_rustle', 'tone_pure', 'q_air')   # round 3: textures + tail shape
 
 
 def preset(kind, name):
@@ -329,6 +398,9 @@ def render(p, r):
     if p['low_db'] > -39.5:
         al = _smooth(a, p['low_smooth'])
         al /= al.max() + 1e-12
+        lag = dsp.n_of(p.get('low_lag', 0.0))
+        if lag > 0:                          # the shove of air arrives after the surface's own brush (cloth, paper)
+            al = np.concatenate([np.zeros(lag), al[:-lag]])
         low = dsp.svf(_brown(n, r), np.clip(p['low_f'] * (0.6 + 0.4 * m), 25, 2000), 0.75, 'low')
         low = dsp.butter(low, 'high', max(28.0, p['low_f'] / 2.5), order=2) * al   # a band, not a rumble floor
         layers.append((p['low_db'], low))
@@ -347,8 +419,13 @@ def render(p, r):
         layers.append((p['sub_db'], sub))
     # hiss top
     if p['hiss_db'] > -44.5:
-        h = dsp.butter(r.standard_normal(n), 'high', p['hiss_hp'], order=4)
+        fab = p.get('hiss_rustle', 0.0) > 0
+        h_lo = p.get('hiss_lo') or p['hiss_hp'] if fab else p['hiss_hp']
+        h = dsp.butter(r.standard_normal(n), 'high', h_lo, order=4)
         h = dsp.svf(h, np.clip(p['hiss_hp'] * 2.0 ** (p['hiss_open'] * m) * 1.5 * dop, 500, 20000), 0.6, 'low')
+        if fab:                              # fabric / paper friction: fibres catch and release, a fast irregular AM
+            ru = np.exp(p['hiss_rustle'] * 1.4 * _lfnoise(n, 1.8 * p['rustle_f'], r))
+            h = h * ru / np.sqrt(np.mean(ru ** 2))
         layers.append((p['hiss_db'], h * a ** p['hiss_pow'] * flut))
     # tonal / whistle
     if p['tone_db'] > -49.5:
@@ -390,9 +467,31 @@ def render(p, r):
     if p['drive_db'] > 0.05:
         from .. import fx
         y = fx.saturate(y / (np.abs(y).max() + 1e-12), drive_db=p['drive_db'], mode='tape', os=2)
+    if abs(p.get('eq_lo_db', 0.0)) > 0.05:
+        y = shelf(y, p.get('eq_lo_f', 150.0), p['eq_lo_db'], high=False)
+    if abs(p.get('eq_hi_db', 0.0)) > 0.05:
+        y = shelf(y, p.get('eq_hi_f', 4000.0), p['eq_hi_db'], high=True)
     y = dsp.butter(y, 'high', 25, order=4)
     y = dsp.butter(y, 'low', 19000, order=4)
     return _edit(y, p['end_db'], p['end_fade'])
+
+
+def shelf(x, f0, gain_db, high=True, s=0.8):
+    """RBJ biquad shelf (slope s): the band above (high) or below f0 moves gain_db, the rest stays"""
+    from scipy import signal
+    A = 10 ** (gain_db / 40)
+    w0 = 2 * np.pi * min(f0, SR * 0.45) / SR
+    c, sn = np.cos(w0), np.sin(w0)
+    al = sn / 2 * np.sqrt((A + 1 / A) * (1 / s - 1) + 2)
+    q = 2 * np.sqrt(A) * al
+    if high:
+        b = [A * ((A + 1) + (A - 1) * c + q), -2 * A * ((A - 1) + (A + 1) * c), A * ((A + 1) + (A - 1) * c - q)]
+        a = [(A + 1) - (A - 1) * c + q, 2 * ((A - 1) - (A + 1) * c), (A + 1) - (A - 1) * c - q]
+    else:
+        b = [A * ((A + 1) - (A - 1) * c + q), 2 * A * ((A - 1) - (A + 1) * c), A * ((A + 1) - (A - 1) * c - q)]
+        a = [(A + 1) + (A - 1) * c + q, -2 * ((A - 1) + (A + 1) * c), (A + 1) + (A - 1) * c - q]
+    b, a = np.array(b) / a[0], np.array(a) / a[0]
+    return signal.lfilter(b, a, x, axis=0)
 
 
 def _edit(y, end_db, end_fade, fin=0.0015):

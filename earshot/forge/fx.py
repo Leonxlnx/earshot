@@ -9,7 +9,8 @@ glitch. Everything is deterministic (randomness only through an explicit rng) an
     y = fx.reverb(y, r, rt60=1.8, size=0.7, predelay=0.012, wet=0.3, stereo=True)   # smooth FDN hall
     y = fx.limit(y, ceiling_db=-1.0)                                                # never above -1 dBFS
 
-Space      reverb (16-line modulated FDN, frequency-dependent decay, early reflections), early (reflections only)
+Space      reverb (16-line modulated FDN, frequency-dependent decay, early reflections), early (reflections only);
+           reverb IRs are cached (see reverb_ir: exact replays of one rng state, or ir_seed= fixed rooms)
 Dynamics   saturate (tanh / tape / hard / fold, oversampled), transient (attack / sustain), limit (look-ahead)
 Colour     split (Linkwitz-Riley bands that sum flat), match_curve / eq_bands / eq_match (fit a smooth 1/3-octave EQ
            so the tonal balance moves toward a target: tone.profile bands, minimum- or linear-phase FIR)
@@ -18,10 +19,66 @@ Motion     doppler (pass-by with distance, air absorption, pan), pan / width / d
 Glitch     crush (bits + sample-rate), stutter, glitch (sliced repeat / reverse / drop / octave / crush), granular
            (grain cloud over a computed source), reverse_swell (a computed tail reversed into a hit)
 """
+import collections
+import threading
+
 import numpy as np
 from scipy import ndimage, signal
 
 from .dsp import SR, butter, curve, n_of, njit, normalize, place, svf
+from .dsp import rng as _rng
+
+IR_CACHE_MB = 64                    # reverb IR cache budget (per process, LRU)
+_IR_CACHE = collections.OrderedDict()
+_IR_LOCK = threading.Lock()
+_IR_STATS = {'hits': 0, 'misses': 0}
+
+
+def ir_cache_stats():
+    """{'hits', 'misses', 'entries', 'mb'} of the reverb IR cache"""
+    with _IR_LOCK:
+        return {**_IR_STATS, 'entries': len(_IR_CACHE),
+                'mb': round(sum(v[0].nbytes for v in _IR_CACHE.values()) / 2 ** 20, 1)}
+
+
+def ir_cache_clear():
+    with _IR_LOCK:
+        _IR_CACHE.clear()
+        _IR_STATS.update(hits=0, misses=0)
+
+
+def _ir_get(key):
+    with _IR_LOCK:
+        v = _IR_CACHE.get(key)
+        if v is not None:
+            _IR_CACHE.move_to_end(key)
+            _IR_STATS['hits'] += 1
+        else:
+            _IR_STATS['misses'] += 1
+        return v
+
+
+def _ir_put(key, ir, post):
+    with _IR_LOCK:
+        _IR_CACHE[key] = (ir, post)
+        _IR_CACHE.move_to_end(key)
+        total = sum(v[0].nbytes for v in _IR_CACHE.values())
+        while _IR_CACHE and total > IR_CACHE_MB * 2 ** 20:
+            _, (old, _) = _IR_CACHE.popitem(last=False)
+            total -= old.nbytes
+
+
+def ir_grid(rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0, diffuse=0.7, width=1.0, tail=None,
+            lowcut=0.0):
+    """reverb parameters snapped to a grid finer than anyone hears (times to 1/24 octave = 2.9 %, below the ~5 %
+    reverb-time JND; size / damp / bass / mod / diffuse / width to 0.05; predelay to 0.5 ms; lowcut to 1/12 octave),
+    so a search over continuous room settings keeps hitting the IR cache (reverb(..., ir_seed=k, grid=True))"""
+    def lg(v, step):
+        return float(2 ** (round(np.log2(v) / step) * step)) if v and v > 0 else v
+    q = lambda v: round(round(float(v) / 0.05) * 0.05, 4)
+    return dict(rt60=lg(rt60, 1 / 24), size=q(size), predelay=round(round(predelay / 0.0005) * 0.0005, 5), damp=q(damp),
+                bass=q(bass), mod=q(mod), diffuse=q(diffuse), width=q(width),
+                tail=None if tail is None else lg(tail, 1 / 24), lowcut=lg(lowcut, 1 / 12))
 
 
 def _2d(x):
@@ -170,7 +227,43 @@ def _late_noise(n, r, rt_f, f_axis, width):
 
 
 def reverb_ir(r, rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0, diffuse=0.7, early_db=-6.0,
-              width=1.0, late='noise', lines=16, tail=None, inputs=1, hf_hz=4000.0, lf_hz=250.0, air=1.0, lowcut=0.0):
+              width=1.0, late='noise', lines=16, tail=None, inputs=1, hf_hz=4000.0, lf_hz=250.0, air=1.0, lowcut=0.0,
+              seed=None, cache=True):
+    """the impulse response reverb() convolves with, shape (n, inputs, 2) (_reverb_ir has the design notes).
+    Cached (cache=True, IR_CACHE_MB, LRU, thread-safe), two ways:
+      seed=None   the IR draws its randomness from r, as always; the cache key is r's exact bit-generator state plus
+                  every parameter, and a hit sets r to the state the build would have left, so a render replayed
+                  with the same (params, seed) is sample-identical and costs no IR build (forge's final re-render,
+                  palette re-renders, render_params). Different seeds never hit.
+      seed=int    a fixed room: the IR comes from dsp.rng(seed) and r is not touched (so the draws after it shift
+                  against the seed=None path: opt in per recipe, then keep it). Cached by parameters: every candidate
+                  of a search with the same room settings reuses one IR (with ir_grid() snapping, a search over rt60
+                  hits too). A real reverb plugin is deterministic per setting; per-seed IR noise is not variation
+                  anyone hears. Measured on the whoosh recipe: see reverb()."""
+    args = (float(rt60), float(size), float(predelay), float(damp), float(bass), float(mod), float(diffuse),
+            None if early_db is None else float(early_db), float(width), str(late), int(lines),
+            None if tail is None else float(tail), int(inputs), float(hf_hz), float(lf_hz), float(air), float(lowcut))
+    if seed is not None:
+        key, src = ('seed', int(seed)) + args, None
+    elif cache and hasattr(r, 'bit_generator'):
+        src = r.bit_generator
+        key = ('state', repr(src.state)) + args
+    else:
+        key, src = None, None
+    if cache and key is not None:
+        hit = _ir_get(key)
+        if hit is not None:
+            if src is not None:
+                src.state = hit[1]
+            return hit[0].copy()
+    ir = _reverb_ir(_rng(seed) if seed is not None else r, *args)
+    if cache and key is not None:
+        _ir_put(key, ir.copy(), src.state if src is not None else None)
+    return ir
+
+
+def _reverb_ir(r, rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0, diffuse=0.7, early_db=-6.0,
+               width=1.0, late='noise', lines=16, tail=None, inputs=1, hf_hz=4000.0, lf_hz=250.0, air=1.0, lowcut=0.0):
     """the impulse response reverb() convolves with, shape (n, inputs, 2); unit energy at mid frequencies (a darker
     tail has less). late='noise': the FDN builds the onset and the first 0.1-0.2 s, then hands over (equal power, one
     shared decay design) to a stochastic late field whose every frequency decays at its own rt60. A real room's late
@@ -246,7 +339,8 @@ def reverb_ir(r, rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0,
 
 
 def reverb(x, r, rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0, diffuse=0.7, early_db=-6.0,
-           width=1.0, wet=0.3, dry=1.0, late='noise', lines=16, tail=None, stereo=None, air=1.0, lowcut=0.0):
+           width=1.0, wet=0.3, dry=1.0, late='noise', lines=16, tail=None, stereo=None, air=1.0, lowcut=0.0,
+           ir_seed=None, grid=False):
     """a smooth algorithmic reverb: a 16-line feedback delay network (Hadamard mix, mutually prime delays scaled by
     size 0..1, slowly modulated all-pass-interpolated taps) builds a dense onset, then a stochastic late field takes
     over (see reverb_ir: it never rings metallic); decay rt60 s at mid frequencies, damp 0..1 shortens it above 4 kHz
@@ -255,12 +349,22 @@ def reverb(x, r, rt60=1.6, size=0.6, predelay=0.01, damp=0.5, bass=1.2, mod=1.0,
     onset, no flutter), early reflections at early_db under the tail, predelay s, stereo width 0..1 (the low end
     stays coherent). The wet IR has unit energy, so wet is the reverb level relative to the direct
     sound (0.3 = -10 dB). Returns len(x) + predelay + tail (default 1.2 * the longest rt60); mono in gives mono out
-    (dry + the wet's mid) unless stereo=True.
+    (dry + the wet's mid) unless stereo=True. ir_seed=k: a fixed room (reverb_ir seed=; r untouched), cached by
+    parameters; grid=True snaps the room parameters first (ir_grid) so a search keeps hitting the cache. Measured
+    on the whoosh recipe's DEFAULTS (cProfile, laptop shared with other jobs): the IR build is 43 % of a render
+    (3.0 of 7.0 s for 4 renders), so a recipe that opts in saves up to that share whenever its room settings repeat
+    (a family with fixed rooms: every candidate after the first; a search over rt60 with grid=True: one build per
+    2.9 % step). The default path stays sample-identical and only saves replays of the same (params, seed).
         y = fx.reverb(hit, dsp.rng(1), rt60=2.4, size=0.8, damp=0.6, wet=0.35, stereo=True)"""
     x2, mono = _2d(x)
     stereo = (not mono) if stereo is None else stereo
+    if grid:
+        g = ir_grid(rt60, size, predelay, damp, bass, mod, diffuse, width, tail, lowcut)
+        rt60, size, predelay, damp, bass, mod, diffuse, width, tail, lowcut = (
+            g['rt60'], g['size'], g['predelay'], g['damp'], g['bass'], g['mod'], g['diffuse'], g['width'], g['tail'],
+            g['lowcut'])
     ir = reverb_ir(r, rt60, size, predelay, damp, bass, mod, diffuse, early_db, width, late, lines, tail, x2.shape[1],
-                   air=air, lowcut=lowcut)
+                   air=air, lowcut=lowcut, seed=ir_seed)
     n_out = len(x2) + len(ir) - 1
     wetv = np.zeros((n_out, 2))
     for c in range(x2.shape[1]):

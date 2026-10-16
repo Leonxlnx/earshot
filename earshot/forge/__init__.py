@@ -22,6 +22,16 @@ The seed bank (earshot/forge/seeds/<recipe>.json) keeps good parameter sets; `ba
 search from them and adds the new picks. `shortlist=S` with `robust=N` re-renders S x keep diverse candidates on N new
 seeds and keeps the `keep` best robust means (the best single render of a search is a winner's curse).
 
+Families (a category's palette of characters, round 3): `forge(rec, families={name: params | {'init', 'space',
+'budget'}}, ...)` searches each member inside its own box (`space`, else family_box(): +-box of each numeric range
+around the preset, choices fixed) with keep=1, then palette() scores the exact member set together (no diverse()
+drop: a family's members may sound alike on purpose), reports the family variety (mean / max pairwise CLAP cosine of
+the members next to the refs' own, and the closest pair's 1/3-octave distance), loudness-matches the palette (every
+member to the quietest momentary-max LUFS, then one common gain so the loudest peak sits at -1 dBFS: swappable in an
+edit without re-levelling) and writes <category>_NN.wav, report.json / report.md and _audition.wav (members at their
+matched levels, each followed by its nearest ref; the leading underscore keeps bench.py from counting it).
+`palette(rec, members, critic, out=...)` does the second half alone for members chosen any other way.
+
 Python API defaults reproduce v1 (strategy 'es', no pre-screen, no bank), so earlier round scripts stay comparable;
 the CLI defaults to the v2 setup (es + prescreen 3 x pop, bank, robust 3, shortlist 2, critic v2 with its own weights,
 and when neither --refs nor --refset is given the recipe's REFSET, else its REFS minus held-out files). The critic is
@@ -108,16 +118,20 @@ def _fmt(v, nd=2):
     return '-' if v is None else (f'{v:.{nd}f}' if isinstance(v, (float, np.floating)) else str(v))
 
 
-def audition(path, made, refs, pairs, gap_s=0.6, pair_gap_s=1.2, peak_db=-3.0):
+def audition(path, made, refs, pairs, gap_s=0.6, pair_gap_s=1.2, peak_db=-3.0, keep_made_levels=False):
     """write made, ref, made, ref ... (each peak-normalised to peak_db, stereo 48 kHz) + a .txt cue list next to it;
-    made / refs = [(name, array)], pairs = a ref index (or None) per made. Returns {'file', 'txt', 'cues'}"""
+    made / refs = [(name, array)], pairs = a ref index (or None) per made. keep_made_levels=True plays the made
+    sounds at their own (e.g. loudness-matched) levels and peak-normalises only the refs. Returns {'file', 'txt',
+    'cues'}"""
     import soundfile as sf
     from . import dsp
+    made_names = {id(x) for _, x in made}
 
     def st(x):
+        keep = keep_made_levels and id(x) in made_names
         x = np.asarray(x, np.float64)
         x = np.stack([x, x], 1) if x.ndim == 1 else x
-        return dsp.normalize(x, peak_db)
+        return x if keep else dsp.normalize(x, peak_db)
 
     parts, cues, t = [], [], 0.0
     for i, (name, x) in enumerate(made):
@@ -137,7 +151,9 @@ def audition(path, made, refs, pairs, gap_s=0.6, pair_gap_s=1.2, peak_db=-3.0):
     sf.write(path, x.astype(np.float32), 48000, subtype='PCM_24')
     txt = os.path.splitext(path)[0] + '.txt'
     lines = [f'{os.path.basename(path)}: each made sound, then its nearest real reference (measured: tonal balance + '
-             f'envelope), every sound peak-normalised to {peak_db:g} dBFS (peak-matched, not loudness-matched)']
+             + (f'envelope), the made sounds at their own matched levels, the refs peak-normalised to {peak_db:g} dBFS'
+                if keep_made_levels else
+                f'envelope), every sound peak-normalised to {peak_db:g} dBFS (peak-matched, not loudness-matched)')]
     lines += [f"{c['t']:8.2f} s  {c['kind']:<4}  {c['name']}" for c in cues]
     with open(txt, 'w', encoding='utf-8') as fh:
         fh.write('\n'.join(lines) + '\n')
@@ -225,7 +241,7 @@ def report_md(r):
 def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4, seed=0, out=None, log=print,
           init=None, holdout=True, robust=0, space=None, sigma0=0.22, sigma1=0.04, critic=None, tone=0.0,
           tone_target=None, reps=1, strategy='es', prescreen=0, workers=None, bank=False, shortlist=1, refset=None,
-          outputs=True, bank_dir=None, weights=None, mode='auto'):
+          outputs=True, bank_dir=None, weights=None, mode='auto', families=None, box=0.15):
     """run the loop for one recipe; writes WAVs + report.json (+ report.md, compare.png, audition.wav when outputs)
     into `out` when given; returns the report dict.
     robust=N re-renders every pick on N new seeds (mean / min / pass rate in pick['robust']); shortlist=S (with
@@ -237,7 +253,12 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
     measurement before the critic (K > pop); workers= render threads; bank=True starts from the recipe's seed bank and
     adds the picks to it (bank_dir= another folder); refset= a refsets category (its 'forge' split) instead of refs
     (held-out bench files among explicit refs are dropped: pick_refs); weights= / mode= go to the Critic (v2 weights,
-    'auto' | 'real' | 'designed'; weights={'tone': 0} makes the tone check report-only)"""
+    'auto' | 'real' | 'designed'; weights={'tone': 0} makes the tone check report-only; a critic built here also gets
+    category= the refset (or the recipe's REFSET): absolute study targets where the refs are thin, critic.py).
+    families= {name: params | {'init': params, 'space': {...}, 'fixed': {...}, 'budget': n}}: one keep=1 search per
+    member (inside `space`, else family_box(rec, params, box); `fixed` keys are never searched; every key outside
+    the box keeps the member's own value, not the recipe's DEFAULTS), then palette() of the exact members (module
+    doc: Families); returns the palette report with 'runs'."""
     import soundfile as sf
     from .critic import Critic
     from .search import diverse, optimize, prescreen_for, render, robust as robust_stats, sound_dist
@@ -248,9 +269,15 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
         target = target or rec.TARGET
         alts = list(alts if alts is not None else getattr(rec, 'ALTS', []))
         refs = resolve_refs(refs, refset, log=log) if (refs or refset) else refs
-        critic = Critic(target, alts, refs, tone=tone, tone_target=tone_target, weights=weights, mode=mode)
+        critic = Critic(target, alts, refs, tone=tone, tone_target=tone_target, weights=weights, mode=mode,
+                        category=refset or getattr(rec, 'REFSET', None))
     else:
         target, alts = critic.target, list(critic.alts)
+    if families:
+        return _forge_families(rec, families, critic, out=out, budget=budget, pop=pop, seed=seed, log=log,
+                               holdout=holdout, robust=robust, sigma0=sigma0, sigma1=sigma1, reps=reps,
+                               strategy=strategy, prescreen=prescreen, workers=workers, shortlist=shortlist,
+                               refset=refset, outputs=outputs, box=box, t0=t0)
     real = name in recipes()
     starts = list(init or [])
     n_bank = 0
@@ -380,6 +407,201 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
             if log:
                 log(f'seed bank not updated: {e}')
     return report
+
+
+def family_box(recipe, params, box=0.15, keys=None):
+    """a narrow search space around one preset: each numeric SPACE entry (or only `keys`) shrunk to +-box of its
+    range (log ranges in log units) around the preset's value, choices and keys outside `keys` fixed at the preset"""
+    rec = load_recipe(recipe) if isinstance(recipe, str) else recipe
+    out = {}
+    for k, spec in rec.SPACE.items():
+        if (keys is not None and k not in keys) or isinstance(spec, list) or k not in params:
+            continue
+        lo, hi = float(spec[0]), float(spec[1])
+        kind = spec[2] if len(spec) > 2 else 'lin'
+        v = float(params[k])
+        if kind == 'log' and lo > 0:
+            a, b, c = np.log(lo), np.log(hi), np.log(min(max(v, lo), hi))
+            w = box * (b - a)
+            out[k] = (float(np.exp(max(a, c - w))), float(np.exp(min(b, c + w))), 'log')
+        else:
+            w = box * (hi - lo)
+            q = (max(lo, v - w), min(hi, v + w))
+            out[k] = (q[0], q[1], 'int') if kind == 'int' else q
+        if out[k][0] >= out[k][1]:
+            del out[k]
+    return out
+
+
+def _forge_families(rec, families, critic, out=None, budget=96, pop=16, seed=0, log=print, holdout=True, robust=0,
+                    sigma0=0.22, sigma1=0.04, reps=1, strategy='es', prescreen=0, workers=None, shortlist=1,
+                    refset=None, outputs=True, box=0.15, t0=None):
+    t0 = time.time() if t0 is None else t0
+    items = list(families.items()) if isinstance(families, dict) else list(families)
+    members, runs = [], []
+    import types
+    for k, (fam, spec) in enumerate(items):
+        spec = dict(spec)
+        plain = not ({'init', 'space', 'fixed', 'budget'} & set(spec))
+        init = dict(spec if plain else spec.get('init', {}))
+        fixed = dict(spec.get('fixed', {}) if not plain else {})
+        base = {**(getattr(rec, 'DEFAULTS', {}) or {}), **init, **fixed}
+        space = {kk: v for kk, v in (spec.get('space') or family_box(rec, base, box)).items() if kk not in fixed}
+        # keys outside the member's box keep the MEMBER's values (optimize() fills them from DEFAULTS)
+        mrec = types.SimpleNamespace(**{a: getattr(rec, a) for a in ('TARGET', 'ALTS', 'REFSET', 'REFS')
+                                        if hasattr(rec, a)})
+        mrec.__name__, mrec.SPACE, mrec.DEFAULTS, mrec.render = rec.__name__, rec.SPACE, base, rec.render
+        rd = os.path.join(out, 'runs', str(fam)) if out else None
+        rep = forge(mrec, critic=critic, space=space, init=[base], keep=1,
+                    budget=int(spec.get('budget', budget)), pop=pop, seed=seed + 101 * k, out=rd, log=log,
+                    holdout=False, robust=robust, sigma0=sigma0, sigma1=sigma1, reps=reps, strategy=strategy,
+                    prescreen=prescreen, workers=workers, shortlist=shortlist, refset=refset, outputs=False,
+                    bank=False)
+        if rep['picks']:
+            pk = rep['picks'][0]
+            members.append({'params': pk['params'], 'seed': pk['seed'], 'family': str(fam),
+                            **({'robust': pk['robust']} if pk.get('robust') else {})})
+        runs.append({'family': str(fam), 'out': rd, 'budget': rep['budget'], 'timing': rep['timing'],
+                     'total': rep['picks'][0]['score'].get('total') if rep['picks'] else None})
+    rep = palette(rec, members, critic, out=out, name=refset, holdout=holdout, log=log, outputs=outputs)
+    rep['runs'] = runs
+    rep['timing'] = {'forge_s': round(time.time() - t0, 1)}
+    if out:
+        with open(os.path.join(out, 'report.json'), 'w', encoding='utf-8') as fh:
+            json.dump(rep, fh, indent=1, default=lambda o: o.tolist() if hasattr(o, 'tolist') else str(o))
+    return rep
+
+
+def _variety(E):
+    """mean / max pairwise cosine of embeddings (rows), None with fewer than 2"""
+    if E is None or len(E) < 2:
+        return None
+    E = np.asarray(E, np.float64)
+    E = E / (np.linalg.norm(E, axis=1, keepdims=True) + 1e-12)
+    C = E @ E.T
+    off = C[~np.eye(len(E), dtype=bool)]
+    return {'cos_mean': round(float(off.mean()), 3), 'cos_max': round(float(off.max()), 3)}
+
+
+def palette(recipe, members, critic, out=None, name=None, peak_db=-1.0, loudness=True, robust=0, workers=None,
+            holdout=True, log=print, outputs=True):
+    """score an exact member set together and write it as one swappable palette (module doc: Families).
+    members: [{'params', 'seed'[, 'family', 'name', 'robust']}] (a report's picks work) or bare params dicts (seed 0);
+    params are merged over the recipe's DEFAULTS. Every member is rendered (search.render) and kept: no diverse()
+    drop. Returns {'recipe', 'category', 'picks', 'variety', 'loudness', 'refs', ...}; writes <name>_NN.wav,
+    report.json, report.md and _audition.wav into `out` when given (compare.png too when outputs)."""
+    import soundfile as sf
+    from .polish import loudness_spread
+    from .search import prescreen_for, render, robust as robust_stats, sound_dist
+    from .tone import profile
+    rec = load_recipe(recipe) if isinstance(recipe, str) else recipe
+    rname = rec.__name__.rsplit('.', 1)[-1]
+    name = name or getattr(rec, 'REFSET', None) or rname
+    base = dict(getattr(rec, 'DEFAULTS', {}) or {})
+    ms = []
+    for i, m in enumerate(members):
+        m = dict(m) if isinstance(m, dict) and 'params' in m else {'params': dict(m), 'seed': 0}
+        m['params'] = {**base, **m['params']}
+        m['seed'] = int(m.get('seed') or 0)
+        ms.append(m)
+    xs = [render(rec, m['params'], m['seed']) for m in ms]
+    bad = [i for i, x in enumerate(xs) if x is None]
+    if bad and log:
+        log(f'palette: {len(bad)} member(s) failed to render or were silent: {bad}')
+    keep = [i for i, x in enumerate(xs) if x is not None]
+    ms, xs = [ms[i] for i in keep], [np.asarray(xs[i], np.float64) for i in keep]
+    lu0 = loudness_spread(xs)
+    gains = [1.0] * len(xs)
+    if loudness and xs:
+        gains = [10 ** ((min(lu0['lufs']) - v) / 20) for v in lu0['lufs']]
+    c = 10 ** (peak_db / 20) / max((float(np.abs(x).max()) * g for x, g in zip(xs, gains)), default=1.0)
+    xs = [(x * g * c).astype(np.float32) for x, g in zip(xs, gains)]
+    rows = critic.score(xs) if xs else []
+    E = critic.embed(xs) if hasattr(critic, 'embed') and len(xs) > 1 else None
+    refs = list(getattr(critic, 'refs', None) or [])
+    ref_x = [audio.load(p) for p in refs]
+    E_r = critic.embed(ref_x) if hasattr(critic, 'embed') and len(ref_x) > 1 else None
+    P = [profile(x) for x in xs]
+    tone_d = [float(np.sqrt(np.mean((P[i] - P[j]) ** 2))) for i in range(len(P)) for j in range(i + 1, len(P))]
+    variety = {'members': _variety(E), 'refs': _variety(E_r),
+               'tone_min_db': round(min(tone_d), 2) if tone_d else None,
+               'tone_mean_db': round(float(np.mean(tone_d)), 2) if tone_d else None}
+    hold = critic.holdout(xs) if holdout and xs and hasattr(critic, 'holdout') else []
+    pre = prescreen_for(critic)
+    report = {'recipe': rname, 'category': name, 'target': getattr(critic, 'target', None), 'refs': refs,
+              'critic': {'version': getattr(critic, 'version', 1), 'mode': getattr(critic, 'mode', None),
+                         'category': getattr(critic, 'category', None)},
+              'pick_rule': ('palette: the exact member set, scored together (no diverse() drop), loudness-matched to '
+                            f'the quietest member, then one common gain to a {peak_db:g} dBFS peak'),
+              'variety': variety, 'loudness': {'before': lu0, 'after': loudness_spread(xs)}, 'picks': []}
+    if out:
+        os.makedirs(out, exist_ok=True)
+    pairs = []
+    for i, (m, x, row, g) in enumerate(zip(ms, xs, rows, gains)):
+        item = {'name': m.get('name') or f'{name}_{i + 1:02d}', 'family': m.get('family'), 'params': m['params'],
+                'seed': m['seed'], 'gain_db': round(float(20 * np.log10(g * c)), 2),
+                'score': {k: v for k, v in row.items() if k != 'i'}}
+        if m.get('robust'):
+            item['robust'] = m['robust']
+        elif robust:
+            item['robust'] = robust_stats(rec, critic, m['params'], robust, workers=workers)
+        if i < len(hold):
+            item['holdout'] = hold[i]
+        j = None
+        if pre.n:
+            r = pre.row(x)
+            j = pre.nearest(r['desc'])
+            item['measured'] = {'tone_db': r['tone_db'], 't40_ms': r['desc']['env']['t40_ms'],
+                                'length_s': round(len(x) / 48000, 3), 'nearest_ref': os.path.basename(refs[j]),
+                                'nearest_dist': round(sound_dist(r['desc'], pre.descs[j]), 2)}
+        pairs.append(j)
+        if out:
+            item['file'] = os.path.join(out, item['name'] + '.wav').replace(chr(92), '/')
+            sf.write(item['file'], x, 48000, subtype='PCM_24')
+        report['picks'].append(item)
+    n_pass = sum(1 for p in report['picks'] if p['score'].get('passes'))
+    vm = variety['members'] or {}
+    vr = variety['refs'] or {}
+    report['summary'] = (f"palette {name}: {len(report['picks'])} members, {n_pass} pass; variety cos "
+                         f"{vm.get('cos_mean', '-')} (refs {vr.get('cos_mean', '-')}), closest pair "
+                         f"{variety['tone_min_db']} dB apart (1/3 oct); loudness spread "
+                         f"{lu0['spread_lu']} -> {report['loudness']['after']['spread_lu']} LU")
+    if out:
+        report['files'] = {}
+        made = [(p['name'], x) for p, x in zip(report['picks'], xs)]
+        refn = [(os.path.basename(p), x) for p, x in zip(refs, ref_x)]
+        report['files']['audition'] = audition(os.path.join(out, '_audition.wav'), made, refn, pairs,
+                                               keep_made_levels=True)['file']
+        if outputs:
+            from .viz import compare_png
+            try:
+                report['files']['compare'] = compare_png(os.path.join(out, 'compare.png'), made, refn, pairs=pairs,
+                                                         title=f'palette {name}: made (left) vs nearest reference')['file']
+            except Exception as e:                    # a plotting problem must not lose the palette
+                report['files']['compare_error'] = f'{type(e).__name__}: {e}'
+            with open(os.path.join(out, 'report.md'), 'w', encoding='utf-8') as fh:
+                fh.write(palette_md(report))
+        with open(os.path.join(out, 'report.json'), 'w', encoding='utf-8') as fh:
+            json.dump(report, fh, indent=1, default=lambda o: o.tolist() if hasattr(o, 'tolist') else str(o))
+    if log:
+        log(report['summary'])
+    return report
+
+
+def palette_md(r):
+    """a palette report as Markdown"""
+    L = [f"# palette {r['category']} ({r['recipe']})", '', r['summary'], '', r['pick_rule'] + '.', '',
+         '| member | family | total | passes | tone dB | env pen | art pen | polish pen | hard | gain dB | nearest ref |',
+         '|---|---|---|---|---|---|---|---|---|---|---|']
+    for p in r['picks']:
+        s, m = p['score'], p.get('measured') or {}
+        L.append(f"| {p['name']} | {p.get('family') or '-'} | {_fmt(s.get('total'))} | {s.get('passes')} | "
+                 f"{_fmt(s.get('tone_db'), 1)} | {_fmt(s.get('env_pen'))} | {_fmt(s.get('art_pen'))} | "
+                 f"{_fmt(s.get('polish_pen'))} | {', '.join(s.get('hard') or []) or '-'} | {p['gain_db']} | "
+                 f"{m.get('nearest_ref', '-')} |")
+    L += ['', '## Critic words', '']
+    L += [f"- {p['name']}: {p['score'].get('summary')}" for p in r['picks']]
+    return '\n'.join(L) + '\n'
 
 
 def render_params(recipe, params, seeds=None, out='.', refs=None):

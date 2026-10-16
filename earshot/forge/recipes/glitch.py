@@ -32,6 +32,12 @@ Character (families): length + crackle share (a quick hit vs a crackling build),
 33 ms or a fast 30 -> 18 ms roll), gate (choppy vs dense), bits / srate (grit), tonal / fm (noise glitch vs data
 bleeps), pitch_step (rising / falling), width. `pattern` fixes the slice layout and the burst choices of one glitch;
 each render varies the noise only, so a variant is reproducible.
+
+Round 3 (read only when a parameter set has them; render does not fill them in from DEFAULTS, so r2 sets render
+exactly as before): `skip` leaves stutter slots empty and `accent_db` puts about 2 in 3 bursts under the accented ones.
+With short bursts (decay ~0.2 slot), a quiet crackle (-21 dB) and a -44 dB bed this gives the film's level drama: the
+median 2 ms level sits at -35..-40 dB re the peak (ref -35.3; r2 finals -20..-25), and the burst onsets show the
+speed-up (glitch_stats early > late). r3 crackle grains use full Hann edges. glitch_stats reports `med2_db`.
 """
 import numpy as np
 
@@ -73,12 +79,16 @@ SPACE = {
     'drive': (0.0, 12.0),
     'end_tail': (0.004, 0.025, 'log'), # the last burst's own decay after the cut (ref t40 42 ms)
     'pattern': (0, 999, 'int'),
+    # round 3 (only read when present: r2 parameter sets render as before)
+    'skip': (0.0, 0.5),                # share of stutter slots left empty (the film skips beats)
+    'accent_db': (0.0, 12.0),          # unaccented bursts sit this far under the accented ones (~1 in 3)
 }
 DEFAULTS = {'dur': 0.65, 'crackle': 0.35, 'crackle_rate': 200.0, 'crackle_hp': 3500.0, 'crackle_db': -14.0,
             'grid0': 0.032, 'grid1': 0.022, 'accel': 1.2, 'gate': 0.7, 'swell': 4.0, 'bits': 5.0, 'srate': 6000.0,
             'tonal': 0.35, 'tone_f': 1800.0, 'fm': 0.3, 'slices': 3, 'repeat': 0.5, 'rev': 0.15, 'pitch_step': 0.0,
             'low_db': -34.0, 'decay': 0.6, 'lvl_jit': 4.0, 'floor_db': -52.0, 'width': 0.9, 'hp': 4500.0, 'bright': 3.0, 'drive': 4.0, 'end_tail': 0.012,
-            'pattern': 11}
+            'pattern': 11, 'skip': 0.0, 'accent_db': 0.0}
+_R3 = ('skip', 'accent_db')   # round-3 keys: read only when a parameter set has them (render does not fill them in)
 
 
 def _db(v):
@@ -139,7 +149,7 @@ def _grid(p, t0, t1):
 
 
 def render(p, r):
-    p = {**DEFAULTS, **p}
+    p = {**{k: v for k, v in DEFAULTS.items() if k not in _R3}, **p}
     pr = dsp.rng(int(p['pattern']) * 7919 + 13)
     dur = p['dur']
     n_end = dsp.n_of(dur)
@@ -154,12 +164,18 @@ def render(p, r):
     nb = len(bursts)
     low = np.zeros(n)
     prev = [0, 0]
+    skip = p.get('skip')                   # r3: drop slots (the film's stutter skips beats: loud bursts with real
+    loud = p.get('accent_db')               # gaps, -40..-45 dB, between them; r2 filled every slot)
     for k, (tb, d) in enumerate(bursts):
         last = k == nb - 1
+        if skip is not None and 0 < k and not last and pr.uniform() < skip:
+            continue
         g = max(16, dsp.n_of(d * p['gate']))
         if last:
             g = max(16, n_end - dsp.n_of(tb))           # the last burst runs to the cut
         lvl = _db(p['swell'] * (k / max(1, nb - 1) - 1.0) - abs(p['lvl_jit'] * pr.standard_normal()) * (not last))
+        if loud is not None and not last and pr.uniform() > 0.35:   # r3: most bursts sit accent_db under the
+            lvl *= _db(-loud)                                     # accented ones (burst-to-burst drama)
         rate = 2 ** (k * p['pitch_step'] / 12)
         for c in range(2):
             if c == 1 and pr.uniform() > p['width']:
@@ -208,7 +224,7 @@ def render(p, r):
                 if t >= t_st:
                     break
                 m = dsp.n_of(r.uniform(0.0015, 0.006))      # grains, not clicks: a few ms, smooth edges
-                gr = r.standard_normal(m) * np.hanning(m) ** 0.5 * np.exp(-_t(m) / (m / SR / 2))
+                gr = r.standard_normal(m) * np.hanning(m) ** (1.0 if skip is not None else 0.5) * np.exp(-_t(m) / (m / SR / 2))   # r3: full Hann edges (the sqrt-Hann grain edge read as a click)
                 if r.uniform() < 0.2:                 # a few low blips among the high grains (smooth, not crushed:
                     gr = np.sin(2 * np.pi * r.uniform(150, 900) * _t(m)) * np.hanning(m) * 1.5   # steps would click)
                 i = dsp.n_of(t)
@@ -259,11 +275,16 @@ def glitch_stats(x):
     d = np.diff(keep)
     h = len(d) // 2
     early, late = (float(np.median(d[:h])), float(np.median(d[h:]))) if len(d) >= 4 else (None, None)
+    k2 = int(SR * 0.002)
+    n2 = len(m) // k2
+    e2 = 10 * np.log10((m[:n2 * k2].reshape(n2, k2) ** 2).mean(1) + 1e-14)
+    med2 = float(np.median(e2) - e2.max())     # level drama: the film's glitch sits at -35 (r2 finals -20..-25)
     edges = [0, 150, 1000, 4000, 12000, 24001]
     sh = [round(float(10 * np.log10(P[(f >= a) & (f < b)].sum() / (P.sum() + 1e-14) + 1e-14)), 1)
           for a, b in zip(edges[:-1], edges[1:])]
     return {'corr': round(corr, 2), 'centroid_hz': round(cen), 's412_db': round(float(s412), 1), 'shares': sh,
-            'end_db': round(float(tail), 1), 'bursts': len(keep), 'early_ms': early, 'late_ms': late}
+            'end_db': round(float(tail), 1), 'bursts': len(keep), 'early_ms': early, 'late_ms': late,
+            'med2_db': round(med2, 1)}
 
 
 def study_extra(x, row=None):
@@ -275,7 +296,8 @@ def study_extra(x, row=None):
            + min(1.0, max(0.0, -4 - s['s412_db']) / 6) + min(1.0, max(0.0, s['end_db'] + 30) / 10)
            + (0.5 if s['bursts'] < 6 else 0.0)
            + (min(1.0, max(0.0, s['late_ms'] - s['early_ms'] + 2) / 8) if s['early_ms'] is not None else 0.5)
-           + min(1.5, sum(max(0.0, abs(a - b) - 6) for a, b in zip(s['shares'], PRO_SHARES)) / 12))
+           + min(1.5, sum(max(0.0, abs(a - b) - 6) for a, b in zip(s['shares'], PRO_SHARES)) / 12)
+           + min(1.0, max(0.0, s['med2_db'] + 29) / 6))      # r3: median 2 ms level <= -29 dB re peak (film -35)
     return -min(3.0, 0.6 * pen)
 
 

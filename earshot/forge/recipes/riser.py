@@ -28,6 +28,11 @@ depth, brightness (nf1, tbright), pitch range (tf0, toct), weight (drone, hp), t
 blips, gate). FAMILIES holds the hand-designed character presets the final runs start from; DEFAULTS is the 'air'
 build.
 
+Round 3 (after the round-2 judge: steady single lines for seconds, a chiptune pro set): `drone_oct` / `drone_noise`
+(the drone glides up with the build, or is a low noise rumble), `metal_n` / `metal_glide` (the cymbal's metal moves),
+tmode 'nblips' (stepped pulses of band-passed noise instead of tone blips); FAMILIES_BY_CAT['riser'] = round 2's picks
+with those fixes, FAMILIES_BY_CAT['pro_riser'] = PRO_R3 (noise-led stutter builds; round 2's PRO kept for the record).
+
 REFSET 'riser' is thin (one designed trailer riser in the forge split; the bench is two real cymbal swells); the
 'pro_riser' set (one stutter riser from the pro films) is used for the short stutter family. The search runs in
 designed mode, and `target_check()` adds the study's model-free targets to the critic (concave rise, ends on its
@@ -52,7 +57,7 @@ SPACE = {
     'nq': (0.7, 4.0, 'log'),              # resonance of the noise filter
     'pink': (0.0, 1.0),                   # 0 white (hissy) .. 1 pink (rounder)
     'tone_db': (-36.0, 0.0),
-    'tmode': ['glide', 'blips'],
+    'tmode': ['glide', 'blips', 'nblips'],
     'wave': ['sine', 'tri', 'saw'],
     'tf0': (60.0, 4000.0, 'log'),         # tonal start pitch (Hz)
     'toct': (0.5, 3.0),                   # octaves of rise
@@ -79,6 +84,13 @@ SPACE = {
     'sat': (0.0, 12.0),                   # tanh drive on the sum (dB)
     'hp': (60.0, 500.0, 'log'),           # high-pass of everything but the drone
     'end_ms': (2.0, 20.0, 'log'),         # final fade (ms): the end is a cut, not a ring-out
+    # round 3 (the judge: no steady single line for seconds: riser_05's 2.5 kHz metal partial, riser_02's sub drone;
+    # pro_riser reads as a chiptune arpeggio, AudioSet 'Music' 4/5)
+    'drone_oct': (0.0, 1.5),              # the drone glides up this many octaves with the build (round 2: 0.08)
+    'drone_noise': (0.0, 1.0),            # 0 saw + sine drone .. 1 a low noise rumble (50-400 Hz band, no line)
+    'metal_n': (9, 40, 'int'),            # metal partials: 9 = round 2's fixed ratios; more = random dense ratios
+    'metal_glide': (0.0, 1.0),            # the metal partials glide up this many octaves with the build
+    'nb_q': (2.0, 16.0, 'log'),           # tmode 'nblips': Q of the noise band each blip is (filtered noise steps)
 }
 
 # character presets (round 1 hand design, then refined by the forge; see out/forge_v2/riser/LOG.md)
@@ -122,6 +134,7 @@ for _f in FAMILIES.values():
     _f.setdefault('metal_db', -48.0)
     _f.setdefault('metal_f', 2600.0)
     _f.setdefault('blip_dec', 0.35)
+    _f.update({'drone_oct': 0.08, 'drone_noise': 0.0, 'metal_n': 9, 'metal_glide': 0.0, 'nb_q': 6.0})
 # round 3: 'rush' was a gated tri / saw glide that CLAP heard as 'a square wave chiptune blip' (z 1.7-2.6, 0/3 pass);
 # now the noise leads (a resonant whistle opening 500 Hz -> 15 kHz) with a sine glide under it and a smooth flutter
 # speeding up 10 -> 35 Hz
@@ -163,6 +176,83 @@ FAMILIES_BY_CAT = {'riser': {k: FAMILIES[k] for k in ('air', 'tension', 'shepard
                    'pro_riser': PRO}
 TARGETS = {'pro_riser': 'a short stuttering digital riser into a cut'}
 DEFAULTS = dict(FAMILIES['air'])
+
+# ------------------------------------------------------------------------------------------------ round 3 presets
+# riser: the round-2 picks (out/forge_v2/riser/final_r2/report.json) with every steady line made to move: the drones
+# glide up with the build (or become a low noise rumble), the cymbal's metal is 28 dense partials gliding up
+_R2 = {
+    'air': {'length': 2.47, 'curve': 2.043, 'rise_db': 33.76, 'noise_db': -2.34, 'nf0': 294.7, 'nf1': 10379.0,
+            'nq': 1.856, 'pink': 0.646, 'tone_db': -22.34, 'tmode': 'glide', 'wave': 'tri', 'tf0': 440.8, 'toct': 1.225,
+            'tbright': 3.63, 'detune': 13.64, 'oct_db': -29.46, 'shep_db': -43.4, 'shep_rate': 0.778,
+            'drone_db': -32.06, 'drone_f': 50.92, 'metal_db': -46.76, 'metal_f': 2615.8, 'gate_depth': 0.039,
+            'gate_on': 0.584, 'gate_p0': 0.173, 'gate_p1': 0.041, 'gate_duty': 0.506, 'gate_sharp': 0.058,
+            'gate_drone': 0.103, 'blip_dec': 0.35, 'verb': 0.259, 'rt60': 1.765, 'width': 0.586, 'sat': 0.861,
+            'hp': 193.6, 'end_ms': 5.46},
+    'tension': {'length': 2.816, 'curve': 2.681, 'rise_db': 35.24, 'noise_db': -9.59, 'nf0': 214.0, 'nf1': 7710.6,
+                'nq': 1.253, 'pink': 0.814, 'tone_db': -3.34, 'tmode': 'glide', 'wave': 'saw', 'tf0': 76.65,
+                'toct': 1.767, 'tbright': 6.06, 'detune': 20.45, 'oct_db': -10.69, 'shep_db': -45.8,
+                'shep_rate': 0.765, 'drone_db': -16.86, 'drone_f': 53.29, 'metal_db': -45.95, 'metal_f': 2641.2,
+                'gate_depth': 0.558, 'gate_on': 0.264, 'gate_p0': 0.254, 'gate_p1': 0.058, 'gate_duty': 0.493,
+                'gate_sharp': 0.213, 'gate_drone': 0.052, 'blip_dec': 0.35, 'verb': 0.286, 'rt60': 2.495,
+                'width': 0.522, 'sat': 5.94, 'hp': 109.6, 'end_ms': 5.56},
+    'shepard': {'length': 3.708, 'curve': 2.026, 'rise_db': 30.53, 'noise_db': -8.98, 'nf0': 206.5, 'nf1': 8656.4,
+                'nq': 2.572, 'pink': 0.974, 'tone_db': -35.18, 'tmode': 'glide', 'wave': 'sine', 'tf0': 260.0,
+                'toct': 1.046, 'tbright': 2.34, 'detune': 9.42, 'oct_db': -32.85, 'shep_db': -4.73,
+                'shep_rate': 0.887, 'drone_db': -22.49, 'drone_f': 51.44, 'metal_db': -44.93, 'metal_f': 2843.6,
+                'gate_depth': 0.048, 'gate_on': 0.578, 'gate_p0': 0.173, 'gate_p1': 0.049, 'gate_duty': 0.483,
+                'gate_sharp': 0.018, 'gate_drone': 0.098, 'blip_dec': 0.35, 'verb': 0.415, 'rt60': 2.889,
+                'width': 0.909, 'sat': 0.291, 'hp': 108.6, 'end_ms': 10.47},
+    'rush': {'length': 1.756, 'curve': 3.117, 'rise_db': 32.74, 'noise_db': -4.32, 'nf0': 468.2, 'nf1': 12035.0,
+             'nq': 2.54, 'pink': 0.344, 'tone_db': -8.74, 'tmode': 'glide', 'wave': 'sine', 'tf0': 397.2,
+             'toct': 2.516, 'tbright': 5.63, 'detune': 9.84, 'oct_db': -19.99, 'shep_db': -42.3, 'shep_rate': 0.889,
+             'drone_db': -24.66, 'drone_f': 76.65, 'metal_db': -43.25, 'metal_f': 2909.5, 'gate_depth': 0.497,
+             'gate_on': 0.074, 'gate_p0': 0.146, 'gate_p1': 0.026, 'gate_duty': 0.458, 'gate_sharp': 0.188,
+             'gate_drone': 0.092, 'blip_dec': 0.364, 'verb': 0.292, 'rt60': 1.687, 'width': 0.565, 'sat': 3.2,
+             'hp': 171.7, 'end_ms': 3.32},
+    'cymbal': {'length': 2.531, 'curve': 2.469, 'rise_db': 41.5, 'noise_db': -3.21, 'nf0': 730.3, 'nf1': 15030.0,
+               'nq': 0.704, 'pink': 0.312, 'tone_db': -33.79, 'tmode': 'glide', 'wave': 'tri', 'tf0': 542.9,
+               'toct': 1.24, 'tbright': 3.7, 'detune': 11.5, 'oct_db': -32.17, 'shep_db': -44.76, 'shep_rate': 0.725,
+               'drone_db': -46.7, 'drone_f': 61.19, 'metal_db': -4.46, 'metal_f': 2153.3, 'gate_depth': 0.035,
+               'gate_on': 0.514, 'gate_p0': 0.209, 'gate_p1': 0.046, 'gate_duty': 0.508, 'gate_sharp': 0.035,
+               'gate_drone': 0.05, 'blip_dec': 0.35, 'verb': 0.396, 'rt60': 1.688, 'width': 0.96, 'sat': 0.901,
+               'hp': 403.8, 'end_ms': 4.21},
+}
+_R3_FIX = {
+    'air': dict(drone_oct=0.9, drone_noise=0.7),
+    'tension': dict(drone_oct=1.0, drone_noise=0.5, drone_db=-20.0),
+    'shepard': dict(drone_oct=0.7, drone_noise=0.8),
+    'rush': dict(drone_oct=0.6, drone_noise=0.3, drone_db=-28.0),
+    # the cymbal: round 2's 9 metal ratios, now gliding up 0.6 oct (28 dense random partials were tried first: the
+    # description z fell to 2.9 against 3.3-3.45 for the 9 gliding ratios)
+    'cymbal': dict(metal_n=9, metal_glide=0.6, metal_db=-6.0, drone_db=-48.0, width=0.75),
+}
+FAMILIES_BY_CAT['riser'] = {k: {**FAMILIES[k], **_R2[k], **_R3_FIX[k]} for k in _R2}
+# pro_riser: noise-led stutter builds (round 2's tone blips and gated saw read as a chiptune arpeggio): the stepped
+# rising gesture is now carried by filtered noise (band-passed noise blips stepping up), the drones are gated noise
+# rumbles, the gate still accelerates into the cut
+PRO_R3 = {
+    'nblips': {**_ST, 'length': 1.0, 'tmode': 'nblips', 'nb_q': 7.0, 'tf0': 1700.0, 'toct': 2.4, 'tone_db': 0.0,
+               'noise_db': -10.0, 'nf0': 900.0, 'nf1': 13000.0, 'nq': 1.2, 'gate_p0': 0.05, 'gate_p1': 0.024,
+               'gate_duty': 0.5, 'blip_dec': 0.25, 'drone_db': -16.0, 'drone_noise': 1.0, 'drone_oct': 0.3,
+               'gate_drone': 1.0, 'oct_db': -20.0, 'rise_db': 20.0, 'curve': 1.8, 'verb': 0.03, 'sat': 2.0,
+               'metal_n': 9, 'metal_glide': 0.0},
+    'chop': {**PRO['chop'], 'tone_db': -24.0, 'drone_noise': 1.0, 'drone_oct': 0.3, 'nq': 2.4, 'gate_p0': 0.045,
+             'gate_p1': 0.02, 'sat': 2.0, 'drone_db': -18.0, 'metal_n': 9, 'metal_glide': 0.0, 'nb_q': 6.0},
+    'roll': {**PRO['roll'], 'drone_noise': 1.0, 'drone_oct': 0.3, 'metal_n': 9, 'metal_glide': 0.0, 'nb_q': 6.0},
+    'air_gate': {**_ST, 'length': 1.2, 'tmode': 'glide', 'wave': 'saw', 'tf0': 400.0, 'toct': 2.0, 'tbright': 2.0,
+                 'tone_db': -16.0, 'noise_db': 0.0, 'nf0': 500.0, 'nf1': 12000.0, 'nq': 3.0, 'pink': 0.5,
+                 'gate_depth': 0.85, 'gate_on': 0.1, 'gate_p0': 0.07, 'gate_p1': 0.022, 'gate_duty': 0.55,
+                 'gate_sharp': 0.6, 'drone_db': -18.0, 'drone_noise': 1.0, 'drone_oct': 0.5, 'gate_drone': 0.8,
+                 'hp': 200.0, 'sat': 2.0, 'rise_db': 26.0, 'curve': 2.2, 'verb': 0.12, 'width': 0.4,
+                 'metal_n': 9, 'metal_glide': 0.0, 'nb_q': 6.0},     # a resonant noise whistle under a gate
+    'nblips_hi': {**_ST, 'length': 0.85, 'tmode': 'nblips', 'nb_q': 10.0, 'tf0': 2600.0, 'toct': 2.1,
+                  'tone_db': 0.0, 'noise_db': -12.0, 'nf0': 1500.0, 'nf1': 14000.0, 'gate_p0': 0.045,
+                  'gate_p1': 0.026, 'blip_dec': 0.22, 'drone_db': -20.0, 'drone_f': 110.0, 'drone_noise': 1.0,
+                  'drone_oct': 0.3, 'gate_drone': 1.0, 'rise_db': 20.0, 'verb': 0.03, 'sat': 2.0, 'metal_n': 9,
+                  'metal_glide': 0.0},
+}
+FAMILIES_BY_CAT['pro_riser'] = PRO_R3
+# (round 2's pro set stays in PRO for the record; its picks re-render from out/forge_v2/pro_riser/final_r2/)
 
 UNISON = (-1.0, -0.45, 0.0, 0.45, 1.0)
 FINAL_OPEN = 0.045    # s: the gate opens (and the blips sustain) over the last 45 ms, so the riser peaks on the cut     # voice offsets (x detune cents) and pans (x width)
@@ -351,18 +441,29 @@ def render(p, r):
     wt = u ** max(1.0, 0.8 * p['curve'])
     f = p['tf0'] * 2 ** (p['toct'] * wt)
     ph0 = r.uniform(0, 1, 2 * len(UNISON))
+    nblips = p['tmode'] == 'nblips'
+    blips = blips or nblips
     if blips:
         idx = np.floor(ph).astype(np.int64)
         starts = np.r_[0, np.nonzero(np.diff(idx))[0] + 1]
         held = np.repeat(f[starts], np.diff(np.r_[starts, n]))   # pitch held per pulse: a stepped arpeggio
         fr = np.mod(ph, 1.0)
         fb = held * 2 ** (-0.35 * fr)                             # each blip a small falling chirp
-        tone = unison(fb, p['wave'], p['detune'], 0.25 * p['width'], ph0[:5])
+        if nblips:                                                # round 3: each blip a band of noise at the step
+            bl = np.stack([dsp.svf(r.standard_normal(n), np.minimum(fb, 16000.0), p['nb_q'], 'band')
+                           for _ in range(2)], axis=1)
+            mid = bl.mean(1, keepdims=True)
+            tone = mid + (bl - mid) * min(1.0, 0.5 * p['width'] + 0.2)
+        else:
+            tone = unison(fb, p['wave'], p['detune'], 0.25 * p['width'], ph0[:5])
         tone *= (gate_shape(ph, per, p['gate_duty'], 1.0, perc=p['blip_dec']) * fin + 1 - fin)[:, None]
     else:
         tone = unison(f, p['wave'], p['detune'] * (0.6 + 0.8 * w), 0.5 * p['width'], ph0[:5])
-    octv = unison(2 * (held * 2 ** (-0.35 * np.mod(ph, 1.0)) if blips else f), p['wave'], p['detune'] * 0.7,
-                  0.6 * p['width'], ph0[5:])
+    if nblips:
+        octv = stereo_of(dsp.svf(r.standard_normal(n), np.minimum(2 * fb, 16000.0), p['nb_q'] * 1.5, 'band'))
+    else:
+        octv = unison(2 * (held * 2 ** (-0.35 * np.mod(ph, 1.0)) if blips else f), p['wave'], p['detune'] * 0.7,
+                      0.6 * p['width'], ph0[5:])
     octv *= np.clip((u - 0.4) / 0.6, 0, 1)[:, None] ** 2
     if blips:
         octv *= (gate_shape(ph, per, p['gate_duty'], 1.0, perc=0.7 * p['blip_dec']) * fin + 1 - fin)[:, None]
@@ -382,9 +483,13 @@ def render(p, r):
         sh_st = np.zeros((n, 2))
 
     # drone: steady low saw + sine, gently swelling
-    df = p['drone_f'] * 2 ** (0.08 * w)
+    df = p['drone_f'] * 2 ** (p['drone_oct'] * w)
     dr = sum(dsp.osc(df * 2 ** (c / 1200), 'saw', phase=r.uniform()) for c in (-7, 0, 7)) / 3
     dr = dsp.butter(dr, 'low', 500, order=2) * 0.8 + 0.35 * dsp.osc(df, 'sine', phase=r.uniform())
+    if p['drone_noise'] > 0.01:                                  # round 3: a low noise rumble instead of a line
+        rn = dsp.svf(r.standard_normal(n), np.clip(2.2 * df, 60, 2000), 1.2, 'band')
+        rn = dsp.butter(rn, 'low', 600, order=2)
+        dr = (1 - p['drone_noise']) * dr / (np.std(dr) + 1e-12) + p['drone_noise'] * rn / (np.std(rn) + 1e-12)
     dr = dsp.butter(dr, 'high', 30, order=2)
     dr *= 10 ** (-0.3 * p['rise_db'] * (1 - w) / 20)
     g2 = gate_shape(2 * ph, per / 2, p['gate_duty'], p['gate_sharp']) if blips else g   # blips: drone at 2x rate
@@ -393,15 +498,28 @@ def render(p, r):
     # metal: inharmonic partials, each shimmering under its own slow random amplitude, brightening with the build
     if p['metal_db'] > -47:
         ratios = np.array([1.0, 1.37, 1.71, 2.13, 2.58, 3.11, 3.66, 4.29, 5.02])
+        if int(p['metal_n']) > 9:                                # round 3: dense random partials, no single line
+            ratios = np.sort(np.exp(r.uniform(0, np.log(6.0), int(p['metal_n']))))
+        glide = 2 ** (p['metal_glide'] * u ** 1.2)                 # moves from the start (w barely moves early)
+        dense = int(p['metal_n']) > 9
+        if dense:                                                # each partial opens at its own random point
+            u_on = np.where(np.arange(len(ratios)) % 5 == 0, -1.0, r.uniform(0.0, 0.75, len(ratios)))
         met = np.zeros(n)
         for k, q in enumerate(ratios):
             fk = p['metal_f'] * q * (1 + 0.004 * r.standard_normal())
-            if fk > 19000:
+            if fk * 2 ** p['metal_glide'] > 19000:
                 continue
             am = dsp.butter(r.standard_normal(n), 'low', 220, order=2)
             am = np.abs(am) / (np.abs(am).mean() + 1e-12)
-            open_k = np.clip(w * len(ratios) * 0.9 - k * 0.6 + 1.0, 0, 1)
-            met += np.sin(2 * np.pi * fk * t + r.uniform(0, 2 * np.pi)) * am * open_k / (1 + 0.15 * k)
+            if dense:
+                open_k = np.clip((w - u_on[k]) / 0.25, 0, 1)
+            else:
+                open_k = np.clip(w * len(ratios) * 0.9 - k * 0.6 + 1.0, 0, 1)
+            if p['metal_glide'] > 0.001:
+                met += np.sin(2 * np.pi * np.cumsum(fk * glide) / dsp.SR + r.uniform(0, 2 * np.pi)) * am * open_k \
+                    / (1 + 0.15 * k * 9 / len(ratios))
+            else:
+                met += np.sin(2 * np.pi * fk * t + r.uniform(0, 2 * np.pi)) * am * open_k / (1 + 0.15 * k)
         met = dsp.butter(met, 'high', 1200, order=2)
         met_st = fx.width(fx.decorrelate(met, 1.0), p['width'])
     else:

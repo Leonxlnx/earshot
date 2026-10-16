@@ -111,3 +111,66 @@ def test_family_members_differ():
             for j in range(i + 1, len(xs)):
                 d = float(np.sqrt(np.mean((prof[i] - prof[j]) ** 2)))
                 assert d > 1.5 or abs(lens[i] - lens[j]) / max(lens[i], lens[j]) > 0.15, (cat, i, j, d)
+
+
+def test_round3_shimmer_rings_out_wide_without_a_bed_line():
+    """round 3 (the judge: shimmer tails half the bench's, mono chimes, steady lines): the real-style members ring
+    out freely (t40 >= 1.5 s), are wide, and an 'off' tone bed adds no line under an air-only bed"""
+    _, _, shimmer = _mods()
+    fam = shimmer.FAMILY['shimmer']
+    for i in (0, 2):                                              # the bar-chime sweep and the wind chimes
+        x = render(shimmer, fam[i], i + 2)
+        m = x.mean(1)
+        h = 240
+        e = 20 * np.log10(np.sqrt((m[:len(m) // h * h].reshape(-1, h) ** 2).mean(1)) + 1e-12)
+        pk = int(np.argmax(e))
+        below = np.nonzero(e[pk:] < e[pk] - 40)[0]
+        assert below[0] * h / SR >= 1.5                            # t40
+        assert shimmer.measure(x)['corr'] < 0.5                    # wide
+        assert abs(m[0]) < 1e-3                                    # starts on zero
+    p = {**fam[0], 'air_db': -30.0, 'tone_db': -40.0, 'verb': 0.0}
+    x = render(shimmer, p, 4).mean(1)
+    S = np.abs(np.fft.rfft(x)) ** 2
+    f = np.fft.rfftfreq(len(x), 1 / SR)
+    assert 10 * np.log10(S[(f > 150) & (f < 1000)].sum() / S.sum()) < -35   # (round 2 left a -40 dB 500 Hz line)
+
+
+def test_round3_notify_bells_are_lower_struck_and_ring():
+    """round 3 (the judge: no strike transient, rings too even, members 1-2 octaves above the bench bells)"""
+    notify, _, _ = _mods()
+    for i, p in enumerate(notify.FAMILY['notify']):
+        assert p['f0'] <= 1400 and p['strike'] > -40 and p['early_db'] > 0
+        if i in (0, 2):
+            x = render(notify, p, i + 1)
+            m = notify.measure(x)
+            assert 1000 <= m['t40_ms'] <= 2600, m
+            e = x.mean(1)
+            pk = int(np.argmax(np.abs(e)))
+            lev = lambda a, b: 20 * np.log10(np.sqrt(np.mean(e[a:b] ** 2)) + 1e-12)
+            first = lev(pk, pk + 480)
+            assert first - lev(pk + 4800, pk + 5280) > 6             # the strike dies fast: > 6 dB down at 0.1 s
+
+
+def test_round3_pro_notify_head_has_no_drive_comb():
+    """round 3: the pro ding's head is clean (no harmonic comb from the drive), its richness is inharmonic"""
+    notify, _, _ = _mods()
+    p = notify.FAMILY['pro_notify'][2]
+    assert p['head_drive'] == 0.0 and p['p3'] > 0 and p['air'] > -40
+    q = {**p, 'body_db': -60.0, 'air': -60.0, 'tick_db': -40.0, 'verb': 0.0, 'p3': 0.0, 'oct': 0.0, 'bright': 0.05}
+    x = render(notify, q, 2).mean(1)
+    S = np.abs(np.fft.rfft(x)) ** 2
+    f = np.fft.rfftfreq(len(x), 1 / SR)
+    band = lambda c: S[(f > c * 0.97) & (f < c * 1.03)].sum()
+    f0 = p['f0']
+    assert band(3 * f0) < 1e-3 * band(f0) and band(5 * f0) < 1e-3 * band(f0)   # no odd-harmonic comb
+
+
+def test_round3_pro_pop_chirps_start_on_zero_without_digital_silence():
+    _, pop, _ = _mods()
+    from earshot.forge import polish
+    for i in (0, 1, 3, 5):
+        p = pop.FAMILY_V2['pro_pop'][i]
+        x = render(pop, p, i + 1)
+        m = x if x.ndim == 1 else x.mean(1)
+        assert abs(m[0]) < 1e-3, i
+        assert polish.silence(x)['silence_ms'] < 2.0, i

@@ -12,6 +12,17 @@ from earshot.forge import search
 from earshot.forge.search import _decode, _encode, diverse, optimize, render, robust
 
 SR = 48000
+# the pop recipe's v1 (bubble model) DEFAULTS as of round 2, pinned here so the module may switch its DEFAULTS to the
+# v2 tonal pop without this test changing meaning (render() dispatches on 'style': these keys take the v1 path)
+POP_V1_DEFAULTS = {
+    'f0': 440.159, 'q': 22.1207, 'rise': 0.991892, 'rise_tau': 0.0159722, 'att': 0.000357098, 'h2': 0.00847939,
+    'wobble': 0.0112906, 'breath_amp': 0.0, 'breath_tau': 0.00848874, 'f2_ratio': 3.82514, 'f2_amp': 0.8, 'f2_q': 25.0,
+    'f2_follow': 0.948223, 'sub_amp': 0.00328062, 'sub_ratio': 2.08913, 'sub_delay': 0.0111736, 'click_amp': 0.685048,
+    'click_w': 7.72837e-05, 'tear': 0.000171419, 'jerks': 1, 'click_lp': 4881.31, 'shred_amp': 0.200779,
+    'shred_tau': 0.00153019, 'shred_hp': 5000.0, 'hiss_amp': 0.0659931, 'hiss_f': 2418.88, 'hiss_q': 2.86992,
+    'hiss_tau': 0.00113073, 'puff_amp': 0.0, 'puff_f': 121.063, 'ring_delay': 0.00105542, 'rt60': 0.249181,
+    'wet': 0.291252, 'damp': 0.490701, 'size': 0.05, 'air_db': -0.476997, 'floor_db': -64.4367, 'swell_amp': 0.160452,
+    'swell_t': 0.00252584, 'pre': 0.0269276, 'hp': 92.6866, 'lp': 10181.4, 'clip': 0.274425, 'cut_fade': 0.0153059}
 
 
 def _toy_render(p, r):
@@ -234,7 +245,8 @@ def test_keypress_and_pop_new_chains_and_old_params_unchanged():
     new = render(kp, kp.DEFAULTS, 3)
     old = render(kp, {k: v for k, v in kp.DEFAULTS.items() if k != 'hpf'}, 3)
     assert profile(new)[0] < profile(old)[0] - 6           # the session high-pass empties the 31 Hz band
-    p = dict(pop.DEFAULTS)
+    p = dict(getattr(pop, 'DEFAULTS_V1', None) or POP_V1_DEFAULTS)
+    assert 'style' not in p
     x = render(pop, p, 3)
     assert len(x) / SR < 0.45                              # the edit: the kit's pops are 0.19-0.41 s
     legacy = {k: v for k, v in p.items() if k not in ('hp', 'lp', 'clip', 'cut_fade', 'cut_db')}

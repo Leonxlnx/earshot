@@ -23,7 +23,13 @@ Styles (`style`):
              by note, ringing (n_decay), gated (pro) or left to ring out (real)
   'chimes'   wind chimes / a bell tree: a set of tuned tubes struck at random, thinning out, each ringing for seconds
 CHARACTER keys: style, length, swell, fade, rate, g_lo / g_hi, scale / key, tone_hz / tone_db, notes / direction,
-n_decay, gate_end. FAMILY[refset] = 5 palette members; FINE[style] = what a forge run tunes with the character fixed.
+n_decay, gate_end, ring. FAMILY[refset] = the palette members; FINE[style] = what a forge run tunes with the character
+fixed.
+Round 3 (forge v2, after the round-2 judge: real shimmer tails half the bench's, narrow steady lines, mono chimes):
+`ring` = 1 lets runs / chimes ring out freely (no drawn envelope; only the file end fades), every partial is a beating
+doublet (`beat`), strikes are detuned (`detune`) and swing (`swing`), each note has a bright strike burst (`sizzle`),
+higher notes die faster (`f_decay`), the bus is decorrelated, the air bed follows the ringing notes, and a tone bed at
+its 'off' level (-40 dB) is really off. FAMILY['shimmer'] holds the six round-3 ring-outs (t40 1.9-3.0 s).
 """
 import numpy as np
 
@@ -90,6 +96,14 @@ SPACE = {
     # chimes
     'tubes': (4, 9, 'int'),
     'strikes': (4, 30, 'int'),
+    # round 3 (real ring-outs: the judge found tails half the bench's, narrow steady lines, mono chimes)
+    'ring': [0, 1],                   # 1: notes ring out freely (no shaped envelope), only the file's end fades
+    'beat': (0.0, 3.0),               # doublet beating per partial (Hz): a struck bar / tube is two close modes
+    'detune': (0.0, 12.0),            # random per-strike detune (cents): no two strikes make the same exact line
+    'swing': (0.0, 8.0),              # slow pitch wobble (cents, 0.7-2 Hz): a swinging tube / a hand-held tree
+    'sizzle': (-60.0, -8.0),          # bright strike noise 5-18 kHz per note (dB re the note): the metallic onset
+    'f_decay': (0.0, 0.8),            # higher notes decay faster: tau ~ (f / 1 kHz)^-f_decay
+    'tail_fade': (0.2, 1.2),          # ring mode: the end fade
 }
 
 DEFAULTS = {'style': 'sparkle', 'length': 1.95, 'start_db': -42.0, 'swell': 0.85, 'rise_curve': 1.2, 'hold': 0.1,
@@ -97,7 +111,8 @@ DEFAULTS = {'style': 'sparkle', 'length': 1.95, 'start_db': -42.0, 'swell': 0.85
             'scale': 'penta', 'key': 2, 'g_tau': 0.004, 'g_noise': 0.6, 'cluster': 2, 'g_bell': 0.3, 'g_jit_db': 6.0, 'tilt': 1.5,
             'spread': 0.95, 'decor': 1.2, 'octave': 0.15, 'tone_hz': 500.0, 'tone_db': -10.0, 'tone_h': 0.2, 'vib': 0.004, 'tone_w': 1.0,
             'air_db': -30.0, 'air_hp': 6500.0, 'verb': 0.3, 'rt60': 1.2, 'hp': 250.0, 'deess': 3.0, 'notes': 12,
-            'run_t': 1.2, 'direction': 'up', 'accel': 1.0, 'n_decay': 0.5, 'hard': 0.5, 'tubes': 6, 'strikes': 14}
+            'run_t': 1.2, 'direction': 'up', 'accel': 1.0, 'n_decay': 0.5, 'hard': 0.5, 'tubes': 6, 'strikes': 14,
+            'ring': 0, 'beat': 0.0, 'detune': 0.0, 'swing': 0.0, 'sizzle': -60.0, 'f_decay': 0.0, 'tail_fade': 0.3}
 
 
 def _fam(**kw):
@@ -118,28 +133,37 @@ FAMILY = {
         _fam(length=2.4, swell=1.0, fade=1.0, rate=34.0, g_hi=6000.0, g_tau=0.012, g_noise=0.15, cluster=1,
              tone_hz=400.0, tone_db=-12.0, verb=0.5, rt60=2.0, g_bell=0.7, scale='lydian', key=5),   # a warm wash
     ],
-    'shimmer': [
-        _fam(style='run', notes=22, run_t=0.9, direction='up', accel=0.9, n_decay=1.2, length=2.6, tone_db=-40.0,
-             scale='major', g_lo=1800.0, g_hi=9000.0, verb=0.3, hard=0.6, start_db=-3.0, swell=0.05, hold=0.9,
-             fade=1.6),                                                                 # bar-chime sweep
-        _fam(style='run', notes=14, run_t=0.8, direction='down', accel=0.8, n_decay=0.9, length=2.4,
-             tone_db=-40.0, g_lo=1500.0, g_hi=8000.0, g_bell=0.0, verb=0.35, start_db=-3.0, swell=0.05, hold=0.8,
-             fade=1.5),                                                                 # bell-tree stroke
-        _fam(style='chimes', tubes=6, strikes=12, n_decay=1.8, length=3.0, tone_db=-40.0, g_lo=900.0,
-             g_hi=3200.0, verb=0.3, start_db=-3.0, swell=0.05, hold=1.0, fade=1.9),     # wind chimes
-        _fam(style='run', notes=8, run_t=0.7, direction='up', accel=1.0, n_decay=0.8, length=2.0, tone_db=-40.0,
-             scale='major', key=0, g_lo=1000.0, g_hi=4200.0, hard=0.7, verb=0.25, start_db=-3.0, swell=0.05,
-             hold=0.7, fade=1.2),                                                       # glock run
-        _fam(length=2.6, swell=0.6, fade=1.6, rate=40.0, g_tau=0.05, g_noise=0.0, cluster=1, g_bell=1.0,
-             verb=0.55, rt60=2.4, tone_db=-30.0),                                       # a ringing sparkle
+    'shimmer': [   # round 3: real ring-outs (the judge: tails half the bench's, narrow steady lines, mono chimes)
+        _fam(style='run', ring=1, notes=22, run_t=0.9, direction='up', accel=0.9, n_decay=0.8, f_decay=0.3,
+             length=4.2, tail_fade=0.7, tone_db=-40.0, scale='major', g_lo=1800.0, g_hi=9000.0, hard=0.65,
+             g_bell=0.5, beat=1.2, detune=3.0, swing=1.0, sizzle=-3.0, verb=0.45, rt60=3.2, spread=0.95,
+             air_db=-30.0, air_hp=3500.0, deess=2.0, decor=0.8),                                                                # bar-chime sweep
+        _fam(style='run', ring=1, notes=14, run_t=0.8, direction='down', accel=0.8, n_decay=0.6, f_decay=0.25,
+             length=4.0, tail_fade=0.7, tone_db=-40.0, g_lo=1500.0, g_hi=8000.0, g_bell=0.15, hard=0.55,
+             beat=1.8, detune=5.0, swing=1.5, sizzle=-5.0, verb=0.5, rt60=3.2, spread=0.9, air_db=-32.0,
+             air_hp=4500.0, decor=0.8),   # bell-tree stroke
+        _fam(style='chimes', ring=1, tubes=6, strikes=12, n_decay=0.7, f_decay=0.2, length=4.2, tail_fade=0.9,
+             tone_db=-40.0, g_lo=900.0, g_hi=3200.0, hard=0.75, beat=0.9, detune=4.0, swing=4.0, sizzle=-6.0,
+             verb=0.42, rt60=3.0, spread=1.0, air_db=-30.0, air_hp=4000.0, tilt=3.0, decor=1.0),                   # wind chimes
+        _fam(style='run', ring=1, notes=8, run_t=0.7, direction='up', accel=1.0, n_decay=0.55, f_decay=0.3,
+             length=3.6, tail_fade=0.6, tone_db=-40.0, scale='major', key=0, g_lo=1000.0, g_hi=4200.0, hard=0.8,
+             g_bell=0.6, beat=0.8, detune=2.0, swing=1.0, sizzle=-9.0, verb=0.42, rt60=2.9, spread=0.9,
+             air_db=-32.0, air_hp=3000.0, decor=0.8),   # glock run
+        _fam(length=4.2, swell=0.6, fade=3.4, rate=40.0, g_tau=0.06, g_noise=0.0, cluster=1, g_bell=1.0,
+             verb=0.5, rt60=3.0, tone_db=-30.0, octave=0.15),                           # a ringing sparkle
+        _fam(style='run', ring=1, notes=16, run_t=1.1, direction='arc', accel=1.0, n_decay=0.75, f_decay=0.35,
+             length=4.4, tail_fade=0.8, tone_db=-40.0, scale='penta', key=9, g_lo=1300.0, g_hi=7000.0, hard=0.5,
+             g_bell=0.8, beat=1.4, detune=6.0, swing=2.0, sizzle=-5.0, verb=0.48, rt60=3.2, spread=1.0,
+             air_db=-30.0, air_hp=4000.0, decor=0.8),                                                             # a slow arc on a bell tree
     ],
 }
 FINE = {
     'sparkle': ['start_db', 'rise_curve', 'dens_floor', 'g_tau', 'g_noise', 'g_bell', 'g_jit_db', 'tilt', 'spread', 'decor', 'octave',
                 'tone_db', 'tone_h', 'vib', 'tone_w', 'air_db', 'air_hp', 'verb', 'rt60', 'hp', 'deess'],
     'run': ['accel', 'hard', 'g_bell', 'g_jit_db', 'tilt', 'spread', 'octave', 'verb', 'rt60', 'hp', 'deess',
-            'air_db'],
-    'chimes': ['hard', 'g_jit_db', 'tilt', 'spread', 'verb', 'rt60', 'hp', 'deess', 'air_db'],
+            'air_db', 'beat', 'detune', 'sizzle'],
+    'chimes': ['hard', 'g_jit_db', 'tilt', 'verb', 'rt60', 'hp', 'deess', 'air_db', 'beat', 'detune', 'swing',
+               'sizzle'],     # round 3: spread pinned (round 2's search narrowed the wind chimes to corr 0.97)
 }
 
 
@@ -178,11 +202,15 @@ def _pan_gains(pos):
     return np.cos(th) * np.sqrt(2), np.sin(th) * np.sqrt(2)
 
 
-def _note(f, n, tau, r, partials, hard, bell):
-    """one struck note (mono): partials with highs dying first, a short mallet"""
+def _note(f, n, tau, r, partials, hard, bell, beat=0.0, swing=0.0, sizzle=None):
+    """one struck note (mono): partials with highs dying first, a short mallet; round 3: each partial a doublet that
+    beats (`beat` Hz), a slow swing wobble (`swing` cents) and an optional bright strike noise (`sizzle` dB)"""
     t = dsp.t_of(n)
     ratios, amps = partials
     y = np.zeros(n)
+    wob = None
+    if swing > 0.05:
+        wob = 2 ** (swing / 1200 * np.sin(2 * np.pi * r.uniform(0.7, 2.0) * t + r.uniform(0, 6.3)))
     for q, a in zip(ratios, amps):
         if q > 1 and bell <= 0:
             continue
@@ -190,13 +218,28 @@ def _note(f, n, tau, r, partials, hard, bell):
         if fq > 18000.0:                     # round 2: partials near Nyquist read as aliasing ('fold')
             continue
         aa = a * (bell if q > 1 else 1.0) * q ** (1.2 * (hard - 0.5))
-        y += aa * np.exp(-t / max(tau * q ** -0.9, 0.002)) * np.sin(2 * np.pi * fq * t + r.uniform(0, 6.3))
+        env = np.exp(-t / max(tau * q ** -0.9, 0.002))
+        ph0 = r.uniform(0, 6.3)
+        if wob is None:
+            z = np.sin(2 * np.pi * fq * t + ph0)
+        else:
+            z = np.sin(2 * np.pi * fq * np.cumsum(wob) / SR + ph0)
+        if beat > 0.02:                      # the doublet starts in phase (loudest at the strike), then beats
+            fb = fq + beat * r.uniform(0.5, 1.5) * np.sqrt(q)
+            z = (z + 0.7 * np.sin(2 * np.pi * fb * t + ph0)) / 1.7
+        y += aa * env * z
     k = min(n, dsp.n_of(0.0006))
     y[:k] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, k))
     if hard > 0.05:
         m = min(n, dsp.n_of(0.003))
         w = dsp.butter(r.standard_normal(m), 'high', min(2 * f, 12000), order=2) * np.exp(-dsp.t_of(m) / 0.0006)
         y[:m] += 0.25 * hard * w / (np.abs(w).max() + 1e-12)
+    if sizzle is not None and sizzle > -59:
+        m = min(n, dsp.n_of(0.08))
+        w = dsp.butter(r.standard_normal(m), 'band', (max(5000.0, 1.5 * f), 18000.0), order=2)
+        w *= np.exp(-dsp.t_of(m) / r.uniform(0.005, 0.016))
+        w[:k] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, k))      # (the strike starts on zero: no edge click)
+        y[:m] += 10 ** (sizzle / 20) * w / (np.sqrt(np.mean(w[:dsp.n_of(0.01)] ** 2)) + 1e-12) * 0.35
     return y
 
 
@@ -260,11 +303,12 @@ def _run(p, r, n):
     for k in range(N):
         tk = p['run_t'] * (k / max(N - 1, 1)) ** p['accel'] + r.uniform(-0.004, 0.004) * (k > 0)
         i = int(max(tk, 0) * SR)
-        m = min(dsp.n_of(min(6 * p['n_decay'], 4.0)), n - i)
+        m = min(dsp.n_of(min(6 * p['n_decay'], 6.0)), n - i)
         if m < 16:
             continue
-        f = notes[idx[k]]
-        y = _note(f, m, p['n_decay'], r, BAR, p['hard'], p['g_bell'] * 0.8 + 0.2)
+        f = notes[idx[k]] * 2 ** (r.uniform(-1, 1) * p['detune'] / 1200)
+        tau = p['n_decay'] * (f / 1000.0) ** -p['f_decay']
+        y = _note(f, m, tau, r, BAR, p['hard'], p['g_bell'] * 0.8 + 0.2, p['beat'], p['swing'], p['sizzle'])
         g = _tilt_gain(f, p['tilt']) * 10 ** (r.uniform(-1, 1) * p['g_jit_db'] / 40)
         pos = (1 if k % 2 else -1) * p['spread'] * r.uniform(0.6, 1.0)        # note by note, hard-panned
         gL, gR = _pan_gains(pos)
@@ -286,8 +330,10 @@ def _chimes(p, r, n):
         if i >= n - 16:
             break
         f, pos = tubes[int(r.integers(0, len(tubes)))]
-        m = min(dsp.n_of(min(5 * p['n_decay'], 4.0)), n - i)
-        y = _note(f, m, p['n_decay'], r, TUBE, p['hard'], 0.8)
+        f = f * 2 ** (r.uniform(-1, 1) * p['detune'] / 1200)
+        m = min(dsp.n_of(min(5 * p['n_decay'], 6.0)), n - i)
+        tau = p['n_decay'] * (f / 1000.0) ** -p['f_decay']
+        y = _note(f, m, tau, r, TUBE, p['hard'], 0.8, p['beat'], p['swing'], p['sizzle'])
         g = 10 ** (r.uniform(-1, 1) * p['g_jit_db'] / 20) * (0.92 ** k)
         gL, gR = _pan_gains(pos)
         out[i:i + m, 0] += g * gL * y
@@ -305,6 +351,8 @@ def _bed(p, r, n, env):
     ph = 2 * np.pi * np.cumsum(f * vib) / SR
     tone = np.sin(ph) + p['tone_h'] * (0.5 * np.sin(2 * ph) + 0.3 * np.sin(3 * ph))
     tone = tone / (np.sqrt(np.mean(tone ** 2)) + 1e-12) * 0.05 * 10 ** (p['tone_db'] / 20)
+    if p['tone_db'] <= -39.0:              # round 3: 'off' means off (an air-only bed left a -40 dB tone line)
+        tone = np.zeros(n)
     tone = fx.decorrelate(tone * env, p['tone_w'], cut=200.0)
     air = dsp.butter(r.standard_normal(n), 'high', p['air_hp'], order=2)
     air = dsp.butter(air, 'low', 14000, order=2)
@@ -325,8 +373,20 @@ def render(p, r):
         h = dsp.n_of(0.2)
         k = max(1, n // h)
         ref = np.sqrt(((grains[:k * h] ** 2).mean(1)).reshape(k, h).mean(1).max()) + 1e-9
-        bed = _bed(p, r, n, env if st == 'sparkle' else envelope(p, n))
+        if st == 'sparkle':
+            benv = env
+        elif p['ring']:                                      # round 3: the bed follows the ringing notes
+            hh = dsp.n_of(0.02)
+            kk = max(1, n // hh)
+            e = np.sqrt(((grains[:kk * hh] ** 2).mean(1)).reshape(kk, hh).mean(1))
+            benv = np.interp(np.arange(n), np.arange(kk) * hh + hh / 2, e / (e.max() + 1e-12))
+        else:
+            benv = envelope(p, n)
+        bed = _bed(p, r, n, benv)
         y = y + bed * ref / 0.05
+    if p['ring'] and st != 'sparkle' and p['decor'] > 0.01:     # round 3: wider ring-outs (the chimes read corr 0.97)
+        mid, side = (y[:, 0] + y[:, 1]) / 2, (y[:, 0] - y[:, 1]) / 2
+        y = fx.decorrelate(mid, p['decor'], cut=500.0) + np.stack([side, -side], 1)
     y = dsp.butter(y, 'high', p['hp'], order=4)
     if p['deess'] > 0.2:
         y = dsp.peq(y, 9000.0, -p['deess'], 0.8)
@@ -334,15 +394,20 @@ def render(p, r):
         y = fx.reverb(y, r, rt60=p['rt60'], size=0.7, predelay=0.015, damp=0.45, wet=p['verb'], stereo=True,
                       width=1.0)
     y = y[:n]
-    if st != 'sparkle':                                      # runs / chimes: the envelope shapes the whole mix
+    if st != 'sparkle' and not p['ring']:                    # runs / chimes: the envelope shapes the whole mix
         y = y * envelope(p, n)[:, None]
     if p['gate_end']:
         k = dsp.n_of(0.03)
+    elif p['ring']:                                          # round 3: free ring-out, only the end fades
+        k = dsp.n_of(min(p['tail_fade'], 0.4 * p['length']))
     else:
         k = dsp.n_of(min(0.3, 0.15 * p['length']))
     w = np.cos(np.linspace(0, np.pi / 2, k)) ** 2
     y = np.array(y)
     y[-k:] *= w[:, None]
+    if p['ring']:                                            # round 3: start on zero (a mallet / strike at t = 0)
+        a = dsp.n_of(0.0005)
+        y[:a] *= (0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a)))[:, None]
     return y
 
 

@@ -48,28 +48,40 @@ SPACE = {
     'width': (0.0, 1.0),
     'verb': (0.0, 0.35),                 # a tiny bright room after the tick: the refs fall fast to -30..-40 dB, then
     'rt': (0.04, 0.3, 'log'),            # hold a low tail (t40 25-87 ms)
-}
+    'contact': (0.0, 40.0),              # round 3: a 0.1-0.6 ms broadband contact impulse (2-20 kHz, decorrelated with
+    'contact_ms': (0.08, 1.0, 'log'),    # the tick) re the tick peak: the pro ticks' peak IS that impulse (t20 1-3 ms,
+    'grains': (0.0, 0.5),                # sparse micro-grains after the contact (4 impulses at 2-25 ms, each 0-20 dB
+}                                        # under `grains` x the contact): the refs' scattered crackle after the spike;
+                                         # contact = 0 = none of this (the round-2 sounds)
 DEFAULTS = {'ping': 0.5, 'ping_f': 8000.0, 'ping_ms': 6.0, 'ping_up': 0.15, 'ping_ratio': 1.9, 'tick_f': 6000.0,
             'tick_q': 1.6, 'tick_ms': 6.0, 'snap': 1.5, 'fall': 0.6, 'detent': 0.0, 'detent_dt': 0.008,
             'attack_ms': 0.3, 'hp': 900.0, 'lp': 16000.0, 'sat': 1.0, 'length': 0.045, 'release_ms': 10.0,
-            'width': 0.3, 'verb': 0.0, 'rt': 0.1}
+            'width': 0.3, 'verb': 0.0, 'rt': 0.1, 'contact': 0.0, 'contact_ms': 0.2, 'grains': 0.0}
 
 FAMILIES = {   # round 2: pings only where the family is a ping (<= 8 ms), faster first falls
-    'pro_hover_tick': {   # the pro ticks fall to -40 dB within 6-14 ms and are bright at the onset: dry, fast, high
-        'ping': {'detent': 0.0, 'ping': (0.75, 1.0), 'ping_f': (8000, 14000, 'log'), 'ping_ms': (1.5, 4, 'log'), 'snap': (2.0, 3.0),
-                 'verb': (0.0, 0.06), 'lp': (16000, 20000, 'log'), 'length': (0.025, 0.045)},
-        'air': {'detent': 0.0, 'ping': (0.0, 0.15), 'tick_f': (7000, 11000, 'log'), 'fall': (0.4, 1.2), 'tick_ms': (2, 6, 'log'),
-                'snap': (2.0, 3.0), 'width': (0.7, 1.0), 'verb': (0.0, 0.06), 'lp': (16000, 20000, 'log'),
-                'length': (0.03, 0.055)},
-        'glass': {'detent': 0.0, 'ping': (0.3, 0.6), 'ping_f': (7000, 11000, 'log'), 'ping_ms': (1.5, 4, 'log'), 'snap': (2.0, 3.0),
-                  'tick_f': (7000, 11000, 'log'), 'ping_up': (0.15, 0.4), 'verb': (0.0, 0.06),
-                  'lp': (16000, 20000, 'log'), 'length': (0.03, 0.05)},
+    'pro_hover_tick': {   # the pro ticks fall to -40 dB within 6-14 ms and are bright at the onset: dry, fast, high.
+        # Round 3: the forge refs' peak is a broadband contact impulse (t20 1-3 ms, > 12 kHz -5 dB of total, L/R
+        # correlation ~0) and the round-2 ticks did not read as ticks (phrase z 0.85 vs real 1.8-3.0): every family now
+        # has the decorrelated contact over its ping / noise tick, and more width; the contact weight differs per family
+        # (ping 3-7x and soft 1.5-4x keep their ping / tick audible, air and detent 12-30x are the refs' spike + grains)
+        'ping': {'detent': 0.0, 'ping': (0.6, 0.9), 'ping_f': (8000, 14000, 'log'), 'ping_ms': (1.5, 3, 'log'),
+                 'snap': (2.0, 3.0), 'contact': (3.0, 7.0), 'grains': 0.0, 'contact_ms': (0.25, 0.6, 'log'), 'width': (0.6, 1.0),
+                 'verb': (0.0, 0.06), 'lp': (13000, 17000, 'log'), 'length': (0.025, 0.045)},
+        'air': {'detent': 0.0, 'ping': (0.0, 0.15), 'tick_f': (7000, 11000, 'log'), 'fall': (0.4, 1.2),
+                'tick_ms': (2, 6, 'log'), 'snap': (2.0, 3.0), 'contact': (12.0, 30.0), 'grains': (0.05, 0.35), 'contact_ms': (0.3, 0.8, 'log'),
+                'width': (0.8, 1.0), 'verb': (0.0, 0.06), 'lp': (13000, 17000, 'log'), 'length': (0.03, 0.055)},
+        'glass': {'detent': 0.0, 'ping': (0.3, 0.6), 'ping_f': (7000, 11000, 'log'), 'ping_ms': (1.5, 3, 'log'),
+                  'snap': (2.0, 3.0), 'tick_f': (7000, 11000, 'log'), 'ping_up': (0.15, 0.4), 'contact': (6.0, 12.0), 'grains': (0.0, 0.15), 'hp': (1000, 2200, 'log'),
+                  'contact_ms': (0.25, 0.6, 'log'), 'width': (0.6, 1.0), 'verb': (0.0, 0.06),
+                  'lp': (13000, 17000, 'log'), 'length': (0.03, 0.05)},
         'soft': {'detent': 0.0, 'ping': (0.0, 0.3), 'ping_ms': (1.5, 3, 'log'), 'tick_f': (5000, 8000, 'log'),
-                 'tick_ms': (2, 6, 'log'), 'snap': (1.5, 2.5), 'attack_ms': (0.3, 1.2, 'log'),
-                 'hp': (800, 1500, 'log'), 'verb': (0.0, 0.08), 'lp': (16000, 20000, 'log'), 'length': (0.03, 0.06)},
+                 'tick_ms': (2, 6, 'log'), 'snap': (1.5, 2.5), 'attack_ms': (0.3, 1.2, 'log'), 'contact': (1.5, 4.0), 'grains': 0.0,
+                 'contact_ms': (0.4, 1.0, 'log'), 'width': (0.6, 1.0), 'hp': (800, 1500, 'log'), 'verb': (0.0, 0.08),
+                 'lp': (12000, 16000, 'log'), 'length': (0.03, 0.06)},
         'detent': {'ping': (0.0, 0.35), 'ping_ms': (1.0, 3, 'log'), 'tick_f': (7000, 11000, 'log'),
                    'snap': (2.0, 3.0), 'tick_ms': (1.5, 4, 'log'), 'detent': (0.35, 0.8), 'detent_dt': (0.006, 0.012),
-                   'verb': (0.0, 0.06), 'lp': (16000, 20000, 'log'), 'length': (0.025, 0.045)},
+                   'contact': (12.0, 30.0), 'grains': (0.05, 0.35), 'contact_ms': (0.2, 0.5, 'log'), 'width': (0.7, 1.0),
+                   'verb': (0.0, 0.06), 'lp': (13000, 17000, 'log'), 'length': (0.025, 0.045)},
     },
     'hover_tick': {
         'high': {'detent': 0.0, 'ping': (0.0, 0.3), 'ping_ms': (1.0, 3, 'log'), 'tick_f': (8000, 11000, 'log'),
@@ -109,12 +121,37 @@ def _ping(p, r, f_scale=1.0):
                     0.1, r, att_s=max(0.0001, p['attack_ms'] * 1e-3))
 
 
+def _contact(p, r):
+    """the contact impulse: a 0.1-1 ms 2-15 kHz noise burst with a squared decay, unit peak (a 20 kHz band edge put
+    energy above 20 kHz at -20..-34 dB where the refs have -70..-82: round 3, first run)"""
+    from .click import burst
+    return burst(p['contact_ms'] * 1e-3, r, 2000.0, 15000.0, att_s=0.00005, order=4)
+
+
 def _one(p, r, f_scale=1.0):
+    """(ping, tick, contact): mono ping and tick (the tick is decorrelated later), and the contact as a stereo
+    (n, 2) pair of independent bursts (no all-pass decorrelator: it smeared the 0.3 ms spike over several ms)"""
     pg = _ping(p, r, f_scale)
     tk = _tick(p, r, f_scale)
     m = max(len(pg), len(tk))
     pg, tk = np.pad(pg, (0, m - len(pg))), np.pad(tk, (0, m - len(tk)))
-    return p['ping'] * pg, (1 - p['ping']) * tk
+    tk = (1 - p['ping']) * tk
+    ct = np.zeros((m, 2))
+    if p.get('contact', 0.0) > 0.01:                    # no rng draw without a contact: round-2 renders unchanged
+        a = p['contact'] * max(np.abs(tk).max(), np.abs(p['ping'] * pg).max())
+        th = 0.5 * np.pi * min(1.0, p['width'])         # width 1: independent L / R bursts (correlation ~0)
+        for t_g, amp, ms in [(0.0, 1.0, p['contact_ms'])] + (
+                [(tg, p['grains'] * 10 ** (db / 20) * (r.integers(0, 2) * 2 - 1), 0.1)
+                 for tg, db in zip(r.uniform(0.002, 0.025, 4), r.uniform(-20.0, 0.0, 4))]
+                if p.get('grains', 0.0) > 0.005 else []):
+            c1, c2 = _contact(dict(p, contact_ms=ms), r), _contact(dict(p, contact_ms=ms), r)
+            L, R = c1, np.cos(th) * c1 + np.sin(th) * c2
+            k = dsp.n_of(t_g)
+            if k < m:
+                q = min(len(L), m - k)
+                ct[k:k + q, 0] += a * amp * L[:q]
+                ct[k:k + q, 1] += a * amp * R[:q]
+    return p['ping'] * pg, tk, ct
 
 
 def render(p, r):
@@ -122,17 +159,21 @@ def render(p, r):
     fs = np.exp(0.01 * r.standard_normal())
     n = dsp.n_of(0.14)
     pre = 0.002
-    pg_all, tk_all = np.zeros(n), np.zeros(n)
-    pg, tk = _one(p, r, fs)
+    pg_all, tk_all, ct_all = np.zeros(n), np.zeros(n), np.zeros((n, 2))
+    pg, tk, ct = _one(p, r, fs)
     dsp.place(pg_all, pg * lvl, pre)
     dsp.place(tk_all, tk * lvl, pre)
+    dsp.place(ct_all, ct * lvl, pre)
     if p['detent'] > 0.02:
-        pg2, tk2 = _one(p, r, fs * 1.06)
+        pg2, tk2, ct2 = _one(p, r, fs * 1.06)
         dsp.place(pg_all, pg2 * p['detent'] * lvl, pre + p['detent_dt'])
         dsp.place(tk_all, tk2 * p['detent'] * lvl, pre + p['detent_dt'])
-    st = np.stack([pg_all, pg_all], 1) + fx.decorrelate(tk_all, amount=p['width'], cut=1500.0)[:n]
+        dsp.place(ct_all, ct2 * p['detent'] * lvl, pre + p['detent_dt'])
+    st = np.stack([pg_all, pg_all], 1) + fx.decorrelate(tk_all, amount=p['width'], cut=1500.0)[:n] + ct_all
     st = dsp.butter(st, 'high', p['hp'], order=4)        # nothing under 500 Hz
     st = dsp.butter(st, 'low', p['lp'], order=2)
+    if p.get('contact', 0.0) > 0.01:                    # the curve below is not level-normalised: a 20x contact
+        st = st / (np.abs(st).max() + 1e-12)              # would be clipped flat into the tick (round 3)
     if p['sat'] > 0.05:
         st = fx.saturate(st, drive_db=p['sat'], mode='tanh', level='peak')
     if p['verb'] > 0.003:

@@ -78,3 +78,52 @@ def test_study_extras_are_bounded_penalties():
     silence = np.zeros((SR // 4, 2))
     silence[100:200] = dsp.rng(0).standard_normal((100, 2)) * 0.1
     assert glitch.study_extra(silence, {}) < -0.5               # a click is not a glitch
+
+
+# ------------------------------------------------------------------------------------------------ round 3
+def _corr(x):
+    a, b = x[:, 0] - x[:, 0].mean(), x[:, 1] - x[:, 1].mean()
+    return float((a * b).sum() / np.sqrt((a * a).sum() * (b * b).sum()))
+
+
+def test_keypress_width_folds_the_pair_and_keeps_mid():
+    """r3 `width`: the spaced pair folded towards mono (r2 finals: corr 0.04-0.47); the mid (what mono checks hear)
+    is unchanged, and parameter sets without the key keep the r2 pair"""
+    wide = {k: v for k, v in keypress.DEFAULTS.items() if k != 'width'}
+    a, b = render(keypress, wide, 4), render(keypress, dict(wide, width=0.2), 4)
+    assert _corr(b) > 0.9 and _corr(b) >= _corr(a)
+    m0 = render(keypress, dict(wide, width=0.0), 4)
+    assert _corr(m0) > 0.99                                     # width 0: mono but for the mic floor
+    ma, mb = _mono(a), _mono(b)
+    assert np.allclose(ma / np.abs(ma).max(), mb / np.abs(mb).max(), atol=1e-3)
+    assert 'width' in keypress.SPACE and keypress.DEFAULTS['width'] <= 0.3
+
+
+def test_designed_key_r3_characters_stay_in_the_band():
+    """grain (velvet crackle) and tink_glide (pitched blip) change the texture, never the band: < 2 kHz stays 30 dB
+    down; the r3 keys at 0 render the r2 key exactly"""
+    base = typing.render(typing.DEFAULTS, dsp.rng(5))
+    r2 = typing.render({k: v for k, v in typing.DEFAULTS.items() if k not in ('grain', 'grain_rate', 'tink_glide')},
+                       dsp.rng(5))
+    assert np.array_equal(base, r2)
+    for over in ({'grain': 0.9, 'grain_rate': 400}, {'tink_db': 0.0, 'tink_glide': -12.0}):
+        x = render(typing, dict(typing.DEFAULTS, **over), 6)
+        assert typing.key_stats(x)['lo2k_db'] < -30
+        assert not np.allclose(x, render(typing, typing.DEFAULTS, 6)[: len(x)])
+
+
+def test_glitch_r3_drama_and_acceleration():
+    """skip + accent_db + short bursts: the median 2 ms level sits far under the bursts (film -35 dB, r2 finals
+    -20..-25) and the burst onsets show the stutter speeding up (late intervals shorter than early ones)"""
+    p = dict(glitch.DEFAULTS, decay=0.22, gate=0.5, crackle=0.33, crackle_db=-21, floor_db=-44, lvl_jit=2.5, skip=0.2,
+             accent_db=6, grid0=0.034, grid1=0.022, accel=1.2, low_db=-32)
+    meds, acc = [], 0
+    for s in range(3):
+        st = glitch.glitch_stats(render(glitch, p, 40 + s))
+        meds.append(st['med2_db'])
+        acc += st['early_ms'] is not None and st['late_ms'] < st['early_ms']
+        assert st['corr'] < 0.4 and -75 < st['end_db'] < -30
+    dense = glitch.glitch_stats(render(glitch, glitch.DEFAULTS, 40))['med2_db']
+    assert np.median(meds) < -30 and np.median(meds) < dense - 5
+    assert acc >= 2
+    assert glitch.study_extra(render(glitch, p, 40), {}) > -1.0

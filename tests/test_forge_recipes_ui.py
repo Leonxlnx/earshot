@@ -90,15 +90,81 @@ def test_deterministic_for_a_seed(rec_name):
     assert not np.array_equal(a, c)                              # round robin: a new seed is a new take
 
 
-def test_pro_click_is_bright_short_and_crisp():
+def test_pro_click_is_short_and_crisp_with_a_body_where_the_family_has_one():
+    """round 3: ref_2's bright idiom stays in tink / glass; the other films' clicks carry a body (the study's ref_5
+    mouse click; the round-2 judge: 150 Hz-1 kHz -41 dB of total made vs -6 in the held-out film clicks)"""
     rec = load_recipe('click')
     for fam in rec.FAMILIES['pro_click']:
         x = render(rec, rec.family_params('pro_click', fam), 1)
         lo150, lo500, cen = _bands(x)
-        assert cen > 4500 and lo500 < -25, fam                   # study: centroid 5-10 kHz, band-limited
+        if fam in ('tink', 'glass'):
+            assert cen > 4500, fam                               # study: centroid 5-10 kHz
+        if fam in ('mouse', 'soft', 'snap'):
+            assert _share(x, 150, 1000) > -12, fam              # a body
+        assert lo150 < -15, fam                                  # no low thump
         assert _t_fall(x, 20) <= 25 and len(x) / SR <= 0.07, fam  # t20 6-16 ms (+ smoothing), 30-60 ms
         e = _env_db(x)
         assert int(np.argmax(e)) - int(np.argmax(e > e.max() - 20)) <= 3, fam   # attack 0-3 ms
+
+
+def _share(x, lo, hi):
+    m = _mono(x)
+    P = np.abs(np.fft.rfft(m)) ** 2
+    f = np.fft.rfftfreq(len(m), 1 / SR)
+    return 10 * np.log10(P[(f >= lo) & (f < hi)].sum() / (P.sum() + 1e-30) + 1e-12)
+
+
+def test_click_fills_1_4_khz_and_rings_no_narrow_line():
+    """round 3: the real clicks' balance is 1-4 kHz -3.7 / > 12 kHz -29 dB of total (forge refs); the round-2 clicks
+    had a 1-4 kHz hole and narrow 6 kHz / 250-500 Hz lines ringing through the room tail"""
+    rec = load_recipe('click')
+    sh = []
+    for fam in rec.FAMILIES['click']:
+        x = render(rec, rec.family_params('click', fam), 2)
+        sh.append((_share(x, 1000, 4000), _share(x, 12000, 24000)))
+        m = _mono(x)
+        on = int(np.argmax(np.abs(m) > 0.1 * np.abs(m).max()))
+        seg = m[on + int(0.02 * SR):]                            # 20 ms after the onset: the room tail
+        F = 10 * np.log10(np.abs(np.fft.rfft(seg * np.hanning(len(seg)), 8192)) ** 2 + 1e-20)
+        f = np.fft.rfftfreq(8192, 1 / SR)
+        sel = (f > 200) & (f < 10000)
+        prom = max(F[i] - np.median(F[(f > f[i] / 1.26) & (f < f[i] * 1.26)]) for i in np.nonzero(sel)[0][::3])
+        assert prom < 30, (fam, round(float(prom), 1))
+    sh = np.array(sh)
+    assert np.median(sh[:, 0]) > -8 and np.median(sh[:, 1]) < -18, sh
+
+
+def test_pro_hover_tick_peaks_on_a_contact_spike():
+    """round 3: the pro ticks' peak is a broadband contact impulse that falls 20 dB within ~1-3 ms"""
+    rec = load_recipe('hover')
+    for fam in rec.FAMILIES['pro_hover_tick']:
+        x = render(rec, rec.family_params('pro_hover_tick', fam), 2)
+        e = _env_db(x)
+        i = int(np.argmax(e))
+        assert int(np.argmax(e[i:] < e[i] - 20)) <= 4, fam
+        L, R = x[:, 0], x[:, 1]
+        corr = float(np.sum(L * R) / np.sqrt(np.sum(L * L) * np.sum(R * R)))
+        assert corr > -0.3, fam                                  # wide, never anti-phase
+
+
+def test_toggle_first_contact_is_the_loudest_in_most_families():
+    rec = load_recipe('toggle')
+    first = 0
+    for fam in rec.FAMILIES['toggle']:
+        p = rec.family_params('toggle', fam)
+        x = render(rec, p, 3)
+        e = _env_db(x)
+        cut = int((0.002 + p['gap'] * 0.7) * 1000)
+        first += int(e[:cut].max() >= e[cut:].max())
+        assert _share(x, 150, 1000) < -10, fam                   # round 3: no heavy body
+    assert first >= 4
+
+
+def test_taps_have_a_contact_and_a_two_stage_decay():
+    rec = load_recipe('popin')
+    for fam in rec.FAMILIES['tap']:
+        x = render(rec, rec.family_params('tap', fam), 4)
+        assert _t_fall(x, 20) <= 25 and _t_fall(x, 40) >= 40, fam
 
 
 def test_hover_has_nothing_under_500_hz():
@@ -107,7 +173,8 @@ def test_hover_has_nothing_under_500_hz():
         for fam in rec.FAMILIES[cat]:
             x = render(rec, rec.family_params(cat, fam), 2)
             lo150, lo500, cen = _bands(x)
-            assert lo500 < -35 and cen > 2800, (cat, fam)
+            lim = -30 if cat == 'pro_hover_tick' else -35            # round 3: the contact spike's skirt (the pro refs
+            assert lo500 < lim and cen > 2800, (cat, fam)           # themselves: 150 Hz-1 kHz -23 dB of total)
             assert len(x) / SR <= 0.12
 
 

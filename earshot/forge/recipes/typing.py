@@ -23,6 +23,10 @@ How each part is built (every sample computed, no recorded audio):
 Character (what makes a family of audibly different but consistent keys): ridge (pitch of the tick), lowcut +
 ridge_db (thin / full), att + touch (soft / snappy), tau1 + tail_db + length (tight / long), tink (noise / tonal),
 rel_db (single / double). `key` fixes one key's layout; each render varies force, timing and noise only.
+Round 3 (read only when present; DEFAULTS hold them at 0, which renders the r2 key exactly): `grain` / `grain_rate`
+replace the smooth hiss by sparse impulses (velvet noise: a crackly key in the same band), `tink_glide` glides the tink
+partials +-12 semitones over ~5 ms (a pitched digital blip), and `tink_db` reaches +2 dB (a clearly tonal glass key).
+They exist for variety: the r2 family was near clones (CLAP cosine 0.926 vs the film keys' 0.849).
 
 RUN: a typed run as one file, the films' way: keys at jittered spacing (62-148 ms in the reference run, median about
 87 ms = 11.5 keys/s), level and timing jittered, never the same key layout twice in a row, an optional soft low swell
@@ -55,17 +59,21 @@ SPACE = {
     'touch_db': (-30.0, -4.0),         # the first (touch) peak re the hit
     'touch_dt': (0.0015, 0.008, 'log'),
     'rattle_db': (-40.0, -18.0),       # small bumps in the tail
-    'tink_db': (-40.0, -4.0),          # tonal partials re the burst (-40 = practically noise only)
+    'tink_db': (-40.0, 2.0),           # tonal partials re the burst (-40 = practically noise only; r3: up to +2)
     'rel_db': (-40.0, -14.0),          # release tick (-40 = none)
     'rel_dt': (0.035, 0.075, 'log'),
     'length': (0.05, 0.1),             # file length (refs 59-99 ms)
     'gate': (0.004, 0.02, 'log'),      # the final gate (convex end)
     'key': (0, 999, 'int'),
+    # round 3 (only read when present: r2 parameter sets render exactly as before)
+    'grain': (0.0, 1.0),               # share of sparse impulse (velvet) excitation: smooth hiss -> crackly sizzle
+    'grain_rate': (300.0, 4000.0, 'log'),   # impulses per second of that excitation
+    'tink_glide': (-12.0, 12.0),       # the tink partials glide this many semitones over ~5 ms (a digital blip)
 }
 DEFAULTS = {'ridge': 9600.0, 'ridge_db': 6.0, 'ridge_q': 1.0, 'lowcut': 3400.0, 'hicut': 16000.0, 'att': 0.003,
             'att_curve': 1.2, 'tau1': 0.0025, 'tail_db': -24.0, 'tau2': 0.016, 'touch_db': -12.0, 'touch_dt': 0.003,
             'rattle_db': -30.0, 'tink_db': -32.0, 'rel_db': -40.0, 'rel_dt': 0.05, 'length': 0.075, 'gate': 0.008,
-            'key': 7}
+            'key': 7, 'grain': 0.0, 'grain_rate': 1500.0, 'tink_glide': 0.0}   # r3 keys at 0: the r2 sound
 
 
 def _t(n):
@@ -112,6 +120,14 @@ def key_mono(p, r, force=1.0, ridge_mul=1.0):
     ridge = p['ridge'] * ridge_mul * (1 + 0.015 * r.standard_normal())
     pp = dict(p, ridge=min(ridge, 16000.0))
     w = r.standard_normal(n)
+    if p.get('grain', 0.0) > 0.0:      # r3: sparse impulses (velvet noise) instead of smooth hiss: a crackly key
+        k = max(1, int(SR / p.get('grain_rate', 1500.0)))   # (tried: a smooth hit with a crackling tail; CLAP and
+        v = np.zeros(n)                                       #  the ear then hear the plain key again)
+        idx = np.arange(0, n, k) + r.integers(0, k, len(range(0, n, k)))
+        idx = idx[idx < n]
+        v[idx] = r.choice([-1.0, 1.0], len(idx)) * r.uniform(0.3, 1.0, len(idx))
+        v /= np.sqrt(np.mean(v ** 2)) + 1e-12
+        w = (1 - p['grain']) * w + p['grain'] * v
     # touch, then hit: two bursts of the same band (the hit starts touch_dt later)
     i_hit = dsp.n_of(p['touch_dt'] * (1 + 0.1 * r.standard_normal()))
     tail = _db(p['tail_db'] + 1.5 * r.standard_normal())
@@ -136,9 +152,15 @@ def key_mono(p, r, force=1.0, ridge_mul=1.0):
         rms = np.sqrt(np.mean(y[: dsp.n_of(0.01)] ** 2)) + 1e-12
         tk = np.zeros(n)
         m = n - i_hit
+        gl = p.get('tink_glide', 0.0)
         for f, a, tau in zip(fs, (1.0, 0.6, 0.4), kr.uniform(0.002, 0.006, 3)):
-            tk[i_hit:] += a * np.exp(-_t(m) / tau) * np.sin(2 * np.pi * f * (1 + 0.003 * r.standard_normal())
-                                                               * _t(m) + r.uniform(0, 6.28))
+            f = f * (1 + 0.003 * r.standard_normal())
+            if gl:                     # r3: the partials glide (exponential, ~5 ms): a pitched digital blip
+                fi = np.minimum(f * 2 ** (gl / 12 * (1 - np.exp(-_t(m) / 0.005))), 17000.0)
+                ph = 2 * np.pi * np.cumsum(fi) / SR
+            else:
+                ph = 2 * np.pi * f * _t(m)
+            tk[i_hit:] += a * np.exp(-_t(m) / tau) * np.sin(ph + r.uniform(0, 6.28))
         tk[i_hit:i_hit + 24] *= np.linspace(0, 1, min(24, m))
         y += _db(p['tink_db']) * tk * rms / (np.sqrt(np.mean(tk[i_hit:i_hit + dsp.n_of(0.01)] ** 2)) + 1e-12)
     if rel:

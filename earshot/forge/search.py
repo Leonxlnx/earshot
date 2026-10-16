@@ -255,12 +255,18 @@ class Prescreen:
     (keypress, 96), picking 16 of 48 raised the mean critic total in all four halves tested; with polish vs critic
     v2 (72 candidates, 12 of 36 picked): whoosh Spearman 0.53 -> 0.69, selected mean 6.66 -> 7.71 and 4.35 -> 6.02
     (critic's best kept in both halves); keypress 0.60 -> 0.71, 1.43 -> 2.40 and -1.99 -> 0.56 (best kept in one
-    half). Without refs only the artifact checks rank."""
+    half). Without refs only the artifact checks rank. study= {key: (lo, hi)} (the critic's absolute fallback
+    targets, critic.STUDY_TARGETS, for a category with fewer than 3 refs; widened to the refs' own values): its
+    tone / env / polish penalties are subtracted from pre too, as the critic counts them."""
 
     def __init__(self, refs=None, tone_target=None, env_w=0.5, env_keys=('t40_ms', 'crest_db', 'end_db'),
-                 polish_ref=None, polish=True):
+                 polish_ref=None, polish=True, study=None):
         from .. import audio
         xs = [audio.load(r) if isinstance(r, str) else np.asarray(r) for r in (refs or [])]
+        self.study = None
+        if study and len(xs) < 3:
+            from .critic import study_measures, widen_targets
+            self.study = widen_targets(study, [study_measures(x) for x in xs])
         self.pol = polish_ref
         if self.pol is None and polish:
             try:
@@ -300,6 +306,11 @@ class Prescreen:
                 art = r['polish']['art_pen'] + 0.75 * r['polish']['polish_pen'] + 1.0 * len(r['polish']['hard'])
             except Exception:
                 pass
+        if self.study:
+            from .critic import study_measures, study_penalties
+            pen, off, _ = study_penalties(study_measures(x), self.study)
+            r['study'] = off
+            art += pen['tone'] + pen['env'] + 0.75 * pen['polish']
         if self.n:
             r['tone_db'] = round(float(np.sqrt(np.mean((d['profile'] - self.med) ** 2))), 2)
             r['tone_ratio'] = round(r['tone_db'] / self.spread, 3)
@@ -325,7 +336,7 @@ class Prescreen:
 def prescreen_for(critic):
     """a Prescreen built from a critic's references (reuses nothing model-based; None-safe for critics without refs)"""
     return Prescreen(getattr(critic, 'refs', None) or [], tone_target=getattr(critic, 'tone_target', None),
-                     polish_ref=getattr(critic, 'polish_ref', None))
+                     polish_ref=getattr(critic, 'polish_ref', None), study=getattr(critic, 'study', None))
 
 
 # ---------------------------------------------------------------------------------------------- the search

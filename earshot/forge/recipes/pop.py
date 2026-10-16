@@ -311,8 +311,10 @@ SPACE_V2 = {
     'daughter': (0.0, 0.6),
     'd_ratio': (1.3, 2.4),
     'd_delay': (0.004, 0.016),
-    'tick_db': (-40.0, -6.0),           # (all styles) a short band-passed click on the onset (-40 = none)
+    'tick_db': (-40.0, 6.0),            # (all styles) a short band-passed click on the onset (-40 = none; > -6: round 3)
     'tick_hz': (1800.0, 9000.0, 'log'),
+    'tick_ms': (1.0, 12.0, 'log'),      # (all styles) click decay scale (1.5 = the round-2 click); round 3 (ui): the pop
+                                        # palette's bright 1-4 kHz click layer is a longer, louder burst
     'breath': (0.0, 0.5),
     'room': (0.0, 0.25),
     'floor_db': (-110.0, -62.0),        # -110 = digital silence (designed); higher = a recording floor
@@ -330,9 +332,19 @@ DEFAULTS_V2 = {'style': 'chirp', 'f_hi': 9800.0, 'f_lo': 360.0, 'sweep': 0.055, 
                'start_db': -2.0, 'tail_db': -11.0, 'tail_hold': 0.006, 'tail_tau': 0.009, 'harm': 0.35, 'odd': 0.6,
                'f_blip': 1220.0, 'box': 0.005, 'b_att': 0.0008, 'b_rel': 0.003, 'b_drop': 0.0, 'b_tau': 0.3, 'f0': 520.0,
                'rise': 0.9, 'rise_tau': 0.012, 'q_tau': 0.035, 'att': 0.0008, 'h2': 0.08, 'daughter': 0.15,
-               'd_ratio': 1.8, 'd_delay': 0.008, 'tick_db': -30.0, 'tick_hz': 3500.0, 'breath': 0.12, 'room': 0.06,
+               'd_ratio': 1.8, 'd_delay': 0.008, 'tick_db': -30.0, 'tick_hz': 3500.0, 'tick_ms': 1.5, 'breath': 0.12,
+               'room': 0.06,
                'floor_db': -110.0, 'hp': 150.0, 'lp': 16000.0, 'drive': 1.5, 'length': 0.16, 'fade': 0.004,
                'width': 0.15}
+
+# round 3, chirp only (tonal area; the judge: pro_pop reads as chiptune to CLAP): the stepped gate's depth apart from
+# the pitch steps (gdepth < 0 = steps, as in round 2), a breath of band noise that follows the pitch (c_breath dB re
+# the tone; -60 = none), a pitch bend down on the landing tone (land_drop semitones) and a soft attack on each step
+# (s_att: fraction of the step spent rising, 0 = round 2's 0.7 ms edges)
+SPACE_V2.update({'gdepth': (-1.0, 1.0), 'c_breath': (-60.0, -6.0), 'c_bq': (1.5, 8.0, 'log'),
+                 'land_drop': (0.0, 7.0), 's_att': (0.0, 0.5), 'pre_ring': (0.0, 8.0), 'c_in': (0.0, 1.0)})
+DEFAULTS_V2.update({'gdepth': -1.0, 'c_breath': -60.0, 'c_bq': 3.0, 'land_drop': 0.0, 's_att': 0.0, 'pre_ring': 0.0,
+                    'c_in': 0.0})   # pre_ring: ms tail on the pre-blip (no digital silence in the gap); c_in: ms fade-in
 
 
 def _v2(**kw):
@@ -340,33 +352,48 @@ def _v2(**kw):
 
 
 FAMILY_V2 = {
-    'pro_pop': [
-        _v2(),                                                                      # the film's stepped chirp
-        _v2(f_hi=6500.0, f_lo=300.0, sweep=0.075, steps=0.0, pre_db=-40.0, peak_at=0.55, start_db=-6.0,
-            tail_db=-14.0, tail_hold=0.003, tail_tau=0.008, harm=0.2),                             # a smooth falling glide
-        _v2(style='blip', f_blip=1220.0, box=0.005, harm=0.5, odd=0.7, length=0.03),   # the film's blip
-        _v2(f_hi=1150.0, f_lo=140.0, sweep=0.06, steps=0.0, pre_db=-40.0, peak_at=0.3, start_db=-3.0,
-            tail_db=-12.0, tail_hold=0.003, tail_tau=0.009, harm=0.5, tick_db=-14.0, tick_hz=4000.0, hp=90.0),   # falling blip + click
-        _v2(style='blip', f_blip=1600.0, box=0.06, b_drop=4.0, b_tau=0.016, harm=0.25, b_rel=0.008,
-            length=0.08),                                                           # a plip (decaying, pitch drop)
+    'pro_pop': [   # round 3: the chirps de-chiptuned (half-glide steps, shallower softer gate, few harmonics, a breath
+                   # that follows the pitch, a bent landing); the two blips are round 2's tuned members unchanged
+        _v2(f_hi=9800.0, f_lo=360.0, sweep=0.055, ease=0.74, steps=0.6, gdepth=0.5, step_ms=7.0, duty=0.72,
+            s_att=0.3, pre_db=-3.0, pre_ring=5.0, peak_at=0.55, start_db=-2.2, tail_db=-22.0, tail_hold=0.002, tail_tau=0.0075,
+            harm=0.22, odd=0.2, tick_db=-18.0, tick_hz=4000.0, hp=110.0, lp=14000.0, drive=2.5, fade=0.008,
+            c_breath=-15.0, c_bq=3.0, land_drop=3.0, c_in=0.3),                                               # the film's stepped chirp
+        _v2(f_hi=5200.0, f_lo=300.0, sweep=0.045, ease=1.4, steps=0.0, pre_db=-40.0, peak_at=0.03, start_db=-0.5,
+            tail_db=-22.0, tail_hold=0.002, tail_tau=0.006, harm=0.05, odd=0.0, tick_db=-34.0, tick_hz=7000.0,
+            hp=260.0, lp=11000.0, drive=1.0, fade=0.004, c_breath=-13.0, c_bq=2.5, land_drop=2.0, c_in=0.3),   # a breathy glide
+        _v2(style='blip', f_blip=1220.0, box=0.005, harm=0.5102, odd=0.06914, step_ms=7.0, b_att=0.0018,
+            b_rel=0.00202, tick_db=-32.96618, tick_hz=2533.60892, hp=81.01064, lp=4820.49678, drive=5.31339,
+            length=0.03, fade=0.02436),                                             # the film's blip
+        _v2(f_hi=1150.0, f_lo=140.0, sweep=0.06, ease=1.16, steps=0.0, pre_db=-40.0, peak_at=0.1, start_db=-4.0,
+            tail_db=-12.0, tail_hold=0.003, tail_tau=0.0119, harm=0.11, odd=0.7, tick_db=-22.0, tick_hz=6000.0,
+            hp=300.0, lp=13800.0, drive=3.0, fade=0.02, c_breath=-18.0, c_bq=3.0, land_drop=2.0, c_in=0.3),   # falling blip + click
+        _v2(style='blip', f_blip=1600.0, box=0.045, b_drop=4.0, harm=0.3305, odd=0.0, step_ms=7.0, b_att=0.00143,
+            b_rel=0.002, tick_db=-7.33112, tick_hz=5329.17327, hp=78.94849, lp=13005.45302, drive=0.61736,
+            length=0.07, fade=0.02784),                                             # a plip
+        _v2(f_hi=3200.0, f_lo=700.0, sweep=0.03, ease=0.8, steps=0.0, pre_db=-40.0, peak_at=0.45, start_db=-6.0,
+            tail_db=-18.0, tail_hold=0.002, tail_tau=0.009, harm=0.08, odd=0.0, tick_db=-24.0, tick_hz=6500.0,
+            hp=200.0, lp=12000.0, drive=1.5, fade=0.006, c_breath=-17.0, c_bq=4.0, land_drop=1.5, c_in=0.3),   # a droplet
     ],
-    'pop': [   # the kit's pops: a ~2-10 ms swell, a fast first drop (t20 ~15-25 ms), then a quiet room tail
-        _v2(style='bubble', f0=520.0, rise=0.9, q_tau=0.014, att=0.002, room=0.15, length=0.2),   # a round bubble
-        _v2(style='bubble', f0=1100.0, rise=0.55, rise_tau=0.006, q_tau=0.009, tick_db=-18.0, daughter=0.3,
-            room=0.1, length=0.15),                                                         # small, high
-        _v2(style='bubble', f0=330.0, rise=1.3, rise_tau=0.03, q_tau=0.03, att=0.005, tick_db=-40.0,
-            daughter=0.0, room=0.08, length=0.25),                                          # a slow bloop
-        _v2(style='bubble', f0=720.0, rise=0.25, q_tau=0.008, breath=0.45, tick_db=-20.0, daughter=0.0,
-            room=0.12, length=0.16),                                                        # a lip / mouth pop
-        _v2(style='bubble', f0=450.0, rise=0.15, q_tau=0.01, tick_db=-8.0, tick_hz=2500.0, room=0.22,
+    'pop': [   # the kit's pops: a ~2-10 ms swell, a fast first drop (t20 ~15-25 ms), then a quiet room tail. Round 3 (ui,
+        # click layer only): every member strikes a bright 1-4 kHz snap (tick_ms 4-7, at about the bubble's peak level):
+        # the round-2 pops had 1-4 kHz at -17 dB of total vs the forge refs' -6 (bench -2)
+        _v2(style='bubble', f0=520.0, rise=0.9, q_tau=0.014, att=0.002, room=0.15, length=0.2,
+            tick_db=0.0, tick_ms=6.0, tick_hz=1700.0),                                      # a round bubble
+        _v2(style='bubble', f0=1100.0, rise=0.55, rise_tau=0.006, q_tau=0.009, tick_db=-6.0, tick_ms=4.0,
+            tick_hz=1700.0, daughter=0.3, room=0.1, length=0.15),                           # small, high
+        _v2(style='bubble', f0=330.0, rise=1.3, rise_tau=0.03, q_tau=0.03, att=0.005, tick_db=0.0, tick_ms=7.0,
+            tick_hz=1700.0, daughter=0.0, room=0.08, length=0.25),                          # a slow bloop
+        _v2(style='bubble', f0=720.0, rise=0.25, q_tau=0.008, breath=0.45, tick_db=-2.0, tick_ms=5.0,
+            tick_hz=1700.0, daughter=0.0, room=0.12, length=0.16),                          # a lip / mouth pop
+        _v2(style='bubble', f0=450.0, rise=0.15, q_tau=0.01, tick_db=2.0, tick_ms=6.0, tick_hz=1700.0, room=0.22,
             length=0.22),                                                                   # a cork-like pop
     ],
 }
 FINE_V2 = {
     'chirp': ['ease', 'duty', 'start_db', 'tail_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive',
-              'fade', 'peak_at'],
+              'fade', 'peak_at', 'c_breath', 'land_drop'],
     'blip': ['b_att', 'b_rel', 'b_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive', 'fade'],
-    'bubble': ['rise_tau', 'att', 'h2', 'd_ratio', 'd_delay', 'tick_db', 'tick_hz', 'breath', 'room', 'hp', 'lp',
+    'bubble': ['rise_tau', 'att', 'h2', 'd_ratio', 'd_delay', 'tick_db', 'tick_hz', 'tick_ms', 'breath', 'room', 'hp', 'lp',
                'drive', 'fade', 'width', 'floor_db'],
 }
 
@@ -389,9 +416,21 @@ def _harmonics(ph, f, harm, odd):
 
 
 def _click(n, db, hz, r, ms=1.5):
-    k = min(n, dsp.n_of(ms / 1000 * 3))
-    w = dsp.butter(r.standard_normal(k), 'band', (hz / 1.5, min(hz * 1.5, 20000)), order=2)
-    w *= np.exp(-dsp.t_of(k) / (ms / 1000 / 2.5))
+    """the click layer: band-passed noise (hz / 1.5 .. hz x 1.5) decaying over ~ms; ms > 1.5 (round 3, ui) is the
+    pop palette's bright snap: an octave-wide 1-4 kHz burst with a 0.3 ms rise and a squared decay (crisp, no hiss)"""
+    if ms <= 1.5 + 1e-9:                                   # the round-2 click, sample for sample
+        k = min(n, dsp.n_of(ms / 1000 * 3))
+        w = dsp.butter(r.standard_normal(k), 'band', (hz / 1.5, min(hz * 1.5, 20000)), order=2)
+        w *= np.exp(-dsp.t_of(k) / (ms / 1000 / 2.5))
+        y = np.zeros(n)
+        y[:k] = w / (np.abs(w).max() + 1e-12) * 10 ** (db / 20)
+        return y
+    k = min(n, dsp.n_of(ms / 1000 * 4))
+    t = dsp.t_of(k)
+    w = dsp.butter(r.standard_normal(k), 'band', (hz / 2.0, min(hz * 1.7, 20000)), order=4)
+    w *= (1 - np.exp(-t / 0.0003)) * np.exp(-t / (ms / 1000)) ** 2
+    w = dsp.butter(w, 'low', min(4000.0, hz * 2.0), order=4)  # keep the snap in 1-4 kHz (r3 runs: 4-12 kHz -18..-20 dB
+                                                                # of total where the forge pops sit at -36)
     y = np.zeros(n)
     y[:k] = w / (np.abs(w).max() + 1e-12) * 10 ** (db / 20)
     return y
@@ -417,11 +456,15 @@ def _chirp(p, r):
         sw_q = np.ceil(p['sweep'] / blk - 1e-9) * blk      # the landing tone starts on a block boundary
         ph_b = np.mod(np.maximum(ts, 0), blk) / blk
         edge = 0.0007 / blk
-        g = np.clip(np.minimum(ph_b / edge, (p['duty'] - ph_b) / edge), 0, 1)
+        e_up = max(edge, p['s_att'] * p['duty'])               # round 3: a softer rise into each step
+        g = np.clip(np.minimum(ph_b / e_up, (p['duty'] - ph_b) / edge), 0, 1)
         land = np.clip((ts - sw_q) / 0.0007, 0, 1)
         g = np.where(ts < sw_q, g, land)
         g = 0.5 - 0.5 * np.cos(np.pi * g)
-        gate = np.where(ts >= 0, 1 - p['steps'] * (1 - g), 1.0)
+        gd = p['steps'] if p['gdepth'] < 0 else p['gdepth']
+        gate = np.where(ts >= 0, 1 - gd * (1 - g), 1.0)
+    if p['land_drop'] > 0:                                   # round 3: the landing tone bends down (a pop, not a beep)
+        lf = lf - np.log(2) * p['land_drop'] / 12 * (1 - np.exp(-np.maximum(ts - p['sweep'], 0) / 0.02))
     f = np.exp(lf)
     ph = 2 * np.pi * np.cumsum(f) / SR + r.uniform(0, 2 * np.pi)
     y = _harmonics(ph, f, p['harm'], p['odd'])
@@ -435,11 +478,24 @@ def _chirp(p, r):
     a = min(dsp.n_of(0.0008), n - i0)
     env[i0:i0 + a] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
     y = y * env
+    if p['c_breath'] > -59:                                  # round 3: a breath that follows the pitch
+        b = dsp.svf(r.standard_normal(n), np.minimum(f, 16000.0), p['c_bq'], 'band')
+        b = b / (np.sqrt(np.mean(b ** 2)) + 1e-12) * np.sqrt(0.5)
+        y = y + 10 ** (p['c_breath'] / 20) * b * env
     if pre:                                                 # the pre-blip: a 3 ms Hann-windowed tone
         k = dsp.n_of(0.003)
         y[:k] += 10 ** (p['pre_db'] / 20) * np.hanning(k) * np.sin(2 * np.pi * p['pre_hz'] * dsp.t_of(k))
+        if p['pre_ring'] > 0.05:                           # round 3: the blip rings on into the gap (no exact zeros)
+            kk = dsp.n_of(t_sw0 + 0.002)
+            tt = dsp.t_of(kk)
+            ring = np.sin(2 * np.pi * p['pre_hz'] * tt) * np.exp(-tt / (p['pre_ring'] / 1000))
+            ring *= np.clip(tt / 0.0015, 0, 1)
+            y[:kk] += 0.5 * 10 ** (p['pre_db'] / 20) * ring
     if p['tick_db'] > -39.0:
-        y += np.roll(_click(n, p['tick_db'], p['tick_hz'], r), i0)
+        y += np.roll(_click(n, p['tick_db'], p['tick_hz'], r, p['tick_ms']), i0)
+    if p['c_in'] > 0.01:                                    # round 3: start on zero (the click / breath began off it)
+        a = dsp.n_of(p['c_in'] / 1000)
+        y[:a] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
     return y
 
 
@@ -453,7 +509,7 @@ def _blip(p, r):
     rel = np.clip((t - p['box']) / p['b_rel'], 0, 1)
     y = y * (0.5 - 0.5 * np.cos(np.pi * a)) * (0.5 + 0.5 * np.cos(np.pi * rel)) * np.exp(-t / p['b_tau'])
     if p['tick_db'] > -39.0:
-        y += _click(n, p['tick_db'], p['tick_hz'], r)
+        y += _click(n, p['tick_db'], p['tick_hz'], r, p['tick_ms'])
     return y
 
 
@@ -474,7 +530,7 @@ def _bubble(p, r):
         b *= (1 - np.exp(-t / 0.0006)) * np.exp(-t / 0.006)
         y += p['breath'] * b / (np.abs(b).max() + 1e-9)
     if p['tick_db'] > -39.0:
-        y += _click(n, p['tick_db'], p['tick_hz'], r)
+        y += _click(n, p['tick_db'], p['tick_hz'], r, p['tick_ms'])
     return y
 
 
