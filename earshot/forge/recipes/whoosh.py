@@ -54,6 +54,7 @@ TARGET = 'a fast crisp air whoosh'
 ALTS = ['a wind gust', 'rain', 'a sword swing', 'a jet engine']
 # round 12: the fast references only (the target is a FAST whoosh; rounds 1-11 also used whoosh_med_01-03, whose
 # longer tails the critic then rewarded). REFS_ROUNDS_1_11 is the old set, kept for reproducing those reports.
+REFSET = 'whoosh_fast'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
 REFS = [f'{REF_ROOT}/whoosh/whoosh_fast_0{i}.wav' for i in range(1, 5)]
 REFS_ROUNDS_1_11 = REFS + [f'{REF_ROOT}/whoosh/whoosh_med_0{i}.wav' for i in range(1, 4)]
 

@@ -61,6 +61,7 @@ SR = dsp.SR
 LO = 6000                     # sample rate of the low layers (body, sub, rumble), up-sampled x8
 TARGET = 'a deep cinematic boom impact'
 ALTS = ['a kick drum', 'an explosion', 'a door slam', 'thunder']
+REFSET = 'impact'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
 REFS = [f'{REF_ROOT}/impact/impact_0{i}.wav' for i in (1, 2, 3)]
 
 MEMBRANE = [1.0, 1.594, 2.136, 2.296, 2.653, 2.918]

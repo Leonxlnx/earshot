@@ -1,0 +1,8475 @@
+{
+ "tag": "v1",
+ "made_from": [
+  "typing_key=demo/forge-test/keypress/final/*.wav",
+  "click=demo/forge-test/click/final/*.wav",
+  "pop=demo/forge-test/pop/final/*.wav",
+  "whoosh_fast=demo/forge-test/whoosh/final/*.wav",
+  "impact=demo/forge-test/impact/final/*.wav"
+ ],
+ "registry": "E:\\earshot\\.cache\\refsets.json",
+ "created": "2026-10-16 04:11",
+ "phrases": {
+  "click": [
+   "a crisp tiny plastic click",
+   "a short clean click of a button being pressed"
+  ],
+  "impact": [
+   "a huge low thud for a movie trailer",
+   "a massive hit with a rumbling tail"
+  ],
+  "pop": [
+   "a popping sound like a bubble bursting",
+   "a quick plop"
+  ],
+  "typing_key": [
+   "one key being pressed on a computer keyboard",
+   "a single keystroke on a mechanical keyboard"
+  ],
+  "whoosh_fast": [
+   "a quick swoosh as something flies past",
+   "a short sharp swoosh of air"
+  ]
+ },
+ "confusions": {
+  "click": [
+   "a wooden stick hit",
+   "a finger snap",
+   "a drop of water",
+   "a stapler"
+  ],
+  "impact": [
+   "a gunshot",
+   "a door being slammed",
+   "a bass drum",
+   "distant fireworks"
+  ],
+  "pop": [
+   "a hand clap",
+   "a gunshot",
+   "a kiss",
+   "a tongue click"
+  ],
+  "typing_key": [
+   "a ballpoint pen click",
+   "a stapler",
+   "a light switch",
+   "a dripping tap"
+  ],
+  "whoosh_fast": [
+   "a steam hiss",
+   "a car driving past",
+   "tearing paper",
+   "a bird flapping its wings"
+  ]
+ },
+ "as_labels": {
+  "click": [
+   "Clicking",
+   "Tick",
+   "Tap"
+  ],
+  "impact": [
+   "Boom",
+   "Thump, thud",
+   "Explosion",
+   "Bang",
+   "Bass drum"
+  ],
+  "pop": [
+   "Burst, pop",
+   "Plop"
+  ],
+  "typing_key": [
+   "Computer keyboard",
+   "Typing",
+   "Typewriter",
+   "Clicking"
+  ],
+  "whoosh_fast": [
+   "Whoosh, swoosh, swish",
+   "Whip"
+  ]
+ },
+ "categories": {
+  "click": {
+   "n_bench": 7,
+   "n_forge": 8,
+   "note": "",
+   "bench_refs": [
+    "E:/earshot/out/refs/click/bench/mk-1124_1.wav",
+    "E:/earshot/out/refs/click/bench/mk-2364_1.wav",
+    "E:/earshot/out/refs/click/bench/fs-610524_1.wav",
+    "E:/earshot/out/refs/click/bench/fs-461799_1.wav",
+    "E:/earshot/out/refs/click/bench/fs-461799_2.wav",
+    "E:/earshot/out/refs/click/bench/fs-431419_1.wav",
+    "E:/earshot/out/refs/click/bench/fs-431419_2.wav"
+   ],
+   "made": [
+    {
+     "file": "demo/forge-test/click/final/click_01.wav",
+     "length_s": 0.078,
+     "typ_z": 2.75,
+     "nn_cos": 0.818,
+     "tone_db": 7.63,
+     "tone_ratio": 0.77,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 25.0,
+     "active_s": 0.036,
+     "onset_s": 0.004,
+     "env_oct": 0.609,
+     "curve_db": 9.37,
+     "t40_ratio": 0.556,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.507,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 3.39,
+     "phrase_min": 3.3,
+     "margin": 1.39,
+     "wins": 1.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Sound effect",
+       0.053
+      ],
+      [
+       "Speech",
+       0.036
+      ],
+      [
+       "Music",
+       0.035
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.003,
+     "floor_db": -49.0,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -67.0,
+      "first_sample": 0.0,
+      "tail_db": -57.6,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/click/final/click_02.wav",
+     "length_s": 0.094,
+     "typ_z": 1.39,
+     "nn_cos": 0.757,
+     "tone_db": 7.6,
+     "tone_ratio": 0.77,
+     "n_outside": 1,
+     "outside": [
+      [
+       "1.26 kHz",
+       11.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 40.0,
+     "active_s": 0.041,
+     "onset_s": 0.004,
+     "env_oct": 0.321,
+     "curve_db": 8.04,
+     "t40_ratio": 0.889,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.577,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 3.12,
+     "phrase_min": 2.97,
+     "margin": 1.13,
+     "wins": 1.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Speech",
+       0.123
+      ],
+      [
+       "Music",
+       0.064
+      ],
+      [
+       "Sound effect",
+       0.023
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -46.3,
+     "stereo_corr": 1.0,
+     "darken": 0.41,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -79.9,
+      "first_sample": 0.0,
+      "tail_db": -58.0,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/click/final/click_03.wav",
+     "length_s": 0.082,
+     "typ_z": 1.89,
+     "nn_cos": 0.8,
+     "tone_db": 5.4,
+     "tone_ratio": 0.55,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 25.0,
+     "active_s": 0.04,
+     "onset_s": 0.005,
+     "env_oct": 0.559,
+     "curve_db": 8.85,
+     "t40_ratio": 0.556,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.563,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 3.07,
+     "phrase_min": 2.88,
+     "margin": 0.99,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Sound effect",
+       0.057
+      ],
+      [
+       "Speech",
+       0.04
+      ],
+      [
+       "Music",
+       0.037
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -52.2,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -87.5,
+      "first_sample": 0.0,
+      "tail_db": -57.7,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity": {
+    "n": 3,
+    "cos_mean": 0.886,
+    "cos_max": 0.93,
+    "tone_min_db": 7.24,
+    "tone_mean_db": 8.13,
+    "near_duplicates": []
+   },
+   "real_cross": [
+    {
+     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_01.wav",
+     "length_s": 0.096,
+     "typ_z": -2.17,
+     "nn_cos": 0.621,
+     "tone_db": 20.26,
+     "tone_ratio": 2.06,
+     "n_outside": 13,
+     "outside": [
+      [
+       "31 Hz",
+       44.1,
+       "above"
+      ],
+      [
+       "4 kHz",
+       -32.4,
+       "below"
+      ],
+      [
+       "3.17 kHz",
+       -30.5,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 60.0,
+     "active_s": 0.082,
+     "onset_s": 0.008,
+     "env_oct": 0.208,
+     "curve_db": 9.91,
+     "t40_ratio": 1.333,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.155,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.54,
+     "phrase_min": 2.14,
+     "margin": 1.05,
+     "wins": 0.5,
+     "best_confusion": "a drop of water",
+     "as_top": [
+      [
+       "Speech",
+       0.125
+      ],
+      [
+       "Vehicle",
+       0.101
+      ],
+      [
+       "Music",
+       0.094
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -43.6,
+     "stereo_corr": 1.0,
+     "darken": 1.51,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -52.9,
+      "first_sample": 0.0,
+      "tail_db": -39.4,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_02.wav",
+     "length_s": 0.118,
+     "typ_z": 0.04,
+     "nn_cos": 0.72,
+     "tone_db": 7.78,
+     "tone_ratio": 0.79,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 110.0,
+     "active_s": 0.107,
+     "onset_s": 0.008,
+     "env_oct": 0.627,
+     "curve_db": 14.28,
+     "t40_ratio": 2.444,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.507,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.37,
+     "phrase_min": 2.33,
+     "margin": 0.07,
+     "wins": 0.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Speech",
+       0.119
+      ],
+      [
+       "Slap, smack",
+       0.047
+      ],
+      [
+       "Music",
+       0.039
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.012,
+     "floor_db": -35.1,
+     "stereo_corr": 0.916,
+     "darken": 0.23,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -64.3,
+      "first_sample": 0.0,
+      "tail_db": -38.5,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_03.wav",
+     "length_s": 0.159,
+     "typ_z": 0.94,
+     "nn_cos": 0.755,
+     "tone_db": 21.05,
+     "tone_ratio": 2.14,
+     "n_outside": 15,
+     "outside": [
+      [
+       "630 Hz",
+       -35.9,
+       "below"
+      ],
+      [
+       "500 Hz",
+       -33.4,
+       "below"
+      ],
+      [
+       "99 Hz",
+       -33.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 5.0,
+     "t40_ms": 30.0,
+     "active_s": 0.032,
+     "onset_s": 0.008,
+     "env_oct": 1.352,
+     "curve_db": 10.15,
+     "t40_ratio": 0.667,
+     "attack_ratio": 5.0,
+     "active_ratio": 0.451,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.97,
+     "phrase_min": 2.9,
+     "margin": 0.25,
+     "wins": 1.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.107
+      ],
+      [
+       "Slap, smack",
+       0.095
+      ],
+      [
+       "Music",
+       0.045
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -58.0,
+     "stereo_corr": 0.973,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -112.3,
+      "first_sample": 0.0,
+      "tail_db": -59.4,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/kit-ui_click_04.wav",
+     "length_s": 0.072,
+     "typ_z": 0.29,
+     "nn_cos": 0.702,
+     "tone_db": 12.86,
+     "tone_ratio": 1.31,
+     "n_outside": 7,
+     "outside": [
+      [
+       "16 kHz",
+       -37.5,
+       "below"
+      ],
+      [
+       "12.7 kHz",
+       -25.9,
+       "below"
+      ],
+      [
+       "39 Hz",
+       20.5,
+       "above"
+      ]
+     ],
+     "attack_ms": 3.0,
+     "t40_ms": 55.0,
+     "active_s": 0.058,
+     "onset_s": 0.007,
+     "env_oct": 0.722,
+     "curve_db": 9.93,
+     "t40_ratio": 1.222,
+     "attack_ratio": 3.0,
+     "active_ratio": 0.817,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.77,
+     "phrase_min": 2.41,
+     "margin": 0.52,
+     "wins": 0.5,
+     "best_confusion": "a wooden stick hit",
+     "as_top": [
+      [
+       "Sound effect",
+       0.069
+      ],
+      [
+       "Music",
+       0.024
+      ],
+      [
+       "Speech",
+       0.024
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -34.0,
+     "stereo_corr": 1.0,
+     "darken": -0.63,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -54.2,
+      "first_sample": 0.0,
+      "tail_db": -37.4,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/fs-167829_1.wav",
+     "length_s": 0.072,
+     "typ_z": 1.72,
+     "nn_cos": 0.807,
+     "tone_db": 6.17,
+     "tone_ratio": 0.63,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 55.0,
+     "active_s": 0.055,
+     "onset_s": 0.005,
+     "env_oct": 0.219,
+     "curve_db": 8.44,
+     "t40_ratio": 1.222,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.775,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.7,
+     "phrase_min": 2.55,
+     "margin": -0.27,
+     "wins": 0.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Sound effect",
+       0.062
+      ],
+      [
+       "Speech",
+       0.028
+      ],
+      [
+       "Music",
+       0.028
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -41.5,
+     "stereo_corr": 0.919,
+     "darken": 0.02,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -69.7,
+      "first_sample": 0.0,
+      "tail_db": -48.4,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/fs-167829_2.wav",
+     "length_s": 0.074,
+     "typ_z": 1.5,
+     "nn_cos": 0.769,
+     "tone_db": 7.53,
+     "tone_ratio": 0.76,
+     "n_outside": 3,
+     "outside": [
+      [
+       "62 Hz",
+       17.4,
+       "above"
+      ],
+      [
+       "50 Hz",
+       13.9,
+       "above"
+      ],
+      [
+       "39 Hz",
+       13.5,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 60.0,
+     "active_s": 0.06,
+     "onset_s": 0.005,
+     "env_oct": 0.219,
+     "curve_db": 8.61,
+     "t40_ratio": 1.333,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.845,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.77,
+     "phrase_min": 2.65,
+     "margin": 0.92,
+     "wins": 1.0,
+     "best_confusion": "a wooden stick hit",
+     "as_top": [
+      [
+       "Sound effect",
+       0.068
+      ],
+      [
+       "Speech",
+       0.03
+      ],
+      [
+       "Music",
+       0.024
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -42.1,
+     "stereo_corr": 0.934,
+     "darken": -0.12,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.5,
+      "first_sample": 0.0,
+      "tail_db": -45.8,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/fs-383863_1.wav",
+     "length_s": 0.165,
+     "typ_z": -0.36,
+     "nn_cos": 0.673,
+     "tone_db": 11.27,
+     "tone_ratio": 1.14,
+     "n_outside": 3,
+     "outside": [
+      [
+       "16 kHz",
+       -37.5,
+       "below"
+      ],
+      [
+       "315 Hz",
+       15.0,
+       "above"
+      ],
+      [
+       "1.26 kHz",
+       12.7,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 70.0,
+     "active_s": 0.072,
+     "onset_s": 0.073,
+     "env_oct": 0.219,
+     "curve_db": 7.33,
+     "t40_ratio": 1.556,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.014,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.88,
+     "phrase_min": 2.62,
+     "margin": 1.11,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.113
+      ],
+      [
+       "Sound effect",
+       0.052
+      ],
+      [
+       "Tap",
+       0.037
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.037,
+     "floor_db": -56.4,
+     "stereo_corr": 1.0,
+     "darken": -1.02,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -85.2,
+      "first_sample": 0.0,
+      "tail_db": -47.4,
+      "lead_s": 0.057,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/forge/fs-383863_2.wav",
+     "length_s": 0.18,
+     "typ_z": -1.1,
+     "nn_cos": 0.649,
+     "tone_db": 11.39,
+     "tone_ratio": 1.16,
+     "n_outside": 4,
+     "outside": [
+      [
+       "16 kHz",
+       -37.5,
+       "below"
+      ],
+      [
+       "2.52 kHz",
+       -15.1,
+       "below"
+      ],
+      [
+       "3.17 kHz",
+       -11.8,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 70.0,
+     "active_s": 0.071,
+     "onset_s": 0.089,
+     "env_oct": 0.212,
+     "curve_db": 10.66,
+     "t40_ratio": 1.556,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.0,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 45.0,
+      "active_s": 0.071
+     },
+     "phrase_z": 2.83,
+     "phrase_min": 2.55,
+     "margin": 0.53,
+     "wins": 1.0,
+     "best_confusion": "a wooden stick hit",
+     "as_top": [
+      [
+       "Chopping (food)",
+       0.649
+      ],
+      [
+       "Finger snapping",
+       0.025
+      ],
+      [
+       "Chop",
+       0.024
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -49.8,
+     "stereo_corr": 1.0,
+     "darken": -0.61,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -72.5,
+      "first_sample": 0.0,
+      "tail_db": -56.7,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_loo": [
+    {
+     "file": "E:/earshot/out/refs/click/bench/mk-1124_1.wav",
+     "length_s": 0.055,
+     "typ_z": 0.58,
+     "nn_cos": 0.699,
+     "tone_db": 14.31,
+     "tone_ratio": 1.5,
+     "n_outside": 12,
+     "outside": [
+      [
+       "12.7 kHz",
+       -25.6,
+       "below"
+      ],
+      [
+       "500 Hz",
+       -21.4,
+       "below"
+      ],
+      [
+       "50 Hz",
+       -20.2,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 25.0,
+     "active_s": 0.022,
+     "onset_s": 0.008,
+     "env_oct": 0.972,
+     "curve_db": 13.19,
+     "t40_ratio": 0.455,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.291,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 55.0,
+      "active_s": 0.075
+     },
+     "phrase_z": 2.67,
+     "phrase_min": 2.65,
+     "margin": 0.63,
+     "wins": 1.0,
+     "best_confusion": "a drop of water",
+     "as_top": [
+      [
+       "Sound effect",
+       0.063
+      ],
+      [
+       "Music",
+       0.045
+      ],
+      [
+       "Speech",
+       0.032
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -68.2,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -94.4,
+      "first_sample": 0.0,
+      "tail_db": -71.2,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/mk-2364_1.wav",
+     "length_s": 0.21,
+     "typ_z": -2.5,
+     "nn_cos": 0.699,
+     "tone_db": 11.83,
+     "tone_ratio": 1.24,
+     "n_outside": 8,
+     "outside": [
+      [
+       "31 Hz",
+       30.5,
+       "above"
+      ],
+      [
+       "794 Hz",
+       21.7,
+       "above"
+      ],
+      [
+       "630 Hz",
+       20.9,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 45.0,
+     "active_s": 0.08,
+     "onset_s": 0.005,
+     "env_oct": 0.205,
+     "curve_db": 17.22,
+     "t40_ratio": 0.857,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.311,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 52.5,
+      "active_s": 0.061
+     },
+     "phrase_z": 2.4,
+     "phrase_min": 2.21,
+     "margin": -0.06,
+     "wins": 0.5,
+     "best_confusion": "a drop of water",
+     "as_top": [
+      [
+       "Plop",
+       0.667
+      ],
+      [
+       "Music",
+       0.045
+      ],
+      [
+       "Sound effect",
+       0.042
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -47.3,
+     "stereo_corr": 1.0,
+     "darken": -2.12,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -53.9,
+      "first_sample": 0.0,
+      "tail_db": -59.7,
+      "lead_s": 0.004,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-610524_1.wav",
+     "length_s": 0.083,
+     "typ_z": -0.31,
+     "nn_cos": 0.712,
+     "tone_db": 11.51,
+     "tone_ratio": 1.21,
+     "n_outside": 9,
+     "outside": [
+      [
+       "99 Hz",
+       23.1,
+       "above"
+      ],
+      [
+       "198 Hz",
+       22.8,
+       "above"
+      ],
+      [
+       "125 Hz",
+       20.4,
+       "above"
+      ]
+     ],
+     "attack_ms": 16.0,
+     "t40_ms": 35.0,
+     "active_s": 0.051,
+     "onset_s": 0.014,
+     "env_oct": 1.739,
+     "curve_db": 12.77,
+     "t40_ratio": 0.636,
+     "attack_ratio": 16.0,
+     "active_ratio": 0.675,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 55.0,
+      "active_s": 0.075
+     },
+     "phrase_z": 2.92,
+     "phrase_min": 2.89,
+     "margin": 1.38,
+     "wins": 1.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Speech",
+       0.053
+      ],
+      [
+       "Music",
+       0.053
+      ],
+      [
+       "Sound effect",
+       0.04
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -44.8,
+     "stereo_corr": -0.129,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -61.6,
+      "first_sample": 0.0,
+      "tail_db": -53.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-461799_1.wav",
+     "length_s": 0.305,
+     "typ_z": -0.2,
+     "nn_cos": 0.68,
+     "tone_db": 6.79,
+     "tone_ratio": 0.64,
+     "n_outside": 1,
+     "outside": [
+      [
+       "2 kHz",
+       7.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 149.0,
+     "t40_ms": 110.0,
+     "active_s": 0.255,
+     "onset_s": 0.03,
+     "env_oct": 3.552,
+     "curve_db": 26.17,
+     "t40_ratio": 2.588,
+     "attack_ratio": 149.0,
+     "active_ratio": 4.18,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 42.5,
+      "active_s": 0.061
+     },
+     "phrase_z": 2.34,
+     "phrase_min": 2.33,
+     "margin": -0.44,
+     "wins": 0.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.578
+      ],
+      [
+       "Clapping",
+       0.447
+      ],
+      [
+       "Speech",
+       0.045
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.024,
+     "floor_db": -38.9,
+     "stereo_corr": 0.824,
+     "darken": -0.35,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -74.6,
+      "first_sample": 0.0,
+      "tail_db": -48.8,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-461799_2.wav",
+     "length_s": 0.109,
+     "typ_z": -0.1,
+     "nn_cos": 0.681,
+     "tone_db": 8.56,
+     "tone_ratio": 0.8,
+     "n_outside": 2,
+     "outside": [
+      [
+       "125 Hz",
+       -21.5,
+       "below"
+      ],
+      [
+       "1.59 kHz",
+       11.0,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 70.0,
+     "active_s": 0.071,
+     "onset_s": 0.019,
+     "env_oct": 0.279,
+     "curve_db": 12.26,
+     "t40_ratio": 1.647,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.084,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 42.5,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.51,
+     "phrase_min": 2.48,
+     "margin": -0.19,
+     "wins": 0.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Speech",
+       0.114
+      ],
+      [
+       "Music",
+       0.034
+      ],
+      [
+       "Single-lens reflex camera",
+       0.028
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.003,
+     "floor_db": -40.0,
+     "stereo_corr": 0.948,
+     "darken": 0.13,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -90.1,
+      "first_sample": 0.0,
+      "tail_db": -50.3,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-431419_1.wav",
+     "length_s": 0.157,
+     "typ_z": 3.25,
+     "nn_cos": 0.792,
+     "tone_db": 9.19,
+     "tone_ratio": 0.86,
+     "n_outside": 1,
+     "outside": [
+      [
+       "39 Hz",
+       -24.8,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 65.0,
+     "active_s": 0.099,
+     "onset_s": 0.006,
+     "env_oct": 0.437,
+     "curve_db": 14.99,
+     "t40_ratio": 1.529,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.623,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 42.5,
+      "active_s": 0.061
+     },
+     "phrase_z": 2.93,
+     "phrase_min": 2.79,
+     "margin": 0.83,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Coin (dropping)",
+       0.274
+      ],
+      [
+       "Chink, clink",
+       0.077
+      ],
+      [
+       "Speech",
+       0.069
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.0,
+     "floor_db": -49.6,
+     "stereo_corr": 1.0,
+     "darken": -0.07,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -105.1,
+      "first_sample": 0.0,
+      "tail_db": -60.2,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-431419_2.wav",
+     "length_s": 0.054,
+     "typ_z": 2.85,
+     "nn_cos": 0.792,
+     "tone_db": 9.85,
+     "tone_ratio": 0.95,
+     "n_outside": 3,
+     "outside": [
+      [
+       "10.1 kHz",
+       15.6,
+       "above"
+      ],
+      [
+       "12.7 kHz",
+       15.1,
+       "above"
+      ],
+      [
+       "2 kHz",
+       -14.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 40.0,
+     "active_s": 0.04,
+     "onset_s": 0.005,
+     "env_oct": 0.459,
+     "curve_db": 12.03,
+     "t40_ratio": 0.727,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.53,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 55.0,
+      "active_s": 0.075
+     },
+     "phrase_z": 3.05,
+     "phrase_min": 2.77,
+     "margin": 0.27,
+     "wins": 0.5,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Sound effect",
+       0.064
+      ],
+      [
+       "Music",
+       0.041
+      ],
+      [
+       "Speech",
+       0.031
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -40.8,
+     "stereo_corr": 1.0,
+     "darken": 0.42,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -89.0,
+      "first_sample": 0.0,
+      "tail_db": -42.6,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_rev": [
+    {
+     "file": "E:/earshot/out/refs/click/bench/mk-1124_1.wav",
+     "length_s": 0.055,
+     "typ_z": -0.27,
+     "nn_cos": 0.755,
+     "tone_db": 16.45,
+     "tone_ratio": 1.77,
+     "n_outside": 1,
+     "outside": [
+      [
+       "62 Hz",
+       -36.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 25.0,
+     "active_s": 0.022,
+     "onset_s": 0.008,
+     "env_oct": 0.946,
+     "curve_db": 10.93,
+     "t40_ratio": 0.417,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.336,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.67,
+     "phrase_min": 2.65,
+     "margin": 0.63,
+     "wins": 1.0,
+     "best_confusion": "a drop of water",
+     "as_top": [
+      [
+       "Sound effect",
+       0.063
+      ],
+      [
+       "Music",
+       0.045
+      ],
+      [
+       "Speech",
+       0.032
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -68.2,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -94.4,
+      "first_sample": 0.0,
+      "tail_db": -71.2,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/mk-2364_1.wav",
+     "length_s": 0.21,
+     "typ_z": -3.09,
+     "nn_cos": 0.604,
+     "tone_db": 7.94,
+     "tone_ratio": 0.85,
+     "n_outside": 3,
+     "outside": [
+      [
+       "630 Hz",
+       14.3,
+       "above"
+      ],
+      [
+       "794 Hz",
+       10.9,
+       "above"
+      ],
+      [
+       "500 Hz",
+       10.7,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 45.0,
+     "active_s": 0.08,
+     "onset_s": 0.005,
+     "env_oct": 0.235,
+     "curve_db": 17.87,
+     "t40_ratio": 0.75,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.221,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.4,
+     "phrase_min": 2.21,
+     "margin": -0.06,
+     "wins": 0.5,
+     "best_confusion": "a drop of water",
+     "as_top": [
+      [
+       "Plop",
+       0.667
+      ],
+      [
+       "Music",
+       0.045
+      ],
+      [
+       "Sound effect",
+       0.042
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -47.3,
+     "stereo_corr": 1.0,
+     "darken": -2.12,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -53.9,
+      "first_sample": 0.0,
+      "tail_db": -59.7,
+      "lead_s": 0.004,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-610524_1.wav",
+     "length_s": 0.083,
+     "typ_z": -0.82,
+     "nn_cos": 0.703,
+     "tone_db": 8.92,
+     "tone_ratio": 0.96,
+     "n_outside": 2,
+     "outside": [
+      [
+       "16 kHz",
+       26.7,
+       "above"
+      ],
+      [
+       "198 Hz",
+       16.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 16.0,
+     "t40_ms": 35.0,
+     "active_s": 0.051,
+     "onset_s": 0.014,
+     "env_oct": 1.713,
+     "curve_db": 13.65,
+     "t40_ratio": 0.583,
+     "attack_ratio": 16.0,
+     "active_ratio": 0.779,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.92,
+     "phrase_min": 2.89,
+     "margin": 1.38,
+     "wins": 1.0,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Speech",
+       0.053
+      ],
+      [
+       "Music",
+       0.053
+      ],
+      [
+       "Sound effect",
+       0.04
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -44.8,
+     "stereo_corr": -0.129,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -61.6,
+      "first_sample": 0.0,
+      "tail_db": -53.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-461799_1.wav",
+     "length_s": 0.305,
+     "typ_z": -1.52,
+     "nn_cos": 0.708,
+     "tone_db": 7.89,
+     "tone_ratio": 0.85,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 149.0,
+     "t40_ms": 110.0,
+     "active_s": 0.255,
+     "onset_s": 0.03,
+     "env_oct": 3.352,
+     "curve_db": 25.04,
+     "t40_ratio": 1.833,
+     "attack_ratio": 149.0,
+     "active_ratio": 3.893,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.34,
+     "phrase_min": 2.33,
+     "margin": -0.44,
+     "wins": 0.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.578
+      ],
+      [
+       "Clapping",
+       0.447
+      ],
+      [
+       "Speech",
+       0.045
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.024,
+     "floor_db": -38.9,
+     "stereo_corr": 0.824,
+     "darken": -0.35,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -74.6,
+      "first_sample": 0.0,
+      "tail_db": -48.8,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-461799_2.wav",
+     "length_s": 0.109,
+     "typ_z": -1.73,
+     "nn_cos": 0.713,
+     "tone_db": 9.67,
+     "tone_ratio": 1.04,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 70.0,
+     "active_s": 0.071,
+     "onset_s": 0.019,
+     "env_oct": 0.113,
+     "curve_db": 11.56,
+     "t40_ratio": 1.167,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.084,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.51,
+     "phrase_min": 2.48,
+     "margin": -0.19,
+     "wins": 0.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Speech",
+       0.114
+      ],
+      [
+       "Music",
+       0.034
+      ],
+      [
+       "Single-lens reflex camera",
+       0.028
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.003,
+     "floor_db": -40.0,
+     "stereo_corr": 0.948,
+     "darken": 0.13,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -90.1,
+      "first_sample": 0.0,
+      "tail_db": -50.3,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-431419_1.wav",
+     "length_s": 0.157,
+     "typ_z": -0.02,
+     "nn_cos": 0.737,
+     "tone_db": 11.24,
+     "tone_ratio": 1.21,
+     "n_outside": 2,
+     "outside": [
+      [
+       "16 kHz",
+       28.7,
+       "above"
+      ],
+      [
+       "39 Hz",
+       -27.2,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 65.0,
+     "active_s": 0.099,
+     "onset_s": 0.006,
+     "env_oct": 0.237,
+     "curve_db": 11.42,
+     "t40_ratio": 1.083,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.511,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 2.93,
+     "phrase_min": 2.79,
+     "margin": 0.83,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Coin (dropping)",
+       0.274
+      ],
+      [
+       "Chink, clink",
+       0.077
+      ],
+      [
+       "Speech",
+       0.069
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.0,
+     "floor_db": -49.6,
+     "stereo_corr": 1.0,
+     "darken": -0.07,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -105.1,
+      "first_sample": 0.0,
+      "tail_db": -60.2,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/click/bench/fs-431419_2.wav",
+     "length_s": 0.054,
+     "typ_z": 0.61,
+     "nn_cos": 0.807,
+     "tone_db": 11.37,
+     "tone_ratio": 1.22,
+     "n_outside": 4,
+     "outside": [
+      [
+       "62 Hz",
+       -36.9,
+       "below"
+      ],
+      [
+       "16 kHz",
+       26.3,
+       "above"
+      ],
+      [
+       "12.7 kHz",
+       12.6,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 40.0,
+     "active_s": 0.04,
+     "onset_s": 0.005,
+     "env_oct": 0.432,
+     "curve_db": 9.02,
+     "t40_ratio": 0.667,
+     "attack_ratio": 1.0,
+     "active_ratio": 0.611,
+     "ref_median": {
+      "attack_ms": 1.0,
+      "t40_ms": 60.0,
+      "active_s": 0.066
+     },
+     "phrase_z": 3.05,
+     "phrase_min": 2.77,
+     "margin": 0.27,
+     "wins": 0.5,
+     "best_confusion": "a finger snap",
+     "as_top": [
+      [
+       "Sound effect",
+       0.064
+      ],
+      [
+       "Music",
+       0.041
+      ],
+      [
+       "Speech",
+       0.031
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -40.8,
+     "stereo_corr": 1.0,
+     "darken": 0.42,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -89.0,
+      "first_sample": 0.0,
+      "tail_db": -42.6,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity_bench": {
+    "n": 7,
+    "cos_mean": 0.576,
+    "cos_max": 0.792,
+    "tone_min_db": 6.13,
+    "tone_mean_db": 12.82,
+    "near_duplicates": []
+   },
+   "diversity_forge": {
+    "n": 8,
+    "cos_mean": 0.651,
+    "cos_max": 0.92,
+    "tone_min_db": 4.52,
+    "tone_mean_db": 16.52,
+    "near_duplicates": []
+   },
+   "inside": {
+    "per_sound": [
+     7,
+     7,
+     7
+    ],
+    "n_checks": 7,
+    "limits": {
+     "typ_z": -0.508,
+     "tone_db": 13.15,
+     "env_oct": 1.048,
+     "curve_db": 14.422,
+     "phrase_z": 2.488,
+     "margin": -0.086,
+     "as_p": 0.002
+    },
+    "real_per_sound": [
+     5,
+     6,
+     5,
+     7,
+     6,
+     7,
+     7,
+     6,
+     6,
+     3,
+     6,
+     3,
+     6,
+     5,
+     7
+    ]
+   },
+   "summary": {
+    "made": {
+     "n": 3,
+     "typ_z": 1.89,
+     "tone_db": 7.6,
+     "env_oct": 0.56,
+     "curve_db": 8.85,
+     "phrase_z": 3.12,
+     "margin": 1.13,
+     "as_p": 0.0,
+     "tone_ratio": 0.77,
+     "t40_ratio": 0.56,
+     "wins": 1.0,
+     "floor_db": -49.0,
+     "stereo_corr": 1.0,
+     "darken": 0.41,
+     "as_names": 0.0,
+     "artifacts": 0,
+     "var_cos": 0.886
+    },
+    "real_cross": {
+     "n": 8,
+     "typ_z": 0.16,
+     "tone_db": 11.33,
+     "env_oct": 0.22,
+     "curve_db": 9.92,
+     "phrase_z": 2.77,
+     "margin": 0.53,
+     "as_p": 0.0,
+     "tone_ratio": 1.15,
+     "t40_ratio": 1.33,
+     "wins": 0.75,
+     "floor_db": -42.85,
+     "stereo_corr": 0.99,
+     "darken": -0.12,
+     "as_names": 0.12,
+     "artifacts": 0,
+     "var_cos": 0.651
+    },
+    "real_loo": {
+     "n": 7,
+     "typ_z": -0.1,
+     "tone_db": 9.85,
+     "env_oct": 0.46,
+     "curve_db": 13.19,
+     "phrase_z": 2.67,
+     "margin": 0.27,
+     "as_p": 0.0,
+     "tone_ratio": 0.95,
+     "t40_ratio": 0.86,
+     "wins": 0.5,
+     "floor_db": -44.8,
+     "stereo_corr": 1.0,
+     "darken": -0.07,
+     "as_names": 0.0,
+     "artifacts": 0,
+     "var_cos": 0.576
+    }
+   }
+  },
+  "impact": {
+   "n_bench": 1,
+   "n_forge": 2,
+   "note": "thin: the library has three cinematic hits (all three were the v1 impact forge refs); one is held out as bench, so v1 impact bench numbers are optimistic.",
+   "bench_refs": [
+    "E:/earshot/out/refs/impact/bench/kit-impact_03.wav"
+   ],
+   "made": [
+    {
+     "file": "demo/forge-test/impact/final/impact_01.wav",
+     "length_s": 7.014,
+     "nn_cos": 0.769,
+     "tone_db": 6.7,
+     "tone_ratio": null,
+     "n_outside": 19,
+     "outside": [
+      [
+       "16 kHz",
+       -12.6,
+       "below"
+      ],
+      [
+       "794 Hz",
+       -12.2,
+       "below"
+      ],
+      [
+       "1.59 kHz",
+       -9.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 363.0,
+     "t40_ms": 1210.0,
+     "active_s": 4.962,
+     "onset_s": 0.538,
+     "env_oct": 1.568,
+     "curve_db": 24.86,
+     "t40_ratio": 0.351,
+     "attack_ratio": 0.145,
+     "active_ratio": 0.755,
+     "ref_median": {
+      "attack_ms": 2505.0,
+      "t40_ms": 3450.0,
+      "active_s": 6.573
+     },
+     "phrase_z": 3.95,
+     "phrase_min": 3.74,
+     "margin": 1.54,
+     "wins": 1.0,
+     "best_confusion": "a gunshot",
+     "as_top": [
+      [
+       "Explosion",
+       0.476
+      ],
+      [
+       "Bang",
+       0.421
+      ],
+      [
+       "Burst, pop",
+       0.334
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.476,
+     "floor_db": -64.3,
+     "stereo_corr": 0.41,
+     "darken": -1.61,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -137.5,
+      "first_sample": 0.0,
+      "tail_db": -129.5,
+      "lead_s": 0.043,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/impact/final/impact_02.wav",
+     "length_s": 7.578,
+     "nn_cos": 0.772,
+     "tone_db": 7.74,
+     "tone_ratio": null,
+     "n_outside": 17,
+     "outside": [
+      [
+       "16 kHz",
+       -17.5,
+       "below"
+      ],
+      [
+       "12.7 kHz",
+       -13.7,
+       "below"
+      ],
+      [
+       "10.1 kHz",
+       -13.4,
+       "below"
+      ]
+     ],
+     "attack_ms": 300.0,
+     "t40_ms": 1740.0,
+     "active_s": 4.413,
+     "onset_s": 0.712,
+     "env_oct": 1.541,
+     "curve_db": 26.47,
+     "t40_ratio": 0.504,
+     "attack_ratio": 0.12,
+     "active_ratio": 0.671,
+     "ref_median": {
+      "attack_ms": 2505.0,
+      "t40_ms": 3450.0,
+      "active_s": 6.573
+     },
+     "phrase_z": 3.68,
+     "phrase_min": 3.54,
+     "margin": 1.81,
+     "wins": 1.0,
+     "best_confusion": "a bass drum",
+     "as_top": [
+      [
+       "Bang",
+       0.389
+      ],
+      [
+       "Explosion",
+       0.204
+      ],
+      [
+       "Burst, pop",
+       0.203
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.389,
+     "floor_db": -69.1,
+     "stereo_corr": 0.183,
+     "darken": -1.11,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -117.1,
+      "first_sample": 0.0,
+      "tail_db": -132.4,
+      "lead_s": 0.049,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/impact/final/impact_03.wav",
+     "length_s": 7.23,
+     "nn_cos": 0.773,
+     "tone_db": 6.07,
+     "tone_ratio": null,
+     "n_outside": 20,
+     "outside": [
+      [
+       "16 kHz",
+       -11.2,
+       "below"
+      ],
+      [
+       "1.59 kHz",
+       -10.2,
+       "below"
+      ],
+      [
+       "2 kHz",
+       -10.1,
+       "below"
+      ]
+     ],
+     "attack_ms": 259.0,
+     "t40_ms": 2145.0,
+     "active_s": 4.56,
+     "onset_s": 1.04,
+     "env_oct": 1.496,
+     "curve_db": 23.51,
+     "t40_ratio": 0.622,
+     "attack_ratio": 0.103,
+     "active_ratio": 0.694,
+     "ref_median": {
+      "attack_ms": 2505.0,
+      "t40_ms": 3450.0,
+      "active_s": 6.573
+     },
+     "phrase_z": 3.68,
+     "phrase_min": 3.43,
+     "margin": 1.83,
+     "wins": 1.0,
+     "best_confusion": "a bass drum",
+     "as_top": [
+      [
+       "Explosion",
+       0.252
+      ],
+      [
+       "Bang",
+       0.165
+      ],
+      [
+       "Sound effect",
+       0.159
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.252,
+     "floor_db": -64.7,
+     "stereo_corr": 0.411,
+     "darken": -1.92,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -126.2,
+      "first_sample": 0.0,
+      "tail_db": -126.4,
+      "lead_s": 0.098,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity": {
+    "n": 3,
+    "cos_mean": 0.931,
+    "cos_max": 0.943,
+    "tone_min_db": 3.76,
+    "tone_mean_db": 4.21,
+    "near_duplicates": []
+   },
+   "real_cross": [
+    {
+     "file": "E:/earshot/out/refs/impact/forge/kit-impact_01.wav",
+     "length_s": 4.455,
+     "nn_cos": 0.449,
+     "tone_db": 7.04,
+     "tone_ratio": null,
+     "n_outside": 18,
+     "outside": [
+      [
+       "12.7 kHz",
+       -18.6,
+       "below"
+      ],
+      [
+       "16 kHz",
+       -17.5,
+       "below"
+      ],
+      [
+       "10.1 kHz",
+       -8.5,
+       "below"
+      ]
+     ],
+     "attack_ms": 10.0,
+     "t40_ms": 1310.0,
+     "active_s": 1.812,
+     "onset_s": 0.013,
+     "env_oct": 3.742,
+     "curve_db": 41.06,
+     "t40_ratio": 0.38,
+     "attack_ratio": 0.004,
+     "active_ratio": 0.276,
+     "ref_median": {
+      "attack_ms": 2505.0,
+      "t40_ms": 3450.0,
+      "active_s": 6.573
+     },
+     "phrase_z": 3.04,
+     "phrase_min": 2.25,
+     "margin": 0.69,
+     "wins": 0.5,
+     "best_confusion": "a bass drum",
+     "as_top": [
+      [
+       "Bang",
+       0.479
+      ],
+      [
+       "Explosion",
+       0.221
+      ],
+      [
+       "Burst, pop",
+       0.206
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.479,
+     "floor_db": -88.8,
+     "stereo_corr": 0.338,
+     "darken": -0.56,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -69.1,
+      "first_sample": 0.0,
+      "tail_db": -130.9,
+      "lead_s": 0.007,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/impact/forge/kit-impact_02.wav",
+     "length_s": 6.5,
+     "nn_cos": 0.842,
+     "tone_db": 5.33,
+     "tone_ratio": null,
+     "n_outside": 15,
+     "outside": [
+      [
+       "50 Hz",
+       -13.3,
+       "below"
+      ],
+      [
+       "39 Hz",
+       -10.9,
+       "below"
+      ],
+      [
+       "31 Hz",
+       -8.6,
+       "below"
+      ]
+     ],
+     "attack_ms": 487.0,
+     "t40_ms": 1865.0,
+     "active_s": 4.565,
+     "onset_s": 0.505,
+     "env_oct": 1.259,
+     "curve_db": 22.9,
+     "t40_ratio": 0.541,
+     "attack_ratio": 0.194,
+     "active_ratio": 0.695,
+     "ref_median": {
+      "attack_ms": 2505.0,
+      "t40_ms": 3450.0,
+      "active_s": 6.573
+     },
+     "phrase_z": 3.03,
+     "phrase_min": 1.8,
+     "margin": 1.5,
+     "wins": 0.5,
+     "best_confusion": "a bass drum",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.808
+      ],
+      [
+       "Sound effect",
+       0.204
+      ],
+      [
+       "Music",
+       0.062
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.028,
+     "floor_db": -52.3,
+     "stereo_corr": 0.745,
+     "darken": -2.04,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -41.5,
+      "first_sample": 0.0,
+      "tail_db": -100.5,
+      "lead_s": 0.041,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_loo": [],
+   "real_rev": [
+    {
+     "file": "E:/earshot/out/refs/impact/bench/kit-impact_03.wav",
+     "length_s": 7.92,
+     "nn_cos": 0.842,
+     "tone_db": 5.13,
+     "tone_ratio": null,
+     "n_outside": 8,
+     "outside": [
+      [
+       "50 Hz",
+       10.3,
+       "above"
+      ],
+      [
+       "4 kHz",
+       7.3,
+       "above"
+      ],
+      [
+       "157 Hz",
+       -7.0,
+       "below"
+      ]
+     ],
+     "attack_ms": 2505.0,
+     "t40_ms": 3450.0,
+     "active_s": 6.573,
+     "onset_s": 0.917,
+     "env_oct": 1.832,
+     "curve_db": 31.74,
+     "t40_ratio": 2.173,
+     "attack_ratio": 10.08,
+     "active_ratio": 2.061,
+     "ref_median": {
+      "attack_ms": 248.5,
+      "t40_ms": 1587.5,
+      "active_s": 3.189
+     },
+     "phrase_z": 2.77,
+     "phrase_min": 1.81,
+     "margin": 1.36,
+     "wins": 0.5,
+     "best_confusion": "a bass drum",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.467
+      ],
+      [
+       "Explosion",
+       0.337
+      ],
+      [
+       "Burst, pop",
+       0.135
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.337,
+     "floor_db": -45.2,
+     "stereo_corr": 0.752,
+     "darken": -2.31,
+     "artifacts": [
+      "late start"
+     ],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -68.0,
+      "first_sample": 0.0,
+      "tail_db": -120.0,
+      "lead_s": 0.138,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity_bench": {
+    "n": 1
+   },
+   "diversity_forge": {
+    "n": 2,
+    "cos_mean": 0.659,
+    "cos_max": 0.659,
+    "tone_min_db": 7.13,
+    "tone_mean_db": 7.13,
+    "near_duplicates": []
+   },
+   "inside": {
+    "per_sound": [
+     5,
+     5,
+     6
+    ],
+    "n_checks": 6,
+    "limits": {
+     "tone_db": 6.698,
+     "env_oct": 3.245,
+     "curve_db": 37.428,
+     "phrase_z": 3.032,
+     "margin": 0.852,
+     "as_p": 0.118
+    },
+    "real_per_sound": [
+     2,
+     4
+    ]
+   },
+   "summary": {
+    "made": {
+     "n": 3,
+     "tone_db": 6.7,
+     "env_oct": 1.54,
+     "curve_db": 24.86,
+     "phrase_z": 3.68,
+     "margin": 1.81,
+     "as_p": 0.39,
+     "t40_ratio": 0.5,
+     "wins": 1.0,
+     "floor_db": -64.7,
+     "stereo_corr": 0.41,
+     "darken": -1.61,
+     "as_names": 1.0,
+     "artifacts": 0,
+     "var_cos": 0.931
+    },
+    "real_cross": {
+     "n": 2,
+     "tone_db": 6.19,
+     "env_oct": 2.5,
+     "curve_db": 31.98,
+     "phrase_z": 3.04,
+     "margin": 1.09,
+     "as_p": 0.25,
+     "t40_ratio": 0.46,
+     "wins": 0.5,
+     "floor_db": -70.55,
+     "stereo_corr": 0.54,
+     "darken": -1.3,
+     "as_names": 0.5,
+     "artifacts": 0,
+     "var_cos": 0.659
+    },
+    "real_loo": {}
+   }
+  },
+  "pop": {
+   "n_bench": 6,
+   "n_forge": 7,
+   "note": "",
+   "bench_refs": [
+    "E:/earshot/out/refs/pop/bench/fs-202230_1.wav",
+    "E:/earshot/out/refs/pop/bench/fs-33369_1.wav",
+    "E:/earshot/out/refs/pop/bench/fs-545201_1.wav",
+    "E:/earshot/out/refs/pop/bench/fs-573152_1.wav",
+    "E:/earshot/out/refs/pop/bench/mk-3192_1.wav",
+    "E:/earshot/out/refs/pop/bench/mk-3070_1.wav"
+   ],
+   "made": [
+    {
+     "file": "demo/forge-test/pop/final/pop_01.wav",
+     "length_s": 0.304,
+     "typ_z": 1.22,
+     "nn_cos": 0.769,
+     "tone_db": 12.23,
+     "tone_ratio": 0.9,
+     "n_outside": 3,
+     "outside": [
+      [
+       "2 kHz",
+       24.9,
+       "above"
+      ],
+      [
+       "500 Hz",
+       13.1,
+       "above"
+      ],
+      [
+       "630 Hz",
+       12.5,
+       "above"
+      ]
+     ],
+     "attack_ms": 3.0,
+     "t40_ms": 125.0,
+     "active_s": 0.146,
+     "onset_s": 0.029,
+     "env_oct": 0.314,
+     "curve_db": 6.29,
+     "t40_ratio": 1.136,
+     "attack_ratio": 1.5,
+     "active_ratio": 1.127,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 3.16,
+     "phrase_min": 2.84,
+     "margin": -0.1,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.936
+      ],
+      [
+       "Sound effect",
+       0.035
+      ],
+      [
+       "Music",
+       0.031
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.936,
+     "floor_db": -57.1,
+     "stereo_corr": 1.0,
+     "darken": 0.43,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -71.0,
+      "first_sample": 0.0,
+      "tail_db": -65.6,
+      "lead_s": 0.028,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/pop/final/pop_02.wav",
+     "length_s": 0.189,
+     "typ_z": 1.67,
+     "nn_cos": 0.826,
+     "tone_db": 8.59,
+     "tone_ratio": 0.63,
+     "n_outside": 2,
+     "outside": [
+      [
+       "630 Hz",
+       14.9,
+       "above"
+      ],
+      [
+       "99 Hz",
+       11.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 13.0,
+     "t40_ms": 110.0,
+     "active_s": 0.136,
+     "onset_s": 0.044,
+     "env_oct": 0.924,
+     "curve_db": 7.89,
+     "t40_ratio": 1.0,
+     "attack_ratio": 6.5,
+     "active_ratio": 1.05,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 3.09,
+     "phrase_min": 2.85,
+     "margin": 0.04,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.884
+      ],
+      [
+       "Music",
+       0.064
+      ],
+      [
+       "Speech",
+       0.041
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.884,
+     "floor_db": -68.0,
+     "stereo_corr": 1.0,
+     "darken": 0.19,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -77.8,
+      "first_sample": 0.0,
+      "tail_db": -51.5,
+      "lead_s": 0.041,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/pop/final/pop_03.wav",
+     "length_s": 0.204,
+     "typ_z": 1.33,
+     "nn_cos": 0.767,
+     "tone_db": 7.17,
+     "tone_ratio": 0.52,
+     "n_outside": 3,
+     "outside": [
+      [
+       "630 Hz",
+       14.0,
+       "above"
+      ],
+      [
+       "125 Hz",
+       13.6,
+       "above"
+      ],
+      [
+       "99 Hz",
+       13.0,
+       "above"
+      ]
+     ],
+     "attack_ms": 8.0,
+     "t40_ms": 110.0,
+     "active_s": 0.127,
+     "onset_s": 0.038,
+     "env_oct": 0.676,
+     "curve_db": 5.9,
+     "t40_ratio": 1.0,
+     "attack_ratio": 4.0,
+     "active_ratio": 0.981,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 3.03,
+     "phrase_min": 2.88,
+     "margin": -0.18,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.895
+      ],
+      [
+       "Speech",
+       0.063
+      ],
+      [
+       "Music",
+       0.051
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.895,
+     "floor_db": -65.0,
+     "stereo_corr": 1.0,
+     "darken": 0.03,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -87.4,
+      "first_sample": 0.0,
+      "tail_db": -56.6,
+      "lead_s": 0.036,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity": {
+    "n": 3,
+    "cos_mean": 0.917,
+    "cos_max": 0.96,
+    "tone_min_db": 4.49,
+    "tone_mean_db": 8.67,
+    "near_duplicates": []
+   },
+   "real_cross": [
+    {
+     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_01.wav",
+     "length_s": 0.19,
+     "typ_z": 2.12,
+     "nn_cos": 0.933,
+     "tone_db": 11.16,
+     "tone_ratio": 0.82,
+     "n_outside": 3,
+     "outside": [
+      [
+       "1.59 kHz",
+       -23.5,
+       "below"
+      ],
+      [
+       "2 kHz",
+       -18.3,
+       "below"
+      ],
+      [
+       "99 Hz",
+       12.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 6.0,
+     "t40_ms": 35.0,
+     "active_s": 0.101,
+     "onset_s": 0.009,
+     "env_oct": 1.199,
+     "curve_db": 10.63,
+     "t40_ratio": 0.318,
+     "attack_ratio": 3.0,
+     "active_ratio": 0.78,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 2.81,
+     "phrase_min": 2.55,
+     "margin": -0.91,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Throat clearing",
+       0.26
+      ],
+      [
+       "Speech",
+       0.116
+      ],
+      [
+       "Sound effect",
+       0.065
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.015,
+     "floor_db": -56.0,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -84.9,
+      "first_sample": 0.0,
+      "tail_db": -58.6,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_02.wav",
+     "length_s": 0.3,
+     "typ_z": 0.54,
+     "nn_cos": 0.722,
+     "tone_db": 11.15,
+     "tone_ratio": 0.82,
+     "n_outside": 3,
+     "outside": [
+      [
+       "2.52 kHz",
+       28.7,
+       "above"
+      ],
+      [
+       "3.17 kHz",
+       27.6,
+       "above"
+      ],
+      [
+       "2 kHz",
+       26.8,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 145.0,
+     "active_s": 0.187,
+     "onset_s": 0.008,
+     "env_oct": 0.643,
+     "curve_db": 9.92,
+     "t40_ratio": 1.318,
+     "attack_ratio": 0.5,
+     "active_ratio": 1.444,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 2.47,
+     "phrase_min": 2.37,
+     "margin": 0.07,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Whip",
+       0.599
+      ],
+      [
+       "Slap, smack",
+       0.101
+      ],
+      [
+       "Finger snapping",
+       0.021
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -46.9,
+     "stereo_corr": 1.0,
+     "darken": 0.04,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -81.7,
+      "first_sample": 0.0,
+      "tail_db": -56.9,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_03.wav",
+     "length_s": 0.414,
+     "typ_z": 0.32,
+     "nn_cos": 0.706,
+     "tone_db": 9.4,
+     "tone_ratio": 0.69,
+     "n_outside": 3,
+     "outside": [
+      [
+       "16 kHz",
+       -14.8,
+       "below"
+      ],
+      [
+       "12.7 kHz",
+       -14.4,
+       "below"
+      ],
+      [
+       "500 Hz",
+       11.8,
+       "above"
+      ]
+     ],
+     "attack_ms": 52.0,
+     "t40_ms": 100.0,
+     "active_s": 0.168,
+     "onset_s": 0.057,
+     "env_oct": 1.738,
+     "curve_db": 26.9,
+     "t40_ratio": 0.909,
+     "attack_ratio": 26.0,
+     "active_ratio": 1.297,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 2.64,
+     "phrase_min": 2.3,
+     "margin": 0.61,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.487
+      ],
+      [
+       "Sound effect",
+       0.129
+      ],
+      [
+       "Drip",
+       0.073
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.487,
+     "floor_db": -62.3,
+     "stereo_corr": 1.0,
+     "darken": 0.38,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -66.0,
+      "first_sample": 0.0,
+      "tail_db": -82.3,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/forge/kit-ui_pop_04.wav",
+     "length_s": 0.236,
+     "typ_z": -1.91,
+     "nn_cos": 0.428,
+     "tone_db": 21.67,
+     "tone_ratio": 1.59,
+     "n_outside": 17,
+     "outside": [
+      [
+       "5.04 kHz",
+       33.3,
+       "above"
+      ],
+      [
+       "6.35 kHz",
+       31.3,
+       "above"
+      ],
+      [
+       "198 Hz",
+       30.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 20.0,
+     "t40_ms": 100.0,
+     "active_s": 0.119,
+     "onset_s": 0.011,
+     "env_oct": 1.194,
+     "curve_db": 9.76,
+     "t40_ratio": 0.909,
+     "attack_ratio": 10.0,
+     "active_ratio": 0.919,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 0.68,
+     "phrase_min": -0.01,
+     "margin": -1.62,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Chink, clink",
+       0.059
+      ],
+      [
+       "Clang",
+       0.048
+      ],
+      [
+       "Dishes, pots, and pans",
+       0.046
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -92.2,
+     "stereo_corr": 1.0,
+     "darken": -0.35,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -85.5,
+      "first_sample": 0.0,
+      "tail_db": -114.4,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/forge/mk-3000_1.wav",
+     "length_s": 0.5,
+     "typ_z": -0.46,
+     "nn_cos": 0.604,
+     "tone_db": 16.22,
+     "tone_ratio": 1.19,
+     "n_outside": 10,
+     "outside": [
+      [
+       "198 Hz",
+       31.6,
+       "above"
+      ],
+      [
+       "1 kHz",
+       -28.8,
+       "below"
+      ],
+      [
+       "315 Hz",
+       24.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 46.0,
+     "t40_ms": 315.0,
+     "active_s": 0.377,
+     "onset_s": 0.008,
+     "env_oct": 2.528,
+     "curve_db": 27.14,
+     "t40_ratio": 2.864,
+     "attack_ratio": 23.0,
+     "active_ratio": 2.911,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 2.46,
+     "phrase_min": 1.59,
+     "margin": 1.08,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.713
+      ],
+      [
+       "Sound effect",
+       0.198
+      ],
+      [
+       "Drip",
+       0.079
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.713,
+     "floor_db": -53.2,
+     "stereo_corr": 0.954,
+     "darken": 1.43,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -84.8,
+      "first_sample": 0.0,
+      "tail_db": -78.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/forge/fs-543200_1.wav",
+     "length_s": 0.048,
+     "typ_z": -0.09,
+     "nn_cos": 0.639,
+     "tone_db": 16.06,
+     "tone_ratio": 1.18,
+     "n_outside": 5,
+     "outside": [
+      [
+       "6.35 kHz",
+       37.5,
+       "above"
+      ],
+      [
+       "5.04 kHz",
+       34.3,
+       "above"
+      ],
+      [
+       "2.52 kHz",
+       23.9,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 35.0,
+     "active_s": 0.035,
+     "onset_s": 0.005,
+     "env_oct": 1.513,
+     "curve_db": 20.54,
+     "t40_ratio": 0.318,
+     "attack_ratio": 0.5,
+     "active_ratio": 0.27,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 1.72,
+     "phrase_min": 1.61,
+     "margin": -0.5,
+     "wins": 0.0,
+     "best_confusion": "a hand clap",
+     "as_top": [
+      [
+       "Sound effect",
+       0.071
+      ],
+      [
+       "Music",
+       0.042
+      ],
+      [
+       "Speech",
+       0.034
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -44.1,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -64.5,
+      "first_sample": 0.0,
+      "tail_db": -43.2,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/forge/fs-543200_2.wav",
+     "length_s": 0.049,
+     "typ_z": -0.39,
+     "nn_cos": 0.609,
+     "tone_db": 16.06,
+     "tone_ratio": 1.18,
+     "n_outside": 5,
+     "outside": [
+      [
+       "6.35 kHz",
+       41.4,
+       "above"
+      ],
+      [
+       "5.04 kHz",
+       32.4,
+       "above"
+      ],
+      [
+       "8 kHz",
+       32.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 30.0,
+     "active_s": 0.03,
+     "onset_s": 0.005,
+     "env_oct": 1.661,
+     "curve_db": 20.71,
+     "t40_ratio": 0.273,
+     "attack_ratio": 0.5,
+     "active_ratio": 0.232,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 110.0,
+      "active_s": 0.13
+     },
+     "phrase_z": 1.55,
+     "phrase_min": 1.27,
+     "margin": -0.73,
+     "wins": 0.0,
+     "best_confusion": "a hand clap",
+     "as_top": [
+      [
+       "Sound effect",
+       0.07
+      ],
+      [
+       "Music",
+       0.043
+      ],
+      [
+       "Speech",
+       0.034
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.004,
+     "floor_db": -42.4,
+     "stereo_corr": 1.0,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -62.7,
+      "first_sample": 0.0,
+      "tail_db": -46.2,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_loo": [
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-202230_1.wav",
+     "length_s": 0.161,
+     "typ_z": -0.66,
+     "nn_cos": 0.642,
+     "tone_db": 14.83,
+     "tone_ratio": 1.1,
+     "n_outside": 7,
+     "outside": [
+      [
+       "157 Hz",
+       -26.6,
+       "below"
+      ],
+      [
+       "62 Hz",
+       -26.2,
+       "below"
+      ],
+      [
+       "79 Hz",
+       -23.7,
+       "below"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 140.0,
+     "active_s": 0.139,
+     "onset_s": 0.006,
+     "env_oct": 0.213,
+     "curve_db": 13.12,
+     "t40_ratio": 1.4,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.112,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 100.0,
+      "active_s": 0.125
+     },
+     "phrase_z": 1.16,
+     "phrase_min": 1.03,
+     "margin": -1.14,
+     "wins": 0.0,
+     "best_confusion": "a hand clap",
+     "as_top": [
+      [
+       "Plop",
+       0.159
+      ],
+      [
+       "Boing",
+       0.131
+      ],
+      [
+       "Frog",
+       0.102
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.159,
+     "floor_db": -41.9,
+     "stereo_corr": 1.0,
+     "darken": -0.25,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -116.1,
+      "first_sample": 0.0,
+      "tail_db": -48.0,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-33369_1.wav",
+     "length_s": 0.159,
+     "typ_z": 3.39,
+     "nn_cos": 0.832,
+     "tone_db": 13.46,
+     "tone_ratio": 0.97,
+     "n_outside": 5,
+     "outside": [
+      [
+       "1 kHz",
+       -23.5,
+       "below"
+      ],
+      [
+       "39 Hz",
+       15.5,
+       "above"
+      ],
+      [
+       "157 Hz",
+       11.4,
+       "above"
+      ]
+     ],
+     "attack_ms": 5.0,
+     "t40_ms": 100.0,
+     "active_s": 0.125,
+     "onset_s": 0.005,
+     "env_oct": 0.562,
+     "curve_db": 13.44,
+     "t40_ratio": 0.833,
+     "attack_ratio": 2.5,
+     "active_ratio": 0.933,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 120.0,
+      "active_s": 0.134
+     },
+     "phrase_z": 2.89,
+     "phrase_min": 2.72,
+     "margin": -0.46,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Sound effect",
+       0.141
+      ],
+      [
+       "Speech",
+       0.094
+      ],
+      [
+       "Plop",
+       0.085
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.085,
+     "floor_db": -46.5,
+     "stereo_corr": 1.0,
+     "darken": -0.53,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.1,
+      "first_sample": 0.0,
+      "tail_db": -55.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-545201_1.wav",
+     "length_s": 0.169,
+     "typ_z": 2.92,
+     "nn_cos": 0.816,
+     "tone_db": 13.86,
+     "tone_ratio": 1.03,
+     "n_outside": 7,
+     "outside": [
+      [
+       "1.26 kHz",
+       -32.8,
+       "below"
+      ],
+      [
+       "3.17 kHz",
+       -29.3,
+       "below"
+      ],
+      [
+       "4 kHz",
+       -24.2,
+       "below"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 125.0,
+     "active_s": 0.145,
+     "onset_s": 0.0,
+     "env_oct": 0.179,
+     "curve_db": 8.51,
+     "t40_ratio": 1.25,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.16,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 100.0,
+      "active_s": 0.125
+     },
+     "phrase_z": 2.8,
+     "phrase_min": 2.54,
+     "margin": 0.17,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.425
+      ],
+      [
+       "Sound effect",
+       0.102
+      ],
+      [
+       "Speech",
+       0.078
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.425,
+     "floor_db": -47.9,
+     "stereo_corr": -0.666,
+     "darken": 0.74,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -80.8,
+      "first_sample": 0.0,
+      "tail_db": -60.8,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-573152_1.wav",
+     "length_s": 0.08,
+     "typ_z": 3.55,
+     "nn_cos": 0.832,
+     "tone_db": 11.03,
+     "tone_ratio": 0.8,
+     "n_outside": 3,
+     "outside": [
+      [
+       "5.04 kHz",
+       -23.8,
+       "below"
+      ],
+      [
+       "16 kHz",
+       -11.1,
+       "below"
+      ],
+      [
+       "12.7 kHz",
+       -10.4,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 70.0,
+     "active_s": 0.07,
+     "onset_s": 0.0,
+     "env_oct": 0.905,
+     "curve_db": 16.32,
+     "t40_ratio": 0.583,
+     "attack_ratio": 0.5,
+     "active_ratio": 0.522,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 120.0,
+      "active_s": 0.134
+     },
+     "phrase_z": 2.5,
+     "phrase_min": 2.47,
+     "margin": -0.98,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Speech",
+       0.177
+      ],
+      [
+       "Throat clearing",
+       0.057
+      ],
+      [
+       "Music",
+       0.053
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.003,
+     "floor_db": -37.9,
+     "stereo_corr": 1.0,
+     "darken": 0.3,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -56.0,
+      "first_sample": 0.0,
+      "tail_db": -43.0,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/mk-3192_1.wav",
+     "length_s": 0.215,
+     "typ_z": -0.78,
+     "nn_cos": 0.568,
+     "tone_db": 18.28,
+     "tone_ratio": 1.36,
+     "n_outside": 15,
+     "outside": [
+      [
+       "5.04 kHz",
+       34.4,
+       "above"
+      ],
+      [
+       "6.35 kHz",
+       31.5,
+       "above"
+      ],
+      [
+       "630 Hz",
+       -28.2,
+       "below"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 65.0,
+     "active_s": 0.134,
+     "onset_s": 0.016,
+     "env_oct": 0.328,
+     "curve_db": 11.88,
+     "t40_ratio": 0.542,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.072,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 120.0,
+      "active_s": 0.125
+     },
+     "phrase_z": 1.41,
+     "phrase_min": 0.97,
+     "margin": -1.83,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Speech",
+       0.05
+      ],
+      [
+       "Plop",
+       0.05
+      ],
+      [
+       "Coin (dropping)",
+       0.044
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.05,
+     "floor_db": -52.5,
+     "stereo_corr": 1.0,
+     "darken": 1.71,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -73.3,
+      "first_sample": 0.0,
+      "tail_db": -69.2,
+      "lead_s": 0.006,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/mk-3070_1.wav",
+     "length_s": 0.145,
+     "typ_z": -1.33,
+     "nn_cos": 0.642,
+     "tone_db": 12.85,
+     "tone_ratio": 0.93,
+     "n_outside": 3,
+     "outside": [
+      [
+       "2.52 kHz",
+       22.7,
+       "above"
+      ],
+      [
+       "2 kHz",
+       19.2,
+       "above"
+      ],
+      [
+       "315 Hz",
+       16.5,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 120.0,
+     "active_s": 0.118,
+     "onset_s": 0.002,
+     "env_oct": 0.482,
+     "curve_db": 9.78,
+     "t40_ratio": 1.2,
+     "attack_ratio": 0.5,
+     "active_ratio": 0.881,
+     "ref_median": {
+      "attack_ms": 2.0,
+      "t40_ms": 100.0,
+      "active_s": 0.134
+     },
+     "phrase_z": 1.21,
+     "phrase_min": 0.86,
+     "margin": -1.6,
+     "wins": 0.0,
+     "best_confusion": "a hand clap",
+     "as_top": [
+      [
+       "Gasp",
+       0.135
+      ],
+      [
+       "Speech",
+       0.039
+      ],
+      [
+       "Scrape",
+       0.037
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.006,
+     "floor_db": -56.7,
+     "stereo_corr": 0.87,
+     "darken": -0.05,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -76.2,
+      "first_sample": 0.0,
+      "tail_db": -77.0,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_rev": [
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-202230_1.wav",
+     "length_s": 0.161,
+     "typ_z": -1.02,
+     "nn_cos": 0.559,
+     "tone_db": 13.87,
+     "tone_ratio": 0.89,
+     "n_outside": 9,
+     "outside": [
+      [
+       "157 Hz",
+       -29.4,
+       "below"
+      ],
+      [
+       "125 Hz",
+       -28.6,
+       "below"
+      ],
+      [
+       "99 Hz",
+       -22.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 140.0,
+     "active_s": 0.139,
+     "onset_s": 0.006,
+     "env_oct": 0.765,
+     "curve_db": 6.72,
+     "t40_ratio": 1.4,
+     "attack_ratio": 0.333,
+     "active_ratio": 1.168,
+     "ref_median": {
+      "attack_ms": 6.0,
+      "t40_ms": 100.0,
+      "active_s": 0.119
+     },
+     "phrase_z": 1.16,
+     "phrase_min": 1.03,
+     "margin": -1.14,
+     "wins": 0.0,
+     "best_confusion": "a hand clap",
+     "as_top": [
+      [
+       "Plop",
+       0.159
+      ],
+      [
+       "Boing",
+       0.131
+      ],
+      [
+       "Frog",
+       0.102
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.159,
+     "floor_db": -41.9,
+     "stereo_corr": 1.0,
+     "darken": -0.25,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -116.1,
+      "first_sample": 0.0,
+      "tail_db": -48.0,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-33369_1.wav",
+     "length_s": 0.159,
+     "typ_z": 1.53,
+     "nn_cos": 0.933,
+     "tone_db": 12.12,
+     "tone_ratio": 0.78,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 5.0,
+     "t40_ms": 100.0,
+     "active_s": 0.125,
+     "onset_s": 0.005,
+     "env_oct": 0.111,
+     "curve_db": 3.86,
+     "t40_ratio": 1.0,
+     "attack_ratio": 0.833,
+     "active_ratio": 1.05,
+     "ref_median": {
+      "attack_ms": 6.0,
+      "t40_ms": 100.0,
+      "active_s": 0.119
+     },
+     "phrase_z": 2.89,
+     "phrase_min": 2.72,
+     "margin": -0.46,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Sound effect",
+       0.141
+      ],
+      [
+       "Speech",
+       0.094
+      ],
+      [
+       "Plop",
+       0.085
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.085,
+     "floor_db": -46.5,
+     "stereo_corr": 1.0,
+     "darken": -0.53,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.1,
+      "first_sample": 0.0,
+      "tail_db": -55.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-545201_1.wav",
+     "length_s": 0.169,
+     "typ_z": 1.02,
+     "nn_cos": 0.81,
+     "tone_db": 15.15,
+     "tone_ratio": 0.97,
+     "n_outside": 3,
+     "outside": [
+      [
+       "3.17 kHz",
+       -37.4,
+       "below"
+      ],
+      [
+       "2.52 kHz",
+       -32.8,
+       "below"
+      ],
+      [
+       "397 Hz",
+       -6.5,
+       "below"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 125.0,
+     "active_s": 0.145,
+     "onset_s": 0.0,
+     "env_oct": 0.731,
+     "curve_db": 7.07,
+     "t40_ratio": 1.25,
+     "attack_ratio": 0.333,
+     "active_ratio": 1.218,
+     "ref_median": {
+      "attack_ms": 6.0,
+      "t40_ms": 100.0,
+      "active_s": 0.119
+     },
+     "phrase_z": 2.8,
+     "phrase_min": 2.54,
+     "margin": 0.17,
+     "wins": 0.5,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Plop",
+       0.425
+      ],
+      [
+       "Sound effect",
+       0.102
+      ],
+      [
+       "Speech",
+       0.078
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.425,
+     "floor_db": -47.9,
+     "stereo_corr": -0.666,
+     "darken": 0.74,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -80.8,
+      "first_sample": 0.0,
+      "tail_db": -60.8,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/fs-573152_1.wav",
+     "length_s": 0.08,
+     "typ_z": 0.98,
+     "nn_cos": 0.789,
+     "tone_db": 13.94,
+     "tone_ratio": 0.9,
+     "n_outside": 5,
+     "outside": [
+      [
+       "1.26 kHz",
+       20.4,
+       "above"
+      ],
+      [
+       "5.04 kHz",
+       -16.8,
+       "below"
+      ],
+      [
+       "397 Hz",
+       -11.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 70.0,
+     "active_s": 0.07,
+     "onset_s": 0.0,
+     "env_oct": 1.288,
+     "curve_db": 9.79,
+     "t40_ratio": 0.7,
+     "attack_ratio": 0.167,
+     "active_ratio": 0.588,
+     "ref_median": {
+      "attack_ms": 6.0,
+      "t40_ms": 100.0,
+      "active_s": 0.119
+     },
+     "phrase_z": 2.5,
+     "phrase_min": 2.47,
+     "margin": -0.98,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Speech",
+       0.177
+      ],
+      [
+       "Throat clearing",
+       0.057
+      ],
+      [
+       "Music",
+       0.053
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.003,
+     "floor_db": -37.9,
+     "stereo_corr": 1.0,
+     "darken": 0.3,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -56.0,
+      "first_sample": 0.0,
+      "tail_db": -43.0,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/mk-3192_1.wav",
+     "length_s": 0.215,
+     "typ_z": -0.49,
+     "nn_cos": 0.706,
+     "tone_db": 16.77,
+     "tone_ratio": 1.08,
+     "n_outside": 11,
+     "outside": [
+      [
+       "315 Hz",
+       -24.7,
+       "below"
+      ],
+      [
+       "630 Hz",
+       -22.9,
+       "below"
+      ],
+      [
+       "250 Hz",
+       -22.8,
+       "below"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 65.0,
+     "active_s": 0.134,
+     "onset_s": 0.016,
+     "env_oct": 0.793,
+     "curve_db": 7.79,
+     "t40_ratio": 0.65,
+     "attack_ratio": 0.333,
+     "active_ratio": 1.126,
+     "ref_median": {
+      "attack_ms": 6.0,
+      "t40_ms": 100.0,
+      "active_s": 0.119
+     },
+     "phrase_z": 1.41,
+     "phrase_min": 0.97,
+     "margin": -1.83,
+     "wins": 0.0,
+     "best_confusion": "a tongue click",
+     "as_top": [
+      [
+       "Speech",
+       0.05
+      ],
+      [
+       "Plop",
+       0.05
+      ],
+      [
+       "Coin (dropping)",
+       0.044
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.05,
+     "floor_db": -52.5,
+     "stereo_corr": 1.0,
+     "darken": 1.71,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -73.3,
+      "first_sample": 0.0,
+      "tail_db": -69.2,
+      "lead_s": 0.006,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/pop/bench/mk-3070_1.wav",
+     "length_s": 0.145,
+     "typ_z": -0.8,
+     "nn_cos": 0.604,
+     "tone_db": 7.28,
+     "tone_ratio": 0.47,
+     "n_outside": 1,
+     "outside": [
+      [
+       "1.26 kHz",
+       14.9,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 120.0,
+     "active_s": 0.118,
+     "onset_s": 0.002,
+     "env_oct": 0.953,
+     "curve_db": 8.3,
+     "t40_ratio": 1.2,
+     "attack_ratio": 0.167,
+     "active_ratio": 0.992,
+     "ref_median": {
+      "attack_ms": 6.0,
+      "t40_ms": 100.0,
+      "active_s": 0.119
+     },
+     "phrase_z": 1.21,
+     "phrase_min": 0.86,
+     "margin": -1.6,
+     "wins": 0.0,
+     "best_confusion": "a hand clap",
+     "as_top": [
+      [
+       "Gasp",
+       0.135
+      ],
+      [
+       "Speech",
+       0.039
+      ],
+      [
+       "Scrape",
+       0.037
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.006,
+     "floor_db": -56.7,
+     "stereo_corr": 0.87,
+     "darken": -0.05,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -76.2,
+      "first_sample": 0.0,
+      "tail_db": -77.0,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity_bench": {
+    "n": 6,
+    "cos_mean": 0.522,
+    "cos_max": 0.832,
+    "tone_min_db": 7.62,
+    "tone_mean_db": 16.34,
+    "near_duplicates": []
+   },
+   "diversity_forge": {
+    "n": 7,
+    "cos_mean": 0.501,
+    "cos_max": 0.978,
+    "tone_min_db": 3.32,
+    "tone_mean_db": 18.73,
+    "near_duplicates": []
+   },
+   "inside": {
+    "per_sound": [
+     7,
+     7,
+     7
+    ],
+    "n_checks": 7,
+    "limits": {
+     "typ_z": -0.732,
+     "tone_db": 16.156,
+     "env_oct": 1.602,
+     "curve_db": 20.642,
+     "phrase_z": 1.29,
+     "margin": -1.416,
+     "as_p": 0.004
+    },
+    "real_per_sound": [
+     7,
+     7,
+     5,
+     3,
+     4,
+     7,
+     5,
+     6,
+     7,
+     7,
+     6,
+     4,
+     4
+    ]
+   },
+   "summary": {
+    "made": {
+     "n": 3,
+     "typ_z": 1.33,
+     "tone_db": 8.59,
+     "env_oct": 0.68,
+     "curve_db": 6.29,
+     "phrase_z": 3.09,
+     "margin": -0.1,
+     "as_p": 0.9,
+     "tone_ratio": 0.63,
+     "t40_ratio": 1.0,
+     "wins": 0.5,
+     "floor_db": -65.0,
+     "stereo_corr": 1.0,
+     "darken": 0.19,
+     "as_names": 1.0,
+     "artifacts": 0,
+     "var_cos": 0.917
+    },
+    "real_cross": {
+     "n": 7,
+     "typ_z": -0.09,
+     "tone_db": 16.06,
+     "env_oct": 1.51,
+     "curve_db": 20.54,
+     "phrase_z": 2.46,
+     "margin": -0.5,
+     "as_p": 0.0,
+     "tone_ratio": 1.18,
+     "t40_ratio": 0.91,
+     "wins": 0.0,
+     "floor_db": -53.2,
+     "stereo_corr": 1.0,
+     "darken": 0.21,
+     "as_names": 0.29,
+     "artifacts": 0,
+     "var_cos": 0.501
+    },
+    "real_loo": {
+     "n": 6,
+     "typ_z": 1.13,
+     "tone_db": 13.66,
+     "env_oct": 0.41,
+     "curve_db": 12.5,
+     "phrase_z": 1.96,
+     "margin": -1.06,
+     "as_p": 0.07,
+     "tone_ratio": 1.0,
+     "t40_ratio": 1.02,
+     "wins": 0.0,
+     "floor_db": -47.2,
+     "stereo_corr": 1.0,
+     "darken": 0.12,
+     "as_names": 0.67,
+     "artifacts": 0,
+     "var_cos": 0.522
+    }
+   }
+  },
+  "typing_key": {
+   "n_bench": 12,
+   "n_forge": 15,
+   "note": "",
+   "bench_refs": [
+    "E:/earshot/out/refs/typing_key/bench/fs-378083_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-378084_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-378085_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-570754_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-766639_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-766640_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-609534_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-609534_2.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-609534_3.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-515810_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-815614_1.wav",
+    "E:/earshot/out/refs/typing_key/bench/fs-815614_2.wav"
+   ],
+   "made": [
+    {
+     "file": "demo/forge-test/keypress/final/keypress_01.wav",
+     "length_s": 0.422,
+     "typ_z": 1.27,
+     "nn_cos": 0.916,
+     "tone_db": 8.88,
+     "tone_ratio": 1.62,
+     "n_outside": 5,
+     "outside": [
+      [
+       "31 Hz",
+       -20.8,
+       "below"
+      ],
+      [
+       "79 Hz",
+       18.8,
+       "above"
+      ],
+      [
+       "794 Hz",
+       -15.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 220.0,
+     "active_s": 0.249,
+     "onset_s": 0.026,
+     "env_oct": 1.128,
+     "curve_db": 18.27,
+     "t40_ratio": 1.833,
+     "attack_ratio": 0.2,
+     "active_ratio": 1.14,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.28,
+     "phrase_min": 4.92,
+     "margin": 3.2,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Knock",
+       0.322
+      ],
+      [
+       "Sound effect",
+       0.093
+      ],
+      [
+       "Tap",
+       0.091
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.065,
+     "floor_db": -47.7,
+     "stereo_corr": 0.937,
+     "darken": 0.75,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -120.1,
+      "first_sample": 0.0,
+      "tail_db": -70.9,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/keypress/final/keypress_02.wav",
+     "length_s": 0.377,
+     "typ_z": 1.2,
+     "nn_cos": 0.924,
+     "tone_db": 6.75,
+     "tone_ratio": 1.23,
+     "n_outside": 3,
+     "outside": [
+      [
+       "79 Hz",
+       17.2,
+       "above"
+      ],
+      [
+       "31 Hz",
+       -15.9,
+       "below"
+      ],
+      [
+       "1.26 kHz",
+       -7.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 155.0,
+     "active_s": 0.176,
+     "onset_s": 0.019,
+     "env_oct": 1.001,
+     "curve_db": 11.05,
+     "t40_ratio": 1.292,
+     "attack_ratio": 0.2,
+     "active_ratio": 0.805,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.67,
+     "phrase_min": 5.25,
+     "margin": 3.74,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Knock",
+       0.095
+      ],
+      [
+       "Sound effect",
+       0.076
+      ],
+      [
+       "Coin (dropping)",
+       0.059
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.027,
+     "floor_db": -54.7,
+     "stereo_corr": 0.878,
+     "darken": -0.8,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -123.6,
+      "first_sample": 0.0,
+      "tail_db": -78.2,
+      "lead_s": 0.014,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/keypress/final/keypress_03.wav",
+     "length_s": 0.388,
+     "typ_z": 0.91,
+     "nn_cos": 0.881,
+     "tone_db": 8.2,
+     "tone_ratio": 1.5,
+     "n_outside": 7,
+     "outside": [
+      [
+       "79 Hz",
+       20.7,
+       "above"
+      ],
+      [
+       "31 Hz",
+       -20.1,
+       "below"
+      ],
+      [
+       "5.04 kHz",
+       -13.2,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 200.0,
+     "active_s": 0.197,
+     "onset_s": 0.023,
+     "env_oct": 1.069,
+     "curve_db": 14.32,
+     "t40_ratio": 1.667,
+     "attack_ratio": 0.2,
+     "active_ratio": 0.902,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.56,
+     "phrase_min": 5.07,
+     "margin": 3.57,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.14
+      ],
+      [
+       "Sound effect",
+       0.118
+      ],
+      [
+       "Typing",
+       0.111
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.14,
+     "floor_db": -55.3,
+     "stereo_corr": 0.958,
+     "darken": 0.4,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -147.2,
+      "first_sample": 0.0,
+      "tail_db": -81.3,
+      "lead_s": 0.017,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity": {
+    "n": 3,
+    "cos_mean": 0.965,
+    "cos_max": 0.967,
+    "tone_min_db": 4.27,
+    "tone_mean_db": 4.93,
+    "near_duplicates": []
+   },
+   "real_cross": [
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_01.wav",
+     "length_s": 0.254,
+     "typ_z": 1.34,
+     "nn_cos": 0.926,
+     "tone_db": 9.89,
+     "tone_ratio": 1.81,
+     "n_outside": 7,
+     "outside": [
+      [
+       "31 Hz",
+       -17.6,
+       "below"
+      ],
+      [
+       "630 Hz",
+       -17.3,
+       "below"
+      ],
+      [
+       "794 Hz",
+       -16.2,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 205.0,
+     "active_s": 0.218,
+     "onset_s": 0.012,
+     "env_oct": 1.033,
+     "curve_db": 15.21,
+     "t40_ratio": 1.708,
+     "attack_ratio": 0.2,
+     "active_ratio": 0.998,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.48,
+     "phrase_min": 5.14,
+     "margin": 3.64,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.306
+      ],
+      [
+       "Computer keyboard",
+       0.076
+      ],
+      [
+       "Tap",
+       0.058
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.076,
+     "floor_db": -40.0,
+     "stereo_corr": 0.668,
+     "darken": -0.39,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -97.7,
+      "first_sample": 0.0,
+      "tail_db": -53.1,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_02.wav",
+     "length_s": 0.281,
+     "typ_z": 0.98,
+     "nn_cos": 0.905,
+     "tone_db": 10.24,
+     "tone_ratio": 1.87,
+     "n_outside": 5,
+     "outside": [
+      [
+       "630 Hz",
+       -23.9,
+       "below"
+      ],
+      [
+       "62 Hz",
+       17.4,
+       "above"
+      ],
+      [
+       "99 Hz",
+       15.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 175.0,
+     "active_s": 0.255,
+     "onset_s": 0.005,
+     "env_oct": 1.03,
+     "curve_db": 19.49,
+     "t40_ratio": 1.458,
+     "attack_ratio": 0.2,
+     "active_ratio": 1.167,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.18,
+     "phrase_min": 4.93,
+     "margin": 3.4,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.481
+      ],
+      [
+       "Typing",
+       0.285
+      ],
+      [
+       "Sound effect",
+       0.05
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.481,
+     "floor_db": -38.9,
+     "stereo_corr": 0.656,
+     "darken": 0.13,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -95.8,
+      "first_sample": 0.0,
+      "tail_db": -61.0,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_03.wav",
+     "length_s": 0.362,
+     "typ_z": 1.25,
+     "nn_cos": 0.927,
+     "tone_db": 9.38,
+     "tone_ratio": 1.71,
+     "n_outside": 4,
+     "outside": [
+      [
+       "630 Hz",
+       -17.6,
+       "below"
+      ],
+      [
+       "62 Hz",
+       15.8,
+       "above"
+      ],
+      [
+       "500 Hz",
+       -14.0,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 185.0,
+     "active_s": 0.269,
+     "onset_s": 0.041,
+     "env_oct": 1.082,
+     "curve_db": 14.68,
+     "t40_ratio": 1.542,
+     "attack_ratio": 0.2,
+     "active_ratio": 1.231,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.42,
+     "phrase_min": 4.97,
+     "margin": 3.87,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.528
+      ],
+      [
+       "Typing",
+       0.355
+      ],
+      [
+       "Sound effect",
+       0.076
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.528,
+     "floor_db": -51.2,
+     "stereo_corr": 0.591,
+     "darken": 0.01,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -96.7,
+      "first_sample": 0.0,
+      "tail_db": -59.9,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_thock_04.wav",
+     "length_s": 0.234,
+     "typ_z": 1.35,
+     "nn_cos": 0.908,
+     "tone_db": 7.72,
+     "tone_ratio": 1.41,
+     "n_outside": 2,
+     "outside": [
+      [
+       "62 Hz",
+       14.9,
+       "above"
+      ],
+      [
+       "500 Hz",
+       -9.5,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 175.0,
+     "active_s": 0.173,
+     "onset_s": 0.042,
+     "env_oct": 1.068,
+     "curve_db": 9.55,
+     "t40_ratio": 1.458,
+     "attack_ratio": 0.2,
+     "active_ratio": 0.792,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.75,
+     "phrase_min": 4.42,
+     "margin": 2.83,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.077
+      ],
+      [
+       "Sound effect",
+       0.063
+      ],
+      [
+       "Typing",
+       0.044
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.077,
+     "floor_db": -43.7,
+     "stereo_corr": 0.528,
+     "darken": -0.8,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -84.1,
+      "first_sample": 0.0,
+      "tail_db": -61.8,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_enter_01.wav",
+     "length_s": 0.4,
+     "typ_z": 1.26,
+     "nn_cos": 0.917,
+     "tone_db": 8.82,
+     "tone_ratio": 1.61,
+     "n_outside": 5,
+     "outside": [
+      [
+       "62 Hz",
+       18.7,
+       "above"
+      ],
+      [
+       "5.04 kHz",
+       -16.7,
+       "below"
+      ],
+      [
+       "4 kHz",
+       -14.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 3.0,
+     "t40_ms": 200.0,
+     "active_s": 0.274,
+     "onset_s": 0.016,
+     "env_oct": 0.6,
+     "curve_db": 19.85,
+     "t40_ratio": 1.667,
+     "attack_ratio": 0.6,
+     "active_ratio": 1.254,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.89,
+     "phrase_min": 4.43,
+     "margin": 3.05,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.167
+      ],
+      [
+       "Tap",
+       0.064
+      ],
+      [
+       "Sound effect",
+       0.062
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.05,
+     "floor_db": -53.9,
+     "stereo_corr": 0.76,
+     "darken": -0.83,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -89.8,
+      "first_sample": 0.0,
+      "tail_db": -80.9,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_space_01.wav",
+     "length_s": 0.33,
+     "typ_z": 0.01,
+     "nn_cos": 0.813,
+     "tone_db": 7.12,
+     "tone_ratio": 1.3,
+     "n_outside": 2,
+     "outside": [
+      [
+       "62 Hz",
+       17.8,
+       "above"
+      ],
+      [
+       "79 Hz",
+       14.0,
+       "above"
+      ]
+     ],
+     "attack_ms": 2.0,
+     "t40_ms": 160.0,
+     "active_s": 0.228,
+     "onset_s": 0.017,
+     "env_oct": 0.599,
+     "curve_db": 16.65,
+     "t40_ratio": 1.333,
+     "attack_ratio": 0.4,
+     "active_ratio": 1.043,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 5.25,
+     "phrase_min": 4.88,
+     "margin": 4.11,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Sound effect",
+       0.084
+      ],
+      [
+       "Crack",
+       0.043
+      ],
+      [
+       "Creak",
+       0.036
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.012,
+     "floor_db": -61.4,
+     "stereo_corr": 0.578,
+     "darken": 0.22,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -90.1,
+      "first_sample": 0.0,
+      "tail_db": -86.0,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_click_01.wav",
+     "length_s": 0.254,
+     "typ_z": -0.47,
+     "nn_cos": 0.812,
+     "tone_db": 14.97,
+     "tone_ratio": 2.73,
+     "n_outside": 7,
+     "outside": [
+      [
+       "62 Hz",
+       -37.7,
+       "below"
+      ],
+      [
+       "50 Hz",
+       -32.5,
+       "below"
+      ],
+      [
+       "79 Hz",
+       -29.5,
+       "below"
+      ]
+     ],
+     "attack_ms": 15.0,
+     "t40_ms": 120.0,
+     "active_s": 0.134,
+     "onset_s": 0.006,
+     "env_oct": 0.763,
+     "curve_db": 9.52,
+     "t40_ratio": 1.0,
+     "attack_ratio": 3.0,
+     "active_ratio": 0.613,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.4,
+     "phrase_min": 3.68,
+     "margin": 2.21,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Single-lens reflex camera",
+       0.069
+      ],
+      [
+       "Coin (dropping)",
+       0.038
+      ],
+      [
+       "Sound effect",
+       0.03
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.008,
+     "floor_db": -59.7,
+     "stereo_corr": 1.0,
+     "darken": 0.66,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -84.8,
+      "first_sample": 0.0,
+      "tail_db": -74.1,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_click_02.wav",
+     "length_s": 0.284,
+     "typ_z": -0.29,
+     "nn_cos": 0.802,
+     "tone_db": 14.0,
+     "tone_ratio": 2.56,
+     "n_outside": 6,
+     "outside": [
+      [
+       "79 Hz",
+       -34.9,
+       "below"
+      ],
+      [
+       "62 Hz",
+       -30.8,
+       "below"
+      ],
+      [
+       "50 Hz",
+       -25.8,
+       "below"
+      ]
+     ],
+     "attack_ms": 3.0,
+     "t40_ms": 110.0,
+     "active_s": 0.109,
+     "onset_s": 0.011,
+     "env_oct": 0.622,
+     "curve_db": 9.78,
+     "t40_ratio": 0.917,
+     "attack_ratio": 0.6,
+     "active_ratio": 0.499,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.69,
+     "phrase_min": 4.18,
+     "margin": 1.99,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Single-lens reflex camera",
+       0.069
+      ],
+      [
+       "Coin (dropping)",
+       0.055
+      ],
+      [
+       "Sound effect",
+       0.04
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.012,
+     "floor_db": -67.6,
+     "stereo_corr": 1.0,
+     "darken": 0.72,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -79.1,
+      "first_sample": 0.0,
+      "tail_db": -88.7,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/kit-kb_enter_02.wav",
+     "length_s": 0.18,
+     "typ_z": -0.43,
+     "nn_cos": 0.783,
+     "tone_db": 8.88,
+     "tone_ratio": 1.62,
+     "n_outside": 1,
+     "outside": [
+      [
+       "16 kHz",
+       20.8,
+       "above"
+      ]
+     ],
+     "attack_ms": 10.0,
+     "t40_ms": 155.0,
+     "active_s": 0.164,
+     "onset_s": 0.006,
+     "env_oct": 0.594,
+     "curve_db": 9.68,
+     "t40_ratio": 1.292,
+     "attack_ratio": 2.0,
+     "active_ratio": 0.751,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 3.33,
+     "phrase_min": 3.15,
+     "margin": 1.24,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Typewriter",
+       0.088
+      ],
+      [
+       "Computer keyboard",
+       0.072
+      ],
+      [
+       "Speech",
+       0.056
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.088,
+     "floor_db": -36.4,
+     "stereo_corr": 1.0,
+     "darken": -0.5,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -95.9,
+      "first_sample": 0.0,
+      "tail_db": -46.3,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/fs-561697_1.wav",
+     "length_s": 0.18,
+     "typ_z": 0.26,
+     "nn_cos": 0.845,
+     "tone_db": 15.76,
+     "tone_ratio": 2.88,
+     "n_outside": 8,
+     "outside": [
+      [
+       "50 Hz",
+       -35.2,
+       "below"
+      ],
+      [
+       "79 Hz",
+       -32.8,
+       "below"
+      ],
+      [
+       "62 Hz",
+       -30.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 17.0,
+     "t40_ms": 140.0,
+     "active_s": 0.155,
+     "onset_s": 0.005,
+     "env_oct": 0.828,
+     "curve_db": 17.09,
+     "t40_ratio": 1.167,
+     "attack_ratio": 3.4,
+     "active_ratio": 0.709,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.18,
+     "phrase_min": 3.68,
+     "margin": 1.42,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Single-lens reflex camera",
+       0.34
+      ],
+      [
+       "Camera",
+       0.045
+      ],
+      [
+       "Sound effect",
+       0.043
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.012,
+     "floor_db": -40.4,
+     "stereo_corr": 1.0,
+     "darken": 0.04,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -73.5,
+      "first_sample": 0.0,
+      "tail_db": -56.6,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/fs-561699_1.wav",
+     "length_s": 0.419,
+     "typ_z": -0.98,
+     "nn_cos": 0.717,
+     "tone_db": 16.54,
+     "tone_ratio": 3.02,
+     "n_outside": 9,
+     "outside": [
+      [
+       "62 Hz",
+       -34.6,
+       "below"
+      ],
+      [
+       "79 Hz",
+       -33.1,
+       "below"
+      ],
+      [
+       "99 Hz",
+       -31.4,
+       "below"
+      ]
+     ],
+     "attack_ms": 17.0,
+     "t40_ms": 80.0,
+     "active_s": 0.094,
+     "onset_s": 0.021,
+     "env_oct": 1.189,
+     "curve_db": 8.6,
+     "t40_ratio": 0.667,
+     "attack_ratio": 3.4,
+     "active_ratio": 0.43,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 2.81,
+     "phrase_min": 2.37,
+     "margin": -0.23,
+     "wins": 0.5,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Sound effect",
+       0.054
+      ],
+      [
+       "Single-lens reflex camera",
+       0.048
+      ],
+      [
+       "Coin (dropping)",
+       0.028
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.002,
+     "floor_db": -62.9,
+     "stereo_corr": 1.0,
+     "darken": -0.66,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -85.3,
+      "first_sample": 0.0,
+      "tail_db": -68.9,
+      "lead_s": 0.004,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/fs-709460_1.wav",
+     "length_s": 0.278,
+     "typ_z": -0.15,
+     "nn_cos": 0.841,
+     "tone_db": 4.88,
+     "tone_ratio": 0.89,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 35.0,
+     "t40_ms": 195.0,
+     "active_s": 0.227,
+     "onset_s": 0.033,
+     "env_oct": 1.188,
+     "curve_db": 13.31,
+     "t40_ratio": 1.625,
+     "attack_ratio": 7.0,
+     "active_ratio": 1.039,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 3.96,
+     "phrase_min": 3.61,
+     "margin": 1.85,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.264
+      ],
+      [
+       "Typing",
+       0.17
+      ],
+      [
+       "Typewriter",
+       0.077
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.264,
+     "floor_db": -40.0,
+     "stereo_corr": 0.603,
+     "darken": 0.7,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -92.1,
+      "first_sample": 0.0,
+      "tail_db": -47.3,
+      "lead_s": 0.004,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/fs-709460_2.wav",
+     "length_s": 0.11,
+     "typ_z": -0.15,
+     "nn_cos": 0.782,
+     "tone_db": 8.13,
+     "tone_ratio": 1.48,
+     "n_outside": 1,
+     "outside": [
+      [
+       "31 Hz",
+       -26.4,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 85.0,
+     "active_s": 0.085,
+     "onset_s": 0.005,
+     "env_oct": 1.394,
+     "curve_db": 12.2,
+     "t40_ratio": 0.708,
+     "attack_ratio": 0.2,
+     "active_ratio": 0.389,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 3.74,
+     "phrase_min": 3.42,
+     "margin": 2.0,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Music",
+       0.143
+      ],
+      [
+       "Speech",
+       0.129
+      ],
+      [
+       "Sound effect",
+       0.045
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -44.2,
+     "stereo_corr": 0.675,
+     "darken": -0.12,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -96.2,
+      "first_sample": 0.0,
+      "tail_db": -50.8,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/fs-665075_1.wav",
+     "length_s": 0.198,
+     "typ_z": 0.97,
+     "nn_cos": 0.875,
+     "tone_db": 5.09,
+     "tone_ratio": 0.93,
+     "n_outside": 1,
+     "outside": [
+      [
+       "5.04 kHz",
+       -10.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 150.0,
+     "active_s": 0.166,
+     "onset_s": 0.014,
+     "env_oct": 1.013,
+     "curve_db": 9.28,
+     "t40_ratio": 1.25,
+     "attack_ratio": 0.2,
+     "active_ratio": 0.76,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.88,
+     "phrase_min": 4.6,
+     "margin": 3.11,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.514
+      ],
+      [
+       "Typing",
+       0.359
+      ],
+      [
+       "Speech",
+       0.039
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.514,
+     "floor_db": -39.4,
+     "stereo_corr": 1.0,
+     "darken": 1.04,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -57.0,
+      "first_sample": 0.0,
+      "tail_db": -58.0,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/forge/fs-665075_2.wav",
+     "length_s": 0.225,
+     "typ_z": 1.35,
+     "nn_cos": 0.903,
+     "tone_db": 7.38,
+     "tone_ratio": 1.35,
+     "n_outside": 1,
+     "outside": [
+      [
+       "50 Hz",
+       -23.0,
+       "below"
+      ]
+     ],
+     "attack_ms": 8.0,
+     "t40_ms": 130.0,
+     "active_s": 0.135,
+     "onset_s": 0.065,
+     "env_oct": 0.496,
+     "curve_db": 6.73,
+     "t40_ratio": 1.083,
+     "attack_ratio": 1.6,
+     "active_ratio": 0.618,
+     "ref_median": {
+      "attack_ms": 5.0,
+      "t40_ms": 120.0,
+      "active_s": 0.218
+     },
+     "phrase_z": 4.95,
+     "phrase_min": 4.61,
+     "margin": 3.48,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.687
+      ],
+      [
+       "Typing",
+       0.517
+      ],
+      [
+       "Sound effect",
+       0.04
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.687,
+     "floor_db": -42.5,
+     "stereo_corr": 1.0,
+     "darken": 0.45,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -57.0,
+      "first_sample": 0.0,
+      "tail_db": -54.5,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_loo": [
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-378083_1.wav",
+     "length_s": 0.17,
+     "typ_z": 0.15,
+     "nn_cos": 0.822,
+     "tone_db": 4.18,
+     "tone_ratio": 0.73,
+     "n_outside": 1,
+     "outside": [
+      [
+       "1 kHz",
+       -9.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 125.0,
+     "active_s": 0.125,
+     "onset_s": 0.035,
+     "env_oct": 1.321,
+     "curve_db": 7.32,
+     "t40_ratio": 1.087,
+     "attack_ratio": 0.143,
+     "active_ratio": 0.488,
+     "ref_median": {
+      "attack_ms": 7.0,
+      "t40_ms": 115.0,
+      "active_s": 0.256
+     },
+     "phrase_z": 3.24,
+     "phrase_min": 2.99,
+     "margin": 0.34,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.151
+      ],
+      [
+       "Computer keyboard",
+       0.105
+      ],
+      [
+       "Typing",
+       0.083
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.105,
+     "floor_db": -30.2,
+     "stereo_corr": 0.996,
+     "darken": 0.51,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -76.2,
+      "first_sample": 0.0,
+      "tail_db": -41.6,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-378084_1.wav",
+     "length_s": 0.367,
+     "typ_z": 0.88,
+     "nn_cos": 0.919,
+     "tone_db": 4.16,
+     "tone_ratio": 0.73,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 3.0,
+     "t40_ms": 180.0,
+     "active_s": 0.262,
+     "onset_s": 0.098,
+     "env_oct": 0.801,
+     "curve_db": 17.01,
+     "t40_ratio": 1.565,
+     "attack_ratio": 0.429,
+     "active_ratio": 1.448,
+     "ref_median": {
+      "attack_ms": 7.0,
+      "t40_ms": 115.0,
+      "active_s": 0.181
+     },
+     "phrase_z": 4.55,
+     "phrase_min": 4.29,
+     "margin": 2.2,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.445
+      ],
+      [
+       "Clapping",
+       0.134
+      ],
+      [
+       "Speech",
+       0.036
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.01,
+     "floor_db": -39.5,
+     "stereo_corr": 0.997,
+     "darken": 0.87,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -78.0,
+      "first_sample": 0.0,
+      "tail_db": -44.7,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-378085_1.wav",
+     "length_s": 0.16,
+     "typ_z": 0.45,
+     "nn_cos": 0.822,
+     "tone_db": 5.25,
+     "tone_ratio": 0.92,
+     "n_outside": 1,
+     "outside": [
+      [
+       "31 Hz",
+       -12.6,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 75.0,
+     "active_s": 0.126,
+     "onset_s": 0.009,
+     "env_oct": 1.522,
+     "curve_db": 10.62,
+     "t40_ratio": 0.6,
+     "attack_ratio": 0.143,
+     "active_ratio": 0.492,
+     "ref_median": {
+      "attack_ms": 7.0,
+      "t40_ms": 125.0,
+      "active_s": 0.256
+     },
+     "phrase_z": 3.83,
+     "phrase_min": 3.49,
+     "margin": 1.16,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.111
+      ],
+      [
+       "Slap, smack",
+       0.061
+      ],
+      [
+       "Sound effect",
+       0.035
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -49.6,
+     "stereo_corr": 0.999,
+     "darken": 0.1,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -79.3,
+      "first_sample": 0.0,
+      "tail_db": -60.5,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-570754_1.wav",
+     "length_s": 0.151,
+     "typ_z": 0.07,
+     "nn_cos": 0.822,
+     "tone_db": 5.26,
+     "tone_ratio": 0.92,
+     "n_outside": 2,
+     "outside": [
+      [
+       "2 kHz",
+       -9.7,
+       "below"
+      ],
+      [
+       "5.04 kHz",
+       6.4,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 85.0,
+     "active_s": 0.085,
+     "onset_s": 0.045,
+     "env_oct": 1.651,
+     "curve_db": 9.86,
+     "t40_ratio": 0.68,
+     "attack_ratio": 0.143,
+     "active_ratio": 0.332,
+     "ref_median": {
+      "attack_ms": 7.0,
+      "t40_ms": 125.0,
+      "active_s": 0.256
+     },
+     "phrase_z": 3.3,
+     "phrase_min": 2.83,
+     "margin": 1.13,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.176
+      ],
+      [
+       "Coin (dropping)",
+       0.151
+      ],
+      [
+       "Computer keyboard",
+       0.049
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.049,
+     "floor_db": -47.8,
+     "stereo_corr": 1.0,
+     "darken": 0.08,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -72.9,
+      "first_sample": 0.0,
+      "tail_db": -56.8,
+      "lead_s": 0.014,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-766639_1.wav",
+     "length_s": 0.104,
+     "typ_z": 0.2,
+     "nn_cos": 0.815,
+     "tone_db": 9.0,
+     "tone_ratio": 1.71,
+     "n_outside": 2,
+     "outside": [
+      [
+       "315 Hz",
+       -26.1,
+       "below"
+      ],
+      [
+       "397 Hz",
+       -25.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 21.0,
+     "t40_ms": 65.0,
+     "active_s": 0.083,
+     "onset_s": 0.002,
+     "env_oct": 1.792,
+     "curve_db": 14.07,
+     "t40_ratio": 0.52,
+     "attack_ratio": 7.0,
+     "active_ratio": 0.324,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 125.0,
+      "active_s": 0.256
+     },
+     "phrase_z": 3.58,
+     "phrase_min": 3.13,
+     "margin": 1.34,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Speech",
+       0.145
+      ],
+      [
+       "Computer keyboard",
+       0.077
+      ],
+      [
+       "Finger snapping",
+       0.069
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.077,
+     "floor_db": -41.2,
+     "stereo_corr": 1.0,
+     "darken": 0.25,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -80.7,
+      "first_sample": 0.0,
+      "tail_db": -50.9,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-766640_1.wav",
+     "length_s": 0.194,
+     "typ_z": 0.11,
+     "nn_cos": 0.815,
+     "tone_db": 10.44,
+     "tone_ratio": 1.98,
+     "n_outside": 8,
+     "outside": [
+      [
+       "198 Hz",
+       -23.8,
+       "below"
+      ],
+      [
+       "157 Hz",
+       -19.8,
+       "below"
+      ],
+      [
+       "125 Hz",
+       -18.1,
+       "below"
+      ]
+     ],
+     "attack_ms": 136.0,
+     "t40_ms": 45.0,
+     "active_s": 0.181,
+     "onset_s": 0.009,
+     "env_oct": 2.492,
+     "curve_db": 19.85,
+     "t40_ratio": 0.36,
+     "attack_ratio": 45.333,
+     "active_ratio": 0.707,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 125.0,
+      "active_s": 0.256
+     },
+     "phrase_z": 3.23,
+     "phrase_min": 2.81,
+     "margin": 0.8,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.053
+      ],
+      [
+       "Scrape",
+       0.032
+      ],
+      [
+       "Speech",
+       0.03
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.0,
+     "floor_db": -35.4,
+     "stereo_corr": 1.0,
+     "darken": -0.67,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.5,
+      "first_sample": 0.0,
+      "tail_db": -37.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_1.wav",
+     "length_s": 0.348,
+     "typ_z": 0.93,
+     "nn_cos": 0.919,
+     "tone_db": 5.69,
+     "tone_ratio": 1.08,
+     "n_outside": 1,
+     "outside": [
+      [
+       "79 Hz",
+       12.5,
+       "above"
+      ]
+     ],
+     "attack_ms": 113.0,
+     "t40_ms": 145.0,
+     "active_s": 0.256,
+     "onset_s": 0.074,
+     "env_oct": 2.023,
+     "curve_db": 16.39,
+     "t40_ratio": 1.261,
+     "attack_ratio": 37.667,
+     "active_ratio": 1.414,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 115.0,
+      "active_s": 0.181
+     },
+     "phrase_z": 5.15,
+     "phrase_min": 4.76,
+     "margin": 3.08,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.123
+      ],
+      [
+       "Clapping",
+       0.088
+      ],
+      [
+       "Ping",
+       0.041
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.013,
+     "floor_db": -67.5,
+     "stereo_corr": 0.998,
+     "darken": -0.44,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.4,
+      "first_sample": 0.0,
+      "tail_db": -51.5,
+      "lead_s": 0.072,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_2.wav",
+     "length_s": 0.442,
+     "typ_z": 0.89,
+     "nn_cos": 0.874,
+     "tone_db": 4.91,
+     "tone_ratio": 0.86,
+     "n_outside": 1,
+     "outside": [
+      [
+       "630 Hz",
+       -11.1,
+       "below"
+      ]
+     ],
+     "attack_ms": 99.0,
+     "t40_ms": 320.0,
+     "active_s": 0.418,
+     "onset_s": 0.007,
+     "env_oct": 2.576,
+     "curve_db": 26.12,
+     "t40_ratio": 2.783,
+     "attack_ratio": 33.0,
+     "active_ratio": 2.309,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 115.0,
+      "active_s": 0.181
+     },
+     "phrase_z": 4.65,
+     "phrase_min": 4.22,
+     "margin": 2.62,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Coin (dropping)",
+       0.066
+      ],
+      [
+       "Sound effect",
+       0.059
+      ],
+      [
+       "Single-lens reflex camera",
+       0.04
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.014,
+     "floor_db": -36.7,
+     "stereo_corr": 0.999,
+     "darken": -2.83,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -83.3,
+      "first_sample": 0.0,
+      "tail_db": -52.1,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_3.wav",
+     "length_s": 0.301,
+     "typ_z": -0.03,
+     "nn_cos": 0.809,
+     "tone_db": 4.86,
+     "tone_ratio": 0.85,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 260.0,
+     "active_s": 0.269,
+     "onset_s": 0.006,
+     "env_oct": 1.519,
+     "curve_db": 20.05,
+     "t40_ratio": 2.261,
+     "attack_ratio": 0.143,
+     "active_ratio": 1.486,
+     "ref_median": {
+      "attack_ms": 7.0,
+      "t40_ms": 115.0,
+      "active_s": 0.181
+     },
+     "phrase_z": 4.84,
+     "phrase_min": 4.36,
+     "margin": 3.09,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Crack",
+       0.126
+      ],
+      [
+       "Breaking",
+       0.059
+      ],
+      [
+       "Sound effect",
+       0.038
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -39.8,
+     "stereo_corr": 0.999,
+     "darken": 0.16,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.6,
+      "first_sample": 0.0,
+      "tail_db": -58.6,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-515810_1.wav",
+     "length_s": 0.319,
+     "typ_z": -12.68,
+     "nn_cos": 0.514,
+     "tone_db": 9.2,
+     "tone_ratio": 1.75,
+     "n_outside": 6,
+     "outside": [
+      [
+       "250 Hz",
+       21.5,
+       "above"
+      ],
+      [
+       "12.7 kHz",
+       20.9,
+       "above"
+      ],
+      [
+       "315 Hz",
+       15.7,
+       "above"
+      ]
+     ],
+     "attack_ms": 7.0,
+     "t40_ms": 105.0,
+     "active_s": 0.288,
+     "onset_s": 0.012,
+     "env_oct": 0.715,
+     "curve_db": 23.77,
+     "t40_ratio": 0.84,
+     "attack_ratio": 2.333,
+     "active_ratio": 1.591,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 125.0,
+      "active_s": 0.181
+     },
+     "phrase_z": 2.32,
+     "phrase_min": 2.06,
+     "margin": 0.55,
+     "wins": 0.5,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Sound effect",
+       0.149
+      ],
+      [
+       "Speech",
+       0.123
+      ],
+      [
+       "Computer keyboard",
+       0.036
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.036,
+     "floor_db": -40.2,
+     "stereo_corr": 0.994,
+     "darken": -1.14,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -74.7,
+      "first_sample": 0.0,
+      "tail_db": -49.3,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_1.wav",
+     "length_s": 0.269,
+     "typ_z": 0.25,
+     "nn_cos": 0.867,
+     "tone_db": 8.69,
+     "tone_ratio": 1.65,
+     "n_outside": 2,
+     "outside": [
+      [
+       "125 Hz",
+       18.5,
+       "above"
+      ],
+      [
+       "99 Hz",
+       12.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 260.0,
+     "active_s": 0.256,
+     "onset_s": 0.009,
+     "env_oct": 1.495,
+     "curve_db": 17.78,
+     "t40_ratio": 2.261,
+     "attack_ratio": 0.143,
+     "active_ratio": 1.414,
+     "ref_median": {
+      "attack_ms": 7.0,
+      "t40_ms": 115.0,
+      "active_s": 0.181
+     },
+     "phrase_z": 3.47,
+     "phrase_min": 3.2,
+     "margin": 1.72,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Tap",
+       0.119
+      ],
+      [
+       "Music",
+       0.116
+      ],
+      [
+       "Sound effect",
+       0.088
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.016,
+     "floor_db": -27.3,
+     "stereo_corr": 1.0,
+     "darken": -0.09,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -70.5,
+      "first_sample": 0.0,
+      "tail_db": -31.0,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_2.wav",
+     "length_s": 0.181,
+     "typ_z": 0.52,
+     "nn_cos": 0.867,
+     "tone_db": 8.02,
+     "tone_ratio": 1.52,
+     "n_outside": 1,
+     "outside": [
+      [
+       "794 Hz",
+       -6.8,
+       "below"
+      ]
+     ],
+     "attack_ms": 7.0,
+     "t40_ms": 115.0,
+     "active_s": 0.135,
+     "onset_s": 0.04,
+     "env_oct": 0.755,
+     "curve_db": 6.9,
+     "t40_ratio": 0.92,
+     "attack_ratio": 2.333,
+     "active_ratio": 0.527,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 125.0,
+      "active_s": 0.256
+     },
+     "phrase_z": 3.93,
+     "phrase_min": 3.57,
+     "margin": 2.23,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.094
+      ],
+      [
+       "Speech",
+       0.065
+      ],
+      [
+       "Tap",
+       0.057
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.094,
+     "floor_db": -37.6,
+     "stereo_corr": 1.0,
+     "darken": 1.32,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -74.7,
+      "first_sample": 0.0,
+      "tail_db": -41.8,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_rev": [
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-378083_1.wav",
+     "length_s": 0.17,
+     "typ_z": -1.72,
+     "nn_cos": 0.748,
+     "tone_db": 6.31,
+     "tone_ratio": 0.74,
+     "n_outside": 1,
+     "outside": [
+      [
+       "10.1 kHz",
+       -9.8,
+       "below"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 125.0,
+     "active_s": 0.125,
+     "onset_s": 0.035,
+     "env_oct": 0.768,
+     "curve_db": 12.15,
+     "t40_ratio": 0.806,
+     "attack_ratio": 0.333,
+     "active_ratio": 0.753,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.24,
+     "phrase_min": 2.99,
+     "margin": 0.34,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.151
+      ],
+      [
+       "Computer keyboard",
+       0.105
+      ],
+      [
+       "Typing",
+       0.083
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.105,
+     "floor_db": -30.2,
+     "stereo_corr": 0.996,
+     "darken": 0.51,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -76.2,
+      "first_sample": 0.0,
+      "tail_db": -41.6,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-378084_1.wav",
+     "length_s": 0.367,
+     "typ_z": 0.49,
+     "nn_cos": 0.892,
+     "tone_db": 8.06,
+     "tone_ratio": 0.95,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 3.0,
+     "t40_ms": 180.0,
+     "active_s": 0.262,
+     "onset_s": 0.098,
+     "env_oct": 0.291,
+     "curve_db": 16.7,
+     "t40_ratio": 1.161,
+     "attack_ratio": 1.0,
+     "active_ratio": 1.578,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 4.55,
+     "phrase_min": 4.29,
+     "margin": 2.2,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.445
+      ],
+      [
+       "Clapping",
+       0.134
+      ],
+      [
+       "Speech",
+       0.036
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.01,
+     "floor_db": -39.5,
+     "stereo_corr": 0.997,
+     "darken": 0.87,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -78.0,
+      "first_sample": 0.0,
+      "tail_db": -44.7,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-378085_1.wav",
+     "length_s": 0.16,
+     "typ_z": -1.31,
+     "nn_cos": 0.789,
+     "tone_db": 5.85,
+     "tone_ratio": 0.69,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 1.0,
+     "t40_ms": 75.0,
+     "active_s": 0.126,
+     "onset_s": 0.009,
+     "env_oct": 1.01,
+     "curve_db": 10.48,
+     "t40_ratio": 0.484,
+     "attack_ratio": 0.333,
+     "active_ratio": 0.759,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.83,
+     "phrase_min": 3.49,
+     "margin": 1.16,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.111
+      ],
+      [
+       "Slap, smack",
+       0.061
+      ],
+      [
+       "Sound effect",
+       0.035
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -49.6,
+     "stereo_corr": 0.999,
+     "darken": 0.1,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -79.3,
+      "first_sample": 0.0,
+      "tail_db": -60.5,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-570754_1.wav",
+     "length_s": 0.151,
+     "typ_z": -1.82,
+     "nn_cos": 0.75,
+     "tone_db": 8.34,
+     "tone_ratio": 0.98,
+     "n_outside": 1,
+     "outside": [
+      [
+       "31 Hz",
+       25.9,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 85.0,
+     "active_s": 0.085,
+     "onset_s": 0.045,
+     "env_oct": 1.139,
+     "curve_db": 14.5,
+     "t40_ratio": 0.548,
+     "attack_ratio": 0.333,
+     "active_ratio": 0.512,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.3,
+     "phrase_min": 2.83,
+     "margin": 1.13,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.176
+      ],
+      [
+       "Coin (dropping)",
+       0.151
+      ],
+      [
+       "Computer keyboard",
+       0.049
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.049,
+     "floor_db": -47.8,
+     "stereo_corr": 1.0,
+     "darken": 0.08,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -72.9,
+      "first_sample": 0.0,
+      "tail_db": -56.8,
+      "lead_s": 0.014,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-766639_1.wav",
+     "length_s": 0.104,
+     "typ_z": -1.14,
+     "nn_cos": 0.789,
+     "tone_db": 8.4,
+     "tone_ratio": 0.99,
+     "n_outside": 3,
+     "outside": [
+      [
+       "315 Hz",
+       -21.5,
+       "below"
+      ],
+      [
+       "397 Hz",
+       -21.1,
+       "below"
+      ],
+      [
+       "630 Hz",
+       12.9,
+       "above"
+      ]
+     ],
+     "attack_ms": 21.0,
+     "t40_ms": 65.0,
+     "active_s": 0.083,
+     "onset_s": 0.002,
+     "env_oct": 1.687,
+     "curve_db": 17.63,
+     "t40_ratio": 0.419,
+     "attack_ratio": 7.0,
+     "active_ratio": 0.5,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.58,
+     "phrase_min": 3.13,
+     "margin": 1.34,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Speech",
+       0.145
+      ],
+      [
+       "Computer keyboard",
+       0.077
+      ],
+      [
+       "Finger snapping",
+       0.069
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.077,
+     "floor_db": -41.2,
+     "stereo_corr": 1.0,
+     "darken": 0.25,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -80.7,
+      "first_sample": 0.0,
+      "tail_db": -50.9,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-766640_1.wav",
+     "length_s": 0.194,
+     "typ_z": -1.32,
+     "nn_cos": 0.771,
+     "tone_db": 10.12,
+     "tone_ratio": 1.19,
+     "n_outside": 2,
+     "outside": [
+      [
+       "198 Hz",
+       -18.9,
+       "below"
+      ],
+      [
+       "1 kHz",
+       9.6,
+       "above"
+      ]
+     ],
+     "attack_ms": 136.0,
+     "t40_ms": 45.0,
+     "active_s": 0.181,
+     "onset_s": 0.009,
+     "env_oct": 2.471,
+     "curve_db": 24.3,
+     "t40_ratio": 0.29,
+     "attack_ratio": 45.333,
+     "active_ratio": 1.09,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.23,
+     "phrase_min": 2.81,
+     "margin": 0.8,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.053
+      ],
+      [
+       "Scrape",
+       0.032
+      ],
+      [
+       "Speech",
+       0.03
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.0,
+     "floor_db": -35.4,
+     "stereo_corr": 1.0,
+     "darken": -0.67,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.5,
+      "first_sample": 0.0,
+      "tail_db": -37.6,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_1.wav",
+     "length_s": 0.348,
+     "typ_z": 0.99,
+     "nn_cos": 0.927,
+     "tone_db": 5.06,
+     "tone_ratio": 0.59,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 113.0,
+     "t40_ms": 145.0,
+     "active_s": 0.256,
+     "onset_s": 0.074,
+     "env_oct": 1.985,
+     "curve_db": 19.66,
+     "t40_ratio": 0.935,
+     "attack_ratio": 37.667,
+     "active_ratio": 1.542,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 5.15,
+     "phrase_min": 4.76,
+     "margin": 3.08,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Finger snapping",
+       0.123
+      ],
+      [
+       "Clapping",
+       0.088
+      ],
+      [
+       "Ping",
+       0.041
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.013,
+     "floor_db": -67.5,
+     "stereo_corr": 0.998,
+     "darken": -0.44,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.4,
+      "first_sample": 0.0,
+      "tail_db": -51.5,
+      "lead_s": 0.072,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_2.wav",
+     "length_s": 0.442,
+     "typ_z": 0.51,
+     "nn_cos": 0.903,
+     "tone_db": 6.7,
+     "tone_ratio": 0.79,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 99.0,
+     "t40_ms": 320.0,
+     "active_s": 0.418,
+     "onset_s": 0.007,
+     "env_oct": 2.474,
+     "curve_db": 26.86,
+     "t40_ratio": 2.065,
+     "attack_ratio": 33.0,
+     "active_ratio": 2.518,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 4.65,
+     "phrase_min": 4.22,
+     "margin": 2.62,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Coin (dropping)",
+       0.066
+      ],
+      [
+       "Sound effect",
+       0.059
+      ],
+      [
+       "Single-lens reflex camera",
+       0.04
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.014,
+     "floor_db": -36.7,
+     "stereo_corr": 0.999,
+     "darken": -2.83,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -83.3,
+      "first_sample": 0.0,
+      "tail_db": -52.1,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-609534_3.wav",
+     "length_s": 0.301,
+     "typ_z": -0.83,
+     "nn_cos": 0.823,
+     "tone_db": 5.61,
+     "tone_ratio": 0.66,
+     "n_outside": 1,
+     "outside": [
+      [
+       "1 kHz",
+       11.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 260.0,
+     "active_s": 0.269,
+     "onset_s": 0.006,
+     "env_oct": 1.009,
+     "curve_db": 15.71,
+     "t40_ratio": 1.677,
+     "attack_ratio": 0.333,
+     "active_ratio": 1.62,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 4.84,
+     "phrase_min": 4.36,
+     "margin": 3.09,
+     "wins": 1.0,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Crack",
+       0.126
+      ],
+      [
+       "Breaking",
+       0.059
+      ],
+      [
+       "Sound effect",
+       0.038
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.001,
+     "floor_db": -39.8,
+     "stereo_corr": 0.999,
+     "darken": 0.16,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -82.6,
+      "first_sample": 0.0,
+      "tail_db": -58.6,
+      "lead_s": 0.002,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-515810_1.wav",
+     "length_s": 0.319,
+     "typ_z": -4.1,
+     "nn_cos": 0.583,
+     "tone_db": 11.19,
+     "tone_ratio": 1.32,
+     "n_outside": 5,
+     "outside": [
+      [
+       "250 Hz",
+       27.4,
+       "above"
+      ],
+      [
+       "397 Hz",
+       21.6,
+       "above"
+      ],
+      [
+       "315 Hz",
+       20.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 7.0,
+     "t40_ms": 105.0,
+     "active_s": 0.288,
+     "onset_s": 0.012,
+     "env_oct": 0.86,
+     "curve_db": 22.11,
+     "t40_ratio": 0.677,
+     "attack_ratio": 2.333,
+     "active_ratio": 1.735,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 2.32,
+     "phrase_min": 2.06,
+     "margin": 0.55,
+     "wins": 0.5,
+     "best_confusion": "a stapler",
+     "as_top": [
+      [
+       "Sound effect",
+       0.149
+      ],
+      [
+       "Speech",
+       0.123
+      ],
+      [
+       "Computer keyboard",
+       0.036
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.036,
+     "floor_db": -40.2,
+     "stereo_corr": 0.994,
+     "darken": -1.14,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -74.7,
+      "first_sample": 0.0,
+      "tail_db": -49.3,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_1.wav",
+     "length_s": 0.269,
+     "typ_z": -1.45,
+     "nn_cos": 0.764,
+     "tone_db": 11.51,
+     "tone_ratio": 1.35,
+     "n_outside": 5,
+     "outside": [
+      [
+       "198 Hz",
+       22.6,
+       "above"
+      ],
+      [
+       "397 Hz",
+       19.8,
+       "above"
+      ],
+      [
+       "157 Hz",
+       19.7,
+       "above"
+      ]
+     ],
+     "attack_ms": 1.0,
+     "t40_ms": 260.0,
+     "active_s": 0.256,
+     "onset_s": 0.009,
+     "env_oct": 0.985,
+     "curve_db": 20.98,
+     "t40_ratio": 1.677,
+     "attack_ratio": 0.333,
+     "active_ratio": 1.542,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.47,
+     "phrase_min": 3.2,
+     "margin": 1.72,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Tap",
+       0.119
+      ],
+      [
+       "Music",
+       0.116
+      ],
+      [
+       "Sound effect",
+       0.088
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.016,
+     "floor_db": -27.3,
+     "stereo_corr": 1.0,
+     "darken": -0.09,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -70.5,
+      "first_sample": 0.0,
+      "tail_db": -31.0,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/typing_key/bench/fs-815614_2.wav",
+     "length_s": 0.181,
+     "typ_z": -0.61,
+     "nn_cos": 0.841,
+     "tone_db": 10.73,
+     "tone_ratio": 1.26,
+     "n_outside": 3,
+     "outside": [
+      [
+       "31 Hz",
+       27.0,
+       "above"
+      ],
+      [
+       "198 Hz",
+       24.3,
+       "above"
+      ],
+      [
+       "157 Hz",
+       20.3,
+       "above"
+      ]
+     ],
+     "attack_ms": 7.0,
+     "t40_ms": 115.0,
+     "active_s": 0.135,
+     "onset_s": 0.04,
+     "env_oct": 0.65,
+     "curve_db": 13.11,
+     "t40_ratio": 0.742,
+     "attack_ratio": 2.333,
+     "active_ratio": 0.813,
+     "ref_median": {
+      "attack_ms": 3.0,
+      "t40_ms": 155.0,
+      "active_s": 0.166
+     },
+     "phrase_z": 3.93,
+     "phrase_min": 3.57,
+     "margin": 2.23,
+     "wins": 1.0,
+     "best_confusion": "a ballpoint pen click",
+     "as_top": [
+      [
+       "Computer keyboard",
+       0.094
+      ],
+      [
+       "Speech",
+       0.065
+      ],
+      [
+       "Tap",
+       0.057
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.094,
+     "floor_db": -37.6,
+     "stereo_corr": 1.0,
+     "darken": 1.32,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -74.7,
+      "first_sample": 0.0,
+      "tail_db": -41.8,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity_bench": {
+    "n": 12,
+    "cos_mean": 0.673,
+    "cos_max": 0.919,
+    "tone_min_db": 4.64,
+    "tone_mean_db": 9.33,
+    "near_duplicates": []
+   },
+   "diversity_forge": {
+    "n": 15,
+    "cos_mean": 0.721,
+    "cos_max": 0.978,
+    "tone_min_db": 3.07,
+    "tone_mean_db": 12.39,
+    "near_duplicates": []
+   },
+   "inside": {
+    "per_sound": [
+     7,
+     7,
+     7
+    ],
+    "n_checks": 7,
+    "limits": {
+     "typ_z": -0.15,
+     "tone_db": 10.17,
+     "env_oct": 1.521,
+     "curve_db": 19.148,
+     "phrase_z": 3.358,
+     "margin": 1.176,
+     "as_p": 0.008
+    },
+    "real_per_sound": [
+     7,
+     5,
+     7,
+     7,
+     6,
+     7,
+     4,
+     5,
+     5,
+     6,
+     2,
+     7,
+     6,
+     7,
+     7,
+     5,
+     7,
+     4,
+     4,
+     6,
+     1,
+     6,
+     5,
+     5,
+     3,
+     7,
+     7
+    ]
+   },
+   "summary": {
+    "made": {
+     "n": 3,
+     "typ_z": 1.2,
+     "tone_db": 8.2,
+     "env_oct": 1.07,
+     "curve_db": 14.32,
+     "phrase_z": 5.56,
+     "margin": 3.57,
+     "as_p": 0.07,
+     "tone_ratio": 1.5,
+     "t40_ratio": 1.67,
+     "wins": 1.0,
+     "floor_db": -54.7,
+     "stereo_corr": 0.94,
+     "darken": 0.4,
+     "as_names": 0.33,
+     "artifacts": 0,
+     "var_cos": 0.965
+    },
+    "real_cross": {
+     "n": 15,
+     "typ_z": 0.26,
+     "tone_db": 8.88,
+     "env_oct": 1.01,
+     "curve_db": 12.2,
+     "phrase_z": 4.75,
+     "margin": 2.83,
+     "as_p": 0.08,
+     "tone_ratio": 1.62,
+     "t40_ratio": 1.29,
+     "wins": 1.0,
+     "floor_db": -43.7,
+     "stereo_corr": 0.76,
+     "darken": 0.04,
+     "as_names": 0.53,
+     "artifacts": 0,
+     "var_cos": 0.721
+    },
+    "real_loo": {
+     "n": 12,
+     "typ_z": 0.23,
+     "tone_db": 5.47,
+     "env_oct": 1.52,
+     "curve_db": 16.7,
+     "phrase_z": 3.71,
+     "margin": 1.53,
+     "as_p": 0.01,
+     "tone_ratio": 1.0,
+     "t40_ratio": 1.0,
+     "wins": 1.0,
+     "floor_db": -39.65,
+     "stereo_corr": 1.0,
+     "darken": 0.09,
+     "as_names": 0.42,
+     "artifacts": 0,
+     "var_cos": 0.673
+    }
+   }
+  },
+  "whoosh_fast": {
+   "n_bench": 5,
+   "n_forge": 5,
+   "note": "",
+   "bench_refs": [
+    "E:/earshot/out/refs/whoosh_fast/bench/fs-352719_1.wav",
+    "E:/earshot/out/refs/whoosh_fast/bench/fs-216675_1.wav",
+    "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_1.wav",
+    "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_2.wav",
+    "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_3.wav"
+   ],
+   "made": [
+    {
+     "file": "demo/forge-test/whoosh/final/whoosh_01.wav",
+     "length_s": 0.313,
+     "typ_z": 2.01,
+     "nn_cos": 0.912,
+     "tone_db": 8.58,
+     "tone_ratio": 1.87,
+     "n_outside": 8,
+     "outside": [
+      [
+       "4 kHz",
+       11.4,
+       "above"
+      ],
+      [
+       "5.04 kHz",
+       10.4,
+       "above"
+      ],
+      [
+       "6.35 kHz",
+       10.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 51.0,
+     "t40_ms": 125.0,
+     "active_s": 0.246,
+     "onset_s": 0.034,
+     "env_oct": 0.888,
+     "curve_db": 15.93,
+     "t40_ratio": 0.472,
+     "attack_ratio": 0.472,
+     "active_ratio": 0.709,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.47,
+     "phrase_min": 4.31,
+     "margin": 3.31,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Sound effect",
+       0.208
+      ],
+      [
+       "Whack, thwack",
+       0.082
+      ],
+      [
+       "Bang",
+       0.076
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.023,
+     "floor_db": -43.9,
+     "stereo_corr": 0.9,
+     "darken": -0.19,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -94.2,
+      "first_sample": 0.0,
+      "tail_db": -70.3,
+      "lead_s": 0.003,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/whoosh/final/whoosh_02.wav",
+     "length_s": 0.394,
+     "typ_z": 2.05,
+     "nn_cos": 0.929,
+     "tone_db": 6.88,
+     "tone_ratio": 1.5,
+     "n_outside": 2,
+     "outside": [
+      [
+       "250 Hz",
+       15.8,
+       "above"
+      ],
+      [
+       "79 Hz",
+       5.7,
+       "above"
+      ]
+     ],
+     "attack_ms": 35.0,
+     "t40_ms": 160.0,
+     "active_s": 0.218,
+     "onset_s": 0.087,
+     "env_oct": 1.008,
+     "curve_db": 13.85,
+     "t40_ratio": 0.604,
+     "attack_ratio": 0.324,
+     "active_ratio": 0.628,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.42,
+     "phrase_min": 4.27,
+     "margin": 3.52,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whack, thwack",
+       0.066
+      ],
+      [
+       "Whoosh, swoosh, swish",
+       0.06
+      ],
+      [
+       "Sound effect",
+       0.053
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.06,
+     "floor_db": -60.1,
+     "stereo_corr": 0.858,
+     "darken": -0.71,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -81.5,
+      "first_sample": 0.0,
+      "tail_db": -73.7,
+      "lead_s": 0.049,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "demo/forge-test/whoosh/final/whoosh_03.wav",
+     "length_s": 0.247,
+     "typ_z": 2.24,
+     "nn_cos": 0.912,
+     "tone_db": 8.87,
+     "tone_ratio": 1.94,
+     "n_outside": 8,
+     "outside": [
+      [
+       "794 Hz",
+       -15.7,
+       "below"
+      ],
+      [
+       "315 Hz",
+       14.1,
+       "above"
+      ],
+      [
+       "157 Hz",
+       10.6,
+       "above"
+      ]
+     ],
+     "attack_ms": 62.0,
+     "t40_ms": 135.0,
+     "active_s": 0.194,
+     "onset_s": 0.021,
+     "env_oct": 0.871,
+     "curve_db": 20.07,
+     "t40_ratio": 0.509,
+     "attack_ratio": 0.574,
+     "active_ratio": 0.559,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.46,
+     "phrase_min": 4.24,
+     "margin": 3.2,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Sound effect",
+       0.155
+      ],
+      [
+       "Music",
+       0.073
+      ],
+      [
+       "Whack, thwack",
+       0.051
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.009,
+     "floor_db": -43.6,
+     "stereo_corr": 0.956,
+     "darken": -0.32,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -71.6,
+      "first_sample": 0.0,
+      "tail_db": -62.2,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity": {
+    "n": 3,
+    "cos_mean": 0.957,
+    "cos_max": 0.973,
+    "tone_min_db": 4.11,
+    "tone_mean_db": 4.69,
+    "near_duplicates": []
+   },
+   "real_cross": [
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_01.wav",
+     "length_s": 0.315,
+     "typ_z": -2.82,
+     "nn_cos": 0.805,
+     "tone_db": 10.5,
+     "tone_ratio": 2.29,
+     "n_outside": 9,
+     "outside": [
+      [
+       "10.1 kHz",
+       14.5,
+       "above"
+      ],
+      [
+       "8 kHz",
+       14.2,
+       "above"
+      ],
+      [
+       "12.7 kHz",
+       14.2,
+       "above"
+      ]
+     ],
+     "attack_ms": 31.0,
+     "t40_ms": 105.0,
+     "active_s": 0.139,
+     "onset_s": 0.031,
+     "env_oct": 1.485,
+     "curve_db": 22.56,
+     "t40_ratio": 0.396,
+     "attack_ratio": 0.287,
+     "active_ratio": 0.401,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 3.54,
+     "phrase_min": 3.04,
+     "margin": 2.29,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Sound effect",
+       0.27
+      ],
+      [
+       "Bang",
+       0.108
+      ],
+      [
+       "Whack, thwack",
+       0.09
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.007,
+     "floor_db": -65.9,
+     "stereo_corr": 0.814,
+     "darken": -0.16,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -49.0,
+      "first_sample": 0.0,
+      "tail_db": -101.0,
+      "lead_s": 0.013,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_02.wav",
+     "length_s": 0.5,
+     "typ_z": 1.26,
+     "nn_cos": 0.926,
+     "tone_db": 7.4,
+     "tone_ratio": 1.62,
+     "n_outside": 1,
+     "outside": [
+      [
+       "10.1 kHz",
+       11.2,
+       "above"
+      ]
+     ],
+     "attack_ms": 72.0,
+     "t40_ms": 180.0,
+     "active_s": 0.25,
+     "onset_s": 0.09,
+     "env_oct": 0.539,
+     "curve_db": 9.22,
+     "t40_ratio": 0.679,
+     "attack_ratio": 0.667,
+     "active_ratio": 0.72,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.27,
+     "phrase_min": 4.04,
+     "margin": 3.39,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Zipper (clothing)",
+       0.343
+      ],
+      [
+       "Whoosh, swoosh, swish",
+       0.238
+      ],
+      [
+       "Sound effect",
+       0.118
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.238,
+     "floor_db": -64.7,
+     "stereo_corr": -0.162,
+     "darken": -0.24,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -112.1,
+      "first_sample": 0.0,
+      "tail_db": -81.3,
+      "lead_s": 0.029,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_03.wav",
+     "length_s": 0.39,
+     "typ_z": 1.15,
+     "nn_cos": 0.908,
+     "tone_db": 10.31,
+     "tone_ratio": 2.25,
+     "n_outside": 12,
+     "outside": [
+      [
+       "794 Hz",
+       -20.5,
+       "below"
+      ],
+      [
+       "198 Hz",
+       18.5,
+       "above"
+      ],
+      [
+       "157 Hz",
+       16.8,
+       "above"
+      ]
+     ],
+     "attack_ms": 51.0,
+     "t40_ms": 90.0,
+     "active_s": 0.141,
+     "onset_s": 0.094,
+     "env_oct": 1.313,
+     "curve_db": 21.2,
+     "t40_ratio": 0.34,
+     "attack_ratio": 0.472,
+     "active_ratio": 0.406,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.6,
+     "phrase_min": 4.27,
+     "margin": 3.4,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Zipper (clothing)",
+       0.211
+      ],
+      [
+       "Whoosh, swoosh, swish",
+       0.079
+      ],
+      [
+       "Sound effect",
+       0.048
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.079,
+     "floor_db": -65.4,
+     "stereo_corr": 0.927,
+     "darken": 0.88,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -68.5,
+      "first_sample": 0.0,
+      "tail_db": -85.1,
+      "lead_s": 0.005,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/forge/kit-whoosh_fast_04.wav",
+     "length_s": 0.395,
+     "typ_z": -2.65,
+     "nn_cos": 0.762,
+     "tone_db": 12.8,
+     "tone_ratio": 2.8,
+     "n_outside": 12,
+     "outside": [
+      [
+       "31 Hz",
+       -24.9,
+       "below"
+      ],
+      [
+       "12.7 kHz",
+       21.4,
+       "above"
+      ],
+      [
+       "10.1 kHz",
+       21.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 24.0,
+     "t40_ms": 160.0,
+     "active_s": 0.203,
+     "onset_s": 0.037,
+     "env_oct": 1.224,
+     "curve_db": 18.13,
+     "t40_ratio": 0.604,
+     "attack_ratio": 0.222,
+     "active_ratio": 0.585,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 3.72,
+     "phrase_min": 3.41,
+     "margin": 2.75,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Sound effect",
+       0.172
+      ],
+      [
+       "Whack, thwack",
+       0.085
+      ],
+      [
+       "Bang",
+       0.075
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.056,
+     "floor_db": -67.3,
+     "stereo_corr": 0.919,
+     "darken": -0.54,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -76.8,
+      "first_sample": 0.0,
+      "tail_db": -86.8,
+      "lead_s": 0.004,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/forge/fs-719636_1.wav",
+     "length_s": 0.275,
+     "typ_z": 0.57,
+     "nn_cos": 0.895,
+     "tone_db": 10.03,
+     "tone_ratio": 2.19,
+     "n_outside": 2,
+     "outside": [
+      [
+       "250 Hz",
+       16.3,
+       "above"
+      ],
+      [
+       "500 Hz",
+       -7.6,
+       "below"
+      ]
+     ],
+     "attack_ms": 22.0,
+     "t40_ms": 210.0,
+     "active_s": 0.228,
+     "onset_s": 0.017,
+     "env_oct": 1.079,
+     "curve_db": 20.2,
+     "t40_ratio": 0.792,
+     "attack_ratio": 0.204,
+     "active_ratio": 0.657,
+     "ref_median": {
+      "attack_ms": 108.0,
+      "t40_ms": 265.0,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.14,
+     "phrase_min": 3.95,
+     "margin": 2.78,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Sound effect",
+       0.163
+      ],
+      [
+       "Bang",
+       0.082
+      ],
+      [
+       "Whack, thwack",
+       0.066
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.006,
+     "floor_db": -40.3,
+     "stereo_corr": 0.605,
+     "darken": 0.64,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -44.4,
+      "first_sample": 0.0,
+      "tail_db": -69.6,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_loo": [
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-352719_1.wav",
+     "length_s": 0.435,
+     "typ_z": -0.1,
+     "nn_cos": 0.908,
+     "tone_db": 9.54,
+     "tone_ratio": 2.14,
+     "n_outside": 5,
+     "outside": [
+      [
+       "31 Hz",
+       23.5,
+       "above"
+      ],
+      [
+       "1 kHz",
+       -23.3,
+       "below"
+      ],
+      [
+       "39 Hz",
+       15.1,
+       "above"
+      ]
+     ],
+     "attack_ms": 41.0,
+     "t40_ms": 220.0,
+     "active_s": 0.325,
+     "onset_s": 0.065,
+     "env_oct": 0.601,
+     "curve_db": 8.9,
+     "t40_ratio": 0.822,
+     "attack_ratio": 0.373,
+     "active_ratio": 0.935,
+     "ref_median": {
+      "attack_ms": 110.0,
+      "t40_ms": 267.5,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.44,
+     "phrase_min": 4.24,
+     "margin": 3.67,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.102
+      ],
+      [
+       "Sound effect",
+       0.08
+      ],
+      [
+       "Zipper (clothing)",
+       0.035
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.102,
+     "floor_db": -44.6,
+     "stereo_corr": 1.0,
+     "darken": -0.45,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -54.7,
+      "first_sample": 0.0,
+      "tail_db": -64.7,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-216675_1.wav",
+     "length_s": 0.23,
+     "typ_z": -0.43,
+     "nn_cos": 0.908,
+     "tone_db": 10.24,
+     "tone_ratio": 2.29,
+     "n_outside": 11,
+     "outside": [
+      [
+       "50 Hz",
+       -23.9,
+       "below"
+      ],
+      [
+       "39 Hz",
+       -17.4,
+       "below"
+      ],
+      [
+       "397 Hz",
+       13.6,
+       "above"
+      ]
+     ],
+     "attack_ms": 33.0,
+     "t40_ms": 110.0,
+     "active_s": 0.177,
+     "onset_s": 0.023,
+     "env_oct": 1.331,
+     "curve_db": 23.4,
+     "t40_ratio": 0.411,
+     "attack_ratio": 0.3,
+     "active_ratio": 0.509,
+     "ref_median": {
+      "attack_ms": 110.0,
+      "t40_ms": 267.5,
+      "active_s": 0.347
+     },
+     "phrase_z": 4.34,
+     "phrase_min": 3.89,
+     "margin": 3.35,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Music",
+       0.209
+      ],
+      [
+       "Sound effect",
+       0.206
+      ],
+      [
+       "Bang",
+       0.138
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.005,
+     "floor_db": -46.7,
+     "stereo_corr": 1.0,
+     "darken": -0.77,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -98.6,
+      "first_sample": 0.0,
+      "tail_db": -63.8,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_1.wav",
+     "length_s": 0.435,
+     "typ_z": 1.52,
+     "nn_cos": 0.915,
+     "tone_db": 4.58,
+     "tone_ratio": 0.66,
+     "n_outside": 1,
+     "outside": [
+      [
+       "1.26 kHz",
+       11.5,
+       "above"
+      ]
+     ],
+     "attack_ms": 117.0,
+     "t40_ms": 295.0,
+     "active_s": 0.406,
+     "onset_s": 0.009,
+     "env_oct": 0.402,
+     "curve_db": 8.21,
+     "t40_ratio": 1.216,
+     "attack_ratio": 1.57,
+     "active_ratio": 1.208,
+     "ref_median": {
+      "attack_ms": 74.5,
+      "t40_ms": 242.5,
+      "active_s": 0.336
+     },
+     "phrase_z": 3.92,
+     "phrase_min": 3.86,
+     "margin": 2.32,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.091
+      ],
+      [
+       "Whip",
+       0.073
+      ],
+      [
+       "Sound effect",
+       0.063
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.091,
+     "floor_db": -32.2,
+     "stereo_corr": 0.995,
+     "darken": -0.03,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -63.4,
+      "first_sample": 0.0,
+      "tail_db": -49.2,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_2.wav",
+     "length_s": 0.398,
+     "typ_z": 6.7,
+     "nn_cos": 0.951,
+     "tone_db": 4.35,
+     "tone_ratio": 0.62,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 108.0,
+     "t40_ms": 270.0,
+     "active_s": 0.347,
+     "onset_s": 0.033,
+     "env_oct": 0.232,
+     "curve_db": 5.81,
+     "t40_ratio": 1.113,
+     "attack_ratio": 1.412,
+     "active_ratio": 1.031,
+     "ref_median": {
+      "attack_ms": 76.5,
+      "t40_ms": 242.5,
+      "active_s": 0.337
+     },
+     "phrase_z": 4.14,
+     "phrase_min": 4.01,
+     "margin": 2.62,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.138
+      ],
+      [
+       "Sound effect",
+       0.063
+      ],
+      [
+       "Music",
+       0.033
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.138,
+     "floor_db": -28.7,
+     "stereo_corr": 0.991,
+     "darken": -0.18,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -51.9,
+      "first_sample": 0.0,
+      "tail_db": -49.3,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_3.wav",
+     "length_s": 0.392,
+     "typ_z": 3.93,
+     "nn_cos": 0.951,
+     "tone_db": 4.26,
+     "tone_ratio": 0.6,
+     "n_outside": 0,
+     "outside": [],
+     "attack_ms": 112.0,
+     "t40_ms": 265.0,
+     "active_s": 0.348,
+     "onset_s": 0.032,
+     "env_oct": 0.251,
+     "curve_db": 4.29,
+     "t40_ratio": 1.082,
+     "attack_ratio": 1.503,
+     "active_ratio": 1.036,
+     "ref_median": {
+      "attack_ms": 74.5,
+      "t40_ms": 245.0,
+      "active_s": 0.336
+     },
+     "phrase_z": 4.03,
+     "phrase_min": 3.94,
+     "margin": 2.09,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.093
+      ],
+      [
+       "Sound effect",
+       0.04
+      ],
+      [
+       "Music",
+       0.024
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.093,
+     "floor_db": -28.9,
+     "stereo_corr": 0.996,
+     "darken": -0.2,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -67.1,
+      "first_sample": 0.0,
+      "tail_db": -47.8,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "real_rev": [
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-352719_1.wav",
+     "length_s": 0.435,
+     "typ_z": 1.44,
+     "nn_cos": 0.897,
+     "tone_db": 7.49,
+     "tone_ratio": 0.99,
+     "n_outside": 2,
+     "outside": [
+      [
+       "157 Hz",
+       -8.1,
+       "below"
+      ],
+      [
+       "2.52 kHz",
+       -6.5,
+       "below"
+      ]
+     ],
+     "attack_ms": 41.0,
+     "t40_ms": 220.0,
+     "active_s": 0.325,
+     "onset_s": 0.065,
+     "env_oct": 0.514,
+     "curve_db": 15.4,
+     "t40_ratio": 1.375,
+     "attack_ratio": 1.323,
+     "active_ratio": 1.601,
+     "ref_median": {
+      "attack_ms": 31.0,
+      "t40_ms": 160.0,
+      "active_s": 0.203
+     },
+     "phrase_z": 4.44,
+     "phrase_min": 4.24,
+     "margin": 3.67,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.102
+      ],
+      [
+       "Sound effect",
+       0.08
+      ],
+      [
+       "Zipper (clothing)",
+       0.035
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.102,
+     "floor_db": -44.6,
+     "stereo_corr": 1.0,
+     "darken": -0.45,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -54.7,
+      "first_sample": 0.0,
+      "tail_db": -64.7,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-216675_1.wav",
+     "length_s": 0.23,
+     "typ_z": 2.39,
+     "nn_cos": 0.926,
+     "tone_db": 8.07,
+     "tone_ratio": 1.07,
+     "n_outside": 4,
+     "outside": [
+      [
+       "50 Hz",
+       -29.1,
+       "below"
+      ],
+      [
+       "39 Hz",
+       -14.3,
+       "below"
+      ],
+      [
+       "2.52 kHz",
+       -5.3,
+       "below"
+      ]
+     ],
+     "attack_ms": 33.0,
+     "t40_ms": 110.0,
+     "active_s": 0.177,
+     "onset_s": 0.023,
+     "env_oct": 0.276,
+     "curve_db": 7.54,
+     "t40_ratio": 0.688,
+     "attack_ratio": 1.065,
+     "active_ratio": 0.872,
+     "ref_median": {
+      "attack_ms": 31.0,
+      "t40_ms": 160.0,
+      "active_s": 0.203
+     },
+     "phrase_z": 4.34,
+     "phrase_min": 3.89,
+     "margin": 3.35,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Music",
+       0.209
+      ],
+      [
+       "Sound effect",
+       0.206
+      ],
+      [
+       "Bang",
+       0.138
+      ]
+     ],
+     "as_names": false,
+     "as_p": 0.005,
+     "floor_db": -46.7,
+     "stereo_corr": 1.0,
+     "darken": -0.77,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -98.6,
+      "first_sample": 0.0,
+      "tail_db": -63.8,
+      "lead_s": 0.001,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_1.wav",
+     "length_s": 0.435,
+     "typ_z": -6.16,
+     "nn_cos": 0.698,
+     "tone_db": 8.45,
+     "tone_ratio": 1.12,
+     "n_outside": 10,
+     "outside": [
+      [
+       "1 kHz",
+       20.5,
+       "above"
+      ],
+      [
+       "1.26 kHz",
+       14.9,
+       "above"
+      ],
+      [
+       "794 Hz",
+       14.7,
+       "above"
+      ]
+     ],
+     "attack_ms": 117.0,
+     "t40_ms": 295.0,
+     "active_s": 0.406,
+     "onset_s": 0.009,
+     "env_oct": 1.266,
+     "curve_db": 23.08,
+     "t40_ratio": 1.844,
+     "attack_ratio": 3.774,
+     "active_ratio": 2.0,
+     "ref_median": {
+      "attack_ms": 31.0,
+      "t40_ms": 160.0,
+      "active_s": 0.203
+     },
+     "phrase_z": 3.92,
+     "phrase_min": 3.86,
+     "margin": 2.32,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.091
+      ],
+      [
+       "Whip",
+       0.073
+      ],
+      [
+       "Sound effect",
+       0.063
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.091,
+     "floor_db": -32.2,
+     "stereo_corr": 0.995,
+     "darken": -0.03,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -63.4,
+      "first_sample": 0.0,
+      "tail_db": -49.2,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_2.wav",
+     "length_s": 0.398,
+     "typ_z": -3.76,
+     "nn_cos": 0.745,
+     "tone_db": 8.15,
+     "tone_ratio": 1.08,
+     "n_outside": 9,
+     "outside": [
+      [
+       "1 kHz",
+       20.6,
+       "above"
+      ],
+      [
+       "794 Hz",
+       14.8,
+       "above"
+      ],
+      [
+       "10.1 kHz",
+       -13.7,
+       "below"
+      ]
+     ],
+     "attack_ms": 108.0,
+     "t40_ms": 270.0,
+     "active_s": 0.347,
+     "onset_s": 0.033,
+     "env_oct": 1.11,
+     "curve_db": 22.91,
+     "t40_ratio": 1.688,
+     "attack_ratio": 3.484,
+     "active_ratio": 1.709,
+     "ref_median": {
+      "attack_ms": 31.0,
+      "t40_ms": 160.0,
+      "active_s": 0.203
+     },
+     "phrase_z": 4.14,
+     "phrase_min": 4.01,
+     "margin": 2.62,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.138
+      ],
+      [
+       "Sound effect",
+       0.063
+      ],
+      [
+       "Music",
+       0.033
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.138,
+     "floor_db": -28.7,
+     "stereo_corr": 0.991,
+     "darken": -0.18,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -51.9,
+      "first_sample": 0.0,
+      "tail_db": -49.3,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    },
+    {
+     "file": "E:/earshot/out/refs/whoosh_fast/bench/fs-463763_3.wav",
+     "length_s": 0.392,
+     "typ_z": -4.94,
+     "nn_cos": 0.721,
+     "tone_db": 8.21,
+     "tone_ratio": 1.09,
+     "n_outside": 9,
+     "outside": [
+      [
+       "1 kHz",
+       21.5,
+       "above"
+      ],
+      [
+       "794 Hz",
+       15.0,
+       "above"
+      ],
+      [
+       "10.1 kHz",
+       -12.9,
+       "below"
+      ]
+     ],
+     "attack_ms": 112.0,
+     "t40_ms": 265.0,
+     "active_s": 0.348,
+     "onset_s": 0.032,
+     "env_oct": 1.12,
+     "curve_db": 21.43,
+     "t40_ratio": 1.656,
+     "attack_ratio": 3.613,
+     "active_ratio": 1.714,
+     "ref_median": {
+      "attack_ms": 31.0,
+      "t40_ms": 160.0,
+      "active_s": 0.203
+     },
+     "phrase_z": 4.03,
+     "phrase_min": 3.94,
+     "margin": 2.09,
+     "wins": 1.0,
+     "best_confusion": "a steam hiss",
+     "as_top": [
+      [
+       "Whoosh, swoosh, swish",
+       0.093
+      ],
+      [
+       "Sound effect",
+       0.04
+      ],
+      [
+       "Music",
+       0.024
+      ]
+     ],
+     "as_names": true,
+     "as_p": 0.093,
+     "floor_db": -28.9,
+     "stereo_corr": 0.996,
+     "darken": -0.2,
+     "artifacts": [],
+     "artifact_detail": {
+      "clipped_samples": 0,
+      "dc_db": -67.1,
+      "first_sample": 0.0,
+      "tail_db": -47.8,
+      "lead_s": 0.0,
+      "peak_dbfs": -1.0
+     }
+    }
+   ],
+   "diversity_bench": {
+    "n": 5,
+    "cos_mean": 0.772,
+    "cos_max": 0.951,
+    "tone_min_db": 2.28,
+    "tone_mean_db": 8.01,
+    "near_duplicates": []
+   },
+   "diversity_forge": {
+    "n": 5,
+    "cos_mean": 0.826,
+    "cos_max": 0.892,
+    "tone_min_db": 5.21,
+    "tone_mean_db": 10.47,
+    "near_duplicates": []
+   },
+   "inside": {
+    "per_sound": [
+     7,
+     7,
+     7
+    ],
+    "n_checks": 7,
+    "limits": {
+     "typ_z": -0.874,
+     "tone_db": 10.348,
+     "env_oct": 1.317,
+     "curve_db": 21.472,
+     "phrase_z": 3.88,
+     "margin": 2.314,
+     "as_p": 0.007
+    },
+    "real_per_sound": [
+     1,
+     7,
+     7,
+     4,
+     6,
+     7,
+     4,
+     7,
+     7,
+     6
+    ]
+   },
+   "summary": {
+    "made": {
+     "n": 3,
+     "typ_z": 2.05,
+     "tone_db": 8.58,
+     "env_oct": 0.89,
+     "curve_db": 15.93,
+     "phrase_z": 4.46,
+     "margin": 3.31,
+     "as_p": 0.02,
+     "tone_ratio": 1.87,
+     "t40_ratio": 0.51,
+     "wins": 1.0,
+     "floor_db": -43.9,
+     "stereo_corr": 0.9,
+     "darken": -0.32,
+     "as_names": 0.33,
+     "artifacts": 0,
+     "var_cos": 0.957
+    },
+    "real_cross": {
+     "n": 5,
+     "typ_z": 0.57,
+     "tone_db": 10.31,
+     "env_oct": 1.22,
+     "curve_db": 20.2,
+     "phrase_z": 4.14,
+     "margin": 2.78,
+     "as_p": 0.06,
+     "tone_ratio": 2.25,
+     "t40_ratio": 0.6,
+     "wins": 1.0,
+     "floor_db": -65.4,
+     "stereo_corr": 0.81,
+     "darken": -0.16,
+     "as_names": 0.4,
+     "artifacts": 0,
+     "var_cos": 0.826
+    },
+    "real_loo": {
+     "n": 5,
+     "typ_z": 1.52,
+     "tone_db": 4.58,
+     "env_oct": 0.4,
+     "curve_db": 8.21,
+     "phrase_z": 4.14,
+     "margin": 2.62,
+     "as_p": 0.09,
+     "tone_ratio": 0.66,
+     "t40_ratio": 1.08,
+     "wins": 1.0,
+     "floor_db": -32.2,
+     "stereo_corr": 1.0,
+     "darken": -0.2,
+     "as_names": 0.8,
+     "artifacts": 0,
+     "var_cos": 0.772
+    }
+   }
+  }
+ },
+ "seconds": 11.5
+}

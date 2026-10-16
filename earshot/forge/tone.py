@@ -23,6 +23,37 @@ Measures (mono sum, the whole file):
              range; length_s the file length
   shares     energy share of 5 broad regions (<150 Hz, 150 Hz-1 kHz, 1-4, 4-12, >12 kHz) in dB of the total, with the
              refs' median share; region_penalty() counts the excess beyond median + 6 dB (a low puff, a bright hiss)
+
+Spectro-temporal envelope (EnvRef): the average spectrum above cannot hear a tail that dies too fast, a swell where
+the refs hit, or a band that rings on after the rest has gone (the blind test caught the forged impact by its tail).
+
+    from earshot.forge.tone import EnvRef
+    er = EnvRef(['real_01.wav', ...])
+    m = er.check(x)
+    m['env_db'], m['env_ratio'], m['env_out'], m['words']   # e.g. 'envelope 9.8 dB from the nearest ref
+        # kb_space_01.wav (the refs sit 6.3-8.1 apart); beyond every ref: tail 4-6.3 kHz +14 dB, tail 1.6-3.2 kHz +12 dB'
+    EnvRef.penalty(m)
+  bandgram   28 third-octave band energies (the CEN bands, 3rd-order Butterworth, so low bands smear in time like an
+             ear's) in 10 ms frames, dB re the loudest frame's total power, floored at -70 dB
+  env_dist   the made sound's bandgram against one ref's: aligned at the onset (first frame within 20 dB of the
+             peak frame) or at the peak frame, whichever fits better, with a small tolerance (time-stretch 0.85-1.18
+             about the anchor, then a shift of +-30 ms around the best; stretch costs a little). Distance = mean
+             |dB difference| over every band x frame of both active spans (cells weighted by how loud the louder of
+             the two is, so a missing tail or an extra swell counts, silence does not; each cell's error capped at
+             30 dB). The tolerance is deliberately small: a tail half as long as the ref's cannot be stretched away.
+  env_db     distance to the NEAREST ref; env_ref: each ref's distance to its nearest other ref (what real spreads
+             to); env_ratio = env_db / median(env_ref). Nearest-ref distances flatter averages: with few, diverse refs
+             a sound in their middle sits closer to each than they sit to each other (the v1 pops, whooshes and
+             impacts do), so env_ratio alone cannot find a gap. Hence:
+  cells      per segment (pre < -20 ms, attack -20..30 ms, body 30-200 ms, tail 0.2-1 s, late > 1 s from the anchor)
+             x 8 band groups (31-80 Hz ... 12.5-16 kHz): the signed weighted difference (made - ref) and the cell's
+             weight share, against each ref at its own best alignment
+  outside    cells where the sound is beyond EVERY kept ref in the same direction by more than max(6 dB, the refs'
+             own median pairwise difference in that cell): a consistent gap that no real recording shares, in a cell
+             where the refs agree with each other. env_out = the sum of the excess dB beyond that tolerance, scaled
+             by min(1, share / 5 %); env_out_ref = the refs' own median env_out (each against the others; the cell
+             spreads use all refs, a small leak in leave-one-out scoring): diverse real refs are each unique
+             somewhere, so only the excess over it counts
 """
 import numpy as np
 
@@ -170,3 +201,194 @@ class ToneRef:
         if b > 0 and m['t40_ms'] > b:
             pen += 0.5 * min(2.0, (m['t40_ms'] - b) / b)
         return pen
+
+
+
+# ------------------------------------------------------------------------------- spectro-temporal envelope
+FLOOR = -70.0
+HOP_MS = 10.0
+STRETCH = (0.85, 0.92, 1.0, 1.08, 1.18)
+SHIFT = (-3, -2, -1, 0, 1, 2, 3)                     # frames (10 ms)
+SEGMENTS = (('pre', -1e9, -2), ('attack', -2, 3), ('body', 3, 20), ('tail', 20, 100), ('late', 100, 1e9))  # frames
+GROUPS = (('31-80 Hz', 0, 90), ('100-200 Hz', 90, 224), ('250-500 Hz', 224, 560), ('630-1250 Hz', 560, 1400),
+          ('1.6-3.2 kHz', 1400, 3550), ('4-6.3 kHz', 3550, 7100), ('8-10 kHz', 7100, 11200), ('12.5-16 kHz', 11200, 1e9))
+OUT_MARGIN = 6.0
+_SOS = []
+
+
+def _bank():
+    if not _SOS:
+        from scipy import signal
+        for c in CEN:
+            _SOS.append(signal.butter(3, [c / EDGE, min(c * EDGE, 0.49 * SR)], 'bandpass', fs=SR, output='sos'))
+    return _SOS
+
+
+def bandgram(x, hop_ms=HOP_MS):
+    """third-octave band energy over time: (frames, 28) dB re the loudest frame's total power, floored at FLOOR"""
+    from scipy import signal
+    m = _mono(x)
+    n = int(SR * hop_ms / 1000)
+    k = max(1, -(-len(m) // n))
+    m = np.pad(m, (0, k * n - len(m)))
+    G = np.empty((k, len(CEN)))
+    for j, sos in enumerate(_bank()):
+        G[:, j] = (signal.sosfilt(sos, m).reshape(k, n) ** 2).mean(1)
+    return np.maximum(10 * np.log10(G / (G.sum(1).max() + 1e-30) + 1e-30), FLOOR)
+
+
+def _total(G):
+    return 10 * np.log10((10 ** (G / 10)).sum(1) + 1e-30)
+
+
+def _anchors(G):
+    tot = _total(G)
+    ip = int(np.argmax(tot))
+    on = int(np.nonzero(tot >= tot[ip] - 20)[0][0])
+    act = np.nonzero(tot >= tot[ip] - 50)[0]
+    return {'onset': on, 'peak': ip}, int(act[0]), int(act[-1])
+
+
+def _rows(G, t):
+    """G sampled at fractional frames t (linear in dB), FLOOR outside"""
+    i0 = np.floor(t).astype(int)
+    fr = (t - i0)[:, None]
+    n = len(G)
+    a = np.where(((i0 >= 0) & (i0 < n))[:, None], G[np.clip(i0, 0, n - 1)], FLOOR)
+    b = np.where(((i0 + 1 >= 0) & (i0 + 1 < n))[:, None], G[np.clip(i0 + 1, 0, n - 1)], FLOOR)
+    return a * (1 - fr) + b * fr
+
+
+def env_dist(A, B, stretch=STRETCH, shift=SHIFT, detail=False):
+    """distance in dB between two bandgrams (A = the sound judged, B = a ref), best over the anchors / stretch /
+    shift tolerance; detail=True also returns the alignment and, per segment x band group, the signed weighted mean
+    difference (A - B, dB) and the cell's share of the weight: cells {'tail 630-1250 Hz': (diff, share)}"""
+    ancA, a_lo, a_hi = _anchors(A)
+    ancB, b_lo, b_hi = _anchors(B)
+    frames = {}
+    for name in ('onset', 'peak'):
+        a0, b0 = ancA[name], ancB[name]
+        lo = max(-300, min(a_lo - a0, b_lo - b0)) - 3
+        hi = min(600, max(a_hi - a0, b_hi - b0)) + 4
+        tt = np.arange(lo, hi, dtype=float)
+        frames[name] = (a0, tt, _rows(B, b0 + tt))
+
+    def cost(name, s, sh):
+        a0, tt, Bv = frames[name]
+        Av = _rows(A, a0 + tt / s + sh)
+        w = np.clip((np.maximum(Av, Bv) - FLOOR) / 40.0, 0.0, 1.0)           # how loud the louder of the two is
+        d = float((w * np.minimum(np.abs(Av - Bv), 30.0)).sum() / (w.sum() + 1e-9))
+        return d * (1.0 + 0.5 * abs(np.log(s))), name, s, sh, tt, Av, Bv, w  # stretching costs a little
+
+    best = min((cost(n, s, 0) for n in frames for s in stretch), key=lambda c: c[0])    # coarse: no shift
+    best = min([best] + [cost(best[1], best[2], sh) for sh in shift if sh], key=lambda c: c[0])   # then shift
+    d, name, s, sh, tt, Av, Bv, w = best
+    if not detail:
+        return d
+    cells, W = {}, w.sum() + 1e-9
+    for seg, t0, t1 in SEGMENTS:
+        rs = (tt >= t0) & (tt < t1)
+        for grp, f0, f1 in GROUPS:
+            cs = (CEN >= f0) & (CEN < f1)
+            ww = w[np.ix_(rs, cs)]
+            if ww.sum() < 0.01 * W:
+                continue
+            diff = float((ww * (Av[np.ix_(rs, cs)] - Bv[np.ix_(rs, cs)])).sum() / ww.sum())
+            cells[f'{seg} {grp}'] = (round(diff, 1), round(float(ww.sum() / W), 3))
+    return d, {'anchor': name, 'stretch': s, 'shift_ms': sh * HOP_MS, 'cells': cells}
+
+
+class EnvRef:
+    """the real references' band-energy trajectories, and a check of any sound's shape over time against them"""
+
+    def __init__(self, refs, names=None, margin=OUT_MARGIN):
+        xs = [_load(r) for r in refs]
+        self.names = list(names) if names is not None else [r if isinstance(r, str) else f'ref{i}' for i, r in
+                                                            enumerate(refs)]
+        self.margin = margin
+        self.G = [bandgram(x) for x in xs]
+        self.n = len(self.G)
+        self.D = np.full((self.n, self.n), np.inf)        # D[i, j] = env_dist(ref i judged against ref j)
+        det = {(i, j): env_dist(self.G[i], self.G[j], detail=True)
+               for i in range(self.n) for j in range(self.n) if i != j}
+        for (i, j), r in det.items():
+            self.D[i, j] = r[0]
+        pair = {}                                         # how far the refs sit from each other, cell by cell
+        for r in det.values():
+            for key, (v, _) in r[1]['cells'].items():
+                pair.setdefault(key, []).append(abs(v))
+        self.cell_spread = {key: float(np.median(v)) for key, v in pair.items() if len(v) >= 2}
+        self.out_ref = np.array([self._outside([det[i, j] for j in range(self.n) if j != i])[1] for i in range(self.n)])
+
+    def _outside(self, res):
+        """cells beyond EVERY compared ref in one direction by more than the margin, and their weighted excess"""
+        outside, out_db = [], 0.0
+        spread = getattr(self, 'cell_spread', {})
+        if len(res) >= 2:
+            for key in res[0][1]['cells']:
+                got = [r[1]['cells'].get(key) for r in res]
+                if any(g is None for g in got):
+                    continue
+                diffs = np.array([g[0] for g in got])
+                share = float(np.mean([g[1] for g in got]))
+                lo = diffs.min() if diffs.min() > 0 else (-diffs.max() if diffs.max() < 0 else 0.0)
+                tol = max(self.margin, spread.get(key, self.margin))     # where the refs disagree, allow as much
+                if lo > tol and share >= 0.02:
+                    outside.append((key, round(float(np.sign(diffs[0]) * lo), 1), round(share, 3)))
+                    out_db += (lo - tol) * min(1.0, share / 0.05)
+        return sorted(outside, key=lambda o: -abs(o[1]) * o[2]), float(out_db)
+
+    def spread(self, exclude=None):
+        """each kept ref's distance to its nearest OTHER kept ref (needs 3+ refs after the exclusion)"""
+        keep = [j for j in range(self.n) if j != exclude]
+        if len(keep) < 3:
+            return np.zeros(0)
+        return np.array([min(self.D[i, j] for j in keep if j != i) for i in keep])
+
+    def check(self, x, exclude=None, G=None):
+        """measure one sound (or its precomputed bandgram G) against the refs; exclude = a ref index to leave out"""
+        keep = [j for j in range(self.n) if j != exclude]
+        if not keep:
+            return {}
+        G = bandgram(_load(x)) if G is None else G
+        res = [env_dist(G, self.G[j], detail=True) for j in keep]
+        k = int(np.argmin([r[0] for r in res]))
+        d, info = res[k]
+        sp = self.spread(exclude)
+        ratio = d / max(float(np.median(sp)), 1.0) if len(sp) else None
+        outside, out_db = self._outside(res)
+        oref = self.out_ref[keep] if self.n >= 3 else np.zeros(0)
+        out = {'env_db': round(d, 2), 'env_ratio': None if ratio is None else round(ratio, 2),
+               'env_ref': [round(float(v), 2) for v in sp],
+               'nearest': self.names[keep[k]].replace(chr(92), '/').rsplit('/', 1)[-1], 'nearest_i': keep[k],
+               'anchor': info['anchor'], 'stretch': info['stretch'], 'shift_ms': info['shift_ms'],
+               'cells': info['cells'], 'outside': outside, 'env_out': round(out_db, 2),
+               'env_out_ref': round(float(np.median(oref)), 2) if len(oref) else None}
+        out['words'] = self.words(out)
+        return out
+
+    @staticmethod
+    def words(m):
+        s = f"envelope {m['env_db']:.1f} dB from the nearest ref {m['nearest']}"
+        if m['env_ref']:
+            s += f" (the refs sit {min(m['env_ref']):.1f}-{max(m['env_ref']):.1f} apart)"
+        if m['outside']:
+            s += '; beyond every ref: ' + ', '.join(f'{k} {v:+.0f} dB' for k, v, _ in m['outside'][:3])
+        else:
+            worst = sorted(((k, v) for k, v in m['cells'].items() if abs(v[0]) >= 8),
+                           key=lambda kv: -abs(kv[1][0]) * kv[1][1] ** 0.5)[:2]
+            if worst:
+                s += ': vs it ' + ', '.join(f'{k} {v[0]:+.0f} dB' for k, v in worst)
+        return s
+
+    @staticmethod
+    def penalty(m, cap=2.0):
+        """nearest part: 0 while the sound is no farther from its nearest ref than a typical ref from its nearest
+        neighbour, then linear in (env_ratio - 1); outside part: (env_out - max(3, the refs' own median env_out)) / 6,
+        so with diverse refs (each real one is unique somewhere) only an excess over what real recordings show
+        counts (6 dB beyond every ref in a cell holding 5 % or more of the weight = 1). Capped."""
+        if not m:
+            return 0.0
+        near = max(0.0, m['env_ratio'] - 1.0) if m.get('env_ratio') is not None else 0.0
+        tol = max(3.0, m.get('env_out_ref') or 0.0)
+        return float(min(cap, near + max(0.0, m.get('env_out', 0.0) - tol) / 6.0))

@@ -51,6 +51,7 @@ from . import REF_ROOT
 TARGET = 'a soft premium UI button click'
 ALTS = ['a mechanical keyboard key press', 'a wooden knock', 'a camera shutter click', 'a finger snap']
 _K = REF_ROOT + '/ui/'
+REFSET = 'click'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
 REFS = [_K + f for f in ('ui_click_01.wav', 'ui_click_02.wav', 'ui_click_03.wav', 'ui_click_04.wav',
                          'ui_toggle_01.wav', 'ui_toggle_02.wav')]
 

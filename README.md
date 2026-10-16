@@ -49,7 +49,7 @@ $ earshot critique film.mp4
 | `critique FILE [--video V]` | a launch-video scorecard against a profile of 7 professional launch films, with timestamped fixes |
 | `profile REFS... -o p.json` | build your own reference profile from films you admire |
 | `measure FILE` | objective measurements only (no models): LUFS, true peak, LRA, envelope, spectrum, tempo / key |
-| `forge RECIPE --refs DIR` | make a sound in code and improve it by listening (see below) |
+| `forge RECIPE --refset CAT` | make a sound in code and improve it by listening (see below) |
 | `llm FILE --yes-upload` | optional audio-LLM critique (Gemini), only with your own key and explicit consent |
 | `mcp` | the same tools as an MCP server for Claude Code and other agents |
 | `doctor [--load]` | check the install, models, data files and CPU settings |
@@ -69,23 +69,33 @@ loudness, sync to the beat):
 Listening makes iteration possible. The agent writes a sound as code: a **recipe** of physical synthesis (modal
 resonators, contact excitations, filtered noise, a computed room and a microphone; no recorded audio inside). The
 forge renders candidates from the recipe's parameters, and a **critic** built from earshot scores each one:
-description match against named confusions, realness, closeness to real reference recordings, measured shape, and a
-model-free tonal-balance and tail check against the references. An evolutionary **search** keeps the best and mutates
-them. Then the agent reads the critic's words ("sounds like: a cork pop, a glass ting", "decay +2.4 outside the
-refs"), looks at spectrograms next to the references, rewrites the recipe, and runs it again.
+description match against named confusions, realness, closeness to real reference recordings and measured shape, then
+model-free penalties against the references: 1/3-octave tonal balance, the spectro-temporal envelope (a tail that dies
+too fast shows here), artifacts (clicks, aliasing, DC / infrasound, harsh resonances, comb ring, cut tails, clipping)
+and polish (attack, onset snap, tail smoothness). A cheap model-free **pre-screen** ranks many renders with the same
+measurements, so the models only hear the best; an evolutionary **search** keeps the best and mutates them. Then the
+agent reads the critic's words ("sounds like: a cork pop, a glass ting", "decay +2.4 outside the refs", "bumpy tail"),
+looks at spectrograms next to the references, rewrites the recipe, and runs it again.
 
 ```bash
-earshot forge                                    # list the recipes: click, impact, keypress, pop, whoosh
-earshot forge keypress --refs path/to/real/keypresses/ --budget 144 --reps 2 --tone 1.5 --keep 4 --robust 8 --dir made/keypress
+earshot forge --list                             # the recipes (click, impact, keypress, pop, whoosh, ...) + refsets
+earshot forge keypress --refs path/to/real/keypresses/ --budget 144 --variants 4 --dir made/keypress
+earshot forge whoosh --refset whoosh_fast --budget 96 --dir made/whoosh      # a reference set's 'forge' split
 earshot forge whoosh --target "a fast crisp air whoosh" --alts "a wind gust" "a sword swing" \
-  --refs path/to/real/whooshes/ --tone 1.5 --dir made/whoosh
+  --refs path/to/real/whooshes/ --mode real --dir made/whoosh
+earshot forge --render keypress --params made/keypress/report.json --seeds 1 2 3 --dir made/again
 ```
 
-Output: the best diverse sounds as WAVs plus `report.json` with every candidate's parameters and scores, the same
-critic's scores of the real references (leave-one-out), held-out AudioSet tags, and with `--robust N` each pick
-re-rendered on N new seeds. Every score also carries model-free measurements (`earshot/forge/tone.py`): the
-1/3-octave tonal balance against the references' median ("+16 dB at 500-630 Hz (above every ref)"), the tail and the
-length. In Python: `from earshot.forge import forge`.
+Output (`--dir`): the best diverse sounds as WAVs; `report.md` (what was asked, the search per generation, each pick in
+the critic's words, the measured gap to the references); `compare.png` (each pick's spectrogram, envelope and
+1/3-octave balance next to its nearest reference); `audition.wav` (made, ref, made, ref ... to listen in pairs);
+`report.json` with every candidate's parameters and scores, the same critic's scores of the real references
+(leave-one-out) and held-out AudioSet tags. Picks are re-rendered on new seeds (`--robust`, default 3) and must differ
+in parameters and in sound. Reference sets (`earshot/forge/refsets.py`) are split by source into a 'forge' side the
+search may use and a 'bench' side only the fixed benchmark (`eval/forge/bench.py`) hears. The DSP toolkit for recipes:
+`earshot/forge/dsp.py` (sources: modal, noise, air, sweeps, Shepard risers, sub drops, bells, FM; layering) and
+`earshot/forge/fx.py` (reverb, saturation, transient shaping, limiter, EQ match, Doppler, filters, glitch, granular).
+In Python: `from earshot.forge import forge`.
 
 **Blind test.** A key press, a UI click, a pop, a fast whoosh and an impact were made from scratch in code and
 played blind next to real recordings of the same kind of sound. The author picked the made one correctly **8 times out

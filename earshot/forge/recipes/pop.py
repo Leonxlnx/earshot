@@ -46,6 +46,7 @@ from . import REF_ROOT
 
 TARGET = 'a small bubble pop'
 ALTS = ['a cork pop', 'a water drop', 'a finger snap', 'a mouse click']
+REFSET = 'pop'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
 REFS = [REF_ROOT + '/ui/ui_pop_0%d.wav' % i for i in (1, 2, 3, 4)]
 
 SPACE = {

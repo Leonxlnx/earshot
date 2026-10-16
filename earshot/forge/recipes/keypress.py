@@ -43,6 +43,7 @@ SR = dsp.SR
 TARGET = 'a single deep thocky mechanical keyboard key press'
 ALTS = ['a wooden knock', 'a computer mouse click', 'a typewriter key', 'a cork pop']
 _K = REF_ROOT + '/keyboard/'
+REFSET = 'typing_key'   # the CLI's default refs: this refsets category, 'forge' split (bench held out)
 REFS = [_K + f for f in ('kb_thock_01.wav', 'kb_thock_02.wav', 'kb_thock_03.wav', 'kb_thock_04.wav',
                          'kb_enter_01.wav', 'kb_space_01.wav')]
 
