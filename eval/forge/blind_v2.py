@@ -396,7 +396,8 @@ def main():
     key = json.load(open(os.path.join(here, 'KEY_open_after.json'), encoding='utf-8'))['trials']
     ans = [a.strip().upper() for a in ' '.join(sys.argv[1:]).replace(',', ' ').split()]
     if len(ans) != len(key) or any(a not in ('A', 'B', '?') for a in ans):
-        sys.exit(f'give {len(key)} answers, each A or B (which one was the REAL recording) or ? (undecided), in trial order')
+        sys.exit(f'give {len(key)} answers, each A or B (which one was the REAL recording) or ? (undecided), '
+                 'in trial order')
     per, tier = {}, {}
     for k, a in zip(key, ans):
         ok = None if a == '?' else a == k['real']
@@ -417,7 +418,8 @@ def main():
     n = sum(len(v) for v in per.values())
     right = sum(sum(v) for v in per.values())
     print()
-    print(f'overall {right} of {n} right; chance of doing at least this well by guessing: p = {p_at_least(right, n):.3f}')
+    print(f'overall {right} of {n} right; chance of doing at least this well by guessing: '
+          f'p = {p_at_least(right, n):.3f}')
     print('p < 0.05: you can tell made from real (at least for some sounds). Otherwise this test could not show it.')
     if n and p_at_most(right, n) < 0.05:
         print(f'note: this few right is itself unlikely by guessing (p = {p_at_most(right, n):.3f}): you heard the made '
@@ -666,11 +668,15 @@ def build_progress(pdir, results_path=None, quiet=False):
     md += [f'Scope: v1 had 5 sounds, 3 finals each (15). v2 delivers {len(cats_v2)} categories, {n_fin} finals '
            f'(`out/forge_v2/<category>/final/`).', '']
     stale = []
+    try:              # when the benchmark ran (its own stamp: the file may be rewritten later, e.g. paths anonymised)
+        made_at = time.mktime(time.strptime(r2['created'], '%Y-%m-%d %H:%M'))
+    except (KeyError, ValueError):
+        made_at = os.path.getmtime(rp)
     for name, cat, *_ in V1:
         listed = {os.path.normcase(os.path.abspath(os.path.join(REPO, m['file']))) for m in
                   r2['categories'].get(cat, {}).get('made', [])}
         now = {os.path.normcase(os.path.abspath(p)) for p in finals(cat)}
-        newer = [p for p in finals(cat) if os.path.getmtime(p) > os.path.getmtime(rp)]
+        newer = [p for p in finals(cat) if os.path.getmtime(p) > made_at + 60]
         if listed != now or newer:
             stale.append(cat)
     if stale:
@@ -703,8 +709,12 @@ def build_progress(pdir, results_path=None, quiet=False):
             md.append(f'| {label} | {fmt(a)} | {fmt(b)} | {fmt(realv)} | {fmt(rxv)} | {v} |')
         ins = lambda d: (f'{np.median(d["per_sound"]):g} / {d["n_checks"]}' if d.get('per_sound') else '-')
         real_ins = (f'{np.median(i1["real_per_sound"]):g} / {i1["n_checks"]}' if i1.get('real_per_sound') else '-')
+        iv = ''
+        if i1.get('per_sound') and i2.get('per_sound'):
+            a, b = float(np.median(i1['per_sound'])), float(np.median(i2['per_sound']))
+            iv = 'more' if b > a + 0.4 else ('fewer' if b < a - 0.4 else 'same')
         md.append(f'| inside the real 80 % limits (median checks) | {ins(i1)} | {ins(i2)} | {real_ins} (real rows) | | '
-                  f'{verdict("model", float(np.median(i1["per_sound"])), float(np.median(i2["per_sound"])), [], 0.4).replace("up", "more").replace("down", "fewer") if i1.get("per_sound") and i2.get("per_sound") else ""} |')
+                  f'{iv} |')
         md.append('')
         summary_rows.append((name, cat, nb, nw))
         if c1.get('note'):
@@ -724,8 +734,8 @@ def build_progress(pdir, results_path=None, quiet=False):
            'typicality, phrasings, margin, AudioSet p) and 3 model-free (tone, envelope, curve): a fall there while '
            'the model-free rows improve may be the saturation unwinding rather than the sound '
            'getting worse; the numbers cannot settle which, the blind test can.',
-           '- v1 impact and fast-whoosh numbers are optimistic: v1 was tuned partly against kit refs that are bench '
-           'refs today (kit impact_03, whoosh_med_01 / 02).',
+           '- v1 impact numbers are optimistic: v1 impact was tuned against kit impact_01-03, and impact_03 is the '
+           'only impact bench ref today. (v1 fast whoosh used kit whoosh_fast_01-04, none cut from a bench source.)',
            '- Impact has a single bench ref (no spread, no variety baseline); typing_key has 12, click 7.',
            '- Numbers are not ears: the clean blind test (`../blind_v2/`) is the deciding test.', '']
     open(os.path.join(pdir, 'progress.md'), 'w', encoding='utf-8').write(chr(10).join(md) + chr(10))
