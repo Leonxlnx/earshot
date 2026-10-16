@@ -360,6 +360,22 @@ SPACE_V2.update({'c_nat': (0.0, 1.0), 'c_ptau': (0.002, 0.03, 'log'), 'c_tau': (
 DEFAULTS_V2.update({'c_nat': 0.0, 'c_ptau': 0.008, 'c_tau': 0.018, 'c_h2': 0.1, 'c_puff': -60.0, 'c_puff_hz': 2500.0,
                     'c_puff_ms': 2.0, 'c_thump': -60.0, 'c_room': 0.0, 'c_pre': -60.0, 'c_pre_hz': 9000.0,
                     'c_pre_t': 0.025})   # c_pre: a soft high tick c_pre_t before the pop (the film chirp's pre-blip)
+# round 6, chirp only (pop-notify; the round-5 judge: natural but four near-steady tones, variety lost): n6 1 = _pop6, a
+# natural pop whose pitch keeps moving through the whole decay (up or down: n_f0 -> n_f1, an exponential approach
+# n_ptau or a log-linear sweep n_sweep / n_ease), a peak at n_att, an exponential decay n_tau, soft 2nd / 3rd partials,
+# an optional inharmonic second mode (n_m2 at n_m2r x, dying n_m2d x faster), a pitch-following breath (n_breath dB,
+# c_bq), and a double pop (n_dbl dB, n_dgap s later, n_dratio x the pitch, n_dtau x the decay). 0 = off (r2-r5 render
+# exactly)
+SPACE_V2.update({'n6': (0.0, 1.0), 'n_f0': (150.0, 12000.0, 'log'), 'n_f1': (100.0, 6000.0, 'log'),
+                 'n_ptau': (0.002, 0.06, 'log'), 'n_sweep': (0.0, 0.14), 'n_ease': (0.4, 2.0),
+                 'n_att': (0.0003, 0.04, 'log'), 'n_tau': (0.003, 0.06, 'log'), 'n_h2': (0.0, 0.4),
+                 'n_h3': (0.0, 0.2), 'n_m2': (0.0, 0.6), 'n_m2r': (1.3, 4.5), 'n_m2d': (1.0, 4.0),
+                 'n_breath': (-60.0, -8.0), 'n_dbl': (-60.0, 0.0), 'n_dgap': (0.02, 0.12), 'n_dratio': (0.6, 2.0),
+                 'n_dtau': (0.4, 1.6)})
+DEFAULTS_V2.update({'n6': 0.0, 'n_f0': 1500.0, 'n_f1': 600.0, 'n_ptau': 0.01, 'n_sweep': 0.0, 'n_ease': 1.0,
+                    'n_att': 0.001, 'n_tau': 0.015, 'n_h2': 0.1, 'n_h3': 0.0, 'n_m2': 0.0, 'n_m2r': 2.3,
+                    'n_m2d': 2.0, 'n_breath': -60.0, 'n_dbl': -60.0, 'n_dgap': 0.05, 'n_dratio': 1.33,
+                    'n_dtau': 1.0})
 
 
 def _v2(**kw):
@@ -453,6 +469,37 @@ FAMILY_V2['pro_pop'] = [
          c_room=0.1),                                                                                 # a droplet
 ]
 FAMILY_V2_NAMES = {'pro_pop': ['chirp', 'mouth', 'blip', 'drop', 'plip', 'droplet']}
+# Round 6 (pop-notify): the round-5 family (final_r5/) stays in FAMILY_V2_R5; FAMILY_V2['pro_pop'] = the round-6 family:
+# natural pops of different kinds (different chirp ranges and directions, bodies, a double pop), the pitch moving through
+# every decay.
+FAMILY_V2_R5 = {'pro_pop': [dict(p) for p in FAMILY_V2['pro_pop']]}
+FAMILY_V2_NAMES_R5 = {'pro_pop': list(FAMILY_V2_NAMES['pro_pop'])}
+
+
+def _p6(**kw):
+    return _v2(**{'n6': 1.0, 'drive': 0.0, 'steps': 0.0, 'pre_db': -40.0, 'tick_db': -40.0, 'harm': 0.0,
+                  'c_breath': -60.0, 'hp': 120.0, 'lp': 16000.0, 'fade': 0.004, **kw})
+
+
+FAMILY_V2_R6 = {'pro_pop': [
+    _p6(n_f0=9800.0, n_f1=350.0, n_ptau=0.03, n_att=0.012, n_tau=0.018, n_h2=0.05, n_breath=-12.0, c_bq=2.0,
+        c_puff=-22.0, c_puff_hz=7000.0, c_puff_ms=0.6, c_pre=-10.0, c_pre_hz=9500.0, c_pre_t=0.026,
+        c_room=0.08),                                                   # the film chirp, smooth: 9.8 kHz -> 350 Hz
+    _p6(n_f0=1200.0, n_f1=210.0, n_ptau=0.014, n_att=0.0008, n_tau=0.016, n_h2=0.05, c_puff=-12.0,
+        c_puff_hz=4500.0, c_puff_ms=0.6, hp=90.0, c_room=0.06),       # a falling boop + click (the over-music pop)
+    _p6(n_f0=260.0, n_f1=540.0, n_ptau=0.022, n_att=0.004, n_tau=0.016, n_h2=0.15, n_breath=-24.0, c_bq=3.0,
+        c_room=0.1, hp=100.0),                                          # a rising bloop (a bubble)
+    _p6(n_f0=1700.0, n_f1=950.0, n_ptau=0.005, n_att=0.0008, n_tau=0.008, n_h2=0.1, n_m2=0.2, n_m2r=2.76,
+        n_m2d=2.5, n_dbl=-4.0, n_dgap=0.07, n_dratio=0.75, n_dtau=1.2, c_puff=-16.0, c_puff_hz=3500.0,
+        c_puff_ms=0.6, c_room=0.08),                                    # a double pop: two rounded blips, the second lower
+    _p6(n_f0=2300.0, n_f1=1900.0, n_ptau=0.004, n_att=0.0005, n_tau=0.012, n_h2=0.03, n_m2=0.45, n_m2r=2.76,
+        n_m2d=1.5, c_puff=-20.0, c_puff_hz=6000.0, c_puff_ms=0.5, c_room=0.08),   # a small glassy tink
+    _p6(n_f0=200.0, n_f1=300.0, n_ptau=0.01, n_att=0.0015, n_tau=0.012, n_h2=0.1, c_puff=-2.0, c_puff_hz=900.0,
+        c_puff_ms=2.5, c_thump=-6.0, c_room=0.08, hp=80.0),            # a low suction 'thup' (air puff + thump)
+]}
+FAMILY_V2_NAMES_R6 = {'pro_pop': ['chirp', 'boop', 'bloop', 'double', 'tink', 'thup']}
+FAMILY_V2['pro_pop'] = FAMILY_V2_R6['pro_pop']
+FAMILY_V2_NAMES['pro_pop'] = FAMILY_V2_NAMES_R6['pro_pop']
 FINE_V2 = {
     'chirp': ['ease', 'duty', 'start_db', 'tail_tau', 'harm', 'odd', 'tick_db', 'tick_hz', 'hp', 'lp', 'drive',
               'fade', 'peak_at', 'c_breath', 'land_drop'],
@@ -548,7 +595,88 @@ def _natchirp(p, r):
     return y                                                # render_v2)
 
 
+def _pop6_one(p, r, n, f0, f1, tau, att):
+    """one round-6 pop: a rounded body whose pitch moves (log-frequency) from f0 to f1 for the whole decay (a pop, not
+    a steady beep), a raised-cosine rise to its peak at `att`, then a natural exponential decay; soft 2nd / 3rd partials
+    and an optional inharmonic second mode, each dying faster than the body; a breath that follows the pitch"""
+    t = dsp.t_of(n)
+    l0, l1 = np.log(f0), np.log(f1)
+    if p['n_sweep'] > 0:                                    # a log-linear (constant oct/s) sweep, eased, then settled
+        u = np.clip(t / p['n_sweep'], 0, 1)
+        g = (1 - u) ** p['n_ease']
+    else:                                                   # an exponential approach (falls / rises fast, then slows)
+        g = np.exp(-t / p['n_ptau'])
+    f = np.exp(l1 + (l0 - l1) * g)
+    ph = 2 * np.pi * np.cumsum(f) / SR + r.uniform(0, 2 * np.pi)
+    rise = 0.5 - 0.5 * np.cos(np.pi * np.clip(t / att, 0, 1))
+    dec = np.exp(-np.maximum(t - att, 0) / tau)
+    env = rise * dec
+    fade = lambda k: np.clip((18000.0 - k * f) / 3000.0, 0, 1)
+    y = np.sin(ph)
+    if p['n_h2'] > 0:
+        y = y + p['n_h2'] * fade(2) * dec ** 1.0 * np.sin(2 * ph + 0.5)
+    if p['n_h3'] > 0:
+        y = y + p['n_h3'] * fade(3) * dec ** 2.0 * np.sin(3 * ph + 1.1)
+    if p['n_m2'] > 0:                                       # a second body mode (membrane / tube / wood): inharmonic
+        q = p['n_m2r']
+        ph2 = 2 * np.pi * np.cumsum(f * q) / SR + r.uniform(0, 2 * np.pi)
+        y = y + p['n_m2'] * fade(q) * dec ** p['n_m2d'] * np.sin(ph2)
+    y = y * env
+    if p['n_breath'] > -59:                                 # turbulence that follows the pitch, riding the envelope
+        b = dsp.svf(r.standard_normal(n), np.minimum(f, 16000.0), p['c_bq'], 'band')
+        b = b / (np.sqrt(np.mean(b[:max(16, dsp.n_of(att + tau))] ** 2)) + 1e-12) * np.sqrt(0.5)
+        y = y + 10 ** (p['n_breath'] / 20) * b * env
+    return y
+
+
+def _pop6(p, r):
+    """round 6 (pop-notify; the round-5 judge: the natural chirp lost on variety, four members were near-steady
+    tones): one natural pop (_pop6_one) or a double pop (n_dbl: a second, smaller pop n_dgap later at n_dratio x the
+    pitch), with the round-5 air puff / thump / pre-blip / tiny room keys (c_puff*, c_thump, c_pre*, c_room)"""
+    tau, att = p['n_tau'], p['n_att']
+    dbl = p['n_dbl'] > -59
+    gap = p['n_dgap'] if dbl else 0.0
+    dur = att + 6.5 * tau * (max(1.0, p['n_dtau']) if dbl else 1.0) + gap + 0.006
+    n = dsp.n_of(min(0.4, max(0.03, dur)))
+    y = _pop6_one(p, r, n, p['n_f0'], p['n_f1'], tau, att)
+    if dbl:
+        k = dsp.n_of(gap)
+        q = p['n_dratio']
+        y2 = _pop6_one(p, r, n - k, p['n_f0'] * q, p['n_f1'] * q, tau * p['n_dtau'], att)
+        y[k:] += 10 ** (p['n_dbl'] / 20) * y2
+    if p['c_puff'] > -59:                                   # the air puff at the release (as round 5)
+        k = min(n, dsp.n_of(max(0.004, 5 * p['c_puff_ms'] / 1000)))
+        tk = dsp.t_of(k)
+        hz = p['c_puff_hz']
+        w = dsp.butter(r.standard_normal(k), 'band', (hz / 2.2, min(hz * 2.2, 16000.0)), order=2)
+        w *= (1 - np.exp(-tk / 0.0006)) * np.exp(-tk / (p['c_puff_ms'] / 1000))
+        y[:k] += 10 ** (p['c_puff'] / 20) * w / (np.abs(w).max() + 1e-12)
+    if p['c_thump'] > -59:                                  # a soft low half-cycle under the puff
+        fl = max(70.0, 0.35 * min(p['n_f0'], p['n_f1']))
+        k = min(n, dsp.n_of(1.5 / fl))
+        tk = dsp.t_of(k)
+        th = np.sin(2 * np.pi * fl * tk) * np.exp(-tk * fl * 2.0) * (1 - np.exp(-tk / 0.0006))
+        y[:k] += 10 ** (p['c_thump'] / 20) * th / (np.abs(th).max() + 1e-12)
+    a = dsp.n_of(0.0003)
+    y[:a] *= 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
+    k = dsp.n_of(0.004)
+    y[-k:] *= np.cos(np.linspace(0, np.pi / 2, k)) ** 2     # the decay ends on zero
+    if p['c_pre'] > -59:                                    # the film chirp's pre-blip (as round 5)
+        kp = dsp.n_of(0.0025)
+        tp = dsp.t_of(dsp.n_of(p['c_pre_t']))
+        pre = np.sin(2 * np.pi * p['c_pre_hz'] * tp) * np.exp(-np.maximum(tp - 0.00125, 0) / 0.002)
+        pre[:kp] *= np.hanning(kp)
+        y = np.concatenate([10 ** (p['c_pre'] / 20) * pre, y])
+    if p['c_room'] > 0.005:
+        y = fx.reverb(y, r, rt60=0.1 + 0.4 * p['c_room'], size=0.12, predelay=0.003, damp=0.6, wet=p['c_room'],
+                      stereo=True, width=0.25)
+        y = dsp.trim_tail(y, -56, 0.012)
+    return y
+
+
 def _chirp(p, r):
+    if p.get('n6', 0.0) > 0.5:                              # round 6: natural pops with moving pitch (new keys only)
+        return _pop6(p, r)
     if p.get('c_nat', 0.0) > 0.5:                           # round 5: the natural pop / chirp (new keys only)
         return _natchirp(p, r)
     pre = p['pre_db'] > -39.0

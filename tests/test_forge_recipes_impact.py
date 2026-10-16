@@ -113,7 +113,7 @@ def test_designed_impacts_are_gated_sub_heavy_and_grainy():
     band = (f > 5) & (f < 120)
     # (round 4: the members start from the r3 finals' searched parameters, and the r3 search had moved the rumble's
     # grain_rate 36 -> 22.7 per s; with random spacing (grain_jit 0.7, mean step x 1.1) the pulse rate is ~19 per s,
-    # slower than the film's 36: a known deviation, see out/forge_v2/pro_impact/LOG.md)
+    # slower than the film's 36; round 6 runs the grains at 34-42 / s with grain_jit 0.5, ~36 / s on 'rumble')
     assert 16 <= f[band][np.argmax(S[band])] <= 50
 
 
@@ -310,3 +310,31 @@ def test_round5_logo_sting_body_decays_smoothly():
         assert _pre_dip(x) < 6.0, s
         e1 = _env_db(x, 1)
         assert np.nonzero(e1 >= e1.max() - 50)[0][0] <= 100, s     # within 100 ms: placeable on a frame
+
+
+# ---------------------------------------------------------------------------------------------- round 6 (pro_impact)
+def test_round6_boom_off_renders_round4_exactly():
+    """boom 0 / roll_in 0 (DEFAULTS) render the round-4 members sample-exact (the boom draws no rng)"""
+    for name, p in impact.FAMILIES_R4['pro_impact'][:2]:
+        q = {k: v for k, v in p.items() if not k.startswith('boom') and k != 'roll_in'}
+        assert np.array_equal(_render(impact, q), _render(impact, {**q, 'boom': 0.0, 'roll_in': 0.0})), name
+    assert impact.DEFAULTS['boom'] == 0.0 and impact.DEFAULTS['roll_in'] == 0.0
+
+
+def test_round6_pro_impacts_have_a_boom_and_faster_grains():
+    def low_db(x):                                     # energy under 120 Hz in the first 200 ms (absolute)
+        m = x.mean(axis=1)[:int(0.2 * SR)]
+        F = np.abs(np.fft.rfft(m)) ** 2
+        f = np.fft.rfftfreq(len(m), 1 / SR)
+        return 10 * np.log10(F[(f > 20) & (f < 120)].sum() + 1e-20)
+    gain = {}
+    for name, p in impact.FAMILIES['pro_impact']:
+        assert p['boom'] > 0.3 and p['boom_f0'] > 2 * p['boom_f1'], name                # a pitch-dropping boom
+        assert 34 <= p['grain_rate'] <= 44, name                                       # near the film's ~36 / s
+        on = np.asarray(impact.render(dict(p), dsp.rng(3)))                             # (renders are peak-normalised)
+        off = np.asarray(impact.render({**p, 'boom': 0.0}, dsp.rng(3)))
+        gain[name] = low_db(on) - low_db(off)
+    # the boom carries the start of rumble / short / deep (+1.2..+8 dB under 120 Hz in the first 200 ms, re the peak).
+    # Known weakness (out/forge_v2/pro_impact/LOG.md, round 6): in air and swell it overlaps the sub / body (both
+    # near 43-46 Hz) and the peak-relative low band does not rise (-2.9 / -0.3 dB): next step, duck sub / body there.
+    assert sum(g > 1.0 for g in gain.values()) >= 3 and gain['rumble'] > 4.0, gain

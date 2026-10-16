@@ -101,13 +101,14 @@ In Python: `from earshot.forge import forge`.
 categories (whooshes, swishes, swipes, risers, downlifters, zips, impacts, sub drops, logo stings, clicks, taps,
 toggles, hover ticks, pops, notification dings, shimmers, glitches, key presses), 16 of them modelled on the designed
 effects of professional launch films, 4-6 variants each. A fixed benchmark scores them against held-out recordings the
-forge never heard. Against v1 on it (final, round 5): variants are no longer near copies (CLAP cosine between
+forge never heard. Against v1 on it (round 6): variants are no longer near copies (CLAP cosine between
 variants 0.89-0.97 -> 0.71-0.85 in the five categories v1 had; real sets 0.52-0.77), tails that died too fast now
 reach the real length (click t40 0.56 -> 1.44 x the bench median, fast whoosh 0.51 -> 0.88), and the tonal balance is
 closer in 3 of those 5 (key press 8.2 -> 7.4 dB, fast whoosh 8.6 -> 6.2, impact 6.7 -> 4.4). Across all 34, the made
 balance is at least as close to the held-out recordings as a second set of real recordings in 18 of the 21
-categories that have a number. The model checks that v1 had saturated fell. Nobody had listened to the v2 sounds
-when this was written; a new blind test is built and waiting. What changed, every number, and what is still weak:
+categories that have a number, and every final re-renders from its `report.json`. The model checks that v1 had
+saturated fell. Nobody had listened to the v2 sounds when this was written; a new blind test is built and waiting.
+What changed, every number, and what is still weak:
 [docs/FORGE_V2.md](docs/FORGE_V2.md).
 
 **Blind test (v1 recipes).** A key press, a UI click, a pop, a fast whoosh and an impact were made from scratch in

@@ -4,6 +4,7 @@
     earshot forge whoosh --target "a fast crisp air whoosh" --refs kit/whoosh --strategy cma --prescreen 64
     earshot forge --list                                       # recipes with their TARGET (+ refset categories)
     earshot forge --render keypress --params made/keypress/report.json --seeds 1 2 3 --dir made/again
+    earshot forge --check out/forge_v2/*/final                # re-render every pick from report.json, compare WAVs
 
 Loop: a recipe (earshot/forge/recipes/<name>.py: physical synthesis written in code, no recorded audio) renders
 candidates from parameters; a model-free pre-screen ranks many renders against the real references (tonal balance,
@@ -18,6 +19,9 @@ timing, the whole history, the same critic's scores of the real references leave
 tags); report.md (what was asked, budget, per-generation best, the critic's words for each pick, the measured gap to
 the references); compare.png (each pick's spectrogram, envelope and 1/3-octave balance next to its nearest reference:
 earshot.forge.viz); audition.wav + audition.txt (made, ref, made, ref ... peak-matched, to listen in pairs).
+Every pick of report.json (forge() and palette(), schema 2 since round 6) carries a `render` block: recipe module,
+render function, family member, the complete params, seed, critic mode, peak / gain (earshot.forge.schema), so each
+WAV re-renders from its report alone (`--check`, schema.check_final; older reports: schema.legacy_block / upgrade).
 The seed bank (earshot/forge/seeds/<recipe>.json) keeps good parameter sets; `bank=True` (CLI default) starts the
 search from them and adds the new picks. `shortlist=S` with `robust=N` re-renders S x keep diverse candidates on N new
 seeds and keeps the `keep` best robust means (the best single render of a search is a winner's curse).
@@ -71,6 +75,35 @@ def recipes():
 
 def load_recipe(name):
     return importlib.import_module(f'earshot.forge.recipes.{name}')
+
+
+def render_block(rec, params, seed, member=None, mode=None, gain=None):
+    """a pick's render block (earshot.forge.schema: recipe module, render function, member, complete params, seed,
+    critic mode, peak / gain) for a recipe module or stand-in object; a variant_recipe() pick names its member's own
+    params and render function. None when the render function cannot be named (a driver's lambda: the driver adds
+    the block itself, schema.make_block)."""
+    from . import schema
+    members = getattr(rec, 'MEMBERS', None)
+    if members is not None and set(params) == {'variant'}:
+        v = int(params['variant'])
+        names = getattr(rec, 'MEMBER_NAMES', None) or [None] * len(members)
+        return schema.make_block(getattr(rec, 'RENDER_FN', None), members[v], seed,
+                                 member=names[v] if member is None else member, mode=mode, gain=gain)
+    return schema.make_block(rec.render, params, seed, member=member, mode=mode, gain=gain)
+
+
+def variant_recipe(render_fn, members, names=None, name=None, **attrs):
+    """a stand-in recipe whose only searched key 'variant' indexes `members` (complete param dicts for the module-level
+    `render_fn`): forge(variant_recipe(...), budget=len(members), pop=len(members), keep=len(members), init=[{'variant':
+    k} ...]) scores an exact hand-made member set (the tonal drivers' final pass); each pick's render block names the
+    member's own params and render_fn, so the picks re-render from report.json. attrs: TARGET, ALTS, REFSET, ..."""
+    import types
+    members = [dict(m) for m in members]
+    mod = getattr(getattr(render_fn, 'func', render_fn), '__module__', None) or 'earshot.forge.recipes.variant'
+    return types.SimpleNamespace(__name__=name or mod, SPACE={'variant': list(range(len(members)))},
+                                 DEFAULTS={'variant': 0}, render=lambda p, r: render_fn(dict(members[p['variant']]), r),
+                                 MEMBERS=members, MEMBER_NAMES=list(names) if names else None, RENDER_FN=render_fn,
+                                 **attrs)
 
 
 def pick_refs(refs=None, refset=None, recipe=None, log=None):
@@ -262,6 +295,7 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
     import soundfile as sf
     from .critic import Critic
     from .search import diverse, optimize, prescreen_for, render, robust as robust_stats, sound_dist
+    from .schema import SCHEMA
     t0 = time.time()
     rec = load_recipe(recipe) if isinstance(recipe, str) else recipe
     name = rec.__name__.rsplit('.', 1)[-1]
@@ -304,7 +338,8 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
         rule = ('Chosen by a fixed rule: the strongest candidates whose parameters and sound differ (passing first)'
                 + (f', each re-rendered on {robust} new seeds for the robust columns.' if robust else '.'))
     ref_scores = critic.score_refs(loo=True) if critic.refs else []
-    report = {'recipe': name, 'target': target, 'alts': alts, 'refs': critic.refs, 'refset': refset, 'budget': budget,
+    report = {'schema': SCHEMA, 'recipe': name, 'target': target, 'alts': alts, 'refs': critic.refs, 'refset': refset,
+              'budget': budget,
               'seed': seed, 'pop': pop, 'tone_weight': (critic.W.get('tone') if getattr(critic, 'version', 1) >= 2 and hasattr(critic, 'W')
                                                   else getattr(critic, 'tone', 0.0)),
               'tone_target': getattr(critic, 'tone_target', None), 'reps': reps, 'strategy': strategy,
@@ -327,6 +362,9 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
     for i, (h, x) in enumerate(zip(picks, xs)):
         item = {'name': f'{name}_{i + 1:02d}', 'params': h['params'], 'seed': h['seed'],
                 'score': {k: v for k, v in h['score'].items() if k != 'i'}}
+        rb = render_block(rec, h['params'], h['seed'], mode=getattr(critic, 'mode', None))
+        if rb is not None:
+            item['render'] = rb
         if i < len(hold):
             item['holdout'] = hold[i]
         if robust:
@@ -350,6 +388,8 @@ def forge(recipe, target=None, alts=None, refs=None, budget=160, pop=16, keep=4,
             item['file'] = os.path.join(out, item['name'] + '.wav').replace(chr(92), '/')
             sf.write(item['file'], x, 48000, subtype='PCM_24')
         report['picks'].append(item)
+    if not all('render' in p for p in report['picks']):  # schema 2 = every pick names its render (a driver's lambda
+        report.pop('schema')                              # stand-in cannot: schema.legacy_block infers those)
     for i, (p, s) in enumerate(zip(critic.refs, ref_scores)):
         report['ref_scores'].append({'file': os.path.basename(p), 'alt_zs': s.get('alt_zs'),
                                      **{k: s.get(k) for k in SCORE_KEYS}})
@@ -494,6 +534,7 @@ def palette(recipe, members, critic, out=None, name=None, peak_db=-1.0, loudness
     report.json, report.md and _audition.wav into `out` when given (compare.png too when outputs)."""
     import soundfile as sf
     from .polish import loudness_spread
+    from .schema import SCHEMA
     from .search import prescreen_for, render, robust as robust_stats, sound_dist
     from .tone import profile
     rec = load_recipe(recipe) if isinstance(recipe, str) else recipe
@@ -530,7 +571,8 @@ def palette(recipe, members, critic, out=None, name=None, peak_db=-1.0, loudness
                'tone_mean_db': round(float(np.mean(tone_d)), 2) if tone_d else None}
     hold = critic.holdout(xs) if holdout and xs and hasattr(critic, 'holdout') else []
     pre = prescreen_for(critic)
-    report = {'recipe': rname, 'category': name, 'target': getattr(critic, 'target', None), 'refs': refs,
+    report = {'schema': SCHEMA, 'recipe': rname, 'category': name, 'target': getattr(critic, 'target', None),
+              'refs': refs,
               'critic': {'version': getattr(critic, 'version', 1), 'mode': getattr(critic, 'mode', None),
                          'category': getattr(critic, 'category', None)},
               'pick_rule': ('palette: the exact member set, scored together (no diverse() drop), loudness-matched to '
@@ -543,6 +585,10 @@ def palette(recipe, members, critic, out=None, name=None, peak_db=-1.0, loudness
         item = {'name': m.get('name') or f'{name}_{i + 1:02d}', 'family': m.get('family'), 'params': m['params'],
                 'seed': m['seed'], 'gain_db': round(float(20 * np.log10(g * c)), 2),
                 'score': {k: v for k, v in row.items() if k != 'i'}}
+        rb = render_block(rec, m['params'], m['seed'], member=m.get('family') or m.get('member') or m.get('preset'),
+                          mode=getattr(critic, 'mode', None), gain=float(g * c))
+        if rb is not None:
+            item['render'] = rb
         if m.get('robust'):
             item['robust'] = m['robust']
         elif robust:
@@ -561,6 +607,8 @@ def palette(recipe, members, critic, out=None, name=None, peak_db=-1.0, loudness
             item['file'] = os.path.join(out, item['name'] + '.wav').replace(chr(92), '/')
             sf.write(item['file'], x, 48000, subtype='PCM_24')
         report['picks'].append(item)
+    if not all('render' in p for p in report['picks']):  # schema 2 only when every pick names its render
+        report.pop('schema')
     n_pass = sum(1 for p in report['picks'] if p['score'].get('passes'))
     vm = variety['members'] or {}
     vr = variety['refs'] or {}
@@ -609,13 +657,28 @@ def palette_md(r):
 def render_params(recipe, params, seeds=None, out='.', refs=None):
     """render parameter sets without searching. params: a dict, a list of dicts, a report.json dict (its picks, with
     their own seeds unless `seeds` is given) or a seed bank dict (its entries). Writes <out>/<recipe>_r<i>_s<seed>.wav;
-    with refs, each file also gets the model-free measurements (tone dB, t40, nearest ref). Returns {'recipe', 'files'}"""
+    with refs, each file also gets the model-free measurements (tone dB, t40, nearest ref). Returns {'recipe', 'files'}
+    A report's pick renders through its render block (earshot.forge.schema: its own render function and complete
+    params, e.g. typing.render_run for a pro_typing_run pick, a 'variant' pick's member params) when it has one, or
+    when the block inferred for an older report names this recipe's module; else rec.render over its DEFAULTS."""
     import soundfile as sf
+    import types
+    from . import schema
     from .search import Prescreen, render
     rec = load_recipe(recipe) if isinstance(recipe, str) else recipe
     name = rec.__name__.rsplit('.', 1)[-1]
     if isinstance(params, dict) and 'picks' in params:
-        sets = [(p['params'], p.get('seed')) for p in params['picks']]
+        sets = []
+        for p in params['picks']:
+            try:
+                b = schema.block(params, p)
+                if isinstance(p.get('render'), dict) or b['recipe'] == name:
+                    fn = schema.resolve(b)
+                    sets.append((b['params'], p.get('seed'), types.SimpleNamespace(__name__=fn.__module__, render=fn)))
+                    continue
+            except (schema.NotReproducible, KeyError, TypeError, ValueError):
+                pass
+            sets.append((p['params'], p.get('seed')))
     elif isinstance(params, dict) and 'entries' in params:
         sets = [(e['params'], None) for e in params['entries']]
     elif isinstance(params, dict):
@@ -626,9 +689,10 @@ def render_params(recipe, params, seeds=None, out='.', refs=None):
     pre = Prescreen(ref_files) if ref_files else None
     os.makedirs(out, exist_ok=True)
     files = []
-    for i, (p, own) in enumerate(sets):
+    for i, (p, own, *blk) in enumerate(sets):
         for s in (seeds or [own if own is not None else 0]):
-            x = render(rec, {**(getattr(rec, 'DEFAULTS', {}) or {}), **p}, int(s))
+            x = (render(blk[0], p, int(s)) if blk else                  # a render block: complete params, own fn
+                 render(rec, {**(getattr(rec, 'DEFAULTS', {}) or {}), **p}, int(s)))
             item = {'set': i, 'seed': int(s), 'file': None}
             if x is not None:
                 item['file'] = os.path.join(out, f'{name}_r{i + 1:02d}_s{int(s)}.wav').replace(chr(92), '/')
@@ -650,6 +714,9 @@ def add_cli(sub):
     p.add_argument('--render', nargs='?', const=True, default=None, metavar='RECIPE',
                    help='render --params without searching (the recipe may follow --render or be the positional)')
     p.add_argument('--params', help='JSON: a params dict, a list of them, a report.json or a seed bank file')
+    p.add_argument('--check', nargs='+', metavar='DIR',
+                   help='re-render every pick of these output folders from their report.json and compare with the '
+                        'WAVs (earshot.forge.schema; within 1e-6)')
     p.add_argument('--seeds', nargs='*', type=int, help='noise seeds for --render (default: each pick\'s own, else 0)')
     p.add_argument('--target', help="description to aim for (default: the recipe's)")
     p.add_argument('--alts', nargs='*', help='confusions it must sound less like')
@@ -680,6 +747,9 @@ def add_cli(sub):
                    help="dB distance from the refs' median balance that counts as typical (default: the refs' own spread)")
 
     def run(a):
+        if a.check:
+            from . import schema
+            return schema.main(list(a.check))
         if a.render is not None:
             name = a.render if isinstance(a.render, str) else a.recipe
             if not name or not a.params:

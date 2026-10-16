@@ -38,6 +38,10 @@ exactly as before): `skip` leaves stutter slots empty and `accent_db` puts about
 With short bursts (decay ~0.2 slot), a quiet crackle (-21 dB) and a -44 dB bed this gives the film's level drama: the
 median 2 ms level sits at -35..-40 dB re the peak (ref -35.3; r2 finals -20..-25), and the burst onsets show the
 speed-up (glitch_stats early > late). r3 crackle grains use full Hann edges. glitch_stats reports `med2_db`.
+
+Round 6 (out/forge_v2/glitch/LOG.md): a second render path, render6 (SPACE6 / DEFAULTS6 / FAMILY6), for parameter sets
+that have `roll0`: a pitched source chopped into buffer repeats that shrink into a buzz, bursts speeding up with
+dropouts, per-burst bit-crush and sample-rate drops, wide stereo. Older sets (and pro_glitch) render as before.
 """
 import numpy as np
 
@@ -149,6 +153,8 @@ def _grid(p, t0, t1):
 
 
 def render(p, r):
+    if 'roll0' in p:                       # a round-6 parameter set: the digital glitch (render6)
+        return render6(p, r)
     p = {**{k: v for k, v in DEFAULTS.items() if k not in _R3}, **p}
     pr = dsp.rng(int(p['pattern']) * 7919 + 13)
     dur = p['dur']
@@ -245,6 +251,215 @@ def render(p, r):
     y[:2] = 0.0
     return dsp.fade(y, 0.0005, 0.003)
 
+
+# ------------------------------------------------------------------------------------------------ round 6
+# The round-5 judge: the generic glitch does not read as a glitch (AudioSet naming fell to 0; the r3 set is sparse
+# high-passed hiss ticks: 'static' at best). Round 6 is a second render path (render6, chosen when a parameter set has
+# `roll0`; r2 / r3 / pro_glitch sets render exactly as before) built on what makes a glitch read as one
+# (docs/motion-sfx-techniques.md section 10): a SOURCE with clear pitch and transients (a stepped synth chord, data
+# chirps, an FM modem layer, a little noise) that gets chopped, not noise alone; BUFFER REPEATS whose slice shrinks
+# across the glitch (roll0 -> roll1 s: the repeat turns into a rising buzz, the beat-repeat roll); bursts on a grid
+# that speeds up (grid0 -> grid1) with hard gates and digital DROPOUTS between them; per burst BIT-CRUSH (bits0 ->
+# bits1) and SAMPLE-RATE DROPS (srate0 -> srate1, plus random octave drops: aliasing on purpose); WIDE stereo (the
+# right channel reads its own slice, bursts jump hard left / right); it ends on the cut.
+SPACE6 = {
+    'dur': (0.22, 0.85),               # length up to the hard end
+    'crackle': (0.0, 0.35),            # share of the length that is a crushed crackle lead-in before the roll
+    'crackle_db': (-30.0, -6.0),
+    'grid0': (0.03, 0.11),             # first burst slot
+    'grid1': (0.012, 0.045),           # last burst slot
+    'accel': (0.6, 2.5, 'log'),
+    'gate': (0.45, 1.0),               # burst length / slot (1 = back to back)
+    'roll0': (0.006, 0.07, 'log'),     # repeat-slice length at the start ...
+    'roll1': (0.0025, 0.03, 'log'),    # ... and at the cut (1 / slice = the buzz pitch)
+    'srate0': (2500.0, 24000.0, 'log'),   # sample-and-hold rate at the start ...
+    'srate1': (700.0, 12000.0, 'log'),    # ... and at the cut (the sample-rate drop)
+    'sdrop': (0.0, 0.8),               # chance a burst drops 1-2 more octaves of sample rate
+    'bits0': (4.0, 12.0),
+    'bits1': (2.0, 8.0),
+    'tone': (0.0, 1.0),                # pitched synth chord share of the source
+    'tone_f': (110.0, 1400.0, 'log'),
+    'notes': (1, 3, 'int'),
+    'chirp': (0.0, 1.0),               # data chirps (stepped squares 1-4 kHz)
+    'fm': (0.0, 1.0),
+    'noise': (0.0, 1.0),
+    'jump': (0.0, 1.0),                # chance a burst reads from a new place in the source (else it plays on)
+    'rev': (0.0, 0.5),
+    'pitch_step': (-2.0, 2.0),         # semitones per burst
+    'drop': (0.0, 0.4),                # chance a burst is a dropout (digital silence)
+    'width': (0.0, 1.0),               # chance the right channel reads its own slice / rate
+    'pan_jump': (0.0, 1.0),            # chance a burst jumps hard to one side
+    'decay': (0.3, 6.0, 'log'),        # a burst's own decay, in slots (large = flat)
+    'swell': (0.0, 10.0),
+    'lvl_jit': (0.0, 8.0),
+    'low_db': (-60.0, -10.0),          # a low thump under the louder bursts (<= -55: none)
+    'hp': (60.0, 2000.0, 'log'),
+    'lp': (5000.0, 18000.0, 'log'),
+    'bright': (-6.0, 6.0),
+    'drive': (0.0, 12.0),
+    'end_tail': (0.004, 0.03, 'log'),
+    'floor_db': (-72.0, -40.0),        # the bed in the dropouts (<= -71.5: exact silence)
+    'pattern': (0, 999, 'int'),
+}
+DEFAULTS6 = {'dur': 0.55, 'crackle': 0.12, 'crackle_db': -18.0, 'grid0': 0.06, 'grid1': 0.022, 'accel': 1.2,
+             'gate': 0.8, 'roll0': 0.03, 'roll1': 0.006, 'srate0': 16000.0, 'srate1': 3000.0, 'sdrop': 0.3,
+             'bits0': 8.0, 'bits1': 4.0, 'tone': 0.6, 'tone_f': 330.0, 'notes': 2, 'chirp': 0.3, 'fm': 0.3,
+             'noise': 0.3, 'jump': 0.5, 'rev': 0.15, 'pitch_step': 0.0, 'drop': 0.12, 'width': 0.8, 'pan_jump': 0.3,
+             'decay': 2.0, 'swell': 4.0, 'lvl_jit': 3.0, 'low_db': -30.0, 'hp': 150.0, 'lp': 14000.0, 'bright': 0.0,
+             'drive': 4.0, 'end_tail': 0.01, 'floor_db': -56.0, 'pattern': 601}
+
+
+def _src6(p, pr, r, n):
+    """the glitch's source (n samples, peak 1): a stepped synth chord (saw / square, a new chord every 40-120 ms, a
+    small detune), data chirps (band-limited squares at 1-4 kHz, a new pitch every 5-30 ms), an FM 'modem' and noise.
+    pr = the pattern rng (pitches, steps), r = the render rng (noise)"""
+    out = np.zeros(n)
+    t = _t(n)
+    if p['tone'] > 0.01:
+        fr = np.zeros(n)
+        i = 0
+        while i < n:
+            m = dsp.n_of(pr.uniform(0.04, 0.12))
+            fr[i:i + m] = p['tone_f'] * 2 ** (pr.integers(-7, 8) / 12)
+            i += m
+        sh = 'square' if pr.uniform() < 0.5 else 'saw'
+        ivs = [0, 7, 12, 3, 10][:int(p['notes'])]
+        y = sum(dsp.osc(fr * 2 ** (iv / 12) * (1 + 0.004 * k), sh) for k, iv in enumerate(ivs)) / len(ivs)
+        out += p['tone'] * y
+    if p['chirp'] > 0.01:
+        fr = np.zeros(n)
+        i = 0
+        while i < n:
+            m = dsp.n_of(pr.uniform(0.005, 0.03))
+            fr[i:i + m] = 1000.0 * 2 ** pr.uniform(0, 2)
+            i += m
+        out += p['chirp'] * 0.8 * dsp.osc(fr, 'square')
+    if p['fm'] > 0.01:
+        fc, ratio, idx = pr.uniform(500, 3000), pr.choice([0.5, 1.0, 1.41, 2.0, 3.0, 7.13]), pr.uniform(2, 9)
+        out += p['fm'] * np.sin(2 * np.pi * fc * t + idx * np.sin(2 * np.pi * fc * ratio * t))
+    if p['noise'] > 0.01:
+        out += p['noise'] * 0.5 * r.standard_normal(n)
+    return out / (np.abs(out).max() + 1e-9)
+
+
+def _crackle6(p, r, n, t_end):
+    """a crushed crackle lead-in over [0, t_end): sparse 1.5-6 ms grains, density rising, independent per channel"""
+    cr = np.zeros((n, 2))
+    for c in range(2):
+        t = 0.0
+        while True:
+            u = t / t_end
+            t += float(r.exponential(1.0 / (220.0 * (0.25 + 0.75 * u ** 1.5))))
+            if t >= t_end:
+                break
+            m = dsp.n_of(r.uniform(0.0015, 0.006))
+            g = fx.crush(r.standard_normal(m), bits=4, rate=float(r.choice([4000.0, 8000.0, 16000.0]))) * np.hanning(m)
+            i = dsp.n_of(t)
+            mm = min(m, n - i)
+            cr[i:i + mm, c] += _db(p['crackle_db'] + 14 * np.log10(r.uniform(0.05, 1.0)) + 6 * u) * g[:mm]
+    return dsp.butter(cr, 'high', 1500.0, order=2)
+
+
+def render6(p, r):
+    """round 6: the digital glitch (see the block comment above SPACE6). Stereo, peak 0.89, ends on the cut +
+    end_tail."""
+    p = {**DEFAULTS6, **p}
+    pr = dsp.rng(int(p['pattern']) * 7919 + 61)
+    dur = p['dur']
+    n_end = dsp.n_of(dur)
+    tail_n = dsp.n_of(p['end_tail'] * 4)
+    n = n_end + tail_n
+    y = np.zeros((n, 2))
+    low = np.zeros(n)
+    t_st = dur * p['crackle'] if p['crackle'] > 0.02 else 0.0
+    bursts = _grid(p, t_st, dur)
+    nb = len(bursts)
+    S = _src6(p, pr, r, dsp.n_of(0.6))
+    NS = len(S)
+    pos = [int(pr.integers(0, NS // 2)), int(pr.integers(0, NS // 2))]
+    run = 0
+    for k, (tb, d) in enumerate(bursts):
+        last = k == nb - 1
+        u = k / max(1, nb - 1)
+        if 0 < k and not last and pr.uniform() < p['drop'] and run < 2:    # a dropout (at most 2 in a row)
+            run += 1
+            continue
+        run = 0
+        g = max(32, dsp.n_of(d * p['gate'])) if not last else max(32, n_end - dsp.n_of(tb))
+        L = max(24, dsp.n_of(p['roll0'] * (p['roll1'] / p['roll0']) ** u))
+        rate = 2 ** (k * p['pitch_step'] / 12)
+        sr0 = p['srate0'] * (p['srate1'] / p['srate0']) ** u
+        b0 = p['bits0'] + (p['bits1'] - p['bits0']) * u
+        lvl = _db(p['swell'] * (u - 1.0) - abs(p['lvl_jit'] * pr.standard_normal()) * (not last))
+        side = pr.uniform() < p['pan_jump'] and not last
+        hard = (1.0, 0.12) if pr.uniform() < 0.5 else (0.12, 1.0)
+        own = pr.uniform() < p['width']
+        segs = []
+        for c in range(2):
+            if c == 0 or own:
+                if pr.uniform() < p['jump']:
+                    pos[c] = int(pr.integers(0, NS - L - 1))
+                rv = pr.uniform() < p['rev']
+                srk = sr0 * (2.0 ** -int(pr.integers(1, 3)) if pr.uniform() < p['sdrop'] else 1.0)
+                bk = int(round(b0 + pr.uniform(-1, 1)))
+                i0 = min(pos[c], NS - L - 1)
+                sl = S[i0:i0 + L][::-1] if rv else S[i0:i0 + L]
+                if rate != 1.0:
+                    sl = sl[np.minimum((np.arange(L) * rate).astype(int), L - 1)]
+                seg = np.resize(sl, g) / (np.abs(sl).max() + 1e-9)
+                seg = fx.crush(seg, bits=max(2, bk), rate=min(srk, SR / 2))
+                pos[c] = (pos[c] + dsp.n_of(d)) % max(1, NS - L - 1)
+                segs.append(seg)
+            else:
+                segs.append(segs[0])
+        if last:                                   # the last burst runs to the cut, falling ~30 dB on the way
+            env = np.exp(-_t(g) / (g / SR / 3.45))   # (a gate once 30 dB down, not a chopped tail), then its own
+            k0 = dsp.n_of(0.0004)                    # decay end_tail
+            env[:k0] *= np.linspace(0, 1, k0)
+            tail = env[-1] * np.exp(-_t(tail_n) / (p['end_tail'] / 1.3))
+            segs = [np.concatenate([s_, np.resize(s_, tail_n)]) for s_ in segs]
+            env = np.concatenate([env, tail])
+        else:
+            env = _box(g, 0.0003) * np.exp(-_t(g) / (p['decay'] * d))
+        i = dsp.n_of(tb)
+        for c in range(2):
+            off = dsp.n_of(pr.uniform(0, 0.002)) if (c == 1 and own and not last) else 0
+            sg = segs[c] * env * lvl * (hard[c] if side else 1.0)
+            mm = min(len(sg), n - i - off)
+            if mm > 0:
+                y[i + off:i + off + mm, c] += sg[:mm]
+        if p['low_db'] > -55 and lvl > 0.5:
+            m = min(dsp.n_of(min(0.05, d)), n - i)
+            lo = np.sin(2 * np.pi * pr.uniform(50, 90) * _t(m)) * np.exp(-_t(m) / 0.015) * _box(m, 0.001)
+            low[i:i + m] += _db(p['low_db']) * lvl * lo
+    y = dsp.butter(y, 'high', p['hp'], order=2)
+    pk = np.abs(y).max() + 1e-9
+    y += low[:, None] * pk * 3
+    if t_st > 0.02:
+        y += _crackle6(p, r, n, t_st) * pk * 2
+    if p['floor_db'] > -71.5:                 # a faint crushed bed: the dropouts are near silence, not exact zeros
+        bed = fx.crush(dsp.butter(r.standard_normal((n, 2)), 'high', 2000, order=2), 6, 8000.0)
+        y += _db(p['floor_db']) * pk * bed / (np.std(bed) * 4) * (_t(n) < dur)[:, None]
+    y = dsp.butter(y, 'high', 25.0, order=2)  # no DC / infrasound from the low thumps
+    y = dsp.butter(y, 'low', p['lp'], order=4)
+    y = dsp.peq(y, 6000, p['bright'], 0.5)
+    if p['drive'] > 0.2:
+        y = fx.saturate(y / (np.abs(y).max() + 1e-9), p['drive'], 'tanh', os=2)
+    y = dsp.butter(y, 'low', 18000, order=8)
+    y[:2] = 0.0
+    y = dsp.fade(y, 0.0005, 0.003)
+    return y / (np.abs(y).max() + 1e-9) * 0.89
+
+
+# the round-6 family (glitch): six digital glitches, each a different gesture (every set has `roll0`: render6)
+FAMILY6 = [
+    ('stutter', {"roll0": 0.035, "roll1": 0.004, "grid0": 0.07, "grid1": 0.02, "gate": 0.9, "srate0": 16000.0, "srate1": 2500.0, "bits0": 8, "bits1": 4, "tone": 0.5, "tone_f": 280.0, "chirp": 0.2, "fm": 0.3, "noise": 0.6, "jump": 0.25, "drop": 0.08, "pattern": 611, "dur": 0.6, "hp": 250.0, "bright": 3.0, "swell": 8.0, "lvl_jit": 2.0}),   # beat-repeat roll: slices 35 -> 4 ms (a rising buzz), 16 -> 2.5 kHz, 8 -> 4 bits
+    ('crush', {"roll0": 0.02, "roll1": 0.011, "grid0": 0.055, "grid1": 0.025, "gate": 0.75, "srate0": 12000.0, "srate1": 1500.0, "sdrop": 0.6, "bits0": 6, "bits1": 3, "tone": 0.25, "noise": 0.9, "fm": 0.4, "chirp": 0.1, "jump": 0.8, "pan_jump": 0.6, "pattern": 612, "dur": 0.5, "hp": 300.0, "bright": 3.0, "swell": 8.0, "lvl_jit": 2.0}),   # crushed noise bursts, random sample-rate octave drops, hard left / right jumps
+    ('data', {"roll0": 0.012, "roll1": 0.005, "grid0": 0.045, "grid1": 0.018, "gate": 0.6, "srate0": 20000.0, "srate1": 6000.0, "bits0": 7, "bits1": 5, "tone": 0.0, "chirp": 0.8, "fm": 0.6, "noise": 0.5, "jump": 0.9, "width": 1.0, "pan_jump": 0.5, "hp": 500.0, "pattern": 613, "dur": 0.45, "crackle": 0.0, "swell": 9.0, "lvl_jit": 2.0, "drop": 0.05}),   # data chirps + FM modem, fast slices, fully wide
+    ('dropout', {"roll0": 0.06, "roll1": 0.012, "grid0": 0.09, "grid1": 0.03, "gate": 0.7, "srate0": 24000.0, "srate1": 1200.0, "sdrop": 0.15, "bits0": 10, "bits1": 3, "tone": 0.35, "tone_f": 180.0, "notes": 2, "chirp": 0.0, "fm": 0.5, "noise": 0.7, "jump": 0.1, "drop": 0.15, "swell": 8.0, "lvl_jit": 2.0, "pattern": 614, "dur": 0.7, "crackle": 0.0, "low_db": -24.0, "hp": 120.0}),   # a synth line breaking up: long slices, dropouts, 24 kHz -> 1.2 kHz, 10 -> 3 bits
+    ('scramble', {"roll0": 0.025, "roll1": 0.006, "grid0": 0.05, "grid1": 0.02, "gate": 0.85, "srate0": 8000.0, "srate1": 2000.0, "sdrop": 0.5, "bits0": 6, "bits1": 4, "tone": 0.3, "tone_f": 600.0, "fm": 0.8, "chirp": 0.3, "noise": 0.6, "jump": 1.0, "rev": 0.45, "pitch_step": 1.0, "pan_jump": 0.4, "pattern": 615, "dur": 0.55, "swell": 9.0, "lvl_jit": 2.0, "drop": 0.05}),   # reversed slices from all over the buffer, FM, climbing a semitone per burst
+    ('hit', {"roll0": 0.015, "roll1": 0.003, "grid0": 0.035, "grid1": 0.014, "gate": 0.75, "srate0": 10000.0, "srate1": 2000.0, "bits0": 6, "bits1": 3, "tone": 0.3, "tone_f": 220.0, "noise": 0.8, "chirp": 0.2, "fm": 0.3, "jump": 0.5, "drop": 0.0, "low_db": -22.0, "swell": 6.0, "pattern": 616, "dur": 0.3, "crackle": 0.0}),   # 0.3 s dense roll 35 -> 14 ms slots with low thumps (a glitch hit)
+]
 
 # ------------------------------------------------------------------------------------------------ study checks
 def glitch_stats(x):

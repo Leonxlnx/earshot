@@ -27,6 +27,9 @@ different kinds of boom: a struck metal `plate` layer (metal) and falling debris
 `pro_impact` gets random grain timing / levels (`grain_jit`) and complete parameter sets (the r3 finals carried a
 snap + sheen click that forge's final pass filled in at mid-range). Neutral values render round 3 exactly; the r3
 families are kept in FAMILIES_R3.
+Round 6 (out/forge_v2/pro_impact/LOG.md): `pro_impact` gets a designed BOOM body (`boom*`: a sine sliding ~95-140 ->
+36-52 Hz, no rng draw), a rumble that enters just after it (`roll_in`) and grains near the film's ~36 / s; boom 0 /
+roll_in 0 render round 4 exactly, and the r4 family is kept in FAMILIES_R4.
 
 v2 (rounds 1-8, the forge test and the launch film), what a trailer boom is, physically:
   * a big, slack drum-like body (a large membrane / a heavy panel) struck hard: its fundamental starts high and SLIDES
@@ -630,6 +633,17 @@ SPACE = {
     'scatter': (0.0, 1.0),                  # debris / rubble falling after the hit (diffuse crackle over scatter_s)
     'scatter_s': (0.3, 2.5),
     'grain_jit': (0.0, 1.0),                # random grain timing / level (0 = r3's even ~28 / 55 ms stripes)
+    # round 6 (pro_impact): a designed BOOM body, the clear pitch-dropping sine kick a designed hit is built on (r4's
+    # members were a gated rumble with a faint body; CLAP: 'a snare roll', phrase z down). 0 = none (r4 exact; no rng)
+    'boom': (0.0, 2.5),                     # level against the body peak of 1
+    'boom_f0': (80, 260, 'log'),            # start pitch ...
+    'boom_f1': (34, 70, 'log'),             # ... sliding exponentially onto this
+    'boom_drop': (0.015, 0.15, 'log'),      # pitch time constant
+    'boom_tau': (0.08, 0.9, 'log'),         # amplitude decay after the rise
+    'boom_att': (0.002, 0.12, 'log'),       # rise (raised cosine)
+    'boom_drive': (0.0, 1.0),               # tanh drive: harmonics that carry the boom on small speakers
+    'roll_in': (0.0, 0.4),                  # round 6: the rumble enters this many s after the contact (0 = r4), so the
+                                            # boom is heard first and the grains carry the tail
 }
 
 # the cinematic boom (family 'impact', preset 'classic'); FAMILIES has the palettes
@@ -642,7 +656,8 @@ DEFAULTS = {'pre': 0.35, 'pre_level': 0.12, 'crack': 0.35, 'crack_f': 2200.0, 'c
             'gate_ms': 20.0, 'floor_db': -90.0, 'snap': 0.0, 'hall_tone': 5000.0, 'sheen': 0.0, 'sheen_ms': 9.0,
             'sheen_f': 6000.0, 'pre_shape': 0, 'gate_fall': 0.25, 'gate_db': 0.0, 'air_div': 1.0, 'grain_sharp': 3.0,
             'air_q': 0.8, 'sheen_top': 20000.0, 'top': 20000.0, 'plate': 0.0, 'plate_f': 400.0, 'plate_tau': 0.8,
-            'scatter': 0.0, 'scatter_s': 1.2, 'grain_jit': 0.0}
+            'scatter': 0.0, 'scatter_s': 1.2, 'grain_jit': 0.0, 'boom': 0.0, 'boom_f0': 150.0, 'boom_f1': 48.0,
+            'boom_drop': 0.045, 'boom_tau': 0.3, 'boom_att': 0.01, 'boom_drive': 0.3, 'roll_in': 0.0}
 
 
 def _crack3(p, n, r):
@@ -836,6 +851,22 @@ def _air3(p, n, r, a):
     return y * e / (np.abs(y * e).max() + 1e-12)
 
 
+def _boom(p, t):
+    """round 6: the designed boom (pro_impact), at LO rate: a sine sliding exponentially from boom_f0 onto boom_f1
+    (time constant boom_drop), a raised-cosine rise over boom_att and an exponential decay boom_tau, then tanh drive
+    (boom_drive) and a low-pass that keeps its harmonics under ~1 kHz. Deterministic (no rng draw: every other layer
+    renders exactly as without it). Peak 1."""
+    f0, f1, td = p['boom_f0'], p['boom_f1'], max(p['boom_drop'], 1e-3)
+    ph = 2 * np.pi * (f1 * t + (f0 - f1) * td * (1 - np.exp(-t / td)))
+    a = p['boom_att']
+    x = np.sin(ph) * _rise(t, a) * np.exp(-np.maximum(t - a, 0) / p['boom_tau'])
+    if p['boom_drive'] > 0.01:
+        g = 1 + 8 * p['boom_drive']
+        x = np.tanh(g * x) / np.tanh(g)
+        x = _lp(x, 1100, 2, LO)
+    return x / (np.abs(x).max() + 1e-12)
+
+
 def _blast3(p, n, r):
     """the air shock of a big hit (Farnell's 'blast' as a band of noise): pink noise band-passed around blast_f
     (about 2 octaves wide), 2 ms attack, decaying with blast_tau while its band sinks an octave (the shock dulls)"""
@@ -877,6 +908,8 @@ def render(p, r):
              if p['shell'] > 0.01 else np.zeros(n))
     crack = _crack3(p, n, r)
     direct = p['body'] * body + 0.6 * p['shell'] * shell + p['crack'] * crack
+    if p.get('boom', 0.0) > 0.005:                       # round 6: the designed boom (no rng draw)
+        direct = direct + p['boom'] * _up(_boom(p, tl), n)
     if p['snap'] > 0.005:                                # drawn only when used: older parameter sets stay exact
         direct = direct + p['snap'] * _snap(n, r)
     shn = _sheen(p, n, r) if p.get('sheen', 0.0) > 0.005 else None     # round 3 (drawn only when used, as snap)
@@ -904,6 +937,8 @@ def render(p, r):
             dry += p['scatter'] * pk_d * sc[:, c]
         if rc is not None:
             rl = (1 - wd) * rc + wd * _roll3(p, n, r) if wd > 0.01 else rc
+            if p.get('roll_in', 0.0) > 0.005:            # round 6: the rumble enters after the boom
+                rl = rl * _rise(t, p['roll_in'])
             dry += p['roll'] * pk_d * rl
         if ac is not None:
             al = (1 - wd) * ac + wd * _air3(p, n, r, a) if wd > 0.01 else ac
@@ -1114,6 +1149,25 @@ FAMILIES['pro_impact'] = [
         'roll_fall': 0.5, 'grain_rate': 32.0, 'grain_depth': 1.0, 'air': 0.7, 'gate': 0.9, 'gate_db': 15.0,
         'pre_shape': 1, 'hall_tone': 6000.0, 'sheen_ms': 8.0, 'sheen_f': 6363.961}),
 ]
+FAMILIES_R4 = {'pro_impact': list(FAMILIES['pro_impact'])}   # the round-4 family (the r4 finals, in final_r4/)
+# round 6 (the round-5 judge: the held-out model checks prefer r3, phrase z 2.55 vs r4 2.17): keep r4's fixes (no onset
+# tick, irregular grains) and give the hit back a clear designed BOOM body (`boom`: a sine sliding ~95-140 -> 36-52 Hz,
+# rising over 60-120 ms so the loudest point still lands 50-290 ms in), let the rumble enter just after it (`roll_in`),
+# and run the grains near the film's ~36 per s (grain_rate 34-42 with grain_jit 0.5: mean step x 1.075). The boom is
+# centred and kept at 0.5-0.65 of the body scale so the whole stays decorrelated (corr < 0.7; the film's tails ~0-0.2).
+_R6 = lambda rate: {'grain_rate': rate, 'grain_jit': 0.5, 'boom_drive': 0.1}   # noqa: E731
+FAMILIES['pro_impact'] = [(n, {**p, **o}) for (n, p), o in zip(FAMILIES_R4['pro_impact'], [
+    {'boom': 0.6, 'boom_f0': 120.0, 'boom_f1': 42.0, 'boom_drop': 0.07, 'boom_tau': 0.3, 'boom_att': 0.07,
+     'roll_in': 0.03, 'crack': 0.7, **_R6(40.0)},                                                  # rumble
+    {'boom': 0.55, 'boom_f0': 130.0, 'boom_f1': 46.0, 'boom_drop': 0.06, 'boom_tau': 0.25, 'boom_att': 0.08,
+     'roll_in': 0.03, **_R6(38.0)},                                                                # air
+    {'boom': 0.55, 'boom_f0': 140.0, 'boom_f1': 52.0, 'boom_drop': 0.05, 'boom_tau': 0.2, 'boom_att': 0.06,
+     'roll_in': 0.03, **_R6(42.0)},                                                                # short
+    {'boom': 0.65, 'boom_f0': 95.0, 'boom_f1': 36.0, 'boom_drop': 0.1, 'boom_tau': 0.3, 'boom_att': 0.08,
+     'roll_in': 0.04, 'gate_db': 12.0, 'air': 0.45, **_R6(34.0)},                                  # deep
+    {'boom': 0.5, 'boom_f0': 110.0, 'boom_f1': 44.0, 'boom_drop': 0.08, 'boom_tau': 0.35, 'boom_att': 0.12,
+     'roll_in': 0.06, **_R6(36.0)},                                                                # swell
+])]
 TARGETS = {'impact': TARGET,
            'pro_impact': 'a deep designed sub impact with a granular rumble tail, gated'}
 # per category: the parameters the forge may move (everything else stays at the family preset)

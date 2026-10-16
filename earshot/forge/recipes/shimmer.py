@@ -30,6 +30,9 @@ Round 3 (forge v2, after the round-2 judge: real shimmer tails half the bench's,
 doublet (`beat`), strikes are detuned (`detune`) and swing (`swing`), each note has a bright strike burst (`sizzle`),
 higher notes die faster (`f_decay`), the bus is decorrelated, the air bed follows the ringing notes, and a tone bed at
 its 'off' level (-40 dB) is really off. FAMILY['shimmer'] holds the six round-3 ring-outs (t40 1.9-3.0 s).
+Round 6 (re-render path only, no new sound): `r2_path` = 1 renders runs / chimes on the round-2 code (no detune draw
+per note / strike, the 4 s note cap, a tone bed at -40 dB left on), so the pro_shimmer run members delivered in round 2
+(pro_shimmer_04 / 05) re-render exactly from their report.json. Not in SPACE or DEFAULTS; absent = today's code.
 """
 import numpy as np
 
@@ -300,13 +303,14 @@ def _run(p, r, n):
     else:
         idx = (len(notes) - 1) * np.sin(np.linspace(0, np.pi, N)) ** 0.8
     idx = np.round(idx).astype(int)
+    r2 = p.get('r2_path', 0)                 # round-2 code path (see render): no detune draw, 4 s note cap
     for k in range(N):
         tk = p['run_t'] * (k / max(N - 1, 1)) ** p['accel'] + r.uniform(-0.004, 0.004) * (k > 0)
         i = int(max(tk, 0) * SR)
-        m = min(dsp.n_of(min(6 * p['n_decay'], 6.0)), n - i)
+        m = min(dsp.n_of(min(6 * p['n_decay'], 4.0 if r2 else 6.0)), n - i)
         if m < 16:
             continue
-        f = notes[idx[k]] * 2 ** (r.uniform(-1, 1) * p['detune'] / 1200)
+        f = notes[idx[k]] if r2 else notes[idx[k]] * 2 ** (r.uniform(-1, 1) * p['detune'] / 1200)
         tau = p['n_decay'] * (f / 1000.0) ** -p['f_decay']
         y = _note(f, m, tau, r, BAR, p['hard'], p['g_bell'] * 0.8 + 0.2, p['beat'], p['swing'], p['sizzle'])
         g = _tilt_gain(f, p['tilt']) * 10 ** (r.uniform(-1, 1) * p['g_jit_db'] / 40)
@@ -325,13 +329,15 @@ def _chimes(p, r, n):
     pick = np.linspace(0, len(notes) - 1, min(T, len(notes))).round().astype(int)
     tubes = [(notes[j], r.uniform(-1, 1) * p['spread']) for j in pick]
     t = 0.0
+    r2 = p.get('r2_path', 0)                 # round-2 code path (see render): no detune draw, 4 s note cap
     for k in range(int(p['strikes'])):
         i = int(t * SR)
         if i >= n - 16:
             break
         f, pos = tubes[int(r.integers(0, len(tubes)))]
-        f = f * 2 ** (r.uniform(-1, 1) * p['detune'] / 1200)
-        m = min(dsp.n_of(min(5 * p['n_decay'], 6.0)), n - i)
+        if not r2:
+            f = f * 2 ** (r.uniform(-1, 1) * p['detune'] / 1200)
+        m = min(dsp.n_of(min(5 * p['n_decay'], 4.0 if r2 else 6.0)), n - i)
         tau = p['n_decay'] * (f / 1000.0) ** -p['f_decay']
         y = _note(f, m, tau, r, TUBE, p['hard'], 0.8, p['beat'], p['swing'], p['sizzle'])
         g = 10 ** (r.uniform(-1, 1) * p['g_jit_db'] / 20) * (0.92 ** k)
@@ -351,8 +357,8 @@ def _bed(p, r, n, env):
     ph = 2 * np.pi * np.cumsum(f * vib) / SR
     tone = np.sin(ph) + p['tone_h'] * (0.5 * np.sin(2 * ph) + 0.3 * np.sin(3 * ph))
     tone = tone / (np.sqrt(np.mean(tone ** 2)) + 1e-12) * 0.05 * 10 ** (p['tone_db'] / 20)
-    if p['tone_db'] <= -39.0:              # round 3: 'off' means off (an air-only bed left a -40 dB tone line)
-        tone = np.zeros(n)
+    if p['tone_db'] <= -39.0 and not p.get('r2_path', 0):   # round 3: 'off' means off (an air-only bed left a
+        tone = np.zeros(n)                                  # -40 dB tone line; r2_path keeps that line)
     tone = fx.decorrelate(tone * env, p['tone_w'], cut=200.0)
     air = dsp.butter(r.standard_normal(n), 'high', p['air_hp'], order=2)
     air = dsp.butter(air, 'low', 14000, order=2)

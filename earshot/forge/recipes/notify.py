@@ -49,7 +49,7 @@ REFSET = 'pro_notify'
 SEMI = 2 ** (1 / 12)
 
 SPACE = {
-    'style': ['ding', 'success', 'bell'],
+    'style': ['ding', 'success', 'bell', 'chime'],   # 'chime': round 6 (appended: older choice indices unchanged)
     'f0': (1100.0, 2600.0, 'log'),    # the note (head fundamental); pro dings 1822-2168 Hz
     # head
     'att': (0.0008, 0.012, 'log'),    # rise after the -30 dB step
@@ -200,6 +200,7 @@ FINE = {
              'strike', 'strike_tau'],
 }
 FINE['success'] = FINE['ding'] + ['gap', 'second_db']
+FINE['chime'] = ['att', 'c_fast', 'c_tf', 'c_ts', 'c_mallet', 'c_hard', 'c_bend', 'detune', 'verb', 'rt60', 'fade', 'hp']
 
 # Round 4 (ui-tonal polish): edits on top of the round-3 DELIVERED members (out/forge_v2/<cat>/final_r3/report.json,
 # 'family' members), applied by out/forge_v2/_uitonal_r4/fam4.py.
@@ -392,6 +393,83 @@ def _bell(p, r, n):
     return y
 
 
+# round 6 (pop-notify; the round-5 judge: clean but near clones, one patch on a semitone ladder): style 'chime' = a
+# struck ding of a chosen material around the film targets (a ~2 kHz fundamental that rings longest, a partial near
+# 3.4x, 1-15 ms attack, t20 ~30-40 ms from a natural two-rate decay: most of the strike dies in ~10-15 ms, a quiet
+# aftersound rings on), varied by what is struck and how: `mat` (the partial set), `c_fast` / `c_tf` / `c_ts` (the
+# two decay rates), `c_mallet` / `c_hard` (felt .. metal strike), `c_bend` (the strike's pitch drop, cents), `c_sub`
+# (an octave-under body: the films' 1 kHz line), and a motif (`c_motif`: one strike, 'up' = a second note `interval`
+# semitones up `gap` s later, 'flam' = a quieter second strike of the same note). 'fm' = a 1 : 2.4 FM bell (its first
+# sidebands sit at 1.4x and 3.4x), the index decaying fast.
+MATS = {   # (ratio, amplitude, decay multiplier on both rates): every set keeps the fundamental strongest
+    'film': [(1.0, 1.0, 1.0), (3.42, 0.3, 0.45)],
+    'glass': [(1.0, 1.0, 1.0), (2.32, 0.3, 0.5), (3.4, 0.28, 0.35), (4.25, 0.12, 0.25), (6.63, 0.05, 0.15)],
+    'bowl': [(1.0, 1.0, 1.0), (2.71, 0.4, 0.6), (3.38, 0.22, 0.4), (5.13, 0.14, 0.3)],
+    'tine': [(1.0, 1.0, 1.0), (3.44, 0.12, 0.3), (5.8, 0.08, 0.25), (6.27, 0.1, 0.2)],
+    'wood': [(1.0, 1.0, 1.0), (3.4, 0.18, 0.3), (3.98, 0.12, 0.22), (9.2, 0.03, 0.1)],
+    'fm': [(1.0, 1.0, 1.0)],
+}
+SPACE.update({'mat': list(MATS), 'c_fast': (0.5, 0.97), 'c_tf': (0.004, 0.03, 'log'), 'c_ts': (0.06, 0.4, 'log'),
+              'c_mallet': (-60.0, -6.0), 'c_hard': (0.0, 1.0), 'c_bend': (0.0, 60.0), 'c_sub': (0.0, 0.6),
+              'c_motif': ['single', 'up', 'flam'], 'c_index': (0.5, 6.0), 'c_itau': (0.006, 0.06, 'log')})
+DEFAULTS.update({'mat': 'film', 'c_fast': 0.9, 'c_tf': 0.012, 'c_ts': 0.15, 'c_mallet': -30.0, 'c_hard': 0.5,
+                 'c_bend': 0.0, 'c_sub': 0.0, 'c_motif': 'single', 'c_index': 2.5, 'c_itau': 0.02})
+
+
+def _strike(p, r, n, f0):
+    """one struck note of material p['mat']: mono, starts at t = 0"""
+    t = dsp.t_of(n)
+    bend = 2 ** (p['c_bend'] / 1200 * np.exp(-t / 0.01))                 # struck hard, the pitch settles
+    att = max(p['att'], 0.0006)
+    rise = 0.5 - 0.5 * np.cos(np.pi * np.clip(t / att, 0, 1))
+    tm = np.maximum(t - att, 0)
+    fast, tf, ts = p['c_fast'], p['c_tf'], p['c_ts']
+    y = np.zeros(n)
+    if p['mat'] == 'fm':                                                   # 1 : 2.4 FM bell, the index decays fast
+        idx = p['c_index'] * np.exp(-tm / p['c_itau']) + 0.25
+        mph = 2 * np.pi * np.cumsum(2.4 * f0 * bend) / SR + r.uniform(0, 6.3)
+        cph = 2 * np.pi * np.cumsum(f0 * bend) / SR + r.uniform(0, 6.3)
+        env = fast * np.exp(-tm / tf) + (1 - fast) * np.exp(-tm / ts)
+        y = np.sin(cph + idx * np.sin(mph)) * env
+    else:
+        for q, a, dm in MATS[p['mat']]:
+            f = f0 * q
+            if f > 0.42 * SR:
+                continue
+            ph = 2 * np.pi * np.cumsum(f * bend) / SR + r.uniform(0, 6.3)
+            tone = np.sin(ph)
+            if p['detune'] > 0:                                            # a slow doublet beat
+                tone = (tone + 0.5 * np.sin(ph + 2 * np.pi * p['detune'] * r.uniform(0.6, 1.4) * t)) / 1.5
+            env = fast * np.exp(-tm / (tf * dm)) + (1 - fast) * np.exp(-tm / (ts * dm))
+            y += a * env * tone
+    if p['c_sub'] > 0:                                                     # the octave-under body (slow, rounded)
+        ein = np.clip(t / 0.02, 0, 1)
+        y += p['c_sub'] * (0.5 - 0.5 * np.cos(np.pi * ein)) * np.exp(-tm / ts) * \
+            np.sin(2 * np.pi * np.cumsum(0.5 * f0 * bend) / SR + r.uniform(0, 6.3))
+    y *= rise
+    if p['c_mallet'] > -59:                                                # felt (soft, dark, longer) .. metal (bright tick)
+        k = min(n, dsp.n_of(0.008))
+        tk = dsp.t_of(k)
+        h = p['c_hard']
+        w = r.standard_normal(k)
+        w = dsp.butter(w, 'band', (1500.0 + 4000.0 * h, min(4000.0 + 12000.0 * h, 18000.0)), order=2)
+        w *= (1 - np.exp(-tk / 0.0003)) * np.exp(-tk / (0.0035 - 0.0027 * h))
+        y[:k] += 10 ** (p['c_mallet'] / 20) * w / (np.abs(w).max() + 1e-12)
+    return y
+
+
+def _chime(p, r, n):
+    y = _strike(p, r, n, p['f0'])
+    if p['c_motif'] in ('up', 'flam'):
+        off = dsp.n_of(p['gap'])
+        f2 = p['f0'] * (SEMI ** p['interval'] if p['c_motif'] == 'up' else 1.0)
+        y2 = _strike(p, r, n - off, f2)
+        if p['c_motif'] == 'up':                                           # the first note ducks under the second
+            y *= np.clip(1 - dsp.t_of(n) / (p['gap'] + 0.04), 0.3, 1)
+        y[off:] += 10 ** (p['second_db'] / 20) * y2
+    return y
+
+
 def _finish(x, p, r, n_len, drive=None):
     """glue, space, stereo, band limit, edit (drive: the head's own drive when >= 0, else p['drive'])"""
     drive = p['drive'] if drive is None or drive < 0 else drive
@@ -430,6 +508,14 @@ def render(p, r):
         if p['early_db'] > 0 or p['strike'] > -59:          # round 3: the ring decays on its own, a short end fade
             return _end(y, p, n_len, fade=max(p['fade'], 0.25))
         return _end(y, p, n_len, fade=max(p['fade'], 0.4 * n_len / SR))
+    if st == 'chime':                                                      # round 6: a struck material + motif
+        y = _finish(_chime(p, r, n), p, r, n_len)
+        y = fx.decorrelate(y, p['width'] * 0.5, cut=1200.0)
+        if p['verb'] > 0.005:
+            wet = fx.reverb(y, r, rt60=p['rt60'], size=0.25, predelay=0.006, damp=0.45, wet=1.0, dry=0.0,
+                            stereo=True, width=0.4 + p['width'])
+            y = np.concatenate([y, np.zeros((len(wet) - len(y), 2))]) + p['verb'] * wet
+        return _end(y, p, n_len)
     head, body = _ding(p, r, n)
     if st == 'success':
         q = {**p, 'f0': p['f0'] * SEMI ** p['interval']}
@@ -559,3 +645,29 @@ def pro_penalty(x, cat):
 def extra_for(cat, weight=1.0):
     """an `extra=` check for the Critic: -weight * pro_penalty"""
     return lambda x, row: -weight * pro_penalty(x, cat)
+
+
+# Round 6 (pop-notify): the round-5 family (the clean film ding on a semitone ladder; variety 0.936 on the bench, the
+# five read as one patch) stays in FAMILY_R5; FAMILY['pro_notify'] = five distinct dings around the film targets: the
+# round-5 film ding itself, a 1 : 2.4 FM bell (sidebands at 1.4x / 3.4x), a felt-struck wooden bar, a two-note glass
+# 'ding-dong' (down a major third) and the film partials with an octave-under body. All clean (no drive, no breath),
+# nothing under 500 Hz, heads on the film's semitone ladder (1822-2296 Hz).
+FAMILY_R5 = {'pro_notify': [dict(p) for p in FAMILY['pro_notify']]}
+FAMILY_NAMES_R5 = {'pro_notify': list(FAMILY_NAMES['pro_notify'])}
+_CH = dict(style='chime', drive=0.0, head_drive=0.0, hp=500.0, verb=0.14, rt60=0.3, width=0.7, fade=0.05, detune=0.8)
+FAMILY_R6 = {'pro_notify': [
+    dict(FAMILY_R5['pro_notify'][0]),                                                      # the film ding (round 5)
+    _fam(**{**_CH, 'f0': _LADDER[1], 'mat': 'fm', 'att': 0.005, 'c_fast': 0.9, 'c_tf': 0.011, 'c_ts': 0.16,
+            'c_index': 1.8, 'c_itau': 0.015, 'c_mallet': -40.0, 'c_hard': 0.4, 'length': 0.3, 'detune': 0.0}),   # FM bell
+    _fam(**{**_CH, 'f0': _LADDER[4], 'mat': 'wood', 'att': 0.002, 'c_fast': 0.95, 'c_tf': 0.007, 'c_ts': 0.09,
+            'c_mallet': -14.0, 'c_hard': 0.1, 'length': 0.22, 'c_bend': 40.0, 'detune': 0.0, 'verb': 0.1}),     # felt on wood
+    _fam(**{**_CH, 'f0': _LADDER[3], 'mat': 'glass', 'att': 0.0015, 'c_fast': 0.9, 'c_tf': 0.012, 'c_ts': 0.12,
+            'c_mallet': -26.0, 'c_hard': 0.7, 'length': 0.4, 'c_motif': 'up', 'interval': -4, 'gap': 0.11,
+            'second_db': -2.0}),                                                           # glass ding-dong
+    _fam(**{**_CH, 'f0': _LADDER[2], 'mat': 'film', 'att': 0.0015, 'c_fast': 0.9, 'c_tf': 0.013, 'c_ts': 0.1,
+            'c_mallet': -30.0, 'c_hard': 0.7, 'length': 0.3, 'c_sub': 0.1}),               # film partials + octave body
+]}
+FAMILY_NAMES_R6 = {'pro_notify': ['film_ding', 'fm_bell', 'wood', 'ding_dong', 'octave_body']}
+# NOT delivered (held-out bench, one run at 19:10): variety 0.936 -> 0.814, phrase z 2.16 -> 1.45, margin 0.38 -> -0.03;
+# by blind_v2.verdict (no real variety row for pro_notify) that is models 0 up / 2 down, so FAMILY['pro_notify'] stays
+# the round-5 family (out/forge_v2/pro_notify/final/); the round-6 palette is in final_r6/ for a swap by ear.

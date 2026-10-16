@@ -271,6 +271,166 @@ PRO_R3 = {
 FAMILIES_BY_CAT['pro_riser'] = PRO_R3
 # (round 2's pro set stays in PRO for the record; its picks re-render from out/forge_v2/pro_riser/final_r2/)
 
+# ------------------------------------------------------------------------------------------------ round 6 'build'
+# The round-5 judge: CLAP's nearest confusion is still 'a jet engine starting' for all five round-4 risers. What a jet
+# spool-up is, acoustically: broadband noise under a resonant low-pass that opens from a low rumble, steady (no pulse),
+# with a turbine whine gliding with it, and it does not stop. The round-4 members still start as low-passed noise at
+# 200-470 Hz (a rumble), keep a continuous noise bed with no rhythm (gate depth 0.04 in air / shepard / cymbal) and
+# glide metal / saw partials together. The 'build' render (p['r6'] = 1; render() is unchanged without it) follows the
+# study instead (docs/motion-sfx-study.md riser; techniques section 2):
+#   noise   a BAND that moves up (low-pass nf0 -> nf1 and a high-pass nbw octaves under it, both 24 dB/oct and
+#           unresonant: no whistle, no rumble at the start), high-passed at hp >= 250 Hz
+#   tonal   a unison chord (root + fifth, + a late octave) of detuned voices in the mid / high register (tf0 300-1500
+#           Hz), rising toct (about 2) octaves on a concave curve: the 'riser' pitch cue an engine does not have
+#   gate    an accelerating gate on everything (period gate_p0 -> gate_p1, e.g. 8 Hz -> 45 Hz, pro 24 -> 20 ms at the
+#           end), depth fading in, laid out from the end so the last pulse is open: rhythm an engine does not have
+#   swell   rswell_db: a reversed computed reverb tail of a bright noise burst (the reverse-cymbal build) under it
+#   end     the loudest moment is the last ~45 ms, then an end_ms cut: it stops on the hit (an engine keeps going)
+# No drone, no sub, no metal partials, no saturation of a low layer.
+SPACE_R6 = {   # extra keys of the build render (not in SPACE: a pro_riser search must not mid-range-fill them)
+    'r6': (0.0, 1.0),                    # 1 = the build render
+    'nbw': (0.8, 4.0),                   # noise band width in octaves (moving high-pass at fc / 2^nbw)
+    'fifth_db': (-48.0, 0.0),            # the fifth (x1.5) of the tonal chord, re the root
+    'tone_gate': (0.0, 1.0),             # how much the gate chops the tonal layer (noise: always)
+    'gate_pow': (0.6, 3.0),              # how late the gate accelerates (period on u^gate_pow)
+    'rswell_db': (-48.0, 0.0),           # reverse reverb swell layer
+    'rswell_rt': (1.0, 4.0),             # its decay (s)
+    'pre_dip_ms': (0.0, 60.0),           # a short duck just before the last pulse (the 'suck' into the hit); 0 = none
+}
+R6_OFF = {'r6': 0.0, 'nbw': 2.0, 'fifth_db': -48.0, 'tone_gate': 1.0, 'gate_pow': 1.4, 'rswell_db': -48.0,
+          'rswell_rt': 2.0, 'pre_dip_ms': 0.0}
+_B6 = {**FAMILIES['air'], 'metal_db': -48.0, 'metal_f': 2600.0, 'blip_dec': 0.35, 'drone_oct': 0.0,
+       'drone_noise': 0.0, 'metal_n': 9, 'metal_glide': 0.0, 'nb_q': 6.0, 'drone_db': -48.0, 'drone_f': 55.0,
+       'shep_db': -48.0, 'gate_drone': 0.0, 'tmode': 'glide', 'sat': 1.0, 'nq': 0.7, **R6_OFF, 'r6': 1.0}
+R6 = {
+    # a noise band opening up under a fast-accelerating tremolo (4 -> 30 Hz), a faint tri chord rising 2 oct
+    'air': {**_B6, 'length': 2.4, 'curve': 2.6, 'rise_db': 34.0, 'noise_db': 0.0, 'nf0': 900.0, 'nf1': 13000.0,
+            'nbw': 2.2, 'pink': 0.5, 'tone_db': -16.0, 'fifth_db': -8.0, 'wave': 'tri', 'tf0': 700.0, 'toct': 2.0,
+            'detune': 14.0, 'oct_db': -26.0, 'gate_depth': 0.6, 'gate_on': 0.15, 'gate_p0': 0.25, 'gate_p1': 0.034,
+            'gate_duty': 0.55, 'gate_sharp': 0.3, 'gate_pow': 1.6, 'tone_gate': 0.6, 'verb': 0.3, 'rt60': 2.0,
+            'width': 0.6, 'hp': 300.0, 'end_ms': 5.0, 'rswell_db': -14.0, 'rswell_rt': 2.2},
+    # pitch leads: a detuned saw chord 300 Hz -> 1.2 kHz, chopped by a gate rolling 6 -> 40 Hz, noise supports
+    'tension': {**_B6, 'length': 2.8, 'curve': 2.4, 'rise_db': 30.0, 'noise_db': -9.0, 'nf0': 1200.0,
+                'nf1': 11000.0, 'nbw': 1.8, 'pink': 0.6, 'tone_db': 0.0, 'fifth_db': -4.0, 'wave': 'saw',
+                'tf0': 300.0, 'toct': 2.0, 'tbright': 4.0, 'detune': 22.0, 'oct_db': -12.0, 'gate_depth': 0.75,
+                'gate_on': 0.1, 'gate_p0': 0.17, 'gate_p1': 0.025, 'gate_duty': 0.5, 'gate_sharp': 0.55,
+                'gate_pow': 1.5, 'tone_gate': 1.0, 'verb': 0.25, 'rt60': 2.0, 'width': 0.5, 'hp': 260.0,
+                'end_ms': 4.0, 'rswell_db': -48.0},
+    # an endless shepard rise over a soft noise band, a slow tremolo speeding up 2 -> 14 Hz, big space
+    'shepard': {**_B6, 'length': 3.4, 'curve': 2.2, 'rise_db': 30.0, 'noise_db': -8.0, 'nf0': 700.0, 'nf1': 9000.0,
+                'nbw': 2.6, 'pink': 0.9, 'tone_db': -36.0, 'fifth_db': -48.0, 'oct_db': -36.0, 'shep_db': 0.0,
+                'shep_rate': 0.9, 'gate_depth': 0.45, 'gate_on': 0.2, 'gate_p0': 0.5, 'gate_p1': 0.07,
+                'gate_duty': 0.5, 'gate_sharp': 0.0, 'gate_pow': 1.3, 'tone_gate': 0.8, 'verb': 0.45, 'rt60': 3.0,
+                'width': 0.85, 'hp': 260.0, 'end_ms': 8.0, 'rswell_db': -20.0, 'rswell_rt': 3.0},
+    # the pro build, short: a sine chord 1 -> 4.5 kHz and a bright band under the pro stutter (24 -> 20 ms at the end)
+    'rush': {**_B6, 'length': 1.3, 'curve': 2.2, 'rise_db': 26.0, 'noise_db': -3.0, 'nf0': 1500.0, 'nf1': 15000.0,
+             'nbw': 1.6, 'pink': 0.35, 'tone_db': -4.0, 'fifth_db': -6.0, 'wave': 'sine', 'tf0': 1000.0,
+             'toct': 2.2, 'detune': 10.0, 'oct_db': -18.0, 'gate_depth': 0.85, 'gate_on': 0.0, 'gate_p0': 0.06,
+             'gate_p1': 0.021, 'gate_duty': 0.5, 'gate_sharp': 0.8, 'gate_pow': 1.2, 'tone_gate': 1.0,
+             'verb': 0.15, 'rt60': 1.2, 'width': 0.4, 'hp': 400.0, 'end_ms': 3.0, 'rswell_db': -48.0},
+    # the reverse-cymbal build: a reversed computed reverb tail of a bright burst, a bright band, a thin high chord
+    'swell': {**_B6, 'length': 2.2, 'curve': 2.8, 'rise_db': 38.0, 'noise_db': -8.0, 'nf0': 2000.0,
+              'nf1': 16000.0, 'nbw': 1.4, 'pink': 0.3, 'tone_db': -22.0, 'fifth_db': -6.0, 'wave': 'sine',
+              'tf0': 1500.0, 'toct': 1.6, 'detune': 8.0, 'oct_db': -30.0, 'gate_depth': 0.35, 'gate_on': 0.5,
+              'gate_p0': 0.12, 'gate_p1': 0.03, 'gate_duty': 0.5, 'gate_sharp': 0.2, 'gate_pow': 2.0,
+              'tone_gate': 0.5, 'verb': 0.2, 'rt60': 1.6, 'width': 0.8, 'hp': 500.0, 'end_ms': 4.0,
+              'rswell_db': 0.0, 'rswell_rt': 2.6},
+}
+
+
+def _lp24(x, fc):
+    return dsp.svf(dsp.svf(x, fc, 0.54, 'low'), fc, 1.31, 'low')      # Butterworth-4 pole pair: no peak
+
+
+def _hp24(x, fc):
+    return dsp.svf(dsp.svf(x, fc, 0.54, 'high'), fc, 1.31, 'high')
+
+
+def render_build(p, r):
+    """round 6: the 'build' riser (see the R6 note above). Stereo, ends on its peak."""
+    p = {**DEFAULTS, **R6_OFF, **p}
+    L = float(p['length'])
+    n = dsp.n_of(L)
+    t = dsp.t_of(n)
+    u = t / L
+    w = u ** p['curve']
+    lv = 10 ** (-p['rise_db'] * (1 - w) / 20)
+    # the accelerating gate, laid out from the end (the last pulse open on the final sample)
+    per = p['gate_p0'] * (p['gate_p1'] / p['gate_p0']) ** (u ** p['gate_pow'])
+    ph = phase_from_end(1.0 / per, end_phase=0.5 * p['gate_duty'])
+    g = gate_shape(ph, per, p['gate_duty'], p['gate_sharp'])
+    on = np.clip((u - p['gate_on']) / 0.2, 0, 1)
+    fin = np.clip((L - t) / FINAL_OPEN, 0, 1)
+    fin = fin * fin * (3 - 2 * fin)
+    depth = p['gate_depth'] * (on * on * (3 - 2 * on)) * fin
+    gate_n = 1 - depth * (1 - g)
+    gate_t = 1 - p['tone_gate'] * depth * (1 - g)
+    # noise: an unresonant band moving up
+    wn = (1 - p['pink']) * r.standard_normal(n) + p['pink'] * dsp.noise(L, r, 'pink')[:n] * 1.6
+    fc = p['nf0'] * (p['nf1'] / p['nf0']) ** w
+    nz = _hp24(_lp24(wn, np.minimum(fc, 18000.0)), np.maximum(fc / 2 ** p['nbw'], 20.0))
+    nz = dsp.butter(nz, 'high', p['hp'], order=4)
+    nz_st = fx.width(fx.decorrelate(nz, 1.0), p['width'] * (0.35 + 0.65 * w))
+    # tonal chord: root + fifth (+ a late octave), concave glide
+    wt = u ** max(1.0, 0.8 * p['curve'])
+    f = p['tf0'] * 2 ** (p['toct'] * wt)
+    ph0 = r.uniform(0, 1, 15)
+    det = p['detune'] * (0.6 + 0.8 * w)
+    tone = unison(f, p['wave'], det, 0.5 * p['width'], ph0[:5])
+    if p['fifth_db'] > -47:
+        tone = tone + 10 ** (p['fifth_db'] / 20) * unison(1.5 * f, p['wave'], det, 0.7 * p['width'], ph0[5:10])
+    octv = unison(2 * f, p['wave'], det * 0.7, 0.6 * p['width'], ph0[10:])
+    octv *= np.clip((u - 0.4) / 0.6, 0, 1)[:, None] ** 2
+    if p['wave'] == 'saw':
+        cut = np.minimum(f * p['tbright'], 18000)
+        tone = np.stack([dsp.svf(tone[:, c], cut, 0.7, 'low') for c in range(2)], axis=1)
+        octv = np.stack([dsp.svf(octv[:, c], np.minimum(2 * cut, 18000), 0.7, 'low') for c in range(2)], axis=1)
+    tone = dsp.butter(tone, 'high', p['hp'] * 0.8, order=2)
+    octv = dsp.butter(octv, 'high', p['hp'], order=2)
+    # shepard (optional)
+    if p['shep_db'] > -47:
+        sh = dsp.shepard(L, r, up=True, rate=p['shep_rate'], f_lo=150.0, f_hi=9000.0, kind='tone')[:n]
+        sh = dsp.butter(sh, 'high', p['hp'], order=2)
+        sh_st = fx.width(fx.decorrelate(sh, 0.6), 0.6 * p['width'])
+    else:
+        sh_st = None
+    # reverse swell: the reversed reverb tail of a bright burst (computed), concave by nature
+    if p['rswell_db'] > -47:
+        hb = dsp.butter(r.standard_normal(dsp.n_of(0.03)), 'high', 1500.0, order=2) * np.exp(
+            -dsp.t_of(dsp.n_of(0.03)) / 0.008)
+        wet = wet_of(hb, p['rswell_rt'], dsp.n_of(p['rswell_rt'] + 0.1), predelay=0.0, damp=0.3, lowcut=400.0)
+        k = min(n, len(wet))
+        sw = np.zeros((n, 2))
+        sw[n - k:] = wet[:k][::-1]
+        sw = fx.width(dsp.butter(sw, 'high', p['hp'], order=2), 0.25 + 0.5 * p['width'])   # mostly centred
+    else:
+        sw = None
+
+    def at(db, x):
+        return 10 ** (db / 20) * x / lvl(x, 0.25)
+
+    noise_l = at(p['noise_db'], nz_st) * gate_n[:, None]
+    tone_l = (at(p['tone_db'], tone) + at(p['oct_db'], octv)) * gate_t[:, None]
+    send = noise_l + tone_l
+    if sh_st is not None:
+        send = send + at(p['shep_db'], sh_st) * gate_t[:, None]
+    send = send * lv[:, None]
+    if sw is not None:                                   # the swell carries its own (reversed-decay) curve
+        send = send + at(p['rswell_db'], sw) * (0.25 + 0.75 * gate_n[:, None])
+    mix = send
+    if p['verb'] > 0.005:
+        wet = wet_of(send, p['rt60'], n)
+        mix = mix + p['verb'] * wet / lvl(wet, 0.25) * lvl(send, 0.25)
+    if p['pre_dip_ms'] > 0.5:                            # a short duck just before the last open pulse
+        d0 = L - FINAL_OPEN - p['pre_dip_ms'] * 1e-3
+        dip = 1 - 0.5 * np.exp(-0.5 * ((t - d0) / (0.35 * p['pre_dip_ms'] * 1e-3)) ** 2)
+        mix = mix * dip[:, None]
+    if p['sat'] > 0.1:
+        mix = fx.saturate(mix, drive_db=p['sat'], mode='tanh')
+    mix = dsp.butter(mix, 'high', 120.0, order=2)
+    mix = dsp.butter(mix, 'low', 18000, order=4)
+    return dsp.fade(mix, 0.004, p['end_ms'] / 1000.0)
+
 UNISON = (-1.0, -0.45, 0.0, 0.45, 1.0)
 FINAL_OPEN = 0.045    # s: the gate opens (and the blips sustain) over the last 45 ms, so the riser peaks on the cut     # voice offsets (x detune cents) and pans (x width)
 
@@ -428,6 +588,8 @@ def target_check(x, row=None):
 
 # ------------------------------------------------------------------------------------------------ render
 def render(p, r):
+    if p.get('r6', 0.0) > 0.5:                                   # round 6: the build render (default off)
+        return render_build(p, r)
     p = {**DEFAULTS, **p}
     L = float(p['length'])
     n = dsp.n_of(L)

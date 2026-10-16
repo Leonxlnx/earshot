@@ -142,3 +142,33 @@ def test_round3_no_steady_lines_and_air(renders):
     assert np.log2(lowpk(x[-n:]) / lowpk(x[:n])) >= 0.4
     z = load_recipe('zip')
     assert all(v['noise_db'] > -20 for v in z.FAMILIES_BY_CAT['pro_zip'].values())
+
+
+def test_round6_build_risers_no_rumble_concave_gated_end_on_peak():
+    """round 6 (the judge: CLAP's nearest confusion for the risers is 'a jet engine starting'): the 'build' render
+    (riser.R6, p['r6'] = 1) has no drone / rumble (nothing under 150 Hz), a concave rise that stops on its peak, a
+    noise band that opens up, and the old render is untouched when r6 is off"""
+    rec = load_recipe('riser')
+    for k, p in rec.R6.items():
+        assert p['r6'] == 1.0 and p['drone_db'] <= -47 and p['metal_db'] <= -47, k
+        x = render(rec, p, 5)
+        assert x is not None and np.isfinite(x).all() and x.shape[1] == 2, k
+        m = rec.measure(x)
+        assert m['end_db'] > -3 and m['last_third'] >= 0.45 and m['hf_rise_db'] > 30, (k, m)
+        assert rec.low_share_db(x, 150.0) < -30, (k, rec.low_share_db(x, 150.0))
+        assert m['side_db'] < -3, (k, m)
+    g = {**rec.R6['rush'], 'tone_db': -36.0, 'oct_db': -36.0, 'fifth_db': -48.0, 'verb': 0.0}   # the gate rate (the strongest
+    y = render(rec, g, 2).mean(axis=1)                       # 3-60 Hz line of the 2 ms envelope) is higher late
+    h = 96
+    e = np.sqrt((y[:len(y) // h * h].reshape(-1, h) ** 2).mean(1))
+
+    def rate(seg):
+        s = (seg - np.convolve(seg, np.ones(15) / 15, 'same')) * np.hanning(len(seg))
+        S = np.abs(np.fft.rfft(s, 8192))
+        f = np.fft.rfftfreq(8192, h / SR)
+        sel = (f > 3) & (f < 60)
+        return f[sel][np.argmax(S[sel])]
+    n = len(e)
+    assert rate(e[int(0.7 * n):int(0.97 * n)]) > 1.5 * rate(e[int(0.15 * n):int(0.45 * n)])
+    p0 = rec.FAMILIES_BY_CAT['riser']['air']
+    assert np.array_equal(render(rec, p0, 4), render(rec, {**p0, 'r6': 0.0}, 4))

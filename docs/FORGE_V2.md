@@ -3,11 +3,12 @@
 What changed in `earshot forge` during the overnight iteration of 2026-10-16, how to try it, what the held-out
 measurements say, what is still weak, and what to check before merging. The branch is not merged; `main` is
 untouched. The round-by-round log with every number is [OVERNIGHT.md](../OVERNIGHT.md). Per-category verdicts are in
-[eval/forge/results_v2r5.md](../eval/forge/results_v2r5.md) (Judge notes, round 5),
+[eval/forge/results_v2r6.md](../eval/forge/results_v2r6.md) (Judge notes, round 6),
+[results_v2r5.md](../eval/forge/results_v2r5.md) (round 5),
 [results_v2r4.md](../eval/forge/results_v2r4.md) (round 4) and [results_v2r3.md](../eval/forge/results_v2r3.md)
 (round 3).
 
-**Status (final, round 5 benchmarked at 15:58):**
+**Status (round 6 benchmarked at 19:03; round 5 at 15:58):**
 - 34 categories, 183 sounds made in code, 0 artifact flags on the held-out benchmark.
 - Every judgement so far is a measurement or a model check: **nobody had listened to the sounds yet.**
 - The clean blind test is ready in `out/showcase/blind_v2/`: 20 trials, loudness-matched, randomised, real refs from
@@ -145,6 +146,22 @@ Round 3 -> round 4, in the 14 categories round 4 changed (full table in `results
 - **pro_impact:** the model checks prefer round 3. It was kept on the spectrogram, because round 3 carried an
   accidental onset tick.
 
+Round 5 -> round 6 (18:00-19:40, after the showcase), full table and reasons in `results_v2r6.md`:
+- **pro_pop (round 6 kept):** six natural pops with a gliding pitch (`n6` in pop.py); variety 0.649 -> 0.617, tone
+  22.9 -> 19.5 dB (real 18.4); CLAP '8-bit' in the top 3 on 0 of 6 (was 3). Phrase z and margin fell.
+- **riser (round 6 kept):** a new render for 3 of 5 members (`r6=1`: rising band without a resonant peak, rising chord,
+  accelerating gate, reverse swell); margin -0.30 -> +0.08, variety 0.801 -> 0.772, env oct 2.35 -> 2.05; tone
+  9.3 -> 12.8 dB (inside the real rows).
+- **tap (round 6 kept):** the better of round 4 / 5 per member; variety 0.782 -> 0.761, env oct 1.40 -> 1.22; margin and
+  typicality slightly down.
+- **glitch (round 6 kept):** a chopped-repeat / bit-crush / dropout path (`roll0`); all three model checks up (no real
+  glitch refs exist).
+- **pro_impact (round 4 kept):** round 6's boom made it recognisable (AudioSet 0.6 -> 1.0) but less varied (0.788 ->
+  0.820) and narrower (corr 0.35 -> 0.67); round 6 is in `final_r6/`.
+- **pro_notify (round 5 kept):** five struck materials read acoustic; both model checks fell (not delivered).
+- **Reports:** one schema for every final (`earshot/forge/schema.py`, `earshot forge --check DIRS`): all 183 picks
+  re-render from their `report.json` within 1.19e-7.
+
 Round 4 -> round 5, in the 6 categories round 5 touched (full table and reasons in `results_v2r5.md`):
 - **pro_logo_sting (kept):**
   - Better: variety 0.908 -> 0.642 (five distinct launch gestures), tone 15.9 -> 15.6 dB, env oct 2.50 -> 2.15,
@@ -211,8 +228,11 @@ Weakest:
   round 4 re-delivered were checked again on the final code (13:55, all 75 members): every one re-renders to max
   3e-7 after peak normalisation. Round 5's deliveries re-render to max 2.5e-7, and pro_notify now reproduces 5 of 5,
   so 32 of 34 categories reproduce (not pro_typing_run or pro_shimmer). The restored round-4 tap and pro_pop finals
-  re-render on the final code to max 1.6e-7. The report schema
-  is not uniform either: 12 reports name the category in `recipe` instead of the module (some add
+  re-render on the final code to max 1.6e-7. **Round 6:** one report schema (`earshot/forge/schema.py`): every pick
+  carries a `render` block (module, function, member, full params, seed, peak, gain), `check_final()` re-renders a
+  final sample by sample, and all 34 finals (183 picks) re-render within 1.19e-7 (`tests/test_forge_rerender.py`).
+  pro_typing_run and pro_shimmer reproduce again. Before round 6 the report schema
+  was not uniform: 12 reports name the category in `recipe` instead of the module (some add
   `recipe_module`), and the tonal and pop finals keep their parameters in `family_params` (merge them under
   `params`), so `earshot forge --render` alone does not reproduce every category yet.
   The per-category driver scripts that ran the family searches live in `out/forge_v2/<category>/` and are not

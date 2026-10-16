@@ -1,0 +1,285 @@
+# forge benchmark: v2r6
+
+made: out/forge_v2; refs: <EARSHOT_HOME>/refsets.json; 2026-10-16 19:03
+
+Medians per set. made = the made sounds vs the bench refs; real x = the forge refs (real, never in the bench) vs the bench refs; real loo = each bench ref vs the other bench refs. typ z, phrase z, margin, AS names: higher is better; tone dB, env oct (octaves off in attack / t40 / length), curve dB: lower is better; t40 x = tail length / bench median (1 = same). inside = checks (of n) a made sound lands inside the real 80% limit, median over the made sounds (real = the same count for the real rows). var cos = mean pairwise CLAP cosine within the set (made variants / forge refs / bench refs): high = the variants are near clones.
+
+| category | set | n | typ z | tone dB | env oct | curve dB | t40 x | phrase z | margin | AS names | artifacts | var cos | inside |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| click | made | 5 | 0.21 | 8.79 | 0.23 | 8.83 | 1.44 | 3.03 | 0.24 | 0 | 0 | 0.723 | 7 / 7 (real 6) |
+|  | real x | 8 | 0.16 | 11.33 | 0.22 | 9.92 | 1.33 | 2.77 | 0.53 | 0.12 | 0 | 0.651 |  |
+|  | real loo | 7 | -0.1 | 9.85 | 0.46 | 13.19 | 0.86 | 2.67 | 0.27 | 0 | 0 | 0.576 |  |
+| downlifter | made | 6 |  |  |  |  |  | 3.23 | 0.92 | 0.33 | 0 | 0.749 |  |
+| | note: empty: the licensed library has no downlifter, real or designed (no reversing or pitching of other sounds here: trim + fade only). Benchmark made downlifters on phrasings, AudioSet and artifacts only. | |  |  |  |  |  |  |  |  |  |  |  |
+| glitch | made | 6 |  |  |  |  |  | 2.62 | 0.88 | 0.17 | 0 | 0.696 |  |
+| | note: empty: no glitch material, real or designed, in the licensed library. Benchmark made glitches on phrasings, AudioSet and artifacts only. | |  |  |  |  |  |  |  |  |  |  |  |
+| hover_tick | made | 5 | 0.13 | 20.99 | 1.51 | 6.27 | 1.1 | 2.41 | 0.66 | 0 | 0 | 0.807 | 6 / 7 (real 5) |
+|  | real x | 6 | 0.09 | 21.2 | 1.64 | 9.88 | 0.9 | 2.51 | 0.9 | 0 | 0 | 0.799 |  |
+|  | real loo | 6 | 0.47 | 15.46 | 1.16 | 19.39 | 1.2 | 2 | 0.58 | 0 | 4 | 0.626 |  |
+| impact | made | 6 |  | 4.38 | 2.39 | 30.05 | 0.58 | 3.25 | 0.9 | 1 | 0 | 0.849 | 6 / 6 (real 3) |
+|  | real x | 2 |  | 6.19 | 2.5 | 31.98 | 0.46 | 3.04 | 1.09 | 0.5 | 0 | 0.659 |  |
+| | note: thin: the library has three cinematic hits (all three were the v1 impact forge refs); one is held out as bench, so v1 impact bench numbers are optimistic. | |  |  |  |  |  |  |  |  |  |  |  |
+| logo_sting | made | 5 |  | 13.08 | 1.68 | 13.93 | 1.04 | 1.38 | -0.47 | 1 | 0 | 0.716 | 5 / 6 (real 5.5) |
+|  | real x | 2 |  | 15.52 | 1.46 | 21.27 | 1.7 | 1.4 | -0.82 | 0.5 | 0 | 0.185 |  |
+|  | real loo | 2 |  | 23.22 | 0.81 | 8.99 | 1.12 | 1.36 | -0.58 | 1 | 0 | 0.507 |  |
+| | note: no real logo stings exist in the library (they are composed); the refs are the struck metal / glass rings a sting ends on: a tail-shape and tone reference only. | |  |  |  |  |  |  |  |  |  |  |  |
+| notify | made | 6 | 0.15 | 15.63 | 0.66 | 13.09 | 0.86 | 1.54 | -0.5 | 1 | 0 | 0.867 | 7 / 7 (real 5.5) |
+|  | real x | 5 | -0.24 | 21.3 | 1.3 | 28.92 | 0.34 | 1.25 | -0.24 | 1 | 0 | 0.593 |  |
+|  | real loo | 5 | 3.84 | 16.7 | 0.81 | 17.41 | 1.19 | 1.76 | -0.91 | 1 | 0 | 0.476 |  |
+| | note: struck bells / glass / kalimba (forge) and celesta / glass / triangle (bench), rings capped at 2 s with a 0.25 s fade; no designed UI dings in the library. | |  |  |  |  |  |  |  |  |  |  |  |
+| pop | made | 5 | -0.02 | 11.42 | 0.55 | 11.01 | 0.82 | 2.32 | -0.2 | 0.4 | 0 | 0.735 | 7 / 7 (real 6) |
+|  | real x | 7 | -0.09 | 16.06 | 1.51 | 20.54 | 0.91 | 2.46 | -0.5 | 0.29 | 0 | 0.501 |  |
+|  | real loo | 6 | 1.13 | 13.66 | 0.41 | 12.5 | 1.02 | 1.96 | -1.06 | 0.67 | 0 | 0.522 |  |
+| pro_click | made | 5 |  | 15.43 | 1.28 | 13.47 | 0.8 | 3.91 | 2.28 | 0 | 0 | 0.786 | 5 / 6 (real 4) |
+|  | real x | 1 |  | 29.35 | 1.06 | 10.68 | 0.53 | 4.25 | 2.96 | 0 | 0 |  |  |
+|  | real loo | 2 |  | 18.53 | 1.73 | 8.99 | 1.08 | 2.19 | 0.51 | 0 | 2 | 0.45 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md).  | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_glitch | made | 6 |  |  |  |  |  | 2.53 | 0.24 | 0 | 0 | 0.853 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge only, one example. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_hover_tick | made | 5 | -1.32 | 6.25 | 0.82 | 10.43 | 1 | 1.61 | 0.45 | 0 | 0 | 0.862 | 6 / 7 (real 6) |
+|  | real x | 3 | -2.23 | 6.51 | 1.11 | 20.12 | 1 | 3.04 | 0.97 | 0 | 0 | 0.82 |  |
+|  | real loo | 3 |  | 8.32 | 0.67 | 5.84 | 0.86 | 1.79 | 0.71 | 0 | 1 | 0.684 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md).  | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_impact | made | 5 |  |  |  |  |  | 2.17 | -0.09 | 0.6 | 0 | 0.788 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge only (one SFX-only film); designed, sub-heavy, gated tails. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_logo_sting | made | 5 |  | 15.62 | 2.15 | 22.33 | 0.24 | 1.02 | -0.68 | 0.2 | 0 | 0.642 | 4 / 6 (real 6) |
+|  | real x | 1 |  | 15.49 | 2.84 | 24.51 | 0.06 | 0.99 | -0.25 | 0 | 0 |  |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge: falling chirp into a tonal hum; bench: a music end chord with a 4 s tail. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_notify | made | 5 |  |  |  |  |  | 2.16 | 0.38 | 1 | 0 | 0.936 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge only. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_pop | made | 6 |  | 19.51 | 1.82 | 37.31 | 0.88 | 2.68 | 1.27 | 0.17 | 0 | 0.617 | 3 / 6 (real 3) |
+|  | real x | 2 |  | 18.43 | 2.78 | 42.94 | 0.06 | 3.54 | 2.33 | 0 | 0 | 0.488 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md).  | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_pop_in | made | 5 |  |  |  |  |  | 0.93 | -3.13 | 0 | 0 | 0.75 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). not a forge category yet: element-in micro hits (thump + tick), forge only. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_riser | made | 5 |  | 17.88 | 1.54 | 36.57 | 0.05 | 2.71 | 0.47 | 0.2 | 0 | 0.712 | 4 / 6 (real 6) |
+|  | real x | 1 |  | 21.35 | 0.79 | 18.43 | 0.68 | 1.03 | -0.72 | 0 | 0 |  |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge: one designed stutter riser; bench: one noise riser at a film end. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_shimmer | made | 5 |  |  |  |  |  | 3.29 | 1 | 0.2 | 0 | 0.646 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge only; one granular sparkle + one melodic chime run. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_sub_drop | made | 5 |  | 24.84 | 0.54 | 16.11 | 1.64 | 2.44 | 0.68 | 0 | 0 | 0.835 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). bench only, one example under music + voice. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_tap | made | 5 |  |  |  |  |  | 1.98 | 1.93 | 0.2 | 0 | 0.861 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge only, one example. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_typing_key | made | 6 |  | 26.09 | 0.43 | 13.62 | 0.79 | 1.6 | -0.96 | 0 | 0 | 0.815 | 4 / 6 (real 5.5) |
+|  | real x | 6 |  | 26.2 | 0.52 | 11.54 | 0.71 | 1.88 | -0.42 | 0 | 0 | 0.849 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md).  | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_typing_run | made | 6 |  |  |  |  |  | 1.79 | 0.59 | 0 | 0 | 0.813 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). not a forge category yet: one whole designed typing run. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_whoosh_big | made | 6 |  |  |  |  |  | 3.71 | 1.56 | 0.83 | 0 | 0.882 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). forge only (one SFX-only film); the bench films bury their whooshes under music + voice. | |  |  |  |  |  |  |  |  |  |  |  |
+| pro_zip | made | 5 | -2.41 | 11.89 | 0.71 | 20.81 | 0.84 | 2.34 | -1.39 | 0 | 0 | 0.761 | 5 / 7 (real 5) |
+|  | real loo | 4 | 1.71 | 10.4 | 1 | 34.47 | 1.15 | 1.4 | 0.54 | 0 | 0 | 0.529 |  |
+| | note: pro designed SFX from the reference launch films (bed under some trims; see docs/motion-sfx-study.md). not a forge category yet: tonal pitch sweeps, bench only (two films over music). | |  |  |  |  |  |  |  |  |  |  |  |
+| riser | made | 5 |  | 12.75 | 2.05 | 23.24 | 0.09 | 2.51 | 0.08 | 0.6 | 0 | 0.772 | 3 / 6 (real 4) |
+|  | real x | 1 |  | 17.61 | 1.01 | 20.04 | 0.5 | 3.52 | 1.06 | 1 | 0 |  |  |
+|  | real loo | 2 |  | 13.22 | 0.95 | 36.07 | 3.35 | 2.7 | 1.15 | 0.5 | 0 | 0.767 |  |
+| | note: thin: one designed trailer riser (forge); the bench is two real cymbal swells, no synth risers. | |  |  |  |  |  |  |  |  |  |  |  |
+| shimmer | made | 6 | 1.07 | 10.68 | 0.35 | 4.06 | 0.97 | 3.46 | 0.91 | 0.67 | 0 | 0.845 | 7 / 7 (real 6) |
+|  | real x | 5 | 1.69 | 9.66 | 0.73 | 8.58 | 0.73 | 2.87 | 0.03 | 0.6 | 2 | 0.59 |  |
+|  | real loo | 4 | 1.01 | 15.52 | 1.33 | 12.89 | 1.05 | 3.4 | 0.56 | 1 | 0 | 0.644 |  |
+| | note: kit shimmer_01 (bar chimes sweep) is bench: its author also recorded the celesta notify bench. | |  |  |  |  |  |  |  |  |  |  |  |
+| sub_drop | made | 5 |  | 8.84 | 1.76 | 37.38 | 0.31 | 3.31 | 0.7 | 0 | 0 | 0.727 |  |
+| | note: one designed source (a tom pitched down 24 semitones by its author), held out as bench; the forge has no sub-drop refs. | |  |  |  |  |  |  |  |  |  |  |  |
+| swipe | made | 5 | -9.49 | 5.15 | 0.38 | 7.67 | 0.92 | 1.88 | 0.11 | 0.6 | 0 | 0.812 | 4 / 7 (real 6) |
+|  | real x | 4 | -10.07 | 16.83 | 0.43 | 14.12 | 0.79 | 2.7 | 0.59 | 1 | 0 | 0.845 |  |
+|  | real loo | 4 | 1.25 | 3.64 | 0.22 | 10.07 | 1.02 | 3.42 | 2.08 | 0.25 | 0 | 0.857 |  |
+| | note: cloth only: the library has no paper slides. | |  |  |  |  |  |  |  |  |  |  |  |
+| swish | made | 5 | 0.62 | 6.69 | 0.23 | 11.69 | 1.02 | 2.94 | 1.62 | 0.8 | 0 | 0.796 | 5 / 7 (real 6) |
+|  | real x | 7 | 1.94 | 11.08 | 0.64 | 12.88 | 0.64 | 3.22 | 1.6 | 0.57 | 0 | 0.811 |  |
+|  | real loo | 3 |  | 9.01 | 0.91 | 16.45 | 1.16 | 3.5 | 1.92 | 0.67 | 0 | 0.79 |  |
+| tap | made | 5 | -2.63 | 6.69 | 1.22 | 11.81 | 1.18 | 1.22 | 0.55 | 0.2 | 0 | 0.761 | 5 / 7 (real 6) |
+|  | real x | 7 | -1.17 | 9.35 | 1.59 | 13.67 | 1.64 | 1.85 | 0.92 | 0.14 | 0 | 0.713 |  |
+|  | real loo | 6 | 1.66 | 16.78 | 1.19 | 11.59 | 1 | 1.62 | 0.35 | 0.17 | 0 | 0.716 |  |
+| toggle | made | 5 | -3.4 | 7.82 | 0.42 | 10.11 | 0.74 | 1.72 | -0.38 | 0 | 0 | 0.729 | 5 / 7 (real 6) |
+|  | real x | 4 | -2.84 | 12.48 | 1.87 | 18.78 | 2.11 | 2.1 | -0.02 | 0 | 0 | 0.477 |  |
+|  | real loo | 4 | 1.54 | 6.25 | 0.28 | 4.92 | 1.02 | 1.94 | -0.28 | 0 | 0 | 0.725 |  |
+| typing_key | made | 6 | -0.32 | 7.44 | 1.04 | 9.08 | 1 | 3.74 | 1.45 | 0 | 0 | 0.713 | 4 / 7 (real 6) |
+|  | real x | 15 | 0.26 | 8.88 | 1.01 | 12.2 | 1.29 | 4.75 | 2.83 | 0.53 | 0 | 0.721 |  |
+|  | real loo | 12 | 0.23 | 5.47 | 1.52 | 16.7 | 1 | 3.71 | 1.53 | 0.42 | 0 | 0.673 |  |
+| whoosh_big | made | 6 | 0.51 | 6.87 | 0.4 | 10.21 | 1.05 | 2.44 | -0.02 | 0.83 | 0 | 0.76 | 7 / 7 (real 5) |
+|  | real x | 3 | -0.27 | 8.8 | 1.13 | 19.46 | 3 | 2.92 | 0.04 | 1 | 0 | 0.7 |  |
+|  | real loo | 3 |  | 4.25 | 0.43 | 6.67 | 0.97 | 1.88 | 0.19 | 0.33 | 0 | 0.495 |  |
+| | note: forge = three designed Mixkit whooshes; bench = real air / cape swoops. | |  |  |  |  |  |  |  |  |  |  |  |
+| whoosh_fast | made | 6 | -5.44 | 6.21 | 0.27 | 10.14 | 0.88 | 3.29 | 2.16 | 1 | 0 | 0.831 | 4 / 7 (real 6.5) |
+|  | real x | 5 | 0.57 | 10.31 | 1.22 | 20.2 | 0.6 | 4.14 | 2.78 | 0.4 | 0 | 0.826 |  |
+|  | real loo | 5 | 1.52 | 4.58 | 0.4 | 8.21 | 1.08 | 4.14 | 2.62 | 0.8 | 0 | 0.772 |  |
+
+Texture (medians; model-free, not in any forge objective): floor dB = 10th percentile 5 ms frame re the loudest (-120 = digital silence), stereo corr (1 = mono), darken = log2 centroid at half the tail / at the peak (< 0: the decay darkens).
+
+| category | set | floor dB | stereo corr | darken |
+|---|---|---|---|---|
+| click | made | -45.0 | 0.99 | 0.26 |
+|  | real x | -42.85 | 0.99 | -0.12 |
+|  | real loo | -44.8 | 1.0 | -0.07 |
+| downlifter | made | -54.45 | 0.67 | -1.81 |
+| glitch | made | -55.65 | 0.13 | 0.03 |
+| hover_tick | made | -44.0 | 0.88 | -0.09 |
+|  | real x | -43.55 | 1.0 | -0.09 |
+|  | real loo | -24.9 | 0.52 | -0.01 |
+| impact | made | -68.95 | 0.68 | -0.96 |
+|  | real x | -70.55 | 0.54 | -1.3 |
+| logo_sting | made | -63.4 | 0.77 | 0.3 |
+|  | real x | -52.1 | 0.59 | -0.85 |
+|  | real loo | -44.1 | 0.81 | -1.43 |
+| notify | made | -43.7 | 0.98 | -1.53 |
+|  | real x | -41.2 | 0.99 | -1.06 |
+|  | real loo | -24.4 | 0.61 | -0.53 |
+| pop | made | -62.8 | 1.0 | 0.25 |
+|  | real x | -53.2 | 1.0 | 0.21 |
+|  | real loo | -47.2 | 1.0 | 0.12 |
+| pro_click | made | -83.1 | 1.0 |  |
+|  | real x | -108.5 | 0.0 |  |
+|  | real loo | -30.6 | 0.95 | 0.26 |
+| pro_glitch | made | -44.85 | 0.04 | 0.04 |
+| pro_hover_tick | made | -37.8 | 0.26 |  |
+|  | real x | -47.0 | -0.0 |  |
+|  | real loo | -37.4 | 0.16 |  |
+| pro_impact | made | -34.7 | 0.35 | 0.41 |
+| pro_logo_sting | made | -50.4 | 0.88 | -0.62 |
+|  | real x | -120.0 | 1.0 | -0.38 |
+| pro_notify | made | -46.3 | 0.95 | -0.37 |
+| pro_pop | made | -53.25 | 1.0 | -0.04 |
+|  | real x | -120.0 | 1.0 |  |
+| pro_pop_in | made | -61.5 | 0.58 | -0.24 |
+| pro_riser | made | -32.5 | 0.82 |  |
+|  | real x | -41.8 | 0.96 | 0.22 |
+| pro_shimmer | made | -49.0 | 0.33 | -0.53 |
+| pro_sub_drop | made | -38.3 | 1.0 | 0.13 |
+| pro_tap | made | -83.3 | 0.42 | 0.07 |
+| pro_typing_key | made | -38.95 | 1.0 | 0.02 |
+|  | real x | -53.55 | 1.0 | -0.04 |
+| pro_typing_run | made | -57.95 | 1.0 |  |
+| pro_whoosh_big | made | -55.05 | 1.0 | -1.31 |
+| pro_zip | made | -52.9 | 0.99 | -1.67 |
+|  | real loo | -21.95 | 0.93 | 0.24 |
+| riser | made | -33.8 | 0.55 |  |
+|  | real x | -49.9 | 0.0 |  |
+|  | real loo | -30.65 | 1.0 | 0.12 |
+| shimmer | made | -57.5 | 0.07 | -0.64 |
+|  | real x | -46.8 | 0.17 | -0.29 |
+|  | real loo | -36.1 | 0.68 | -0.33 |
+| sub_drop | made | -67.0 | 1.0 | -0.59 |
+| swipe | made | -61.9 | 0.64 | 0.19 |
+|  | real x | -56.85 | 0.42 | 0.07 |
+|  | real loo | -38.05 | 0.68 | 0.61 |
+| swish | made | -57.9 | 0.96 | -0.02 |
+|  | real x | -55.6 | 0.87 | -0.16 |
+|  | real loo | -44.6 | 1.0 | -0.45 |
+| tap | made | -54.2 | 0.99 | -0.03 |
+|  | real x | -43.6 | 1.0 | 1.31 |
+|  | real loo | -38.4 | 1.0 | 0.94 |
+| toggle | made | -67.3 | 1.0 | 0.32 |
+|  | real x | -48.4 | 1.0 | -0.11 |
+|  | real loo | -49.1 | 0.48 | -0.18 |
+| typing_key | made | -51.8 | 0.96 | -0.43 |
+|  | real x | -43.7 | 0.76 | 0.04 |
+|  | real loo | -39.65 | 1.0 | 0.09 |
+| whoosh_big | made | -59.3 | 0.94 | -0.1 |
+|  | real x | -43.2 | 0.66 | -0.11 |
+|  | real loo | -42.9 | 1.0 | 0.28 |
+| whoosh_fast | made | -63.35 | 0.97 | -0.24 |
+|  | real x | -65.4 | 0.81 | -0.16 |
+|  | real loo | -32.2 | 1.0 | -0.2 |
+
+Diversity among the made variants (CLAP cosine mean / max, tonal distance min dB, near duplicates):
+
+- click: cos 0.723 / 0.837, tone min 7.41 dB, 0 near duplicate pair(s) (bench refs: cos 0.576 / 0.792, tone min 6.13 dB)
+- downlifter: cos 0.749 / 0.955, tone min 3.12 dB, 0 near duplicate pair(s)
+- glitch: cos 0.696 / 0.836, tone min 2.68 dB, 0 near duplicate pair(s)
+- hover_tick: cos 0.807 / 0.923, tone min 3.74 dB, 0 near duplicate pair(s) (bench refs: cos 0.626 / 0.847, tone min 9.21 dB)
+- impact: cos 0.849 / 0.955, tone min 1.01 dB, 0 near duplicate pair(s)
+- logo_sting: cos 0.716 / 0.946, tone min 11.23 dB, 0 near duplicate pair(s) (bench refs: cos 0.507 / 0.507, tone min 23.22 dB)
+- notify: cos 0.867 / 0.959, tone min 5.35 dB, 0 near duplicate pair(s) (bench refs: cos 0.476 / 0.905, tone min 11.33 dB)
+- pop: cos 0.735 / 0.877, tone min 5.92 dB, 0 near duplicate pair(s) (bench refs: cos 0.522 / 0.832, tone min 7.62 dB)
+- pro_click: cos 0.786 / 0.902, tone min 6.93 dB, 0 near duplicate pair(s) (bench refs: cos 0.45 / 0.45, tone min 18.53 dB)
+- pro_glitch: cos 0.853 / 0.912, tone min 1.35 dB, 0 near duplicate pair(s)
+- pro_hover_tick: cos 0.862 / 0.942, tone min 1.79 dB, 0 near duplicate pair(s) (bench refs: cos 0.684 / 0.776, tone min 6.36 dB)
+- pro_impact: cos 0.788 / 0.898, tone min 5.23 dB, 0 near duplicate pair(s)
+- pro_logo_sting: cos 0.642 / 0.827, tone min 14.47 dB, 0 near duplicate pair(s)
+- pro_notify: cos 0.936 / 0.973, tone min 5.72 dB, 0 near duplicate pair(s)
+- pro_pop: cos 0.617 / 0.779, tone min 11.75 dB, 0 near duplicate pair(s)
+- pro_pop_in: cos 0.75 / 0.823, tone min 5.62 dB, 0 near duplicate pair(s)
+- pro_riser: cos 0.712 / 0.808, tone min 2.42 dB, 0 near duplicate pair(s)
+- pro_shimmer: cos 0.646 / 0.808, tone min 7.57 dB, 0 near duplicate pair(s)
+- pro_sub_drop: cos 0.835 / 0.885, tone min 4.46 dB, 0 near duplicate pair(s)
+- pro_tap: cos 0.861 / 0.939, tone min 7.57 dB, 0 near duplicate pair(s)
+- pro_typing_key: cos 0.815 / 0.952, tone min 1.1 dB, 0 near duplicate pair(s)
+- pro_typing_run: cos 0.813 / 0.951, tone min 1.36 dB, 0 near duplicate pair(s)
+- pro_whoosh_big: cos 0.882 / 0.966, tone min 3.24 dB, 0 near duplicate pair(s)
+- pro_zip: cos 0.761 / 0.922, tone min 3.83 dB, 0 near duplicate pair(s) (bench refs: cos 0.529 / 0.686, tone min 8.63 dB)
+- riser: cos 0.772 / 0.873, tone min 3.64 dB, 0 near duplicate pair(s) (bench refs: cos 0.767 / 0.767, tone min 13.22 dB)
+- shimmer: cos 0.845 / 0.938, tone min 6.82 dB, 0 near duplicate pair(s) (bench refs: cos 0.644 / 0.765, tone min 10.66 dB)
+- sub_drop: cos 0.727 / 0.889, tone min 4.89 dB, 0 near duplicate pair(s)
+- swipe: cos 0.812 / 0.897, tone min 2.37 dB, 0 near duplicate pair(s) (bench refs: cos 0.857 / 0.918, tone min 2.76 dB)
+- swish: cos 0.796 / 0.946, tone min 3.54 dB, 0 near duplicate pair(s) (bench refs: cos 0.79 / 0.908, tone min 9.83 dB)
+- tap: cos 0.761 / 0.853, tone min 5.43 dB, 0 near duplicate pair(s) (bench refs: cos 0.716 / 0.98, tone min 2.68 dB)
+- toggle: cos 0.729 / 0.782, tone min 4.99 dB, 0 near duplicate pair(s) (bench refs: cos 0.725 / 0.846, tone min 5.33 dB)
+- typing_key: cos 0.713 / 0.885, tone min 6.37 dB, 0 near duplicate pair(s) (bench refs: cos 0.673 / 0.919, tone min 4.64 dB)
+- whoosh_big: cos 0.76 / 0.902, tone min 3.3 dB, 0 near duplicate pair(s) (bench refs: cos 0.495 / 0.768, tone min 3.17 dB)
+- whoosh_fast: cos 0.831 / 0.921, tone min 3.0 dB, 0 near duplicate pair(s) (bench refs: cos 0.772 / 0.951, tone min 2.28 dB)
+
+## Judge notes (round 6, finalizer, 19:02-19:40)
+
+Made = `out/forge_v2/<category>/final/` after round 6 (183 sounds, 34 categories). This file is one full run at 19:03
+on the tree the areas delivered (112 s). Nothing was tuned on it. It only decided round 5 vs round 6 per category.
+Each area had run the benchmark once to confirm (pop-notify on candidates with `--no-real`; tap-riser and
+impact-glitch on their deliveries). Nobody has listened yet.
+
+Round 6 re-delivered 5 categories: pro_pop (pop-notify), riser and tap (tap-riser), pro_impact and glitch
+(impact-glitch). pro_notify was built but not delivered by its area (candidate in `pro_notify/final_r6/`). The code
+area changed only `report.json` files (pro_shimmer, pro_typing_run; then the finalizer applied the same schema upgrade
+to every final). The other 29 categories give exactly the round-5 numbers (checked field by field).
+
+Rule for r5 vs r6: the same as rounds 4 and 5 (`blind_v2.verdict`). A check counts as better or worse only when it
+moves relative to what real recordings score on it. The recording floor is left out. Model checks count as up or
+down. Trust order: model-free first, then model checks, and the areas' spectrogram sheets break ties. Script:
+`out/forge_v2/_final_r6/r5_vs_r6.py` (local, not committed).
+
+**pro_impact went back to round 4** (the round-5 final; round 5 did not touch it). Its rows in this file are the
+round-5 rows (same files) and the JSON says so under `kept_r4`. The round-6 delivery is in `pro_impact/final_r6/`;
+its as-run rows are in `out/forge_v2/_final_r6/results_v2r6_asrun.json` (local).
+
+### Round 5 -> round 6 (made medians on the held-out bench)
+
+| category | final | model-free better / worse | model up / down | moves |
+|---|---|---|---|---|
+| pro_pop | **r6** | 2 / 0 | 1 / 2 | variety 0.649 -> 0.617 (forge refs 0.488); tone 22.93 -> 19.51 dB (real x 18.43); env oct 1.41 -> 1.82, curve 35.59 -> 37.31, t40 x 0.75 -> 0.88 all inside the real rows; phrase z 3.29 -> 2.68, margin 1.76 -> 1.27, AudioSet names 0 -> 0.17 |
+| riser | **r6** | 2 / 0 | 1 / 1 | variety 0.801 -> 0.772 (bench 0.767); env oct 2.35 -> 2.05; tone 9.33 -> 12.75 dB (inside the real rows, loo 13.22); margin -0.30 -> +0.08; phrase z 2.65 -> 2.51 |
+| tap | **r6** | 2 / 0 | 1 / 2 | variety 0.782 -> 0.761 (real 0.71); env oct 1.40 -> 1.22; tone 5.81 -> 6.69 and t40 x 1.00 -> 1.18 inside the real rows; phrase z 1.12 -> 1.22; typ z -2.31 -> -2.63; margin 0.77 -> 0.55; inside 4 -> 5 of 7 |
+| glitch | **r6** | no checks (no refs) | 3 / 0 | phrase z 2.03 -> 2.62; margin -0.13 -> 0.88; AudioSet names 0 -> 0.17; variety 0.728 -> 0.696 (no real row) |
+| pro_impact | **r4 kept** | 0 / 1 | 2 / 0 | variety 0.788 -> 0.820 (film refs 0.612) worse; stereo corr 0.35 -> 0.67 (no bench row; the film tails measure -0.01 / 0.22); phrase z 2.17 -> 2.64; AudioSet names 0.6 -> 1.0; margin -0.09 -> -0.06 |
+| pro_notify | r5 (not re-delivered) | - | - | the area's candidate (`final_r6/`, measured on its own run): variety 0.936 -> 0.814, phrase z 2.16 -> 1.45, margin 0.38 -> -0.03 |
+| pro_shimmer, pro_typing_run | unchanged sound | - | - | `report.json` only: render blocks (schema 2); pro_shimmer 04 / 05 re-render again (`r2_path`) |
+| pro_tap | unchanged | - | - | not attempted |
+
+Reasons:
+- **pro_pop (r6).** Variety and tone both move toward the real rows, nothing model-free gets worse. On the area's
+  sheet (`pro_pop/r4_vs_r6.png`) round 4's 01 / 02 carry stepped square gates (the '8-bit' reading); round 6 has
+  six gliding pops (chirp, falling boop with a click, rising bloop, double pop, tink, low thup). CLAP '8-bit /
+  chiptune' in the top 3: 3 of 6 -> 0 of 6 (forge-side diagnostic). The held-out phrasings ('a quick electronic
+  blip', 'a tiny synthetic pop') prefer round 4's synthetic idiom, so phrase z and margin fell. The floor rose
+  -69.5 -> -53.3 dB (room and tails; left out by the rule). Open: member 05 (tink) is a near-steady 2 kHz line
+  after its first ~4 ms.
+- **riser (r6).** The jet-engine reading was the round's target: margin -0.30 -> +0.08 (the three new members are
+  positive, the two kept round-4 members, shepard and rush, are still negative), AudioSet no longer lists
+  'Aircraft' / 'Jet engine' in its top three. Tone moved away from the two cymbal swells but stays inside the real
+  rows. The gallery's own check flags the swell member (`riser_05`) for a tail cut at -2 dB: the riser stops at its
+  peak, where the hit lands; on its own it ends abruptly.
+- **tap (r6).** No new search: per family the better of round 4 / round 5 on the forge critic, round 4's width, round
+  5's tails capped. Model-free better 2 / worse 0 (round 5's delivery was 1 / 3). Stereo corr stays at 0.99. Two of
+  three model checks fell slightly, and AudioSet still names it on 1 of 5.
+- **glitch (r6).** Glitch has no real material in the library, so only model checks exist; all three go up, CLAP's top
+  phrase is 'a digital glitch' on 5 of 6 (forge side; round 3: 0). No artifact flags.
+- **pro_impact (r4 kept).** Close call. The only held-out model-free check, variety against the two film refs, got
+  worse (0.788 -> 0.820), and the centred boom narrows the stereo image (corr 0.35 -> 0.67) away from the films'
+  wide tails. The model checks rose a lot (AudioSet names it on 5 of 5), and the area's sheet
+  (`pro_impact/r6/sheet_r6_vs_r4.png`) shows a cleaner hit-then-decay envelope. By the trust order round 4 stays,
+  as tap did in round 5. Swapping is one folder copy; both are on `out/showcase/compare_r6.html`.
+
+Reproducibility: the finalizer applied the code area's schema upgrade to every final
+(`python -m earshot.forge.schema out/forge_v2/*/final --upgrade --write`, after restoring pro_impact): 34 of 34 finals,
+183 of 183 picks re-render from their `report.json` within 1.19e-7 (one 24-bit step), every report now carries
+`schema: 2` and a `render` block per pick. The pre-upgrade reports are in `out/forge_v2/_final_r6/reports_pre_schema/`.
+Seed-bank pins were redone for all 34 finals (`out/forge_v2/_core_r5/pin_finals.py`; glitch, pop, popin and riser
+banks changed).

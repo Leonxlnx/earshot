@@ -211,8 +211,8 @@ def test_round5_pro_pop_is_a_natural_pop():
     _, pop, _ = _mods()
     from earshot.forge import polish
     from earshot.forge.critic import study_measures
-    fam = pop.FAMILY_V2['pro_pop']
-    assert len(fam) == len(pop.FAMILY_V2_NAMES['pro_pop'])
+    fam = pop.FAMILY_V2_R5['pro_pop']                              # round 6: the round-5 family moved here (final_r5/)
+    assert len(fam) == len(pop.FAMILY_V2_NAMES_R5['pro_pop'])
     for i, p in enumerate(fam):
         assert p['c_nat'] == 1.0 and p['drive'] <= 0.2 and p['steps'] == 0.0, i
         x = render(pop, p, i + 1)
@@ -266,3 +266,53 @@ def test_round5_pro_notify_is_the_clean_film_ding():
     assert np.allclose(steps, 1.0, atol=0.01)                                # a semitone family
     for i, p in enumerate(notify.FAMILY_R3['pro_notify']):                   # the round-3 members still render
         assert render(notify, p, 1) is not None, i
+
+
+def test_round6_pro_pop_natural_and_varied():
+    """round 6 (pop-notify; the round-5 judge: natural but four near-steady tones, variety lost): every member is a
+    natural pop (n6: no drive, no stepped gate, soft partials) whose pitch moves through its decay; the family covers
+    falling and rising pitches, low and high registers and a double pop; the round-5 sets render exactly as before"""
+    _, pop, _ = _mods()
+    from earshot.forge import polish
+    from earshot.forge.critic import study_measures
+    fam = pop.FAMILY_V2['pro_pop']
+    assert fam is pop.FAMILY_V2_R6['pro_pop'] and len(fam) == len(pop.FAMILY_V2_NAMES['pro_pop']) == 6
+    for i, p in enumerate(fam):
+        assert p['n6'] == 1.0 and p['drive'] <= 0.2 and p['steps'] == 0.0 and p['n_h3'] <= 0.05, i
+        assert abs(np.log2(p['n_f0'] / p['n_f1'])) >= 0.25, i                   # the pitch moves (no steady beep)
+        x = render(pop, p, i + 1)
+        m = x if x.ndim == 1 else x.mean(1)
+        assert abs(m[0]) < 1e-3 and abs(m[-1]) < 1e-3 and polish.silence(x)['silence_ms'] < 2.0, i
+        sm = study_measures(x)
+        assert 0.05 <= sm['length'] <= 0.2 and sm['corr'] >= 0.95, (i, sm['length'], sm['corr'])
+        assert pop.pro_penalty(x, 'pro_pop') <= 1.0, i                          # (the chirp's t40 ~80 ms vs 70)
+    up = [p for p in fam if p['n_f1'] > p['n_f0']]
+    down = [p for p in fam if p['n_f1'] < p['n_f0']]
+    assert len(up) >= 2 and len(down) >= 3
+    assert any(p['n_dbl'] > -59 for p in fam)                                   # a double pop
+    lo = min(min(p['n_f0'], p['n_f1']) for p in fam)
+    hi = max(max(p['n_f0'], p['n_f1']) for p in fam)
+    assert lo < 300 and hi > 8000                                               # registers far apart
+    for p in pop.FAMILY_V2_R5['pro_pop'][:2] + pop.FAMILY_V2_R4['pro_pop'][:2]:
+        base = {k: v for k, v in p.items() if not k.startswith('n_') and k != 'n6'}
+        assert np.array_equal(render(pop, base, 3), render(pop, dict(base, n6=0.0), 3))
+
+
+def test_round6_pro_notify_chime_family():
+    """round 6 (not delivered; kept as notify.FAMILY_R6 / final_r6/): five distinct dings around the film targets:
+    heads on the semitone ladder, attack <= 15 ms, t20 20-56 ms, t40 70-360 ms (the wood bar is short), nothing under
+    500 Hz, no drive"""
+    notify, _, _ = _mods()
+    fam = notify.FAMILY_R6['pro_notify']
+    assert len(fam) == 5 and len({p.get('mat', 'film') + p['style'] + str(p.get('c_motif')) for p in fam}) == 5
+    for i, p in enumerate(fam):
+        assert p['drive'] == 0.0 and p['head_drive'] == 0.0 and p['air'] <= -59, i
+        x = render(notify, p, i + 3)
+        assert render(notify, p, i + 3).tolist() == x.tolist()
+        m = notify.measure(x)
+        assert m['attack_ms'] <= 15 and 20 <= m['t20_ms'] <= 56 and 70 <= m['t40_ms'] <= 360, (i, m)  # fm_bell t20 50-54; wood t40 78-142 (short)
+        lo = 10 * np.log10(sum(10 ** (s / 10) for s in m['shares'][:2]))
+        assert lo < -38 and 1700 <= m['head_hz'] <= 2400, (i, m)
+        assert notify.pro_penalty(x, 'pro_notify') <= 1.0, i
+    assert notify.FAMILY['pro_notify'] is not notify.FAMILY_R6['pro_notify']   # delivered: round 5
+    assert notify.FAMILY['pro_notify'][0]['style'] == 'ding'

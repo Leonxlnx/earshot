@@ -127,3 +127,49 @@ def test_glitch_r3_drama_and_acceleration():
     assert np.median(meds) < -30 and np.median(meds) < dense - 5
     assert acc >= 2
     assert glitch.study_extra(render(glitch, p, 40), {}) > -1.0
+
+
+# ---------------------------------------------------------------------------------------------- round 6 (glitch)
+def _r6(name):
+    return dict(dict(glitch.FAMILY6)[name])
+
+
+def test_glitch_r6_older_sets_keep_their_path():
+    """only parameter sets with `roll0` take render6; an r3-style set renders exactly as before (no r6 key leaks)"""
+    assert 'roll0' not in glitch.DEFAULTS and set(glitch.DEFAULTS) <= set(glitch.SPACE)
+    x = glitch.render(dict(glitch.DEFAULTS), dsp.rng(5))
+    y = glitch.render(dict(glitch.DEFAULTS), dsp.rng(5))
+    assert np.array_equal(x, y) and len(x) / SR < glitch.DEFAULTS['dur'] + 0.12
+
+
+def test_glitch_r6_family_renders_wide_hard_ended_and_clean():
+    assert 5 <= len(glitch.FAMILY6) <= 6
+    for name, p in glitch.FAMILY6:
+        assert 'roll0' in p and all(k in glitch.SPACE6 for k in p), name
+        x = glitch.render(dict(p), dsp.rng(3))
+        assert np.array_equal(x, glitch.render(dict(p), dsp.rng(3))), name           # pure function of params + seed
+        assert x.ndim == 2 and np.isfinite(x).all() and 0.5 < np.abs(x).max() <= 0.9, name
+        st = glitch.glitch_stats(x)
+        assert st['corr'] < 0.5, (name, st['corr'])                                    # wide (the film: 0.04)
+        assert st['end_db'] < -45, (name, st['end_db'])                                # ends on the cut, not chopped
+        assert st['bursts'] >= 6, (name, st['bursts'])
+        assert abs(float(x.mean())) < 1e-3, name                                      # no DC from the low thumps
+        m = np.abs(x.mean(1))
+        aud = np.nonzero(m > m.max() * 1e-3)[0]
+        assert (m[aud[0]:aud[-1]] < 1e-6).sum() < 96, name                            # dropouts are not digital silence
+
+
+def test_glitch_r6_roll_speeds_up_and_sample_rate_drops():
+    p = {**glitch.DEFAULTS6, **_r6('stutter')}
+    ts = glitch._grid(p, p['dur'] * p['crackle'], p['dur'])
+    assert ts[0][1] > 2 * ts[-1][1]                                                    # slots 70 -> 20 ms
+    assert p['roll1'] < p['roll0'] / 4 and p['srate1'] < p['srate0'] / 4 and p['bits1'] < p['bits0']
+    # the sample-and-hold drop shows as lost top end: the last 150 ms is darker than the first 150 ms of the roll
+    x = glitch.render(_r6('dropout'), dsp.rng(3)).mean(1)
+
+    def hi_share(seg):
+        F = np.abs(np.fft.rfft(seg)) ** 2
+        f = np.fft.rfftfreq(len(seg), 1 / SR)
+        return F[f > 4000].sum() / (F.sum() + 1e-20)
+    n = int(0.15 * SR)
+    assert hi_share(x[-n - int(0.03 * SR):-int(0.03 * SR)]) < hi_share(x[:n])
