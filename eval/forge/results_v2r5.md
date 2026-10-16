@@ -219,7 +219,7 @@ Diversity among the made variants (CLAP cosine mean / max, tonal distance min dB
 - whoosh_big: cos 0.76 / 0.902, tone min 3.3 dB, 0 near duplicate pair(s) (bench refs: cos 0.495 / 0.768, tone min 3.17 dB)
 - whoosh_fast: cos 0.831 / 0.921, tone min 3.0 dB, 0 near duplicate pair(s) (bench refs: cos 0.772 / 0.951, tone min 2.28 dB)
 
-## Judge notes (round 5, finalizer, 15:56-16:45)
+## Judge notes (round 5, finalizer, 15:56-16:30)
 
 Made = `out/forge_v2/<category>/final/` after round 5 (183 sounds, 34 categories). Round 5 re-delivered 6 categories:
 whoosh_fast, tap, logo_sting (polish-ui) and pro_logo_sting, pro_pop, pro_notify (polish-pro). Their round-4 finals
