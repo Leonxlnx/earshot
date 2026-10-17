@@ -32,14 +32,35 @@ model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md).
   `earshot.forge.fit`, tunable when the fit is tonal. Extra bank files load from `EARSHOT_BANK`.
 - **Python API** `earshot.api.sfx_list / sfx_render / sfx_check / kit_init / kit_render / kit_check / kit_audition`;
   **MCP tools** `sfx_list`, `sfx_render`, `kit_render` (16 tools in all).
+- **Fitted sounds in the bank** (`earshot/forge/bank/fit.json`, `fit1`; `bank.VERSION` is now
+  `forge_v2r6+fit1+pluck1`): 15 recipes fitted from CC0 recordings on Freesound, `fit/<role>/<name>`, each with its
+  source (title, author, URL, licence) and the take-to-take `vary` at which its takes passed the take check (seeds
+  0-4 as the bank renders them: no hard artifact beyond the recording's, every audit warning also on the recording,
+  CLAP >= 0.90 to the fit's own render and within 0.06 of the fit's CLAP to the recording, excess energy within
+  1.5 dB, loudness spread <= 2 LU), at a fit grade of high. Credits: `docs/CREDITS_FIT.md` (CC0 needs none).
+- **Fit takes** (`earshot/forge/fit`, details in [docs/FIT.md](docs/FIT.md#takes-a-fit-rendered-for-use-03)):
+  `fit.render(model, seed, vary=v)` with `vary > 0`, or `take=True`, renders a take. Modal modes and sines partials
+  ring out past the trimmed recording's end instead of stopping on a ringing tail (13 of 46 CC0 fits had cut tails in
+  their takes), takes are high-passed at 8 Hz (no random DC offset), a spectral model's takes keep one loudness
+  (a cloth whoosh's 8 seeds: 7.3 -> 0.45 LU apart), and a sines residual follows the recording's roll-off above 16 kHz
+  (`residual.hf`; no more noise above 20 kHz the recording lacked). `earshot fit --takes` scores candidates on seeds
+  0, 1, 2. The fit itself is unchanged: on the 12 validation refs every seed-0 and seed-averaged quality number is
+  the same as in 0.2.
+- `earshot doctor` reports the sound bank: its version, the files it loaded and how many sounds of each type.
 - Docs: `docs/SFX.md`; README "Sound for films"; `docs/INTEGRATION.md` "cinetic uses earshot"; the earshot skill's
-  Loop 5 "make a film's sound kit".
-- Tests: `tests/test_bank.py`, `tests/test_sfx_kit.py` (no models).
+  Loop 5 "make a film's sound kit"; `docs/FIT.md` "Takes"; `docs/CREDITS_FIT.md`.
+- Tests: `tests/test_bank.py`, `tests/test_sfx_kit.py`, `tests/test_fit_takes.py` (no models).
 
 ### Changed
 
 - Wheels now ship the forge seed banks (`earshot/forge/seeds/*.json`) next to the bank and kit presets; before, a
   non-editable install had none.
+- **Presets use the fitted sounds where the measured comparison favours them** (earshot match of the role's
+  description, also against synth-blip descriptions, and earshot realness): calm tick, pop, short whoosh, space bar,
+  click and snap; crisp tick, light touch, text, click, snap, key and space bar; minimal light touch, text and snap
+  (16 role changes). A changed role keeps its loudness (`level_db` moved by the measured difference at the same
+  peak). Every note now says what the sound is and what was measured; no note cites a listening test. All takes of
+  the three presets pass `earshot kit check` (57, 59 and 58 takes).
 
 ## 0.2.1 - 2026-10-17
 

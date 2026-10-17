@@ -1,9 +1,11 @@
 # Sound for films: the bank, `earshot sfx`, `earshot kit`
 
-earshot 0.3.0 ships its forge sounds as a bank that renders by id, aims a take at the picture, audits it without
-models, and renders a whole film's kit into takes with measured sync points. Everything here is pure DSP (numpy /
-scipy): no models, no network, no recorded audio. It is the sound engine of a code-made film: a film pipeline renders
-from the bank in seconds and only ever searches (`earshot forge`) offline.
+earshot 0.3.0 ships its forge sounds, three tuned voices and 15 sounds fitted from public-domain recordings as a bank
+that renders by id, aims a take at the picture, audits it without models, and renders a whole film's kit into takes
+with measured sync points. Everything here is pure DSP (numpy / scipy): no models, no network, no recorded audio (a
+fitted sound is stored as its modes, partials and band envelopes, not as samples). It is the sound engine of a
+code-made film: a film pipeline renders from the bank in seconds and only ever searches (`earshot forge`) or fits
+(`earshot fit`) offline.
 
 ```bash
 earshot sfx list --kind whoosh                                     # what is in the bank
@@ -22,16 +24,17 @@ Contents: [the bank](#the-bank) · [knobs](#knobs-dur-apex-pitch-level) · [the 
 
 ## The bank
 
-`earshot/forge/bank/*.json` (package data; the forge file is 275 KB, 64 KB gzipped): 186 sounds today.
+`earshot/forge/bank/*.json` (package data; the forge file is 275 KB, 64 KB gzipped; the fit file 0.5 MB): 201 sounds
+today. `earshot doctor` reports the version and the counts.
 
 | file | version | entries | what |
 |---|---|---|---|
 | `forge_v2.json` | `forge_v2r6` | 183 | every delivered forge v2 final (34 categories, 4-6 named members each) |
+| `fit.json` | `fit1` | 15 | recipes fitted from CC0 recordings (`fit/<role>/<name>`, [below](#fit-entries-from-public-domain-recordings)) |
 | `pluck.json` | `pluck1` | 3 | the tuned kalimba voices (`pluck/kalimba`, `pluck/kalimba_soft`, `pluck/kalimba_ring`) |
-| `fit.json` (later) | `fit1` | - | recipes fitted from public-domain recordings (`fit/<role>/<name>`) |
 
-`bank.VERSION` joins the file versions (`forge_v2r6+pluck1`); extra bank files load from `EARSHOT_BANK` (paths joined
-by the OS path separator). Ids are `<category>/<member>`: the category is the public name (a user never needs the
+`bank.VERSION` joins the file versions (`forge_v2r6+fit1+pluck1`); extra bank files load from `EARSHOT_BANK` (paths
+joined by the OS path separator). Ids are `<category>/<member>`: the category is the public name (a user never needs the
 recipe module behind it: `typing_key` renders with `recipes/keypress.py`, `pro_pop` with `pop.render_v2`,
 `pro_typing_run` with `typing.render_run`).
 
@@ -76,6 +79,7 @@ bit-exactly.
 | glitch, pro_glitch | glitch | glitch transitions; a designed stutter ending on the cut |
 | typing_key, pro_typing_key, pro_typing_run | key, key.space, key.return, key.run | mechanical keys; designed key ticks; a whole run |
 | pluck | bell, text, hit | a kalimba tine: tuned notes (native C5) |
+| fit | the role in the id, plus its `kinds` | recordings fitted as code: clicks, a tick, pops, light touches, keys, a space bar, a snap, a bell, a whoosh, a knock |
 
 ## Knobs: dur, apex, pitch, level
 
@@ -154,10 +158,11 @@ bells and plucks read 0. The layer heuristic reads a 25 ms RMS envelope (peaks w
 dip between them, in the first 0.5 s): two noise hits 60 or 120 ms apart read 2, a gated grain texture reads 1
 (pro_impact short / air / swell: 1; deep: 2; rumble: 3); impact swell builds 220 ms before its hit.
 
-Audit of the whole bank (each final at its own seed): 170 of 186 clean. Flagged: the three rising zips, the two
+Audit of the whole bank (each sound at its own seed): 185 of 201 clean. Flagged: the three rising zips, the two
 logo-sting leads, the two rising bubbles, typing_key light and laptop (comb ring), pro_hover_tick air and glass
 (clicks), hover_tick detent and pro_typing_key soft (truncated), glitch dropout and logo_sting reverse_bloom, pro_shimmer
-m3 (ring). The presets use none of them.
+m3 (ring). The presets use none of them. All 15 fitted sounds are clean at their own seed; on some new seeds the
+small bell and the lubed key show a comb ring in the tail, as their recordings do (the presets use neither).
 
 ## Kits
 
@@ -195,7 +200,7 @@ text fragment resolving). Other role names are allowed; a renderer must know the
 `bell_C5.wav`, `text_Cs5_2.wav`) and `kit.lock.json`:
 
 ```json
-{"kit": 1, "earshot": "0.3.0", "bank": "forge_v2r6+pluck1", "sr": 48000, "name": "calm",
+{"kit": 1, "earshot": "0.3.0", "bank": "forge_v2r6+fit1+pluck1", "sr": 48000, "name": "calm",
  "roles": {"hit": {"sound": "notify/m0", "align": "onset", "level_db": -3.0, "max_s": null,
    "takes": [{"file": "hit_1.wav", "seed": 1826701615, "pitch": null, "onset_s": 0.0, "peak_s": 0.0045,
               "end_s": 2.157, "dur_s": 2.3, "peak_db": -1.0, "lufs_m_max": -11.06, "sha1": "...", "key": "...",
@@ -205,8 +210,8 @@ text fragment resolving). Other role names are allowed; a renderer must know the
 
 - **Deterministic.** The same kit renders the same takes. A take that fails the audit is rendered again on
   `seed + 1000 j` (up to 3 times) and the first clean one kept, as a sound designer discards a bad take; the lock then
-  names `seed` and `planned_seed`. On the three presets 6 of 174 takes needed it (four key takes and a pitched ding
-  that rang, a tap that stopped early); every preset take is clean.
+  names `seed` and `planned_seed`. On the three presets 4 of 174 takes needed it (three key takes and a pitched ding,
+  all forge members; no fitted sound); every preset take is clean.
 - **Cached.** A take whose key (bank entry, seed, pitch, edits, max_s, sr, bank version, earshot version) and file
   hash match the existing lock is kept; changed roles re-render; files the new kit no longer names are removed (only
   files the old lock listed); `--force` renders everything.
@@ -220,35 +225,58 @@ text fragment resolving). Other role names are allowed; a renderer must know the
 
 `earshot kit init --preset calm|crisp|minimal` (`earshot/forge/kits/*.json`). All three sound every role except
 `riser`, `swell` and `suck` (calm also keeps `drop` off): a reveal resolves on one element, and one clean hit carries
-the lockup with nothing layered on it. Each role's `note` says why its member was chosen. The choices follow what
-earshot measured and heard:
+the lockup with nothing layered on it. Each role's `note` says what the sound is and what was measured. How the members
+were chosen:
 
-- In the author's blind test of the v2 finals (one listener, loudness-matched, randomised), the made clicks, pops,
-  impacts, toggles, hover ticks, swipes, swishes and risers were picked out; taps, struck bells (notify) and shimmers
-  were taken for recordings. So taps and bells carry the natural roles, and designed members appear where the idiom
-  is designed (crisp UI ticks, the gated hit, minimal's sub-led set).
-- Every member passes the audit; members the audit flags (ringing keys, clicking airy ticks, rising zips) are out.
-- No pitch-rising zip or whip, no shepard riser or downlifter, no logo-sting composite, no shimmer, no glitch, no
-  tonal pop with the 8-bit risk; the hit is one sound with one attack and no build.
+- **Every take passes the audit** (`earshot kit check`, all takes of all three presets); members the audit flags
+  (ringing keys, clicking airy ticks, rising zips) are out.
+- **Measured against the role.** Per role, the candidates (forge members and the fitted sounds) were read the same
+  way: `earshot match` of the role's description (a calibrated z, and a forced choice against three synth-blip
+  descriptions: 'a cheap synthesizer laser zap', 'a video game blip', 'an 8-bit chiptune sound'), `earshot realness`
+  (a model's reading of "a real recording": information, not a quality score) and the model-free measures (length,
+  centroid, attack, crest). A fitted sound replaced a forge member where it measured clearly closer: a higher match
+  and forced-choice score at an equal or higher realness. Where the two measured about the same, the forge member
+  stayed (calm's light touch tap/soft: z +1.88, realness 0.96, the fitted fingertip +2.07, 0.95; calm's key
+  typing_key/thock +5.74 against the fitted keys' +4.65 to +5.14).
+- **Designed where the idiom is designed**: crisp's tink, gated hit, sub drop and dings; minimal's sub-led set and its
+  high-passed key ticks.
+- **Restraint**: no pitch-rising zip or whip, no shepard riser or downlifter, no logo-sting composite, no shimmer, no
+  glitch, no tonal pop with the 8-bit risk; the hit is one sound with one attack and no build.
+- **Levels**: a role whose sound changed kept its loudness: `level_db` moved by the measured loudness difference of
+  the two sounds at the same peak (momentary-max LUFS at -1 dBFS), rounded to 0.5 dB.
 
 | role | calm (text-led films, the default) | crisp (energetic product films) | minimal (designed, effects only) |
 |---|---|---|---|
-| tick / tick.crisp | tap/glass / pro_tap/glass | tap/glass / pro_click/tink | pro_hover_tick/soft / pro_hover_tick/ping |
+| tick / tick.crisp | fit/tick/domino / pro_tap/glass | fit/tick/domino / pro_click/tink | pro_hover_tick/soft / pro_hover_tick/ping |
 | tock | tap/knuckle | tap/knuckle | pro_tap/soft |
 | hit | notify/m0 (one struck C5 bell) | pro_impact/short (one gated hit) | pro_impact/air (one sub-led hit) |
-| land / land.light | pro_pop_in/deep / tap/soft | pro_pop_in/deep / pro_tap/knock | pro_pop_in/deep / pro_tap/finger |
-| pop | pro_pop_in/airy | pro_pop_in/round | pro_pop_in/round |
-| whoosh.short / .long | swipe/velvet / whoosh_big/swell | whoosh_fast/tight / whoosh_big/swell | whoosh_fast/heavy / pro_whoosh_big/swell |
+| land / land.light | pro_pop_in/deep / tap/soft | pro_pop_in/deep / fit/land.light/fingertip_book | pro_pop_in/deep / fit/land.light/fingertip_book |
+| pop | fit/pop/mouth_plop | pro_pop_in/round | pro_pop_in/round |
+| whoosh.short / .long | fit/whoosh.short/bamboo_swish / whoosh_big/swell | whoosh_fast/tight / whoosh_big/swell | whoosh_fast/heavy / pro_whoosh_big/swell |
 | drop | off | pro_sub_drop/quick | pro_sub_drop/ref |
-| key / .space / .return | typing_key thock / deep / deep | typing_key crisp / thock / clicky | pro_typing_key glass / tick / double |
-| click / click.confirm | tap/finger / pluck/kalimba_soft C6 | pro_click/mouse / pro_notify/ding_2045 | pro_click/soft / pro_notify/ding_1822 |
-| snap | pro_pop_in/knock | toggle/latch | pro_pop_in/knock |
+| key / .space / .return | typing_key/thock / fit/key.space/thock_space / typing_key/deep | fit/key/medium / fit/key.space/thock_space / typing_key/clicky | pro_typing_key glass / tick / double |
+| click / click.confirm | fit/click/floss_lid / pluck/kalimba_soft C6 | fit/click/floss_lid / pro_notify/ding_2045 | pro_click/soft / pro_notify/ding_1822 |
+| snap | fit/snap/switch_flip | fit/snap/switch_flip | fit/snap/switch_flip |
 | bell | pluck/kalimba C D E G A (octave 5) | pluck/kalimba C D E G A | pro_notify/ding_1822 F G A C D (octaves 6-7) |
-| text | pluck/kalimba_soft C5 E5 G5 | pro_tap/soft | pro_tap/finger |
+| text | pluck/kalimba_soft C5 E5 G5 | fit/land.light/finger_phone | fit/land.light/finger_phone |
 | riser / swell / suck | off | off | off |
 
-Set `edits.pitch` on `hit` (calm) and `drop` (crisp, minimal) to the film's root. A later bank version may swap in
-fitted sounds (`fit/<role>/<name>`) where they beat a forge member; a kit references them like any other id.
+The replacements, measured (match z / forced choice against the synth-blip descriptions / realness; `_compare` of
+the fit run, the forge members at their own seed):
+
+| role | forge member before | fitted sound now | where |
+|---|---|---|---|
+| tick ('a soft quiet UI tick') | tap/glass -0.08 / 0.01 / 0.45 | domino +1.02 / 0.67 / 0.83 | calm, crisp |
+| click ('a soft UI button click') | tap/finger +1.37 / 0.61 / 0.89; pro_click/mouse +1.03 / 0.35 / 0.06 | floss_lid +1.70 / 0.73 / 0.97 | calm, crisp |
+| pop ('a soft natural pop') | pro_pop_in/airy +1.88 / 0.98 / 0.65 | mouth_plop +2.98 / 1.00 / 0.97 | calm |
+| land.light ('a soft finger tap on wood') | pro_tap/knock +0.13 / 0.00 / 0.28; pro_tap/finger +0.69 / 0.01 / 0.16 | fingertip_book +2.07 / 0.99 / 0.95 | crisp, minimal |
+| whoosh.short ('a short fast whoosh swish through the air') | swipe/velvet +2.01 / 1.00 / 0.97 (tagged 'a heavy thud') | bamboo_swish +5.32 / 1.00 / 0.99 | calm |
+| key ('a single mechanical keyboard key press') | typing_key/crisp +4.48 / 1.00 / 0.95 | medium +4.65 / 1.00 / 0.99 (2.2 kHz centroid against 0.6) | crisp |
+| key.space ('a spacebar press') | typing_key/deep +2.14 / 0.97 / 0.84; typing_key/thock +2.59 / 0.98 / 0.96 | thock_space +3.22 / 1.00 / 0.99 | calm, crisp |
+| snap ('a toggle switch click') | pro_pop_in/knock +0.61 / 0.27 / 0.08; toggle/latch +2.04 / 0.97 / 0.50 | switch_flip +2.24 / 1.00 / 0.97 | calm, crisp, minimal |
+| text (a soft touch for a resolving fragment) | pro_tap/soft, pro_tap/finger (realness 0.16-0.25) | finger_phone (tagged 'a soft UI button tap', realness 0.89) | crisp, minimal |
+
+Set `edits.pitch` on `hit` (calm) and `drop` (crisp, minimal) to the film's root.
 
 ## Python and MCP
 
@@ -266,21 +294,72 @@ audit) and `kit_render` (a kit.json into takes + lock). They load no models.
 
 ## Fit entries (from public-domain recordings)
 
-`earshot fit` turns a recording into a recipe; `add-fit` puts the fitted model into a bank file as
-`fit/<role>/<name>` with its source:
+`earshot fit` turns a recording into a model ([docs/FIT.md](FIT.md)); a fitted model in a bank file is a sound like any
+other, `fit/<role>/<name>`, with its source. The bank ships 15, fitted from CC0 recordings on Freesound (credits:
+[docs/CREDITS_FIT.md](CREDITS_FIT.md)):
+
+| id | what | model | length (take) | CLAP to the recording | kinds |
+|---|---|---|---|---|---|
+| `fit/click/floss_lid` | a small plastic click | sines | 0.13 s | 0.96 | click, tick.crisp |
+| `fit/tick/domino` | domino pieces knocking together | sines | 0.14 s | 0.94 | tick |
+| `fit/pop/mouth_plop` | a soft mouth plop | hybrid | 0.28 s | 0.96 | pop |
+| `fit/pop/lip_pop` | a short pop | modal | 0.22 s | 0.95 | pop |
+| `fit/land.light/fingertip_book` | light finger steps on a book | modal | 0.38 s | 0.94 | land.light, tock |
+| `fit/land.light/finger_wood` | a finger tap on a wooden counter | modal | 0.34 s | 0.93 | land.light, tock |
+| `fit/land.light/finger_phone` | a finger tapping a phone | hybrid | 0.33 s | 0.93 | land.light, text |
+| `fit/whoosh.short/bamboo_swish` | a short whoosh | sines | 0.48 s | 0.94 | whoosh.short |
+| `fit/key/medium` | one mechanical key, press and release | hybrid | 0.43 s | 0.94 | key |
+| `fit/key/thock` | one low mechanical key press | modal | 0.45 s | 0.94 | key |
+| `fit/key/lubed` | one mechanical key press | modal | 0.42 s | 0.98 | key |
+| `fit/key.space/thock_space` | a mechanical keyboard space bar | sines | 0.39 s | 0.95 | key.space |
+| `fit/snap/switch_flip` | a switch flip | sines | 0.19 s | 0.94 | snap, click |
+| `fit/bell/small_bell` | a small bell struck once | sines | 1.66 s | 0.94 | bell |
+| `fit/hit/bamboo_tok` | a bamboo hit | hybrid | 0.17 s | 0.97 | hit, tock |
+
+Every entry renders through `earshot.forge.fit.render(model, seed, vary=vary, take=True)`: a new seed is a new take of
+the same object (modes, partials and noise jittered by `vary`, 0.3 for all 15), it rings out instead of stopping where
+the trimmed recording stopped, and it carries no DC offset (FIT.md, "Takes"). A take is 0.06-0.2 s longer than its
+recording; `max_s` in a kit trims it.
+
+**How they were chosen.** 46 CC0 recordings were fitted (`earshot fit --clap`) for the film roles. A fit ships when:
+- its grade is high: CLAP to the recording >= 0.92 and mel distance within 2.5 dB of the model's own floor (two
+  renders of the model);
+- five takes (seeds 0-4, rendered as the bank renders them, at the shipped `vary`) pass the take check: no hard
+  artifact beyond the recording's own (`polish.PolishRef`), every audit warning also on the recording itself, CLAP >=
+  0.90 to the fit's render and within 0.06 of the fit's CLAP to the recording (compared over the recording's length:
+  CLAP repeat-pads a short clip, so another length reads as another rhythm), excess energy within 1.5 dB of the fit's,
+  loudness spread <= 2 LU. The check tries vary 0.3, then 0.15, then fresh noise only; a fit clean only with fresh
+  noise does not ship (its takes barely differ);
+- the source is CC0 1.0 and no title, author or page names a commercial sound library (a re-upload is not the
+  recordist's to release).
+
+15 of 46 pass, all at vary 0.3. Of the other 31, 20 grade good or fair; of the 11 high-grade ones, 7 make takes that
+drift from the recording (CLAP), add an artifact the recording lacks (a comb ring, a rising glide) or spread over
+2 LU, 3 are clean only with fresh noise, and one is a re-upload. Two shipped sounds, the small bell and the lubed
+key, show the comb-ring warning on some takes, as their recordings do: in a kit, such a take is re-rolled on a new
+seed (or kept with its warning when no re-roll is clean).
+
+### Add your own fit
 
 ```bash
-earshot fit door_cc0.wav -o made/door_fit.py          # writes made/door_fit.json (the model) next to it
-python -m earshot.forge.bank add-fit made/door_fit.json --id fit/hit/door --source source.json [--vary 0.2]
-#   source.json: {"id": "freesound:123", "title": "...", "author": "...", "license": "CC0 1.0", "url": "..."}
+# 1. a CC0 / public-domain recording of ONE sound, trimmed close (a short fade-out at the cut is fine)
+earshot fit door.wav -o made/door_fit.py --clap --takes --report   # model made/door_fit.json + quality + floor
+# 2. hear and audit takes the way the bank will render them
+python -c "from earshot.forge.fit import auto; from earshot.forge import sfx; import soundfile as sf; m = auto.load('made/door_fit.json'); [print(s, sfx.check(auto.render(m, seed=s, vary=0.3, take=True))['summary']) or sf.write(f'made/take{s}.wav', auto.render(m, seed=s, vary=0.3, take=True), 48000) for s in range(5)]"
+# 3. add it to a bank file of your own (or, in a checkout, the default earshot/forge/bank/fit.json)
+python -m earshot.forge.bank add-fit made/door_fit.json --id fit/hit/door --source source.json --vary 0.3 --bank my_bank.json
+#    source.json: {"id": "freesound:123", "title": "...", "author": "...", "license": "CC0 1.0", "url": "https://..."}
+EARSHOT_BANK=my_bank.json earshot sfx render fit/hit/door -o door_take.wav --seed 3
 ```
 
-The licence must be CC0 or public domain (`--allow-license` keeps an attribution licence; NC and ND licences are
-always refused: a fit is a derivative and the bank ships inside an MIT package). The entry keeps the model (its fit
-report dropped), seed, `vary` (take-to-take jitter), the source, the measured note of a tonal fit (`pitch_hz`, so the
-pitch knob can tune it through the fit's own pitch / transpose / size knob, within an octave) and the usual meta.
-Fit entries render through `earshot.forge.fit.render`. Default file: `earshot/forge/bank/fit.json`; `--bank` writes
-elsewhere (load it with `EARSHOT_BANK`).
+- `--takes` scores the candidates on seeds 0-2 (a fit meant to make takes); `--clap` lets CLAP help choose (loads
+  CLAP, about 50 s). The report's `quality` against `floor` says how close the fit is (FIT.md, "Quality metrics").
+- Lower `--vary` (0.15, 0) when takes drift: listen to the takes, and run `earshot sfx check` on them.
+- The licence must be CC0 or public domain; `--allow-license` keeps an attribution licence (credit the source), and NC
+  or ND licences are always refused: a fit is a derivative of its recording and the bank ships in an MIT package.
+- The entry keeps the model (its fit report dropped), seed, `vary`, the source, the measured note of a tonal fit
+  (`pitch_hz`: the pitch knob tunes it through the fit's own pitch / transpose / size knob, within an octave), the
+  kinds (`--kinds`, default the role in the id) and the usual meta and fingerprint (`bank check` re-renders it).
 
 ## Cost
 
@@ -295,16 +374,17 @@ Measured on the development laptop (AMD Ryzen 7 260, 2 threads, while other jobs
 | warm render / render + audit: whooshes, swipes, bells, sub drops | 0.1-0.45 s / 0.25-0.8 s |
 | warm render / render + audit: pluck (3 s), impact (4.8 s) | 1.0-1.1 s / 1.4-2.2 s |
 | a targeted whoosh (dur + apex: up to 3 renders + audit) | 1.9 s |
-| render + audit, median over all 186 sounds (a cold process per batch) | 0.5 s |
-| `kit render`, whole preset, fresh process | calm 73 s (57 takes), crisp 61 s (59), minimal 25 s (58) |
+| render + audit, median over the 186 forge sounds and plucks (a cold process per batch) | 0.5 s |
+| `kit render`, whole preset, fresh process | calm 28 s (57 takes), crisp 81 s (59), minimal 24 s (58), with the fitted sounds |
 | `kit render`, everything cached | 3-5 s (the process start; 0.1-0.6 s inside it) |
 
 Render a film's sounds in one process and keep the takes: the lock and its cache are made for that.
 
 ## Limits
 
-- The bank is the forge's sound, chosen and checked by measurement and one listener; it is not a library of
-  recordings. A blind listener picked out several v2 categories (above); the presets lean on the ones that passed.
+- The bank is the forge's sound plus 15 fitted recordings, chosen and checked by measurement; it is not a library of
+  recordings. Measurements (realness, a match against a role's description, the audit) are models and heuristics,
+  not ears: a film's own listening pass still decides.
 - Bit-exact re-renders hold on the machine that built the bank; another platform (numpy, scipy, numba versions) can
   differ by tiny amounts, which is why entries carry fingerprints with tolerances instead of hashes.
 - Knobs leave the searched point: a far dur or pitch changes a sound's character, and only the model-free audit checks

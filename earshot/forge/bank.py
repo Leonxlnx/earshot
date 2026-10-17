@@ -1,7 +1,7 @@
 """The shipped sound bank: every delivered forge v2 final, tuned plucks and fitted recipes, rendered by id.
 
     from earshot.forge import bank
-    bank.VERSION                                  # 'forge_v2r6+pluck1' (one tag per bank file)
+    bank.VERSION                                  # 'forge_v2r6+fit1+pluck1' (one tag per bank file)
     bank.list(kind='whoosh')                      # [{id, category, member, type, dur_s, peak_s, onset_s, ...}, ...]
     y, meta = bank.render('whoosh_fast/crisp')    # the delivered final (its own seed), peak -1 dBFS, float32
     y, meta = bank.render('whoosh_fast/crisp', seed=7, dur=0.8, apex=0.32)   # a new take aimed at the picture

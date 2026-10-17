@@ -157,9 +157,11 @@ bank instead of writing synth voices. No models load; a whole kit renders in abo
    tail, comb ring, a pitch that climbs more than 4 semitones, a hit with two attacks or a build before it); swap the
    sound or the knob rather than keeping a warned take. Read the notes too (a sounded riser, a composite sting).
 5. Listen through the finished film with Loop 2 (`timeline --cues`, `sheet`) and check that each cue landed.
-Say plainly what the bank is: forge sounds made in code and checked by measurement and one blind listener, not
-recordings. When the brief asks for recorded sound, use `skills/real-sound` instead. Fitted sounds (`fit/<role>/<name>`)
-come from public-domain recordings and carry their source. Reference: `docs/SFX.md`.
+Say plainly what the bank is: forge sounds made in code, and 15 sounds fitted as code from CC0 recordings
+(`fit/<role>/<name>`, each with its source; the presets use them for clicks, ticks, keys, touches and the snap), all
+chosen and checked by measurement. They are not recordings: when the brief asks for recorded sound, use
+`skills/real-sound` instead. To add a fit of your own (`earshot fit --takes`, then `bank add-fit`), see `docs/SFX.md`
+("Add your own fit").
 
 ## Optional: a second opinion in words (audio LLM)
 `earshot llm mix.wav --yes-upload [--with-timeline] [--prompt "Is the riser at 0:12 cheap?"]` asks Google Gemini for

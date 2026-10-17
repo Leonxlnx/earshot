@@ -156,8 +156,10 @@ so keep the source's licence with the recipe. Limits: [docs/FIT.md](docs/FIT.md#
 ## Sound for films: bank, sfx, kits
 
 The forge's delivered sounds ship as a bank that renders by id, with no models and no network: 183 forge v2 finals
-(34 categories) and three tuned kalimba voices, each stored as its render block and re-rendering its delivered WAV to
-one 24-bit step. A film pipeline renders from it in seconds; searching new sounds stays an offline step.
+(34 categories), each stored as its render block and re-rendering its delivered WAV to one 24-bit step, three tuned
+kalimba voices, and 15 sounds fitted from CC0 recordings (clicks, a tick, pops, touches, keys, a snap, a bell, a
+whoosh; credits in [docs/CREDITS_FIT.md](docs/CREDITS_FIT.md)). A film pipeline renders from it in seconds; searching
+and fitting new sounds stay offline steps.
 
 ```bash
 earshot sfx list --kind whoosh                                      # ids, lengths, peak times, cue kinds, knobs
@@ -173,11 +175,12 @@ earshot kit render audio/kit.json --out audio/kit                    # takes + k
   sub drop G1 measure 0 cents off); noise sounds refuse a pitch and say why.
 - **The audit** (`earshot sfx check`, run on every render) is measurement only: clicks, cut tails, clipping, DC, comb
   ring, a re-rising tail, a tonal pitch that climbs more than 4 semitones (the rising "synth whip"), and for hits,
-  stacked attacks or a build before the hit. 170 of the 186 sounds are clean; the presets use none of the others.
+  stacked attacks or a build before the hit. 185 of the 201 sounds are clean; the presets use none of the others.
 - **Kits** name one sound per role (tick, hit, whoosh.short, key, bell, text ...). `kit render` writes deterministic,
   cached takes and a lock with each take's measured sync points; a take that fails the audit is re-rolled on a new
-  seed. The three presets sound every role but riser, swell and suck, use one clean hit for the lockup, and favour the
-  families a blind listener took for recordings (taps, struck bells).
+  seed. The three presets sound every role but riser, swell and suck, use one clean hit for the lockup, and use the
+  fitted recordings for clicks, ticks, keys, touches and the snap where they measure closer to the role than the
+  forge member (earshot match and realness).
 - **Python and MCP**: `from earshot.forge import bank; y, meta = bank.render('pro_sub_drop/ref', pitch='G1')`;
   `earshot.api.sfx_render / kit_render`; MCP tools `sfx_list`, `sfx_render`, `kit_render`.
 
