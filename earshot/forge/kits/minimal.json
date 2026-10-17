@@ -2,7 +2,7 @@
  "kit": 1,
  "name": "minimal",
  "sr": 48000,
- "note": "Designed, sub-led, effects-only films (no music bed): airy digital ticks, low sub swells for moves, one sub-led hit, the designed sub drop, high-passed key ticks. Every member passes the model-free audit. Riser, swell and suck are off.",
+ "note": "Designed, sub-led, effects-only films (no music bed): airy digital ticks, low sub swells for moves, one sub-led hit, the designed sub drop, high-passed key ticks. The light touch, the text touch and the snap are CC0 recordings fitted as code: the designed taps and knock they replace read as synth blips to earshot match (p 0.01-0.27 for their role against synth-blip descriptions). Every take passes the model-free audit. Riser, swell and suck are off.",
  "roles": {
   "tick": {"sound": "pro_hover_tick/soft", "takes": 3, "align": "onset", "level_db": -10.0,
            "note": "an airy digital tick (32 ms): cursor blinks and counters; the air / glass members click in the audit"},
@@ -14,8 +14,8 @@
           "note": "one sub-led gated hit: a single attack, 0.85 s, the weight below 150 Hz; nothing layered on it"},
   "land": {"sound": "pro_pop_in/deep", "takes": 3, "align": "onset", "level_db": -5.0,
            "note": "a low round thump (75 Hz body)"},
-  "land.light": {"sound": "pro_tap/finger", "takes": 3, "align": "onset", "level_db": -8.0,
-                 "note": "a fingertip touch for small elements"},
+  "land.light": {"sound": "fit/land.light/fingertip_book", "takes": 3, "align": "onset", "level_db": -7.5,
+                 "note": "light finger steps on a book, a CC0 recording fitted as code (0.38 s, 240 Hz centroid: it sits under sub-led sounds): matches 'a soft finger tap on wood' at z +2.07, p 0.99 over synth-blip descriptions (pro_tap/finger: +0.69, p 0.01), realness 0.95 (0.16)"},
   "pop": {"sound": "pro_pop_in/round", "takes": 4, "align": "onset", "level_db": -7.0,
           "note": "a round pop-in thump, no pitch glide"},
   "whoosh.short": {"sound": "whoosh_fast/heavy", "takes": 3, "align": "peak", "level_db": -7.0,
@@ -36,13 +36,13 @@
             "note": "a soft designed UI click (53 ms)"},
   "click.confirm": {"sound": "pro_notify/ding_1822", "takes": 1, "align": "onset", "level_db": -10.0,
                     "note": "a short clean ding (0.26 s)"},
-  "snap": {"sound": "pro_pop_in/knock", "takes": 2, "align": "onset", "level_db": -6.0,
-           "note": "a firm short knock for a lock-in"},
+  "snap": {"sound": "fit/snap/switch_flip", "takes": 2, "align": "onset", "level_db": -3.5,
+           "note": "a switch flip, a CC0 recording fitted as code (0.19 s, one attack): matches 'a toggle switch click' at z +2.24, p 1.00 over synth-blip descriptions (pro_pop_in/knock: +0.61, 0.27), realness 0.97 (0.08)"},
   "swell": null,
   "bell": {"sound": "pro_notify/ding_1822", "pitches": ["F6", "G6", "A6", "C7", "D7"], "takes": 1, "align": "onset", "level_db": -8.0,
            "note": "the clean ding on an F pentatonic around its own pitch (1822 Hz): sparse designed notes, no ringing bell"},
-  "text": {"sound": "pro_tap/finger", "takes": 3, "seed": 5200, "align": "onset", "level_db": -13.0,
-           "note": "a quiet touch when a text fragment resolves"}
+  "text": {"sound": "fit/land.light/finger_phone", "takes": 3, "align": "onset", "level_db": -8.0,
+           "note": "a finger tapping a phone, a CC0 recording fitted as code (0.33 s, a quiet low tap): its top tag is 'a soft UI button tap'; realness 0.89 (pro_tap/finger: 0.16); level +5 dB for its lower loudness at the same peak"}
  },
  "off": {
   "suck": "off by default: a reverse whoosh into a cut stacks a build onto the reveal",

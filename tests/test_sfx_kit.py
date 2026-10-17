@@ -2,6 +2,7 @@
 plus the MCP tool functions of the sound bank. Synthetic signals and short bank sounds only; no models."""
 import json
 import os
+import re
 
 import numpy as np
 import pytest
@@ -98,6 +99,28 @@ def test_presets_are_valid_restrained_and_explained():
         assert len(hits) == 1
         files = [t['file'] for t in kit.plan(k)]
         assert len(files) == len(set(files))
+
+
+LISTENING_WORDS = re.compile(r'listener|blind test|picked out|taken for recordings|heard as|to the ear', re.I)
+
+
+def test_presets_reference_bank_sounds_and_state_measured_facts():
+    """every preset sound is in the bank (forge, pluck or fit); notes describe the sound and what was measured,
+    never a listening test as a rule"""
+    ids = set(bank.ids())
+    fits = 0
+    for name in kit.presets():
+        k = kit.preset(name)
+        notes = [k.get('note', '')] + list((k.get('off') or {}).values())
+        for role, spec in k['roles'].items():
+            if not spec:
+                continue
+            assert spec['sound'] in ids, (name, role, spec['sound'])
+            fits += spec['sound'].startswith('fit/')
+            notes.append(spec['note'])
+        bad = [n for n in notes if LISTENING_WORDS.search(n)]
+        assert not bad, (name, bad)
+    assert fits >= 6                      # the presets use the shipped fits where the comparison favoured them
 
 
 def _tiny(**edit):
