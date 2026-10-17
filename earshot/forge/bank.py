@@ -384,7 +384,7 @@ def compare_fp(meta, y, sr=SR, floor=-40.0):
     k = min(len(ref), len(fp))
     d = [abs(a - b) for a, b in zip(ref[:k], fp[:k]) if a > floor]
     return {'len_diff': int(round((t['dur_s'] - meta['dur_s']) * sr)),
-            'peak_diff_ms': round(1000 * (t['peak_s'] - meta['peak_s']), 2),
+            'peak_diff_ms': round(float(1000 * (t['peak_s'] - meta['peak_s'])), 2),
             'env_db': round(max(d), 2) if d else 0.0}
 
 

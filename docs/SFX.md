@@ -286,11 +286,16 @@ elsewhere (load it with `EARSHOT_BANK`).
 
 Measured on the development laptop (AMD Ryzen 7 260, 2 threads, while other jobs kept the CPU near 100 %):
 
-| step | time |
+| step (one process) | time |
 |---|---|
-| `import earshot.forge.bank` + load the bank | ~3 s cold |
-| first render in a fresh process | 10-45 s (numba compiles the filter kernels once per install, imports) |
-| warm render + audit, median over the 186 finals | 0.5 s (UI sounds 0.05-0.3 s, whooshes 0.5-1.5 s, impacts and plucks 2-6 s) |
+| `import earshot.forge.bank` + load the bank | 1.3 s (3 s on a cold disk) |
+| first render in the process (recipe import, numba kernels from their cache) | 10 s (25-45 s the first time after an install, while numba compiles) |
+| the same render again, warm | 54 ms |
+| warm render / render + audit: UI sounds (click, tap, pop-in, key, ding) | 40-65 ms / 80-160 ms |
+| warm render / render + audit: whooshes, swipes, bells, sub drops | 0.1-0.45 s / 0.25-0.8 s |
+| warm render / render + audit: pluck (3 s), impact (4.8 s) | 1.0-1.1 s / 1.4-2.2 s |
+| a targeted whoosh (dur + apex: up to 3 renders + audit) | 1.9 s |
+| render + audit, median over all 186 sounds (a cold process per batch) | 0.5 s |
 | `kit render`, whole preset, fresh process | calm 73 s (57 takes), crisp 61 s (59), minimal 25 s (58) |
 | `kit render`, everything cached | 3-5 s (the process start; 0.1-0.6 s inside it) |
 
