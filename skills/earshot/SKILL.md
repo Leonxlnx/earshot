@@ -153,9 +153,11 @@ bank instead of writing synth voices. No models load; a whole kit renders in abo
 3. Render: `earshot kit render audio/kit.json --out audio/kit`. The takes and `kit.lock.json` (measured onset, peak,
    end, loudness per take) are what the mixer places on cue frames: onset on the frame for hits and touches, the
    peak on a whoosh's apex, the end on a riser's hit.
-4. Check: `earshot kit check audio/kit.json --out audio/kit`. Every warning names a take and a reason (clicks, a cut
-   tail, comb ring, a pitch that climbs more than 4 semitones, a hit with two attacks or a build before it); swap the
-   sound or the knob rather than keeping a warned take. Read the notes too (a sounded riser, a composite sting).
+4. Check: `earshot kit check audio/kit.json --out audio/kit`. It refuses what a render cannot use (a knob or pitch
+   the sound cannot take, a level over 0 dBFS, two takes that would share a file). Every warning names a take and a
+   reason (clicks, a cut tail, comb ring, silence, a pitch that climbs more than 4 semitones, a hit with two attacks
+   or a build before it, `pitch_off`: a note the knob did not land); swap the sound or the knob rather than keeping a
+   warned take. Read the notes too (a sounded riser, a composite sting).
 5. Listen through the finished film with Loop 2 (`timeline --cues`, `sheet`) and check that each cue landed.
 Say plainly what the bank is: forge sounds made in code, and 15 sounds fitted as code from CC0 recordings
 (`fit/<role>/<name>`, each with its source; the presets use them for clicks, ticks, keys, touches and the snap), all

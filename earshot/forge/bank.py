@@ -22,7 +22,8 @@ searching, rounded and without their render function; re-rendered from them, a t
 as different sounds. A bank entry is the final's schema-2 render block (earshot.forge.schema) at full precision, and
 `build` refuses any final whose block does not re-render its delivered WAV (within one 24-bit step).
 
-Bank file (earshot/forge/bank/*.json, package data; extra files: EARSHOT_BANK=path[;path...]):
+Bank file (earshot/forge/bank/*.json, package data; extra files: EARSHOT_BANK, paths joined by os.pathsep: ';' on
+Windows, ':' elsewhere; a missing or unreadable one is a BankError naming it):
     {"bank": 1, "name": "forge_v2", "version": "forge_v2r6", "earshot": "0.3.0", "note": "...",
      "categories": {"click": {"recipe": "click", "target": "...", "kinds": ["click"], "use": "..."}, ...},
      "entries": {"click/soft": {<entry>}, ...}}
@@ -60,6 +61,7 @@ BANK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bank')
 FORMAT = 1
 FORGE_VERSION = 'forge_v2r6'      # the delivery the shipped forge_v2.json was built from (forge v2, round 6)
 PEAK_DB = -1.0
+SRS = (44100, 48000, 88200, 96000)   # the sample rates a take is written at (render, sfx render, kit sr)
 ENV_DB = -30.0                    # onset: the 1 ms envelope's first point within this of its maximum
 END_DB = -50.0                    # end: the last 5 ms frame within this of the loudest
 FP_HOP = 0.05                     # fingerprint frame (s)
@@ -136,8 +138,13 @@ def _files():
 
 
 def _read(path):
-    with open(path, encoding='utf-8') as fh:
-        d = json.load(fh)
+    try:
+        with open(path, encoding='utf-8') as fh:
+            d = json.load(fh)
+    except FileNotFoundError:
+        raise BankError(f'EARSHOT_BANK file {path} not found (paths are joined by {os.pathsep!r})') from None
+    except (OSError, ValueError) as e:
+        raise BankError(f'{path}: not readable as a bank file ({type(e).__name__}: {e})') from None
     if not isinstance(d, dict) or d.get('bank') != FORMAT or not isinstance(d.get('entries'), dict):
         raise BankError(f'{path}: not an earshot bank file (bank: {FORMAT} with entries)')
     return d
@@ -262,12 +269,42 @@ def normalize(x, peak_db=PEAK_DB):
     return np.asarray(x, np.float64) * (10 ** (peak_db / 20) / (np.abs(x).max() + 1e-12))
 
 
+def level(peak_db=PEAK_DB, weight=None):
+    """the sample peak (dBFS) a take is written at: peak_db, moved 6 dB per doubling of weight. BankError for a
+    level over 0 dBFS (a clipped take), a weight outside (0, 4] or a value that is no number"""
+    def num(v, name):
+        if isinstance(v, bool) or not isinstance(v, (int, float, np.integer, np.floating)) or not np.isfinite(v):
+            raise BankError(f'{name} must be a number, got {v!r}')
+        return float(v)
+    lv = num(peak_db, 'peak_db')
+    if lv > 0:
+        raise BankError(f'peak_db {lv:g} is over 0 dBFS: the take would clip (use 0 or less)')
+    if weight is not None:
+        w = num(weight, 'weight')
+        if not 0 < w <= 4:
+            raise BankError(f'weight must be in (0, 4], got {weight}')
+        lv += 20 * np.log10(w)
+        if lv > 0:
+            raise BankError(f'weight {w:g} at peak_db {peak_db:g} puts the peak at {lv:+.1f} dBFS: lower peak_db')
+    return float(lv)
+
+
+def check_sr(sr):
+    """sr as an int when it is one of SRS (an integral float such as 48000.0 too), else BankError"""
+    ok = not isinstance(sr, bool) and isinstance(sr, (int, float, np.integer, np.floating)) and float(sr) in SRS
+    if not ok:
+        raise BankError(f'sr must be one of {", ".join(map(str, SRS))}, got {sr!r}')
+    return int(sr)
+
+
 def render(sound_id, seed=None, dur=None, apex=None, pitch=None, peak_db=PEAK_DB, sr=SR, weight=None, checks=True):
     """one take of a bank sound: (y float32 (n,) or (n, 2), meta). seed None = the entry's own seed (the delivered
     final); dur / apex (s), pitch ('E5' or Hz) aim it through the recipe's own parameters (earshot.forge.knobs);
-    peak_db = its sample peak; weight scales that by 6 dB per doubling (1 = peak_db, 0.5 = 6 dB down; a weight that
-    would push the peak over 0 dBFS is refused). sr != 48000 resamples the finished take (soxr). checks=False skips
-    the model-free audit (meta['checks'] None)."""
+    peak_db = its sample peak (0 dBFS or less); weight scales that by 6 dB per doubling (1 = peak_db, 0.5 = 6 dB
+    down; a level over 0 dBFS is refused: level()). sr (one of SRS) != 48000 resamples the finished take (soxr).
+    checks=False skips the model-free audit (meta['checks'] None)."""
+    lv = level(peak_db, weight)
+    sr = check_sr(sr)
     e = sound_id if isinstance(sound_id, dict) else get(sound_id)
     sid = e.get('id')
     run = renderer(e, seed)
@@ -276,26 +313,33 @@ def render(sound_id, seed=None, dur=None, apex=None, pitch=None, peak_db=PEAK_DB
         x, edits = knobs.apply(e, run, dur=dur, apex=apex, pitch=pitch)
     else:
         x, edits = run(), {}
-    level = float(peak_db)
+    level_db = lv
     if weight is not None:
-        w = float(weight)
-        if not 0 < w <= 4:
-            raise BankError(f'weight must be in (0, 4], got {weight}')
-        level = peak_db + 20 * np.log10(w)
-        edits['weight'] = {'weight': w, 'peak_db': round(level, 2)}
-        if level > 0:
-            raise BankError(f'weight {w:g} at peak_db {peak_db:g} puts the peak at {level:+.1f} dBFS: lower peak_db')
-    y = normalize(x, level).astype(np.float32)
+        edits['weight'] = {'weight': float(weight), 'peak_db': round(level_db, 2)}
+    y = normalize(x, level_db).astype(np.float32)
     meta = {'id': sid, 'seed': int(e['seed'] if seed is None else seed), 'sr': int(sr), **measure(y),
             'edits': edits, 'checks': None}
     if checks:
         from . import sfx
         meta['checks'] = sfx.check(y, category=e.get('category'), sound=sid)
+        add_warning(meta['checks'], knobs.pitch_warning(edits))
     if int(sr) != SR:
         import soxr
         y = np.asarray(soxr.resample(y, SR, int(sr)), np.float32)
         meta['dur_s'] = round(len(y) / int(sr), 4)
     return y, meta
+
+
+def add_warning(c, w):
+    """add one warning ({code, msg} or None) to an audit result (sfx.check): ok becomes False, the summary says it"""
+    if not w:
+        return c
+    c['warnings'].append(w)
+    c['ok'] = False
+    name = c['summary'].split(':', 1)[0]
+    c['summary'] = (f"{name}: {len(c['warnings'])} warning{'s' if len(c['warnings']) != 1 else ''}: "
+                    + '; '.join(x['msg'] for x in c['warnings']))
+    return c
 
 
 def render_final(sound_id):
@@ -483,6 +527,7 @@ def build(dirs, out, version=FORGE_VERSION, tol=None, log=print):
                  **{k: b[k] for k in ('recipe', 'fn', 'params', 'seed', 'peak_db', 'gain_db', 'gain', 'mode')
                     if k in b}}
             e['meta'] = meta_of(normalize(x).astype(np.float32))
+            add_partial(e, x)
             entries[sid] = e
             if log:
                 log(f"  {sid:30s} {e['meta']['dur_s']:6.3f} s  err {err:.1e}")
@@ -497,6 +542,17 @@ def build(dirs, out, version=FORGE_VERSION, tol=None, log=print):
            'categories': cats, 'entries': entries}
     _write(out, doc)
     return doc
+
+
+def add_partial(e, x=None):
+    """meta['pitch_hz'] of a click / toggle entry: its heard partial (knobs.partial_hz on its own render), None when it
+    has no clear one; other entries are left as they are. Returns the entry"""
+    from . import knobs
+    if (knobs.PITCH.get(e.get('category')) or {}).get('partial') and e.get('type', 'forge') == 'forge':
+        x = renderer(e)() if x is None else x
+        f = knobs.partial_hz(e, x)
+        e.setdefault('meta', {})['pitch_hz'] = None if f is None else round(float(f), 2)
+    return e
 
 
 def _pluck_params(edit):

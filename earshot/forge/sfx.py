@@ -9,6 +9,9 @@
     sfx.rising_glide(y), sfx.layers(y)
 
 `list` / `render` are the bank (earshot.forge.bank; knobs: earshot.forge.knobs). `check` measures, it never listens:
+  silent         nothing to hear: a sample peak under SILENT_DBFS (-60 dBFS), or less than SILENT_MS (5 ms) within
+                 40 dB of its peak (1 ms RMS frames; the shortest bank sound, pro_hover_tick/air, holds 9 ms): digital
+                 silence, or a take faded to nothing
   clicks, edge   polish.clicks: isolated discontinuities inside the sound; a first / last sample off zero
   clipping       flat tops at the peak, samples over full scale
   dc             an offset (|mean| > -40 dB re peak)
@@ -45,6 +48,8 @@ SR = 48000
 GLIDE_ST = 4.0
 GLIDE_MIN_S = 0.05
 PRE_SWELL_MS = 100.0
+SILENT_DBFS = -60.0
+SILENT_MS = 5.0
 HIT_ROLES = ('hit', 'land')
 GATED = ('glitch', 'pro_glitch', 'riser', 'pro_riser', 'pro_zip', 'pro_impact')
 DESIGNED = ('glitch', 'pro_glitch')
@@ -142,6 +147,20 @@ def layers(x, peak_db=-6.0, dip_db=10.0, window_s=0.5, win=0.025, hop=0.005):
             'pre_swell_ms': round((i6 - i30) * 1000.0 * h / SR, 1)}
 
 
+def live_ms(x, db=-40.0):
+    """how long a sound stays within db of its loudest moment: 1 ms RMS frames every 0.25 ms, counted (ms)"""
+    m = _mono(x)
+    w, h = SR // 1000, SR // 4000
+    if len(m) < w:
+        m = np.pad(m, (0, w - len(m)))
+    c = np.concatenate([[0.0], np.cumsum(m * m)])
+    st = np.arange(0, len(m) - w + 1, h)
+    e = (c[st + w] - c[st]) / w
+    if not len(e) or e.max() <= 0:
+        return 0.0
+    return float((e >= e.max() * 10 ** (db / 10)).sum() * 1000.0 * h / SR)
+
+
 def _ends_on_peak(x):
     m = np.abs(_mono(x))
     return len(m) > 0 and int(np.argmax(m)) >= 0.97 * len(m)
@@ -161,6 +180,13 @@ def check(x, sr=SR, category=None, role=None, sound=None):
         (notes if soft else warn).append({'code': code, 'msg': msg})
     designed = category in DESIGNED
     gated = category in GATED or _ends_on_peak(y)
+    pk = float(np.abs(y).max()) if np.size(y) else 0.0
+    peak_dbfs = 20 * np.log10(pk) if pk > 0 else -np.inf
+    live = live_ms(y)
+    if peak_dbfs < SILENT_DBFS or live < SILENT_MS:
+        add('silent', 'digital silence: nothing to hear' if pk == 0 else
+            f'nearly silent: peak {peak_dbfs:.0f} dBFS, {live:.1f} ms within 40 dB of its peak (a take faded to '
+            'nothing, or a level far too low)')
     if m['clicks']:
         add('clicks', f"{m['clicks']} click{'s' if m['clicks'] != 1 else ''} at "
             + ', '.join(f'{t:.3f} s' for t in m['click_times'][:4]), soft=designed)
@@ -194,13 +220,14 @@ def check(x, sr=SR, category=None, role=None, sound=None):
                 soft=not hit)
     keep = ('clicks', 'edge_db', 'clip_runs', 'overs', 'dc_db', 'ring_z', 'trunc_db', 'silence_ms', 'bump_db',
             'attack_ms', 't40_ms', 'crest_db', 'res_db', 'res_hz')
+    extra = {'peak_dbfs': round(peak_dbfs, 2) if np.isfinite(peak_dbfs) else None, 'live_ms': round(live, 2)}
     name = sound or (os.path.basename(x) if isinstance(x, str) else 'sound')
     if warn:
         summary = f"{name}: {len(warn)} warning{'s' if len(warn) != 1 else ''}: " + '; '.join(w['msg'] for w in warn)
     else:
         summary = f'{name}: clean' + (f" ({'; '.join(n['msg'] for n in notes)})" if notes else '')
     return {'ok': not warn, 'warnings': warn, 'notes': notes, 'summary': summary,
-            'measures': {k: m.get(k) for k in keep}, 'glide': g, 'layers': lay,
+            'measures': {**{k: m.get(k) for k in keep}, **extra}, 'glide': g, 'layers': lay,
             'context': {k: v for k, v in (('category', category), ('role', role), ('sound', sound)) if v}}
 
 
@@ -276,9 +303,10 @@ def add_cli(sub):
     pr.add_argument('--dur', type=float, help='length in seconds (exact)')
     pr.add_argument('--apex', type=float, help='seconds from the start to the loudest moment (whoosh family)')
     pr.add_argument('--pitch', help="note name ('E5', 'Eb6') or Hz, through the recipe's own pitch parameter")
-    pr.add_argument('--peak', type=float, default=-1.0, help='sample peak in dBFS (default -1)')
+    pr.add_argument('--peak', type=float, default=-1.0, help='sample peak in dBFS, 0 or less (default -1)')
     pr.add_argument('--weight', type=float, help='level relative to --peak, 6 dB per doubling (0.5 = 6 dB down)')
-    pr.add_argument('--sr', type=int, default=SR, help='sample rate of the WAV (default 48000)')
+    pr.add_argument('--sr', type=int, default=SR, choices=(44100, 48000, 88200, 96000),
+                    help='sample rate of the WAV (default 48000)')
     pc = common(s.add_parser('check', help='model-free audit: clicks, truncation, clipping, DC, ring, tail, rising '
                                            'pitch glide, stacked hits'))
     pc.add_argument('files', nargs='+')

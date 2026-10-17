@@ -23,12 +23,15 @@ kit.json (schema 1):
             so take 1 is the delivered final). A take that fails the audit is rendered again on seed + 1000 j (up to
             REROLL times) and the first clean one kept (the lock names it, with planned_seed). Same kit, same takes:
             rendering is deterministic.
-  edits     knobs for every take: dur, apex, pitch, peak_db (default -1), weight (earshot.forge.knobs, bank.render)
-  pitches   one set of takes per pitch (note names or Hz), through the recipe's own pitch parameter
+  edits     knobs for every take: dur, apex, pitch, peak_db (default -1, at most 0), weight (earshot.forge.knobs,
+            bank.render); checked like a render checks them (a whoosh-only apex, a pitch the sound cannot take)
+  pitches   one set of takes per pitch (note names, 'Cs5' sharps included, or Hz), through the recipe's own pitch
+            parameter; two spellings of one pitch ('C#5', 'Db5', 554.37) are one take, so a list may not repeat one
   align     the sync point a mixer puts on the cue: onset (the take's measured onset), peak (its loudest 5 ms: whoosh
             apexes), end (its end: risers, swells); default ALIGN[role]
-  max_s     a take longer than this is faded out to it (a quarter of the length, at most 150 ms)
-  level_db  the mix level of the role relative to a take at its peak: information for the mixer (audition uses it)
+  max_s     a take longer than this is faded out to it (a quarter of the length, at most 150 ms); 0.01 s or more
+  level_db  the mix level of the role relative to a take at its peak: information for the mixer (audition uses it); a
+            number (leave it out for 0)
   note      why this sound (the presets say why for every role; "off" says why a role is null)
   null      the role is not sounded: a renderer skips such cues (the presets keep riser, swell and suck off)
 
@@ -40,13 +43,17 @@ kit.lock.json (written by render into --out with the takes):
                                   "key": "...", "checks": []}]},
                "riser": null}}
 Takes are 24-bit WAVs named <role>_<k>.wav (dots in a role become '-': tick-crisp_1.wav) or <role>_<pitch>[_k].wav
-(C#5 -> Cs5). The cache: a take whose key (bank entry, seed, pitch, edits, max_s, sr, bank version, earshot
-version) and file hash match the existing lock is kept as it is; --force renders everything; files of the old lock
+with one canonical label per pitch (knobs.label: C#5 / Db5 / 554.37 -> Cs5, 445 -> 445hz). Names must differ also
+without regard to case (Windows and macOS file systems): a kit whose takes would share a file is refused. The
+cache: a take whose key (bank entry, seed, pitch, edits, max_s, sr, bank version, earshot version) and file hash
+match the existing lock is kept as it is; --force renders everything; files of the old lock
 that the new kit no longer names are removed (only those). `checks` lists the warning codes of the take's audit
-(earshot.forge.sfx.check with the role as context: a hit warns on stacked attacks and pre-swells).
+(earshot.forge.sfx.check with the role as context: a hit warns on stacked attacks and pre-swells; a pitch knob that
+missed its note by more than 50 cents adds pitch_off).
 """
 import hashlib
 import json
+import math
 import os
 import re
 import time
@@ -109,14 +116,21 @@ def load(kit):
     return kit
 
 
+def _is_num(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
 def problems(kit):
-    """what is wrong with a kit dict (schema, roles, ids, knob names); [] when it is valid"""
+    """what is wrong with a kit dict: schema, roles, ids, keys, and every value a render would refuse (knob ranges,
+    pitches the sound cannot take, levels over 0 dBFS, take files that would collide); [] when it is valid"""
     from . import bank
     out = []
     if not isinstance(kit, dict) or kit.get('kit') != SCHEMA:
         return [f'not a kit file (needs "kit": {SCHEMA})']
-    if int(kit.get('sr', SR)) not in (44100, 48000, 88200, 96000):
-        out.append(f"sr {kit.get('sr')}: use 48000 (or 44100 / 88200 / 96000)")
+    try:
+        bank.check_sr(kit.get('sr', SR))
+    except bank.BankError:
+        out.append(f"sr {kit.get('sr')!r}: use 48000 (or 44100 / 88200 / 96000)")
     roles = kit.get('roles')
     if not isinstance(roles, dict) or not roles:
         return out + ['roles: a non-empty object {role: spec | null}']
@@ -142,20 +156,95 @@ def problems(kit):
             out.append(f'{role}: takes must be an integer 1-{MAX_TAKES}')
         if spec.get('seed') is not None and (not isinstance(spec['seed'], int) or isinstance(spec['seed'], bool)):
             out.append(f'{role}: seed must be an integer')
-        ed = spec.get('edits') or {}
+        ed = spec.get('edits') if spec.get('edits') is not None else {}
         if not isinstance(ed, dict) or set(ed) - set(EDITS):
             out.append(f'{role}: edits takes {", ".join(EDITS)}')
+            ed = {}
         ps = spec.get('pitches')
         if ps is not None and (not isinstance(ps, list) or not ps):
             out.append(f'{role}: pitches must be a non-empty list of notes / Hz')
-        if ps and isinstance(ed, dict) and ed.get('pitch') is not None:
+            ps = None
+        if ps and ed.get('pitch') is not None:
             out.append(f'{role}: give edits.pitch or pitches, not both')
         if spec.get('align', ALIGN.get(role, 'onset')) not in ALIGNS:
             out.append(f'{role}: align must be one of {", ".join(ALIGNS)}')
-        for k in ('max_s', 'level_db'):
-            if spec.get(k) is not None and not isinstance(spec[k], (int, float)):
-                out.append(f'{role}: {k} must be a number')
+        if 'level_db' in spec and not _is_num(spec['level_db']):
+            out.append(f"{role}: level_db must be a number (leave it out for 0 dB), got {spec['level_db']!r}")
+        if spec.get('max_s') is not None and (not _is_num(spec['max_s']) or spec['max_s'] < 0.01):
+            out.append(f"{role}: max_s must be a number of seconds, 0.01 or more (a shorter take is silence), got "
+                       f"{spec['max_s']!r}")
+        out += _edit_problems(role, sid if sid in known else None, ed, ps)
+    out += _name_problems(kit)
     return out
+
+
+def _edit_problems(role, sid, ed, ps):
+    """the knob values of one role that a render would refuse (the same checks: bank.level, knobs.validate)"""
+    from . import bank, knobs
+    out = []
+    try:
+        bank.level(ed.get('peak_db', -1.0), ed.get('weight'))
+    except bank.BankError as e:
+        out.append(f'{role}: {e}')
+    for k in ('dur', 'apex'):
+        if ed.get(k) is not None and not _is_num(ed[k]):
+            out.append(f'{role}: edits.{k} must be a number of seconds, got {ed[k]!r}')
+            return out
+    if sid is None:
+        return out
+    e = bank.get(sid)
+    try:
+        knobs.validate(e, dur=ed.get('dur'), apex=ed.get('apex'))
+    except knobs.KnobError as x:
+        out.append(f'{role}: {x}')
+    for p in (ps or [ed.get('pitch')]):
+        if p is None:
+            continue
+        try:
+            knobs.validate(e, pitch=p)
+        except knobs.KnobError as x:
+            out.append(f'{role}: pitch {p!r}: {x}')
+    return out
+
+
+def _take_names(kit):
+    """[(role, file name, pitch)] of every take a kit would write, for the specs whose pitches all parse (plan's
+    naming)"""
+    from . import knobs
+    out = []
+    for role, spec in (kit.get('roles') or {}).items():
+        if not isinstance(spec, dict) or not isinstance(role, str):
+            continue
+        n = spec.get('takes', 1)
+        n = n if isinstance(n, int) and not isinstance(n, bool) and 1 <= n <= MAX_TAKES else 1
+        ps = spec.get('pitches') if isinstance(spec.get('pitches'), list) and spec.get('pitches') else None
+        try:
+            labels = [knobs.label(p) for p in ps] if ps else [None]
+        except knobs.KnobError:
+            continue
+        stem = role.replace('.', '-')
+        for p, lb in zip(ps or [None], labels):
+            for k in range(1, n + 1):
+                f = stem + (f'_{lb}' if lb else '') + (f'_{k}' if (n > 1 or not ps) else '') + '.wav'
+                out.append((role, f, p))
+    return out
+
+
+def _name_problems(kit):
+    """take files that would share a name, compared without regard to case (Windows / macOS file systems)"""
+    seen, out = {}, []
+    for role, f, p in _take_names(kit):
+        key = f.lower()
+        if key not in seen:
+            seen[key] = (role, f, p)
+            continue
+        r0, f0, p0 = seen[key]
+        if r0 == role and p is not None:
+            out.append(f'{role}: pitches {p0!r} and {p!r} are one pitch ({f}): list each pitch once')
+        else:
+            out.append(f'{role}: take file {f} is also {f0} of role {r0} on a case-insensitive file system: rename '
+                       'the role')
+    return sorted(set(out), key=out.index)
 
 
 def init(preset_name='calm', out='audio/kit.json', force=False):
@@ -174,16 +263,17 @@ def init(preset_name='calm', out='audio/kit.json', force=False):
 
 # ------------------------------------------------------------------------------------------------------- planning
 def _label(p):
-    from .knobs import midi
-    s = str(p).strip()
-    if midi(s) is not None:
-        return s.replace('#', 's')
-    return re.sub(r'[^0-9a-zA-Z.]+', '', s.lower().replace('hz', '')) + 'hz'
+    from .knobs import label
+    return label(p)
 
 
 def plan(kit):
-    """the takes a kit renders: [{role, file, sound, seed, pitch, edits, max_s, k}]"""
+    """the takes a kit renders: [{role, file, sound, seed, pitch, edits, max_s, k}]. KitError when two takes would
+    share a file (case-insensitively)"""
     from . import bank
+    dup = _name_problems(kit)
+    if dup:
+        raise KitError('invalid kit: ' + '; '.join(dup))
     out = []
     for role, spec in kit['roles'].items():
         if not spec:
@@ -230,6 +320,7 @@ def _render_one(t, seed, role):
     if t['max_s'] and len(y) > t['max_s'] * SR:
         y = knobs.fit_length(y, float(t['max_s']))[0].astype(np.float32)
     c = sfx.check(y, category=bank.get(t['sound'])['category'], role=role or t['role'], sound=t['sound'])
+    bank.add_warning(c, knobs.pitch_warning(meta.get('edits')))
     return y, c, meta
 
 
@@ -279,7 +370,7 @@ def render(kit, out, force=False, log=None):
     for role, spec in k['roles'].items():
         lock['roles'][role] = None if not spec else {
             'sound': spec['sound'], 'align': spec.get('align', ALIGN.get(role, 'onset')),
-            'level_db': float(spec.get('level_db', 0.0)), 'max_s': spec.get('max_s'), 'takes': []}
+            'level_db': float(spec.get('level_db') or 0.0), 'max_s': spec.get('max_s'), 'takes': []}
     rendered = cached = 0
     for t in plan(k):
         key = take_key(t, sr)
@@ -372,6 +463,9 @@ def check(kit, out=None, log=None):
             if tk and os.path.isfile(os.path.join(out, tk['file'])):
                 c = sfx.check(os.path.join(out, tk['file']), category=bank.get(t['sound'])['category'],
                               role=t['role'], sound=t['sound'])
+                if 'pitch_off' in (tk.get('checks') or []):   # measured at render (the file does not say)
+                    bank.add_warning(c, {'code': 'pitch_off', 'msg': f"pitch {t['pitch']}: the knob did not land "
+                                                                     'the note (kit.lock.json)'})
                 row['source'] = 'rendered file'
             else:
                 _, c, _, used = render_take(t)

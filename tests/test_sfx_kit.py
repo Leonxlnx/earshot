@@ -79,6 +79,22 @@ def test_artifacts_are_flagged():
     assert 'truncated' in _codes(sfx.check(cut.astype(np.float32), category='riser'), 'notes')   # the design
 
 
+def test_silence_is_flagged(wav, capsys):
+    """review: sfx.check(np.zeros(4800)) and a kit take faded to nothing by a tiny max_s were called 'clean'"""
+    z = sfx.check(np.zeros(4800, np.float32))
+    assert not z['ok'] and 'silent' in _codes(z) and 'digital silence' in z['summary']
+    t = np.arange(int(0.2 * SR)) / SR
+    tone = 0.5 * np.sin(2 * np.pi * 440 * t) * np.exp(-t / 0.05)
+    assert 'silent' in _codes(sfx.check((tone * 1e-4).astype(np.float32)))              # peak -86 dBFS
+    blip = np.zeros(int(0.2 * SR))
+    blip[1000:1060] = np.hanning(60) * 0.5                                             # ~1 ms of sound
+    assert 'silent' in _codes(sfx.check(blip.astype(np.float32)))
+    y, _ = bank.render('pro_hover_tick/air', checks=False)                             # the shortest bank sound
+    assert 'silent' not in _codes(sfx.check(y)) and sfx.live_ms(y) > 1.5 * sfx.SILENT_MS
+    assert cli.main(['sfx', 'check', wav(np.zeros(4800))]) == 1
+    assert 'digital silence' in capsys.readouterr().out
+
+
 # --------------------------------------------------------------------------------------------------------- kits
 def test_presets_are_valid_restrained_and_explained():
     assert kit.presets() == ['calm', 'crisp', 'minimal']
@@ -98,7 +114,33 @@ def test_presets_are_valid_restrained_and_explained():
         hits = [s['sound'] for r, s in k['roles'].items() if s and r == 'hit']
         assert len(hits) == 1
         files = [t['file'] for t in kit.plan(k)]
-        assert len(files) == len(set(files))
+        assert len(files) == len({f.lower() for f in files})
+
+
+def _midi(p):
+    from earshot.forge import knobs
+    return knobs.midi(p)
+
+
+@pytest.mark.parametrize('name', ['calm', 'crisp', 'minimal'])
+def test_presets_have_the_rungs_a_progress_motif_needs(name):
+    """review (cinetic 5.5b): with 5 bell takes a climbing progress motif ran out of rungs; the bell now spans two
+    octaves of one pentatonic (10 notes), and a tonal text role offers the 5 pentatonic degrees of one octave so a
+    chain can step through the chord's tones. An untuned text role (crisp, minimal: a soft tap, untuned on purpose)
+    rotates its takes instead"""
+    k = kit.preset(name)
+    bell = [_midi(p) for p in k['roles']['bell']['pitches']]
+    assert len(bell) == 10 and bell == sorted(bell) and len(set(bell)) == 10
+    pcs = {m % 12 for m in bell}
+    assert len(pcs) == 5 and max(bell) - min(bell) >= 21                    # two octaves of a pentatonic
+    steps = sorted({(b - a) for a, b in zip(sorted(pcs), sorted(pcs)[1:] + [min(pcs) + 12])})
+    assert steps == [2, 3]                                                  # whole steps and minor thirds only
+    text = k['roles']['text']
+    if text.get('pitches'):
+        tm = [_midi(p) for p in text['pitches']]
+        assert len({m % 12 for m in tm}) >= 5 and {m % 12 for m in tm} <= pcs and max(tm) - min(tm) < 12
+    else:
+        assert text['takes'] >= 3 and 'untuned' in text['note']
 
 
 LISTENING_WORDS = re.compile(r'listener|blind test|picked out|taken for recordings|heard as|to the ear', re.I)
@@ -178,6 +220,75 @@ def test_kit_check_and_problems(tmp_path):
     assert any('riser is sounded' in n for n in r['notes']) and any('synth whip' in n for n in r['notes'])
     with pytest.raises(kit.KitError, match='unknown sound'):
         kit.load(bad)
+
+
+@pytest.mark.parametrize('spec,match', [
+    ({'sound': 'tap/finger', 'level_db': None}, 'level_db must be a number'),
+    ({'sound': 'tap/finger', 'level_db': True}, 'level_db must be a number'),
+    ({'sound': 'tap/finger', 'max_s': -1}, 'max_s must be a number of seconds, 0.01 or more'),
+    ({'sound': 'tap/finger', 'max_s': 0.001}, 'max_s must be a number of seconds, 0.01 or more'),
+    ({'sound': 'tap/finger', 'edits': {'peak_db': 6}}, 'over 0 dBFS'),
+    ({'sound': 'tap/finger', 'edits': {'weight': 2.0}}, 'over 0 dBFS|lower peak_db'),
+    ({'sound': 'tap/finger', 'edits': {'dur': 'long'}}, 'edits.dur must be a number'),
+    ({'sound': 'tap/finger', 'edits': {'dur': 0.001}}, 'dur must be 0.01-60'),
+    ({'sound': 'pluck/kalimba', 'pitches': ['C5', 'H5']}, "pitch 'H5'"),
+    ({'sound': 'pluck/kalimba', 'pitches': ['C1']}, 'outside its f0 range'),
+    ({'sound': 'whoosh_fast/crisp', 'edits': {'pitch': 'C5'}}, 'noise pass-by'),
+    ({'sound': 'click/soft', 'edits': {'apex': 0.05}}, 'whoosh family'),
+    ({'sound': 'whoosh_fast/tight', 'edits': {'dur': 0.3, 'apex': 0.29}}, 'must lie inside the sound'),
+    ({'sound': 'pluck/kalimba', 'pitches': ['440', '440hz']}, 'are one pitch'),
+    ({'sound': 'pluck/kalimba', 'pitches': ['C#5', 'Db5']}, 'are one pitch'),
+    ({'sound': 'pluck/kalimba', 'pitches': ['C5', 'c5']}, 'are one pitch'),
+])
+def test_kit_check_refuses_what_kit_render_cannot_use(tmp_path, spec, match):
+    """review: problems() let through values that made `kit render` crash (level_db null, max_s -1, a bad pitch after
+    a first take was written), render silence (max_s 0.001), clip (peak_db 6) or overwrite one take with another
+    (two spellings of one pitch): check and render now refuse the same things"""
+    k = {'kit': 1, 'name': 'bad', 'sr': 48000, 'roles': {'bell': spec}}
+    probs = kit.problems(k)
+    assert probs and re.search(match, '; '.join(probs)), probs
+    r = kit.check(k)
+    assert not r['ok'] and r['problems'] and not r['roles']
+    with pytest.raises(kit.KitError):
+        kit.render(k, str(tmp_path / 'takes'))
+    assert not (tmp_path / 'takes').exists() or not os.listdir(tmp_path / 'takes')
+
+
+def test_kit_sr_and_role_name_collisions_are_problems():
+    base = {'kit': 1, 'roles': {'tick': {'sound': 'tap/finger'}}}
+    for sr in ('48000x', True, 22050, None):
+        assert any('sr' in p for p in kit.problems(dict(base, sr=sr))), sr
+    two = {'kit': 1, 'roles': {'bell': {'sound': 'pluck/kalimba', 'pitches': ['C5'], 'takes': 2},
+                               'bell_c5': {'sound': 'tap/finger', 'takes': 2}}}
+    assert any('case-insensitive' in p for p in kit.problems(two))
+    with pytest.raises(kit.KitError, match='case-insensitive'):
+        kit.plan(two)
+
+
+def test_kit_take_labels_are_canonical(tmp_path):
+    """one label per pitch (knobs.label): 'Db5' and 'Cs5' render to bell_Cs5.wav, Hz that equal a note take its name;
+    kit render accepts every pitch kit check accepts (review: 'Cs5' passed the check and failed the render)"""
+    k = {'kit': 1, 'name': 'labels', 'roles': {'bell': {'sound': 'pluck/kalimba', 'pitches': ['Db5', '587.33', 'Fs5']},
+                                               'text': {'sound': 'pluck/kalimba_soft', 'pitches': ['Cs5']}}}
+    assert kit.problems(k) == []
+    assert [t['file'] for t in kit.plan(k)] == ['bell_Cs5.wav', 'bell_D5.wav', 'bell_Fs5.wav', 'text_Cs5.wav']
+    lock = kit.render(k, str(tmp_path / 'takes'))
+    assert lock['stats']['rendered'] == 4 and 'checks clean' in lock['summary']
+    assert [t['pitch'] for t in lock['roles']['bell']['takes']] == ['Db5', '587.33', 'Fs5']   # as written
+
+
+def test_kit_pitch_off_is_reported_by_render_and_check(tmp_path, monkeypatch):
+    from earshot.forge import knobs
+    k = {'kit': 1, 'name': 'off', 'roles': {'bell': {'sound': 'pluck/kalimba', 'pitches': ['E5']}}}
+    monkeypatch.setattr(knobs, 'PITCH_TOL_CENTS', -1)           # nothing lands: every take misses
+    lock = kit.render(k, str(tmp_path / 'takes'))
+    tk = lock['roles']['bell']['takes'][0]
+    assert 'pitch_off' in tk['checks'] and 'bell:pitch_off' in lock['summary']
+    r = kit.check(k, str(tmp_path / 'takes'))                    # from the rendered file + the lock
+    assert not r['ok'] and r['roles']['bell'][0]['source'] == 'rendered file'
+    assert 'pitch_off' in {w['code'] for w in r['roles']['bell'][0]['warnings']}
+    monkeypatch.setattr(knobs, 'PITCH_TOL_CENTS', 50)
+    assert kit.check(k)['ok']
 
 
 def test_kit_audition(tmp_path):

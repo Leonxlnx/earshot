@@ -60,7 +60,35 @@ model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md).
   click and snap; crisp tick, light touch, text, click, snap, key and space bar; minimal light touch, text and snap
   (16 role changes). A changed role keeps its loudness (`level_db` moved by the measured difference at the same
   peak). Every note now says what the sound is and what was measured; no note cites a listening test. All takes of
-  the three presets pass `earshot kit check` (57, 59 and 58 takes).
+  the three presets pass `earshot kit check` (64, 64 and 63 takes).
+- **The presets' bell spans two octaves of one pentatonic** (calm, crisp: kalimba G4-E6; minimal: the ding A5-G7; 10
+  notes each), so a climbing progress motif has a rung for every step; calm's tonal text holds the five pentatonic
+  degrees of one octave (C5 D5 E5 G5 A5), so a chain of fragments can step through the chord's tones. crisp and
+  minimal keep an untuned soft tap for text.
+
+### Fixed (review before release)
+
+- **apex with a short tail**: the fade that fits a whoosh to `dur` covered an apex 0.03-0.1 s before the end, so the
+  delivered peak came 8-189 ms early while `edits['apex']` (measured before that fit) said ok. The fade now starts at
+  least 5 ms after the apex, candidates are ranked on apex plus tail error, the peak is placed in whole 1 ms steps of
+  its measure, and `edits['apex']` is measured on the delivered file: 59 whoosh-family targets with 0.1-0.12 s tails
+  land within 2.5 ms.
+- **`kit check` refuses what `kit render` cannot use**, with the same checks (`knobs.validate`, `bank.level`): a null
+  or non-numeric `level_db`, `max_s` under 0.01 s (a silent take), `peak_db` / `weight` over 0 dBFS, knob values and
+  pitches the sound cannot take, a bad `sr`, and take files that would collide (two spellings of one pitch, or names
+  that differ only in case). Pitch labels are canonical (`C#5`, `Db5`, 554.37 Hz -> `Cs5`).
+- `knobs.midi` accepts `s` sharps (`Cs5`), the spelling of take file names and of cinetic's kit.py.
+- The audit flags **silence** (`silent`: a peak under -60 dBFS or less than 5 ms within 40 dB of it).
+- `bank.render` / `earshot sfx render` refuse a peak over 0 dBFS and sample rates other than 44100 / 48000 / 88200 /
+  96000 (the CLI wrote clipped WAVs).
+- **Click and toggle pitch**: their `pitch` parameter is the tink centre, not the partial heard (click/soft +291
+  cents), so `--pitch C7` landed 362 cents off with no warning. Their note is now the measured partial (`meta.pitch_hz`
+  in the bank; no pitch knob where there is no clear partial), a target is landed by measurement, every measured pitch
+  edit reports `ok` (within 50 cents), and a miss adds a `pitch_off` warning to the take's checks.
+- `EARSHOT_BANK`: the docstring gives `os.pathsep` as the separator, and a missing or unreadable file is a readable
+  error naming it instead of a traceback.
+- The README and docs/SFX.md agree on the blind test: no v2 score is published; the README's test is the v1 one (one
+  listener, the author, 15 trials).
 
 ## 0.2.1 - 2026-10-17
 

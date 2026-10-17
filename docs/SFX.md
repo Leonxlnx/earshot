@@ -34,7 +34,8 @@ today. `earshot doctor` reports the version and the counts.
 | `pluck.json` | `pluck1` | 3 | the tuned kalimba voices (`pluck/kalimba`, `pluck/kalimba_soft`, `pluck/kalimba_ring`) |
 
 `bank.VERSION` joins the file versions (`forge_v2r6+fit1+pluck1`); extra bank files load from `EARSHOT_BANK` (paths
-joined by the OS path separator). Ids are `<category>/<member>`: the category is the public name (a user never needs the
+joined by the OS path separator, `os.pathsep`: `;` on Windows, `:` elsewhere; a missing or unreadable file is an error
+that names it). Ids are `<category>/<member>`: the category is the public name (a user never needs the
 recipe module behind it: `typing_key` renders with `recipes/keypress.py`, `pro_pop` with `pop.render_v2`,
 `pro_typing_run` with `typing.render_run`).
 
@@ -84,7 +85,7 @@ bit-exactly.
 ## Knobs: dur, apex, pitch, level
 
 `bank.render(id, seed=None, dur=None, apex=None, pitch=None, peak_db=-1.0, sr=48000, weight=None)`;
-`earshot sfx render ID -o out.wav [--seed N] [--dur S] [--apex S] [--pitch NOTE|HZ] [--peak DB] [--weight W]`.
+`earshot sfx render ID -o out.wav [--seed N] [--dur S] [--apex S] [--pitch NOTE|HZ] [--peak DB] [--weight W] [--sr R]`.
 Knobs edit the recipe's own parameters (`earshot/forge/knobs.py`); nothing is resampled or time-stretched.
 `meta['edits']` reports what each knob did and how close it landed.
 
@@ -95,24 +96,29 @@ Knobs edit the recipe's own parameters (`earshot/forge/knobs.py`); nothing is re
   shimmers, zips, glitches, typing runs, pro_logo_sting, the UI sounds' end gate) scale that key, render, measure and
   correct along a secant through the renders so far (at most 2 corrections, keeping the closest); the rest (impact,
   toggle, typing_key, logo_sting, pluck) keep their sound as it is. Then every dur lands exactly: a longer file is faded
-  out to the length (raised cosine over a quarter of it, 10-150 ms), a shorter one padded with silence. A riser's
+  out to the length (raised cosine over a quarter of it, 10-150 ms; with apex as well the fade starts at least 5 ms
+  after the apex, shortening to as little as 2 ms), a shorter one padded with silence. A riser's
   length is exact by construction (`length` 1.0 -> a 1.000 s file that stops on its loudest 5 ms).
 - **apex** (seconds to the loudest 5 ms, the whoosh family only): the pass engine's peak is analytic,
   `tp = rise * (|start_db| / 30) ** (1 / rise_k)`; rise is solved for the target, measured, corrected up to twice,
   then the closest render's peak is placed on the target by trimming the quiet approach (a head at least 20 dB under
-  the peak, with a 3 ms fade-in) or padding silence before it. Measured: the closed form lands within about 12 ms on
+  the peak, with a 3 ms fade-in) or padding silence before it, in whole 1 ms steps of the peak measure (a shift off
+  that grid can re-read a fluttering pass's near-equal maxima, 0.2 dB and 15 ms apart on whoosh_big/swell). With dur
+  as well, the candidates are ranked on apex error plus the error of the tail after it, and the apex is measured again
+  on the file after its fit to dur, so `edits['apex']` describes the delivered file. Measured: the closed form lands within about 12 ms on
   the fast family, but a broad fluttering pass's 5 ms peak moves non-monotonically with rise (whoosh_big and
   pro_whoosh_big swell: up to 50 ms for a 10 % change), so the search alone cannot promise 5 ms; with the placement
-  every tested target lands within 2.5 ms (`edits['apex']`: `search_err_ms`, `fit`, `err_ms`, `ok`). Combine with dur
+  every tested target lands within 2.5 ms, also a whoosh peaking 0.03-0.1 s before its end (59 whoosh-family
+  targets, tails 0.1-0.12 s; `edits['apex']`: `search_err_ms`, `fit`, `measured`, `err_ms`, `ok`). Combine with dur
   for a move: `--dur 0.8 --apex 0.32` = a 0.8 s file whose loudest moment is 0.32 s in.
-- **pitch** (`'C5'`, `'Eb6'`, `'F#4'`, `440`, `'440hz'`): the note goes into the recipe's pitch parameter and the
-  parameters of the same body move by the same ratio:
+- **pitch** (`'C5'`, `'Eb6'`, `'F#4'` or `'Fs4'`, `440`, `'440hz'`): the note goes into the recipe's pitch parameter
+  and the parameters of the same body move by the same ratio:
 
   | category | parameter (co-scaled) | range |
   |---|---|---|
   | pluck | f0 | 130-2100 Hz |
   | notify / pro_notify | f0 (the head fundamental) | 220-3200 / 600-3200 Hz |
-  | click, pro_click, toggle | pitch (the tink partials) | 1.2-9.5 kHz / 1.6-8 kHz |
+  | click, pro_click, toggle | pitch (the tink centre), landed on the heard partial (below) | the parameter's 1.2-9.5 kHz / 1.6-8 kHz, moved to the heard partial |
   | hover_tick, pro_hover_tick | ping_f (tick_f), only members whose ping is on | 3-15 kHz |
   | tap, pro_tap, pro_pop_in | body_f (knock_f, glass_f) | 70-220 Hz |
   | pop / pro_pop | f0 (f_hi, f_lo, f_blip / + n_f0, n_f1) | 400-3500 / 280-1400 Hz |
@@ -126,10 +132,18 @@ Knobs edit the recipe's own parameters (`earshot/forge/knobs.py`); nothing is re
 
   Noise sounds are refused with the reason (whoosh_fast, whoosh_big, swish, swipe, glitch, pro_glitch, typing_key,
   pro_typing_key, pro_typing_run), as are targets outside the range and members whose tonal layer is off. The render is
-  measured: `edits['pitch']['measured_hz']` / `cents_off` (pluck E5, notify G5, pro_sub_drop G1: 0 cents; a tap's body
-  is a damped thump, within about 60 cents).
-- **level**: `peak_db` sets the sample peak (-1 dBFS by default); `weight` scales it by 6 dB per doubling (0.5 = 6 dB
-  down) and refuses a level over 0 dBFS. Loudness inside a family was matched in the forge (`render_final()` keeps
+  measured: `edits['pitch']['measured_hz']` / `cents_off` / `ok` (within 50 cents; pluck E5, notify G5,
+  pro_sub_drop G1: 0 cents; a tap's body is a damped thump, within about 60 cents). A take whose note missed carries a
+  `pitch_off` warning in its checks, so a kit re-rolls or reports it; risers and impacts are not measured (`ok` null).
+  Clicks and toggles: their `pitch` parameter is the centre of the tink partials and noise band, not the partial you
+  hear (click/soft: 2454 Hz, heard 2903 Hz, +291 cents). Their note is the heard partial, measured when the bank was
+  built (`meta.pitch_hz`, shown by `sfx list`; null for click/thock and toggle/micro, which have no clear partial and
+  refuse a pitch), and a target is landed by measurement: the parameter moves by target / heard, the render is
+  measured and corrected at most twice. pro_click members land within a few cents; some click and toggle members do
+  not reach every note, and then say so (`ok` false, `pitch_off`).
+- **level**: `peak_db` sets the sample peak (-1 dBFS by default, 0 at most: a level over 0 dBFS is refused, it
+  would clip); `weight` scales it by 6 dB per doubling (0.5 = 6 dB down), with the same limit. `sr` is 48000 or one
+  of 44100 / 88200 / 96000 (the finished take resampled), as in a kit. Loudness inside a family was matched in the forge (`render_final()` keeps
   that palette gain); a kit's `level_db` carries the mix level per role.
 
 ## The audit: `sfx check`
@@ -144,10 +158,12 @@ render runs it (`meta['checks']`). Warnings make `ok` false; notes are informati
 | dc | an offset above -40 dB re peak | `polish.dc` |
 | ring | a metallic comb in the tail (z > 15) | `polish.ring` |
 | truncated | a tail cut while still decaying, above -45 dB; a note for the categories whose stop is the design (riser, pro_riser, pro_zip, glitch, pro_glitch, pro_impact) and for any sound that ends on its loudest moment | `polish.truncated` |
+| silent | nothing to hear: a sample peak under -60 dBFS, or less than 5 ms within 40 dB of the peak (the shortest bank sound holds 9 ms): digital silence, or a take faded to nothing | `sfx.live_ms` |
 | silence | digital silence inside the sound (a note for glitches) | `polish.silence` |
 | tail | the tail rises again by more than 6 dB (a note: a roll, a second event, a double member) | `polish.tail` |
 | rising_glide | a tonal sound whose pitch climbs more than 4 semitones over at least 50 ms: the rising "synth whip" | `sfx.rising_glide` |
 | stacked, pre_swell | for a hit (role hit / land): two separate attacks, or more than 100 ms of build before the hit | `sfx.layers` |
+| pitch_off | a render with a pitch knob whose measured note is more than 50 cents off (bank renders and kit takes) | `knobs.pitch_warning` |
 
 The glide detector tracks the strongest partial in 21 ms frames every 5 ms where it holds at least half of the frame's
 80 Hz-10 kHz energy within +-3 semitones (a tone, also a fast smeared sweep; a noise band does not), splits the track
@@ -188,16 +204,17 @@ text fragment resolving). Other role names are allowed; a renderer must know the
 | `sound` | a bank id |
 | `takes` | takes per role (default 1, at most 32); take k renders on `seed + k - 1` |
 | `seed` | default: the sound's own, so take 1 is the delivered final |
-| `edits` | knobs for every take: `dur`, `apex`, `pitch`, `peak_db` (default -1), `weight` |
-| `pitches` | one set of takes per note (or Hz) |
+| `edits` | knobs for every take: `dur`, `apex`, `pitch`, `peak_db` (default -1, at most 0), `weight` |
+| `pitches` | one set of takes per note (or Hz); each pitch once (`C#5`, `Db5`, `Cs5` and 554.37 are one pitch) |
 | `align` | the sync point a mixer puts on the cue: `onset`, `peak` (whoosh apexes), `end` (risers, swells); default per role |
-| `max_s` | a take longer than this is faded out to it |
-| `level_db` | the role's mix level relative to a take at its peak (for the mixer; the audition applies it) |
+| `max_s` | a take longer than this is faded out to it (0.01 s or more) |
+| `level_db` | the role's mix level relative to a take at its peak, a number (for the mixer; the audition applies it) |
 | `note` | why this sound |
 | `null` | the role is not sounded: a renderer skips its cues |
 
 `earshot kit render audio/kit.json --out audio/kit` writes 24-bit takes (`hit_1.wav`, `tick-crisp_2.wav`,
-`bell_C5.wav`, `text_Cs5_2.wav`) and `kit.lock.json`:
+`bell_C5.wav`, `text_Cs5_2.wav`; one canonical label per pitch, so `Db5` is `Cs5` and 523.25 Hz is `C5`) and
+`kit.lock.json`:
 
 ```json
 {"kit": 1, "earshot": "0.3.0", "bank": "forge_v2r6+fit1+pluck1", "sr": 48000, "name": "calm",
@@ -210,8 +227,12 @@ text fragment resolving). Other role names are allowed; a renderer must know the
 
 - **Deterministic.** The same kit renders the same takes. A take that fails the audit is rendered again on
   `seed + 1000 j` (up to 3 times) and the first clean one kept, as a sound designer discards a bad take; the lock then
-  names `seed` and `planned_seed`. On the three presets 4 of 174 takes needed it (three key takes and a pitched ding,
+  names `seed` and `planned_seed`. On the three presets 4 of 191 takes needed it (three key takes and a pitched ding,
   all forge members; no fitted sound); every preset take is clean.
+- **Validated like a render.** `kit check` refuses what `kit render` cannot use, with the same checks: knob values
+  and ranges (a whoosh-only apex, a pitch the sound cannot take, `dur` 0.01-60 s), `peak_db` / `weight` over 0 dBFS,
+  `max_s` under 0.01 s, a `level_db` that is no number, an unknown sample rate, and two takes that would share a file
+  (compared without regard to case, as on Windows and macOS file systems).
 - **Cached.** A take whose key (bank entry, seed, pitch, edits, max_s, sr, bank version, earshot version) and file
   hash match the existing lock is kept; changed roles re-render; files the new kit no longer names are removed (only
   files the old lock listed); `--force` renders everything.
@@ -257,8 +278,8 @@ were chosen:
 | key / .space / .return | typing_key/thock / fit/key.space/thock_space / typing_key/deep | fit/key/medium / fit/key.space/thock_space / typing_key/clicky | pro_typing_key glass / tick / double |
 | click / click.confirm | fit/click/floss_lid / pluck/kalimba_soft C6 | fit/click/floss_lid / pro_notify/ding_2045 | pro_click/soft / pro_notify/ding_1822 |
 | snap | fit/snap/switch_flip | fit/snap/switch_flip | fit/snap/switch_flip |
-| bell | pluck/kalimba C D E G A (octave 5) | pluck/kalimba C D E G A | pro_notify/ding_1822 F G A C D (octaves 6-7) |
-| text | pluck/kalimba_soft C5 E5 G5 | fit/land.light/finger_phone | fit/land.light/finger_phone |
+| bell | pluck/kalimba, C pentatonic G4-E6 (10 notes) | pluck/kalimba, C pentatonic G4-E6 | pro_notify/ding_1822, F pentatonic A5-G7 (10 notes) |
+| text | pluck/kalimba_soft C5 D5 E5 G5 A5 | fit/land.light/finger_phone (untuned) | fit/land.light/finger_phone (untuned) |
 | riser / swell / suck | off | off | off |
 
 The replacements, measured (match z / forced choice against the synth-blip descriptions / realness; `_compare` of
@@ -276,7 +297,10 @@ the fit run, the forge members at their own seed):
 | snap ('a toggle switch click') | pro_pop_in/knock +0.61 / 0.27 / 0.08; toggle/latch +2.04 / 0.97 / 0.50 | switch_flip +2.24 / 1.00 / 0.97 | calm, crisp, minimal |
 | text (a soft touch for a resolving fragment) | pro_tap/soft, pro_tap/finger (realness 0.16-0.25) | finger_phone (tagged 'a soft UI button tap', realness 0.89) | crisp, minimal |
 
-Set `edits.pitch` on `hit` (calm) and `drop` (crisp, minimal) to the film's root.
+Set `edits.pitch` on `hit` (calm) and `drop` (crisp, minimal) to the film's root. The bell spans two octaves of
+one pentatonic so a climbing progress motif finds a rung for each step; a tonal text role holds the five pentatonic
+degrees of one octave, so a chain of fragments can step through whichever of the chord's tones the takes hold. crisp
+and minimal resolve text on an untuned soft tap (a new take per fragment), which never clashes with a note.
 
 ## Python and MCP
 
@@ -375,7 +399,7 @@ Measured on the development laptop (AMD Ryzen 7 260, 2 threads, while other jobs
 | warm render / render + audit: pluck (3 s), impact (4.8 s) | 1.0-1.1 s / 1.4-2.2 s |
 | a targeted whoosh (dur + apex: up to 3 renders + audit) | 1.9 s |
 | render + audit, median over the 186 forge sounds and plucks (a cold process per batch) | 0.5 s |
-| `kit render`, whole preset, fresh process | calm 28 s (57 takes), crisp 81 s (59), minimal 24 s (58), with the fitted sounds |
+| `kit render`, whole preset, fresh process | calm 34 s (64 takes), crisp 22 s (64), minimal 9 s (63), with the fitted sounds (inside the process, numba kernels cached; the first run after an install adds the compile) |
 | `kit render`, everything cached | 3-5 s (the process start; 0.1-0.6 s inside it) |
 
 Render a film's sounds in one process and keep the takes: the lock and its cache are made for that.
@@ -383,7 +407,8 @@ Render a film's sounds in one process and keep the takes: the lock and its cache
 ## Limits
 
 - The bank is the forge's sound plus 15 fitted recordings, chosen and checked by measurement; it is not a library of
-  recordings. Measurements (realness, a match against a role's description, the audit) are models and heuristics,
+  recordings. No blind listening result for the v2 sounds is published: the README's blind test covers the v1 recipes
+  (one listener, the author, 15 trials), and `eval/forge/blind_v2.py` builds the kit for a v2 test. Measurements (realness, a match against a role's description, the audit) are models and heuristics,
   not ears: a film's own listening pass still decides.
 - Bit-exact re-renders hold on the machine that built the bank; another platform (numpy, scipy, numba versions) can
   differ by tiny amounts, which is why entries carry fingerprints with tolerances instead of hashes.

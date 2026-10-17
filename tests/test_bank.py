@@ -124,6 +124,45 @@ def test_levels_weight_and_sr():
     assert abs(len(y44) - round(len(y) * 44100 / SR)) <= 2 and m44['sr'] == 44100
 
 
+def test_levels_over_0_dbfs_and_odd_sample_rates_are_refused(tmp_path, capsys):
+    """review: `sfx render --peak 3` wrote a clipped WAV (exit 0) and any sr was resampled to, while --weight, the MCP
+    tool and kits refused or restricted them"""
+    for bad in (3.0, 0.5, float('nan'), True, '-1'):
+        with pytest.raises(bank.BankError, match='over 0 dBFS|must be a number'):
+            bank.render('tap/finger', peak_db=bad, checks=False)
+    y, m = bank.render('tap/finger', peak_db=0.0, checks=False)            # 0 dBFS itself is fine
+    assert abs(m['peak_db']) < 0.01
+    for sr in (1000, 22050, 48000.5, True, '48000'):
+        with pytest.raises(bank.BankError, match='sr must be one of'):
+            bank.render('tap/finger', sr=sr, checks=False)
+    from earshot import cli
+    f = str(tmp_path / 'clip.wav')
+    assert cli.main(['sfx', 'render', 'tap/finger', '-o', f, '--peak', '3']) == 1 and not os.path.exists(f)
+    assert 'over 0 dBFS' in capsys.readouterr().err
+    with pytest.raises(SystemExit):                                         # argparse: not one of the choices
+        cli.main(['sfx', 'render', 'tap/finger', '-o', f, '--sr', '1000'])
+
+
+def test_earshot_bank_missing_file_is_a_readable_error(monkeypatch, tmp_path, capsys):
+    """review: EARSHOT_BANK naming a missing file broke every bank command with a raw FileNotFoundError; the docstring
+    gave ';' as the separator, which is os.pathsep only on Windows"""
+    missing = str(tmp_path / 'nope.json')
+    monkeypatch.setenv('EARSHOT_BANK', missing)
+    with pytest.raises(bank.BankError, match='EARSHOT_BANK file .*nope.json not found'):
+        bank.ids()
+    from earshot import cli
+    assert cli.main(['sfx', 'list']) == 1
+    err = capsys.readouterr().err
+    assert 'BankError' in err and 'not found' in err and 'Traceback' not in err
+    junk = tmp_path / 'junk.json'
+    junk.write_text('{not json', encoding='utf-8')
+    monkeypatch.setenv('EARSHOT_BANK', str(junk))
+    with pytest.raises(bank.BankError, match='not readable as a bank file'):
+        bank.ids()
+    monkeypatch.delenv('EARSHOT_BANK')
+    assert 'os.pathsep' in bank.__doc__ and len(bank.ids()) > 180
+
+
 def _final(tmp_path, sid, scale=1.0):
     """a forge final folder holding one bank entry: report.json with its render block + the WAV it renders"""
     e = bank.get(sid)
@@ -165,6 +204,20 @@ def test_note_parsing():
             knobs.hz(bad)
 
 
+def test_s_sharps_and_canonical_labels():
+    """review: take files spell sharps 's' (bell_Cs5.wav) and cinetic's kit.py accepts 'Cs5', but knobs.midi refused
+    it, so `kit render` died on a kit that `kit check` passed"""
+    assert knobs.midi('Cs5') == knobs.midi('C#5') == knobs.midi('Db5') == 73 and knobs.midi('fs4') == 66
+    assert abs(knobs.hz('Cs5') - knobs.hz('C#5')) < 1e-9
+    y, m = bank.render('pluck/kalimba', pitch='Cs5', checks=False)
+    assert m['edits']['pitch']['note'] == 'C#5' and m['edits']['pitch']['ok']
+    assert {knobs.label(p) for p in ('C#5', 'Db5', 'Cs5', 554.365)} == {'Cs5'}
+    assert knobs.label('440') == knobs.label('440hz') == knobs.label('A4') == 'A4'
+    assert knobs.label(445) == '445hz' and knobs.label('Eb6') == 'Eb6'
+    with pytest.raises(knobs.KnobError):
+        knobs.label('H5')
+
+
 def test_dur_lands_exactly():
     y, m = bank.render('pro_riser/air_gate', dur=1.0)          # the riser's own length key: exact, ends on its peak
     assert len(y) == SR and m['edits']['dur']['method'] == 'param' and m['peak_s'] > 0.97
@@ -176,6 +229,41 @@ def test_dur_lands_exactly():
     assert len(y) == int(0.3 * SR) and np.abs(y[-480:]).max() == 0.0
     y, m = bank.render('click/soft', dur=0.06)                  # the click's end gate: its own length key
     assert len(y) == int(0.06 * SR) and m['edits']['dur']['method'] == 'param'
+
+
+def test_fit_length_fade_starts_after_keep_s():
+    t = np.arange(int(0.6 * SR)) / SR
+    x = np.minimum(t / 0.5, 1.0)                     # a ramp that peaks at 0.5 s, then holds
+    y, how = knobs.fit_length(x, 0.52)
+    assert y[int(0.5 * SR)] < 0.9                    # the default fade (a quarter, 130 ms) covers the peak
+    y, how = knobs.fit_length(x, 0.52, keep_s=0.505)
+    assert np.array_equal(y[:int(0.505 * SR)], x[:int(0.505 * SR)]) and 'fade 15 ms' in how
+    assert len(y) == int(0.52 * SR) and abs(y[-1]) < 1e-3
+
+
+@pytest.mark.parametrize('sid,apex,dur', [('whoosh_big/swell', 0.5, 0.6), ('whoosh_fast/heavy', 0.5, 0.6),
+                                          ('swipe/velvet', 0.4, 0.43)])
+def test_apex_with_a_short_tail_lands_and_edits_say_what_ships(sid, apex, dur):
+    """review: the fade that fits a whoosh to dur covered an apex 0.03-0.1 s before the end, so the delivered peak
+    came 34-189 ms early while edits['apex'] (measured before the fit) said ok"""
+    y, m = bank.render(sid, apex=apex, dur=dur)
+    a = m['edits']['apex']
+    assert abs(m['peak_s'] - apex) <= knobs.APEX_TOL, a
+    assert abs(a['measured'] - m['peak_s']) <= 0.001 and a['ok'] is True
+    assert len(y) == int(round(dur * SR)) and 'fade' in m['edits']['dur']['fit']
+
+
+def test_apex_ok_is_false_when_the_delivered_file_misses(monkeypatch):
+    """edits['apex'] describes the delivered file: with the old fit (a fade over the apex) the miss is reported"""
+    real = knobs.fit_length
+
+    def old_fit(x, dur, keep_s=None):
+        return real(x, dur)
+    monkeypatch.setattr(knobs, 'fit_length', old_fit)
+    y, m = bank.render('whoosh_big/swell', apex=0.5, dur=0.6)
+    a = m['edits']['apex']
+    assert abs(a['measured'] - m['peak_s']) <= 0.001
+    assert abs(m['peak_s'] - 0.5) > knobs.APEX_TOL and a['ok'] is False
 
 
 @pytest.mark.parametrize('sid,apex,dur', [('whoosh_fast/tight', 0.25, None), ('whoosh_fast/tight', 0.3, 0.7),
@@ -191,13 +279,45 @@ def test_apex_lands_within_5_ms(sid, apex, dur):
 def test_pitch_goes_through_the_recipe():
     y, m = bank.render('pluck/kalimba', pitch='E5')
     p = m['edits']['pitch']
-    assert p['param'] == 'f0' and abs(p['cents_off']) <= 30 and p['semitones'] == 4.0
+    assert p['param'] == 'f0' and abs(p['cents_off']) <= 30 and p['semitones'] == 4.0 and p['ok'] is True
+    assert 'pitch_off' not in {w['code'] for w in m['checks']['warnings']}
     y, m = bank.render('pro_sub_drop/quick', pitch='G1')
     p = m['edits']['pitch']
     e = bank.get('pro_sub_drop/quick')['params']
     assert abs(p['params']['f1'] - 49.0) < 0.01
     assert abs(p['params']['f0'] / p['params']['f1'] - e['f0'] / e['f1']) < 1e-3          # the glide ratio kept
     assert p['measured_hz'] and abs(p['cents_off']) <= 50
+
+
+def test_click_pitch_lands_on_the_heard_partial():
+    """review: a click's `pitch` is its tink centre, not the partial heard (click/soft 2454 Hz, heard 2903 Hz), so
+    --pitch C7 measured 362 cents off with no warning while describe advertised a native note. The note is now the
+    measured partial, a target is landed by measurement, and edits.pitch.ok says whether it landed"""
+    d = knobs.describe(bank.get('click/soft'))['pitch']
+    assert d['mode'] == 'partial' and abs(d['native_hz'] - 2903.4) < 1 and d['note'] == knobs.note(d['native_hz'])
+    assert abs(d['param_hz'] - 2454.3) < 1 and d['range_hz'][0] > 1200 * 2903 / 2455 - 1
+    for sid in ('click/soft', 'pro_click/glass', 'pro_click/mouse'):
+        y, m = bank.render(sid, pitch='C7')
+        p = m['edits']['pitch']
+        assert p['ok'] is True and abs(p['cents_off']) <= knobs.PITCH_TOL_CENTS, (sid, p)
+        assert 'pitch_off' not in {w['code'] for w in m['checks']['warnings']}
+    with pytest.raises(knobs.KnobError, match='no clear tonal partial'):
+        bank.render('click/thock', pitch='C7')
+    assert knobs.describe(bank.get('click/thock'))['pitch'] is None
+    with pytest.raises(knobs.KnobError, match='outside its pitch range'):
+        bank.render('toggle/latch', pitch='C7')        # heard 3370 Hz: its range starts at ~2266 Hz
+
+
+def test_a_missed_pitch_is_a_pitch_off_warning(monkeypatch):
+    """edits.pitch.ok False puts 'pitch_off' in the render's checks (and a kit take's), so a take that missed its note
+    is re-rolled or reported, never silently kept"""
+    assert knobs.pitch_warning({'pitch': {'ok': True}}) is None and knobs.pitch_warning({}) is None
+    w = knobs.pitch_warning({'pitch': {'ok': False, 'note': 'C7', 'measured_hz': 2579.7, 'cents_off': 362}})
+    assert w['code'] == 'pitch_off' and '+362 cents' in w['msg']
+    monkeypatch.setattr(knobs, 'PITCH_TOL_CENTS', -1)           # nothing lands now
+    y, m = bank.render('pluck/kalimba', pitch='E5')
+    assert m['edits']['pitch']['ok'] is False and not m['checks']['ok']
+    assert 'pitch_off' in {w['code'] for w in m['checks']['warnings']} and 'pitch E5' in m['checks']['summary']
 
 
 def test_pitch_and_apex_refusals_say_why():

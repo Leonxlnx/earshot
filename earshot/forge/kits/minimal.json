@@ -39,10 +39,10 @@
   "snap": {"sound": "fit/snap/switch_flip", "takes": 2, "align": "onset", "level_db": -3.5,
            "note": "a switch flip, a CC0 recording fitted as code (0.19 s, one attack): matches 'a toggle switch click' at z +2.24, p 1.00 over synth-blip descriptions (pro_pop_in/knock: +0.61, 0.27), realness 0.97 (0.08)"},
   "swell": null,
-  "bell": {"sound": "pro_notify/ding_1822", "pitches": ["F6", "G6", "A6", "C7", "D7"], "takes": 1, "align": "onset", "level_db": -8.0,
-           "note": "the clean ding on an F pentatonic around its own pitch (1822 Hz): sparse designed notes, no ringing bell"},
+  "bell": {"sound": "pro_notify/ding_1822", "pitches": ["A5", "C6", "D6", "F6", "G6", "A6", "C7", "D7", "F7", "G7"], "takes": 1, "align": "onset", "level_db": -8.0,
+           "note": "the clean ding on two octaves of an F pentatonic around its own pitch (1822 Hz; A5-G7, 10 notes): sparse designed notes, a rung for every progress step, no ringing bell"},
   "text": {"sound": "fit/land.light/finger_phone", "takes": 3, "align": "onset", "level_db": -8.0,
-           "note": "a finger tapping a phone, a CC0 recording fitted as code (0.33 s, a quiet low tap): its top tag is 'a soft UI button tap'; realness 0.89 (pro_tap/finger: 0.16); level +5 dB for its lower loudness at the same peak"}
+           "note": "a finger tapping a phone, a CC0 recording fitted as code (0.33 s, a quiet low tap, untuned so it never fights a note: a new take per fragment): its top tag is 'a soft UI button tap'; realness 0.89 (pro_tap/finger: 0.16); level +5 dB for its lower loudness at the same peak"}
  },
  "off": {
   "suck": "off by default: a reverse whoosh into a cut stacks a build onto the reveal",

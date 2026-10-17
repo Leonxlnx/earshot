@@ -111,7 +111,7 @@ balance is closer in 3 of those 5 (key press 8.2 -> 7.4 dB, fast whoosh 8.6 -> 6
 34, the made balance is at least as close to the held-out recordings as a second set of real recordings in 18 of the
 21 categories that have a number, and every final re-renders from its `report.json` (`earshot forge --check`). The
 model checks that v1 had saturated fell. A clean blind-test kit for the v2 sounds is `eval/forge/blind_v2.py`; no v2
-score is published yet. What changed, every number, and what is still weak: [docs/FORGE_V2.md](docs/FORGE_V2.md).
+score is published yet (docs/SFX.md says the same), so the blind test below is the v1 one. What changed, every number, and what is still weak: [docs/FORGE_V2.md](docs/FORGE_V2.md).
 
 The reference recordings are licensed and not in this repo, so `--refset` needs a local registry: bring your own refs
 with `--refs DIR`, or lay them out as described in `earshot/forge/refsets.py`. Without refs the critic runs in

@@ -38,10 +38,10 @@
   "snap": {"sound": "fit/snap/switch_flip", "takes": 2, "align": "onset", "level_db": -3.5,
            "note": "a switch flip, a CC0 recording fitted as code (0.19 s, one attack): matches 'a toggle switch click' at z +2.24, p 1.00 over synth-blip descriptions (pro_pop_in/knock: +0.61, 0.27), realness 0.97 (0.08)"},
   "swell": null,
-  "bell": {"sound": "pluck/kalimba", "pitches": ["C5", "D5", "E5", "G5", "A5"], "takes": 1, "align": "onset", "level_db": -5.0,
-           "note": "the launch film's kalimba on a C pentatonic: one tuned note per progress step or motif note"},
-  "text": {"sound": "pluck/kalimba_soft", "pitches": ["C5", "E5", "G5"], "takes": 1, "align": "onset", "level_db": -12.0,
-           "note": "one soft tuned note when a text fragment resolves (not per word), rotating through the chord, under the picture"}
+  "bell": {"sound": "pluck/kalimba", "pitches": ["G4", "A4", "C5", "D5", "E5", "G5", "A5", "C6", "D6", "E6"], "takes": 1, "align": "onset", "level_db": -5.0,
+           "note": "the launch film's kalimba on two octaves of a C pentatonic (G4-E6, 10 notes): one tuned note per progress step or motif note, so a climbing motif has a rung for every step"},
+  "text": {"sound": "pluck/kalimba_soft", "pitches": ["C5", "D5", "E5", "G5", "A5"], "takes": 1, "align": "onset", "level_db": -12.0,
+           "note": "one soft tuned note when a text fragment resolves (not per word), stepping through the chord's tones among the five pentatonic degrees of one octave, under the picture"}
  },
  "off": {
   "suck": "off by default: a reverse whoosh into a cut stacks a build onto the reveal",
