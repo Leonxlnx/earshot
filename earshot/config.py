@@ -3,8 +3,9 @@
 EARSHOT_HOME     cache root (models, embeddings, decoded audio). Default: <repo>/.cache in a source checkout,
                  else ~/.cache/earshot.
 EARSHOT_THREADS  torch CPU threads per process (default: min(4, cores // 2)); earshot never uses a GPU.
-EARSHOT_CLAP     CLAP model id (default laion/larger_clap_general)
-EARSHOT_AST      AudioSet tagger id (default MIT/ast-finetuned-audioset-10-10-0.4593)
+EARSHOT_CLAP     CLAP model: a Hub id (default laion/larger_clap_general) or a local model folder (config.json plus
+                 model.safetensors), loaded from disk as it is, never downloaded into
+EARSHOT_AST      AudioSet tagger: a Hub id (default MIT/ast-finetuned-audioset-10-10-0.4593) or a local model folder
 EARSHOT_CLAP_REVISION, EARSHOT_AST_REVISION
                  Hub revision (commit sha, branch or tag) to use instead of the pinned one (PINS below); a custom
                  model id without a revision uses 'main'

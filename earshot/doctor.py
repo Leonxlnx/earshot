@@ -31,7 +31,8 @@ def _models():
 
 
 def models():
-    """per model id: the revision earshot wants, what the cache holds and the folder that loads. Filesystem only"""
+    """per model id: the revision earshot wants ('local' for a local model folder), what the cache holds and the
+    folder that loads. Filesystem only"""
     from .models import hub
     out = {}
     for mid, rev in _models():
@@ -49,7 +50,7 @@ def fetch():
     for mid, rev in _models():
         s = hub.resolve(mid, rev)
         if s.state == 'cached':
-            out[mid] = 'already cached'
+            out[mid] = 'already cached' if not s.folder else 'a local folder (nothing to download)'
             continue
         try:
             out[mid] = 'downloaded ' + hub.fetch(s).sha[:7]
@@ -114,7 +115,11 @@ def check(load=False, fetch_missing=False):
     problems += [f'data file earshot/data/{f} missing' for f, ok in data.items() if not ok]
     failed = [m for m, v in r.get('fetched', {}).items() if v.startswith('failed')]
     problems += [f"{m}: {r['fetched'][m]}" for m in failed]
-    notes, todo = [], [m for m, ok in r['models_cached'].items() if not ok and m not in failed]
+    folders = {m for m, v in r['models'].items() if v['revision'] == 'local'}
+    problems += [f"{m}: the local model folder lacks {' and '.join(r['models'][m]['missing'])} (earshot never "
+                 'downloads into a folder)' for m in r['models']
+                 if m in folders and not r['models_cached'][m] and m not in failed]
+    notes, todo = [], [m for m, ok in r['models_cached'].items() if not ok and m not in failed and m not in folders]
     if todo and r['offline']:
         problems.append(f"{' and '.join(todo)} not in the cache ({config.HF_CACHE}) and {r['offline']} is set, so "
                         'earshot will not download them: run `earshot doctor --fetch` once without it, or copy a '

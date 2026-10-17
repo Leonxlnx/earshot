@@ -213,8 +213,11 @@ doctor` says so; `earshot doctor --fetch` downloads the pinned safetensors (776 
 
 Settings (environment variables): `EARSHOT_THREADS` (torch CPU threads, default min(4, cores/2)), `EARSHOT_HOME`
 (cache root), `EARSHOT_PRECISION` (`bf16` by default, used only on CPUs with native bf16 such as AVX512-BF16 / AMX,
-fp32 everywhere else; `fp32` forces fp32), `EARSHOT_OFFLINE=1` (above), `EARSHOT_CLAP` / `EARSHOT_AST` (other model
-ids) and `EARSHOT_CLAP_REVISION` / `EARSHOT_AST_REVISION` (another Hub revision; safetensors weights only).
+fp32 everywhere else; `fp32` forces fp32), `EARSHOT_OFFLINE=1` (above), `EARSHOT_CLAP` / `EARSHOT_AST` (another
+Hub model id, or a local model folder with `config.json` and `model.safetensors`, which loads from disk as it is with
+no network and is never downloaded into) and `EARSHOT_CLAP_REVISION` / `EARSHOT_AST_REVISION` (another Hub revision;
+safetensors weights only). A custom Hub model downloads its top-level config, tokenizer and safetensors files by name,
+never a repo's subfolders or weight variants.
 `earshot doctor` reports the revisions and what the cache holds; `--load` also what loads (revision, weights,
 precision).
 

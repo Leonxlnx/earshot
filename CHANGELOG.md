@@ -28,6 +28,15 @@ Two fixes from a careful outside review (thanks, @markblundeberg).
   - `earshot doctor` reports, per model, the pinned revision, what the cache holds (cached / legacy / incomplete /
     missing), the folder that loads and the offline flag; `--load` adds the revision and weights file that loaded.
     The first download is ~1.1 GB (the docs said 1.4 GB).
+  - `EARSHOT_CLAP` / `EARSHOT_AST` may still name a local model folder (`config.json` plus `model.safetensors`, or an
+    older checkpoint's `pytorch_model.bin`): it loads from disk as it is, with no network and no revision, has its own
+    embedding caches, and earshot never downloads into it (an incomplete folder is an error naming what is missing).
+  - A custom Hub model downloads its top-level config, tokenizer and safetensors files by name; the old `*.json` /
+    `*.safetensors` globs also matched every subfolder and weight variant of a repo.
+- **The optional Gemini critique no longer treats synthesized sound as a defect by itself** (#1). Its rubric set
+  "real recorded foley" as the bar and scored "obviously cheap or synthetic"; it now judges each sound by whether it
+  fits the film and is well made, counts synthesis as a flaw only where a sound should read as recorded, and
+  `earshot llm --synth-intended` (MCP `synth_intended`) tells the model that synthesized sound is the point.
 
 ### Added
 

@@ -30,7 +30,7 @@ _inst = None
 
 
 def _slug(model_id):
-    return model_id.replace('/', '--')
+    return hub.slug(model_id)
 
 
 def _read_npz(path):
@@ -56,18 +56,22 @@ def _quiet_transformers():
 def _load_hf(cls, spec, weights=False):
     """a model (weights=True) or its processor from the spec's local snapshot folder (hub.Spec). transformers gets the
     folder, not the repo id, so nothing asks the Hub. A failed load is an error that names the folder, never a
-    silent new download; only a legacy snapshot loads pickle weights (pytorch_model.bin, torch weights_only)"""
+    silent new download; only a legacy snapshot or a local model folder loads pickle weights (pytorch_model.bin,
+    torch weights_only)"""
     import warnings
     _quiet_transformers()
     kw = dict(local_files_only=True)
     if weights:
-        kw['use_safetensors'] = not spec.weights.endswith('.bin')
+        kw['use_safetensors'] = spec.weights not in hub.PICKLE
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', message='.*mel filter.*')
         warnings.filterwarnings('ignore', category=FutureWarning)
         try:
             return cls.from_pretrained(spec.snapshot, **kw)
         except Exception as e:
+            if spec.folder:   # the user's own folder: never suggest deleting it
+                raise RuntimeError(f'could not load {spec.label} ({cls.__name__}): {type(e).__name__}: {e}. The '
+                                   'files may be damaged or this transformers version cannot read them') from e
             raise RuntimeError(f'could not load {spec.label} ({cls.__name__}) from the earshot cache '
                                f'({spec.snapshot}): {type(e).__name__}: {e}. The files may be damaged or this '
                                'transformers version cannot read them: delete that folder and earshot fetches the '
@@ -125,8 +129,7 @@ class Clap:
         self.proc = _load_hf(ClapProcessor, self.spec)
         self.dtype = _set_precision(self.model, torch)
         self.precision = 'bf16' if self.dtype == torch.bfloat16 else 'fp32'
-        self.dir = os.path.join(config.EMB_CACHE, 'clap',
-                                _slug(self.model_id) + self.spec.cache_tag + '--' + self.precision)
+        self.dir = os.path.join(config.EMB_CACHE, 'clap', self.spec.cache_name + '--' + self.precision)
         os.makedirs(self.dir, exist_ok=True)
         self._text = {}
         self._text_path = os.path.join(self.dir, 'text.npz')

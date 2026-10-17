@@ -19,7 +19,7 @@ import numpy as np
 
 from .. import audio, config
 from . import hub
-from .clap import _load_hf, _set_precision, _slug
+from .clap import _load_hf, _set_precision
 
 SR_AST = 16000
 WIN_S = 10.24
@@ -43,8 +43,7 @@ class AST:
         self.precision = 'bf16' if self.dtype == torch.bfloat16 else 'fp32'
         self.labels = [self.model.config.id2label[i] for i in range(len(self.model.config.id2label))]
         self.index = {l: i for i, l in enumerate(self.labels)}
-        self.dir = os.path.join(config.EMB_CACHE, 'ast',
-                                _slug(self.model_id) + self.spec.cache_tag + '--' + self.precision)
+        self.dir = os.path.join(config.EMB_CACHE, 'ast', self.spec.cache_name + '--' + self.precision)
         os.makedirs(self.dir, exist_ok=True)
 
     def _forward(self, segs16, batch=8):

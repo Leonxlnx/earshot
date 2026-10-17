@@ -497,6 +497,10 @@ def tool_llm_critique(path: Path,
                       model: Annotated[str | None, Field(description='Gemini model id (default '
                                                                      'EARSHOT_GEMINI_MODEL or gemini-3.8-flash)')]
                       = None,
+                      synth_intended: Annotated[bool, Field(description='true when the film uses synthesized or '
+                                                                        'procedural sound on purpose: the critique '
+                                                                        'then does not count synthesis as a flaw')]
+                      = False,
                       start: Start = None, end: End = None, full: Full = False) -> str:
     """OPTIONAL second opinion from Google Gemini (an audio LLM): rubric critique of sync, realism, mix balance,
     loudness, cheap / synthetic moments, and concrete fixes with timestamps. Use after timeline / critique when a
@@ -507,7 +511,7 @@ def tool_llm_critique(path: Path,
     from . import llm
     p = _file(path)
     kw = dict(path=p, consent=consent, prompt=prompt, video=_opt_file(video, 'video'), with_timeline=with_timeline,
-              model=model, start=start, end=end)
+              model=model, start=start, end=end, synth_intended=synth_intended)
     return _run('llm_critique', kw, full, llm.critique)
 
 

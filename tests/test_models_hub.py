@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 
+import numpy as np
 import pytest
 
 from earshot import config, doctor
@@ -43,8 +44,10 @@ def downloads(monkeypatch):
         calls.append(dict(repo_id=repo_id, revision=revision, cache_dir=cache_dir, allow_patterns=allow_patterns, **kw))
         if fake.fail:
             raise ConnectionError('no route to the Hub')
-        files = [f for f in allow_patterns if '*' not in f and f not in fake.skip]
-        return snap(repo_id, revision, files)
+        files = [f for f in allow_patterns if '*' not in f and '?' not in f and f not in fake.skip]
+        if re.fullmatch(r'[0-9a-f]{40}', revision or ''):
+            return snap(repo_id, revision, files)
+        return snap(repo_id, 'c' * 40, files, ref=revision)   # a branch: a commit plus refs/<branch>, as the Hub's
     fake.fail, fake.skip = False, ()
     monkeypatch.setattr(huggingface_hub, 'snapshot_download', fake)
     fake.calls = calls
@@ -234,10 +237,131 @@ def test_missing_model_downloads_the_pinned_files_once(cache, downloads):
 
 
 def test_custom_model_download_never_asks_for_pickles(cache, downloads):
-    with pytest.raises(RuntimeError, match='safetensors weights only'):
-        hub.ensure('someone/clap-ft')   # the fake writes no files for wildcard patterns
+    spec = hub.ensure('someone/clap-ft')
+    assert (spec.state, spec.weights) == ('cached', 'model.safetensors')
     [call] = downloads.calls
     assert call['revision'] == 'main' and not any('.bin' in p or p == '*' for p in call['allow_patterns'])
+    downloads.skip = hub.SAFETENSORS   # a repo with pickle weights only
+    with pytest.raises(RuntimeError, match='safetensors weights only'):
+        hub.ensure('someone/other-ft')
+
+
+def test_custom_model_download_takes_top_level_files_by_name():
+    """review finding: '*.json' / '*.safetensors' matched every subfolder and weight variant of a custom repo
+    (fnmatch's '*' also matches '/'), possibly several GB. Only the top-level configs, tokenizer and weights load"""
+    from huggingface_hub.utils import filter_repo_objects
+    repo = ['config.json', 'preprocessor_config.json', 'tokenizer.json', 'tokenizer_config.json', 'vocab.json',
+            'merges.txt', 'special_tokens_map.json', 'model.safetensors', 'model.safetensors.index.json',
+            'model-00001-of-00002.safetensors', 'model-00002-of-00002.safetensors', 'spiece.model',
+            'model.fp16.safetensors', 'onnx/model.safetensors', 'onnx/config.json', 'unet/config.json',
+            'unet/diffusion_pytorch_model.safetensors', 'tokenizer/vocab.json', 'tokenizer/merges.txt',
+            'pytorch_model.bin', 'flax_model.msgpack', 'README.md', 'training_args.txt', 'eval/results.json',
+            'text_encoder/model.safetensors', 'sub/spiece.model']
+    got = set(filter_repo_objects(repo, allow_patterns=list(hub.CUSTOM_PATTERNS)))
+    assert got == {'config.json', 'preprocessor_config.json', 'tokenizer.json', 'tokenizer_config.json', 'vocab.json',
+                   'merges.txt', 'special_tokens_map.json', 'model.safetensors', 'model.safetensors.index.json',
+                   'model-00001-of-00002.safetensors', 'model-00002-of-00002.safetensors', 'spiece.model'}
+
+
+# ------------------------------------------------------------------------------------------- local model folder
+def model_folder(path, files=('config.json', 'model.safetensors')):
+    os.makedirs(path, exist_ok=True)
+    for f in files:
+        with open(os.path.join(path, f), 'wb') as fh:
+            fh.write(b'x')
+    return str(path)
+
+
+@pytest.mark.parametrize('flag', [None, *config.OFFLINE_FLAGS])
+def test_local_model_folder_loads_from_disk_with_no_network(cache, fake, downloads, monkeypatch, tmp_path, flag):
+    """review finding (regression from main): EARSHOT_CLAP / EARSHOT_AST naming a local folder with config.json and
+    model.safetensors loaded from disk on main (from_pretrained(folder, local_files_only=True)); it must again, with
+    or without an offline flag, and never look in the Hub cache or download"""
+    if flag:
+        monkeypatch.setenv(flag, '1')
+    d = model_folder(tmp_path / 'models' / 'my-clap')
+    s = hub.ensure(d)
+    assert (s.state, s.revision, s.snapshot, s.weights, s.folder) == ('cached', 'local', d, 'model.safetensors', True)
+    assert s.local and not s.pinned and s.sha is None and s.missing == ()
+    assert s.label == f'the local model folder {d}'
+    clap._load_hf(fake, s, weights=True)
+    clap._load_hf(fake, s)
+    assert fake.calls == [(d, {'local_files_only': True, 'use_safetensors': True}), (d, {'local_files_only': True})]
+    assert downloads.calls == [] and not os.path.exists(config.HF_CACHE)
+    monkeypatch.chdir(tmp_path)   # a relative folder works too
+    assert hub.resolve(os.path.join('models', 'my-clap')).snapshot == d
+
+
+def test_local_model_folder_with_pickle_weights_loads_as_transformers_would(cache, fake, downloads, tmp_path):
+    d = model_folder(tmp_path / 'old-ast', ('config.json', 'preprocessor_config.json', 'pytorch_model.bin'))
+    s = hub.ensure(d)
+    assert (s.state, s.weights) == ('cached', 'pytorch_model.bin')
+    clap._load_hf(fake, s, weights=True)
+    assert fake.calls == [(d, {'local_files_only': True, 'use_safetensors': False})] and downloads.calls == []
+    model_folder(d, ('model.safetensors',))   # safetensors win when both are there
+    assert hub.resolve(d).weights == 'model.safetensors'
+
+
+def test_incomplete_local_model_folder_is_an_error_never_a_download(cache, downloads, tmp_path):
+    d = model_folder(tmp_path / 'half', ('config.json',))
+    s = hub.resolve(d)
+    assert (s.state, s.snapshot, s.missing, s.folder) == ('incomplete', None, ('model.safetensors',), True)
+    with pytest.raises(RuntimeError, match='lacks model.safetensors: earshot loads a local model folder as it is'):
+        hub.ensure(d)
+    assert downloads.calls == []
+
+
+def test_failed_local_folder_load_never_suggests_deleting_it(cache, fake, tmp_path):
+    d = model_folder(tmp_path / 'mine')
+    fake.error = OSError('bad header')
+    with pytest.raises(RuntimeError, match='could not load the local model folder') as e:
+        clap._load_hf(fake, hub.ensure(d), weights=True)
+    assert 'delete' not in str(e.value) and 'bad header' in str(e.value)
+
+
+def test_pinned_ids_are_never_read_as_folders(cache, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    model_folder(tmp_path / 'laion' / 'larger_clap_general')   # a stray folder named like the pin
+    s = hub.resolve(CLAP_ID)
+    assert not s.folder and s.revision == CLAP_PIN['revision'] and s.state == 'missing'
+
+
+def test_local_folder_embedding_caches_stay_inside_the_cache_root(cache, tmp_path, monkeypatch):
+    """a folder path (with a drive letter on Windows) must become one path component, or os.path.join would leave
+    EMB_CACHE; new weights in the same folder get a fresh cache. The pinned models keep their old names"""
+    from earshot import vocab
+    from earshot.forge import critic
+    d = model_folder(tmp_path / 'clap ft')
+    s = hub.resolve(d)
+    name = s.cache_name
+    assert re.fullmatch(r'local--clap_ft--local[0-9a-f]{8}', name), name
+    root = os.path.abspath(config.EMB_CACHE)
+    assert os.path.abspath(os.path.join(root, 'clap', name)).startswith(root)
+    model_folder(d, ())
+    with open(os.path.join(d, 'model.safetensors'), 'wb') as fh:
+        fh.write(b'other weights')
+    assert hub.resolve(d).cache_name != name
+    monkeypatch.setattr(config, 'CLAP_MODEL', d)
+    assert os.path.abspath(vocab._cache_dir()).startswith(root)
+    monkeypatch.setattr(config, 'AST_MODEL', d)
+    key = critic.holdout_key(np.zeros(16, np.float32))
+    assert key.startswith('local--clap_ft--local') and ':' not in key
+    assert hub.cache_name(CLAP_ID) == 'laion--larger_clap_general' and hub.cache_name(AST_ID) == hub.slug(AST_ID)
+
+
+def test_doctor_reports_a_local_model_folder(cache, downloads, tmp_path, monkeypatch):
+    good = model_folder(tmp_path / 'clap')
+    half = model_folder(tmp_path / 'ast', ('config.json',))
+    monkeypatch.setattr(config, 'CLAP_MODEL', good)
+    monkeypatch.setattr(config, 'AST_MODEL', half)
+    r = doctor.check(fetch_missing=True)
+    assert r['models'][good]['revision'] == 'local' and r['models'][good]['cached'] == 'cached'
+    assert r['models'][good]['snapshot'] == good and r['models_cached'] == {good: True, half: False}
+    assert r['fetched'][good] == 'a local folder (nothing to download)'
+    assert r['fetched'][half].startswith('failed: the local model folder') and downloads.calls == []
+    assert 'Not cached yet' not in r['summary']
+    r = doctor.check()
+    assert any('local model folder lacks model.safetensors' in p for p in r['problems'])
 
 
 def test_failed_download_is_one_readable_error(cache, downloads):
