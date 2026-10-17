@@ -3,7 +3,7 @@
 Every number here comes from a command in this repo, run on a Ryzen 7 260 laptop CPU (bf16, `EARSHOT_THREADS` 2-3,
 other jobs running). Full tables, data descriptions and "what was tuned on what" live in each area's results file;
 this page is the summary. Data: the Clawd film's licensed recordings (219 used + 125 rejected Freesound/Mixkit files),
-its finished 60 s soundtrack with every placement logged, the retired code-synthesized score the user rejected, renders
+its finished 60 s soundtrack with every placement logged, the code-synthesized score that project retired, renders
 of the Cinetic synth engine, independent numpy generators, and 7 professional launch films (measured locally, never
 committed).
 
@@ -50,7 +50,7 @@ committed).
 |---|---|---|
 | leave one real category / synth family out (headline) | 0.922 | 0.860 |
 | leave one synth generator type out | 0.958 | 0.902 |
-| retired (user-rejected) score never trained on: real vs retired | **0.948** | 0.862 |
+| retired score never trained on: real vs retired | **0.948** | 0.862 |
 | retired score + the whole engine that made it never trained on: real vs retired | 0.909 | 0.839 |
 | zero-shot CLAP prompts (no training, baseline) | 0.858 | 0.749 |
 

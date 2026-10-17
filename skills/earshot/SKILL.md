@@ -1,6 +1,6 @@
 ---
 name: earshot
-description: Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking that audio is real and not code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, or making a sound in code and improving it by listening (earshot forge). Use it before telling anyone how audio sounds.
+description: Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, or making a sound in code and improving it by listening (earshot forge). Use it before telling anyone how audio sounds.
 ---
 
 # earshot: ears for an agent
@@ -49,8 +49,10 @@ including the audio of an mp4 (a video with no audio track says so). Errors are 
    'tagger unsure' or a near class (Zipper for a swish, Finger snapping for a click) is neutral; only an outright
    different class (Speech, Music, Engine, Vehicle) is a red flag.
 4. `earshot realness winner.ogg --start 1.12 --end 1.48` (or a whole folder) - judge the trim you will use: a
-   multi-take file's p_real is a mean over every take and the silence between them. Reject 'likely code-synthesized';
-   read the evidence of an 'uncertain' before using it, and write why you kept it. The verdict thresholds depend on
+   multi-take file's p_real is a mean over every take and the silence between them. When the user wants real or
+   professionally produced sound, do not use a 'likely code-synthesized' trim, and read the evidence of an
+   'uncertain' one before using it (write why you kept it). When synthesized sound is the point (procedural music, UI
+   tones, sounds made with earshot forge), realness is information, not a gate. The verdict thresholds depend on
    length (each summary names them): a sound up to 6 s uses the clip thresholds (lo 0.17 / hi 0.77), a longer file
    the mean of its 4 s windows with weakly calibrated file thresholds (lo 0.40 / hi 0.77), so compare verdicts, not
    raw p_real, across files of different lengths. Real recordings and professionally produced music and sound design

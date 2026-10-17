@@ -681,8 +681,8 @@ Every clip is scored by a model that never saw its group (nor augmented copies o
 D is scored on real vs the retired score and the cinetic engine only (its sole negatives were the generic generators).
 
 ### The required check: real recordings rank above the retired synthesized score
-The retired score (the synthesized soundtrack the user rejected) is held out of every training set (scheme C), or held
-out together with the whole cinetic engine that made it (scheme D):
+The retired score (the synthesized soundtrack the Clawd project replaced) is held out of every training set
+(scheme C), or held out together with the whole cinetic engine that made it (scheme D):
 
 """, _tab(['check', 'ROC-AUC', 'acc@0.5', 'mean p_real of the synth side'],
           [[k, v.get('auc'), v.get('acc@0.5'), v.get('synth_mean_p')] for k, v in res['retired_check'].items()]),

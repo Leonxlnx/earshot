@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.1 - 2026-10-17
+
+Two fixes from a careful outside review (thanks, @markblundeberg).
+
+### Fixed
+
+- **Agent-facing text no longer states one user's preferences as instructions** (#1). The `realness` tool description
+  and the MCP server instructions told every agent to check every sound because "the user rejects synthetic-sounding
+  audio"; the earshot skill said to reject 'likely code-synthesized' sounds outright, and the real-sound skill and
+  several docs called the bundled launch-film profile "the user's". They now say what realness measures and leave the
+  decision to the current user: use it when real or professionally produced sound is wanted, and treat a synthesized
+  verdict as information when synthesized sound is the point. `critique`'s realness fix is scoped the same way. A
+  test keeps such phrasing out of tool descriptions, the server instructions, skills and docs.
+
 ## 0.2.0 - 2026-10-16
 
 forge v2 and `earshot fit`.

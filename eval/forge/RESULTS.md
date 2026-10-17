@@ -134,8 +134,8 @@ How to read it:
    progress: they are already above real.
 4. **Tails.** Made clicks have t40 0.56x the bench median, against the real refs' 0.86-1.33. Made whooshes are at
    0.51x, against 0.6-1.08. Both are short tails. Made impacts are at 0.35-0.62x the single held-out impact's 3.45 s
-   tail. But the two forge impacts are just as short (0.38x, 0.54x), so one bench ref cannot settle it. The user's ear
-   ("the tail died too fast") points the same way.
+   tail. But the two forge impacts are just as short (0.38x, 0.54x), so one bench ref cannot settle it. One listener's
+   note ("the tail died too fast") points the same way.
 5. **Phrasings are saturated.** Phrase z and margin are above real in every category, as expected, so don't read
    progress from them. AudioSet naming is mixed: made sounds beat real for pop (1 vs 0.29 / 0.67) and impact (1 vs
    0.5), but fall below it for click (0 vs 0.12 / 0), typing_key (0.33 vs 0.53 / 0.42) and whoosh_fast (0.33 vs 0.4 /

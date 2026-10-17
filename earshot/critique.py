@@ -55,7 +55,8 @@ SPEC = {
                   'a master above -1 dBTP clips once encoded to AAC / MP3 (a decoded lossy file above 0 dBTP already '
                   'clips on playback): crackle on the biggest hits'),
     'p_real': (3, 0.0, 'lower', None,
-               'code-synthesized sound reads as cheap and generic; launch films use real recordings and produced music'),
+               'the reference launch films use real recordings and produced music; next to them, code-synthesized '
+               'sound reads as cheap and generic'),
     'music_frac': (3, 0.05, 'lower', None,
                    'the references are music-led: one continuous track carries the energy and hides edit seams'),
     'cuts_with_sound': (2, 0.05, 'lower', None,
@@ -239,8 +240,9 @@ def _actions(key, st, v, f, a, refs):
         more = f' (+{len(flagged) - len(pick)} more)' if flagged and len(flagged) > len(pick) else ''
         where = (f"; 4 s windows at or below the window threshold {tw['lo']:.2f} (code-synthesized): {spans}{more}"
                  if flagged else f'; lowest-scoring 4 s windows: {spans}' if spans else '')
-        fix = ('replace oscillator / noise layers with real recordings and produced music (skills/real-sound has the '
-               'sourcing and licence workflow)' if v < 0.5 else 'find and replace the layer that sounds synthetic')
+        fix = ('if the film should sound recorded or produced, replace oscillator / noise layers with real recordings '
+               'and produced music (skills/real-sound has the sourcing and licence workflow)' if v < 0.5 else
+               'if the film should sound recorded or produced, find and replace the layer that sounds synthetic')
         return [f'{head}{where}: {fix}; judge each stem with `earshot realness stem.wav` (a finished mix is harder to '
                 'judge than its sources)']
     if key == 'music_frac':

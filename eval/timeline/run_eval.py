@@ -1,5 +1,5 @@
 """Evaluate earshot.timeline / earshot.sheet against the Clawd film's ground truth (never used for tuning) and on the
-user's reference launch films.
+7 reference launch films of the launch profile.
 
     EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/timeline/run_eval.py --parts detect,tags,sync,film,refs,timing60,timing93
 

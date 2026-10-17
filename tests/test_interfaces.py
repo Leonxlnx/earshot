@@ -1,8 +1,10 @@
 """interfaces: the optional audio-LLM critique (HTTP mocked: no network, no key needed) and the MCP server (in-process
 tool functions + a real stdio round trip with the mcp client)."""
 import base64
+import glob
 import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -438,6 +440,36 @@ def test_mcp_server_registers_all_tools():
     ann = llm_tool.annotations.model_dump()   # snake_case in mcp 2.x
     assert ann.get('read_only_hint', ann.get('readOnlyHint')) is False
     assert ann.get('open_world_hint', ann.get('openWorldHint')) is True
+
+
+# one person's taste written as a rule for every agent (issue #1); conditional, generic phrasing such as "when the user
+# wants real sound" stays allowed
+PREFERENCE_AS_RULE = re.compile(
+    r"\bthe user (?:rejects|rejected|hates|hated)\b|\buser-rejected\b"
+    r"|\bthe user's (?:own )?(?:reference (?:profile|films)|ear)\b"
+    r"|\bthe user (?:chose|picked) as\b|\bfilms the user (?:chose|picked)\b|random ass", re.I)
+
+
+def test_agent_text_states_no_preference_as_a_rule():
+    """issue #1: tool descriptions, server instructions, skills and docs say what earshot measures and leave the
+    decision to the current user's own instructions (synthesized audio may be the point of a film)"""
+    import anyio
+    texts = {f'tool {t.name}': t.description for t in anyio.run(mcp_server.build().list_tools)}
+    texts['INSTRUCTIONS'] = mcp_server.INSTRUCTIONS
+    for pattern in ('README.md', 'docs/*.md', 'skills/**/*.md', 'eval/*/RESULTS.md'):
+        for path in glob.glob(os.path.join(REPO, pattern), recursive=True):
+            with open(path, encoding='utf-8') as f:
+                texts[os.path.relpath(path, REPO)] = f.read()
+    assert len(texts) > 30 and any(k.startswith('skills') for k in texts)
+    hits = [f'{k}: {m.group(0)!r}' for k, v in texts.items()
+            for m in PREFERENCE_AS_RULE.finditer(' '.join(v.split()))]   # joined lines: phrases split by a wrap count
+    assert not hits, hits
+    realness = ' '.join(texts['tool realness'].split())
+    assert 'Use when the user wants real or professionally produced sound' in realness
+    assert 'Synthesized audio may be intended' in realness
+    assert 'realness when the user wants real' in ' '.join(mcp_server.INSTRUCTIONS.split())
+    skill = ' '.join(texts[os.path.join('skills', 'earshot', 'SKILL.md')].split())
+    assert "Reject 'likely code-synthesized'" not in skill and 'realness is information, not a gate' in skill
 
 
 async def _stdio_session(calls, log, *args):
