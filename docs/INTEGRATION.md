@@ -1,10 +1,63 @@
-# Integration: real-sound + earshot inside a Cinetic film (without changing Cinetic)
+# Integration: earshot inside a Cinetic film
 
-Cinetic (`~/.claude/skills/cinetic`) directs and renders launch films from code. Its Step 5 synthesizes the whole
-soundtrack (`scripts/audio/score.py` + `synth.py`) from a beat-locked timeline. This document shows how a Cinetic film
-gets a real-recordings soundtrack from `skills/real-sound` instead, and how earshot gives Cinetic's review loop ears,
-using Cinetic exactly as it is today. The last section lists the small changes a future Cinetic could make so this
-becomes one flag.
+Cinetic (`~/.claude/skills/cinetic`) directs and renders launch films from code. Its Step 5 builds the soundtrack
+(`scripts/audio/score.py`) from a beat-locked timeline. Two routes give that soundtrack better sounds: an **earshot
+sound kit** (the first section: forge sounds rendered from earshot's bank, the route cinetic 1.1 takes by default when
+earshot is installed), and a **real-recordings soundtrack** from `skills/real-sound` (sections 1-4, which use Cinetic
+exactly as it was before 1.1). Either way earshot gives Cinetic's review loop ears (section 3).
+
+## cinetic uses earshot
+
+The effects of a cinetic film come from an earshot kit; cinetic keeps the conductor (timing, typing plan, levels,
+ducks, arc, master, report, stems) and earshot supplies the voices. Rendering a kit is pure DSP: no models, no torch
+import, seconds per film once cached.
+
+```
+src/sync.ts --export-cues--> out/cues.json ---------------------------------+
+audio/score.json  "sfx": {"engine": "auto", "kit": "audio/kit.json"} ------+--> score.py --> master.py --> soundtrack.wav
+audio/kit.json --scripts/audio/kit.py--> earshot kit render --> audio/kit/*.wav + kit.lock.json --^
+```
+
+1. **The kit.** `audio/kit.json` starts from a preset (`earshot kit init --preset calm|crisp|minimal`; calm is the
+   default for text-led films) and is edited per film: the lockup hit tuned to the film's root (`edits.pitch`), another
+   member for a role, a fitted sound. Roles are cinetic's cue kinds and their variants (below); `null` roles are not
+   sounded.
+2. **The bridge.** cinetic's `scripts/audio/kit.py` finds earshot (importable in cinetic's Python, `sfx.python` in
+   `score.json`, `EARSHOT_PYTHON`, or `earshot` on PATH), runs `earshot kit render audio/kit.json --out audio/kit` in
+   one process (cached: an unchanged kit re-renders nothing) and keeps the takes in `audio/kit/`, so the film rebuilds
+   on a machine without earshot.
+3. **Placement.** score.py plays one take per event (a new take per event by hash; typing cycles through the takes),
+   placed by the sync point the lock measured for the role's `align`: the take's onset on the cue frame, a whoosh's
+   loudest 5 ms on its apex, a riser's end on the hit. `level_db` and the event weight set its level; a cue whose role
+   is `null` is skipped with a report line.
+4. **Fallback.** earshot render -> the vendored `audio/kit/` takes -> cinetic's own synth voices with a loud warning.
+   The build never fails only because earshot is missing.
+5. **Listening.** `scripts/audio/listen.py` runs `earshot timeline --cues`, `sheet` and `critique` in one process and
+   writes `out/qa/listen.json`.
+6. **The lockup** is a stop-down and one clean element. `earshot kit check` warns when the hit role has two attacks or
+   a build before the hit, and when any role's pitch climbs (the rising synth whip); score.py's stack guard warns on a
+   second designed effect within 3 frames of the lockup or payoff.
+
+| cinetic cue (kind, variant) | kit role | align |
+|---|---|---|
+| tick / tick crisp | `tick` / `tick.crisp` | onset |
+| tock | `tock` | onset |
+| hit | `hit` | onset |
+| land / land light | `land` / `land.light` | onset |
+| pop | `pop` | onset |
+| whoosh (short / long move) | `whoosh.short` / `whoosh.long` | peak |
+| suck, riser, swell | `suck`, `riser`, `swell` (off in every preset) | end |
+| drop | `drop` | onset |
+| key / key space / key return | `key` / `key.space` / `key.return` | onset |
+| click / click confirm | `click` / `click.confirm` | onset |
+| snap | `snap` | onset |
+| bell (motif notes, progress steps) | `bell` (one take per pitch) | onset |
+| a text fragment resolving | `text` | onset |
+
+What earshot guarantees the bridge: the role vocabulary, kit and lock schema 1 (docs/SFX.md#kits), the CLI flags
+above, deterministic takes, and a lock that names the bank version (a new bank version re-renders the kit, because
+it is part of every take's cache key). The bank, knobs, audit and presets are documented in
+[docs/SFX.md](SFX.md).
 
 ## 1. What Cinetic produces that the soundtrack needs
 

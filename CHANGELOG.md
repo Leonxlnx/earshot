@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.3.0 - unreleased (0.3.0.dev0)
+
+The sound engine of a film: the forge's delivered sounds as a bank, one-sound renders aimed at the picture, a
+model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md).
+
+### Added
+
+- **The sound bank** (`earshot/forge/bank.py`, `earshot/forge/bank/*.json`, shipped as package data): the 183 forge
+  v2 finals as their schema-2 render blocks at full precision (`forge_v2r6`), plus three tuned kalimba voices from the
+  launch film (`pluck1`). Ids are `<category>/<member>`, `pluck/<name>` and `fit/<role>/<name>`; categories are the
+  public names (no recipe module names needed). `python -m earshot.forge.bank build out/forge_v2/*/final -o ...`
+  refuses any pick whose block does not re-render its WAV (183 of 183 within 1.2e-7); each entry stores its measured
+  onset, peak, end, attack, centroid, loudness and a 50 ms envelope fingerprint, and `bank check` re-renders against
+  it (length exact, peak within 5 ms, envelope within 0.5 dB). Rendering needs numpy / scipy only.
+- **Knobs** (`earshot/forge/knobs.py`): `dur` (exact: the whoosh family scales its pass, length keys are searched by
+  secant, then the file is faded or padded to the sample), `apex` (whoosh family: closed form, up to two measured
+  corrections, then the peak is placed by trimming the quiet approach or padding silence: within 2.5 ms on every
+  tested target), `pitch` (a note name or Hz into each recipe's own pitch parameter, co-scaling the parameters of the
+  same body, inside the parameter's designed range; noise sounds refuse it with the reason), `weight` / `peak_db`.
+- **`earshot sfx list / render / check`** and the audit (`earshot/forge/sfx.py`): polish's artifact detectors as
+  warnings with context (gated categories may stop on their peak), a rising pitch-glide detector (a tonal sound
+  climbing more than 4 semitones over 50 ms or more) and, for hits, a stacked-attack / pre-swell heuristic. Every bank
+  render runs it.
+- **`earshot kit init / render / check / audition`** (`earshot/forge/kit.py`): kit.json (schema 1) names one bank
+  sound per role; `render` writes deterministic, cached takes and `kit.lock.json` with each take's measured onset /
+  peak / end / loudness; a take that fails the audit is re-rolled on a new seed. Presets `calm`, `crisp`, `minimal`
+  (`earshot/forge/kits/`) with a reason per role; riser, swell and suck off in all three.
+- **`python -m earshot.forge.bank add-fit MODEL.json --id fit/<role>/<name> --source SOURCE.json`**: a fitted recipe
+  as a bank entry with its source (CC0 / public domain unless `--allow-license`; NC / ND refused), rendered through
+  `earshot.forge.fit`, tunable when the fit is tonal. Extra bank files load from `EARSHOT_BANK`.
+- **Python API** `earshot.api.sfx_list / sfx_render / sfx_check / kit_init / kit_render / kit_check / kit_audition`;
+  **MCP tools** `sfx_list`, `sfx_render`, `kit_render` (16 tools in all).
+- Docs: `docs/SFX.md`; README "Sound for films"; `docs/INTEGRATION.md` "cinetic uses earshot"; the earshot skill's
+  Loop 5 "make a film's sound kit".
+- Tests: `tests/test_bank.py`, `tests/test_sfx_kit.py` (no models).
+
+### Changed
+
+- Wheels now ship the forge seed banks (`earshot/forge/seeds/*.json`) next to the bank and kit presets; before, a
+  non-editable install had none.
+
 ## 0.2.1 - 2026-10-17
 
 Two fixes from a careful outside review (thanks, @markblundeberg).

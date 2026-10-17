@@ -153,6 +153,38 @@ close, not identical: onsets, tone balance and noise texture still differ measur
 on the same 12 recordings; risers, zips and long designed sounds are untested. A fit is a derivative of its recording,
 so keep the source's licence with the recipe. Limits: [docs/FIT.md](docs/FIT.md#limits-honest).
 
+## Sound for films: bank, sfx, kits
+
+The forge's delivered sounds ship as a bank that renders by id, with no models and no network: 183 forge v2 finals
+(34 categories) and three tuned kalimba voices, each stored as its render block and re-rendering its delivered WAV to
+one 24-bit step. A film pipeline renders from it in seconds; searching new sounds stays an offline step.
+
+```bash
+earshot sfx list --kind whoosh                                      # ids, lengths, peak times, cue kinds, knobs
+earshot sfx render whoosh_fast/crisp -o w.wav --dur 0.8 --apex 0.32  # a new take aimed at a move (--seed N)
+earshot sfx render pluck/kalimba -o e5.wav --pitch E5                # tuned through the recipe's own f0
+earshot sfx check w.wav                                              # clicks, cut tails, clipping, ring, rising glides
+earshot kit init --preset calm -o audio/kit.json                     # calm | crisp | minimal
+earshot kit render audio/kit.json --out audio/kit                    # takes + kit.lock.json (measured onset / peak / end)
+```
+
+- **Knobs** edit each recipe's own parameters, never resample: `dur` lands exactly, `apex` puts a whoosh's loudest
+  moment within 5 ms of the target (measured within 2.5 ms), `pitch` takes a note name or Hz (pluck E5, a bell G5, a
+  sub drop G1 measure 0 cents off); noise sounds refuse a pitch and say why.
+- **The audit** (`earshot sfx check`, run on every render) is measurement only: clicks, cut tails, clipping, DC, comb
+  ring, a re-rising tail, a tonal pitch that climbs more than 4 semitones (the rising "synth whip"), and for hits,
+  stacked attacks or a build before the hit. 170 of the 186 sounds are clean; the presets use none of the others.
+- **Kits** name one sound per role (tick, hit, whoosh.short, key, bell, text ...). `kit render` writes deterministic,
+  cached takes and a lock with each take's measured sync points; a take that fails the audit is re-rolled on a new
+  seed. The three presets sound every role but riser, swell and suck, use one clean hit for the lockup, and favour the
+  families a blind listener took for recordings (taps, struck bells).
+- **Python and MCP**: `from earshot.forge import bank; y, meta = bank.render('pro_sub_drop/ref', pitch='G1')`;
+  `earshot.api.sfx_render / kit_render`; MCP tools `sfx_list`, `sfx_render`, `kit_render`.
+
+Full reference (every knob, the audit, the kit and lock formats, the presets role by role, fit entries from
+public-domain recordings, measured cost): [docs/SFX.md](docs/SFX.md). How cinetic uses it:
+[docs/INTEGRATION.md](docs/INTEGRATION.md#cinetic-uses-earshot).
+
 ## Gallery
 
 `earshot gallery` turns forge outputs into one static HTML page for people with ears: no server, no network, no
@@ -287,11 +319,12 @@ style of the 7 films behind it, not every good film. Details in [docs/LIMITS.md]
 earshot/            the package: CLI, Python API, MCP server, CPU model wrappers
   forge/            make sounds in code: DSP building blocks, critic, model-free tone checks, search, recipes/
     fit/            recording -> code: modal / sines / spectral fitters, quality metrics, recipe codegen
+    bank/, kits/    the sound bank (render blocks + fingerprints, no audio) and the kit presets: earshot sfx / kit
   gallery.py        the static listening page
   data/             vocabulary + calibration stats, realness model weights, launch profile (numbers only, no media)
 skills/earshot/     agent skill: how to listen with earshot
 skills/real-sound/  agent skill: real-recordings soundtracks (scripts, templates, prompts, references)
-docs/               VALIDATION, LIMITS, FORGE_V2, FIT, the motion-SFX study, launch-video playbook, design notes
+docs/               VALIDATION, LIMITS, FORGE_V2, FIT, SFX, the motion-SFX study, launch-video playbook, design notes
 eval/               evaluation scripts and results per area (see eval/README.md)
 tests/              pytest (fast by default; --slow loads the models)
 ```
