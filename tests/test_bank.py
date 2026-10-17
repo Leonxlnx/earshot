@@ -2,12 +2,15 @@
 stored fingerprints, list / get, levels, the build's refusal of picks that do not re-render, add-fit, and dur / apex /
 pitch landing on their targets. No models; every sound is rendered here from code."""
 import json
+import os
 
 import numpy as np
 import pytest
 import soundfile as sf
 
 from earshot.forge import bank, knobs
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SR = 48000
 # a dozen short entries across recipes (the long designed sounds take seconds each; bank.check covers them all)
@@ -18,7 +21,7 @@ SHORT = ['click/soft', 'pro_click/tink', 'hover_tick/ping', 'pro_hover_tick/soft
 
 def test_bank_contents():
     v = bank.VERSION
-    assert v.startswith('forge_v2r6') and 'pluck1' in v
+    assert v.startswith('forge_v2r6') and 'pluck1' in v and 'fit1' in v
     ids = bank.ids()
     forge = [i for i in ids if bank.get(i)['type'] == 'forge' and not i.startswith('pluck/')]
     assert len(forge) == 183 and len({i.split('/')[0] for i in forge}) == 34
@@ -28,6 +31,9 @@ def test_bank_contents():
         assert e['id'] == i and e['category'] == i.split('/')[0]
         m = e['meta']
         assert m['dur_s'] > 0 and 0 <= m['onset_s'] <= m['peak_s'] <= m['dur_s'] and m['fp']['env_db'][0] <= 0
+        if e['type'] == 'fit':
+            assert isinstance(e['model'], dict) and isinstance(e['seed'], int)
+            continue
         assert e['recipe'] and e['fn'] and isinstance(e['params'], dict) and isinstance(e['seed'], int)
     tk = bank.get('typing_key/crisp')                    # the category is the public name, the module is inside
     assert tk['recipe'] == 'keypress' and bank.get('pro_typing_run/blip')['fn'] == 'render_run'
@@ -42,6 +48,43 @@ def test_rerender_matches_fingerprint(sid):
     assert d['len_diff'] == 0 and abs(d['peak_diff_ms']) <= 5 and d['env_db'] <= 0.5, d
     assert meta['seed'] == e['seed'] and abs(meta['peak_db'] + 1.0) < 0.01
     assert meta['checks']['ok'], meta['checks']['summary']
+
+
+# ----------------------------------------------------------------------------------------- shipped fit entries
+FITS = ['fit/click/floss_lid', 'fit/tick/domino', 'fit/land.light/fingertip_book', 'fit/pop/mouth_plop',
+        'fit/snap/switch_flip']
+
+
+def test_fit_entries_load_with_their_cc0_sources():
+    fits = [i for i in bank.ids() if i.startswith('fit/')]
+    assert len(fits) >= 10 and set(FITS) <= set(fits)
+    with open(os.path.join(REPO, 'docs', 'CREDITS_FIT.md'), encoding='utf-8') as fh:
+        credits = fh.read()
+    for i in fits:
+        e = bank.get(i)
+        assert e['type'] == 'fit' and e['category'] == 'fit' and bank.FIT_ID.match(i)
+        src = e['source']
+        assert src['license'] == 'CC0 1.0' and src['url'].startswith('https://freesound.org/')
+        text = ' '.join(str(src[k]) for k in ('title', 'author', 'url')).lower()
+        assert not any(c in text for c in ('zapsplat', 'soundsnap', 'sound-ideas', 'boom library'))
+        assert 0.0 <= e['vary'] <= 0.6 and i.split('/')[1] in e['kinds'] and len(e['notes']) > 20
+        assert 'fit_engine' not in e['model'] and e['meta']['fp']['env_db']
+        assert i in credits and src['url'] in credits
+    rows = bank.list(kind='key')
+    assert any(r['id'].startswith('fit/key/') and r['source']['license'] == 'CC0 1.0' for r in rows)
+
+
+@pytest.mark.parametrize('sid', FITS)
+def test_fit_entry_rerenders_to_its_fingerprint(sid):
+    """a fit entry re-renders as stored, as a clean take; another seed is another clean take of the same sound"""
+    e = bank.get(sid)
+    y, meta = bank.render(sid)
+    d = bank.compare_fp(e['meta'], y)
+    assert d['len_diff'] == 0 and abs(d['peak_diff_ms']) <= 5 and d['env_db'] <= 0.5, d
+    assert meta['checks']['ok'], meta['checks']['summary']
+    y2, m2 = bank.render(sid, seed=7)
+    assert m2['checks']['ok'], m2['checks']['summary']
+    assert abs(len(y2) - len(y)) <= 0.1 * len(y) and not np.allclose(y2[:min(len(y), len(y2))], y[:len(y2)])
 
 
 def test_render_final_is_the_delivered_level():
