@@ -479,8 +479,9 @@ def tool_critique(path: Path, video: Video = None,
 
 def tool_doctor(load: Annotated[bool, Field(description='also load both models and time one window (~20-60 s)')]
                 = False, full: Full = False) -> str:
-    """Check the earshot install: python packages, ffmpeg, cached models, CPU threads, whether an LLM key is present.
-    Use when a tool fails, or once before the first real use."""
+    """Check the earshot install: python packages, ffmpeg, the models (pinned revision, what the cache holds, whether
+    an offline flag is set), CPU threads, whether an LLM key is present. Use when a tool fails, or once before the
+    first real use."""
     from . import doctor
     return _run('doctor', dict(load=load), full, doctor.check)
 

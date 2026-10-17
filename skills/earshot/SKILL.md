@@ -15,7 +15,7 @@ handful of calls, use MCP or a short script (`from earshot import api; api.find(
 ## Setup (once)
 ```
 pip install -e "/path/to/earshot[mcp,llm]"   # or the repo venv: /path/to/earshot/.venv/bin/python -m earshot ...
-earshot doctor                           # packages, ffmpeg, cached models; --load also times the models
+earshot doctor                           # packages, ffmpeg, models (pinned revision, cache state); --load times them
 ```
 Two ways in, same functions:
 - **CLI**: `earshot <command> ... [--json] [--out result.json]`. Text output starts with a plain summary; times are
