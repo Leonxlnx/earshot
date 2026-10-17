@@ -11,7 +11,7 @@
   "tock": {"sound": "tap/knuckle", "takes": 3, "align": "onset", "level_db": -6.0,
            "note": "a knuckle knock: the low partner of the glass tick"},
   "hit": {"sound": "notify/m0", "takes": 2, "align": "onset", "level_db": -3.0,
-          "note": "the lockup as one struck C5 bell (single attack, no build, 1.9 s natural decay): a soft tonal resolve instead of a boom; set edits.pitch to the film's root"},
+          "note": "the lockup as one struck bell (C5 until edits.pitch or a retune moves it) (single attack, no build, 1.9 s natural decay): a soft tonal resolve instead of a boom; set edits.pitch to the film's root"},
   "land": {"sound": "pro_pop_in/deep", "takes": 3, "align": "onset", "level_db": -5.0,
            "note": "a round low thump (75 Hz body, 0.18 s): an element settling, felt more than heard"},
   "land.light": {"sound": "tap/soft", "takes": 3, "align": "onset", "level_db": -8.0,
@@ -39,7 +39,7 @@
            "note": "a switch flip, a CC0 recording fitted as code (0.19 s, one attack): matches 'a toggle switch click' at z +2.24, p 1.00 over synth-blip descriptions (pro_pop_in/knock: +0.61, 0.27), realness 0.97 (0.08)"},
   "swell": null,
   "bell": {"sound": "pluck/kalimba", "pitches": ["G4", "A4", "C5", "D5", "E5", "G5", "A5", "C6", "D6", "E6"], "takes": 1, "align": "onset", "level_db": -5.0,
-           "note": "the launch film's kalimba on two octaves of a C pentatonic (G4-E6, 10 notes): one tuned note per progress step or motif note, so a climbing motif has a rung for every step"},
+           "note": "the launch film's kalimba on two octaves of the key's pentatonic (C: G4-E6, 10 notes, until a retune moves it): one tuned note per progress step or motif note, so a climbing motif has a rung for every step"},
   "text": {"sound": "pluck/kalimba_soft", "pitches": ["C5", "D5", "E5", "G5", "A5"], "takes": 1, "align": "onset", "level_db": -12.0,
            "note": "one soft tuned note when a text fragment resolves (not per word), stepping through the chord's tones among the five pentatonic degrees of one octave, under the picture"}
  },

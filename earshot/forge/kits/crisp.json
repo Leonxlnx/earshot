@@ -40,7 +40,7 @@
            "note": "a switch flip, a CC0 recording fitted as code (0.19 s, one attack): matches 'a toggle switch click' at z +2.24, p 1.00 over synth-blip descriptions (toggle/latch, two attacks: +2.04, 0.97), realness 0.97 (0.50)"},
   "swell": null,
   "bell": {"sound": "pluck/kalimba", "pitches": ["G4", "A4", "C5", "D5", "E5", "G5", "A5", "C6", "D6", "E6"], "takes": 1, "align": "onset", "level_db": -5.0,
-           "note": "the tuned kalimba voice on two octaves of a C pentatonic (G4-E6, 10 notes): progress steps and motifs, a rung for every step"},
+           "note": "the tuned kalimba voice on two octaves of the key's pentatonic (C: G4-E6, 10 notes, until a retune moves it): progress steps and motifs, a rung for every step"},
   "text": {"sound": "fit/land.light/finger_phone", "takes": 3, "align": "onset", "level_db": -5.0,
            "note": "a finger tapping a phone, a CC0 recording fitted as code (0.33 s, a low soft tap, untuned so it never fights the music: a new take per fragment): its top tag is 'a soft UI button tap'; realness 0.89 (pro_tap/soft, which it replaces, is a designed thump); level +7 dB for its lower loudness at the same peak (95 Hz centroid)"}
  },
