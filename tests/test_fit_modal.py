@@ -127,8 +127,9 @@ def test_knobs(fitted):
     assert np.mean(modal.render(md, 0, damping=2.0)[late] ** 2) < 0.2 * e0
     assert centroid(modal.render(md, 0, brightness=6.0)) > 1.3 * centroid(y0)
     assert centroid(modal.render(md, 0, brightness=-6.0)) < centroid(y0)
-    yv = modal.render(md, 5, vary=0.6)
+    yv = modal.render(md, 5, vary=0.6, ring=False)
     assert len(yv) == len(y0) and not np.allclose(yv, y0)
+    assert len(modal.render(md, 5, vary=0.6)) >= len(y0)                   # a vary take rings out (ring=None)
     assert np.allclose(modal.render(md, 0, gain=-6.0), y0 * 10 ** (-6 / 20))
     s = modal.render(md, 0, stereo=True, room=0.3)
     assert s.shape == (len(y0), 2) and np.isfinite(s).all()

@@ -31,7 +31,8 @@ Entry types:
            gain_db (+ gain): the render block; the delivered WAV = normalise(fn(params, rng(seed)), peak_db) * gain
     fit    category 'fit', member, model (an `earshot fit` model, its fit_engine report dropped), seed, vary, source
            {id, title, author, license, url}, pitch_hz (the measured note of a tonal fit, else null): rendered by
-           earshot.forge.fit.render(model, seed, vary=vary)
+           earshot.forge.fit.render(model, seed, vary=vary, take=True) (a take: it rings out to 60 dB down instead
+           of stopping where the trimmed recording stopped, no DC offset)
 Every entry carries `meta`, measured on its render at peak -1 dBFS: dur_s, onset_s, peak_s, end_s, attack_ms,
 centroid_hz, lufs_m_max, channels and a short fingerprint `fp` (50 ms RMS frames in dB re the loudest frame, to the
 point where the sound stays 60 dB down) so a later re-render (another machine, numpy, scipy) can be checked against
@@ -243,7 +244,7 @@ def renderer(entry, seed=None):
         from . import fit as _fit
 
         def run(edit=None, fit_knobs=None):
-            kn = {'vary': float(entry.get('vary') or 0.0), **(fit_knobs or {})}
+            kn = {'vary': float(entry.get('vary') or 0.0), 'take': True, **(fit_knobs or {})}
             if not kn['vary']:
                 kn.pop('vary')
             return _valid(np.asarray(_fit.render(entry['model'], seed=seed, **kn), np.float64), entry)

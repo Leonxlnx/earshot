@@ -47,6 +47,14 @@ the noise bands), width (x side), room (0..1 wet of a small stochastic room), va
 frequencies / decays / amplitudes, strike timing and noise bands: new takes of the same object), spacing (x the
 time between strikes), gain (dB). seed changes only the noise (and, with vary > 0, the jitter). The side of a
 stereo render is the mid's Hilbert transform shaped per band by `side`.
+ring: a take that rings out (default None: on when vary > 0; off, the render keeps the recording's length and
+fade-out, what the fit is measured against). A trimmed recording stops while its modes still ring (a key's release
+70 ms before the cut), and vary lengthens some decays further; with ring the render goes on until every mode is
+RING_DB (60 dB) under the loudest strike's mode sum, at least RING_MIN_S (RING_LOUD_S when the modes are still
+above RING_LOUD_DB at the cut) and at most RING_EXT x the sound's span longer, and the added stretch fades 60 dB
+(linear in dB) instead of the recording's fade-out (the noise keeps falling at its last slope). A fitted model often
+holds a few faint poles with decays of seconds (noise the fitter took for modes); the cap keeps a take short, the
+fade keeps it from stopping on them. The fit engine's takes (auto.render(take=True), the bank) ring out.
 What it is not for: glides / chirps (a rising pop, a zip) split into many false strikes; designed impacts with long
 reverb tails fit, but the tail is mostly noise bands.
 Pure numpy / scipy.
@@ -69,6 +77,11 @@ NOISE_H = 0.4              # crossover half-width, ERB-rate units
 GRID = 0.0005              # dense envelope grid, s
 SUB_HZ = 20.0              # below this the residual is kept as a decimated waveform (a pressure pulse)
 SUB_DEC = 480              # its decimation (100 Hz)
+RING_DB = 60.0             # ring=True: the render goes on until every mode is this far under the loudest strike's
+RING_EXT = 0.5             # mode sum, at most this x the sound's span (first strike to the nominal end) longer, at
+RING_MIN_S = 0.06          # least this much longer; the added stretch fades RING_DB (linear in dB)
+RING_LOUD_DB = -50.0       # modes still above this at the recording's end (re the loudest strike's mode sum) ...
+RING_LOUD_S = 0.2          # ... get at least this long a fade (a fast fade from a loud ring reads as a cut)
 
 
 # ------------------------------------------------------------------------------------------------ helpers
@@ -740,9 +753,10 @@ def _fit(x, max_strikes=10, kmax=16, nmax=384, passes=2, skip_ms=0.5, prune_db=-
 # ------------------------------------------------------------------------------------------------ render
 # Everything below `render_model` uses only numpy / scipy and the constants SR, GRID: to_code() copies these
 # functions verbatim into a standalone script, so the script renders the same samples as render().
-def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing):
+def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing, ring=False):
     """the model with the knobs applied: strikes (onset s, ramp s, f, tau, amp, phase arrays), the dense noise
-    envelope (bands x grid, dB) on a GRID-second grid, the band centres and the output length (samples)"""
+    envelope (bands x grid, dB) on a GRID-second grid, the band centres and the output length (samples). ring: when
+    a mode outlives the recording's length, render on until every mode is RING_DB down (see render)"""
     rv = np.random.default_rng([int(seed) & 0xFFFFFFFF, 1])
     st = model['strikes']
     t0 = [s['t'] for s in st]
@@ -773,6 +787,15 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
     L0 = model['length_s']
     t_last0, t_last = t0[-1], tn[-1]
     length = t_last + (L0 - t_last0) * max(1.0, stretch)
+    n_nom = int(round(length * SR))
+    if ring:
+        t_ring, lv_end = _ring_end(strikes, length)
+        ring = None
+        if t_ring > length + 0.001:
+            lo = RING_LOUD_S if lv_end > RING_LOUD_DB else RING_MIN_S
+            ext = min(max(t_ring - length, lo), max(lo, RING_EXT * (length - tn[0])))
+            length += ext
+            ring = (n_nom, int(round(length * SR)))
     n_out = int(round(length * SR))
     # dense noise envelope on the original's time axis
     nz = model['noise']
@@ -818,7 +841,26 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
     sub = model.get('sub')
     sub = (int(round((tn[0] - t0[0]) * SR)), sub['x']) if sub else None
     return {'strikes': strikes, 'E': E, 'cen': cen, 'edges': edges, 'h': nz['h_erb'], 'n': n_out, 'sub': sub,
-            'fade': float(model.get('fade_out_s', 0.0))}
+            'fade': 0.0 if ring else float(model.get('fade_out_s', 0.0)), 'ring': ring or None}
+
+
+def _ring_end(strikes, t_end):
+    """(when every mode of the planned strikes has decayed RING_DB under the loudest strike's mode sum (s), the
+    modes' summed level at t_end in dB re that sum); the contact modes are a few ms long and do not count"""
+    ref = max([float(np.sqrt(np.sum(np.asarray(s[4]) ** 2))) for s in strikes] + [0.0])
+    if ref <= 0:
+        return 0.0, -300.0
+    thr = ref * 10 ** (-RING_DB / 20)
+    end, p_end = 0.0, 0.0
+    for s in strikes:
+        a = np.abs(np.asarray(s[4]))
+        tau = np.asarray(s[3], float)
+        k = a > thr
+        if k.any():
+            end = max(end, s[0] + float(np.max(tau[k] * np.log(a[k] / thr))))
+        if t_end >= s[0]:
+            p_end += float(np.sum((a * np.exp(-(t_end - s[0]) / np.maximum(tau, 1e-9))) ** 2))
+    return end, float(10 * np.log10(p_end / ref ** 2 + 1e-30))
 
 
 def _masks(n_fft, edges, h):
@@ -911,11 +953,15 @@ def _room(y, rng, wet, rt60=0.35):
 
 
 def render_model(model, seed=0, size=1.0, damping=1.0, brightness=0.0, hardness=1.0, noise=0.0, width=1.0,
-                 room=0.0, vary=0.0, spacing=1.0, gain=0.0, stereo=None):
-    plan = _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing)
+                 room=0.0, vary=0.0, spacing=1.0, gain=0.0, stereo=None, ring=None):
+    ring = vary > 0 if ring is None else bool(ring)
+    plan = _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing, ring)
     n = plan['n']
     s = int(seed) & 0xFFFFFFFF
     mid = _modes(plan, n) + _noise(plan, n, np.random.default_rng([s, 2]))
+    if plan.get('ring'):                      # the ring-out past the recording's length fades RING_DB (linear in dB)
+        a, b = plan['ring']
+        mid[a:b] *= 10 ** (-RING_DB / 20 * np.arange(b - a) / max(b - a, 1))
     two = (model.get('channels', 1) == 2) if stereo is None else bool(stereo)
     if two:
         side = np.zeros(n)
@@ -941,7 +987,7 @@ def render_model(model, seed=0, size=1.0, damping=1.0, brightness=0.0, hardness=
 
 def render(model, seed=0, **knobs):
     """re-synthesise a modal model: (n, 2) for a stereo original (or stereo=True), else (n,); knobs: size, damping,
-    brightness, hardness, noise, width, room, vary, spacing, gain, stereo (see the module doc)"""
+    brightness, hardness, noise, width, room, vary, spacing, gain, stereo, ring (see the module doc)"""
     check(model)
     return render_model(model, seed, **knobs)
 
@@ -981,7 +1027,7 @@ def summary(model):
     return '\n'.join(lines)
 
 
-_CODE_FUNCS = (_plan, _masks, _ring, _modes, _noise, _room, render_model)
+_CODE_FUNCS = (_plan, _ring_end, _masks, _ring, _modes, _noise, _room, render_model)
 
 
 def _literal(model):
@@ -1018,7 +1064,9 @@ def to_code(model, name='sound'):
             f'{model["version"]}).\n\n{summary(model)}\n\nrender(seed, size=, damping=, brightness=, hardness=, '
             f'noise=, width=, room=, vary=, spacing=, gain=) -> float array at 48 kHz.\n"""\n')
     body = [head, 'import sys', '', 'import numpy as np', 'from scipy import fft as sfft', 'from scipy import signal', '',
-            f'SR = {SR}', f'GRID = {GRID!r}', f'SUB_DEC = {SUB_DEC}', '', _literal(model), '', '']
+            f'SR = {SR}', f'GRID = {GRID!r}', f'SUB_DEC = {SUB_DEC}', f'RING_DB = {RING_DB!r}', f'RING_EXT = {RING_EXT!r}',
+            f'RING_MIN_S = {RING_MIN_S!r}', f'RING_LOUD_DB = {RING_LOUD_DB!r}', f'RING_LOUD_S = {RING_LOUD_S!r}', '',
+            _literal(model), '', '']
     for fn in _CODE_FUNCS:
         body.append(inspect.getsource(fn))
         body.append('')

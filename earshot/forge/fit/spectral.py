@@ -51,8 +51,15 @@ Rendering (`render`): each call draws NEW noise (seeded, deterministic per seed)
 statistically identical sound; knobs: length (time-stretch of the gesture, texture rates kept), speed (movement
 speed: shorter, higher by SPEED_OCT octaves per doubling, faster flutter), sweep (scales the spectral centroid's
 excursion around its mean), shift (octaves), tilt (dB / octave about 1 kHz), roughness (texture depth; 0 = smooth
-Gaussian), width (side / pan amount), ridges (tonal ridge gain), gain_db. Output is levelled to the original's
-loudest 50 ms RMS (+ gain_db), sample peak capped at -0.5 dBFS.
+Gaussian), width (side / pan amount), ridges (tonal ridge gain), gain_db. Level: the gain that puts the EXPECTED
+loudest 50 ms RMS (computed from the gesture: band envelopes, their overlaps, the ridges) on the original's
+(+ gain_db), times the take's own correction to its expected K-weighted energy (BS.1770 weighting, the loudness a
+meter reads). A noise band holds few independent bins over a short gesture, so a take's loudness wanders with the
+seed; levelled by its own loudest 50 ms, as before 0.3, takes of one model came out 2-7 LU apart (a cloth whoosh),
+now within about 0.5 LU. A scalar per take: the fit-quality numbers, which level both sounds, do not move
+(steady=False keeps the old levelling: a hybrid's air layer, whose post stage was measured on it). Sample peak capped
+at -0.5 dBFS (limit=False: not capped; the fit engine renders so, as the cap would make a high-crest take quieter
+than the others).
 
 Judging a fit: a fresh-noise render can never match the samples, and even two renders of one model differ by a few
 dB cell by cell (a noise band's level estimate fluctuates). So `fit_report` also gives the floor: compare(render,
@@ -334,9 +341,19 @@ def _clicks(N, rate, rng, spread=SPREAD):
     return c / p if p > 0 else c
 
 
+def _k_gain2(f):
+    """|K-weighting|^2 (ITU-R BS.1770, 48 kHz) at frequencies f (Hz)"""
+    from scipy import signal
+    from ..polish import K_SOS
+    return np.abs(signal.sosfreqz(K_SOS, worN=np.asarray(f, np.float64), fs=SR)[1]) ** 2
+
+
 def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=False, rate_scale=1.0,
-           rough=1.0, fine=None, fine_shift=0.0):
-    """the renderer core. tk (K,) key times in s, env (K, B) density dB. Returns (n,) if mono else (n, 2)."""
+           rough=1.0, fine=None, fine_shift=0.0, power=False):
+    """the renderer core. tk (K,) key times in s, env (K, B) density dB. Returns (n,) if mono else (n, 2).
+    power=True returns (y, p, pk): the expected channel-mean power of the render, plain and K-weighted ((n,) each:
+    the bands' envelopes with their neighbours' overlap, the ridges; flutter has E[mod^2] = 1), the same for every
+    seed (render levels by them)"""
     n = int(n)
     ss = np.random.SeedSequence(abs(int(seed)) % (2 ** 32))
     rA, rB, rC, rM, rR = [np.random.default_rng(s) for s in ss.spawn(5)]
@@ -393,6 +410,10 @@ def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=F
 
     L = np.zeros(n)
     R = None if mono else np.zeros(n)
+    P = np.zeros(n) if power else None
+    PK = np.zeros(n) if power else None
+    K2 = _k_gain2(f) if power else None
+    prev = None                              # (w, amp) of the band below: neighbours overlap (their cross power)
     for b in range(len(cents)):
         w = _wband(ef, ec, b)
         nz = np.nonzero(w)[0]
@@ -404,6 +425,15 @@ def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=F
         nA = sfft.irfft(Xb, N, workers=wk)[:n]
         amp = 10 ** (np.interp(ts, tk, env[:, b]) / 20)
         g0, g1, a = blend[b]
+        if P is not None:                    # expected power: sum over bins of (sum_b amp_b w_b)^2 x 2 / N
+            ww = w[lo:hi] ** 2
+            P += amp * amp * (2.0 * float(np.sum(ww)) / N)
+            PK += amp * amp * (2.0 * float(np.sum(ww * K2[lo:hi])) / N)
+            if prev is not None:
+                wx = prev[0][lo:hi] * w[lo:hi]
+                P += 2.0 * (2.0 * float(np.sum(wx)) / N) * prev[1] * amp
+                PK += 2.0 * (2.0 * float(np.sum(wx * K2[lo:hi])) / N) * prev[1] * amp
+            prev = (w, amp)
         if mods is not None:
             amp = amp * ((1 - a) * mods[g0] + a * mods[g1])
         if mono:
@@ -432,6 +462,9 @@ def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=F
         # fade the ridge in / out over 5 ms at its ends
         e = np.clip(np.minimum(ts - rt[0], rt[-1] - ts) / 0.005, 0, 1)
         y = y * e
+        if P is not None:
+            P += 0.5 * (A * e) ** 2
+            PK += 0.5 * (A * e) ** 2 * float(_k_gain2([max(float(np.median(rd['f'])), 1.0)])[0])
         if mono or ctl is None:
             L += y
         else:
@@ -439,10 +472,31 @@ def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=F
             L += y * ctl[2, g]
             R += y * ctl[3, g]
     if mono:
-        return L
+        return (L, P, PK) if power else L
     if ctl is None:
         R = L.copy()
-    return np.stack([L, R], 1)
+    y = np.stack([L, R], 1)
+    return (y, P, PK) if power else y
+
+
+def _take_gain(y, pk):
+    """the gain that puts a take's K-weighted energy (channel mean) on its expected one"""
+    from scipy import signal
+    from ..polish import K_SOS
+    y2 = np.asarray(y, np.float64)
+    y2 = y2 if y2.ndim == 2 else y2[:, None]
+    act = float(np.mean([np.sum(signal.sosfilt(K_SOS, y2[:, c]) ** 2) for c in range(y2.shape[1])]))
+    want = float(np.sum(pk))
+    return float(np.sqrt(want / act)) if act > 1e-300 and want > 0 else 1.0
+
+
+def _peak_mean_db(p, win_s=0.05):
+    """the loudest win_s mean of a power curve (dB)"""
+    k = max(1, int(win_s * SR))
+    if len(p) < k:
+        return float(_db(np.mean(p)))
+    c = np.concatenate([[0.0], np.cumsum(p)])
+    return float(_db(((c[k:] - c[:-k]) / k).max()))
 
 
 def _peak_rms_db(x, win_s=0.05):
@@ -1006,8 +1060,10 @@ def _centroid_oct(E, cents, bw):
 
 
 def render(model, seed=0, length=1.0, speed=1.0, sweep=1.0, shift=0.0, tilt=0.0, roughness=1.0, width=1.0,
-           ridges=1.0, gain_db=0.0, level=True):
-    """render a model: (n, 2) float32 at 48 kHz. New `seed` = new noise, same statistics. See the module doc."""
+           ridges=1.0, gain_db=0.0, level=True, limit=True, steady=True):
+    """render a model: (n, 2) float32 at 48 kHz. New `seed` = new noise, same statistics. See the module doc.
+    limit=False skips the -0.5 dBFS sample-peak cap (a per-take gain: the fit engine levels takes itself).
+    steady=False levels the take by its own loudest 50 ms (the 0.2 renderer; a hybrid's air layer was fitted so)"""
     check(model)
     cents = centers(model['bands']['n'])
     bw = bandwidths(cents)
@@ -1036,13 +1092,14 @@ def render(model, seed=0, length=1.0, speed=1.0, sweep=1.0, shift=0.0, tilt=0.0,
             o = oct_ + (float(sweep) - 1.0) * (np.interp(rt, np.asarray(model['env']['t']), co) - cm)
             rds.append({'t': rt * s, 'f': np.minimum(np.asarray(rd['f']) * 2 ** o, SR * 0.45),
                         'db': np.asarray(rd['db']) + 20 * np.log10(float(ridges)), 'jitter': rd.get('jitter', 0.002)})
-    y = _synth(n, tk, E, cents, seed, stereo=st, texture=model.get('texture'), ridges=rds, rate_scale=speed,
-               fine=model.get('fine'), fine_shift=oct_,
-               rough=float(roughness))
-    if level:
+    y, p, pk = _synth(n, tk, E, cents, seed, stereo=st, texture=model.get('texture'), ridges=rds,
+                      rate_scale=speed, fine=model.get('fine'), fine_shift=oct_, rough=float(roughness), power=True)
+    if level and steady:   # the expected loudest 50 ms on the original's, this take's K-weighted energy on its own
+        y *= 10 ** ((model['level_db'] + float(gain_db) - _peak_mean_db(p)) / 20) * _take_gain(y, pk)   # expectation
+    elif level:
         y *= 10 ** ((model['level_db'] + float(gain_db) - _peak_rms_db(y)) / 20)
     pk = np.abs(y).max()
-    if pk > 10 ** (-0.5 / 20):
+    if limit and pk > 10 ** (-0.5 / 20):
         y *= 10 ** (-0.5 / 20) / pk
     return y.astype(np.float32)
 
