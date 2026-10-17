@@ -3,6 +3,8 @@
 - the fit itself (identity render, seed 0) keeps the recording's length;
 - a sines fit's residual noise follows the recording's roll-off above 16 kHz (no noise above 20 kHz it lacked);
 - takes carry no DC offset; spectral takes keep one loudness across seeds; candidates can be scored on 3 seeds."""
+import json
+
 import numpy as np
 import pytest
 
@@ -88,9 +90,13 @@ def test_hf_rolloff_is_monotone_and_finds_a_band_limit():
     assert lv[-1] < -40                                            # nothing above the 16 kHz cut
 
 
-def test_sines_residual_follows_the_recordings_rolloff():
-    x = _lossy_tone()
-    m = sines.fit(x, windows=(1024,))
+@pytest.fixture(scope='module')
+def tone_model():
+    return sines.fit(_lossy_tone(), windows=(1024,))
+
+
+def test_sines_residual_follows_the_recordings_rolloff(tone_model):
+    m = tone_model
     assert m['residual']['hf'][0] == [16000.0, 0.0]
     flat = dict(m, residual={k: v for k, v in m['residual'].items() if k != 'hf'})   # a model fitted before 0.3
     y, y_flat = sines.render(m, 0), sines.render(flat, 0)
@@ -101,9 +107,22 @@ def test_sines_residual_follows_the_recordings_rolloff():
     assert np.allclose(ns['render'](0), y, atol=1e-9)
 
 
-def test_takes_have_no_dc_offset():
-    x = _lossy_tone()
-    m = sines.fit(x, windows=(1024,))
+def test_sines_take_fades_its_noise_out(tone_model):
+    """a trimmed tone whose noise is still sounding at the cut: the take fades it over RING_FADE_S, the fit keeps
+    the recording's length"""
+    m = json.loads(json.dumps(tone_model))
+    n_id = int(round(m['duration'] * SR))
+    res = m['residual']
+    res['db'] = [row[:-1] + [max(row)] if max(row) > -149 else row for row in res['db']]   # loud to the last time
+    assert len(sines.render(m, 0)) == n_id
+    y = sines.render(m, 3, knobs={'vary': 0.3})                                              # ring=None -> on
+    assert len(y) >= n_id + int(sines.RING_FADE_S * SR)
+    e = 10 * np.log10(np.convolve(y ** 2, np.ones(240) / 240, 'valid') + 1e-20)
+    assert e[-1] < e.max() - 55
+
+
+def test_takes_have_no_dc_offset(tone_model):
+    m = json.loads(json.dumps(tone_model))
     res = m['residual']
     res['db'][0] = [v + 30.0 if v > -149 else v for v in res['db'][0]]      # a loud lowest band (flat to DC)
     dc = lambda y: polish.dc(y)['dc_db']

@@ -56,7 +56,8 @@ render(model, seed, knobs) knobs (all default to the identity, which re-renders 
     inharm (stretch of partial ratios about the lowest strong partial: f/f_low -> (f/f_low)^(1+inharm)),
     phases ('fit' or 'random'), gain_db, stereo (False: mono; True: (n, 2) with the residual decorrelated by width),
     ring (None: True when vary > 0; True renders until the last partial's release ends, so a decay that vary
-    lengthens is not cut at the recording's length, and fades the noise out past the last residual time).
+    lengthens is not cut at the recording's length, and fades the residual noise out over RING_FADE_S past the
+    recording's length instead of stopping on it).
 
 Deterministic: render(model, seed, knobs) is a pure function (the noise and every jitter come from `seed`).
 Pure numpy / scipy; no recorded audio is stored in a model, only parameters.
@@ -77,6 +78,7 @@ DEFAULT_KNOBS = {'transpose': 0.0, 'stretch': 1.0, 'decay': 1.0, 'brightness': 0
                  'vibrato_rate': 5.5, 'drift': 0.0, 'residual': 1.0, 'transient': 1.0, 'vary': 0.0, 'partials': None,
                  'inharm': 0.0, 'phases': 'fit', 'gain_db': 0.0, 'stereo': False, 'ring': None}
 HF_POINTS = (16000.0, 17000.0, 18000.0, 19000.0, 20000.0, 21000.0, 22000.0, 23000.0, 24000.0)   # the roll-off grid
+RING_FADE_S = 0.06          # ring: the residual noise fades out over this past the recording's length
 
 
 # ================================================================================================ small helpers
@@ -1070,9 +1072,10 @@ def render(model, seed=0, knobs=None, **kw):
     ring = vary > 0 if k['ring'] is None else bool(k['ring'])
     n_id = int(round(model['duration'] * sr))
     n = int(np.ceil(max(ends) * sr)) + 1 if (d_ > 1.0 or s_ != 1.0 or ring) else n_id
-    if ring and n > n_id and len(times):            # the noise fades out (10 ms) past the recording's length
-        t_end = max(float(times[-1]), n_id / sr)
-        times = np.append(times, t_end + 0.01)
+    if ring and len(times):          # the noise fades out over RING_FADE_S past the recording's length (linear in dB)
+        t_end = max(float(times[-1]), float(T(model['duration'])))
+        n = max(n, int(np.ceil((t_end + RING_FADE_S) * sr)) + 1)
+        times = np.append(times, t_end + RING_FADE_S)
         lev = np.column_stack([lev, np.full(len(lev), -150.0)])
     cents = None
     if k['vibrato'] or k['drift']:
