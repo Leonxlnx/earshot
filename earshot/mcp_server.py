@@ -22,6 +22,9 @@ time. Each result is text: the plain-language summary first (plus the listening 
 critique text for llm_critique / one row per file for realness on a folder), then compact JSON (always valid JSON;
 full=true for everything). sheet also returns the picture as an image. A tool whose module is missing from this
 install answers with a clear message instead of failing the server.
+
+Sound bank tools (no models, pure DSP): sfx_list, sfx_render (one take aimed at the picture), kit_render (a film's
+kit.json into takes + kit.lock.json); earshot.forge.sfx / earshot.forge.kit.
 """
 from __future__ import annotations
 
@@ -55,6 +58,10 @@ alternatives); cosine is raw CLAP similarity (not a probability, only comparable
 measurements most, verdicts and z next, cosine least. If realness is unavailable, say real-vs-synthetic was not
 checked; describe's AudioSet synth classes (Sine wave, Beep, Synthesizer) are weaker evidence. The first call that
 needs models takes ~20-60 s; later calls are fast (models stay loaded)."""
+
+INSTRUCTIONS += """
+Sounds for a film (no models, fast): sfx_list (the shipped bank) -> sfx_render (one take aimed at a cue: dur, apex,
+pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take)."""
 
 IMG_INLINE_MAX = 1600        # px, long edge of the inline copy (sent as JPEG q88: ~1/3 of the PNG bytes)
 JSON_MAX = 7000
@@ -521,6 +528,79 @@ TOOLS = [  # (function, read-only, talks to the internet)
     (tool_timeline, True, False), (tool_sheet, False, False), (tool_critique, True, False),
     (tool_doctor, True, False), (tool_llm_critique, False, True),   # uploads audio: clients should ask first
 ]
+
+
+# ------------------------------------------------------------------------------------- the sound bank (no models)
+def _out_path(path, what):
+    if not path or not isinstance(path, str):
+        raise ToolFailure(f'{what}: an absolute path is required')
+    return os.path.abspath(os.path.expanduser(path.strip().strip('"')))
+
+
+def tool_sfx_list(category: Annotated[str | None, Field(description='only this category, e.g. "whoosh_fast", '
+                                                                    '"pro_impact", "typing_key", "pluck"')] = None,
+                  kind: Annotated[str | None, Field(description='only sounds for this cue kind or kit role, e.g. '
+                                                                '"whoosh" (short and long), "hit", "key", "bell"')]
+                  = None,
+                  full: Full = False) -> str:
+    """List earshot's shipped sound bank (no models, instant): every id (<category>/<member>, pluck/<name>,
+    fit/<role>/<name>) with its length, onset and peak time, the cue kinds it serves and its knobs (dur; apex for
+    the whoosh family; pitch for tonal sounds, with the native note). Use to choose sounds for a film's cues or kit
+    before sfx_render / kit_render; filter by category or kind to keep it short."""
+    from .forge import sfx
+
+    def run(category=None, kind=None):
+        r = sfx.sfx_list(category, kind)
+        lines = [r['summary']]
+        for x in r['sounds']:
+            kn = x['knobs']
+            k = [f"dur {kn['dur']}"] + (['apex'] if kn['apex'] else []) + (
+                [f"pitch {kn['pitch'].get('note')}"] if kn['pitch'] else [])
+            lines.append(f"{x['id']}: {x['dur_s']:.3f} s, peak {x['peak_s']:.3f} s; {','.join(x['kinds']) or '-'}; "
+                         f"{', '.join(k)}")
+        r['text'] = '\n'.join(lines)
+        return r
+    return _run('sfx_list', dict(category=category, kind=kind), full, run)
+
+
+def tool_sfx_render(sound: Annotated[str, Field(description='bank id from sfx_list, e.g. "whoosh_fast/crisp"')],
+                    out: Annotated[str, Field(description='absolute path of the WAV to write (24-bit)')],
+                    seed: Annotated[int | None, Field(description="noise seed for a new take (default: the sound's "
+                                                                  'own, the delivered final)')] = None,
+                    dur: Annotated[float | None, Field(description='length in seconds (exact)', gt=0)] = None,
+                    apex: Annotated[float | None, Field(description='seconds from the start to the loudest moment '
+                                                                    '(whoosh family)', gt=0)] = None,
+                    pitch: Annotated[str | None, Field(description='note name ("E5", "Eb6") or Hz ("440"), through '
+                                                                   "the recipe's own pitch parameter")] = None,
+                    peak_db: Annotated[float, Field(description='sample peak in dBFS', le=0)] = -1.0,
+                    full: Full = False) -> str:
+    """Render one sound of earshot's shipped bank to a WAV (no models, about a second), aimed at the picture:
+    exact dur, the loudest moment on apex (whooshes), a note through the recipe's own pitch parameter (never
+    resampled). Returns the measured onset, peak and end (for placing it on a cue) and the model-free audit (clicks,
+    truncation, clipping, ring, rising pitch glide). Use for a single cue or to audition a candidate before a kit."""
+    from .forge import sfx
+    p = _out_path(out, 'out')
+    return _run('sfx_render', dict(sound=sound, out=p, seed=seed, dur=dur, apex=apex, pitch=pitch, peak_db=peak_db),
+                full, sfx.sfx_render)
+
+
+def tool_kit_render(kit: Annotated[str, Field(description="absolute path of the film's kit.json (earshot kit init "
+                                                         'writes one from a preset: calm, crisp, minimal)')],
+                    out: Annotated[str, Field(description='absolute path of the folder for the takes and '
+                                                          'kit.lock.json')],
+                    force: Annotated[bool, Field(description='render every take again (default: keep the takes '
+                                                             'whose cache key and file still match)')] = False,
+                    full: Full = False) -> str:
+    """Render a film's sound kit (no models): every role's takes from the bank into WAVs plus kit.lock.json with the
+    measured onset, peak, end and loudness of each take, cached by sound, seed, edits and bank version, every take
+    audited model-free (a take that fails is re-rolled on a new seed). Use when a film's cues need sounds: the lock
+    is what a mixer or cinetic's score.py places on the cue frames."""
+    from .forge import kit as _kit
+    return _run('kit_render', dict(kit=_file(kit, 'kit'), out=_out_path(out, 'out'), force=force), full,
+                _kit.kit_render)
+
+
+TOOLS += [(tool_sfx_list, True, False), (tool_sfx_render, False, False), (tool_kit_render, False, False)]
 
 
 def _sdk():

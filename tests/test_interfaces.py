@@ -431,7 +431,7 @@ def test_mcp_server_registers_all_tools():
     tools = anyio.run(srv.list_tools)
     names = {t.name for t in tools}
     assert names == {'measure', 'describe', 'match', 'rank', 'find', 'compare', 'ab', 'realness', 'timeline', 'sheet',
-                     'critique', 'doctor', 'llm_critique'}
+                     'critique', 'doctor', 'llm_critique', 'sfx_list', 'sfx_render', 'kit_render'}
     for t in tools:
         schema = getattr(t, 'input_schema', None) or t.inputSchema
         assert len(t.description) > 120 and 'Use ' in t.description
@@ -529,7 +529,7 @@ def test_mcp_stdio_end_to_end(wav, tmp_path):
                 await s.call_tool('rank', {'paths': path + '.missing', 'query': 'a door'}),
                 await s.call_tool('llm_critique', {'path': path}))
     tools, meas, missing, rank, llm_res = anyio.run(_stdio_session, calls, str(tmp_path / 'server.log'))
-    assert len(tools.tools) == 13
+    assert len(tools.tools) == 16   # 13 listening tools + sfx_list, sfx_render, kit_render (the sound bank)
     assert not _is_error(meas) and _text(meas).startswith('3.000 s, ') and 'dBTP' in _text(meas)
     assert _is_error(missing) and 'not found' in _text(missing)
     assert _is_error(rank) and 'no audio/video files found' in _text(rank)   # a plain string passes the schema
