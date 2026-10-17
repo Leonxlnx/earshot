@@ -164,15 +164,15 @@ def check(load=False, fetch_missing=False):
             _load(r)
         except RuntimeError as e:   # a model that cannot load (offline and not cached, a damaged cache): say why
             problems.append(f'model load failed: {e}')
-    b = r['bank']
+    b, head = r['bank'], []
     if not b.get('error'):
         ty = b['types']
-        notes.append(f"Sound bank {b['version']}: {b['sounds']} sounds ({ty.get('forge', 0) - b['pluck']} forge, "
-                     f"{b['pluck']} plucks, {ty.get('fit', 0)} fitted from CC0 recordings"
-                     + (f"; extra files from EARSHOT_BANK: {', '.join(b['extra'])}" if b['extra'] else '') + ').')
+        head.append(f"Sound bank {b['version']}: {b['sounds']} sounds ({ty.get('forge', 0) - b['pluck']} forge, "
+                    f"{b['pluck']} plucks, {ty.get('fit', 0)} fitted from CC0 recordings"
+                    + (f"; extra files from EARSHOT_BANK: {', '.join(b['extra'])}" if b['extra'] else '') + ').')
     r['problems'], r['notes'] = problems, notes
-    r['summary'] = ' '.join(['earshot looks healthy.' if not problems else
-                             'Problems: ' + '; '.join(p.rstrip('.') for p in problems) + '.'] + notes)
+    r['summary'] = ' '.join(head + ['earshot looks healthy.' if not problems else
+                                    'Problems: ' + '; '.join(p.rstrip('.') for p in problems) + '.'] + notes)
     return r
 
 

@@ -1146,7 +1146,8 @@ def to_code(model, name='sound'):
         lines.append(f"    ({tr['t']}, {_lit(tr['atoms'])}),")
     lines.append(']')
     lines.append(f"BANDS = {_lit(res['bands'])}")
-    lines.append(f"HF = {_lit(res.get('hf'))}   # the noise above 16 kHz: the recording's roll-off [Hz, dB]")
+    lines.append(f"HF = {_lit(res['hf']) if res.get('hf') else None}   # the noise above 16 kHz: the recording's "
+                 "roll-off [Hz, dB] (None: flat, a model fitted before 0.3)")
     lines.append(f"TIMES = {_lit(res['times'])}")
     lines.append('LEVELS = [')
     for row in res['db']:

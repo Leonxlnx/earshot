@@ -102,9 +102,10 @@ def test_sines_residual_follows_the_recordings_rolloff(tone_model):
     y, y_flat = sines.render(m, 0), sines.render(flat, 0)
     assert _above_20k_db(y) < _above_20k_db(y_flat) - 10
     assert _above_20k_db(y) < -60
-    ns = {}
-    exec(compile(sines.to_code(m, 'tone'), 'tone.py', 'exec'), ns)
-    assert np.allclose(ns['render'](0), y, atol=1e-9)
+    for model, ref in ((m, y), (flat, y_flat)):                    # the standalone script, with and without hf
+        ns = {}
+        exec(compile(sines.to_code(model, 'tone'), 'tone.py', 'exec'), ns)
+        assert np.allclose(ns['render'](0), ref, atol=1e-9)
 
 
 def test_sines_take_fades_its_noise_out(tone_model):
