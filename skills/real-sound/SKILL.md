@@ -13,7 +13,8 @@ time-stretches the music and masters; code never generates a sound.
 
 The bar is a professional launch film: every sound caused by something on screen, one material palette, the music's
 drop on the hero reveal, restraint everywhere else, a resolved logo, a tail into silence. Rules:
-`references/sound-design.md` (and the earshot repo's `docs/launch-video-sound.md` for the user's reference profile).
+`references/sound-design.md` (and the earshot repo's `docs/launch-video-sound.md` for the bundled reference profile:
+7 professional launch films).
 
 `<skill>` below is this folder. **Python:** `{{PY}}` below (and in every prompt template) is ONE interpreter that has
 numpy, scipy, soundfile and the earshot package: the earshot repo's venv

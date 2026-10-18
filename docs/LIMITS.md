@@ -22,7 +22,7 @@ earshot gives an agent measured evidence about sound, not taste. Read this befor
   them apart as unvalidated hints. Instruments, rain, birds and voice are usually right.
 - **"Uncertain" from realness** on designed library sounds ("magic" chimes/celesta, "motion" whooshes) and on real
   electronic music: they sit between real and synthesized. Read it as "sounds designed", not "fake".
-- **The launch scorecard ranges** come from 7 films the user picked. They describe that style (modern SaaS / AI
+- **The launch scorecard ranges** come from 7 films the author picked. They describe that style (modern SaaS / AI
   launch films, kinetic type, UI demos), not every good film. A cinematic short or a quiet piano piece will break
   rules that do not apply to it. Build your own profile from films you admire (`earshot profile`).
 - **The "cuts without a hit" list** (timeline, sheet, critique tips): soft build-ups (whooshes, risers, swells) can

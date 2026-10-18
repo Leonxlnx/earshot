@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earshot"
-version = "0.2.0"
+version = "0.2.1"
 description = "Ears for coding agents: describe, match, search, compare, time-align and critique sound files an agent cannot hear."
 readme = "README.md"
 requires-python = ">=3.10"

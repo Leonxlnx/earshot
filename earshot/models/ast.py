@@ -18,7 +18,8 @@ import warnings
 import numpy as np
 
 from .. import audio, config
-from .clap import _load_hf, _set_precision, _slug, offline_if_cached
+from . import hub
+from .clap import _load_hf, _set_precision
 
 SR_AST = 16000
 WIN_S = 10.24
@@ -29,19 +30,20 @@ _inst = None
 class AST:
     def __init__(self, model_id=None):
         config.ensure_dirs()
-        offline_if_cached(model_id or config.AST_MODEL)
+        self.model_id = model_id or config.AST_MODEL
+        self.spec = hub.ensure(self.model_id, config.AST_REVISION if self.model_id == config.AST_MODEL else None)
+        self.revision, self.weights = self.spec.sha, self.spec.weights
         import torch
         from transformers import ASTFeatureExtractor, ASTForAudioClassification
         torch.set_num_threads(config.threads())
         self.torch = torch
-        self.model_id = model_id or config.AST_MODEL
-        self.model = _load_hf(ASTForAudioClassification, self.model_id).eval()
-        self.fe = _load_hf(ASTFeatureExtractor, self.model_id)
+        self.model = _load_hf(ASTForAudioClassification, self.spec, weights=True).eval()
+        self.fe = _load_hf(ASTFeatureExtractor, self.spec)
         self.dtype = _set_precision(self.model, torch)
         self.precision = 'bf16' if self.dtype == torch.bfloat16 else 'fp32'
         self.labels = [self.model.config.id2label[i] for i in range(len(self.model.config.id2label))]
         self.index = {l: i for i, l in enumerate(self.labels)}
-        self.dir = os.path.join(config.EMB_CACHE, 'ast', _slug(self.model_id) + '--' + self.precision)
+        self.dir = os.path.join(config.EMB_CACHE, 'ast', self.spec.cache_name + '--' + self.precision)
         os.makedirs(self.dir, exist_ok=True)
 
     def _forward(self, segs16, batch=8):

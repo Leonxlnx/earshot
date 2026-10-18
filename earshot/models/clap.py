@@ -6,11 +6,13 @@
     t = c.embed_text(['a fast air whoosh'])        # (1, 512)
     cos = a @ t.T
 
-Model: laion/larger_clap_general (Apache-2.0) by default. Its mel front end covers 50 Hz - 14 kHz at 48 kHz, so it is
-deaf to "air" above 14 kHz (use earshot.features for bandwidth / lowpass checks). Inputs longer than 10 s are embedded
-as deterministic 10 s windows (hop 5 s) and averaged; the model's own random crop is never used, so results are
-reproducible. Short sounds are repeat-padded to 10 s like in CLAP's training (pad='repeatpad'); pad='zero' pads with
-silence instead (better for judging a single hit's character in isolation).
+Model: laion/larger_clap_general (Apache-2.0) by default, at a pinned revision with safetensors weights, loaded from
+earshot's cache only (earshot.models.hub: fetched once when missing, never while an offline flag is set). Its mel
+front end covers 50 Hz - 14 kHz at 48 kHz, so it is deaf to "air" above 14 kHz (use earshot.features for bandwidth /
+lowpass checks). Inputs longer than 10 s are embedded as deterministic 10 s windows (hop 5 s) and averaged; the
+model's own random crop is never used, so results are reproducible. Short sounds are repeat-padded to 10 s like in
+CLAP's training (pad='repeatpad'); pad='zero' pads with silence instead (better for judging a single hit's character
+in isolation).
 """
 import hashlib
 import os
@@ -19,6 +21,7 @@ import threading
 import numpy as np
 
 from .. import audio, config
+from . import hub
 
 WIN_S = 10.0
 HOP_S = 5.0
@@ -27,7 +30,7 @@ _inst = None
 
 
 def _slug(model_id):
-    return model_id.replace('/', '--')
+    return hub.slug(model_id)
 
 
 def _read_npz(path):
@@ -41,15 +44,6 @@ def _read_npz(path):
         return {}
 
 
-def offline_if_cached(*model_ids):
-    """when every model is already in the cache, keep huggingface_hub / transformers fully offline (no update checks)"""
-    ok = all(os.path.isdir(os.path.join(config.HF_CACHE, 'models--' + _slug(m))) for m in model_ids)
-    if ok or config.OFFLINE:
-        os.environ.setdefault('HF_HUB_OFFLINE', '1')
-        os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
-    return ok
-
-
 def _quiet_transformers():
     try:
         from transformers.utils import logging as tlog
@@ -59,21 +53,29 @@ def _quiet_transformers():
         pass
 
 
-def _load_hf(cls, model_id):
+def _load_hf(cls, spec, weights=False):
+    """a model (weights=True) or its processor from the spec's local snapshot folder (hub.Spec). transformers gets the
+    folder, not the repo id, so nothing asks the Hub. A failed load is an error that names the folder, never a
+    silent new download; only a legacy snapshot or a local model folder loads pickle weights (pytorch_model.bin,
+    torch weights_only)"""
     import warnings
     _quiet_transformers()
-    kw = dict(cache_dir=config.HF_CACHE)
+    kw = dict(local_files_only=True)
+    if weights:
+        kw['use_safetensors'] = spec.weights not in hub.PICKLE
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', message='.*mel filter.*')
         warnings.filterwarnings('ignore', category=FutureWarning)
         try:
-            return cls.from_pretrained(model_id, local_files_only=True, **kw)
-        except Exception:
-            if config.OFFLINE:
-                raise
-            os.environ.pop('HF_HUB_OFFLINE', None)
-            os.environ.pop('TRANSFORMERS_OFFLINE', None)
-            return cls.from_pretrained(model_id, **kw)
+            return cls.from_pretrained(spec.snapshot, **kw)
+        except Exception as e:
+            if spec.folder:   # the user's own folder: never suggest deleting it
+                raise RuntimeError(f'could not load {spec.label} ({cls.__name__}): {type(e).__name__}: {e}. The '
+                                   'files may be damaged or this transformers version cannot read them') from e
+            raise RuntimeError(f'could not load {spec.label} ({cls.__name__}) from the earshot cache '
+                               f'({spec.snapshot}): {type(e).__name__}: {e}. The files may be damaged or this '
+                               'transformers version cannot read them: delete that folder and earshot fetches the '
+                               'pinned files again, or run earshot doctor') from e
 
 
 def native_bf16(torch):
@@ -116,17 +118,18 @@ def _set_precision(model, torch):
 class Clap:
     def __init__(self, model_id=None):
         config.ensure_dirs()
-        offline_if_cached(model_id or config.CLAP_MODEL)
+        self.model_id = model_id or config.CLAP_MODEL
+        self.spec = hub.ensure(self.model_id, config.CLAP_REVISION if self.model_id == config.CLAP_MODEL else None)
+        self.revision, self.weights = self.spec.sha, self.spec.weights   # what actually loads (doctor reports it)
         import torch
         from transformers import ClapModel, ClapProcessor
         torch.set_num_threads(config.threads())
         self.torch = torch
-        self.model_id = model_id or config.CLAP_MODEL
-        self.model = _load_hf(ClapModel, self.model_id).eval()
-        self.proc = _load_hf(ClapProcessor, self.model_id)
+        self.model = _load_hf(ClapModel, self.spec, weights=True).eval()
+        self.proc = _load_hf(ClapProcessor, self.spec)
         self.dtype = _set_precision(self.model, torch)
         self.precision = 'bf16' if self.dtype == torch.bfloat16 else 'fp32'
-        self.dir = os.path.join(config.EMB_CACHE, 'clap', _slug(self.model_id) + '--' + self.precision)
+        self.dir = os.path.join(config.EMB_CACHE, 'clap', self.spec.cache_name + '--' + self.precision)
         os.makedirs(self.dir, exist_ok=True)
         self._text = {}
         self._text_path = os.path.join(self.dir, 'text.npz')

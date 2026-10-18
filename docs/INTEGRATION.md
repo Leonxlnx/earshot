@@ -86,7 +86,7 @@ earshot adds hearing to the measure and lens steps:
 | av-audit | `python3 scripts/av-audit.py out/preview.mp4 --cues out/qa/cues_sounded.json --stems out/stems` | Cinetic's own onset/sync audit on the real soundtrack; `cues_sounded.json` (written by mix.py) lists only events that received a sound, so deliberate silences are not counted as misses |
 | sound-sync lens (`assets/critics/sound-sync.md`) | hand the lens `qa.json`, the earshot transcript, sheet and scorecard with `av.json` | the lens can name the exact rule / sample to change; with real recordings its fixes are design operations (`<rs>/templates/prompts/fixer.md`), not score.py parameters |
 | verifier (`assets/critics/verifier.md`) | refute a sound issue with earshot evidence (`earshot match` on the placed sample, the transcript at that time) | fewer false P1s from reading code alone |
-| a synthesized score already exists | `python -m earshot realness public/audio/soundtrack.wav` (score.py's output) | shows (per 4 s window) where the synthesized score reads as code-made: the case for switching |
+| a synthesized score already exists | `python -m earshot realness public/audio/soundtrack.wav` (score.py's output) | shows (per 4 s window) where the synthesized score reads as code-made: useful when the brief asks for recorded sound |
 
 ## 4. A minimal change list for a future Cinetic
 

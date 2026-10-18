@@ -42,7 +42,8 @@ from .report import _clean, emit
 
 INSTRUCTIONS = """earshot gives you ears: you cannot hear, so use these tools whenever you must judge, choose or check
 sound (sound effects, music, ambience, a mix, the audio of a video). Use absolute paths.
-Loops: choose an asset = rank (many files) -> find (best moment in the winner) -> describe + realness (verify).
+Loops: choose an asset = rank (many files) -> find (best moment in the winner) -> describe (verify; + realness when
+the user wants real or professionally produced sound).
 Review a mix or film = timeline (what happens when, sync to cuts/cues) -> sheet (look at the picture) -> critique
 (scorecard vs professional launch films). A/B a change = ab on before/after renders, then timeline on the new one.
 measure = exact meters (LUFS, dBTP, noise floor), no models. llm_critique = optional Gemini opinion, uploads audio:
@@ -368,11 +369,13 @@ def tool_realness(path: Annotated[str, Field(description='an audio/video file, o
                   ast: Annotated[bool, Field(description='also run the AudioSet tagger for synth-class evidence '
                                                          '(slower)')] = False,
                   full: Full = False) -> str:
-    """Real recording / professionally produced audio, or cheap code-synthesized sound (oscillators, filtered noise,
-    simple envelopes, beeps)? p_real (a probability) with a verdict and the evidence in words; files over 6 s also get
-    per-window verdicts; a folder or glob gives one row per file. Electronic music and pro sound design count as real:
-    it flags amateur procedural audio. Use on every sound before it goes into a film and on finished mixes: the user
-    rejects synthetic-sounding audio. Strong evidence, not proof: read the evidence list."""
+    """Does it sound like a real recording / professionally produced audio, or like simple code-synthesized sound
+    (oscillators, filtered noise, simple envelopes, beeps)? p_real (a probability) with a verdict and the evidence in
+    words; files over 6 s also get per-window verdicts; a folder or glob gives one row per file. Electronic music and
+    pro sound design count as real: it flags simple procedural audio. Use when the user wants real or professionally
+    produced sound (choosing recordings, checking a finished mix), or asks whether a sound reads as code-synthesized.
+    Synthesized audio may be intended: report the verdict, and treat it as a defect only when the user asked for real
+    sound. Strong evidence, not proof: read the evidence list."""
     fn = _api('realness')
     mod = sys.modules.get('earshot.realness')
     model = getattr(mod, 'MODEL_PATH', None)
@@ -476,8 +479,9 @@ def tool_critique(path: Path, video: Video = None,
 
 def tool_doctor(load: Annotated[bool, Field(description='also load both models and time one window (~20-60 s)')]
                 = False, full: Full = False) -> str:
-    """Check the earshot install: python packages, ffmpeg, cached models, CPU threads, whether an LLM key is present.
-    Use when a tool fails, or once before the first real use."""
+    """Check the earshot install: python packages, ffmpeg, the models (pinned revision, what the cache holds, whether
+    an offline flag is set), CPU threads, whether an LLM key is present. Use when a tool fails, or once before the
+    first real use."""
     from . import doctor
     return _run('doctor', dict(load=load), full, doctor.check)
 
@@ -493,6 +497,10 @@ def tool_llm_critique(path: Path,
                       model: Annotated[str | None, Field(description='Gemini model id (default '
                                                                      'EARSHOT_GEMINI_MODEL or gemini-3.8-flash)')]
                       = None,
+                      synth_intended: Annotated[bool, Field(description='true when the film uses synthesized or '
+                                                                        'procedural sound on purpose: the critique '
+                                                                        'then does not count synthesis as a flaw')]
+                      = False,
                       start: Start = None, end: End = None, full: Full = False) -> str:
     """OPTIONAL second opinion from Google Gemini (an audio LLM): rubric critique of sync, realism, mix balance,
     loudness, cheap / synthetic moments, and concrete fixes with timestamps. Use after timeline / critique when a
@@ -503,7 +511,7 @@ def tool_llm_critique(path: Path,
     from . import llm
     p = _file(path)
     kw = dict(path=p, consent=consent, prompt=prompt, video=_opt_file(video, 'video'), with_timeline=with_timeline,
-              model=model, start=start, end=end)
+              model=model, start=start, end=end, synth_intended=synth_intended)
     return _run('llm_critique', kw, full, llm.critique)
 
 

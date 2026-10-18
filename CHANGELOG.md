@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.2.1 - 2026-10-17
+
+Two fixes from a careful outside review (thanks, @markblundeberg).
+
+### Fixed
+
+- **Agent-facing text no longer states one user's preferences as instructions** (#1). The `realness` tool description
+  and the MCP server instructions told every agent to check every sound because "the user rejects synthetic-sounding
+  audio"; the earshot skill said to reject 'likely code-synthesized' sounds outright, and the real-sound skill and
+  several docs called the bundled launch-film profile "the user's". They now say what realness measures and leave the
+  decision to the current user: use it when real or professionally produced sound is wanted, and treat a synthesized
+  verdict as information when synthesized sound is the point. `critique`'s realness fix is scoped the same way. A
+  test keeps such phrasing out of tool descriptions, the server instructions, skills and docs.
+- **Model loading respects the user's offline setting, never downloads after a failed load, and pins its weights**
+  (#2). Before, earshot set `HF_HUB_OFFLINE` / `TRANSFORMERS_OFFLINE` once a model's cache folder existed, cleared
+  them and downloaded again after any failed local load (a damaged cache, a transformers mismatch, a typo in
+  `EARSHOT_CLAP`), and fetched whatever each repo's main held, for CLAP a pickle. Now (`earshot/models/hub.py`):
+  - `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` mean the same as `EARSHOT_OFFLINE=1`: no download, a clear error
+    naming the flag when a model is not cached. earshot never sets or clears any of them.
+  - Models load from a complete local snapshot folder only (transformers gets a folder, not a repo id), so a cached
+    load never contacts the Hub (no update checks, no safetensors conversion requests). A failed load is an error
+    that names the folder; the only download is for files that are not in the cache.
+  - Pinned revisions with safetensors weights: CLAP `16c8cc3` (the Hub's safetensors conversion of main `ada0c23`),
+    AST `f826b80`; overrides `EARSHOT_CLAP_REVISION` / `EARSHOT_AST_REVISION`. A cache made before 0.2.1 (CLAP
+    `ada0c23`, `pytorch_model.bin`, the same tensors) keeps working from the cache, without a forced 776 MB download.
+  - `earshot doctor` reports, per model, the pinned revision, what the cache holds (cached / legacy / incomplete /
+    missing), the folder that loads and the offline flag; `--load` adds the revision and weights file that loaded.
+    The first download is ~1.1 GB (the docs said 1.4 GB).
+  - `EARSHOT_CLAP` / `EARSHOT_AST` may still name a local model folder (`config.json` plus `model.safetensors`, or an
+    older checkpoint's `pytorch_model.bin`): it loads from disk as it is, with no network and no revision, has its own
+    embedding caches, and earshot never downloads into it (an incomplete folder is an error naming what is missing).
+  - A custom Hub model downloads its top-level config, tokenizer and safetensors files by name; the old `*.json` /
+    `*.safetensors` globs also matched every subfolder and weight variant of a repo.
+- **The optional Gemini critique no longer treats synthesized sound as a defect by itself** (#1). Its rubric set
+  "real recorded foley" as the bar and scored "obviously cheap or synthetic"; it now judges each sound by whether it
+  fits the film and is well made, counts synthesis as a flaw only where a sound should read as recorded, and
+  `earshot llm --synth-intended` (MCP `synth_intended`) tells the model that synthesized sound is the point.
+
+### Added
+
+- `earshot doctor --fetch`: download the pinned model files that are not in the cache (also upgrades a legacy CLAP
+  cache to the pinned safetensors).
+
+### Changed
+
+- A custom model (`EARSHOT_CLAP` / `EARSHOT_AST`) or another revision keeps its embedding caches per commit, so they
+  never mix with the pinned model's; the default models keep their existing caches.
+
 ## 0.2.0 - 2026-10-16
 
 forge v2 and `earshot fit`.

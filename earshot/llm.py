@@ -45,32 +45,40 @@ RETRY_WAIT = (4, 12)
 KEY_URL = 'https://aistudio.google.com/apikey'
 
 RUBRIC = """You are a senior re-recording mixer and sound supervisor reviewing the soundtrack of a short product launch
-film (or one stem of it). The bar is a premium launch film from a top studio: real recorded foley and ambience, music
-that is produced and mixed, sounds that land exactly on picture events, a clean, controlled master that is loud but
-not crushed. Listen to the whole clip. Be specific and blunt; praise only what is genuinely good.
+film (or one stem of it). The bar is a premium launch film from a top studio: every sound crafted and intentional,
+music that is produced and mixed, sounds that land exactly on picture events, a clean, controlled master that is loud
+but not crushed. Effects may be recorded foley or designed / synthesized on purpose: judge each by whether it fits the
+film and is well made, not by how it was made. Listen to the whole clip. Be specific and blunt; praise only what is
+genuinely good.
 
 Judge:
 1. sync: do hits, whooshes and accents land where they seem to belong? You cannot see the picture: use the picture
    cut / cue times in the context if given, otherwise judge rhythmic tightness and whether sounds feel late, early or
    smeared. Use null for the sync score when there is nothing to judge it against.
-2. realism: which sounds are real recordings and which sound code-synthesized, stock-cheesy or generic (pure sine
+2. realism: which sounds read as real recordings and which as code-synthesized, stock-cheesy or generic (pure sine
    beeps, plain filtered-noise whooshes, chiptune blips, preset risers, the identical sample machine-gunned)?
+   Synthesis is a flaw only where a sound is meant to read as recorded. If the context or the editor's question says
+   the film uses synthesized or procedural sound on purpose, judge those sounds as designed sound (clean, crafted,
+   fitting the picture) and do not count synthesis itself as a flaw.
 3. mix balance: music vs effects vs ambience, masking, elements too loud or buried, low-end mud, harsh 2-5 kHz
    (the clip is a mono reduction: do not judge stereo width).
 4. loudness and dynamics: use the measured numbers in the context, never guess numbers; squashed, too quiet, peaky,
    pumping, clipped?
 5. what is cheap: the moments that would make a professional wince.
-6. concrete fixes, each tied to a time range and saying exactly what to change (for example: replace the beep with a
-   recorded UI tap, -4 dB on the music under 12.0-15.0, move the hit 80 ms earlier, high-pass the pad at 150 Hz).
+6. concrete fixes, each tied to a time range and saying exactly what to change (for example: soften the harsh beep
+   or swap it for a gentler tap that suits the film, -4 dB on the music under 12.0-15.0, move the hit 80 ms earlier,
+   high-pass the pad at 150 Hz).
 
 Scores 1-10: 10 = indistinguishable from the premium reference, 7 = good professional work with small flaws,
-5 = competent amateur, 3 = obviously cheap or synthetic, 1 = broken.
+5 = competent amateur, 3 = obviously cheap, 1 = broken. realism rates how convincing and well made the sounds are for
+what the film intends (recorded, or designed on purpose), not whether they were recorded.
 Times are seconds from the start of THIS clip, as numbers (12.4, not "0:12"). Reply with ONLY this JSON object:
 {"overall": {"score": <1-10>, "verdict": "<one sentence>"},
  "scores": {"sync": <1-10 or null>, "realism": <1-10>, "mix_balance": <1-10>, "loudness": <1-10>,
             "music": <1-10 or null when there is no music>},
  "notes": {"sync": "", "realism": "", "mix_balance": "", "loudness": "", "music": ""},
- "synthetic_or_cheap": [{"start": <s>, "end": <s>, "what": "<the sound>", "why": "<what gives it away>"}],
+ "synthetic_or_cheap": [{"start": <s>, "end": <s>, "what": "<the sound>",
+                         "why": "<what gives it away: cheap, generic, or synthetic where it should read as recorded>"}],
  "issues": [{"start": <s>, "end": <s>, "severity": "high|medium|low",
              "category": "sync|realism|mix|loudness|music|noise|edit", "problem": "", "fix": ""}],
  "strengths": [""],
@@ -292,11 +300,17 @@ def context(path, clip, video=None, with_timeline=False, cuts=True):
     return '\n'.join(lines), notes
 
 
-def build_prompt(ctx_text, question=None):
+SYNTH_INTENT = ('Intent: this film uses synthesized / procedural sound on purpose. Judge those sounds as designed '
+                'sound; list a sound under synthetic_or_cheap only when it is cheap, harsh, generic or badly made, '
+                'never only because it is synthesized.')
+
+
+def build_prompt(ctx_text, question=None, synth_intended=False):
     rubric = RUBRIC % (',\n "answer": "<direct answer to the editor\'s question>"' if question else '')
     q = (f'\n\nThe editor\'s specific question (answer it in "answer"; still fill the rest):\n{question}'
          if question else '')
-    return f'{rubric}\n\nContext:\n{ctx_text}{q}'
+    intent = f'\n{SYNTH_INTENT}' if synth_intended else ''
+    return f'{rubric}\n\nContext:\n{ctx_text}{intent}{q}'
 
 
 def parse_json(text):
@@ -437,8 +451,10 @@ def _off(path, provider, why, steps):
 
 
 def critique(path, prompt=None, provider='gemini', model=None, consent=False, video=None, with_timeline=False,
-             start=None, end=None, max_seconds=600.0, cuts=True):
-    """audio-LLM critique of a soundtrack against the film-sound rubric (only with an API key AND consent)"""
+             start=None, end=None, max_seconds=600.0, cuts=True, synth_intended=False):
+    """audio-LLM critique of a soundtrack against the film-sound rubric (only with an API key AND consent).
+    synth_intended=True tells the model that synthesized / procedural sound is the point of this film, so synthesis
+    itself is not counted as a flaw (the rubric also says so when the editor's question mentions it)"""
     if provider not in PROVIDERS:
         raise ValueError(f'unknown provider {provider!r}; available: {", ".join(PROVIDERS)}')
     if not os.path.isfile(path):
@@ -464,7 +480,7 @@ def critique(path, prompt=None, provider='gemini', model=None, consent=False, vi
     try:
         data, mime, clip = encode(path, start, end, max_seconds)
         ctx_text, notes = context(path, clip, video, with_timeline, cuts)
-        out = pv.generate(data, mime, build_prompt(ctx_text, prompt), m, key)
+        out = pv.generate(data, mime, build_prompt(ctx_text, prompt, synth_intended), m, key)
     except Exception as e:  # noqa: BLE001 - any failure becomes a readable result, never a traceback with the key
         msg = _scrub(_msg(e), key)
         return {'enabled': True, 'ok': False, 'path': path, 'provider': pv.name, 'model': m, 'uploaded': clip,
@@ -512,7 +528,10 @@ def add_cli(sub):
     p.add_argument('--start', type=float, help='send only from here (s)')
     p.add_argument('--end', type=float, help='send only up to here (s)')
     p.add_argument('--max-seconds', type=float, default=600.0, help='trim longer audio to this (default 600)')
+    p.add_argument('--synth-intended', action='store_true',
+                   help='the film uses synthesized / procedural sound on purpose: do not count synthesis as a flaw')
     p.set_defaults(func=lambda a: 0 if emit(critique(a.file, a.prompt, model=a.model, consent=a.yes_upload,
                                                      video=a.video, with_timeline=a.with_timeline, start=a.start,
-                                                     end=a.end, max_seconds=a.max_seconds, cuts=not a.no_cuts),
+                                                     end=a.end, max_seconds=a.max_seconds, cuts=not a.no_cuts,
+                                                     synth_intended=a.synth_intended),
                                             a)['ok'] else 1)

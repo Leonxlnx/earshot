@@ -1,11 +1,13 @@
 # Launch-film sound: the playbook for coding agents
 
 You cannot hear the film you are making. This page tells you what professional launch films do with sound, how to
-build that from real recordings, and how to check your result with earshot until the numbers say it is there.
+build that from real recordings, and how to check your result with earshot until the numbers say it is there. It is
+written for films meant to sound like those references; when synthesized sound is the point of a film, read the
+realness numbers as information, not as defects.
 
 How to read it:
 
-- **[measured]** = measured by earshot on the 7 professional launch films the user chose as the quality bar (modern
+- **[measured]** = measured by earshot on the 7 professional launch films the author chose as the quality bar (modern
   SaaS / AI product launches and motion reels, web-delivered MP4s with 128 kbps AAC audio). Numbers come from
   `earshot/data/launch_profile.json`; the commands and the leave-one-out check are in `eval/launch/RESULTS.md`.
   Seven films are a small sample: treat the numbers as "what pros did here", not as laws.

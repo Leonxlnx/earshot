@@ -2,8 +2,8 @@
 
 The rules the designers, critics and fixer work from. Numbers marked *(norm)* are measured norms of top-tier launch
 films (from the Cinetic skill's measurements, `references/sound.md` §13 there); the rest is practice that held up on
-shipped films. The earshot repo's `docs/launch-video-sound.md` profiles the user's own reference films in depth; use it
-for the targets of a specific film, this file stands alone for the craft.
+shipped films. The earshot repo's `docs/launch-video-sound.md` profiles 7 professional reference launch films in depth
+(earshot's bundled launch profile); use it for the targets of a specific film, this file stands alone for the craft.
 
 ## 1. The bar
 
@@ -114,7 +114,7 @@ for the targets of a specific film, this file stands alone for the craft.
 - Reject: clipped, low-bitrate (a cliff above 16 kHz), roomy foley, anything with voices or bumps inside the window you
   need, anything whose licence you cannot read on its own page.
 
-## 10. The cheap tells (what made the user call a soundtrack "random ass sounds")
+## 10. The cheap tells (what makes a soundtrack sound like random stock effects)
 
 Code-synthesized beeps, sine pings and noise sweeps; one sample machine-gunned; a whoosh on every cut; a boom on every
 logo; sparkle / shimmer sweeps standing in for "magic"; reverb on tiny sounds; random pitch on typing; partial

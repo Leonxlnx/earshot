@@ -216,11 +216,13 @@ _HOLD = {}
 
 
 def holdout_key(mono):
-    """cache key of one sound for Critic.holdout: sha1 of its mono float32 samples + the AudioSet model id"""
+    """cache key of one sound for Critic.holdout: sha1 of its mono float32 samples + the AudioSet model's cache name
+    (org--name for the pinned model, so existing caches stay valid; a revision or a local folder gets its own)"""
     import hashlib
     from .. import config
+    from ..models import hub
     m = np.ascontiguousarray(mono, np.float32)
-    return config.AST_MODEL.replace('/', '--') + '/' + hashlib.sha1(m.tobytes()).hexdigest()
+    return hub.cache_name(config.AST_MODEL, config.AST_REVISION) + '/' + hashlib.sha1(m.tobytes()).hexdigest()
 
 
 def _holdout_dir():

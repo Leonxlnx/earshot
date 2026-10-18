@@ -198,13 +198,28 @@ python -m venv .venv
 .venv/bin/python -m earshot doctor --load
 ```
 
-The first model use downloads two open models (~1.4 GB) into `.cache/hf` inside the repo (or `EARSHOT_HOME`): CLAP
-`laion/larger_clap_general` (text-audio embeddings) and the AudioSet tagger `MIT/ast-finetuned-audioset-10-10-0.4593`.
-After that earshot works offline.
+The first model use downloads two open models (~1.1 GB) into `.cache/hf` inside the repo (or `EARSHOT_HOME`), each at
+a pinned revision with safetensors weights: CLAP `laion/larger_clap_general` @ `16c8cc3` (text-audio embeddings; the
+Hub's safetensors conversion of its main revision) and the AudioSet tagger `MIT/ast-finetuned-audioset-10-10-0.4593`
+@ `f826b80`. `earshot doctor --fetch` downloads them up front. After that earshot loads them from that cache only and
+never contacts the Hub; a damaged cache is an error that names the folder, not a silent new download.
+
+Offline: `EARSHOT_OFFLINE=1`, `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` all mean the same to earshot: it never
+downloads, and a model missing from the cache is an error that says so. earshot never sets or clears these variables.
+
+A cache made before 0.2.1 holds CLAP's main revision `ada0c23`, whose only weights are a pickle (`pytorch_model.bin`,
+the same tensors). earshot still loads it from the cache (torch `weights_only`), never downloads it, and `earshot
+doctor` says so; `earshot doctor --fetch` downloads the pinned safetensors (776 MB), used from then on.
 
 Settings (environment variables): `EARSHOT_THREADS` (torch CPU threads, default min(4, cores/2)), `EARSHOT_HOME`
 (cache root), `EARSHOT_PRECISION` (`bf16` by default, used only on CPUs with native bf16 such as AVX512-BF16 / AMX,
-fp32 everywhere else; `fp32` forces fp32), `EARSHOT_OFFLINE=1`. `earshot doctor --load` reports what is in use.
+fp32 everywhere else; `fp32` forces fp32), `EARSHOT_OFFLINE=1` (above), `EARSHOT_CLAP` / `EARSHOT_AST` (another
+Hub model id, or a local model folder with `config.json` and `model.safetensors`, which loads from disk as it is with
+no network and is never downloaded into) and `EARSHOT_CLAP_REVISION` / `EARSHOT_AST_REVISION` (another Hub revision;
+safetensors weights only). A custom Hub model downloads its top-level config, tokenizer and safetensors files by name,
+never a repo's subfolders or weight variants.
+`earshot doctor` reports the revisions and what the cache holds; `--load` also what loads (revision, weights,
+precision).
 
 ### MCP server for Claude Code
 

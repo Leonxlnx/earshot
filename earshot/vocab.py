@@ -73,7 +73,9 @@ def _clap():
 
 
 def _cache_dir():
-    d = os.path.join(config.EMB_CACHE, 'semantics', config.CLAP_MODEL.replace('/', '--') + '--' + config.PRECISION)
+    from .models import hub   # filesystem only: another CLAP revision or a local folder gets its own cache
+    d = os.path.join(config.EMB_CACHE, 'semantics',
+                     hub.cache_name(config.CLAP_MODEL, config.CLAP_REVISION) + '--' + config.PRECISION)
     os.makedirs(d, exist_ok=True)
     return d
 
