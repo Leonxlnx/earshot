@@ -31,7 +31,9 @@ kind='auto' (fit):
   3. each candidate is rendered (seed 0) and scored against the original (quality.score: mel dB, tone, envelope,
      onset, excess / missing energy, + CLAP with clap=True); the lowest score wins. Hybrids reuse the single-kind
      fits as their first layer. The model gets a 'fit_engine' entry: the character, every candidate's metrics, the
-     choice.
+     choice. seeds=TAKE_SEEDS (`earshot fit --takes`) scores the mean over seeds 0, 1, 2 instead: a candidate with
+     noise in it can win on one lucky seed-0 draw and then make weaker takes (on 10 of the 12 validation fits the
+     chosen candidate's seed-0 score sat 0.1-2.4 under its mean over seeds 0-7).
 Pure numpy / scipy (CLAP only with clap=True). Deterministic: render(model, seed, knobs) is a pure function.
 """
 import copy
@@ -43,6 +45,8 @@ import numpy as np
 from . import quality as Q
 
 SR = 48000
+TAKE_DC_HZ = 8.0          # a take (render(take=True)) is high-passed here: no DC offset, no infrasound
+TAKE_SEEDS = (0, 1, 2)    # fit(seeds=TAKE_SEEDS): score candidates on these seeds (a fit meant to make takes)
 KINDS = ('modal', 'spectral', 'sines', 'hybrid')
 ROLE = {'sines': 'tone', 'modal': 'body', 'spectral': 'air'}
 HYBRIDS = {'modal+spectral': ('modal', 'spectral'), 'sines+spectral': ('sines', 'spectral'),
@@ -521,8 +525,8 @@ def fit(x, kind='auto', layers=None, candidates=None, clap=False, fast=False, se
         collect=None, post=True):
     """a model of x (path or 48 kHz array). kind: 'auto' | 'modal' | 'sines' | 'spectral' | 'hybrid' (layers=
     ('modal', 'spectral') by default). auto: candidates (default plan(character(x))) are all fitted, rendered with
-    `seeds` and scored (quality.score; clap=True adds CLAP), the best is returned with a 'fit_engine' entry.
-    collect: a dict that receives every candidate's model ({candidate: model})"""
+    `seeds` and scored (quality.score; clap=True adds CLAP; the mean over seeds), the best is returned with a
+    'fit_engine' entry. collect: a dict that receives every candidate's model ({candidate: model})"""
     import os
     if name is None and isinstance(x, (str, os.PathLike)):
         name = os.path.basename(str(x))
@@ -541,6 +545,7 @@ def fit(x, kind='auto', layers=None, candidates=None, clap=False, fast=False, se
     cands = list(candidates or plan(c))
     base, rows, best = {}, [], None
     clap_e = None
+    seeds = tuple(int(s) for s in seeds) or (0,)
     if clap:
         clap_e = Q.clap_embed([X])[0]
     for cand in cands:
@@ -559,11 +564,12 @@ def fit(x, kind='auto', layers=None, candidates=None, clap=False, fast=False, se
         if post:
             r0 = [render(m, seed=s) for s in (0, 1)]
             m['post'] = fit_post(X, r0)
-        for s in seeds:
-            y = render(m, seed=s)
+        ys = [render(m, seed=s) for s in seeds]
+        E = Q.clap_embed(ys) if clap_e is not None else None
+        for i, y in enumerate(ys):
             q = Q.quality(X, y)
-            if clap_e is not None:
-                q['clap_cos'] = round(float(clap_e @ Q.clap_embed([y])[0]), 4)
+            if E is not None:
+                q['clap_cos'] = round(float(clap_e @ E[i]), 4)
             qs.append(q)
         sc = float(np.mean([Q.score(q) for q in qs]))
         row = {'candidate': cand, 'score': round(sc, 3), 'fit_s': round(tf, 2), 'quality': qs[0]}
@@ -576,7 +582,7 @@ def fit(x, kind='auto', layers=None, candidates=None, clap=False, fast=False, se
         raise RuntimeError('every fitter failed: ' + '; '.join(r.get('error', '') for r in rows))
     m = best[2]
     m['fit_engine'] = {'kind': 'auto', 'chosen': best[1], 'character': c, 'candidates': rows,
-                       'seconds': round(time.time() - t0, 2)}
+                       'seeds': list(seeds), 'seconds': round(time.time() - t0, 2)}
     return m
 
 
@@ -589,7 +595,7 @@ def _layer_render(m, seed, two, **kn):
     elif k == 'modal':
         y = F['modal'].render(m, seed, **kn)
     else:
-        y = np.asarray(F['spectral'].render(m, seed, **kn), np.float64)
+        y = np.asarray(F['spectral'].render(m, seed, limit=False, steady=False, **kn), np.float64)
     y = np.asarray(y, np.float64)
     if y.ndim == 1:
         y = y[:, None]
@@ -601,8 +607,9 @@ def _layer_render(m, seed, two, **kn):
 
 
 def _render_hybrid(model, seed=0, pitch=0.0, decay=1.0, bright=0.0, vary=0.0, width=1.0, tone_db=0.0,
-                   body_db=0.0, air_db=0.0, stereo=None):
+                   body_db=0.0, air_db=0.0, stereo=None, ring=None):
     two = (model.get('channels', 1) == 2) if stereo is None else bool(stereo)
+    ring = vary > 0 if ring is None else bool(ring)
     gains = {'tone': tone_db, 'body': body_db, 'air': air_db}
     ys = []
     for i, L in enumerate(model['layers']):
@@ -610,11 +617,11 @@ def _render_hybrid(model, seed=0, pitch=0.0, decay=1.0, bright=0.0, vary=0.0, wi
         k = kind_of(m)
         s = (int(seed) * 7 + 101 * (i + 1)) & 0x7FFFFFFF
         if k == 'sines':
-            kn = {'transpose': pitch, 'decay': decay, 'brightness': bright, 'vary': vary}
+            kn = {'transpose': pitch, 'decay': decay, 'brightness': bright, 'vary': vary, 'ring': ring}
         elif k == 'modal':
             size = 2.0 ** (-pitch / 12.0)
             kn = {'size': size, 'damping': size / max(decay, 1e-3), 'brightness': bright, 'vary': vary,
-                  'stereo': False if m.get('side') is None else two, 'width': width}
+                  'stereo': False if m.get('side') is None else two, 'width': width, 'ring': ring}
         else:
             kn = {'shift': pitch / 12.0, 'tilt': bright, 'width': width}
         y = _layer_render(m, s, two, **kn) * 10 ** ((float(L.get('gain_db', 0.0)) + gains[L['role']]) / 20)
@@ -633,7 +640,7 @@ def _render_raw(model, seed=0, **knobs):
     if k == 'morph':
         w = knobs.pop('morph', model.get('amount', 0.5))
         return render(morph(model['a'], model['b'], w), seed, **knobs)
-    allowed = set(knobs_of(model)) | {'stereo', 'gain', 'gain_db'}
+    allowed = set(knobs_of(model)) | {'stereo', 'gain', 'gain_db', 'ring'}
     bad = set(knobs) - allowed
     if bad:
         raise ValueError(f'unknown knobs for a {k} model: {sorted(bad)} (known: {sorted(allowed)})')
@@ -654,25 +661,43 @@ def _render_raw(model, seed=0, **knobs):
     else:
         if 'gain' in knobs:
             knobs['gain_db'] = knobs.pop('gain')
-        y = np.asarray(F['spectral'].render(model, seed, **knobs), np.float64)
+        knobs.pop('ring', None)                     # a noise gesture has no ringing modes
+        y = np.asarray(F['spectral'].render(model, seed, limit=False, **knobs), np.float64)
         if not two:
             y = y.mean(1)
     return np.asarray(y, np.float64)
 
 
-def render(model, seed=0, **knobs):
+def render(model, seed=0, take=None, **knobs):
     """the sound of a model (float64, 48 kHz): (n, 2) when the source was stereo, else (n,), through the model's post
     stage (fitted EQ + gain) when it has one. knobs: knobs_of(model) names (identity values re-render the fit);
-    unknown names raise"""
-    y = _render_raw(model, seed, **dict(knobs))
+    unknown names raise.
+    take (not a search knob; default None = True when vary > 0): render a take to use, not the fit to measure.
+    Modes and partials ring out past the recording's length to 60 dB down with a fade instead of stopping where
+    the trimmed recording stopped (modal / sines ring=True), and the result is high-passed at TAKE_DC_HZ (no DC
+    offset, no infrasound: a noise band modulated by its envelope spreads energy down to DC, and a new seed of a
+    fit could carry an offset of 1-2 % of its peak). take=False keeps the recording's length and every bit of its
+    low end: what the fit's quality is measured on (the identity render, seed 0, is that)."""
+    knobs = dict(knobs)
+    take = float(knobs.get('vary') or 0.0) > 0 if take is None else bool(take)
     if kind_of(model) == 'morph':
-        return y
+        w = knobs.pop('morph', model.get('amount', 0.5))
+        return render(morph(model['a'], model['b'], w), seed, take=take, **knobs)
+    knobs.setdefault('ring', take)
+    y = _render_raw(model, seed, **knobs)
     k = kind_of(model)
     scale = float(knobs.get('length', 1.0)) / float(knobs.get('speed', 1.0)) if k == 'spectral' else 1.0
     tail = {'modal': lambda: float(knobs.get('size', 1.0)) / float(knobs.get('damping', 1.0)),
             'sines': lambda: float(knobs.get('stretch', 1.0)) * float(knobs.get('decay', 1.0)),
             'hybrid': lambda: float(knobs.get('decay', 1.0))}.get(k, lambda: 1.0)()
-    return apply_post(y, model.get('post'), scale, tail)
+    y = apply_post(y, model.get('post'), scale, tail)
+    return _dc_block(y) if take else y
+
+
+def _dc_block(y, hz=TAKE_DC_HZ):
+    """a causal 2nd-order Butterworth high-pass (per channel)"""
+    from scipy import signal
+    return signal.sosfilt(signal.butter(2, hz, 'highpass', fs=SR, output='sos'), np.asarray(y, np.float64), axis=0)
 
 
 def identity(model):

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earshot"
-version = "0.2.1"
+version = "0.3.0.dev0"
 description = "Ears for coding agents: describe, match, search, compare, time-align and critique sound files an agent cannot hear."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -57,7 +57,7 @@ earshot = "earshot.cli:main"
 include = ["earshot*"]
 
 [tool.setuptools.package-data]
-earshot = ["data/*.json", "data/*.npz"]
+earshot = ["data/*.json", "data/*.npz", "forge/bank/*.json", "forge/kits/*.json", "forge/seeds/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

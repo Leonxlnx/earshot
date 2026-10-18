@@ -36,9 +36,15 @@ Model (plain JSON-serialisable dict):
      'partials': [{'t0': birth s, 'rise': s, 't1': last breakpoint s, 'rel': release s, 'ph': phase at t0 (rad),
                    'freq': [[t, Hz], ...], 'amp': [[t, dBFS], ...]}, ...]          (strongest first)
      'transients': [{'t': start s, 'atoms': [[f Hz, tau s, amplitude, phase], ...]}, ...]   (one per strike)
-     'residual': {'bands': [Hz centres, 1/3 octave], 'times': [s, ...], 'db': [[dBFS per time] per band]},
+     'residual': {'bands': [Hz centres, 1/3 octave], 'times': [s, ...], 'db': [[dBFS per time] per band],
+                  'hf': [[Hz, dB], ...]},
      'width': side/mid energy of the source in dB (stereo renders), 'analysis': {...}, 'summary': {...}}
 The residual bands are triangles on log frequency that sum to one; a band's dB is the RMS of the band-passed residual.
+The top band (16 kHz) is flat to Nyquist and the lowest (50 Hz) flat to DC. Above 16 kHz the noise follows the
+recording's own roll-off `hf` (its residual's spectrum re 16 kHz, made monotone); models fitted before 0.3 have no
+`hf` and keep the flat top band, which leaves noise above 20 kHz that the recording did not have (hf_rolloff(x)
+measures it for them). The lowest band, modulated by its envelope, spreads energy down to DC: a new seed can carry an
+offset of 1-2 % of its peak; the fit engine's takes (auto.render(take=True)) are DC-blocked for that.
 
 render(model, seed, knobs) knobs (all default to the identity, which re-renders the fit):
     transpose (semitones; every partial and the residual's spectrum move together, relative partials kept),
@@ -48,7 +54,10 @@ render(model, seed, knobs) knobs (all default to the identity, which re-renders 
     transient (gain on the noise in the first 15 ms after each strike), vary (0-1: seeded per-partial detune,
     level and decay jitter, band jitter: new takes of the same object), partials (keep the N strongest),
     inharm (stretch of partial ratios about the lowest strong partial: f/f_low -> (f/f_low)^(1+inharm)),
-    phases ('fit' or 'random'), gain_db, stereo (False: mono; True: (n, 2) with the residual decorrelated by width).
+    phases ('fit' or 'random'), gain_db, stereo (False: mono; True: (n, 2) with the residual decorrelated by width),
+    ring (None: True when vary > 0; True renders until the last partial's release ends, so a decay that vary
+    lengthens is not cut at the recording's length, and fades the residual noise out over RING_FADE_S past the
+    recording's length instead of stopping on it).
 
 Deterministic: render(model, seed, knobs) is a pure function (the noise and every jitter come from `seed`).
 Pure numpy / scipy; no recorded audio is stored in a model, only parameters.
@@ -67,7 +76,9 @@ WINDOWS = (512, 1024, 2048, 4096)
 
 DEFAULT_KNOBS = {'transpose': 0.0, 'stretch': 1.0, 'decay': 1.0, 'brightness': 0.0, 'vibrato': 0.0,
                  'vibrato_rate': 5.5, 'drift': 0.0, 'residual': 1.0, 'transient': 1.0, 'vary': 0.0, 'partials': None,
-                 'inharm': 0.0, 'phases': 'fit', 'gain_db': 0.0, 'stereo': False}
+                 'inharm': 0.0, 'phases': 'fit', 'gain_db': 0.0, 'stereo': False, 'ring': None}
+HF_POINTS = (16000.0, 17000.0, 18000.0, 19000.0, 20000.0, 21000.0, 22000.0, 23000.0, 24000.0)   # the roll-off grid
+RING_FADE_S = 0.06          # ring: the residual noise fades out over this past the recording's length
 
 
 # ================================================================================================ small helpers
@@ -196,13 +207,21 @@ def synth_partials(partials, n, sr=48000, cents=None):
     return y
 
 
-def synth_noise(bands, times, levels, n, seed=0, sr=48000, pad=4096):
+def synth_noise(bands, times, levels, n, seed=0, sr=48000, pad=4096, hf=None):
     """noise shaped by band envelopes: white noise split by band_masks(), each band at unit RMS times its dB envelope
-    (levels[b] at `times`, linear in dB between them)"""
+    (levels[b] at `times`, linear in dB between them). hf ([[Hz, dB], ...]): above its first frequency the masks
+    follow it, a roll-off that takes the energy out (the band's level below it stays as fitted)"""
     r = np.random.default_rng(int(seed) & 0xFFFFFFFF)
     nfft = 1 << int(np.ceil(np.log2(n + 2 * pad)))
     spec = np.fft.rfft(r.standard_normal(nfft))
     masks = band_masks(bands, nfft, sr)
+    keep = np.ones(len(masks))
+    if hf:
+        f = np.fft.rfftfreq(nfft, 1.0 / sr)
+        h = np.asarray(hf, float)
+        shaped = masks * np.where(f > h[0, 0], 10.0 ** (np.interp(f, h[:, 0], h[:, 1]) / 20.0), 1.0)
+        keep = np.sqrt((shaped ** 2).sum(1) / np.maximum((masks ** 2).sum(1), 1e-30))
+        masks = shaped
     t = np.arange(n) / sr
     y = np.zeros(n)
     for b in range(len(bands)):
@@ -210,9 +229,27 @@ def synth_noise(bands, times, levels, n, seed=0, sr=48000, pad=4096):
         if lv.max() < -140:
             continue
         u = np.fft.irfft(spec * masks[b], nfft)[pad:pad + n]
-        u /= np.sqrt(np.mean(u ** 2)) + 1e-20
+        u *= keep[b] / (np.sqrt(np.mean(u ** 2)) + 1e-20)
         y += u * 10.0 ** (np.interp(t, times, lv) / 20.0)
     return y
+
+
+def hf_rolloff(x, sr=48000, points=(16000.0, 17000.0, 18000.0, 19000.0, 20000.0, 21000.0, 22000.0, 23000.0,
+                                    24000.0)):
+    """a recording's (or a residual's) roll-off above points[0]: [[Hz, dB re points[0]], ...] from its long-term
+    spectrum (1/6-octave means), made monotone (a partial up there does not lift the noise), floored at -80 dB"""
+    m = np.asarray(x, float)
+    m = m.mean(1) if m.ndim == 2 else m
+    nper = int(min(4096, 1 << int(np.floor(np.log2(max(len(m), 256))))))
+    f, P = signal.welch(m, sr, nperseg=nper)
+    out, run, ref = [], 0.0, None
+    for p in points:
+        k = (f >= p * 2 ** (-1 / 12)) & (f <= min(p * 2 ** (1 / 12), sr / 2))
+        v = 10 * np.log10(float(np.mean(P[k])) + 1e-30) if k.any() else -300.0
+        ref = v if ref is None else ref
+        run = min(run, v - ref)
+        out.append([float(p), round(max(run, -80.0), 1)])
+    return out
 
 
 def synth_atoms(transients, n, sr=48000):
@@ -833,6 +870,7 @@ def _analyze(x, sr, W, onsets, width, opts):
     res2 = res - synth_atoms(trans, len(x), sr)
     centers = _band_centers()
     resid = _residual_model(res2, sr, centers, floor_db=peak_db - opts['res_range_db'], onsets=onsets)
+    resid['hf'] = hf_rolloff(res2, sr, HF_POINTS)
     e_x = float((x ** 2).sum()) + 1e-20
     model = {'kind': KIND, 'version': VERSION, 'sr': SR, 'duration': round(len(x) / sr, 5),
              'onset': round(onsets[0]['t'], 5) if onsets else 0.0,
@@ -1031,7 +1069,14 @@ def render(model, seed=0, knobs=None, **kw):
             lev = lev + 20 * np.log10(max(float(k['residual']), 1e-6))
         lev = np.where(np.asarray(res['db'], float) <= -149, -150.0, lev)
     ends = [p['t1'] + p['rel'] for p in new] + [float(T(model['duration']))]
-    n = int(np.ceil(max(ends) * sr)) + 1 if (d_ > 1.0 or s_ != 1.0) else int(round(model['duration'] * sr))
+    ring = vary > 0 if k['ring'] is None else bool(k['ring'])
+    n_id = int(round(model['duration'] * sr))
+    n = int(np.ceil(max(ends) * sr)) + 1 if (d_ > 1.0 or s_ != 1.0 or ring) else n_id
+    if ring and len(times):          # the noise fades out over RING_FADE_S past the recording's length (linear in dB)
+        t_end = max(float(times[-1]), float(T(model['duration'])))
+        n = max(n, int(np.ceil((t_end + RING_FADE_S) * sr)) + 1)
+        times = np.append(times, t_end + RING_FADE_S)
+        lev = np.column_stack([lev, np.full(len(lev), -150.0)])
     cents = None
     if k['vibrato'] or k['drift']:
         tt = np.arange(n) / sr
@@ -1048,7 +1093,8 @@ def render(model, seed=0, knobs=None, **kw):
                                               * np.log2(max(f * ratio, 20.0) / f_ref)) / 20), ph]
                             for f, tau, a, ph in tr['atoms']]} for tr in trans]
     y = y + synth_atoms(trans, n, sr)
-    noise = synth_noise(bands, times, lev, n, seed, sr) if len(bands) else np.zeros(n)
+    hf = res.get('hf')
+    noise = synth_noise(bands, times, lev, n, seed, sr, hf=hf) if len(bands) else np.zeros(n)
     if k['transient'] != 1.0:
         tt = np.arange(n) / sr
         w = np.zeros(n)
@@ -1060,7 +1106,7 @@ def render(model, seed=0, knobs=None, **kw):
     if k['gain_db']:
         y = y * 10 ** (float(k['gain_db']) / 20)
     if k['stereo']:
-        side = synth_noise(bands, times, lev, n, seed + 1000003, sr) * 10 ** (model.get('width', -120.0) / 20)
+        side = synth_noise(bands, times, lev, n, seed + 1000003, sr, hf=hf) * 10 ** (model.get('width', -120.0) / 20)
         side *= 10 ** (float(k['gain_db']) / 20)
         return np.column_stack([y + side, y - side])
     return y
@@ -1100,6 +1146,8 @@ def to_code(model, name='sound'):
         lines.append(f"    ({tr['t']}, {_lit(tr['atoms'])}),")
     lines.append(']')
     lines.append(f"BANDS = {_lit(res['bands'])}")
+    lines.append(f"HF = {_lit(res['hf']) if res.get('hf') else None}   # the noise above 16 kHz: the recording's "
+                 "roll-off [Hz, dB] (None: flat, a model fitted before 0.3)")
     lines.append(f"TIMES = {_lit(res['times'])}")
     lines.append('LEVELS = [')
     for row in res['db']:
@@ -1117,7 +1165,7 @@ def to_code(model, name='sound'):
               '             for p in PARTIALS]',
               "    trans = [{'t': t, 'atoms': a} for t, a in TRANSIENTS]",
               '    return (synth_partials(parts, n, SR) + synth_atoms(trans, n, SR)',
-              '            + synth_noise(BANDS, TIMES, LEVELS, n, seed, SR))',
+              '            + synth_noise(BANDS, TIMES, LEVELS, n, seed, SR, hf=HF))',
               '',
               '',
               "if __name__ == '__main__':",

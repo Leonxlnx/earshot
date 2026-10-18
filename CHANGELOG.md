@@ -1,5 +1,95 @@
 # Changelog
 
+## 0.3.0 - unreleased (0.3.0.dev0)
+
+The sound engine of a film: the forge's delivered sounds as a bank, one-sound renders aimed at the picture, a
+model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md).
+
+### Added
+
+- **The sound bank** (`earshot/forge/bank.py`, `earshot/forge/bank/*.json`, shipped as package data): the 183 forge
+  v2 finals as their schema-2 render blocks at full precision (`forge_v2r6`), plus three tuned kalimba voices from the
+  launch film (`pluck1`). Ids are `<category>/<member>`, `pluck/<name>` and `fit/<role>/<name>`; categories are the
+  public names (no recipe module names needed). `python -m earshot.forge.bank build out/forge_v2/*/final -o ...`
+  refuses any pick whose block does not re-render its WAV (183 of 183 within 1.2e-7); each entry stores its measured
+  onset, peak, end, attack, centroid, loudness and a 50 ms envelope fingerprint, and `bank check` re-renders against
+  it (length exact, peak within 5 ms, envelope within 0.5 dB). Rendering needs numpy / scipy only.
+- **Knobs** (`earshot/forge/knobs.py`): `dur` (exact: the whoosh family scales its pass, length keys are searched by
+  secant, then the file is faded or padded to the sample), `apex` (whoosh family: closed form, up to two measured
+  corrections, then the peak is placed by trimming the quiet approach or padding silence: within 2.5 ms on every
+  tested target), `pitch` (a note name or Hz into each recipe's own pitch parameter, co-scaling the parameters of the
+  same body, inside the parameter's designed range; noise sounds refuse it with the reason), `weight` / `peak_db`.
+- **`earshot sfx list / render / check`** and the audit (`earshot/forge/sfx.py`): polish's artifact detectors as
+  warnings with context (gated categories may stop on their peak), a rising pitch-glide detector (a tonal sound
+  climbing more than 4 semitones over 50 ms or more) and, for hits, a stacked-attack / pre-swell heuristic. Every bank
+  render runs it.
+- **`earshot kit init / render / check / audition`** (`earshot/forge/kit.py`): kit.json (schema 1) names one bank
+  sound per role; `render` writes deterministic, cached takes and `kit.lock.json` with each take's measured onset /
+  peak / end / loudness; a take that fails the audit is re-rolled on a new seed. Presets `calm`, `crisp`, `minimal`
+  (`earshot/forge/kits/`) with a reason per role; riser, swell and suck off in all three.
+- **`python -m earshot.forge.bank add-fit MODEL.json --id fit/<role>/<name> --source SOURCE.json`**: a fitted recipe
+  as a bank entry with its source (CC0 / public domain unless `--allow-license`; NC / ND refused), rendered through
+  `earshot.forge.fit`, tunable when the fit is tonal. Extra bank files load from `EARSHOT_BANK`.
+- **Python API** `earshot.api.sfx_list / sfx_render / sfx_check / kit_init / kit_render / kit_check / kit_audition`;
+  **MCP tools** `sfx_list`, `sfx_render`, `kit_render` (16 tools in all).
+- **Fitted sounds in the bank** (`earshot/forge/bank/fit.json`, `fit1`; `bank.VERSION` is now
+  `forge_v2r6+fit1+pluck1`): 15 recipes fitted from CC0 recordings on Freesound, `fit/<role>/<name>`, each with its
+  source (title, author, URL, licence) and the take-to-take `vary` at which its takes passed the take check (seeds
+  0-4 as the bank renders them: no hard artifact beyond the recording's, every audit warning also on the recording,
+  CLAP >= 0.90 to the fit's own render and within 0.06 of the fit's CLAP to the recording, excess energy within
+  1.5 dB, loudness spread <= 2 LU), at a fit grade of high. Credits: `docs/CREDITS_FIT.md` (CC0 needs none).
+- **Fit takes** (`earshot/forge/fit`, details in [docs/FIT.md](docs/FIT.md#takes-a-fit-rendered-for-use-03)):
+  `fit.render(model, seed, vary=v)` with `vary > 0`, or `take=True`, renders a take. Modal modes and sines partials
+  ring out past the trimmed recording's end instead of stopping on a ringing tail (13 of 46 CC0 fits had cut tails in
+  their takes), takes are high-passed at 8 Hz (no random DC offset), a spectral model's takes keep one loudness
+  (a cloth whoosh's 8 seeds: 7.3 -> 0.45 LU apart), and a sines residual follows the recording's roll-off above 16 kHz
+  (`residual.hf`; no more noise above 20 kHz the recording lacked). `earshot fit --takes` scores candidates on seeds
+  0, 1, 2. The fit itself is unchanged: on the 12 validation refs every seed-0 and seed-averaged quality number is
+  the same as in 0.2.
+- `earshot doctor` reports the sound bank: its version, the files it loaded and how many sounds of each type.
+- Docs: `docs/SFX.md`; README "Sound for films"; `docs/INTEGRATION.md` "cinetic uses earshot"; the earshot skill's
+  Loop 5 "make a film's sound kit"; `docs/FIT.md` "Takes"; `docs/CREDITS_FIT.md`.
+- Tests: `tests/test_bank.py`, `tests/test_sfx_kit.py`, `tests/test_fit_takes.py` (no models).
+
+### Changed
+
+- Wheels now ship the forge seed banks (`earshot/forge/seeds/*.json`) next to the bank and kit presets; before, a
+  non-editable install had none.
+- **Presets use the fitted sounds where the measured comparison favours them** (earshot match of the role's
+  description, also against synth-blip descriptions, and earshot realness): calm tick, pop, short whoosh, space bar,
+  click and snap; crisp tick, light touch, text, click, snap, key and space bar; minimal light touch, text and snap
+  (16 role changes). A changed role keeps its loudness (`level_db` moved by the measured difference at the same
+  peak). Every note now says what the sound is and what was measured; no note cites a listening test. All takes of
+  the three presets pass `earshot kit check` (64, 64 and 63 takes).
+- **The presets' bell spans two octaves of one pentatonic** (calm, crisp: kalimba G4-E6; minimal: the ding A5-G7; 10
+  notes each), so a climbing progress motif has a rung for every step; calm's tonal text holds the five pentatonic
+  degrees of one octave (C5 D5 E5 G5 A5), so a chain of fragments can step through the chord's tones. crisp and
+  minimal keep an untuned soft tap for text.
+
+### Fixed (review before release)
+
+- **apex with a short tail**: the fade that fits a whoosh to `dur` covered an apex 0.03-0.1 s before the end, so the
+  delivered peak came 8-189 ms early while `edits['apex']` (measured before that fit) said ok. The fade now starts at
+  least 5 ms after the apex, candidates are ranked on apex plus tail error, the peak is placed in whole 1 ms steps of
+  its measure, and `edits['apex']` is measured on the delivered file: 59 whoosh-family targets with 0.1-0.12 s tails
+  land within 2.5 ms.
+- **`kit check` refuses what `kit render` cannot use**, with the same checks (`knobs.validate`, `bank.level`): a null
+  or non-numeric `level_db`, `max_s` under 0.01 s (a silent take), `peak_db` / `weight` over 0 dBFS, knob values and
+  pitches the sound cannot take, a bad `sr`, and take files that would collide (two spellings of one pitch, or names
+  that differ only in case). Pitch labels are canonical (`C#5`, `Db5`, 554.37 Hz -> `Cs5`).
+- `knobs.midi` accepts `s` sharps (`Cs5`), the spelling of take file names and of cinetic's kit.py.
+- The audit flags **silence** (`silent`: a peak under -60 dBFS or less than 5 ms within 40 dB of it).
+- `bank.render` / `earshot sfx render` refuse a peak over 0 dBFS and sample rates other than 44100 / 48000 / 88200 /
+  96000 (the CLI wrote clipped WAVs).
+- **Click and toggle pitch**: their `pitch` parameter is the tink centre, not the partial heard (click/soft +291
+  cents), so `--pitch C7` landed 362 cents off with no warning. Their note is now the measured partial (`meta.pitch_hz`
+  in the bank; no pitch knob where there is no clear partial), a target is landed by measurement, every measured pitch
+  edit reports `ok` (within 50 cents), and a miss adds a `pitch_off` warning to the take's checks.
+- `EARSHOT_BANK`: the docstring gives `os.pathsep` as the separator, and a missing or unreadable file is a readable
+  error naming it instead of a traceback.
+- The README and docs/SFX.md agree on the blind test: no v2 score is published; the README's test is the v1 one (one
+  listener, the author, 15 trials).
+
 ## 0.2.1 - 2026-10-17
 
 Two fixes from a careful outside review (thanks, @markblundeberg).

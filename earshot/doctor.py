@@ -3,7 +3,8 @@
     earshot doctor [--load] [--fetch] [--json]
 
 Without --load it imports nothing heavy (a few seconds). It reports, per model, the pinned revision, what the cache
-holds (cached / legacy / incomplete / missing) and the folder that loads, and whether an offline flag is set. --load
+holds (cached / legacy / incomplete / missing) and the folder that loads, whether an offline flag is set, and the
+sound bank (earshot sfx / kit: its version, the files it loads and how many sounds of each type). --load
 also loads both models, times one embedding (first load can take ~20-40 s) and reports the revision, weights file and
 precision in use (bf16 only on CPUs with native bf16, else fp32). --fetch downloads the pinned files that are not in
 the cache yet (~1.1 GB the first time; refused while an offline flag is set).
@@ -59,6 +60,28 @@ def fetch():
     return out
 
 
+def bank_info():
+    """the sound bank as loaded (earshot.forge.bank): {'version', 'sounds', 'types': {forge, fit, ...}, 'pluck',
+    'files': [{file, version, entries}], 'extra': EARSHOT_BANK files, 'error'}. Reads the bank files only"""
+    try:
+        from .forge import bank
+        st = bank._load()
+        types, files = {}, {}
+        for i, e in st['entries'].items():
+            t = e.get('type', 'forge')
+            types[t] = types.get(t, 0) + 1
+            f = st['where'][i]
+            files[f] = files.get(f, 0) + 1
+        own = os.path.normcase(os.path.abspath(bank.BANK_DIR))
+        rows = [{'file': os.path.basename(f) if os.path.normcase(os.path.dirname(f)) == own else f, 'entries': n}
+                for f, n in files.items()]
+        return {'version': st['version'], 'sounds': len(st['entries']), 'types': types,
+                'pluck': sum(1 for i in st['entries'] if i.startswith('pluck/')), 'files': rows,
+                'extra': [p for p in (os.environ.get('EARSHOT_BANK') or '').split(os.pathsep) if p.strip()]}
+    except Exception as e:  # noqa: BLE001  (a broken bank file: say so, keep checking the rest)
+        return {'error': f'{type(e).__name__}: {e}'}
+
+
 def _load(r):
     """load both models, time one window each and record what loaded (revision, weights file, precision)"""
     import numpy as np
@@ -109,7 +132,10 @@ def check(load=False, fetch_missing=False):
     data = {f: os.path.exists(os.path.join(config.DATA_DIR, f)) for f in
             ('vocab.json', 'vocab_stats.json', 'realness_model.json', 'launch_profile.json')}
     r['data_files'] = data
+    r['bank'] = bank_info()
     problems = [f'{k}: {v}' for k, v in pk.items() if str(v).startswith('MISSING') and k not in ('mcp', 'requests')]
+    if r['bank'].get('error'):
+        problems.append(f"sound bank: {r['bank']['error']}")
     if 'MISSING' in str(r['ffmpeg']):
         problems.append('ffmpeg missing')
     problems += [f'data file earshot/data/{f} missing' for f, ok in data.items() if not ok]
@@ -138,9 +164,15 @@ def check(load=False, fetch_missing=False):
             _load(r)
         except RuntimeError as e:   # a model that cannot load (offline and not cached, a damaged cache): say why
             problems.append(f'model load failed: {e}')
+    b, head = r['bank'], []
+    if not b.get('error'):
+        ty = b['types']
+        head.append(f"Sound bank {b['version']}: {b['sounds']} sounds ({ty.get('forge', 0) - b['pluck']} forge, "
+                    f"{b['pluck']} plucks, {ty.get('fit', 0)} fitted from CC0 recordings"
+                    + (f"; extra files from EARSHOT_BANK: {', '.join(b['extra'])}" if b['extra'] else '') + ').')
     r['problems'], r['notes'] = problems, notes
-    r['summary'] = ' '.join(['earshot looks healthy.' if not problems else
-                             'Problems: ' + '; '.join(p.rstrip('.') for p in problems) + '.'] + notes)
+    r['summary'] = ' '.join(head + ['earshot looks healthy.' if not problems else
+                                    'Problems: ' + '; '.join(p.rstrip('.') for p in problems) + '.'] + notes)
     return r
 
 

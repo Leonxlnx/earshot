@@ -251,7 +251,9 @@ Weakest:
 
 1. **Listen.** `out/showcase/gallery_embedded.html` for the whole set; the blind test (`out/showcase/blind_v2/`,
    20 trials, chance = 10, 15 or more right has p = 0.021) for the deciding call.
-   Update the README's "Blind test" paragraph (it describes the v1 test: 8 of 15) with the v2 result.
+   When a v2 result exists, publish it in the README's "Blind test" paragraph and in docs/SFX.md "Limits" together,
+   with the number of listeners and trials (today both say that no v2 score is published; the README's paragraph is
+   the v1 test, 8 of 15, one listener).
 2. **No media, no names.** `git ls-files | grep -iE '\.(wav|flac|mp3|ogg|m4a|mp4)$'` returns nothing (checked
    12:10); the pro films appear only as ref_1..ref_8 (the map is `out/refs_pro/films_map.json`, local; at 12:10 no
    tracked file named a film file or its folder).

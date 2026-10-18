@@ -68,9 +68,10 @@ def _write_wav(path, y):
 
 
 def run_fit(path, kind='auto', layers=None, output=None, out_dir=None, render_path=None, report=False, clap=False,
-            describe=False, seed=0, target=None, fast=False, verbose=True, log=print):
+            describe=False, seed=0, target=None, fast=False, verbose=True, log=print, takes=False):
     """the `earshot fit <file>` pipeline as a function: fit, write the recipe / WAV / PNG / model JSON, measure.
-    Returns the result dict (paths, quality, floor, chosen kind, timings)."""
+    takes=True scores the candidates on seeds 0, 1, 2 (auto.TAKE_SEEDS), not seed 0 alone. Returns the result dict
+    (paths, quality, floor, chosen kind, timings)."""
     import time
 
     import numpy as np
@@ -87,7 +88,7 @@ def run_fit(path, kind='auto', layers=None, output=None, out_dir=None, render_pa
     t0 = time.time()
     X = Q.load(path)
     m = auto.fit(X, kind=kind, layers=layers, clap=clap, fast=fast, name=os.path.basename(path),
-                 verbose=verbose and kind == 'auto')
+                 verbose=verbose and kind == 'auto', seeds=auto.TAKE_SEEDS if takes else (0,))
     t_fit = time.time() - t0
     codegen.write_recipe(P['recipe'], m, name=P['name'], source=path, target=target)
     rec = codegen.load_recipe(P['recipe'])
@@ -174,6 +175,8 @@ def add_cli(sub):
     p.add_argument('--target', help='critic description for the recipe (default: from the refset category / sound)')
     p.add_argument('--seed', type=int, default=0)
     p.add_argument('--fast', action='store_true', help='cheaper fitter settings (previews)')
+    p.add_argument('--takes', action='store_true',
+                   help='a fit meant to make takes: score every candidate on seeds 0, 1, 2 (not seed 0 alone)')
     p.add_argument('--morph', nargs=2, metavar=('A', 'B'),
                    help='fit two recordings with one kind and write a morph recipe')
     p.add_argument('--amount', type=float, default=0.5, help='with --morph: 0 = A, 1 = B (default 0.5)')
@@ -216,7 +219,7 @@ def add_cli(sub):
             return 2
         layers = tuple(a.layers.split(',')) if a.layers else None
         r = run_fit(a.file, a.kind, layers, a.output, a.dir, a.render, a.report, a.clap, a.describe, a.seed, a.target,
-                    a.fast, verbose=not a.quiet and not a.json)
+                    a.fast, verbose=not a.quiet and not a.json, takes=a.takes)
         lines = [f"{os.path.basename(a.file)} -> {r['kind']} model" + (f" (auto chose {r['chosen']})"
                                                                       if a.kind == 'auto' else '')
                  + f" in {r['seconds']['fit']:.1f} s",

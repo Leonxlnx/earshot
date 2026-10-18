@@ -27,7 +27,7 @@ Two ways in, same functions:
   llm tool; Claude Code fills it from the user's environment, other clients may need the key set in the environment
   that launches them: never write a literal key into a project file).
   Tools: measure, describe, match, rank, find, compare, ab, realness, timeline, sheet, critique, doctor,
-  llm_critique. Pass absolute paths; `full=true` returns all JSON. The server answers within a few seconds, longer on a cold or
+  llm_critique; the sound bank (no models): sfx_list, sfx_render, kit_render (Loop 5). Pass absolute paths; `full=true` returns all JSON. The server answers within a few seconds, longer on a cold or
   busy machine; if Claude Code shows no earshot tools, start it with `MCP_TIMEOUT=60000` (PowerShell:
   `$env:MCP_TIMEOUT=60000; claude`). `earshot mcp --warm` preloads the models at startup.
 If the machine is shared, set `EARSHOT_THREADS=2-3` (or `--threads 2` on any command). The first model call of a
@@ -139,6 +139,31 @@ In the first test (demo/forge-test) an independent judge found the key press 8-1
 the pops band-unlimited with long hissy tails, while every model check called them real. Re-made by steering with the
 model-free check, they now sit inside the real recordings' measured spread. The whoosh was re-made as a truly fast
 one. The impact (darker, swell-led) and the click (short tails) were not re-made. No human has listened yet.
+
+## Loop 5: make a film's sound kit (earshot sfx / earshot kit)
+Use this when a code-made film (a cinetic film, any cue sheet) needs its effects: render them from earshot's shipped
+bank instead of writing synth voices. No models load; a whole kit renders in about a minute and re-renders in seconds.
+1. Start from a preset: `earshot kit init --preset calm -o audio/kit.json` (calm for text-led films, crisp for
+   energetic product films, minimal for designed effects-only films). Each role's `note` says why its sound was
+   chosen; riser, swell and suck are off: a reveal resolves on one element, and the lockup is one clean hit.
+2. Fit it to the film: `earshot sfx list --kind hit` (or `--category`) shows the candidates with lengths, peak times
+   and knobs. Change a role's `sound`, set `edits` (`pitch` to the film's root for the hit or drop, `dur` / `apex` for
+   a fixed move), `takes` (12 or more for typing, 2-4 elsewhere), `level_db`. Audition one candidate with
+   `earshot sfx render ID -o x.wav [--pitch E5] [--dur 0.8 --apex 0.32]` and read its measured onset / peak / end.
+3. Render: `earshot kit render audio/kit.json --out audio/kit`. The takes and `kit.lock.json` (measured onset, peak,
+   end, loudness per take) are what the mixer places on cue frames: onset on the frame for hits and touches, the
+   peak on a whoosh's apex, the end on a riser's hit.
+4. Check: `earshot kit check audio/kit.json --out audio/kit`. It refuses what a render cannot use (a knob or pitch
+   the sound cannot take, a level over 0 dBFS, two takes that would share a file). Every warning names a take and a
+   reason (clicks, a cut tail, comb ring, silence, a pitch that climbs more than 4 semitones, a hit with two attacks
+   or a build before it, `pitch_off`: a note the knob did not land); swap the sound or the knob rather than keeping a
+   warned take. Read the notes too (a sounded riser, a composite sting).
+5. Listen through the finished film with Loop 2 (`timeline --cues`, `sheet`) and check that each cue landed.
+Say plainly what the bank is: forge sounds made in code, and 15 sounds fitted as code from CC0 recordings
+(`fit/<role>/<name>`, each with its source; the presets use them for clicks, ticks, keys, touches and the snap), all
+chosen and checked by measurement. They are not recordings: when the brief asks for recorded sound, use
+`skills/real-sound` instead. To add a fit of your own (`earshot fit --takes`, then `bank add-fit`), see `docs/SFX.md`
+("Add your own fit").
 
 ## Optional: a second opinion in words (audio LLM)
 `earshot llm mix.wav --yes-upload [--with-timeline] [--prompt "Is the riser at 0:12 cheap?"]` asks Google Gemini for

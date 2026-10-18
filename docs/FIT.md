@@ -216,6 +216,35 @@ Each comes with:
 
 The 0.5 morphs sit between their sources: CLAP 0.48-0.76 to each, so they are new sounds, not copies.
 
+## Takes: a fit rendered for use (0.3)
+
+A fit is measured against a trimmed recording: the identity render (seed 0, no knobs) keeps the recording's length
+and every bit of its low end, and that is what the tables above measure. A take for a film is another job, and the
+0.2 renderer made takes with three measured defects. Since 0.3, `fit.render(model, seed, vary=v)` with `vary > 0`, or
+any render with `take=True`, renders a take (the bank renders every fit entry so):
+
+| defect in 0.2 takes | measured on | fix (take mode) |
+|---|---|---|
+| tails cut where the trimmed recording stopped: fitted modes outlive it, vary lengthens decays further, a sines residual stops on the last sample | a cut tail in the takes of 13 of 46 CC0 fits (keys, clicks, a clip, a key release, a whoosh) | modal: modes ring on until all are 60 dB under the loudest strike's mode sum, at most 0.5 x the sound's span longer (at least 60 ms; 200 ms when the modes are still above -50 dB at the cut), the added stretch fading 60 dB linear in dB. sines: renders to the last partial's release, the residual noise fading out over 60 ms past the recording |
+| a random DC offset per seed: a sines residual's lowest band is flat to DC, and its envelope spreads energy down there | takes of one whoosh at -31 to -34 dB re peak (the audit warns over -40) | takes are high-passed at 8 Hz (2nd order) |
+| a spectral model's takes 2-7 LU apart: low noise bands hold few independent bins over a short gesture, and each take was levelled by its own loudest 50 ms | a cloth whoosh 7.3 LU, a key 3.8 LU, a cape 1.4 LU over 8 seeds | each take is levelled by its expected loudest 50 ms (from the gesture) and corrected to its expected K-weighted energy: 0.45, 2.6 and 0.15 LU |
+
+Two more 0.3 changes:
+- **The sines residual follows the recording's roll-off above 16 kHz.** The top residual band is flat to Nyquist, so a
+  fit put noise above 20 kHz that a 16-20 kHz band-limited recording never had (a click: -19 dB of its energy above
+  20 kHz against -34 dB in the recording). A sines fit now stores `residual.hf`, the residual's spectrum above
+  16 kHz relative to 16 kHz, made monotone, and the noise follows it; `sines.hf_rolloff(x)` measures it for an older
+  model. On the six sines validation refs (mean of 6 seeds) the energy above 20 kHz moved toward the recording's
+  (click -19.5 -> -30.0 dB, recording -33.5; impact -44.8 -> -60.5, recording -62.4; whoosh -41.8 -> -60.1, recording
+  -75.3) and mel dB changed by -0.10 to +0.00.
+- **`earshot fit --takes`** scores every candidate on seeds 0, 1, 2 instead of seed 0 alone
+  (`auto.fit(seeds=auto.TAKE_SEEDS)`). A candidate with noise in it can win on one lucky draw: on 10 of the 12
+  validation refs the chosen fit's seed-0 score sat 0.1-2.4 under its mean over seeds 0-7.
+
+**The fit itself did not move.** Every identity render of the 12 validation refs is the same as in 0.2 (a hybrid's
+noise layer keeps its 0.2 levelling): seed-0 and seed-averaged quality (seeds 0-7: mel, envelope, tone, onset,
+excess, missing, CLAP) are identical, so the tables above stand.
+
 ## Licence
 
 A fit of a recording is a derivative of that recording: the parameters are measured from it. Keep the source's
