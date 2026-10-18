@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.3.0 - unreleased (0.3.0.dev0)
+## 0.3.0 - 2026-10-19
 
 The sound engine of a film: the forge's delivered sounds as a bank, one-sound renders aimed at the picture, a
-model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md).
+model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md). This release also ships the 0.2.1 fixes
+below (#1, #2), which were not released on their own. No new dependencies.
 
 ### Added
 
@@ -91,6 +92,8 @@ model-free audit, and film kits. Reference: [docs/SFX.md](docs/SFX.md).
   listener, the author, 15 trials).
 
 ## 0.2.1 - 2026-10-17
+
+Not released separately: these fixes ship in 0.3.0.
 
 Two fixes from a careful outside review (thanks, @markblundeberg).
 

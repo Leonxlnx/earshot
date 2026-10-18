@@ -20,6 +20,10 @@ professional launch films. It runs locally on CPU, as a CLI, a Python API and an
 With ears, an agent can also **make its own sounds in code** and improve them by listening (`earshot forge`), and
 **translate a recording into code** it can vary (`earshot fit`). Both below.
 
+**New in 0.3: sound for code-made films.** A bank of 201 sound effects stored as code that render by id in seconds,
+with no models and no network: `earshot sfx` aims a whoosh, hit, click or note at a moment in the picture, and
+`earshot kit` renders a whole film's effects with measured sync points ([below](#sound-for-films-bank-sfx-kits)).
+
 ```
 $ earshot describe enter.ogg
   0.56 s short transient (attack 3 ms, decays in 190 ms). Sounds most like: a single mechanical keyboard key press
@@ -52,6 +56,8 @@ $ earshot critique film.mp4
 | `measure FILE` | objective measurements only (no models): LUFS, true peak, LRA, envelope, spectrum, tempo / key |
 | `forge RECIPE --refset CAT` | make a sound in code and improve it by listening (see below) |
 | `fit FILE -o recipe.py` | translate a recording into a forge recipe module that re-renders it, with knobs and morphs (see below) |
+| `sfx render ID -o x.wav` | a sound from the shipped bank of 201, aimed at the picture (`--dur`, `--apex`, `--pitch`) and audited; `sfx list`, `sfx check` (no models) |
+| `kit init / render / check` | a film's sound kit: one bank sound per role, rendered into cached takes with measured onset / peak / end (no models) |
 | `gallery DIR -o page.html` | one static HTML listening page of forge outputs: players, spectrograms, numbers |
 | `llm FILE --yes-upload` | optional audio-LLM critique (Gemini), only with your own key and explicit consent |
 | `mcp` | the same tools as an MCP server for Claude Code and other agents |
@@ -59,8 +65,8 @@ $ earshot critique film.mp4
 
 Every command prints a plain-language summary first; `--json` gives the full result, `--out f.json` saves it. Errors
 are one line on stderr (`earshot <command>: error: ...`, exit 1). Each CLI call is a new process and loads the models
-(~20-40 s) before it answers: for more than a few calls use the MCP server (models stay loaded) or one Python script
-with `from earshot import api`.
+(~20-40 s) before it answers (`measure`, `sfx` and `kit` load none): for more than a few calls use the MCP server
+(models stay loaded) or one Python script with `from earshot import api`.
 
 What an agent sees when it listens to that film with `earshot sheet` (frames, labelled sound events, spectrogram,
 loudness, sync to the beat):
