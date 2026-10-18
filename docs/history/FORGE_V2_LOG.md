@@ -1,4 +1,4 @@
-# forge v2: overnight iteration log (branch `forge-v2`, not merged)
+# forge v2: overnight iteration log (historical; forge v2 shipped in 0.2.0)
 
 Goal (from the user, 2026-10-16 ~02:40): iterate ~12 h to make earshot much better, above all **forge**: sound
 effects that are genuinely great for motion-design launch videos (whooshes, swishes, risers, downlifters, impacts,

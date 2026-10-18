@@ -120,7 +120,7 @@ FAIL_AT = {'loud_lu': 0.5, 'true_peak_dbtp': TP_MAX + 0.05, 'floor_margin_db': 6
 WARN_AT = {'length_ratio': 1.6, 'true_peak_diff_db': 6.0, 'other_window_lu': 2.0, 'mono_corr': 0.995,
            'wide_corr': 0.9, 'floor_dbfs': -60.0, 'floor_exposed_ms': 30.0}
 
-# (category, answer-sheet name, trials at N = 20, tier from the round-3 verdicts in OVERNIGHT.md / results_v2r3.md;
+# (category, answer-sheet name, trials at N = 20, tier from the round-3 verdicts in docs/history/FORGE_V2_LOG.md / results_v2r3.md;
 #  round 4 moved toggle from weak to middle: tone 10.4 -> 7.8 dB, curve 14.6 -> 10.1 dB, ring lines gone, v2r4.md)
 PLAN = [
     ('whoosh_big', 'big whoosh', 2, 'strong'),

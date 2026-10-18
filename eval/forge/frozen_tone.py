@@ -4,7 +4,7 @@
     from frozen_tone import ToneRef, profile, t40_ms      (eval/forge/bench.py imports it from this folder)
 
 Do not edit: a change here changes every benchmark number. Add new measurements in bench.py instead (and record them in
-OVERNIGHT.md). The original docstring follows.
+docs/history/FORGE_V2_LOG.md). The original docstring follows.
 
 Model-free ears for the forge: tonal balance and tail, measured straight from the samples.
 
