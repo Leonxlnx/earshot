@@ -22,7 +22,7 @@ committed).
 | weak | 2-2.5 | 12 : 1 | 0.28 | 0.92 | 6.6 : 1 |
 | no match | < 2 | 0.25 : 1 | 0.008 | 0.20 | 0.25 : 1 |
 
-  Half of the true matches reach "strong" (recall 0.51), 76% reach at least "weak". The strong band's ratio rests on
+  Half of the true matches reach "strong" (recall 0.51); 76% reach at least "weak". The strong band's ratio rests on
   only 3 wrong pairs: with that count's 95% Poisson range (0.6-8.8) it lies anywhere from ~440:1 to ~6000:1, and the
   tuning library gave 170:1. In a library search (~3% of candidate pairs true) a "strong" hit is the right kind of
   sound 98% of the time but the exact variant only 61% of the time (an Enter key for a spacebar counts as wrong).
