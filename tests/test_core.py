@@ -120,7 +120,8 @@ assert 'numpy' not in sys.modules
 cli.main(sys.argv[1:])
 try:
     from threadpoolctl import threadpool_info
-    used = max(i['num_threads'] for i in threadpool_info() if i['user_api'] == 'blas')
+    counts = [i['num_threads'] for i in threadpool_info() if i.get('internal_api') == 'openblas']
+    used = max(counts) if counts else None   # MKL and Accelerate builds ignore OPENBLAS_NUM_THREADS
 except ImportError:
     used = None
 print(os.environ.get('OPENBLAS_NUM_THREADS'), used)

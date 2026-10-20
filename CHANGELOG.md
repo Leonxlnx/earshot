@@ -5,7 +5,7 @@
 ### Fixed
 
 - **BLAS threads follow `EARSHOT_THREADS`.** numpy and scipy each bundle an OpenBLAS that started a worker thread per
-  core and, on Windows, committed a buffer for each when first imported: on a 12-thread machine an idle MCP server
+  logical CPU and, on Windows, committed a buffer for each when first imported: with 12 logical CPUs an idle MCP server
   reserved 411 MB and ran 21 threads (154 MB and 13 threads now, at the default limit of 4), and the gap grew once a
   tool loaded scipy. Memory in use and speed are unchanged (`measure` median 600 ms either way). The CLI and the MCP
   server now set `OPENBLAS_NUM_THREADS` to `--threads` / `EARSHOT_THREADS` / min(4, cores/2) before numpy loads,

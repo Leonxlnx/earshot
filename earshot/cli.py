@@ -46,8 +46,8 @@ def _parser():
 
 
 def _hold_blas(argv):
-    """numpy and scipy each bundle an OpenBLAS that starts a worker thread per core and, on Windows, commits a buffer
-    for each when first imported: ~0.4 GB per process on 12 threads before any audio is read, ~0.9 GB once a tool
+    """numpy and scipy each bundle an OpenBLAS that starts a worker thread per logical CPU and, on Windows, commits a
+    buffer for each when first imported: ~0.4 GB per process on 12 CPUs before any audio is read, ~0.9 GB once a tool
     has loaded scipy, for no speed-up (the heavy work is torch, already held to EARSHOT_THREADS). Give BLAS the same
     limit, from --threads or EARSHOT_THREADS, unless OPENBLAS_NUM_THREADS is set. It only counts before numpy is
     first imported, so main() calls this before any command module loads."""
