@@ -40,8 +40,32 @@ COMMANDS = {
 def _parser():
     ap = argparse.ArgumentParser(prog='earshot', description='Ears for coding agents: describe, match, search, compare, '
                                  'time-align and critique sound files you cannot hear.')
-    ap.add_argument('--threads', type=int, help='torch CPU threads (default: EARSHOT_THREADS or min(4, cores/2))')
+    ap.add_argument('--threads', type=int, help='CPU threads for torch and BLAS (default: EARSHOT_THREADS or '
+                                                'min(4, cores/2))')
     return ap
+
+
+def _hold_blas(argv):
+    """numpy and scipy each bundle an OpenBLAS that starts a worker thread per core and, on Windows, commits a buffer
+    for each when first imported: ~0.4 GB per process on 12 threads before any audio is read, ~0.9 GB once a tool
+    has loaded scipy, for no speed-up (the heavy work is torch, already held to EARSHOT_THREADS). Give BLAS the same
+    limit, from --threads or EARSHOT_THREADS, unless OPENBLAS_NUM_THREADS is set. It only counts before numpy is
+    first imported, so main() calls this before any command module loads."""
+    if 'OPENBLAS_NUM_THREADS' in os.environ or 'numpy' in sys.modules:
+        return
+    n = None
+    for i, a in enumerate(argv):  # the last one wins, as in argparse
+        if a == '--threads' and i + 1 < len(argv):
+            n = argv[i + 1]
+        elif a.startswith('--threads='):
+            n = a.split('=', 1)[1]
+    from . import config
+    try:
+        n = int(n or 0)
+        n = n if n > 0 else config.threads()   # --threads 0 means the default, as in main()
+    except ValueError:  # a bad value: argparse (or the first model load) reports it
+        return
+    os.environ['OPENBLAS_NUM_THREADS'] = str(n)
 
 
 def _register(sub, modules):
@@ -60,6 +84,7 @@ def _register(sub, modules):
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else list(argv)
+    _hold_blas(argv)
     ap = _parser()
     sub = ap.add_subparsers(dest='command', metavar='<command>')
     cmd = next((a for a in argv if not a.startswith('-')), None)
@@ -96,7 +121,8 @@ def common(p):
     p.add_argument('--json', action='store_true', help='print the full result as JSON')
     p.add_argument('--out', help='also write the JSON result to this file')
     p.add_argument('--threads', type=int, default=argparse.SUPPRESS,
-                   help='torch CPU threads (also accepted before the command; default EARSHOT_THREADS or min(4, cores/2))')
+                   help='CPU threads for torch and BLAS (also accepted before the command; default EARSHOT_THREADS or '
+                        'min(4, cores/2))')
     return p
 
 

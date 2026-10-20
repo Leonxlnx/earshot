@@ -2,7 +2,8 @@
 
 EARSHOT_HOME     cache root (models, embeddings, decoded audio). Default: <repo>/.cache in a source checkout,
                  else ~/.cache/earshot.
-EARSHOT_THREADS  torch CPU threads per process (default: min(4, cores // 2)); earshot never uses a GPU.
+EARSHOT_THREADS  torch CPU threads per process (default: min(4, cores // 2)); earshot never uses a GPU. The CLI and
+                 the MCP server also give numpy / scipy's OpenBLAS this limit, unless OPENBLAS_NUM_THREADS is set.
 EARSHOT_CLAP     CLAP model: a Hub id (default laion/larger_clap_general) or a local model folder (config.json plus
                  model.safetensors), loaded from disk as it is, never downloaded into
 EARSHOT_AST      AudioSet tagger: a Hub id (default MIT/ast-finetuned-audioset-10-10-0.4593) or a local model folder
