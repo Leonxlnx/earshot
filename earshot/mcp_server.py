@@ -40,8 +40,12 @@ import threading
 import time
 from typing import Annotated
 
-from . import audio, config
-from .report import _clean, emit
+if __name__ == '__main__':  # python -m earshot.mcp_server: hold BLAS before numpy loads, as `earshot mcp` does
+    from .cli import _hold_blas
+    _hold_blas(sys.argv[1:])
+
+from . import audio, config  # noqa: E402
+from .report import _clean, emit  # noqa: E402
 
 INSTRUCTIONS = """earshot gives you ears: you cannot hear, so use these tools whenever you must judge, choose or check
 sound (sound effects, music, ambience, a mix, the audio of a video). Use absolute paths.

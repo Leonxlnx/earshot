@@ -4,6 +4,7 @@ import io
 import json
 import os
 import subprocess
+import sys
 
 import numpy as np
 import pytest
@@ -11,6 +12,7 @@ import pytest
 from earshot import audio, cli, critique, features, profile, report, search, sheet
 
 SR = 48000
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _decaying(f, tau=0.5, dur=4.0, lead=0.1):
@@ -109,6 +111,38 @@ def test_threads_after_the_command_and_errors_on_stderr(wav, sine, capsys, monke
     assert cli.main(['measure', p + '.nope']) == 1
     err = capsys.readouterr().err.strip()
     assert err.startswith('earshot measure: error:') and '\n' not in err
+
+
+# OpenBLAS reads its thread count once, when numpy is first imported: only a fresh process shows what the CLI set
+_BLAS = '''import os, sys
+from earshot import cli
+assert 'numpy' not in sys.modules
+cli.main(sys.argv[1:])
+try:
+    from threadpoolctl import threadpool_info
+    counts = [i['num_threads'] for i in threadpool_info() if i.get('internal_api') == 'openblas']
+    used = max(counts) if counts else None   # MKL and Accelerate builds ignore OPENBLAS_NUM_THREADS
+except ImportError:
+    used = None
+print(os.environ.get('OPENBLAS_NUM_THREADS'), used)
+'''
+
+
+@pytest.mark.parametrize('args, env, want', [
+    (['--threads', '2'], {}, '2'),
+    (['--threads=2'], {}, '2'),
+    ([], {'EARSHOT_THREADS': '3'}, '3'),
+    (['--threads', '2'], {'OPENBLAS_NUM_THREADS': '1'}, '1'),   # the user's own setting wins
+])
+def test_blas_threads_follow_the_thread_limit(wav, sine, args, env, want):
+    p = wav(sine)
+    e = {k: v for k, v in os.environ.items() if k not in ('OPENBLAS_NUM_THREADS', 'EARSHOT_THREADS')}
+    r = subprocess.run([sys.executable, '-c', _BLAS, 'measure', p, '--light', *args], capture_output=True, text=True,
+                       env={**e, **env}, cwd=REPO)
+    assert r.returncode == 0, r.stderr
+    told, used = r.stdout.strip().splitlines()[-1].split()
+    assert told == want
+    assert used in (want, 'None')
 
 
 def test_profile_summary_survives_unmeasured_metrics():

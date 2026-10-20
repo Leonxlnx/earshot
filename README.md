@@ -252,7 +252,8 @@ A cache made before 0.2.1 holds CLAP's main revision `ada0c23`, whose only weigh
 the same tensors). earshot still loads it from the cache (torch `weights_only`), never downloads it, and `earshot
 doctor` says so; `earshot doctor --fetch` downloads the pinned safetensors (776 MB), used from then on.
 
-Settings (environment variables): `EARSHOT_THREADS` (torch CPU threads, default min(4, cores/2)), `EARSHOT_HOME`
+Settings (environment variables): `EARSHOT_THREADS` (torch CPU threads, default min(4, cores/2); the CLI and the MCP
+server hold numpy / scipy's OpenBLAS to it too, unless `OPENBLAS_NUM_THREADS` is set), `EARSHOT_HOME`
 (cache root), `EARSHOT_PRECISION` (`bf16` by default, used only on CPUs with native bf16 such as AVX512-BF16 / AMX,
 fp32 everywhere else; `fp32` forces fp32), `EARSHOT_OFFLINE=1` (above), `EARSHOT_CLAP` / `EARSHOT_AST` (another
 Hub model id, or a local model folder with `config.json` and `model.safetensors`, which loads from disk as it is with
