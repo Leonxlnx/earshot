@@ -10,6 +10,7 @@ here.
 | `timeline/` | the listening transcript and the sheet: event recall on a real 60 s film mix with known placements (quiet events under music too), tags, sections, tempo / beat grid, sync of hits to picture cuts and cue frames, run time on 30-90 s films | [RESULTS.md](timeline/RESULTS.md) |
 | `realness/` | the real-vs-code-synthesized detector: held-out ROC-AUC with whole sound families held out, robustness to noise, room, gating, length and mp3, firm-verdict error rates, a tone guard on real recordings | [RESULTS.md](realness/RESULTS.md) |
 | `launch/` | the launch profile and `critique` scorecard: leave-one-out over the 7 reference films, a film with a real vs a synthesized soundtrack, known-bad mixes (quiet, hot, mono, muffled, late, dead air, fade-out, hole, over-compressed ...), the visual-event detector vs scene cuts | [RESULTS.md](launch/RESULTS.md) |
+| `forge/` | the forge's sound recipes against real references (`bench.py`, `blind_v2.py`); `replicate.py`, the replication benchmark of `earshot fit`: every clip of a folder of film sound effects fitted with `--clap`, its seed-0 render and four takes measured against the clip (CLAP, mel gap over the model's own floor, attack, width, glide, tail, pulses, gate, the take check), on a fixed 70 / 30 dev / held-out split by clip id (targets from `--targets` or `EARSHOT_REPLICATE_TARGETS`, results to a folder outside the repo or under `out/`) | [RESULTS.md](forge/RESULTS.md) |
 
 ## The data is not redistributed
 
