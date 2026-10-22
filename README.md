@@ -3,10 +3,11 @@
 **Ears for coding agents.**
 
 <!-- launch video -->
-[**Watch the 22 s launch film**](https://github.com/Leonxlnx/earshot/releases/tag/v0.1.0) - every sound in it was made
-in code by `earshot forge`; no recordings, no music track.
+[**Watch the 0.4 launch film**](https://github.com/Leonxlnx/earshot/releases/tag/v0.4.0) (35 s): its sound effects are
+takes from the earshot bank placed with the launch kit, over a licensed music track. Play every sound in the bank on
+[the earshot site](https://leonxlnx.github.io/earshot-site/).
 
-![Frames from the launch film](docs/media/launch_frames.png)
+![Frames from the first launch film (0.1)](docs/media/launch_frames.png)
 
 AI coding agents can now write the code that renders a film, a product demo or a game. They still cannot hear what
 they made. They cannot tell a premium key press from a cheap one, notice that a hit lands 80 ms after the cut, or
