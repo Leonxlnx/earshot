@@ -10,7 +10,8 @@ dur (s, the length of the file):
   shape   the whoosh family (whoosh_fast, whoosh_big, pro_whoosh_big, swish, swipe): rise, hold and fall scale
           together, so the pass keeps its shape; with apex as well, rise comes from apex and hold / fall from the rest
   param   the recipe's own length key (riser, downlifter, sub drops, shimmer, zip: `length`; glitch and typing runs:
-          `dur`; pro_logo_sting: `g_length`; the UI sounds' end gate: `length`; a spectral fit: its `length` knob):
+          `dur`; pro_logo_sting: `g_length`; the UI sounds' end gate: `length`; a spectral or gesture fit: its `length`
+          knob; a sines fit: `stretch`):
           scaled, rendered, measured, then corrected along the secant through the renders so far, at most MAX_FIX
           times (a key that turns out not to move the length falls back to trim)
   trim    no length key (impact, toggle, typing_key, logo_sting, pluck: its file always holds 3 s of ring and room,
@@ -39,6 +40,23 @@ pitch ('C5', 'Eb6', 'F#4' or 'Fs4', 440, '440hz'): the note goes into the recipe
   partial you hear (click/soft: 2454 Hz, heard 2903 Hz). Their note is the measured partial (meta pitch_hz, measured
   when the bank was built; null = no clear partial, so no pitch knob); a target is landed by measurement: the
   parameter is scaled by target / heard, rendered, measured and corrected (at most MAX_FIX times), keeping the closest.
+decay / onset / bright / width (earshot 0.4, the tonal knobs; TONAL): aim a tonal or UI sound at a film's measured
+  character through one recipe parameter, landed by measurement with the catalog's own definitions
+  (recipes/_tonal.measure, the ones the films were measured with):
+    decay   t20 in ms (the peak to 20 dB down): the ring itself gets shorter (notify / pro_notify: `ring`, which scales
+            every decay constant of the style; a pluck's tau1; a pop's tau ...), never a fade over a long ring (dur
+            does that, and the audit calls such takes truncated)
+    onset   attack in ms (the first ms within 20 dB of the peak, to the peak): a felt mallet / a soft rise (notify:
+            `soft`; ui_pop / drip / mallet: `onset`); the films' pops and dings start in 20-60 ms, the bank's in 5
+    bright  spectral centroid in Hz (a mallet's hardness, a pop's or a drip's 2nd partial, a shutter's box)
+    width   L / R correlation (1 = mono, 0 = decorrelated: the films' bell notes sit at 0.33-0.67, their ticks at 0)
+  The parameter moves along a secant through the renders (log-log for decay / onset / bright, linear for the
+  parameters that may sit at 0, width ** 2 against (1 - corr) / (1 + corr) for width), kept inside the tightest
+  bracket once two renders straddle the target, at most TONAL_FIX corrections after a first render at the sound's own
+  value; the closest render's value is kept. edits[knob] = {target,
+  param, value, measured (on the file that ships), renders, ok (within TONAL_TOL)}. A sound without the parameter
+  (whooshes, keys, fits) is refused with the reason. bank.render / kit edits pass these through apply(..., decay=,
+  onset=, bright=, width=) once they name them.
 Level (peak_db, weight) is bank.render's, after the knobs.
 """
 import re
@@ -63,7 +81,10 @@ LENGTH = {'riser': 'length', 'pro_riser': 'length', 'downlifter': 'length', 'sub
           'glitch': 'dur', 'pro_glitch': 'dur', 'pro_typing_run': 'dur', 'pro_logo_sting': 'g_length',
           'click': 'length', 'pro_click': 'length', 'hover_tick': 'length', 'pro_hover_tick': 'length',
           'tap': 'length', 'pro_tap': 'length', 'pro_pop_in': 'length', 'pop': 'length', 'pro_pop': 'length',
-          'notify': 'length', 'pro_notify': 'length', 'pro_typing_key': 'length'}
+          'notify': 'length', 'pro_notify': 'length', 'pro_typing_key': 'length',
+          'reverse_swell': 'length'}
+# (earshot 0.4: reverse_swell = recipes/revcymbal.py; cut_hit stays trim: its `length` is a ceiling, the render ends
+# 30 ms after it is 60 dB down)
 
 # category -> pitch spec: param (the note), co (scaled with it), range (Hz), needs (param, minimum: the tonal layer
 # must be on), measure ('start': the first 0.6 s, 'end': the last half, None: not measured), mode 'pc' = a pitch class,
@@ -95,6 +116,15 @@ PITCH = {
     'pro_whoosh_big': {'param': 'sub_f', 'range': (25.0, 120.0), 'needs': ('sub_db', -30.0), 'measure': 'end'},
     'shimmer': {'param': 'key', 'mode': 'pc'},
     'pro_shimmer': {'param': 'key', 'mode': 'pc'},
+    # earshot 0.4 tonal / UI recipes (ui_pop: the landing pitch; knock: the lowest mode; drip: the pitch at pinch-off,
+    # not measured: the heard pitch is where it has risen to)
+    'ui_pop': {'param': 'f0', 'range': (250.0, 1200.0)},
+    'mallet': {'param': 'f0', 'range': (150.0, 3200.0)},
+    'knock': {'param': 'f1', 'range': (250.0, 2600.0)},
+    'drip': {'param': 'f0', 'range': (250.0, 1600.0), 'measure': None},
+    # earshot 0.4 cut hit (recipes/cuthit.py): the sub lands on the track's root, its start keeps the glide ratio; not
+    # measured (the kick's click and the short glide hide the landing pitch in a 0.3 s file)
+    'cut_hit': {'param': 'sub_f1', 'co': ('sub_f0',), 'range': (36.0, 130.0), 'measure': None},
 }
 UNTUNED = {
     'whoosh_fast': 'a noise pass-by: its band moves with the motion, it has no note',
@@ -108,8 +138,37 @@ UNTUNED = {
     'pro_typing_run': 'a typed run is not tuned',
 }
 FIT_PITCH = {'hybrid': 'pitch', 'sines': 'transpose', 'modal': 'size'}   # fit kind -> knob (semitones; size ratio)
-FIT_LENGTH = {'spectral': 'length', 'sines': 'stretch'}
+FIT_LENGTH = {'spectral': 'length', 'sines': 'stretch', 'gesture': 'length'}   # (0.4: the gesture's time-stretch)
 FIT_PITCH_ST = 12.0       # a fit moves at most an octave from its own note
+
+# earshot 0.4, the tonal knobs (module doc): knob -> category -> {param, range (the parameter's own limits), co (scaled
+# by the same ratio), lin (search the parameter linearly: it may sit at 0), inverse (a larger value lowers the measure),
+# styles (only these values of the recipe's `style`: notify's hardness is the bell's; a mallet pluck has none)}
+TONAL = {
+    'decay': {'notify': {'param': 'ring', 'range': (0.05, 4.0)}, 'pro_notify': {'param': 'ring', 'range': (0.05, 4.0)},
+              'pluck': {'param': 'tau1', 'range': (0.03, 2.4)}, 'ui_pop': {'param': 'tau', 'range': (0.006, 0.2)},
+              'drip': {'param': 'tau', 'range': (0.008, 0.25)}, 'knock': {'param': 'decay', 'range': (0.002, 0.2)},
+              'mallet': {'param': 'decay', 'co': ('gate',), 'range': (0.02, 2.0)},
+              'shutter': {'param': 'b_decay', 'co': ('body_ms',), 'range': (0.002, 0.15)}},
+    'onset': {'notify': {'param': 'soft', 'range': (0.0, 0.12), 'lin': True},
+              'pro_notify': {'param': 'soft', 'range': (0.0, 0.12), 'lin': True},
+              'ui_pop': {'param': 'onset', 'range': (0.002, 0.12)}, 'drip': {'param': 'onset', 'range': (0.0005, 0.12)},
+              'mallet': {'param': 'onset', 'range': (0.0003, 0.12)}},
+    'bright': {'notify': {'param': 'hard', 'range': (0.0, 1.0), 'lin': True, 'styles': ('bell',)},
+               'mallet': {'param': 'hard', 'range': (0.0, 1.0), 'lin': True, 'styles': ('note',)},
+               'ui_pop': {'param': 'h2', 'range': (0.0, 1.2), 'lin': True},
+               'drip': {'param': 'h2', 'range': (0.0, 1.0), 'lin': True},
+               'shutter': {'param': 'b_hz', 'range': (300.0, 3000.0)}},    # the box under the curtain
+    # (no knock: its centroid follows the contact's spectral nulls and the noise, not one parameter; pick a member or
+    # use the pitch knob)
+    'width': {c: {'param': 'width', 'range': (0.0, 3.0 if c in ('notify', 'pro_notify') else 1.5), 'lin': True,
+                  'inverse': True}      # fx.decorrelate reaches corr ~0 at 1.43 (notify halves its width: 2.9)
+              for c in ('notify', 'pro_notify', 'ui_pop', 'drip', 'knock', 'mallet', 'shutter', 'pluck')},
+}
+TONAL_LIMITS = {'decay': (2.0, 3000.0), 'onset': (0.5, 300.0), 'bright': (50.0, 16000.0), 'width': (-1.0, 1.0)}
+TONAL_TOL = {'decay': (0.1, 3.0), 'onset': (0.15, 3.0), 'bright': (0.08, 30.0), 'width': (0.0, 0.05)}  # (rel, abs)
+TONAL_ORDER = ('decay', 'onset', 'bright', 'width')
+TONAL_FIX = 4             # tonal knobs: corrections after the first render (_aim_tonal)
 
 
 class KnobError(ValueError):
@@ -180,6 +239,12 @@ def describe(entry):
         out['pitch'] = _pitch_spec(entry)
     except KnobError as e:
         out['why'] = str(e).split(': ', 1)[-1]
+    out['tonal'] = {}
+    for knob in TONAL_ORDER:                     # earshot 0.4: which tonal knobs it takes, through which parameter
+        try:
+            out['tonal'][knob] = _tonal_spec(entry, knob)['param']
+        except KnobError:
+            out['tonal'][knob] = None
     return out
 
 
@@ -275,10 +340,17 @@ def _number(v, name):
     return float(v)
 
 
-def validate(entry, dur=None, apex=None, pitch=None):
+def validate(entry, dur=None, apex=None, pitch=None, decay=None, onset=None, bright=None, width=None):
     """the knobs an entry can take, checked without rendering (KnobError says why): what apply() refuses, so a kit
     check refuses the same (earshot.forge.kit.problems)"""
     sid = entry.get('id') or _cat(entry)
+    for knob, v in (('decay', decay), ('onset', onset), ('bright', bright), ('width', width)):
+        if v is not None:
+            v = _number(v, knob)
+            lo, hi = TONAL_LIMITS[knob]
+            if not lo <= v <= hi:
+                raise KnobError(f'{knob} must be {lo:g}-{hi:g} ({TONAL_UNITS[knob]}), got {v:g}')
+            _tonal_spec(entry, knob)
     if dur is not None:
         dur = _number(dur, 'dur')
         if not 0.01 <= dur <= 60:
@@ -296,10 +368,10 @@ def validate(entry, dur=None, apex=None, pitch=None):
         _pitch(entry, pitch)
 
 
-def apply(entry, run, dur=None, apex=None, pitch=None):
+def apply(entry, run, dur=None, apex=None, pitch=None, decay=None, onset=None, bright=None, width=None):
     """(raw render, edits) of an entry with its knobs set: run(params_edit, fit_knobs) renders (bank.renderer)"""
     from . import bank
-    validate(entry, dur, apex, pitch)
+    validate(entry, dur, apex, pitch, decay, onset, bright, width)
     edits, pe, fk = {}, {}, {}
     if pitch is not None:
         p_upd, f_upd, info = _pitch(entry, pitch)
@@ -309,6 +381,11 @@ def apply(entry, run, dur=None, apex=None, pitch=None):
     meta = entry.get('meta') or {}
     if pitch is not None and edits['pitch'].get('mode') == 'partial':
         pe.update(_land_partial(entry, run, pe, fk, edits['pitch']))
+    tonal = {'decay': decay, 'onset': onset, 'bright': bright, 'width': width}
+    for knob in TONAL_ORDER:                      # earshot 0.4: the tonal knobs, each landed by measurement
+        if tonal[knob] is not None:
+            upd, edits[knob] = _aim_tonal(entry, run, pe, fk, knob, float(tonal[knob]))
+            pe.update(upd)
     if apex is not None or (dur is not None and _cat(entry) in WHOOSH):
         x, info = _whoosh(entry, run, pe, dur, apex, meta)
         edits.update(info)
@@ -331,7 +408,138 @@ def apply(entry, run, dur=None, apex=None, pitch=None):
             edits['pitch']['cents_off'] = int(round(1200 * np.log2(got / edits['pitch']['target_hz'])))
         ok = bool(got) and abs(edits['pitch'].get('cents_off', 0)) <= PITCH_TOL_CENTS
         edits['pitch']['ok'] = ok if where else None   # None: a sound whose pitch is not measured (riser, impact)
+    if any(tonal[k] is not None for k in TONAL_ORDER):   # measure the file that ships (dur may have changed it)
+        got = _tonal_measures(x)
+        for knob in TONAL_ORDER:
+            if tonal[knob] is not None:
+                edits[knob]['measured'] = got[knob]
+                edits[knob]['ok'] = _tonal_ok(knob, got[knob], tonal[knob])
     return x, edits
+
+
+# ------------------------------------------------------------------------------------------- earshot 0.4: tonal knobs
+TONAL_UNITS = {'decay': 't20 ms', 'onset': 'attack ms', 'bright': 'centroid Hz', 'width': 'L/R correlation'}
+
+
+def _recipe_defaults(entry):
+    """the DEFAULTS of an entry's recipe module ({} when it has none): a parameter added after the entry was built
+    (notify's ring / soft) takes its recipe default, which renders the entry unchanged"""
+    import importlib
+    try:
+        return dict(getattr(importlib.import_module(f"earshot.forge.recipes.{entry.get('recipe')}"), 'DEFAULTS', {}))
+    except (ImportError, TypeError, ValueError):
+        return {}
+
+
+def _tonal_spec(entry, knob):
+    """{param, range, co, lin, inverse} of a tonal knob on an entry, or KnobError with the reason"""
+    sid = entry.get('id') or _cat(entry)
+    if entry.get('type') == 'fit':
+        raise KnobError(f'{sid}: a fitted recording has no {knob} parameter (its fit knobs are pitch and length)')
+    s = TONAL[knob].get(_cat(entry))
+    if s is None:
+        raise KnobError(f'{sid}: {_cat(entry)} has no {knob} knob (it applies to '
+                        f'{", ".join(sorted(TONAL[knob]))})')
+    if s['param'] not in entry.get('params', {}) and s['param'] not in _recipe_defaults(entry):
+        raise KnobError(f"{sid}: its recipe has no {s['param']} parameter (the {knob} knob)")
+    if s.get('styles'):
+        style = {**_recipe_defaults(entry), **entry.get('params', {})}.get('style')
+        if style not in s['styles']:
+            raise KnobError(f"{sid}: its {style} style has no {knob} parameter (only {', '.join(s['styles'])})")
+    return s
+
+
+def _tonal_measures(x):
+    from .recipes._tonal import measure
+    m = measure(x)
+    return {'decay': m['t20_ms'], 'onset': m['attack_ms'], 'bright': m['centroid_hz'], 'width': m['corr']}
+
+
+def _tonal_ok(knob, got, target):
+    if got is None:
+        return False
+    rel, ab = TONAL_TOL[knob]
+    return bool(abs(got - target) <= max(ab, rel * abs(target)))
+
+
+def _aim_tonal(entry, run, pe, fk, knob, target):
+    """({param: value, co...}, info) landing one tonal knob (module doc): a first render at the current value, then at
+    most TONAL_FIX corrections along a safeguarded secant in the knob's own coordinates (_tonal_axes): extrapolated
+    from the last two renders (a first step from the knob's sense) until two renders bracket the target, then kept
+    inside the tightest bracket (the catalog's measures step where an envelope's peak moves along a plateau, so a free
+    secant can wander); the closest render is kept"""
+    s = _tonal_spec(entry, knob)
+    k, (lo, hi) = s['param'], s['range']
+    base = {**_recipe_defaults(entry), **entry.get('params', {}), **pe}
+    v0 = float(base[k])
+    co = {c: float(base[c]) for c in s.get('co', ()) if c in base}
+    lin = s.get('lin', False)
+    X, Xi, Y = _tonal_axes(knob, lin)
+    yt = Y(target)
+
+    def upd(v):
+        return {k: v, **{c: c0 * (v / v0) for c, c0 in co.items()}} if v0 > 0 else {k: v}
+
+    def meas(v):
+        got = _tonal_measures(run({**pe, **upd(v)}, fk))[knob]
+        return None if got is None else float(got)
+
+    def first_step(v1, m1):
+        if knob == 'width':                       # decorrelation: (1 - corr) / (1 + corr) grows as width ** 2
+            return 0.5 if v1 <= 1e-6 or m1 is None else float(np.sqrt(yt / max(Y(m1) / v1 ** 2, 1e-9)))
+        if lin and knob == 'onset' and m1 is not None:   # a soft rise of T s lengthens the attack by ~0.9 T
+            return v1 + 0.9 * (target - m1) / 1000.0
+        if lin:                                   # guess the direction from the knob's sense
+            sgn = -1.0 if s.get('inverse') else 1.0
+            return v1 + (0.25 * (hi - lo) * (1.0 if m1 is None else np.sign(target - m1) * sgn))
+        ratio = target / max(m1, 1e-9) if m1 else 2.0
+        return v1 * (ratio ** (-1.0 if s.get('inverse') else 1.0))
+
+    def step():
+        ok = [(X(v), Y(m)) for v, m in pts if m is not None]
+        below, above = [p for p in ok if p[1] < yt], [p for p in ok if p[1] > yt]
+        if below and above:                       # bracketed: interpolate, kept off the ends of the tightest bracket
+            a, b = min(((p, q) for p in below for q in above), key=lambda pq: abs(pq[0][0] - pq[1][0]))
+            x = a[0] + (yt - a[1]) * (b[0] - a[0]) / (b[1] - a[1])
+            x0, x1 = sorted((a[0], b[0]))
+            return Xi(float(np.clip(x, x0 + 0.15 * (x1 - x0), x1 - 0.15 * (x1 - x0))))
+        (va, ma), (vb, mb) = (pts[-2] if len(pts) > 1 else (None, None)), pts[-1]
+        if knob != 'width' and va is not None and ma is not None and mb is not None and Y(ma) != Y(mb) and va != vb:
+            xa, xb = X(va), X(vb)
+            slope = (Y(mb) - Y(ma)) / (xb - xa)
+            if slope * (-1.0 if s.get('inverse') else 1.0) > 0:  # a secant against the knob's sense is noise: skip it
+                x = xb + (yt - Y(mb)) / slope
+                lim = (hi - lo) * 0.5 if lin else np.log(4.0)   # an extrapolation moves at most this far
+                return Xi(float(np.clip(x, xb - lim, xb + lim)))
+        return first_step(vb, mb)
+
+    pts = [(v0, meas(v0))]
+    best = pts[0]
+    for _ in range(TONAL_FIX):
+        if best[1] is not None and _tonal_ok(knob, best[1], target):
+            break
+        v = float(np.clip(step(), lo, hi))
+        if any(abs(v - p[0]) <= 1e-9 * max(1.0, abs(v)) for p in pts):
+            break
+        pts.append((v, meas(v)))
+        if pts[-1][1] is not None and (best[1] is None or abs(pts[-1][1] - target) < abs(best[1] - target)):
+            best = pts[-1]
+    info = {'target': target, 'param': k, 'value': round(best[0], 6), 'renders': len(pts),
+            'search_measured': None if best[1] is None else round(best[1], 3)}
+    if co:
+        info['co'] = {c: round(v, 6) for c, v in upd(best[0]).items() if c != k}
+    return upd(best[0]), info
+
+
+def _tonal_axes(knob, lin):
+    """(X, X inverse, Y): the coordinates a tonal knob's secant runs in, where the measure is near linear in the
+    parameter: width = (width ** 2, (1 - corr) / (1 + corr)); lin specs = (value, measure); the rest log-log"""
+    if knob == 'width':
+        return (lambda v: v * v, lambda x: float(np.sqrt(max(x, 0.0))),
+                lambda c: (1 - min(max(c, -0.99), 0.999)) / (1 + min(max(c, -0.99), 0.999)))
+    if lin:
+        return (lambda v: v, lambda x: x, lambda m: m)
+    return (lambda v: float(np.log(max(v, 1e-9))), lambda x: float(np.exp(x)), lambda m: float(np.log(max(m, 1e-9))))
 
 
 def _land_partial(entry, run, pe, fk, info):
