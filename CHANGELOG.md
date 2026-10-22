@@ -1,5 +1,156 @@
 # Changelog
 
+## 0.4.0 - 2026-10-22
+
+Sound for music-led launch films: 51 new recipe-made sounds in the bank (seven new families), a `launch` kit preset
+mixed against the music bed instead of at fixed levels, and the fit engine re-made and measured with a replication
+benchmark on a private set of licensed reference clips (not in the repo: no audio, no clip name and no per-clip
+model ships; aggregate measurements of them (medians, IQRs), CLAP cosines to them and parameters tuned toward them
+do). Tuned on a fixed 78-clip dev split; the 38 held-out clips were opened once, at the end of the first round, and a
+fresh 28-clip held-out set, frozen before any further tuning, at the end of round C2. No new dependencies.
+
+### Added
+
+- **Bank 0.4** (`earshot/forge/bank/forge04.json`, `forge04r1`; `bank.VERSION` is now
+  `forge_v2r6+forge04r1+fit1+pluck1`, 252 sounds): 51 recipe-made sounds, built from the recipe palettes by
+  `python -m earshot.forge.bank build --forge04`. New categories: `cut_hit` (sub, kick, punch, rumble, air),
+  `reverse_swell` (cymbal, ring, dark, short, breath), `ui_pop` (soft, step, boop, blip, fall, wide), `knock` (wood,
+  plastic, snap, desk, double), `mallet` (glock, pluck, celesta, marimba; chime runs flourish, up4), `drip` (drop,
+  bubble, plink, bloop, tiny), `shutter` (dslr, snap, mirror, film, quick). New members of old categories: whoosh_big
+  thump / thump_deep / thump_airy, riser dark / build / snatch, swish bright / flick, whoosh_fast whip, glitch burst /
+  mid / chirp, notify mid_tine / mid_wood. Every entry carries, besides its render block, meta and fingerprint: the
+  catalog profile (`profile`: length, attack, t20 / t40, centroid, low / high shares, tonal share, glide, L/R
+  correlation), its take audit in its kit role (`audit`: seeds n..n+5; 50 members 6 of 6 clean, glitch/mid 5 of 6)
+  and its originality (`original.max_ref_clap`: the largest CLAP cosine of its render to any of the reference clips,
+  three excerpt conventions, 0.53-0.84; the bar is 0.96). The build refuses a member whose own take is not clean,
+  with fewer than 5 of 6 clean takes, or without a measured originality under the bar; a recorded value holds only
+  for the render it was measured on (`bank.FORGE04_REF_ON`: the member's render block, and the shipped fingerprint),
+  so a member changed since needs a fresh one (`build --forge04 --ref-clap`).
+- **Recipes** (originals made from recipes, none copied from the reference clips): `ui_pop`, `knock`, `mallet` (with
+  chime runs), `drip`, `shutter` (shared parts in `recipes/_tonal.py`), notify's mid dings (`notify.FAMILY_MID`;
+  `ring` / `soft` / `bell_len` keys, off by default: earlier members render sample for sample); `cuthit`, `thump`,
+  `revcymbal`, `darkriser`, `brightswish`, `burstglitch`. Eight members came last, each found by a model-free search
+  from a hand-set corner toward a designed aim with every candidate's takes audited (drip bloop / tiny, shutter film /
+  quick, mallet celesta / marimba, reverse_swell short / breath).
+- **The launch preset** (`earshot kit init --preset launch`): music-led launch films. The 0.4 members where they fit
+  (ui_pop/soft for the pop, knock/wood, cut_hit/punch and kick, whoosh_big/thump, riser/dark, reverse_swell/dark,
+  notify/mid_tine, shutter/dslr, a wide gated mallet/glock bell and a soft mallet/pluck text), every role placed
+  against the music bed. riser and swell are sounded (at most one or two a film, at a section change), suck is off;
+  both are aligned on their peak (the 0.4 members fall after their climax: aligned on the end, the dark riser's
+  climax would come 0.27 s before the cut), and `kit check` notes an end-aligned role whose sound rings on more than
+  30 ms past its peak. Its 72 takes are clean in `kit check`.
+- **Kit mix keys** (optional; a kit without them plans, keys and locks its takes as before): `bed_db` (the mix's
+  loudest 50 ms at the effect, K-weighted, over the music's median 50 ms level in the second before the cue; the takes
+  of such a role carry `l50_lufs`), `offset_ms` (the sync point against the picture: taps, knocks and clicks lead,
+  pop-in thumps and whoosh and swell peaks land after), `min_gap_ms` (run spacing), `width` (the L / R correlation
+  every take is set to by mid / side, measured into the lock as `corr`), and a kit-level `mix` block (the stop-down:
+  the music steps down before a hit and comes back on it; no ducking). Helpers for a mixer: `kit.bed_level(music, t)`
+  (None where the music is silent, under -60 LUFS: `gain_db` then falls back to `level_db`; a mono take or bed
+  measured as the dual mono it plays as), `kit.gain_db(take, role, bed_lufs)` (the take alone lands at bed + 10
+  log10(10^(bed_db/10) - 1), never over -1 dBFS at its peak), `kit.place(take, role, cue_s)`, `kit.space_run(times, min_gap_ms)`, `kit.stereo_width(y, corr)`,
+  `kit.loud_lufs(y)`. The launch preset's numbers are medians measured on the reference clips (effects 3-10 dB over
+  their bed; touches lead the cut by 11-60 ms, pop-in thumps and whoosh and swell peaks land 30-42 ms after it; runs
+  66-159 ms apart).
+- **The audit gives a drip its rise**: `sfx.check` applies `recipes/drip.allows()` to the drip category, so a climb a
+  bubble makes (at most 14 st, starting within 60 ms, done within 250 ms) is a note, while any other rising tone is
+  still the rising-glide warning (drip/bloop needs it).
+- **The gesture model** (`earshot/forge/fit/gesture.py`, kind `gesture`): tones (the sines candidate's partials) +
+  air (a detail noise model of what the tones leave, split in the magnitude domain), with motion knobs (length,
+  sweep, doppler, proximity, pan, motion, width, roughness, tone_db / air_db, vary). Tried on every sound under 1 s
+  and second in the long gesture / mixed / glide / ringing plans; it won 38 of the 78 dev clips. `earshot fit --kind
+  gesture`; a bank fit entry's dur knob maps to its `length`.
+- **Stereo and space.** Sines and modal fits keep the recording's side over time per octave band (the part coherent
+  with the mid as a pan, the rest as the mid's quadrature): on 42 wide or decorrelated dev clips the side / mid error
+  fell from 13.4 to 0.15 dB, the tail correlation error from 0.39 to 0.04. A hybrid's sines layer keeps its side and
+  the residual the next layers are fitted on leaves it out (`fit_hybrid` takes the layer's stereo render out), so
+  the air does not model the tones' side a second time. `earshot/forge/fit/space.py`: a fitted
+  diffuse side layer for a stereo recording whose tail is decorrelated (`post['space']`). `quality` measures
+  `side_db`, `width_db`, `tail_corr`, `tail_corr_err`, and `score` weighs width and tail correlation.
+- **Beds.** A recording with a steady music bed in its pre-roll is stripped and the sound alone is fitted; the bed is
+  rendered back under it by default (`render(bed=False)`: the sound alone, which is what a bank entry's and a kit's
+  takes render: `bank add-fit` of such a fit keeps the bed out of its takes). `earshot fit --keep-bed` turns it off.
+  Analysis by synthesis decides whether it is a bed: the winning candidate's kind is also fitted on the recording as
+  it is, and the bed is dropped when that scores lower (`auto.BED_CHECK`; a whoosh's own steady approach had been
+  stripped as music).
+- **CLAP margin rule.** After the confirm stage a candidate whose CLAP is 0.02 higher on seed 0 and on the confirm
+  seeds' mean, within 1.5 of the score and 0.05 of the envelope r, is chosen instead (`auto.CLAP_MARGIN`; rows keep
+  `clap2`).
+- **Time shape.** A post-stage gate (cut-only, kept when it lowers the score and costs no CLAP) for gated pulses,
+  hard stops and merged runs (it follows the knobs that move time: a modal spacing moves each reopening with the
+  strike it opens for; a gesture length moves the gate and the attack clamp about the tones' first strike; a morph
+  warps each source's gate onto its timeline); modal noise bands may not rise before a strike (onset error 0.39 -> 0.25 octave on the
+  modal dev fits); the glide gate now fires at 2 semitones over 15 ms; the best three candidates are confirmed on two
+  more seeds.
+- **Spectral**: a detail fit (`spectral.DETAIL`, `quiet_db`), `trajectory()` and the motion knobs doppler,
+  proximity, pan and motion.
+- **Tonal knobs** (`knobs.apply(..., decay=, onset=, bright=, width=)`): t20, attack, centroid and L/R correlation
+  targets landed by measurement through one recipe parameter; pitch knobs for ui_pop, mallet, knock, drip and
+  cut_hit; a dur knob for reverse_swell.
+- **`eval/forge/replicate.py`**, the replication benchmark (targets read from a folder you pass, or a frozen split
+  file with `--split-file`; results go outside the repo or under `out/`; an explicit `PYTHONPATH` picks the engine).
+
+### Changed
+
+- Every render of a model fitted by 0.4 starts at zero (a fade-in of 2 ms, shorter when the onset is earlier) and
+  peaks at -1 dBFS at most. Models fitted before 0.4 (modal, sines and hybrid models without the `coherent` flag: the
+  0.3 bank's fit entries; spectral models without the `finish` flag, which every 0.4 spectral fit carries) render as
+  0.3.0 did, sample for sample (`auto.finished()`).
+- **calm, crisp and minimal sound as in 0.3.0**: rendered with the 0.3.0 code and with 0.4.0, all 191 of their takes
+  are byte-identical. The bank version is part of every take's cache key, so a kit re-renders once after the update.
+- Takes of fits made by 0.4 (models marked `coherent`): modal vary moves the modes by a smooth random function of
+  log frequency, the same in every strike, with phases kept on the first strike's timeline, and strike times no
+  longer jitter (independent per-mode detune undid the fit's cancellations: takes rang on); multi-strike modal fits
+  keep their strikes coherent under the size and spacing knobs too; sines vary moves neighbouring partials together.
+  A modal or hybrid fit's `vary_scale` 0.5 halves the bank's vary for these kinds.
+- The attack clamp of a noise model's post stage is high-passed and kept only where it helps.
+- Takes without clicks: the post gate's gain is smoothed over 1 ms, a later modal strike rises over 0.15 ms (coherent
+  models), and a coherent sines model jitters a strike's atoms together.
+- The gesture air's grain texture is levelled over 5 ms windows and kept only when it is stationary
+  (`spectral.fit(grain_norm_ms=, grain_halves=)`, `grains['norm_ms']`; older models render as before).
+- `kit check`'s restraint note says which presets keep riser, swell and suck off (launch sounds riser and swell).
+- Recipe comments no longer name a source film.
+
+### Measured (replication benchmark)
+
+Tuned on the dev split only; each held-out set opened once. Details and the regressions in
+[docs/FIT.md](docs/FIT.md#the-replication-benchmark-04). The fresh held-out set is harder and more bedded than the
+benchmark (its isolation bar is lower): compare engines on it, not its numbers with the other rows. The 0.4.0 rows were
+measured before the release review's hybrid side fix (a hybrid's residual now leaves its tone layer's stereo side
+out), which can change hybrid candidates on stereo tonal clips; they were not measured again.
+
+| split | engine | CLAP (median) | mel gap dB | high / good / fair / poor | takes pass |
+|---|---|---|---|---|---|
+| dev (78) | 0.3 | 0.884 | 1.43 | 19 / 20 / 31 / 8 | 29 |
+| dev (78) | 0.4, first round | 0.907 | 0.90 | 30 / 26 / 20 / 2 | 46 |
+| dev (78) | 0.4.0 | 0.921 | 0.85 | 40 / 20 / 17 / 1 | 42 |
+| held-out (38) | 0.3 | 0.878 | 1.73 | 7 / 8 / 19 / 4 | 21 |
+| held-out (38) | 0.4, first round | 0.909 | 0.98 | 14 / 9 / 12 / 3 | 25 |
+| held-out (38), opened | 0.4.0 | 0.903 | 1.04 | 14 / 11 / 12 / 1 | 25 |
+| fresh held-out (28) | 0.3 | 0.853 | 0.87 | 2 / 6 / 14 / 6 | 8 |
+| fresh held-out (28) | 0.4, first round | 0.830 | 0.75 | 4 / 3 / 14 / 7 | 12 |
+| fresh held-out (28) | 0.4.0 | 0.851 | 0.58 | 5 / 6 / 13 / 4 | 7 |
+
+On the fresh held-out set 0.4.0 is level with 0.3 on the median CLAP (0.851 against 0.853) and ahead on the mean
+(0.860 against 0.844), the mel gap, the grades (grade up on 7 clips, down on 2) and the take CLAP (0.863 against
+0.809); fewer takes pass the take check (7 against 8), and the onset error grew (1.00 octave against 0.53).
+
+### Not done (known gaps)
+
+- The four stereo sines fit entries (fit/click/floss_lid, fit/key.space/thock_space, fit/snap/switch_flip,
+  fit/whoosh.short/bamboo_swish) keep their 0.3 fits with the old, too quiet side: calm uses all four, crisp three
+  (not bamboo_swish), minimal switch_flip and launch floss_lid and thock_space, and a refit would change those
+  presets' takes (calm, crisp and minimal stay byte-identical to 0.3.0).
+- The bed check has no CLAP guard: on the fresh held-out set it dropped a knock's bed although the plain fit had 0.087
+  less CLAP, and a plain fit of a bedded clip keeps the bed in its sound (four of the six new take failures there).
+- Onsets: the onset error grew against 0.3 on the fresh held-out set (14 of 28 clips off by more than an octave).
+- Take clicks left: a loud grain inside an air-only key's attack and one modal-layer click in a hybrid take; a comb
+  ring in the ring-out tails of short modal clips (7-8 dev clips).
+- Multi-pulse counts on long gesture wins (7 of the 28 dev clips with 3 or more pulses miss by more than 2) and clips
+  of 0.5 s or longer (3 of 13 high on dev).
+- Takes passing fell this round (dev 46 -> 42, fresh held-out 12 -> 7) although the take CLAP rose.
+- Both held-out sets are now opened; a next round needs a new one.
+- No listening test of the 0.4 sounds: they were chosen and checked by measurement (profiles, audits, CLAP).
+
 ## 0.3.0 - 2026-10-19
 
 The sound engine of a film: the forge's delivered sounds as a bank, one-sound renders aimed at the picture, a

@@ -1,6 +1,6 @@
 ---
 name: earshot
-description: Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, or making a sound in code and improving it by listening (earshot forge). Use it before telling anyone how audio sounds.
+description: Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, making a sound in code and improving it by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
 ---
 
 # earshot: ears for an agent
@@ -144,26 +144,57 @@ one. The impact (darker, swell-led) and the click (short tails) were not re-made
 Use this when a code-made film (a cinetic film, any cue sheet) needs its effects: render them from earshot's shipped
 bank instead of writing synth voices. No models load; a whole kit renders in about a minute and re-renders in seconds.
 1. Start from a preset: `earshot kit init --preset calm -o audio/kit.json` (calm for text-led films, crisp for
-   energetic product films, minimal for designed effects-only films). Each role's `note` says why its sound was
-   chosen; riser, swell and suck are off: a reveal resolves on one element, and the lockup is one clean hit.
+   energetic product films, minimal for designed effects-only films, launch for films cut to music). Each role's
+   `note` says why its sound was chosen. calm / crisp / minimal keep riser, swell and suck off: a reveal resolves on
+   one element, and the lockup is one clean hit. launch sounds one riser or reverse swell at a section change and
+   uses the 0.4 sounds made for music-led films (below).
 2. Fit it to the film: `earshot sfx list --kind hit` (or `--category`) shows the candidates with lengths, peak times
    and knobs. Change a role's `sound`, set `edits` (`pitch` to the film's root for the hit or drop, `dur` / `apex` for
    a fixed move), `takes` (12 or more for typing, 2-4 elsewhere), `level_db`. Audition one candidate with
    `earshot sfx render ID -o x.wav [--pitch E5] [--dur 0.8 --apex 0.32]` and read its measured onset / peak / end.
 3. Render: `earshot kit render audio/kit.json --out audio/kit`. The takes and `kit.lock.json` (measured onset, peak,
    end, loudness per take) are what the mixer places on cue frames: onset on the frame for hits and touches, the
-   peak on a whoosh's apex, the end on a riser's hit.
+   peak on a whoosh's apex, the end on a riser's hit (its peak when the role aligns on `peak`, as launch's riser and
+   swell do: those members fall after their climax; `kit check` notes an end-aligned one).
 4. Check: `earshot kit check audio/kit.json --out audio/kit`. It refuses what a render cannot use (a knob or pitch
    the sound cannot take, a level over 0 dBFS, two takes that would share a file). Every warning names a take and a
    reason (clicks, a cut tail, comb ring, silence, a pitch that climbs more than 4 semitones, a hit with two attacks
    or a build before it, `pitch_off`: a note the knob did not land); swap the sound or the knob rather than keeping a
    warned take. Read the notes too (a sounded riser, a composite sting).
 5. Listen through the finished film with Loop 2 (`timeline --cues`, `sheet`) and check that each cue landed.
-Say plainly what the bank is: forge sounds made in code, and 15 sounds fitted as code from CC0 recordings
-(`fit/<role>/<name>`, each with its source; the presets use them for clicks, ticks, keys, touches and the snap), all
-chosen and checked by measurement. They are not recordings: when the brief asks for recorded sound, use
-`skills/real-sound` instead. To add a fit of your own (`earshot fit --takes`, then `bank add-fit`), see `docs/SFX.md`
-("Add your own fit").
+
+**The 0.4 families** (`earshot sfx list --category ui_pop`, ...), for the soft, short, mid-register sound of
+music-led launch films: `ui_pop` (rounded mid pops for chips, bubbles and rows arriving: the most used effect in
+those films), `knock` (mid-band wood and plastic), `cut_hit` (short sub hits with a kick, a punchy cut hit),
+`mallet` (gated glockenspiel / celesta / marimba notes, a soft pluck, chime runs; `--pitch` tunes them), `drip`
+(water drops whose pitch rises: the audit allows a bubble its climb), `shutter` (snap zooms, whip-cuts),
+`reverse_swell` (peaks just after a cut, one a film), plus whoosh_big thump*, riser dark / build / snatch, swish
+bright / flick, whoosh_fast whip, glitch burst / mid / chirp and notify mid_tine / mid_wood. Prefer them over the
+bright 5 ms blips and long cinematic tails of the older categories when the film is cut to music.
+
+**Levels against the music, not fixed** (launch, or any role with `bed_db`). In films cut to music effects ride 3-10
+dB over the music and read by timing and spectrum: a fixed `level_db` is either buried in loud passages or sticks
+out in quiet ones. For each cue, measure the bed and set the take from the lock:
+```python
+from earshot.forge import kit
+lock = kit.render('audio/kit.json', 'audio/kit')                 # takes carry l50_lufs; roles bed_db, offset_ms
+role = lock['roles']['pop']; take = role['takes'][i]
+bed = kit.bed_level(music, t_cue)                                # the music's median 50 ms level, second before
+gain = kit.gain_db(take, role, bed)                              # dB on the take file (never over -1 dBFS peak)
+start = kit.place(take, role, t_cue)                             # taps / knocks / clicks lead, whoosh peaks land after
+cues = kit.space_run(run_times, role['min_gap_ms'])              # a run keeps its gap (pops 114 ms, keys 87)
+```
+Pull the music down 6-12 dB for 0.3-0.5 s before a hit, a drop, a big whoosh or a swell and bring it back on the hit
+(the lock's `mix.stop_down`); do not duck the music under every effect. Without a music bed (an effects-led film)
+`level_db` is the fallback; where the music is silent before a cue (a cold open, a gap in the score) `bed_level`
+returns `None` and `gain_db` uses `level_db`. Report the gains you set and the bed levels you measured.
+
+Say plainly what the bank is: forge sounds made in code (0.4's tuned toward the measured style of a private set of
+licensed reference clips, and checked to stay originals: CLAP 0.84 at most against any of them), and 15 sounds fitted
+as code from CC0 recordings (`fit/<role>/<name>`, each with its source; the presets use them for clicks, ticks, keys,
+touches and the snap), all chosen and checked by measurement, none by a listening test. They are not recordings: when
+the brief asks for recorded sound, use `skills/real-sound` instead. To add a fit of your own (`earshot fit --takes`,
+then `bank add-fit`), see `docs/SFX.md` ("Add your own fit").
 
 ## Optional: a second opinion in words (audio LLM)
 `earshot llm mix.wav --yes-upload [--with-timeline] [--prompt "Is the riser at 0:12 cheap?"]` asks Google Gemini for
