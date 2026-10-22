@@ -174,3 +174,17 @@ def test_critique_flags_windows_at_the_window_threshold():
     _, flagged, tw = critique._realness_windows(f)
     assert tw == t and [q['p_real'] for q in flagged] == [t['lo'] - 0.01]
     assert critique._p(0.766, {'lo': 0.4, 'hi': 0.77}) == '0.766' and critique._p(0.81, {'lo': 0.4, 'hi': 0.77}) == '0.81'
+
+
+# ------------------------------------------------------------------------------------------------- version
+def test_one_version_everywhere():
+    """the package, pyproject and the newest changelog entry name one version"""
+    import re
+
+    import earshot
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root, 'pyproject.toml'), encoding='utf-8') as fh:
+        pyproject = re.search(r'^version = "([^"]+)"', fh.read(), re.M).group(1)
+    with open(os.path.join(root, 'CHANGELOG.md'), encoding='utf-8') as fh:
+        top = re.search(r'^## (\S+)', fh.read(), re.M).group(1)
+    assert earshot.__version__ == pyproject == top == '0.4.0'
