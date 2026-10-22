@@ -1,6 +1,6 @@
 """earshot kit: one film's sounds by role, rendered from the bank into takes with measured sync points.
 
-    earshot kit init --preset calm -o audio/kit.json               # calm | crisp | minimal (earshot/forge/kits)
+    earshot kit init --preset calm -o audio/kit.json               # calm | crisp | minimal | launch (forge/kits)
     earshot kit render audio/kit.json --out audio/kit [--force]    # cached; writes audio/kit/kit.lock.json
     earshot kit check audio/kit.json [--out audio/kit] [--json]    # ids, knobs, the model-free audit of every take
     earshot kit audition audio/kit.json -o audition.wav [--out audio/kit]   # every take, role by role, at its level
@@ -28,20 +28,47 @@ kit.json (schema 1):
   pitches   one set of takes per pitch (note names, 'Cs5' sharps included, or Hz), through the recipe's own pitch
             parameter; two spellings of one pitch ('C#5', 'Db5', 554.37) are one take, so a list may not repeat one
   align     the sync point a mixer puts on the cue: onset (the take's measured onset), peak (its loudest 5 ms: whoosh
-            apexes), end (its end: risers, swells); default ALIGN[role]
+            apexes, and a riser or swell that falls after its climax: the 0.4 members), end (its end, the last 5 ms
+            within 50 dB of its loudest: builds that stop on their loudest sample, forge_v2's risers); default
+            ALIGN[role]. kit check notes an end-aligned role whose sound rings on more than END_PEAK_S past its peak
   max_s     a take longer than this is faded out to it (a quarter of the length, at most 150 ms); 0.01 s or more
   level_db  the mix level of the role relative to a take at its peak: information for the mixer (audition uses it); a
             number (leave it out for 0)
   note      why this sound (the presets say why for every role; "off" says why a role is null)
-  null      the role is not sounded: a renderer skips such cues (the presets keep riser, swell and suck off)
+  null      the role is not sounded: a renderer skips such cues (calm / crisp / minimal keep riser, swell, suck off)
+Mix keys (earshot 0.4, optional; a kit without them renders and locks exactly as before):
+  bed_db    the role's level against the film's music bed: the mix's loudest 50 ms at the effect (K-weighted, LUFS
+            scale) this many dB over the bed's level, the median 50 ms K-weighted level of the music in the second
+            before the cue (bed_level()). Music-led films put effects 3-10 dB over their bed, not at a fixed level:
+            gain_db() turns it into the gain for one take on one cue (the take alone lands at bed + 10 log10(10 **
+            (bed_db / 10) - 1): the bed is under it in the mix; never over a -1 dBFS peak); level_db stays the
+            fallback where there is no bed: bed_level() gives None for a bed under BED_FLOOR_LUFS (digital silence
+            before the music starts, a gap or a drop in the score, the end card after the track) and gain_db()
+            takes None, or any level under the floor, as no bed. Both sides are measured as played: a mono take or
+            bed counts as the two identical channels it plays as (dual mono at unity, like audio.load and
+            audition); 0.5..30
+  offset_ms where the take's sync point (align) sits against the picture event: negative = the sound leads (taps,
+            knocks, clicks a frame or two early), positive = it lands after (pop-in thumps, whoosh peaks, swell
+            peaks); place() gives a take's start time for a cue; -500..500
+  min_gap_ms the smallest spacing of two cues of the role in a run (keys ~87 ms, clicks ~85, ticks ~66, pops ~114):
+            space_run() pushes closer cues apart; 0..2000
+  width     the L / R correlation every take is set to (1 = mono, 0 = fully decorrelated), by mid / side on the
+            finished take (stereo_width(): the side scaled down, or a decorrelated copy of the mid added above 250 Hz,
+            solved to within WIDTH_TOL); 0..1
+  mix       (kit level) information for the mixer: {"level": "bed", "duck_db": 0, "stop_down": {"before": [roles],
+            "depth_db": [lo, hi], "length_s": [lo, hi]}, ...}: the music steps down before a big hit and comes back
+            on it, instead of ducking under every effect
 
 kit.lock.json (written by render into --out with the takes):
-    {"kit": 1, "earshot": "0.3.0", "bank": "<bank.VERSION>", "sr": 48000, "name": "calm",
+    {"kit": 1, "earshot": "0.4.0", "bank": "<bank.VERSION>", "sr": 48000, "name": "calm",
      "roles": {"hit": {"sound": "notify/m0", "align": "onset", "level_db": -2.0, "max_s": 2.0,
                        "takes": [{"file": "hit_1.wav", "seed": 1, "pitch": null, "onset_s": 0.0, "peak_s": 0.004,
                                   "end_s": 1.6, "dur_s": 1.6, "peak_db": -1.0, "lufs_m_max": -11.1, "sha1": "...",
                                   "key": "...", "checks": []}]},
                "riser": null}}
+A role with mix keys carries them in the lock (bed_db, offset_ms, min_gap_ms, width) and its takes carry what they
+need: l50_lufs (the loudest 50 ms, K-weighted, of the file: bed_db) and corr (the measured L / R correlation: width);
+a kit with "mix" carries it too.
 Takes are 24-bit WAVs named <role>_<k>.wav (dots in a role become '-': tick-crisp_1.wav) or <role>_<pitch>[_k].wav
 with one canonical label per pitch (knobs.label: C#5 / Db5 / 554.37 -> Cs5, 445 -> 445hz). Names must differ also
 without regard to case (Windows and macOS file systems): a kit whose takes would share a file is refused. The
@@ -70,8 +97,20 @@ ROLES = ('tick', 'tick.crisp', 'tock', 'hit', 'land', 'land.light', 'pop', 'whoo
          'riser', 'drop', 'key', 'key.space', 'key.return', 'click', 'click.confirm', 'snap', 'swell', 'bell', 'text')
 ALIGN = {'whoosh.short': 'peak', 'whoosh.long': 'peak', 'suck': 'end', 'riser': 'end', 'swell': 'end'}
 ALIGNS = ('onset', 'peak', 'end')
+END_PEAK_S = 0.03         # kit check: an end-aligned sound whose end comes this much after its peak falls after its
+                          # climax (riser/dark: 0.25 s), so 'end' puts the climax that much before the cue
 EDITS = ('dur', 'apex', 'pitch', 'peak_db', 'weight')
-ROLE_KEYS = ('sound', 'takes', 'seed', 'edits', 'pitches', 'align', 'max_s', 'level_db', 'note')
+ROLE_KEYS = ('sound', 'takes', 'seed', 'edits', 'pitches', 'align', 'max_s', 'level_db', 'note', 'bed_db', 'offset_ms',
+             'min_gap_ms', 'width')
+MIX_KEYS = ('bed_db', 'offset_ms', 'min_gap_ms', 'width')           # earshot 0.4 (module doc), with their ranges:
+MIX_RANGES = {'bed_db': (0.5, 30.0), 'offset_ms': (-500.0, 500.0), 'min_gap_ms': (0.0, 2000.0), 'width': (0.0, 1.0)}
+WIDTH_TOL = 0.05          # a take's L / R correlation lands within this of the role's width (when it can)
+L_WIN = 2400              # the loudest-window measure for bed_db: 50 ms at 48 kHz
+BED_SPAN_S = 1.0          # bed_level(): the music's level over the second before the cue
+BED_FLOOR_LUFS = -60.0    # bed_level(): a quieter bed is no bed (silence, a gap in the score): None, so gain_db falls
+                          # back to level_db instead of setting the effect bed_db over silence (-240 LUFS: muted)
+AUDITION_BED_LUFS = -24.0  # audition: the nominal music bed a bed_db role is set against
+CEILING_DB = -1.0         # gain_db never lifts a take's sample peak over this
 MAX_TAKES = 32
 REROLL = 3                # extra seeds a take that fails the audit may try (render_take)
 RESTRAINED = ('riser', 'swell', 'suck')
@@ -173,8 +212,42 @@ def problems(kit):
         if spec.get('max_s') is not None and (not _is_num(spec['max_s']) or spec['max_s'] < 0.01):
             out.append(f"{role}: max_s must be a number of seconds, 0.01 or more (a shorter take is silence), got "
                        f"{spec['max_s']!r}")
+        for key in MIX_KEYS:
+            lo, hi = MIX_RANGES[key]
+            if key in spec and (not _is_num(spec[key]) or not lo <= spec[key] <= hi):
+                out.append(f'{role}: {key} must be a number in {lo:g}..{hi:g}, got {spec[key]!r}')
         out += _edit_problems(role, sid if sid in known else None, ed, ps)
     out += _name_problems(kit)
+    out += _mix_problems(kit.get('mix'), roles)
+    return out
+
+
+def _mix_problems(mix, roles):
+    """the kit-level mix block (information for the mixer): an object; stop_down.before names roles of the kit, its
+    depth_db / length_s are [lo, hi] pairs; duck_db a number"""
+    if mix is None:
+        return []
+    if not isinstance(mix, dict):
+        return ['mix: an object (information for the mixer: level, duck_db, stop_down ...)']
+    out = []
+    if 'duck_db' in mix and not _is_num(mix['duck_db']):
+        out.append(f"mix.duck_db must be a number, got {mix['duck_db']!r}")
+    sd = mix.get('stop_down')
+    if sd is not None:
+        if not isinstance(sd, dict):
+            return out + ['mix.stop_down: an object {before, depth_db, length_s}']
+        before = sd.get('before', [])
+        if not isinstance(before, list):
+            out.append(f'mix.stop_down.before: a list of roles of this kit, got {before!r}')
+        else:
+            bad = [r for r in before if not isinstance(r, str) or r not in roles]
+            if bad:
+                out.append(f'mix.stop_down.before: roles of this kit (unknown: {bad})')
+        for k in ('depth_db', 'length_s'):
+            v = sd.get(k)
+            if v is not None and not (isinstance(v, list) and len(v) == 2 and all(_is_num(x) for x in v)
+                                      and v[0] <= v[1]):
+                out.append(f'mix.stop_down.{k}: a [lo, hi] pair of numbers, got {v!r}')
     return out
 
 
@@ -289,8 +362,11 @@ def plan(kit):
             for k in range(1, n + 1):
                 name = stem + (f'_{_label(p)}' if spec.get('pitches') else '') + (
                     f'_{k}' if (n > 1 or not spec.get('pitches')) else '')
-                out.append({'role': role, 'file': name + '.wav', 'sound': spec['sound'], 'seed': base + k - 1,
-                            'pitch': p, 'edits': ed, 'max_s': spec.get('max_s'), 'k': k})
+                t = {'role': role, 'file': name + '.wav', 'sound': spec['sound'], 'seed': base + k - 1,
+                     'pitch': p, 'edits': ed, 'max_s': spec.get('max_s'), 'k': k}
+                if spec.get('width') is not None:
+                    t['width'] = float(spec['width'])
+                out.append(t)
     return out
 
 
@@ -302,9 +378,11 @@ def take_key(t, sr=SR):
     """the cache key of one planned take (module doc)"""
     from .. import __version__
     from . import bank
-    return _digest({'sound': t['sound'], 'entry': _digest(bank.get(t['sound'])), 'seed': t['seed'],
-                    'pitch': t['pitch'], 'edits': t['edits'], 'max_s': t['max_s'], 'sr': int(sr),
-                    'bank': bank.VERSION, 'earshot': __version__})
+    k = {'sound': t['sound'], 'entry': _digest(bank.get(t['sound'])), 'seed': t['seed'], 'pitch': t['pitch'],
+         'edits': t['edits'], 'max_s': t['max_s'], 'sr': int(sr), 'bank': bank.VERSION, 'earshot': __version__}
+    if t.get('width') is not None:                  # (0.4: only a kit that sets it changes the key)
+        k['width'] = t['width']
+    return _digest(k)
 
 
 def _sha1(path):
@@ -319,6 +397,8 @@ def _render_one(t, seed, role):
                           peak_db=ed.get('peak_db', -1.0), weight=ed.get('weight'), checks=False)
     if t['max_s'] and len(y) > t['max_s'] * SR:
         y = knobs.fit_length(y, float(t['max_s']))[0].astype(np.float32)
+    if t.get('width') is not None:
+        y, meta['width'] = stereo_width(y, t['width'])
     c = sfx.check(y, category=bank.get(t['sound'])['category'], role=role or t['role'], sound=t['sound'])
     bank.add_warning(c, knobs.pitch_warning(meta.get('edits')))
     return y, c, meta
@@ -370,17 +450,24 @@ def render(kit, out, force=False, log=None):
     for role, spec in k['roles'].items():
         lock['roles'][role] = None if not spec else {
             'sound': spec['sound'], 'align': spec.get('align', ALIGN.get(role, 'onset')),
-            'level_db': float(spec.get('level_db') or 0.0), 'max_s': spec.get('max_s'), 'takes': []}
+            'level_db': float(spec.get('level_db') or 0.0), 'max_s': spec.get('max_s'),
+            **{m: float(spec[m]) for m in MIX_KEYS if spec.get(m) is not None}, 'takes': []}
+    if k.get('mix') is not None:
+        lock['mix'] = k['mix']
     rendered = cached = 0
     for t in plan(k):
         key = take_key(t, sr)
         path = os.path.join(out, t['file'])
         hit = cache.get((key, t['file']))
+        role_lock = lock['roles'][t['role']]
         if not force and hit and os.path.isfile(path) and _sha1(path) == hit.get('sha1'):
-            lock['roles'][t['role']]['takes'].append(hit)
+            if 'bed_db' in role_lock and 'l50_lufs' not in hit:       # a take cached before the role had bed_db
+                import soundfile as sf
+                hit = dict(hit, l50_lufs=loud_lufs(sf.read(path, dtype='float64')[0], sr))
+            role_lock['takes'].append(hit)
             cached += 1
             continue
-        y, c, _, used = render_take(t)
+        y, c, meta, used = render_take(t)
         m = bank.measure(y)
         if sr != SR:
             import soxr
@@ -391,7 +478,11 @@ def render(kit, out, force=False, log=None):
                'checks': [w['code'] for w in c['warnings']]}
         if used != t['seed']:
             rec['planned_seed'] = t['seed']
-        lock['roles'][t['role']]['takes'].append(rec)
+        if 'bed_db' in role_lock:
+            rec['l50_lufs'] = loud_lufs(y, sr)
+        if t.get('width') is not None:
+            rec['corr'] = meta['width']['measured']
+        role_lock['takes'].append(rec)
         rendered += 1
         if log:
             log(f"  {t['file']:24s} {t['sound']:26s} seed {t['seed']:<11d} {m['dur_s']:6.3f} s"
@@ -440,13 +531,21 @@ def check(kit, out=None, log=None):
     notes = []
     for role, spec in k['roles'].items():
         if role.split('.')[0] in RESTRAINED and spec:
-            notes.append(f'{role} is sounded: the presets keep {", ".join(RESTRAINED)} off (one clean element on a '
-                         'reveal reads better than a build stacked onto it)')
+            notes.append(f'{role} is sounded: calm, crisp and minimal keep {", ".join(RESTRAINED)} off (one clean '
+                         'element on a reveal reads better than a build stacked onto it; launch sounds one riser or '
+                         'swell at a section change)')
         if spec:
             cat = spec['sound'].split('/')[0]
             why = NEVER.get(spec['sound']) or NEVER_CATEGORIES.get(cat)
             if why:
                 notes.append(f"{role}: {spec['sound']} is {why}; the presets never use it")
+        if spec and spec.get('align', ALIGN.get(role, 'onset')) == 'end':
+            m = bank.get(spec['sound']).get('meta') or {}
+            if _is_num(m.get('end_s')) and _is_num(m.get('peak_s')) and m['end_s'] - m['peak_s'] > END_PEAK_S:
+                notes.append(f"{role}: aligned on its end, but {spec['sound']} rings on "
+                             f"{(m['end_s'] - m['peak_s']) * 1000:.0f} ms past its loudest point (its end is the "
+                             "last 5 ms within 50 dB of it): its climax lands that much before the cue; align "
+                             "'peak' puts the climax on the cue")
         if role.split('.')[0] not in {r.split('.')[0] for r in ROLES}:
             notes.append(f'{role}: not one of the shared roles ({", ".join(ROLES)}); a renderer must know it')
     lock = _read_lock(out) if out else None
@@ -505,8 +604,8 @@ def audition(kit, out_wav, takes=None, gap_s=0.3, role_gap_s=0.8):
     for role, r in lock['roles'].items():
         if not r:
             continue
-        g = 10 ** (float(r.get('level_db') or 0.0) / 20)
         for tk in r['takes']:
+            g = 10 ** (gain_db(tk, r, AUDITION_BED_LUFS) / 20)       # bed_db against a nominal bed, else level_db
             y, fs = sf.read(os.path.join(takes, tk['file']), always_2d=True, dtype='float32')
             y = np.repeat(y, 2, 1) if y.shape[1] == 1 else y[:, :2]
             index.append({'t': round(t, 3), 'role': role, 'file': tk['file'], 'sound': r['sound'],
@@ -528,6 +627,140 @@ def audition(kit, out_wav, takes=None, gap_s=0.3, role_gap_s=0.8):
     return {'summary': f"wrote {f}: {len(index)} takes of {len({i['role'] for i in index})} roles, "
                        f"{len(y) / sr:.1f} s (index in {os.path.splitext(f)[0]}.txt)",
             'file': f, 'index': index, 'takes_dir': takes.replace(chr(92), '/')}
+
+
+# ---------------------------------------------------------------------------------- the mix keys (earshot 0.4)
+def _kpower(x):
+    """K-weighted power per sample, summed over the channels as they play: a mono signal ((n,) or (n, 1)) counts as
+    the two identical channels a player makes of it (dual mono at unity: audio.load, audition, stereo_width), so a
+    mono take or bed measures as its stereo file would (before: 3.01 dB lower)"""
+    from .polish import _chans, _kweight
+    ch = _chans(x)
+    tot = sum(_kweight(c) ** 2 for c in ch)
+    return 2.0 * tot if len(ch) == 1 else tot
+
+
+def loud_lufs(y, sr=SR, win=None):
+    """the loudest 50 ms of a sound, K-weighted over the channel sum of powers (a mono sound as dual mono: _kpower),
+    on the LUFS scale (the measure the bed_db level model uses on both sides: a take's peak and the music bed)"""
+    from .polish import _movmax
+    x = np.asarray(y, np.float64)
+    if sr != SR:
+        import soxr
+        x = soxr.resample(x, sr, SR)
+    return round(float(-0.691 + 10 * np.log10(_movmax(_kpower(x), win or L_WIN) + 1e-24)), 2)
+
+
+def bed_level(music, t, sr=SR):
+    """the music bed's level before a cue at t seconds: the median of its 50 ms K-weighted levels (LUFS scale; a mono
+    bed as dual mono, like a file through audio.load) over the second before t (the level a bed_db role is set
+    against). None when that is under BED_FLOOR_LUFS: no bed there (silence before the music starts, a gap or a drop
+    in the score, after the track ends), and gain_db falls back to the role's level_db. music = samples (n,) /
+    (n, ch) at sr or a path. KitError when less than 50 ms of the music lies before t"""
+    if isinstance(music, str):
+        from .. import audio
+        music, sr = audio.load(music), SR
+    x = np.asarray(music, np.float64)
+    if sr != SR:
+        import soxr
+        x = soxr.resample(x, sr, SR)
+    b, e = int(max(0.0, t - BED_SPAN_S) * SR), int(max(0.0, t) * SR)
+    seg = x[b:e]
+    k = len(seg) // L_WIN
+    if k < 1:
+        raise KitError(f'bed_level: no music before t = {t:g} s')
+    tot = _kpower(seg)[:k * L_WIN].reshape(k, L_WIN).mean(1)
+    lv = round(float(-0.691 + 10 * np.log10(np.median(tot) + 1e-24)), 2)
+    return None if lv < BED_FLOOR_LUFS else lv
+
+
+def over_bed(bed_db):
+    """the take's own loudest 50 ms over the bed for a mix bed_db over it (the two add as powers)"""
+    return float(10 * np.log10(10 ** (float(bed_db) / 10) - 1.0))
+
+
+def gain_db(take, role, bed_lufs=None, ceiling_db=CEILING_DB):
+    """the gain (dB) a mixer applies to one take file on one cue. With the role's bed_db and the bed's level there
+    (bed_level): the mix's loudest 50 ms at the effect lands bed_db over the bed, so the take alone goes to bed_lufs
+    + over_bed(bed_db) - its l50_lufs, but never past ceiling_db at its sample peak (a bed too loud for a short tick
+    leaves it under its bed_db); without them, the role's level_db (relative to the take at its peak). A bed_lufs
+    of None or under BED_FLOOR_LUFS (silence: what bed_level returns as None) is no bed: level_db. take / role =
+    rows of kit.lock.json"""
+    if bed_lufs is not None and bed_lufs >= BED_FLOOR_LUFS and role.get('bed_db') is not None             and take.get('l50_lufs') is not None:
+        g = bed_lufs + over_bed(role['bed_db']) - take['l50_lufs']
+        if take.get('peak_db') is not None:
+            g = min(g, ceiling_db - take['peak_db'])
+        return round(float(g), 2)
+    return float(role.get('level_db') or 0.0)
+
+
+def place(take, role, cue_s):
+    """where a take file starts (s) so its sync point (the role's align: onset / peak / end) lands on the cue
+    shifted by the role's offset_ms (negative = the sound leads the picture). May be negative: the caller trims"""
+    a = role.get('align') or 'onset'
+    return round(float(cue_s + float(role.get('offset_ms') or 0.0) / 1000.0 - float(take[f'{a}_s'])), 4)
+
+
+def space_run(times, min_gap_ms):
+    """cue times (s) of a run pushed apart to at least min_gap_ms (each one no earlier than the one before + the
+    gap), in time order"""
+    out, gap = [], float(min_gap_ms or 0.0) / 1000.0
+    for t in sorted(float(x) for x in times):
+        out.append(round(max(t, out[-1] + gap), 4) if out else t)
+    return out
+
+
+def corr(y):
+    """L / R correlation of a take (1 for mono): sum(L R) / sqrt(sum L^2 sum R^2)"""
+    y = np.asarray(y, np.float64)
+    if y.ndim == 1 or y.shape[1] == 1:
+        return 1.0
+    L, R = y[:, 0], y[:, 1]
+    return float((L * R).sum() / (np.sqrt((L * L).sum() * (R * R).sum()) + 1e-20))
+
+
+def stereo_width(y, target, tol=WIDTH_TOL):
+    """(take, info): a take set to L / R correlation `target` by mid / side, at its own sample peak. Wider than
+    asked: the side is scaled down. Narrower: a decorrelated copy of the mid (fx.decorrelate's three all-passes,
+    high-passed at 250 Hz, so the low end stays mono) is added to the side; the amount is solved by bisection. A mono
+    take comes back stereo. Deterministic. info = {target, before, measured, ok (within tol)}"""
+    from . import dsp, fx
+    x = np.asarray(y, np.float64)
+    x = np.stack([x, x], 1) if x.ndim == 1 else (np.repeat(x, 2, 1) if x.shape[1] == 1 else x[:, :2])
+    pk = np.abs(x).max()
+    M, S = (x[:, 0] + x[:, 1]) / 2, (x[:, 0] - x[:, 1]) / 2
+    c0 = corr(x)
+    target = float(np.clip(target, 0.0, 1.0))
+
+    def make(side):
+        return np.stack([M + side, M - side], 1)
+    if abs(c0 - target) <= tol / 4:
+        out = x
+    elif c0 < target:                               # too wide: less side
+        lo, hi = 0.0, 1.0
+        for _ in range(40):
+            g = (lo + hi) / 2
+            lo, hi = (g, hi) if corr(make(g * S)) > target else (lo, g)
+        out = make((lo + hi) / 2 * S)
+    else:                                           # too narrow: add a decorrelated mid above 250 Hz
+        D = np.ascontiguousarray(M)
+        for dl, g in ((149, 0.6), (263, -0.55), (397, 0.5)):      # fx.decorrelate's all-passes, at the mid's level
+            D = fx._allpass(D, dl, g)
+        D = dsp.butter(D, 'high', 250.0)            # (not re-levelled: what is under 250 Hz stays in the mid)
+        f = min(len(D), SR // 200)                  # the all-passes ring past a hard end: fade their last 5 ms
+        D[-f:] *= np.cos(np.linspace(0, np.pi / 2, f)) ** 2
+        lo, hi = 0.0, 4.0
+        if corr(make(S + hi * D)) > target:         # not reachable (a sound mostly under 250 Hz): as far as it goes
+            lo = hi
+        else:
+            for _ in range(40):
+                h = (lo + hi) / 2
+                lo, hi = (h, hi) if corr(make(S + h * D)) > target else (lo, h)
+        out = make(S + (lo + hi) / 2 * D)
+    out = out * (pk / (np.abs(out).max() + 1e-12))
+    got = corr(out)
+    return out.astype(np.float32), {'target': round(target, 3), 'before': round(c0, 3), 'measured': round(got, 3),
+                                    'ok': bool(abs(got - target) <= tol)}
 
 
 # --------------------------------------------------------------------------------------------------- the API
@@ -562,7 +795,8 @@ def add_cli(sub):
                                    'sync points (no models)')
     s = p.add_subparsers(dest='kit_cmd', metavar='<init|render|check|audition>')
     pi = common(s.add_parser('init', help='write a preset kit file'))
-    pi.add_argument('--preset', default='calm', help='calm (text-led films, default), crisp, minimal')
+    pi.add_argument('--preset', default='calm', help='calm (text-led films, default), crisp, minimal, launch '
+                                                    '(music-led launch films: levels against the music bed)')
     pi.add_argument('-o', '--output', default='audio/kit.json')
     pi.add_argument('--force', action='store_true', help='overwrite an existing file')
     pr = _flags(s.add_parser('render', help='render every take (cached) and write kit.lock.json'))

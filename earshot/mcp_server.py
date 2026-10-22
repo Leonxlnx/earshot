@@ -585,7 +585,7 @@ def tool_sfx_render(sound: Annotated[str, Field(description='bank id from sfx_li
 
 
 def tool_kit_render(kit: Annotated[str, Field(description="absolute path of the film's kit.json (earshot kit init "
-                                                         'writes one from a preset: calm, crisp, minimal)')],
+                                                         'writes one from a preset: calm, crisp, minimal, launch)')],
                     out: Annotated[str, Field(description='absolute path of the folder for the takes and '
                                                           'kit.lock.json')],
                     force: Annotated[bool, Field(description='render every take again (default: keep the takes '

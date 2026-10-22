@@ -97,12 +97,15 @@ def test_silence_is_flagged(wav, capsys):
 
 # --------------------------------------------------------------------------------------------------------- kits
 def test_presets_are_valid_restrained_and_explained():
-    assert kit.presets() == ['calm', 'crisp', 'minimal']
+    assert kit.presets() == ['calm', 'crisp', 'launch', 'minimal']
     for name in kit.presets():
         k = kit.preset(name)
         assert kit.problems(k) == [], name
         assert set(k['roles']) == set(kit.ROLES), (name, set(kit.ROLES) ^ set(k['roles']))
         for r in kit.RESTRAINED:
+            if name == 'launch' and r in ('riser', 'swell'):     # launch films use one, at a section change
+                assert 'at most one' in k['roles'][r]['note'], r
+                continue
             assert k['roles'][r] is None and k['off'][r], (name, r)
         for role, spec in k['roles'].items():
             if spec is None:
@@ -122,7 +125,7 @@ def _midi(p):
     return knobs.midi(p)
 
 
-@pytest.mark.parametrize('name', ['calm', 'crisp', 'minimal'])
+@pytest.mark.parametrize('name', ['calm', 'crisp', 'minimal', 'launch'])
 def test_presets_have_the_rungs_a_progress_motif_needs(name):
     """review (cinetic 5.5b): with 5 bell takes a climbing progress motif ran out of rungs; the bell now spans two
     octaves of one pentatonic (10 notes), and a tonal text role offers the 5 pentatonic degrees of one octave so a
@@ -344,3 +347,188 @@ def test_api_and_mcp_tools(tmp_path):
     k.write_text(json.dumps(_tiny(bell=None, **{'whoosh.short': None})), encoding='utf-8')
     text = mcp_server.tool_kit_render(str(k), str(tmp_path / 'takes'))
     assert '2 takes' in text and (tmp_path / 'takes' / 'kit.lock.json').is_file()
+
+
+# ------------------------------------------------------------------------------- the mix keys and launch (0.4)
+def test_old_presets_render_as_before():
+    """calm / crisp / minimal carry no mix key: their plans, take keys and lock rows are the 0.3 ones (the version
+    aside), so their takes render sample for sample as before"""
+    from earshot import __version__
+    for name in ('calm', 'crisp', 'minimal'):
+        k = kit.preset(name)
+        assert 'mix' not in k and not any(set(s) & set(kit.MIX_KEYS) for s in k['roles'].values() if s), name
+        for t in kit.plan(k)[:6]:
+            assert set(t) == {'role', 'file', 'sound', 'seed', 'pitch', 'edits', 'max_s', 'k'}
+            old = kit._digest({'sound': t['sound'], 'entry': kit._digest(bank.get(t['sound'])), 'seed': t['seed'],
+                               'pitch': t['pitch'], 'edits': t['edits'], 'max_s': t['max_s'], 'sr': 48000,
+                               'bank': bank.VERSION, 'earshot': __version__})
+            assert kit.take_key(t) == old
+
+
+def test_launch_preset_levels_sync_and_runs():
+    k = kit.preset('launch')
+    on = {r: s for r, s in k['roles'].items() if s}
+    assert set(on) == set(kit.ROLES) - {'suck'} and k['off']['suck']
+    for role, spec in on.items():                                   # every sounded role is placed against a bed
+        assert 0.5 <= spec['bed_db'] <= 12 and -100 <= spec['offset_ms'] <= 100, role
+        assert spec['level_db'] <= 0 and spec['sound'] in bank.ids()
+    assert on['land.light']['offset_ms'] < on['tock']['offset_ms'] < on['click']['offset_ms'] < 0   # touches lead
+    assert on['whoosh.short']['offset_ms'] > 0 and on['swell']['offset_ms'] > 0 and on['land']['offset_ms'] > 0
+    assert on['riser']['offset_ms'] < 0 and on['riser']['align'] == 'peak'     # its climax before the cut, its
+    for r in ('riser', 'swell'):                                    # fall across it (the members ring on past it)
+        assert on[r]['align'] == 'peak' and not any('aligned on its end' in n for n in kit.check(
+            {'kit': 1, 'roles': {r: dict(on[r], takes=1)}})['notes']), r
+    assert on['pop']['min_gap_ms'] > on['key']['min_gap_ms'] > on['tick']['min_gap_ms']
+    assert on['tick']['width'] < 0.5 and 0.3 <= on['bell']['width'] <= 0.7
+    assert max(s['level_db'] for s in on.values()) == 0.0
+    new = {'cut_hit', 'ui_pop', 'knock', 'mallet', 'shutter', 'reverse_swell'}
+    assert new <= {s['sound'].split('/')[0] for s in on.values()}
+    mix = k['mix']
+    assert mix['duck_db'] == 0 and set(mix['stop_down']['before']) <= set(on)
+
+
+def test_check_notes_an_end_aligned_riser_that_rings_past_its_peak():
+    """riser/dark peaks 0.25 s before its end (the last 5 ms within 50 dB): aligned on the end, its climax would land
+    a quarter second before the cue; forge_v2's risers stop on their loudest sample and pass"""
+    m = bank.get('riser/dark')['meta']
+    assert m['end_s'] - m['peak_s'] > 0.2
+    r = kit.check({'kit': 1, 'roles': {'riser': {'sound': 'riser/dark'}}})       # ALIGN's default for riser: end
+    assert any(n.startswith('riser: aligned on its end') and "'peak'" in n for n in r['notes']), r['notes']
+    r = kit.check({'kit': 1, 'roles': {'riser': {'sound': 'riser/dark', 'align': 'peak'}}})
+    assert not any('aligned on its end' in n for n in r['notes'])
+    r = kit.check({'kit': 1, 'roles': {'riser': {'sound': 'riser/rush'}}})
+    assert not any('aligned on its end' in n for n in r['notes'])
+
+
+@pytest.mark.parametrize('spec,match', [
+    ({'sound': 'tap/finger', 'bed_db': 0.0}, 'bed_db must be a number in 0.5..30'),
+    ({'sound': 'tap/finger', 'bed_db': 'loud'}, 'bed_db must be a number'),
+    ({'sound': 'tap/finger', 'offset_ms': 900}, 'offset_ms must be a number in -500..500'),
+    ({'sound': 'tap/finger', 'min_gap_ms': -5}, 'min_gap_ms must be a number in 0..2000'),
+    ({'sound': 'tap/finger', 'width': 1.5}, 'width must be a number in 0..1'),
+])
+def test_mix_keys_are_checked(spec, match):
+    probs = kit.problems({'kit': 1, 'roles': {'tick': spec}})
+    assert probs and re.search(match, '; '.join(probs)), probs
+
+
+def test_mix_block_is_checked():
+    base = {'kit': 1, 'roles': {'hit': {'sound': 'cut_hit/punch'}}}
+    assert kit.problems(dict(base, mix={'duck_db': 0, 'stop_down': {'before': ['hit'], 'depth_db': [6, 12]}})) == []
+    assert any('unknown' in p for p in kit.problems(dict(base, mix={'stop_down': {'before': ['drop']}})))
+    assert any('[lo, hi]' in p for p in kit.problems(dict(base, mix={'stop_down': {'length_s': [0.5, 0.3]}})))
+    assert any('an object' in p for p in kit.problems(dict(base, mix=3)))
+    for before in ([['hit']], [{'role': 'hit'}], [3]):                 # reported, not a TypeError
+        probs = kit.problems(dict(base, mix={'stop_down': {'before': before}}))
+        assert any('mix.stop_down.before' in p and 'unknown' in p for p in probs), before
+    assert any('a list of roles' in p for p in kit.problems(dict(base, mix={'stop_down': {'before': 'hit'}})))
+    assert not kit.check(dict(base, mix={'stop_down': {'before': [['hit']]}}))['ok']
+    with pytest.raises(kit.KitError, match='mix.stop_down.before'):
+        kit.load(dict(base, mix={'stop_down': {'before': [['hit']]}}))
+
+
+def test_stereo_width_lands_the_correlation():
+    rng = np.random.default_rng(3)
+    t = np.arange(int(0.3 * SR)) / SR
+    mono = (np.sin(2 * np.pi * 1200 * t) + 0.3 * rng.standard_normal(len(t))) * np.exp(-t / 0.05)
+    mono *= 0.8 / np.abs(mono).max()
+    y, info = kit.stereo_width(mono, 0.3)                            # a mono take comes back wide
+    assert y.shape == (len(t), 2) and info['ok'] and abs(kit.corr(y) - 0.3) <= kit.WIDTH_TOL
+    assert abs(np.abs(y).max() - 0.8) < 1e-4                         # at its own sample peak
+    assert np.array_equal(y, kit.stereo_width(mono, 0.3)[0])         # deterministic
+    z, info = kit.stereo_width(y, 0.9)                               # a wide take narrowed
+    assert info['ok'] and abs(kit.corr(z) - 0.9) <= kit.WIDTH_TOL and info['before'] < 0.4
+    low = np.sin(2 * np.pi * 60 * t) * np.exp(-t / 0.1)              # all under 250 Hz: as far as it goes
+    _, info = kit.stereo_width(low, 0.0)
+    assert not info['ok'] and info['measured'] > 0.5
+
+
+def test_gain_place_and_runs():
+    take = {'onset_s': 0.002, 'peak_s': 0.03, 'end_s': 0.4, 'l50_lufs': -10.0, 'peak_db': -1.0}
+    role = {'align': 'onset', 'level_db': -6.0, 'bed_db': 8.0, 'offset_ms': -40}
+    g = kit.gain_db(take, role, bed_lufs=-24.0)
+    assert abs(g - (-24.0 + kit.over_bed(8.0) + 10.0)) < 0.01 and abs(kit.over_bed(8.0) - 7.25) < 0.01
+    assert kit.gain_db(take, role, bed_lufs=-2.0) == 0.0             # never over the ceiling (-1 dBFS at its peak)
+    assert kit.gain_db(take, role) == -6.0 and kit.gain_db(take, {'level_db': -3.0}, -24.0) == -3.0
+    assert kit.place(take, role, 2.0) == round(2.0 - 0.04 - 0.002, 4)
+    assert kit.place(take, {'align': 'peak', 'offset_ms': 37}, 2.0) == round(2.0 + 0.037 - 0.03, 4)
+    assert kit.place(take, {'align': 'end'}, 2.0) == 1.6
+    assert kit.space_run([1.0, 1.05, 1.06, 1.5], 87) == [1.0, 1.087, 1.174, 1.5]
+    assert kit.space_run([0.3, 0.1], 0) == [0.1, 0.3]
+
+
+def test_bed_level_reads_the_music_before_the_cue():
+    rng = np.random.default_rng(5)
+    music = np.concatenate([0.01 * rng.standard_normal(SR), 0.1 * rng.standard_normal(SR)])
+    quiet, loud = kit.bed_level(music, 1.0), kit.bed_level(music, 2.0)
+    assert 18 < loud - quiet < 22                                    # 20 dB apart: the second before each cue
+    assert abs(loud - kit.loud_lufs(music[SR:])) < 1.5
+    with pytest.raises(kit.KitError, match='no music'):
+        kit.bed_level(music, 0.01)
+
+
+def test_a_silent_bed_is_no_bed():
+    """the second before a cue in digital silence (a cold open, a gap in the score) used to read -240.69 LUFS and
+    set the effect ~220 dB down: it is no bed (None), and gain_db falls back to the role's level_db"""
+    rng = np.random.default_rng(6)
+    music = np.concatenate([np.zeros(2 * SR), 0.1 * rng.standard_normal(SR), 1e-5 * rng.standard_normal(SR)])
+    assert kit.bed_level(music, 1.5) is None and kit.bed_level(music, 4.0) is None     # silence; a -100 dB hiss
+    assert kit.bed_level(music, 3.0) > -30
+    take = {'onset_s': 0.002, 'peak_s': 0.03, 'end_s': 0.4, 'l50_lufs': -12.0, 'peak_db': -1.0}
+    role = {'align': 'onset', 'level_db': -8.0, 'bed_db': 8.5}
+    assert kit.gain_db(take, role, kit.bed_level(music, 1.5)) == -8.0
+    assert kit.gain_db(take, role, -240.69) == -8.0                 # a caller's own silent measure: no bed either
+    assert kit.gain_db(take, role, kit.BED_FLOOR_LUFS) < -30
+
+
+def test_mono_takes_and_beds_measure_as_dual_mono():
+    """a mono take plays on both channels at unity (audition, any dual-mono mixer) and a mono file loads as two
+    channels: both measures count it so, or a mono take with bed_db lands 3 dB hot and a 1-D bed reads 3 dB low"""
+    rng = np.random.default_rng(8)
+    t = np.arange(int(0.3 * SR)) / SR
+    mono = 0.3 * np.sin(2 * np.pi * 900 * t) * np.exp(-t / 0.05)
+    dual = np.stack([mono, mono], 1)
+    assert kit.loud_lufs(mono) == kit.loud_lufs(dual) == kit.loud_lufs(mono[:, None])
+    music = 0.05 * rng.standard_normal(2 * SR)
+    assert kit.bed_level(music, 1.5) == kit.bed_level(np.stack([music, music], 1), 1.5)
+    assert abs(kit.bed_level(music[:, None], 1.5) - kit.bed_level(music, 1.5)) < 1e-9
+
+
+def test_a_take_mixed_at_gain_db_lands_bed_db_over_its_bed():
+    """the level model end to end: a mono take set by gain_db and played dual mono over a steady stereo bed puts the
+    mix's loudest 50 ms bed_db over bed_level (a mono take measured on one channel landed 3 dB hot)"""
+    rng = np.random.default_rng(11)
+    bed = 0.02 * rng.standard_normal((3 * SR, 2))
+    t = np.arange(int(0.3 * SR)) / SR
+    take = 0.5 * np.sin(2 * np.pi * 700 * t) * np.exp(-t / 0.06) * np.minimum(t / 0.002, 1.0)
+    row = {'l50_lufs': kit.loud_lufs(take), 'peak_db': float(20 * np.log10(np.abs(take).max()))}
+    for bed_db in (4.0, 8.0):
+        cue = 2.0
+        lv = kit.bed_level(bed, cue)
+        g = 10 ** (kit.gain_db(row, {'bed_db': bed_db}, lv) / 20)
+        mix = bed.copy()
+        i = int(cue * SR)
+        mix[i:i + len(take)] += (g * take)[:, None]                 # dual mono at unity
+        assert abs(kit.loud_lufs(mix[i:i + len(take)]) - (lv + bed_db)) < 1.0, bed_db
+
+
+def test_kit_render_with_mix_keys(tmp_path):
+    k = {'kit': 1, 'name': 'mixed', 'roles': {
+        'pop': {'sound': 'ui_pop/soft', 'takes': 2, 'bed_db': 8.5, 'offset_ms': 4, 'min_gap_ms': 114, 'width': 0.5},
+        'tock': {'sound': 'knock/wood', 'offset_ms': -40, 'level_db': -3.0}},
+        'mix': {'level': 'bed', 'duck_db': 0, 'stop_down': {'before': ['tock'], 'depth_db': [6, 12]}}}
+    out = tmp_path / 'kit'
+    lock = kit.render(k, str(out))
+    assert 'checks clean' in lock['summary'] and lock['mix']['duck_db'] == 0
+    pop, tock = lock['roles']['pop'], lock['roles']['tock']
+    assert pop['bed_db'] == 8.5 and pop['offset_ms'] == 4.0 and pop['min_gap_ms'] == 114.0 and pop['width'] == 0.5
+    assert 'bed_db' not in tock and tock['offset_ms'] == -40.0 and 'width' not in tock
+    for tk in pop['takes']:
+        y, _ = sf.read(str(out / tk['file']))
+        assert abs(tk['corr'] - 0.5) <= kit.WIDTH_TOL and abs(kit.corr(y) - tk['corr']) < 0.01
+        assert abs(tk['l50_lufs'] - kit.loud_lufs(y)) < 0.05
+    assert 'l50_lufs' not in tock['takes'][0] and 'corr' not in tock['takes'][0]
+    again = kit.render(k, str(out))
+    assert again['stats']['cached'] == 3 and again['roles']['pop']['takes'][0]['l50_lufs'] == pop['takes'][0]['l50_lufs']
+    r = kit.audition(k, str(tmp_path / 'aud.wav'), takes=str(out))
+    assert len(r['index']) == 3
