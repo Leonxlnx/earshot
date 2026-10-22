@@ -2,7 +2,9 @@
 - a modal take rings out past a trimmed recording's end instead of stopping on a ringing tail (ring / take);
 - the fit itself (identity render, seed 0) keeps the recording's length;
 - a sines fit's residual noise follows the recording's roll-off above 16 kHz (no noise above 20 kHz it lacked);
-- takes carry no DC offset; spectral takes keep one loudness across seeds; candidates can be scored on 3 seeds."""
+- takes carry no DC offset; spectral takes keep one loudness across seeds; candidates can be scored on 3 seeds;
+- 0.4: vary and the knobs keep a coherent (0.4) model's structure (a strike that stops the ring still stops it), and
+  models without the flag render as before."""
 import json
 
 import numpy as np
@@ -158,3 +160,116 @@ def test_fit_scores_candidates_on_three_seeds():
     m = auto.fit(x, candidates=['modal', 'spectral'], fast=True, seeds=auto.TAKE_SEEDS)
     assert m['fit_engine']['seeds'] == [0, 1, 2]
     assert auto.fit(x, candidates=['modal'], fast=True)['fit_engine']['seeds'] == [0]
+
+
+# ------------------------------------------------------------------------------------- 0.4: coherent takes
+def _stopped_strike(coherent):
+    """a two-strike modal model whose second strike stops the first one's ring (the same modes, opposite phase: what a
+    least squares fit makes of a gated pulse or a damped hit), as a fit would hold it"""
+    t1, t2, L = 480 / SR, 1920 / SR, 0.2
+    modes = ((600.0, 0.5, 1.0), (1700.0, 0.4, 0.6), (3100.0, 0.3, 0.3))
+    s1 = [[f, tau, a, 0.0] for f, tau, a in modes]
+    s2 = [[f, tau, a * np.exp(-(t2 - t1) / tau), float(np.mod(2 * np.pi * f * (t2 - t1) + np.pi, 2 * np.pi))]
+          for f, tau, a in modes]
+    m = {'kind': 'modal', 'version': modal.VERSION, 'sr': SR, 'length_s': L, 'channels': 1, 'fade_out_s': 0.0,
+         'strikes': [{'t': t1, 'ramp_ms': 0.0, 'modes': s1, 'attack': []},
+                     {'t': t2, 'ramp_ms': 0.0, 'modes': s2, 'attack': []}],
+         'sub': None, 'side': None,
+         'noise': {'edges': list(modal.NOISE_EDGES), 'h_erb': modal.NOISE_H,
+                   'env': [[[0.0, -240.0], [L, -240.0]] for _ in range(len(modal.NOISE_EDGES) + 1)]}}
+    if coherent:
+        m['coherent'] = True
+    return m
+
+
+def _tail_db(y):
+    """the energy after the second strike (+ 5 ms) re the first strike's loudest 5 ms (dB)"""
+    p = np.convolve(y ** 2, np.ones(240) / 240, 'valid')
+    return float(10 * np.log10(np.mean(y[2160:SR // 10] ** 2) / p[:1900].max() + 1e-30))
+
+
+def test_coherent_modal_vary_keeps_the_fit_structure():
+    old, new = _stopped_strike(False), _stopped_strike(True)
+    y_old, y_new = modal.render(old, 0), modal.render(new, 0)
+    keep = np.ones(len(y_old), bool)                                          # the fit itself: the same samples, but
+    keep[1920:1920 + int(round(modal.STRIKE_RAMP_S * SR)) + 1] = False        # the later strike's 0.15 ms onset ramp
+    assert np.array_equal(y_old[keep], y_new[keep])                           # (round C2: no step, no click)
+    assert np.max(np.abs(np.diff(y_new[1910:1940]))) < np.max(np.abs(np.diff(y_old[1910:1940])))
+    assert _tail_db(modal.render(new, 0)) < -100                             # the second strike stops the ring
+    t_old = [_tail_db(modal.render(old, s, vary=0.3, ring=False)) for s in (1, 2, 3)]
+    t_new = [_tail_db(modal.render(new, s, vary=0.3, ring=False)) for s in (1, 2, 3)]
+    assert max(t_new) < -40                                                   # coherent takes still stop
+    assert min(t_old) > max(t_new) + 15                                       # per-mode jitter undid the stop
+    t_size = [_tail_db(modal.render(m, 0, size=1.1)) for m in (old, new)]     # a pitch knob keeps it too (the
+    assert t_size[1] < -35 and t_size[1] < t_size[0] - 20                     # decays it stretches leave a trace)
+    assert not np.allclose(modal.render(new, 1, vary=0.3), modal.render(new, 2, vary=0.3))
+    ns = {}
+    exec(compile(modal.to_code(new, 'stop'), 'stop.py', 'exec'), ns)
+    assert np.array_equal(ns['render'](3, vary=0.3), modal.render(new, 3, vary=0.3))
+
+
+def test_fits_are_coherent_and_old_models_render_as_before(strike_model, tone_model, monkeypatch):
+    """a model fitted before 0.4 (no 'coherent': the 0.3 bank's fit entries) renders as 0.3 did: no fade-in, no peak
+    limit (sines and auto), and the flag changes nothing else at vary 0"""
+    from earshot.forge.fit import auto
+    assert strike_model[1].get('coherent') is True and tone_model.get('coherent') is True
+    old = json.loads(json.dumps(tone_model))
+    old.pop('coherent')
+    assert sines.fade_in_s(old) == 0.0 and not sines._limited(old) and sines.fade_in_s(tone_model) > 0
+    assert not auto.finished(old) and auto.finished(tone_model)
+    hyb = {'kind': 'hybrid', 'layers': [{'role': 'tone', 'model': old}, {'role': 'air', 'model': {'kind': 'spectral_noise'}}]}
+    assert not auto.finished(hyb)
+    hyb['layers'][0]['model'] = tone_model
+    assert auto.finished(hyb)
+    y_old = sines.render(old, 2)
+    monkeypatch.setattr(sines, 'finish', lambda y, sr=48000, fade_s=0.002, peak_db=-1.0, limit=True: np.array(y, float))
+    assert np.array_equal(y_old, sines.render(tone_model, 2))
+    assert not np.allclose(sines.render(old, 2, knobs={'vary': 0.3}), sines.render(tone_model, 2, knobs={'vary': 0.3}))
+
+
+def test_spectral_fits_carry_the_finish_flag_and_old_ones_render_as_before():
+    """a spectral model fitted by 0.3 has no 'finish' flag: auto.render leaves out the 0.4 fade-in and peak limit
+    (its renders stay 0.3's, sample for sample); every 0.4 spectral fit carries it, and a morph keeps it"""
+    x = _gesture(int(0.3 * SR), np.random.default_rng(9))
+    m = spectral.fit(0.9 * x / np.abs(x).max(), texture=False, iters=1, seeds=(1,))
+    assert m['finish'] is True and auto.finished(m)
+    old = json.loads(json.dumps(m))
+    old.pop('finish')
+    assert not auto.finished(old)
+    for s in (0, 3):
+        assert np.array_equal(auto.render(old, seed=s), auto._render(old, seed=s, final=False))
+    y = auto.render(m, seed=0)
+    assert abs(y[0]) < 1e-12 and np.abs(y).max() <= 10 ** (auto.PEAK_DB / 20) + 1e-9
+    assert auto.finished(auto.morph(m, m, 0.5)) and not auto.finished(auto.morph(old, old, 0.5))
+
+
+def test_old_stereo_sines_side_keeps_the_0_3_arithmetic_under_gain(tone_model, monkeypatch):
+    """a 0.3 stereo sines model (no 'side', a real width) with a gain knob: the side is scaled in 0.3's two steps,
+    width then gain, so it stays bit-identical to 0.3.0 (one combined step differs in the last bits)"""
+    old = json.loads(json.dumps(tone_model))
+    for k in ('coherent', 'side'):
+        old.pop(k, None)
+    old.update(width=-6.4, channels=2)
+    seen = {}
+    real = sines.synth_noise
+
+    def spy(*a, **kw):
+        out = real(*a, **kw)
+        seen[a[4]] = out.copy()
+        return out
+    monkeypatch.setattr(sines, 'synth_noise', spy)
+    y2 = sines.render(old, 5, knobs={'gain_db': 3.0, 'stereo': True})
+    y1 = sines.render(old, 5, knobs={'gain_db': 3.0, 'stereo': False})
+    side = seen[5 + 1000003] * 10 ** (-6.4 / 20)
+    side *= 10 ** (3.0 / 20)
+    assert np.array_equal(y2[:, 0], y1 + side) and np.array_equal(y2[:, 1], y1 - side)
+
+
+def test_vary_field_is_smooth_in_log_frequency():
+    r = np.random.default_rng(4)
+    fs = [sines.vary_field(r) for _ in range(200)]
+    h = 200.0 * np.arange(1, 41)                                              # a harmonic series
+    v = np.array([[F(f) for f in h] for F in fs])
+    assert abs(v.std() - 1.0) < 0.15                                          # unit variance over draws
+    step = np.abs(np.diff(v[:, 20:], axis=1)).mean()                          # neighbouring upper partials
+    assert step < 0.25                                                        # independent draws differ by ~1.13

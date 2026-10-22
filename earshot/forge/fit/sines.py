@@ -38,13 +38,30 @@ Model (plain JSON-serialisable dict):
      'transients': [{'t': start s, 'atoms': [[f Hz, tau s, amplitude, phase], ...]}, ...]   (one per strike)
      'residual': {'bands': [Hz centres, 1/3 octave], 'times': [s, ...], 'db': [[dBFS per time] per band],
                   'hf': [[Hz, dB], ...]},
-     'width': side/mid energy of the source in dB (stereo renders), 'analysis': {...}, 'summary': {...}}
+     'width': side/mid energy of the source in dB, 'side': {'bands': [Hz, octaves], 'times': [s, ...],
+              'pan': [[gain per time] per band], 'diffuse': [[gain per time] per band]} (a stereo source; else None),
+     'coherent': True (0.4; see vary below), 'analysis': {...}, 'summary': {...}}
 The residual bands are triangles on log frequency that sum to one; a band's dB is the RMS of the band-passed residual.
 The top band (16 kHz) is flat to Nyquist and the lowest (50 Hz) flat to DC. Above 16 kHz the noise follows the
 recording's own roll-off `hf` (its residual's spectrum re 16 kHz, made monotone); models fitted before 0.3 have no
 `hf` and keep the flat top band, which leaves noise above 20 kHz that the recording did not have (hf_rolloff(x)
 measures it for them). The lowest band, modulated by its envelope, spreads energy down to DC: a new seed can carry an
 offset of 1-2 % of its peak; the fit engine's takes (auto.render(take=True)) are DC-blocked for that.
+The side (0.4; a stereo source): per octave band and keyframe (dense after the first strike, sparse in the tail) the
+source's side split into its part coherent with the mid ('pan', a signed gain: L = M (1 + g), R = M (1 - g)) and the
+rest ('diffuse', a gain re the mid), measured by space.side_powers. A stereo render makes the side FROM the render's
+mid: each band's mid times its pan gain plus the band's quadrature (Hilbert transform, uncorrelated with it) times its
+diffuse gain (space.shaped_side). So the side follows the mid (a ringing partial's tail stays as wide as the source's)
+and partials are panned and decorrelated like the source's; the mono sum is the mono render. On the 42 wide or
+decorrelated stereo dev targets of the replication benchmark (sines fits alone): side / mid error 13.4 dB median ->
+0.15 dB (33 -> 0 off by more than 3 dB), tail L/R correlation error 0.39 -> 0.04. Models fitted before 0.4
+have only 'width' and keep their old side (a fresh draw of the residual noise times 10^(width / 20), which sits far
+under the mid when the sound is tonal).
+Renders start at zero (a FADE_IN_S half-cosine fade-in, not mid-way into a bed; shorter, down to 0.25 ms, when the
+first strike comes earlier: a clip cut into its own attack keeps it) and are peak-limited to PEAK_DB dBFS by a gain
+(finish(); a hybrid's deterministic layer is not limited: the hybrid's sum is what counts). On the 78 dev targets of
+the replication benchmark: CLAP -0.0002 median, 7 renders over -1 dBFS (6 over 0 dBFS) -> 0, 44 starting off zero -> 0.
+A model fitted before 0.4 (no 'coherent' flag: the 0.3 bank's fit entries) renders as it did, with neither.
 
 render(model, seed, knobs) knobs (all default to the identity, which re-renders the fit):
     transpose (semitones; every partial and the residual's spectrum move together, relative partials kept),
@@ -52,10 +69,14 @@ render(model, seed, knobs) knobs (all default to the identity, which re-renders 
     peak, frequency trajectories keep their timing), brightness (dB per octave about the partials' centroid),
     vibrato (cents) + vibrato_rate (Hz), drift (cents of slow random wander), residual (gain on the noise),
     transient (gain on the noise in the first 15 ms after each strike), vary (0-1: seeded per-partial detune,
-    level and decay jitter, band jitter: new takes of the same object), partials (keep the N strongest),
+    level and decay jitter, band jitter: new takes of the same object; a model with 'coherent' (0.4: every fit) draws
+    the partials' jitter from smooth random functions of log frequency, vary_field(), so a harmonic series' upper
+    partials move together and keep their ratios: independently detuned, they went off the harmonic grid and the
+    takes rang or read as aliasing (on the films' dev fits 4 of 21 failing takes passed at vary 0)), partials (keep
+    the N strongest),
     inharm (stretch of partial ratios about the lowest strong partial: f/f_low -> (f/f_low)^(1+inharm)),
-    phases ('fit' or 'random'), gain_db, stereo (False: mono; True: (n, 2) with the residual decorrelated by width),
-    ring (None: True when vary > 0; True renders until the last partial's release ends, so a decay that vary
+    phases ('fit' or 'random'), gain_db, stereo (False: mono; True: (n, 2) with the fitted side), width (factor on
+    the side), ring (None: True when vary > 0; True renders until the last partial's release ends, so a decay that vary
     lengthens is not cut at the recording's length, and fades the residual noise out over RING_FADE_S past the
     recording's length instead of stopping on it).
 
@@ -76,24 +97,32 @@ WINDOWS = (512, 1024, 2048, 4096)
 
 DEFAULT_KNOBS = {'transpose': 0.0, 'stretch': 1.0, 'decay': 1.0, 'brightness': 0.0, 'vibrato': 0.0,
                  'vibrato_rate': 5.5, 'drift': 0.0, 'residual': 1.0, 'transient': 1.0, 'vary': 0.0, 'partials': None,
-                 'inharm': 0.0, 'phases': 'fit', 'gain_db': 0.0, 'stereo': False, 'ring': None}
+                 'inharm': 0.0, 'phases': 'fit', 'gain_db': 0.0, 'stereo': False, 'width': 1.0, 'ring': None}
 HF_POINTS = (16000.0, 17000.0, 18000.0, 19000.0, 20000.0, 21000.0, 22000.0, 23000.0, 24000.0)   # the roll-off grid
 RING_FADE_S = 0.06          # ring: the residual noise fades out over this past the recording's length
+SIDE_BANDS = (125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0)   # the side's octave bands
+SIDE_STEPS = ((0.1, 0.01), (0.3, 0.02), (0.7, 0.04), (1e9, 0.08))   # side keyframes after the onset: (until s, step s)
+SIDE_TOL = 0.04             # keyframes are dropped where the gains stay this close to the line through their neighbours
+SIDE_QUIET_DB = 50.0        # a keyframe this far under its band's loudest takes the band's overall side
+FADE_IN_S = 0.002           # every render fades in over this (it starts at zero, not mid-way into a bed)
+PEAK_DB = -1.0              # and is peak-limited to this (dBFS) by a gain
 
 
 # ================================================================================================ small helpers
 def _load(x, sr=SR):
-    """(mono float64 signal, side/mid dB) from a path or an array (mono or (n, 2))"""
+    """(mono float64 signal, side/mid dB, the (n, 2) source or None) from a path or an array (mono or (n, 2))"""
     if isinstance(x, str):
         from ... import audio
         x = audio.load(x, sr=SR)
         sr = SR
     x = np.asarray(x, np.float64)
     width = -120.0
+    st = None
     if x.ndim == 2:
         if x.shape[1] == 2:
             mid, side = x.mean(1), (x[:, 0] - x[:, 1]) / 2
             width = float(10 * np.log10((side ** 2).sum() / ((mid ** 2).sum() + 1e-20) + 1e-12))
+            st = x
             x = mid
         else:
             x = x.mean(1)
@@ -101,7 +130,8 @@ def _load(x, sr=SR):
         from math import gcd
         g = gcd(int(sr), SR)
         x = signal.resample_poly(x, SR // g, int(sr) // g)
-    return x, max(width, -120.0)
+        st = None if st is None else signal.resample_poly(st, SR // g, int(sr) // g, axis=0)
+    return x, max(width, -120.0), st
 
 
 def _db(v, floor=-200.0):
@@ -172,7 +202,7 @@ def _band_centers(lo=50.0, hi=16000.0, per_oct=3):
 
 
 # ================================================================================================ synthesis kernels
-# These three functions are copied verbatim into to_code() output: keep them self-contained (numpy only, SR global).
+# These functions are copied verbatim into to_code() output: keep them self-contained (numpy only, SR global).
 def band_masks(centers, nfft, sr=48000):
     """triangles on log frequency, one per band centre, that sum to one at every frequency (flat beyond the ends)"""
     f = np.fft.rfftfreq(nfft, 1.0 / sr)
@@ -250,6 +280,20 @@ def hf_rolloff(x, sr=48000, points=(16000.0, 17000.0, 18000.0, 19000.0, 20000.0,
         run = min(run, v - ref)
         out.append([float(p), round(max(run, -80.0), 1)])
     return out
+
+
+def finish(y, sr=48000, fade_s=0.002, peak_db=-1.0, limit=True):
+    """a render's edges: a half-cosine fade-in over fade_s (it starts at zero) and, when limit and its peak is over
+    peak_db dBFS, a gain down to it (no clipping, no limiter colour)"""
+    y = np.array(y, dtype=float)
+    k = min(len(y), int(round(fade_s * sr)))
+    if k > 1:
+        ramp = np.sin(0.5 * np.pi * np.arange(k) / k) ** 2
+        y[:k] *= ramp[:, None] if y.ndim == 2 else ramp
+    pk = float(np.abs(y).max()) if y.size else 0.0
+    if limit and pk > 10 ** (peak_db / 20):
+        y *= 10 ** (peak_db / 20) / pk
+    return y
 
 
 def synth_atoms(transients, n, sr=48000):
@@ -883,6 +927,88 @@ def _analyze(x, sr, W, onsets, width, opts):
     return {'model': model, 'det': det, 'res': res, 'atoms': res - res2, 'tracks': tracks}
 
 
+def _side_times(onset, duration, steps=SIDE_STEPS):
+    """keyframe times: 0, 10 ms before the onset, then SIDE_STEPS after it, and the end"""
+    tk = [0.0, onset - 0.01, onset]
+    t = onset
+    for until, step in steps:
+        while t + step <= onset + until and t + step < duration:
+            t += step
+            tk.append(t)
+    tk.append(duration)
+    return np.unique(np.round(np.clip(tk, 0.0, duration), 5))
+
+
+def side_model(st, duration=None, bands=SIDE_BANDS, tol=SIDE_TOL):
+    """the side of a stereo source ((n, 2) at 48 kHz) per octave band at keyframes (_side_times after the source's
+    onset, space.active_span, then dropped where a line through the neighbours stays within `tol`): 'pan' =
+    Re(S M*) / |M|^2 (the side's part coherent with the mid, signed) and 'diffuse' = sqrt((|S|^2 - Re(S M*)^2 / |M|^2)
+    / |M|^2) (the rest re the mid), from the STFT frames under a tent from the previous keyframe to the next (what
+    linear interpolation between keyframes spreads it over); a keyframe SIDE_QUIET_DB under its band's loudest (a
+    pre-roll, a faded tail) takes the band's whole-sound values, a band with hardly any energy the whole sound's"""
+    from .space import active_span, side_powers
+    st = np.asarray(st, np.float64)
+    duration = len(st) / SR if duration is None else float(duration)
+    P = side_powers(st, bands)
+    t, PM, PS, C = P['t'], P['PM'], P['PS'], P['C']
+    tk = _side_times(active_span(st)[0] / SR, duration)
+    J = len(tk)
+    edges = np.concatenate([[tk[0] - 0.01], tk, [tk[-1] + 0.01]])
+    sPM, sPS, sC = np.zeros((len(bands), J)), np.zeros((len(bands), J)), np.zeros((len(bands), J))
+    for j in range(J):
+        a, c_, b = edges[j], edges[j + 1], edges[j + 2]
+        w = np.clip(np.minimum((t - a) / max(c_ - a, 1e-6), (b - t) / max(b - c_, 1e-6)), 0.0, 1.0)
+        if not w.any():                                                    # no frame under its tent: the nearest
+            w[int(np.argmin(np.abs(t - c_)))] = 1.0
+        sPM[:, j], sPS[:, j], sC[:, j] = PM @ w, PS @ w, C @ w
+
+    def gains(pm, ps, c):
+        pm = np.maximum(pm, 1e-30)
+        return np.clip(c / pm, -1.5, 1.5), np.clip(np.sqrt(np.maximum(ps - c ** 2 / pm, 0.0) / pm), 0.0, 2.0)
+    pan, dif = gains(sPM, sPS, sC)
+    tot = PM.sum(1)
+    gp, gd = gains(PM.sum(), PS.sum(), C.sum())                            # the whole sound, all bands
+    for b in range(len(bands)):
+        if tot[b] < tot.max() * 1e-6:
+            bp, bd = gp, gd
+        else:
+            bp, bd = gains(tot[b], PS[b].sum(), C[b].sum())
+        quiet = sPM[b] < sPM[b].max() * 10 ** (-SIDE_QUIET_DB / 10) if tot[b] >= tot.max() * 1e-6 else np.ones(J, bool)
+        pan[b, quiet], dif[b, quiet] = bp, bd
+    keep = _simplify_multi(tk, np.vstack([pan, dif]), tol)
+    return {'bands': [float(b) for b in bands], 'times': [round(float(v), 5) for v in tk[keep]],
+            'pan': [[round(float(v), 3) for v in row[keep]] for row in pan],
+            'diffuse': [[round(float(v), 3) for v in row[keep]] for row in dif]}
+
+
+def morph_side(sa, sb, w, map_a=None, map_b=None):
+    """the side of a morph between two sines models' sides (fit.auto morph): each side's keyframe times through its
+    time map (map_a / map_b: arrays -> arrays, the morph's anchors; None = unchanged), the gains interpolated on the
+    union of the two grids; a model without a side counts as a centred one (all gains 0). None when neither has one"""
+    if not sa and not sb:
+        return None
+    bands = (sa or sb)['bands']
+    if sa and sb and list(sa['bands']) != list(sb['bands']):
+        raise ValueError('sines sides with different bands cannot be morphed')
+    grids = []
+    for s, f in ((sa, map_a), (sb, map_b)):
+        if s:
+            t = np.asarray(s['times'], float)
+            grids.append((np.asarray(f(t) if f else t, float), np.asarray(s['pan'], float),
+                          np.asarray(s['diffuse'], float)))
+        else:
+            grids.append(None)
+    tt = np.unique(np.round(np.concatenate([g[0] for g in grids if g is not None]), 5))
+
+    def at(g, i):
+        return np.zeros((len(bands), len(tt))) if g is None else np.array([np.interp(tt, g[0], r) for r in g[i]])
+    pan = (1 - w) * at(grids[0], 1) + w * at(grids[1], 1)
+    dif = (1 - w) * at(grids[0], 2) + w * at(grids[1], 2)
+    return {'bands': [float(b) for b in bands], 'times': [float(v) for v in tt],
+            'pan': [[round(float(v), 3) for v in row] for row in pan],
+            'diffuse': [[round(float(v), 3) for v in row] for row in dif]}
+
+
 def fit(x, sr=SR, windows=WINDOWS, max_partials=160, dyn_db=80.0, keep_db=60.0, prom_db=4.0, max_peaks=100, min_ms=15.0,
         amp_tol_db=1.0, freq_tol_cents=1.0, res_range_db=140.0, transients=True, passes=2, snr_db=10.0, source=None):
     """a sines model of `x` (a path or an array at `sr`); every size in `windows` is tried and the model whose
@@ -890,7 +1016,7 @@ def fit(x, sr=SR, windows=WINDOWS, max_partials=160, dyn_db=80.0, keep_db=60.0, 
     if isinstance(x, str) and source is None:
         import os
         source = os.path.basename(x)
-    x, width = _load(x, sr)
+    x, width, st = _load(x, sr)
     opts = {'dyn_db': dyn_db, 'keep_db': keep_db, 'prom_db': prom_db, 'max_peaks': max_peaks, 'min_ms': min_ms,
             'max_partials': max_partials, 'amp_tol_db': amp_tol_db, 'freq_tol_cents': freq_tol_cents,
             'res_range_db': res_range_db, 'transients': transients, 'passes': passes, 'snr_db': snr_db}
@@ -905,6 +1031,9 @@ def fit(x, sr=SR, windows=WINDOWS, max_partials=160, dyn_db=80.0, keep_db=60.0, 
         if best is None or d < best[0]:
             best = (d, m)
     model = best[1]
+    if st is not None and width > -60.0:
+        model['side'] = side_model(st, model['duration'])
+    model['coherent'] = True
     model['analysis']['lsd_db'] = round(best[0], 2)
     model['analysis']['tried'] = tried
     model['analysis']['onset_rise_ms'] = [round(o['rise'] * 1000, 2) for o in onsets]
@@ -1025,6 +1154,9 @@ def render(model, seed=0, knobs=None, **kw):
         parts = parts[:int(k['partials'])]
     identity = (s_ == 1.0 and d_ == 1.0 and ratio == 1.0 and vary == 0.0 and k['brightness'] == 0.0
                 and k['inharm'] == 0.0 and k['phases'] == 'fit')
+    coherent = bool(model.get('coherent')) and vary > 0
+    if coherent:                     # the jitter as smooth functions of log frequency (module doc)
+        jf, jl, jd = vary_field(r), vary_field(r), vary_field(r)
     new = []
     for p in parts:
         if identity:
@@ -1034,9 +1166,13 @@ def render(model, seed=0, knobs=None, **kw):
         am = np.asarray(p['amp'], float).copy()
         fmed = partial_freq(p)
         fac = ratio * (fmed / f_low) ** float(k['inharm']) if fmed > 0 else ratio
-        detune = r.normal(0, 8.0 * vary)
-        jit_db = r.normal(0, 2.0 * vary)
-        jit_dec = float(np.exp(r.normal(0, 0.15 * vary)))
+        if coherent:
+            detune, jit_db = 8.0 * vary * jf(fmed), 2.0 * vary * jl(fmed)
+            jit_dec = float(np.exp(0.15 * vary * jd(fmed)))
+        else:
+            detune = r.normal(0, 8.0 * vary)
+            jit_db = r.normal(0, 2.0 * vary)
+            jit_dec = float(np.exp(r.normal(0, 0.15 * vary)))
         ph = float(p['ph']) if k['phases'] == 'fit' else float(r.uniform(-np.pi, np.pi))
         fq[:, 1] = fq[:, 1] * fac * 2 ** (detune / 1200)
         am[:, 1] = am[:, 1] + jit_db + float(k['brightness']) * np.log2(max(fmed * ratio, 1.0) / f_ref)
@@ -1087,11 +1223,19 @@ def render(model, seed=0, knobs=None, **kw):
     trans = model.get('transients', [])
     if trans and (not identity or k['transient'] != 1.0):
         tg = float(k['transient'])
-        trans = [{'t': float(T(tr['t'])),
-                  'atoms': [[f * ratio * 2 ** (r.normal(0, 30.0 * vary) / 1200), tau / ratio,
-                             a * tg * 10 ** ((r.normal(0, 2.0 * vary) + float(k['brightness'])
-                                              * np.log2(max(f * ratio, 20.0) / f_ref)) / 20), ph]
-                            for f, tau, a, ph in tr['atoms']]} for tr in trans]
+        out = []
+        for tr in trans:             # a coherent model jitters a strike's atoms together: they were fitted jointly
+            if coherent:             # and cancel each other's step at the onset (6 atoms of a sub drop's strike: amp
+                d1, g1 = r.normal(0, 30.0 * vary), r.normal(0, 2.0 * vary)     # up to 1.5, their sum there 0.015;
+                jit = [(d1, g1)] * len(tr['atoms'])                             # jittered apart, the takes clicked)
+            else:
+                jit = [(r.normal(0, 30.0 * vary), r.normal(0, 2.0 * vary)) for _ in tr['atoms']]
+            out.append({'t': float(T(tr['t'])),
+                        'atoms': [[f * ratio * 2 ** (dc / 1200), tau / ratio,
+                                   a * tg * 10 ** ((dg + float(k['brightness'])
+                                                    * np.log2(max(f * ratio, 20.0) / f_ref)) / 20), ph]
+                                  for (f, tau, a, ph), (dc, dg) in zip(tr['atoms'], jit)]})
+        trans = out
     y = y + synth_atoms(trans, n, sr)
     hf = res.get('hf')
     noise = synth_noise(bands, times, lev, n, seed, sr, hf=hf) if len(bands) else np.zeros(n)
@@ -1105,11 +1249,46 @@ def render(model, seed=0, knobs=None, **kw):
     y = y + noise
     if k['gain_db']:
         y = y * 10 ** (float(k['gain_db']) / 20)
+    limit = _limited(model)
+    fade = fade_in_s(model)
     if k['stereo']:
-        side = synth_noise(bands, times, lev, n, seed + 1000003, sr, hf=hf) * 10 ** (model.get('width', -120.0) / 20)
-        side *= 10 ** (float(k['gain_db']) / 20)
-        return np.column_stack([y + side, y - side])
-    return y
+        sd = model.get('side')
+        if sd:                       # the side made from the mid, per band (module doc); keyframes move like the noise
+            from .space import shaped_side
+            st = np.asarray(sd['times'], float)
+            piv = on + 0.010
+            st = T(np.where(st > piv, piv + (st - piv) * d_, st))
+            sign = -1.0 if np.random.default_rng((int(seed) * 31 + 7) & 0xFFFFFFFF).uniform() < 0.5 else 1.0
+            side = shaped_side(y, np.asarray(sd['bands'], float) * ratio, st, sd['pan'], sd['diffuse'], sign, sr)
+        else:                        # a model fitted before 0.4: its old side (module doc)
+            w_old = 10 ** (model.get('width', -120.0) / 20)
+            side = synth_noise(bands, times, lev, n, seed + 1000003, sr, hf=hf) * w_old
+            side *= 10 ** (float(k['gain_db']) / 20)     # 0.3's two steps exactly (one differs in the last bits)
+        side = side * float(k['width'])
+        return finish(np.column_stack([y + side, y - side]), sr, fade, limit=limit)
+    return finish(y, sr, fade, limit=limit)
+
+
+def vary_field(r, parts=6):
+    """a smooth random function of frequency (Hz -> unit-variance value): `parts` cosines over log2 frequency of
+    0.25-1.25 cycles per octave with random phases. A coherent model's vary draws its jitter from it: neighbouring
+    partials (a harmonic series' upper partials) move together and keep their ratios"""
+    c, p = r.uniform(0.25, 1.25, parts), r.uniform(0.0, 2 * np.pi, parts)
+    return lambda f: float(np.sqrt(2.0 / parts) * np.cos(2 * np.pi * np.log2(max(float(f), 20.0)) * c + p).sum())
+
+
+def fade_in_s(model):
+    """the render's fade-in: FADE_IN_S, shortened (to 0.25 ms at least) when the first strike comes earlier, so a clip
+    cut into its own attack keeps the attack; 0 for a model fitted before 0.4 (no 'coherent'): it renders as it did"""
+    if not model.get('coherent'):
+        return 0.0
+    return float(np.clip(float(model.get('onset', 1.0)) - 0.0005, 0.00025, FADE_IN_S))
+
+
+def _limited(model):
+    """is the render peak-limited to PEAK_DB? Not a hybrid's deterministic layer (the sum is what counts), not a model
+    fitted before 0.4 (it renders as it did)"""
+    return model.get('layer') != 'deterministic' and bool(model.get('coherent'))
 
 
 # ================================================================================================ model -> code
@@ -1153,8 +1332,10 @@ def to_code(model, name='sound'):
     for row in res['db']:
         lines.append(f'    {_lit(row)},')
     lines.append(']')
+    lines.append(f"LIMIT = {_limited(model)}   # peak-limit the render to -1 dBFS")
+    lines.append(f"FADE_S = {fade_in_s(model)!r}   # the fade-in (s): the render starts at zero")
     lines.append('')
-    for fn in (band_masks, synth_partials, synth_atoms, synth_noise):
+    for fn in (band_masks, synth_partials, synth_atoms, synth_noise, finish):
         lines.append('')
         lines.append(inspect.getsource(fn).rstrip())
         lines.append('')
@@ -1164,8 +1345,8 @@ def to_code(model, name='sound'):
               "    parts = [{'t0': p[0], 'rise': p[1], 't1': p[2], 'rel': p[3], 'ph': p[4], 'freq': p[5], 'amp': p[6]}",
               '             for p in PARTIALS]',
               "    trans = [{'t': t, 'atoms': a} for t, a in TRANSIENTS]",
-              '    return (synth_partials(parts, n, SR) + synth_atoms(trans, n, SR)',
-              '            + synth_noise(BANDS, TIMES, LEVELS, n, seed, SR, hf=HF))',
+              '    return finish(synth_partials(parts, n, SR) + synth_atoms(trans, n, SR)',
+              '                  + synth_noise(BANDS, TIMES, LEVELS, n, seed, SR, hf=HF), SR, FADE_S, limit=LIMIT)',
               '',
               '',
               "if __name__ == '__main__':",

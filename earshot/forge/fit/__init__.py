@@ -1,7 +1,7 @@
 """earshot fit: translate a real recording into code (analysis by synthesis), then vary it.
 
     from earshot.forge import fit
-    m = fit.fit('click.wav')                    # kind='auto' | 'modal' | 'spectral' | 'sines' | 'hybrid'
+    m = fit.fit('click.wav')                    # kind='auto' | 'modal' | 'spectral' | 'sines' | 'gesture' | 'hybrid'
     y = fit.render(m, seed=0)                   # the resynthesis (seeds change only noise / jitter); knobs vary it
     from earshot.forge.fit.quality import quality
     q = quality('click.wav', y)                 # mel dB, envelope r, tone dB, onset error, ... (clap=True: CLAP cos)
@@ -16,6 +16,8 @@ The fitters (one module each, plain-JSON models, deterministic per seed, pure nu
   modal.py     struck / ringing sounds -> strikes of damped sinusoids (ESPRIT + least squares) + band noise
   sines.py     tonal sounds -> tracked partials (McAulay-Quatieri / SMS) + strike atoms + 1/3-octave noise
   spectral.py  noisy sounds -> a time-varying 48-band noise gesture + stereo + texture + tonal ridges
+  gesture.py   designed gestures (whooshes, swells, risers) -> tones (a sines / modal fit's partials) + air (noise)
+  space.py     a stereo recording's decorrelated tail -> a seeded diffuse side layer (the chosen fit's post stage)
   auto.py      the engine: character -> candidates -> fit, render, score, keep the best; hybrids; morph
   quality.py   the metrics every fit is judged by (and the side-by-side spectrogram picture)
   codegen.py   model -> a forge recipe module (TARGET / SPACE / DEFAULTS / MODEL / render(p, r))
@@ -68,10 +70,11 @@ def _write_wav(path, y):
 
 
 def run_fit(path, kind='auto', layers=None, output=None, out_dir=None, render_path=None, report=False, clap=False,
-            describe=False, seed=0, target=None, fast=False, verbose=True, log=print, takes=False):
+            describe=False, seed=0, target=None, fast=False, verbose=True, log=print, takes=False, bed=True):
     """the `earshot fit <file>` pipeline as a function: fit, write the recipe / WAV / PNG / model JSON, measure.
-    takes=True scores the candidates on seeds 0, 1, 2 (auto.TAKE_SEEDS), not seed 0 alone. Returns the result dict
-    (paths, quality, floor, chosen kind, timings)."""
+    takes=True scores the candidates on seeds 0, 1, 2 (auto.TAKE_SEEDS), not seed 0 alone. bed=False fits a
+    recording with a bed under it as it is (auto.fit strips the bed by default). Returns the result dict (paths,
+    quality, floor, chosen kind, timings)."""
     import time
 
     import numpy as np
@@ -88,7 +91,7 @@ def run_fit(path, kind='auto', layers=None, output=None, out_dir=None, render_pa
     t0 = time.time()
     X = Q.load(path)
     m = auto.fit(X, kind=kind, layers=layers, clap=clap, fast=fast, name=os.path.basename(path),
-                 verbose=verbose and kind == 'auto', seeds=auto.TAKE_SEEDS if takes else (0,))
+                 verbose=verbose and kind == 'auto', seeds=auto.TAKE_SEEDS if takes else (0,), bed=bed)
     t_fit = time.time() - t0
     codegen.write_recipe(P['recipe'], m, name=P['name'], source=path, target=target)
     rec = codegen.load_recipe(P['recipe'])
@@ -165,7 +168,7 @@ def add_cli(sub):
     p.add_argument('file', nargs='?', help='the recording to fit')
     p.add_argument('-o', '--output', help='recipe path (.py); the WAV / PNG / model JSON go next to it')
     p.add_argument('--dir', help='output folder when -o is not given (default: current folder)')
-    p.add_argument('--kind', default='auto', choices=('auto', 'modal', 'spectral', 'sines', 'hybrid'))
+    p.add_argument('--kind', default='auto', choices=('auto', 'modal', 'spectral', 'sines', 'gesture', 'hybrid'))
     p.add_argument('--layers', help='hybrid layers, e.g. sines,modal,spectral (default modal,spectral)')
     p.add_argument('--render', help='resynthesis WAV path (default next to the recipe)')
     p.add_argument('--report', action='store_true',
@@ -177,6 +180,9 @@ def add_cli(sub):
     p.add_argument('--fast', action='store_true', help='cheaper fitter settings (previews)')
     p.add_argument('--takes', action='store_true',
                    help='a fit meant to make takes: score every candidate on seeds 0, 1, 2 (not seed 0 alone)')
+    p.add_argument('--keep-bed', action='store_true',
+                   help='fit a recording with a bed under it (music in its pre-roll) as it is; by default the bed is '
+                        'stripped and the sound alone is fitted')
     p.add_argument('--morph', nargs=2, metavar=('A', 'B'),
                    help='fit two recordings with one kind and write a morph recipe')
     p.add_argument('--amount', type=float, default=0.5, help='with --morph: 0 = A, 1 = B (default 0.5)')
@@ -219,7 +225,7 @@ def add_cli(sub):
             return 2
         layers = tuple(a.layers.split(',')) if a.layers else None
         r = run_fit(a.file, a.kind, layers, a.output, a.dir, a.render, a.report, a.clap, a.describe, a.seed, a.target,
-                    a.fast, verbose=not a.quiet and not a.json, takes=a.takes)
+                    a.fast, verbose=not a.quiet and not a.json, takes=a.takes, bed=not a.keep_bed)
         lines = [f"{os.path.basename(a.file)} -> {r['kind']} model" + (f" (auto chose {r['chosen']})"
                                                                       if a.kind == 'auto' else '')
                  + f" in {r['seconds']['fit']:.1f} s",
