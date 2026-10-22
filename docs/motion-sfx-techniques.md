@@ -257,7 +257,7 @@ another plugin instead of another layer (src 10). Reverb on the sub (mud) [sv]. 
 
 **Anatomy.** A sine gliding down into the sub-bass region. It is usually a pure sine because it has no harmonics.
 Designers add subtle distortion or harmonics so it survives phones and laptops. The glide lasts from a fraction of a
-second to a few seconds: a quick punchy drop reinforces an impact, a long descent signals dread. It usually sits under
+second to a few seconds: a quick punchy drop reinforces an impact; a long descent signals dread. It usually sits under
 an impact or downbeat as its low foundation, with the surrounding elements high-passed to make room (src 12).
 
 **Synthesis** [sv unless marked]
