@@ -4,7 +4,8 @@
 
 <!-- launch video -->
 [**Watch the 0.4 launch film**](https://github.com/Leonxlnx/earshot/releases/tag/v0.4.0) (35 s): its sound effects are
-takes from the earshot bank placed with the launch kit, over a licensed music track. Play every sound in the bank on
+takes from the earshot bank placed with the launch kit, plus the one CC0 recording it shows being re-made, over a
+licensed music track. Play every sound in the bank on
 [the earshot site](https://leonxlnx.github.io/earshot-site/).
 
 ![Frames from the first launch film (0.1)](docs/media/launch_frames.png)
