@@ -9,6 +9,7 @@ import pytest
 import soundfile as sf
 
 from earshot.forge import bank, knobs
+from earshot.forge.fit import auto
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -21,10 +22,13 @@ SHORT = ['click/soft', 'pro_click/tink', 'hover_tick/ping', 'pro_hover_tick/soft
 
 def test_bank_contents():
     v = bank.VERSION
-    assert v.startswith('forge_v2r6') and 'pluck1' in v and 'fit1' in v
+    assert v.startswith('forge_v2r6+forge04r1') and 'pluck1' in v and 'fit1' in v
     ids = bank.ids()
-    forge = [i for i in ids if bank.get(i)['type'] == 'forge' and not i.startswith('pluck/')]
+    where = bank._load()['where']
+    forge = [i for i in ids if os.path.basename(where[i]) == 'forge_v2.json']
     assert len(forge) == 183 and len({i.split('/')[0] for i in forge}) == 34
+    new = [i for i in ids if os.path.basename(where[i]) == 'forge04.json']
+    assert sorted(new) == sorted(bank.FORGE04) and len(new) == 51 and not set(new) & set(forge)
     assert {'pluck/kalimba', 'pluck/kalimba_soft', 'pluck/kalimba_ring'} <= set(ids)
     for i in ids:
         e = bank.get(i)
@@ -69,6 +73,7 @@ def test_fit_entries_load_with_their_cc0_sources():
         assert not any(c in text for c in ('zapsplat', 'soundsnap', 'sound-ideas', 'boom library'))
         assert 0.0 <= e['vary'] <= 0.6 and i.split('/')[1] in e['kinds'] and len(e['notes']) > 20
         assert 'fit_engine' not in e['model'] and e['meta']['fp']['env_db']
+        assert not auto.finished(e['model'])             # fitted by 0.3: renders as it did (no 0.4 fade-in, no limit)
         assert i in credits and src['url'] in credits
     rows = bank.list(kind='key')
     assert any(r['id'].startswith('fit/key/') and r['source']['license'] == 'CC0 1.0' for r in rows)
@@ -369,3 +374,128 @@ def test_add_fit_writes_a_fit_entry_and_checks_its_licence(tmp_path, monkeypatch
         monkeypatch.delenv('EARSHOT_BANK')
         bank.reload()
     assert 'fit/bell/tone' not in bank.ids()
+
+
+def test_bank_fit_takes_leave_a_stripped_bed_out(tone_model):
+    """a fit of a stripped recording keeps post['bed'] (render() puts it back under the sound by default, to compare
+    with the original); a bank or kit take is the sound alone: the entry renders exactly as the model without it"""
+    import copy
+    from earshot.forge.fit import auto
+    n = int(0.3 * SR)
+    bedded = copy.deepcopy(tone_model)
+    bedded['post'] = dict(bedded.get('post') or {}, bed={'t_on': 0.0, 'level_db': -20.0, 'n': n, 'nfft': 512,
+                                                         'psd_db': [-60.0] * 257})
+    assert not np.array_equal(auto.render(bedded, seed=0, take=True), auto.render(tone_model, seed=0, take=True))
+    e = {'id': 'fit/bell/tone', 'type': 'fit', 'seed': 0, 'vary': 0.0}
+    with_bed = bank.renderer(dict(e, model=bedded))()
+    assert np.array_equal(with_bed, bank.renderer(dict(e, model=tone_model))())
+    assert np.array_equal(with_bed, auto.render(bedded, seed=0, take=True, bed=False))
+
+
+def test_add_fit_refuses_vary_for_an_air_only_gesture(tmp_path):
+    """an air-only gesture fit has no vary knob: add-fit --vary 0.3 is a BankError (it was a ValueError traceback
+    from the render), and the same fit at vary 0 adds"""
+    from earshot.forge.fit import auto, gesture
+    rng = np.random.default_rng(4)
+    t = np.arange(int(0.25 * SR)) / SR
+    x = (rng.standard_normal(len(t)) * np.exp(-t / 0.04) * 0.3).astype(np.float32)
+    m = gesture.fit(x, tones=False, fast=True)
+    assert m['tones'] is None and 'vary' not in auto.knobs_of(m)
+    src = {'id': 'test:2', 'title': 'a test burst', 'author': 'the test', 'license': 'CC0 1.0', 'url': 'https://x.test'}
+    path = tmp_path / 'fit.json'
+    with pytest.raises(bank.BankError, match='vary'):
+        bank.add_fit(m, 'fit/tick/burst', src, str(path), vary=0.3, log=None)
+    assert not path.exists()
+    e = bank.add_fit(m, 'fit/tick/burst', src, str(path), log=None)
+    assert e['vary'] == 0.0 and path.exists()
+
+
+def test_forge04_build_refuses_an_originality_measured_on_another_render(tmp_path, monkeypatch):
+    """FORGE04_REF_CLAP holds for the render it was measured on: a member whose params changed, or whose render
+    moved off the shipped fingerprint, is refused with a stale value instead of getting the old cosine as if
+    measured; a fresh measurement (ref_clap) is taken"""
+    sid = 'ui_pop/blip'
+    monkeypatch.setattr(bank, 'FORGE04', {sid: bank.FORGE04[sid]})
+    out = tmp_path / 'f04.json'
+    doc = bank.build_forge04(str(out), log=None)                    # unchanged: the recorded value holds
+    shipped = bank.get(sid)
+    assert doc['entries'][sid]['original'] == shipped['original']
+    assert bank.forge04_digest(shipped) == bank.FORGE04_REF_ON[sid]
+    orig = bank.forge04_entry
+
+    def edited(i):
+        e = orig(i)
+        k = next(k for k, v in sorted(e['params'].items()) if isinstance(v, float) and v)
+        e['params'] = dict(e['params'], **{k: e['params'][k] * 1.02})
+        return e
+    monkeypatch.setattr(bank, 'forge04_entry', edited)
+    with pytest.raises(bank.BankError, match='stale: its params'):
+        bank.build_forge04(str(tmp_path / 'f04b.json'), log=None)
+    assert not (tmp_path / 'f04b.json').exists()
+    doc = bank.build_forge04(str(tmp_path / 'f04c.json'), ref_clap={sid: 0.7}, log=None)
+    assert doc['entries'][sid]['original']['max_ref_clap'] == 0.7
+    monkeypatch.setattr(bank, 'forge04_entry', orig)               # same block, another render (a recipe change)
+    moved = {sid: dict(shipped, meta=dict(shipped['meta'], fp={'hop_s': 0.05, 'env_db': [0.0, -20.0]}))}
+    monkeypatch.setattr(bank, '_forge04_shipped', lambda: moved)
+    with pytest.raises(bank.BankError, match='stale: its render changed'):
+        bank.build_forge04(str(tmp_path / 'f04d.json'), log=None)
+
+
+# ------------------------------------------------------------------------------------- the 0.4 recipe members
+NEW04 = ['ui_pop/soft', 'knock/wood', 'drip/bloop', 'shutter/quick', 'mallet/celesta', 'cut_hit/punch',
+         'notify/mid_tine', 'swish/flick']
+
+
+def test_forge04_entries_are_their_recipe_palettes_with_a_record():
+    """every 0.4 member is its recipe palette's member on its seed, with meta, the catalog profile, a clean take audit
+    and its originality on record (CLAP to the private reference clips <= 0.96; the clips themselves are not here)"""
+    cats = {'cut_hit', 'reverse_swell', 'ui_pop', 'knock', 'mallet', 'drip', 'shutter'}
+    for sid in bank.FORGE04:
+        e = bank.get(sid)
+        bare = bank.forge04_entry(sid)
+        assert {k: e[k] for k in ('recipe', 'fn', 'params', 'seed', 'member', 'category')} == {
+            k: bare[k] for k in ('recipe', 'fn', 'params', 'seed', 'member', 'category')}, sid
+        assert e['kinds'] and all(isinstance(k, str) for k in e['kinds']) and len(e['notes']) > 15
+        assert set(e['profile']) >= {'dur_s', 'attack_ms', 't20_ms', 'centroid_hz', 'tonal', 'corr'}
+        a = e['audit']
+        assert a['role'] == e['kinds'][0] and a['clean'] >= bank.FORGE04_MIN_CLEAN
+        assert e['original']['made'] == 'recipe' and 0 < e['original']['max_ref_clap'] <= bank.FORGE04_REF_MAX
+        assert e['meta']['fp']['env_db'] and e['category'] in bank.CATEGORIES
+    assert cats <= {bank.get(i)['category'] for i in bank.FORGE04}
+    for c in cats:                                               # a useful handful per new category, all different
+        members = [i for i in bank.FORGE04 if i.startswith(c + '/')]
+        assert len(members) >= 5, c
+        assert len({json.dumps(bank.get(i)['params'], sort_keys=True) for i in members}) == len(members)
+        assert bank.category_info(c)['kinds'] and bank.list(category=c)
+
+
+@pytest.mark.parametrize('sid', NEW04)
+def test_forge04_rerenders_to_its_fingerprint_and_audits_clean(sid):
+    e = bank.get(sid)
+    y, meta = bank.render(sid)
+    d = bank.compare_fp(e['meta'], y)
+    assert d['len_diff'] == 0 and abs(d['peak_diff_ms']) <= 5 and d['env_db'] <= 0.5, d
+    assert meta['checks']['ok'], meta['checks']['summary']
+    y2, m2 = bank.render(sid, seed=e['seed'] + 7)                    # another take of the same member
+    assert m2['checks'] is not None and len(y2)
+
+
+def test_the_bloop_needs_the_drip_allowance():
+    """drip/bloop climbs ~5 st over ~0.1 s: sfx.check accepts it for the drip category (a note), not for others"""
+    from earshot.forge import sfx
+    y, meta = bank.render('drip/bloop')
+    assert meta['checks']['ok'] and 'rising_glide' in [n['code'] for n in meta['checks']['notes']]
+    assert not sfx.check(y, category='ui_pop')['ok']
+
+
+def test_forge04_knobs_where_the_recipes_have_them():
+    y, m = bank.render('cut_hit/sub', pitch='A1')                   # the sub lands on the root (not measured)
+    p = m['edits']['pitch']
+    assert p['params']['sub_f1'] == 55.0 and p['ok'] is None and m['checks']['ok']
+    y, m = bank.render('reverse_swell/cymbal', dur=1.2)
+    assert abs(len(y) / SR - 1.2) < 1e-3 and knobs.describe(bank.get('reverse_swell/cymbal'))['dur'] == 'param'
+    y, m = bank.render('ui_pop/soft', pitch='A4')
+    assert abs(m['edits']['pitch']['cents_off']) <= 50
+    with pytest.raises(knobs.KnobError, match='no pitch'):
+        bank.render('shutter/dslr', pitch='C5')
+    assert {r['id'] for r in bank.list(kind='swell')} >= {'reverse_swell/cymbal', 'reverse_swell/dark'}
