@@ -61,3 +61,12 @@ earshot = ["data/*.json", "data/*.npz", "forge/bank/*.json", "forge/kits/*.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+# uv (`uv tool install`) takes torch from the CPU-only wheel index; pip ignores this
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

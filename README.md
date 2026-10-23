@@ -296,7 +296,18 @@ page that plays them private. In Python: `from earshot.gallery import gallery`.
 
 ## Install
 
-Python 3.10+ and ffmpeg / ffprobe on PATH. CPU only; no GPU is used.
+Needs [uv](https://docs.astral.sh/uv/getting-started/installation/) and ffmpeg / ffprobe on PATH. CPU only; no GPU
+is used.
+
+```bash
+uv tool install "earshot[mcp] @ git+https://github.com/Leonxlnx/earshot"
+earshot doctor --fetch     # downloads the two models now (~1.1 GB)
+```
+
+Update with `uv tool upgrade earshot`. For the optional Gemini critique (`earshot llm`, needs your own Gemini API
+key), install `"earshot[mcp,llm] @ git+https://github.com/Leonxlnx/earshot"` instead.
+
+To work on earshot itself, install from a clone (Python 3.10+):
 
 ```bash
 git clone https://github.com/Leonxlnx/earshot && cd earshot
@@ -306,11 +317,12 @@ python -m venv .venv
 .venv/bin/python -m earshot doctor --load
 ```
 
-The first model use downloads two open models (~1.1 GB) into `.cache/hf` inside the repo (or `EARSHOT_HOME`), each at
-a pinned revision with safetensors weights: CLAP `laion/larger_clap_general` @ `16c8cc3` (text-audio embeddings; the
-Hub's safetensors conversion of its main revision) and the AudioSet tagger `MIT/ast-finetuned-audioset-10-10-0.4593`
-@ `f826b80`. `earshot doctor --fetch` downloads them up front. After that earshot loads them from that cache only and
-never contacts the Hub; a damaged cache is an error that names the folder, not a silent new download.
+The first model use downloads two open models (~1.1 GB) into `.cache/hf` inside a clone, `~/.cache/earshot/hf`
+otherwise (or `EARSHOT_HOME`), each at a pinned revision with safetensors weights: CLAP `laion/larger_clap_general` @
+`16c8cc3` (text-audio embeddings; the Hub's safetensors conversion of its main revision) and the AudioSet tagger
+`MIT/ast-finetuned-audioset-10-10-0.4593` @ `f826b80`. `earshot doctor --fetch` downloads them up front. After that
+earshot loads them from that cache only and never contacts the Hub; a damaged cache is an error that names the folder,
+not a silent new download.
 
 Offline: `EARSHOT_OFFLINE=1`, `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` all mean the same to earshot: it never
 downloads, and a model missing from the cache is an error that says so. earshot never sets or clears these variables.
@@ -332,7 +344,8 @@ precision).
 ### MCP server for Claude Code
 
 ```bash
-claude mcp add earshot --scope user -e EARSHOT_THREADS=3 -- /path/to/earshot/.venv/bin/python -m earshot mcp
+claude mcp add earshot --scope user -e EARSHOT_THREADS=3 -- earshot mcp     # uv install
+claude mcp add earshot --scope user -e EARSHOT_THREADS=3 -- /path/to/earshot/.venv/bin/python -m earshot mcp   # clone
 ```
 
 Or in any client's `.mcp.json`:
