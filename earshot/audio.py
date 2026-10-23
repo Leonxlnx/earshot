@@ -142,6 +142,11 @@ def load(path, sr=SR, mono=False, start=None, end=None, cache=True):
             tmp = f'{npy}.{os.getpid()}.tmp.npy'
             np.save(tmp, x)
             replace_quietly(tmp, npy)
+    bad = ~np.isfinite(x)
+    if bad.any():   # one NaN / Inf sample breaks every analysis downstream (#12)
+        bad = bad.any(axis=-1) if x.ndim == 2 else bad
+        raise AudioError(f'{path}: {int(bad.sum())} NaN / Inf sample(s), first at {int(np.argmax(bad)) / sr:.3f} s: '
+                         'the file is corrupt or the code that made it divided by zero')
     if start is not None or end is not None:
         a = max(0, int(round((start or 0.0) * sr)))
         b = len(x) if end is None else min(len(x), int(round(end * sr)))
