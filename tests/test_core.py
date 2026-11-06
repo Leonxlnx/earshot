@@ -74,6 +74,14 @@ def test_decode_errors_are_one_readable_line(tmp_path):
         audio.load(str(vid), cache=False)
 
 
+def test_nan_or_inf_samples_are_one_readable_error(wav, sine):
+    for v in (np.nan, np.inf, -np.inf):
+        x = sine.copy()
+        x[SR // 2] = v
+        with pytest.raises(audio.AudioError, match=r'1 NaN / Inf sample\(s\), first at 0\.500 s'):
+            audio.load(wav(x), cache=False)
+
+
 def test_missing_paths_are_named(tmp_path, wav, sine):
     ok = wav(sine)
     audio.check_paths([ok])
