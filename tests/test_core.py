@@ -229,4 +229,4 @@ def test_one_version_everywhere():
         pyproject = re.search(r'^version = "([^"]+)"', fh.read(), re.M).group(1)
     with open(os.path.join(root, 'CHANGELOG.md'), encoding='utf-8') as fh:
         top = re.search(r'^## (\S+)', fh.read(), re.M).group(1)
-    assert earshot.__version__ == pyproject == top == '0.4.0'
+    assert earshot.__version__ == pyproject == top == '0.4.1'
