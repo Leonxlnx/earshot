@@ -89,13 +89,15 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
     if method == 'diff':
         fps, d = frame_diff(path, cache=cache)
         return [round(float(i) / fps, 3) for i in diff_events(d, fps)]
-    k = hashlib.sha1(f'{audio.file_id(path)}|{threshold}|{min_gap}|v1'.encode()).hexdigest()[:20]
+    k = hashlib.sha1(f'{audio.file_id(path)}|{threshold}|{min_gap}|v2'.encode()).hexdigest()[:20]
     f = _cache(f'cuts_{k}.json')
     if cache and os.path.exists(f):
         return json.load(open(f))
     p = subprocess.run(['ffmpeg', '-hide_banner', '-nostdin', '-i', path, '-an', '-vf',
                         f"scale=320:-2,select='gt(scene,{threshold})',showinfo", '-f', 'null', '-'],
                        capture_output=True, text=True, errors='replace')
+    if p.returncode != 0:
+        raise audio.AudioError(f'cannot decode the picture of {path}: {audio._ffmpeg_reason(p.stderr)}')
     ts = [float(m) for m in re.findall(r'pts_time:([0-9.]+)', p.stderr)]
     out = []
     for t in ts:
