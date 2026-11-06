@@ -229,7 +229,8 @@ def list_media(paths, recursive=True, exts=MEDIA_EXTS):
             out.append(p)
         else:
             import glob
-            out += sorted(g for g in glob.glob(p, recursive=True) if os.path.splitext(g)[1].lower() in exts)
+            out += sorted(g for g in glob.glob(p, recursive=True)
+                          if os.path.isfile(g) and os.path.splitext(g)[1].lower() in exts)
     seen, res = set(), []
     for p in out:
         k = os.path.normcase(os.path.abspath(p))
