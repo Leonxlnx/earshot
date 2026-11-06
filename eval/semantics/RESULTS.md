@@ -89,6 +89,36 @@ model load 27 s; describe 0.56 s key 17.0 s; describe 31 s rain 52.5 s; match, n
 find 18 s file 29.9 s cold, 1.2 s new query; find 300 s file 61.8 s cold; rank 20 foley files (804 s of audio) 55.8 s
 cold (2.8 s per file), 3.4 s new query. A CLI `match` on a cached file and query loads no model: 1.5 s wall.
 
+## Real sound effects: what they are vs the job they play (`real_effects.py`, 2026-11-06)
+A second library: 195 real licensed one-shot effects (Freesound CC0 / Mixkit, 148 shorter than 1 s), each with its
+title as published (a person's label of what it is) and filed under the film jobs it plays (26 jobs: appear, toggle,
+logo-lock, text, whip ...) with the description an agent had judged that job by. Nothing in earshot was tuned on it.
+Repeatpad (shipped) unless the row says otherwise; "passed" = own job at z >= 2 (weak or better).
+
+| asked with | strong | plausible | weak | no match | AUC own vs other | other jobs passed | cheap synth won |
+|---|---|---|---|---|---|---|---|
+| its own title (vs the other 194 titles) | 124 | 27 | 17 | 27 | 0.919 | - | - |
+| the job's description as filed | 95 | 33 | 24 | 43 | 0.912 | 10.4 % | 14 |
+| best of two sound-only phrasings (written before scoring) | 108 | 34 | 23 | 30 | 0.914 | 12.5 % | 22 |
+| best of the description and the two phrasings | 119 | 36 | 21 | 19 | **0.922** | 14.9 % | 10 |
+| its own title, spaced padding | 135 | 24 | 16 | 20 | 0.921 | - | - |
+| the description and the two phrasings, spaced padding | 125 | 31 | 20 | 19 | 0.920 | 15.4 % | 15 |
+
+- **earshot hears real effects as what they are**: asked by its own title, 168 of 195 pass (124 strong). The
+  failures as filed come from job words, which the model cannot hear: "a soft rounded pop, something appearing"
+  passed 0 of 9 real pops, 8 of which pass by their own titles ("a soft mouth pop" z 4.8); "one clean low hit under a logo"
+  0 of 4; "a light finger tap on a screen" 0 of 4; "a soft plucked or tapped note" 3 of 8 kalimba, marimba and
+  sansula notes (titles z 3.2-6.2).
+- Asking the way the skill says to (two or three phrasings of the sound itself, keep the best) passes 176 instead of
+  152 and separates the jobs slightly better (AUC 0.922 vs 0.912). The cost: a sound passes 15 % of the other jobs
+  instead of 10 % (jobs overlap: one soft tap can play a letter or a touch).
+- The forced choice against four cheap-synth descriptions ("a video game blip" ...) is not a realness test: on short
+  real transients CLAP's closest of the four is usually "a video game blip", and with the job words it won 14 times,
+  mostly on taps, pops and soft thumps. Use `realness` to ask whether a sound is a recording.
+- Spaced padding (silence to 1 s, then tiled: one hit per second instead of the hit repeated back to back) lifts the
+  title matches (strong 124 -> 135, no match 27 -> 20) at the same AUC; zero padding is worse on every row (title no
+  match 38). Not shipped: the verdict bands were set with repeatpad, so a switch needs the held-out library run again.
+
 ## Commands
 ```
 EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py embed --set heldout --part 1/2   # and 2/2
@@ -98,6 +128,7 @@ EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py heldout
 EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py kind
 EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py find
 EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py timing
+EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/real_effects.py   # the effect library (EARSHOT_EVAL_SFX_LIBRARY)
 ```
 (tuning-library and tuning-reference embeddings for the three pad modes were cached by `embed --set eval|tuneref --pad
 repeatpad|zero|spaced` in the first build.)

@@ -35,6 +35,12 @@ committed).
   300 s scene every planted event is found as a tight trim (the first build never looked past ~95 s; fixed with
   gap-free windows and a two-stage search). Re-run after the final review's find changes (snapped windows for
   one-shot queries, no events across edit gaps, `--kind event` = onset-based trims only): the same numbers.
+- **Real sound effects** (195 real licensed one-shots filed by the film job they play, `eval/semantics/real_effects.py`):
+  asked by its own title, a real effect passes (weak or better) 168 times of 195, 124 strong. Asked by job words ("a
+  soft rounded pop, something appearing", "one clean low hit under a logo") real pops and logo hits pass none; the
+  best of two phrasings of the sound itself plus the job's description passes 176 of 195 (152 with the description
+  alone) at AUC 0.922 own vs other jobs (0.912). Describe the sound, never its job; a forced choice against
+  "a video game blip" is not a realness test.
 - Speed (`eval/semantics/timing.json`, models already loaded, nothing cached): model load 27 s once per process;
   `describe` of a 0.56 s key 17 s; `match`, new query on a cached file 2.0 s; `find` on an 18 s file 29.9 s for a new
   file, 1.2 s for a new query; `rank` 2.8 s per new file. Every CLI call is a new process and pays the model load, so

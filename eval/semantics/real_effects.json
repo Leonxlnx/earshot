@@ -1,0 +1,522 @@
+{
+ "what": "Real sound effects judged by what they are and by the job they play: does earshot hear real recordings?",
+ "queries": {
+  "sound_only": {
+   "logo-lock": [
+    "a single low impact",
+    "a struck note ringing out"
+   ],
+   "error": [
+    "a short error buzz",
+    "a short glitchy digital buzz"
+   ],
+   "letter": [
+    "a tiny soft tap",
+    "a tiny click"
+   ],
+   "detent": [
+    "a small mechanical tick",
+    "a ratchet click"
+   ],
+   "appear": [
+    "a soft pop",
+    "a mouth pop"
+   ],
+   "jump-cut": [
+    "a dry quick click",
+    "a short sharp snap"
+   ],
+   "touch": [
+    "a light finger tap",
+    "a soft tap on glass"
+   ],
+   "lock": [
+    "a short wooden knock",
+    "a plastic latch clicking shut"
+   ],
+   "press": [
+    "a soft mouse click",
+    "a button click"
+   ],
+   "toggle": [
+    "a light switch click",
+    "a small switch being flipped"
+   ],
+   "shutter": [
+    "a camera shutter",
+    "a camera shutter click"
+   ],
+   "slide": [
+    "a thin quick swish",
+    "a soft sliding swoosh"
+   ],
+   "type": [
+    "a mechanical keyboard key press",
+    "a keyboard key click"
+   ],
+   "swipe": [
+    "a paper swipe",
+    "a quick soft swoosh"
+   ],
+   "whip": [
+    "a fast air whoosh",
+    "a whip swoosh"
+   ],
+   "card-land": [
+    "paper dropped on a table",
+    "a soft slap of a card on a table"
+   ],
+   "land": [
+    "a soft low thump",
+    "a soft thud"
+   ],
+   "success": [
+    "a soft ding",
+    "a soft chime notification"
+   ],
+   "chime": [
+    "a struck bell note",
+    "a chime"
+   ],
+   "text": [
+    "a soft plucked or mallet note",
+    "a kalimba or marimba note"
+   ],
+   "reveal": [
+    "a single clean low impact",
+    "a deep cinematic hit"
+   ],
+   "thud": [
+    "a deep short sub thud",
+    "a low boom"
+   ],
+   "pass": [
+    "a big low whoosh",
+    "a deep air whoosh"
+   ],
+   "shape": [
+    "a soft air whoosh",
+    "a soft swoosh"
+   ],
+   "swell": [
+    "a reverse swell",
+    "a reversed cymbal"
+   ],
+   "build": [
+    "a short dark riser",
+    "a rising whoosh"
+   ]
+  },
+  "cheap_synth": [
+   "a cheap synthesizer laser zap",
+   "a video game blip",
+   "an 8-bit chiptune sound",
+   "a rising synth whip sweep"
+  ]
+ },
+ "n_sounds": 195,
+ "n_jobs": 26,
+ "n_short": 148,
+ "pads": {
+  "repeatpad": {
+   "title": {
+    "verdicts": {
+     "strong": 124,
+     "plausible": 27,
+     "weak": 17,
+     "no match": 27
+    },
+    "median_z": 3.32,
+    "auc": 0.9191,
+    "top1": 24,
+    "top5": 90
+   },
+   "job": {
+    "verdicts": {
+     "strong": 95,
+     "plausible": 33,
+     "weak": 24,
+     "no match": 43
+    },
+    "median_z": 2.95,
+    "auc": 0.912,
+    "other_jobs_passed": 0.1044,
+    "cheap_synth_won": 14,
+    "passed_by_job": {
+     "appear": "0/9",
+     "build": "2/2",
+     "card-land": "3/4",
+     "chime": "12/12",
+     "detent": "12/12",
+     "error": "7/7",
+     "jump-cut": "10/10",
+     "land": "3/6",
+     "letter": "1/5",
+     "lock": "10/11",
+     "logo-lock": "0/4",
+     "pass": "3/3",
+     "press": "1/1",
+     "reveal": "2/4",
+     "shape": "11/11",
+     "shutter": "12/12",
+     "slide": "4/5",
+     "success": "5/5",
+     "swell": "10/11",
+     "swipe": "8/10",
+     "text": "3/8",
+     "thud": "9/9",
+     "toggle": "4/10",
+     "touch": "0/4",
+     "type": "9/9",
+     "whip": "11/11"
+    }
+   },
+   "sound_only": {
+    "verdicts": {
+     "strong": 108,
+     "plausible": 34,
+     "weak": 23,
+     "no match": 30
+    },
+    "median_z": 3.09,
+    "auc": 0.9141,
+    "other_jobs_passed": 0.1245,
+    "cheap_synth_won": 22,
+    "passed_by_job": {
+     "appear": "7/9",
+     "build": "1/1",
+     "card-land": "3/4",
+     "chime": "10/10",
+     "detent": "11/12",
+     "error": "7/7",
+     "jump-cut": "10/10",
+     "land": "2/6",
+     "letter": "0/4",
+     "lock": "9/11",
+     "logo-lock": "3/4",
+     "pass": "6/6",
+     "press": "1/1",
+     "reveal": "3/5",
+     "shape": "6/8",
+     "shutter": "12/12",
+     "slide": "2/3",
+     "success": "2/5",
+     "swell": "11/12",
+     "swipe": "9/11",
+     "text": "10/10",
+     "thud": "8/8",
+     "toggle": "10/10",
+     "touch": "1/5",
+     "type": "9/9",
+     "whip": "12/12"
+    }
+   },
+   "union": {
+    "verdicts": {
+     "strong": 119,
+     "plausible": 36,
+     "weak": 21,
+     "no match": 19
+    },
+    "median_z": 3.25,
+    "auc": 0.9223,
+    "other_jobs_passed": 0.1494,
+    "cheap_synth_won": 10,
+    "passed_by_job": {
+     "appear": "7/9",
+     "build": "1/1",
+     "card-land": "4/4",
+     "chime": "10/10",
+     "detent": "12/12",
+     "error": "7/7",
+     "jump-cut": "10/10",
+     "land": "3/6",
+     "letter": "1/4",
+     "lock": "10/11",
+     "logo-lock": "3/4",
+     "pass": "6/6",
+     "press": "1/1",
+     "reveal": "3/5",
+     "shape": "8/8",
+     "shutter": "12/12",
+     "slide": "3/4",
+     "success": "5/5",
+     "swell": "11/12",
+     "swipe": "9/10",
+     "text": "10/10",
+     "thud": "8/8",
+     "toggle": "10/10",
+     "touch": "1/5",
+     "type": "9/9",
+     "whip": "12/12"
+    }
+   }
+  },
+  "spaced": {
+   "title": {
+    "verdicts": {
+     "strong": 135,
+     "plausible": 24,
+     "weak": 16,
+     "no match": 20
+    },
+    "median_z": 3.64,
+    "auc": 0.9209,
+    "top1": 29,
+    "top5": 95
+   },
+   "job": {
+    "verdicts": {
+     "strong": 101,
+     "plausible": 31,
+     "weak": 25,
+     "no match": 38
+    },
+    "median_z": 3.03,
+    "auc": 0.9051,
+    "other_jobs_passed": 0.1064,
+    "cheap_synth_won": 18,
+    "passed_by_job": {
+     "appear": "1/9",
+     "build": "2/2",
+     "card-land": "1/3",
+     "chime": "11/11",
+     "detent": "11/11",
+     "error": "7/7",
+     "jump-cut": "11/11",
+     "land": "3/7",
+     "letter": "1/6",
+     "lock": "10/11",
+     "logo-lock": "1/4",
+     "pass": "3/3",
+     "reveal": "4/4",
+     "shape": "9/11",
+     "shutter": "12/12",
+     "slide": "5/5",
+     "success": "5/5",
+     "swell": "10/11",
+     "swipe": "7/10",
+     "text": "5/9",
+     "thud": "9/9",
+     "toggle": "9/10",
+     "touch": "0/4",
+     "type": "9/9",
+     "whip": "11/11"
+    }
+   },
+   "sound_only": {
+    "verdicts": {
+     "strong": 113,
+     "plausible": 32,
+     "weak": 23,
+     "no match": 27
+    },
+    "median_z": 3.22,
+    "auc": 0.9118,
+    "other_jobs_passed": 0.1355,
+    "cheap_synth_won": 22,
+    "passed_by_job": {
+     "appear": "8/9",
+     "build": "1/1",
+     "card-land": "2/4",
+     "chime": "9/9",
+     "detent": "11/11",
+     "error": "7/7",
+     "jump-cut": "10/10",
+     "land": "3/6",
+     "letter": "1/5",
+     "lock": "8/10",
+     "logo-lock": "3/4",
+     "pass": "6/6",
+     "press": "1/1",
+     "reveal": "5/5",
+     "shape": "6/8",
+     "shutter": "12/12",
+     "slide": "3/4",
+     "success": "2/5",
+     "swell": "12/12",
+     "swipe": "7/10",
+     "text": "11/11",
+     "thud": "9/9",
+     "toggle": "9/10",
+     "touch": "1/5",
+     "type": "9/9",
+     "whip": "12/12"
+    }
+   },
+   "union": {
+    "verdicts": {
+     "strong": 125,
+     "plausible": 31,
+     "weak": 20,
+     "no match": 19
+    },
+    "median_z": 3.29,
+    "auc": 0.9195,
+    "other_jobs_passed": 0.154,
+    "cheap_synth_won": 15,
+    "passed_by_job": {
+     "appear": "8/9",
+     "build": "1/1",
+     "card-land": "2/4",
+     "chime": "9/9",
+     "detent": "11/11",
+     "error": "7/7",
+     "jump-cut": "11/11",
+     "land": "3/6",
+     "letter": "2/5",
+     "lock": "10/11",
+     "logo-lock": "4/4",
+     "pass": "6/6",
+     "reveal": "4/4",
+     "shape": "6/8",
+     "shutter": "12/12",
+     "slide": "5/5",
+     "success": "5/5",
+     "swell": "12/12",
+     "swipe": "8/10",
+     "text": "11/11",
+     "thud": "9/9",
+     "toggle": "9/10",
+     "touch": "1/5",
+     "type": "9/9",
+     "whip": "11/11"
+    }
+   }
+  },
+  "zero": {
+   "title": {
+    "verdicts": {
+     "strong": 105,
+     "plausible": 31,
+     "weak": 21,
+     "no match": 38
+    },
+    "median_z": 3.13,
+    "auc": 0.9125,
+    "top1": 29,
+    "top5": 84
+   },
+   "job": {
+    "verdicts": {
+     "strong": 71,
+     "plausible": 45,
+     "weak": 28,
+     "no match": 51
+    },
+    "median_z": 2.62,
+    "auc": 0.9061,
+    "other_jobs_passed": 0.089,
+    "cheap_synth_won": 22,
+    "passed_by_job": {
+     "appear": "4/9",
+     "build": "5/5",
+     "card-land": "3/5",
+     "chime": "11/12",
+     "detent": "8/9",
+     "error": "7/7",
+     "jump-cut": "7/10",
+     "land": "3/6",
+     "letter": "3/8",
+     "lock": "6/9",
+     "logo-lock": "1/4",
+     "pass": "6/6",
+     "press": "1/1",
+     "reveal": "3/5",
+     "shape": "8/8",
+     "shutter": "12/12",
+     "slide": "6/6",
+     "success": "5/5",
+     "swell": "7/8",
+     "swipe": "5/10",
+     "text": "4/8",
+     "thud": "9/9",
+     "toggle": "6/10",
+     "touch": "0/4",
+     "type": "4/9",
+     "whip": "10/10"
+    }
+   },
+   "sound_only": {
+    "verdicts": {
+     "strong": 85,
+     "plausible": 35,
+     "weak": 35,
+     "no match": 40
+    },
+    "median_z": 2.86,
+    "auc": 0.9046,
+    "other_jobs_passed": 0.1227,
+    "cheap_synth_won": 26,
+    "passed_by_job": {
+     "appear": "8/9",
+     "build": "2/2",
+     "card-land": "4/5",
+     "chime": "9/9",
+     "detent": "9/10",
+     "error": "7/7",
+     "jump-cut": "7/9",
+     "land": "3/6",
+     "letter": "1/6",
+     "lock": "6/10",
+     "logo-lock": "3/4",
+     "pass": "6/6",
+     "press": "2/2",
+     "reveal": "4/6",
+     "shape": "7/8",
+     "shutter": "12/12",
+     "slide": "3/4",
+     "success": "3/5",
+     "swell": "10/11",
+     "swipe": "4/10",
+     "text": "9/11",
+     "thud": "7/7",
+     "toggle": "9/10",
+     "touch": "1/5",
+     "type": "7/9",
+     "whip": "12/12"
+    }
+   },
+   "union": {
+    "verdicts": {
+     "strong": 93,
+     "plausible": 44,
+     "weak": 29,
+     "no match": 29
+    },
+    "median_z": 2.95,
+    "auc": 0.913,
+    "other_jobs_passed": 0.1356,
+    "cheap_synth_won": 20,
+    "passed_by_job": {
+     "appear": "8/9",
+     "build": "2/2",
+     "card-land": "6/6",
+     "chime": "9/9",
+     "detent": "9/9",
+     "error": "7/7",
+     "jump-cut": "8/10",
+     "land": "3/6",
+     "letter": "3/7",
+     "lock": "6/9",
+     "logo-lock": "4/4",
+     "pass": "6/6",
+     "press": "1/1",
+     "reveal": "4/6",
+     "shape": "8/8",
+     "shutter": "12/12",
+     "slide": "5/5",
+     "success": "5/5",
+     "swell": "10/11",
+     "swipe": "6/10",
+     "text": "9/11",
+     "thud": "7/7",
+     "toggle": "9/10",
+     "touch": "1/5",
+     "type": "7/9",
+     "whip": "11/11"
+    }
+   }
+  }
+ }
+}

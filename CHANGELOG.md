@@ -2,8 +2,8 @@
 
 ## 0.4.1 - 2026-11-06
 
-Fixes from the community, thanks to @SmitMachhi, @yinbowen-dc, @kyexyz and @lunar-me. On valid input every command
-gives the same results as 0.4.0. No new dependencies.
+Fixes from the community, thanks to @SmitMachhi, @yinbowen-dc, @kyexyz and @lunar-me, and a measurement of how
+earshot hears real sound effects. On valid input every command gives the same results as 0.4.0. No new dependencies.
 
 ### Added
 
@@ -45,6 +45,12 @@ gives the same results as 0.4.0. No new dependencies.
 
 - The README opens with the 0.4 launch film and links the earshot site, where every bank sound plays (#10).
 - Two comma splices, in `docs/VALIDATION.md` and `docs/motion-sfx-techniques.md` (#6, #7; thanks, @lunar-me).
+- **Real sound effects, measured** (`eval/semantics/real_effects.py`, `docs/VALIDATION.md` §1): on 195 real licensed
+  one-shots filed by the film job they play, a sound asked by its own title passes 168 times (124 strong), while job
+  words are not heard ("a soft rounded pop, something appearing" passed none of 9 real pops). Describing the job's
+  sound two or three ways and keeping the best reading passes 176 instead of 152 at a slightly better AUC (0.922 vs
+  0.912); the skill says so. Spaced padding of short sounds lifts the title matches (no match 27 -> 20) at the same
+  AUC; it is not shipped, because the verdict bands were set with repeatpad.
 
 ## 0.4.0 - 2026-10-22
 

@@ -25,6 +25,8 @@ redistributed from here. Only derived numbers are committed. What was used:
   code-synthesized soundtrack and its stems.
 - **Code-synthesized one-shots** rendered with an open synth engine (kick, clap, tick, key click, UI click, FM bell,
   whoosh, riser, drone ...).
+- **A library of real sound effects** (Freesound CC0 / Mixkit, 195 one-shots): each with its published title and the
+  film jobs it was filed under (appear, toggle, logo-lock ...). Only aggregate numbers are committed, no titles.
 - **7 professional launch films** as the quality bar, measured only. They are called `ref_1` .. `ref_7` everywhere,
   with a neutral style line each in `launch/refs.json`. The shipped profile (`earshot/data/launch_profile.json`) holds
   their numbers only: no media, no file names.
@@ -40,6 +42,7 @@ The scripts read the data locations from environment variables, or from a gitign
 | `EARSHOT_EVAL_FILM` | `film_project` | a film project: `out/audio/soundtrack.wav`, `out/audio/stems_pro/{sfx,amb,music}.wav`, `out/qa/mix_report.json`, `out/cues_all.json`, the film as `out/Clawd_1080p60.mp4`, the synthesized versions under `audio/_retired_synth/`, `out/audio/stems/` and `out/superseded/` |
 | `EARSHOT_EVAL_REFS` | `refs_dir`, or `refs: {"ref_1": "/any/file.mp4", ...}` | your reference launch films, named `ref_1.mp4` .. `ref_7.mp4` |
 | `EARSHOT_EVAL_SYNTH` | `synth_scripts` | a folder with the synth engine scripts (`synth.py`, `score.py`), only for `realness/build_data.py` |
+| `EARSHOT_EVAL_SFX_LIBRARY` | `sfx_library` | a library of real sound effects filed by film job (`library.json`: per sound its `file`, `title`, `actions` and `ears.<job>.query`), only for `semantics/real_effects.py` |
 
 Example `eval/local_paths.json`:
 
