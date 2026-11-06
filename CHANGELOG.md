@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.4.1 - 2026-11-06
+
+Fixes from the community, thanks to @SmitMachhi, @yinbowen-dc, @kyexyz and @lunar-me, and a measurement of how
+earshot hears real sound effects. On valid input every command gives the same results as 0.4.0. No new dependencies.
+
+### Added
+
+- **Install and upgrade with one uv command** (#5, #11; thanks, @SmitMachhi): `uv tool install "earshot[mcp] @
+  git+https://github.com/Leonxlnx/earshot"`, then `uv tool upgrade earshot`. Under uv, torch comes from PyTorch's
+  CPU-only wheel index (`[tool.uv.sources]` in `pyproject.toml`), so a Linux install skips the CUDA libraries earshot
+  never uses; pip ignores that table and installs as before. The README puts this install first, says where such an
+  install keeps its models (`~/.cache/earshot/hf`) and gives the short `earshot mcp` line for Claude Code. The clone
+  install stays for working on earshot itself.
+
+### Fixed
+
+- **A NaN or Inf sample is one clear error** (#12, #13; thanks, @SmitMachhi). One non-finite sample crashed most
+  commands with an error that did not name the file (`cannot convert float NaN to integer`, a librosa
+  `ParameterError`, an `IndexError` in `sfx check`), and `match`, `rank` and `realness` exited 0 with a wrong answer
+  (`z +nan`, a whoosh called silent). `audio.load()` now refuses such a file, also when it comes from the decode
+  cache, with one line that names the file, the count and the time of the first bad sample, so the CLI, the MCP
+  server and the Python API stop alike; `rank` skips it like any unreadable file.
+- **Media globs match files only** (#16, #17; thanks, @yinbowen-dc). A directory whose name ends in a media extension
+  (`folder.wav`) counted as an unreadable file when a glob matched it, so `rank 'a click' '*.wav'` with no real files
+  exited 0. A glob that matches only directories is now "nothing playable" (exit 1); a directory given by name still
+  expands to the media files inside it.
+- **`video.cuts(..., cache=False)` scans again** (#14; thanks, @yinbowen-dc): the default frame-difference method
+  reused its saved differences anyway. A forced scan still refreshes the cache.
+- **A failed scene scan is an error, not a film without cuts** (#15; thanks, @yinbowen-dc). `video.cuts(method='scene')`
+  parsed a failed ffmpeg run as no cuts and cached that empty list. It now raises with the file and ffmpeg's reason
+  and caches only a scan that ran; the cache key moved to v2, so older scene scans run once more.
+- **BLAS threads follow `EARSHOT_THREADS`** (#8; thanks, @kyexyz). numpy and scipy each bundle an OpenBLAS that
+  started a worker thread per logical CPU and, on Windows, committed a buffer for each when first imported: with 12
+  logical CPUs an idle MCP server reserved 411 MB and ran 21 threads (154 MB and 13 threads now, at the default limit
+  of 4), and the gap grew once a tool loaded scipy. Memory in use and speed are unchanged (`measure` median 600 ms
+  either way). The CLI and the MCP server now set `OPENBLAS_NUM_THREADS` to `--threads` / `EARSHOT_THREADS` /
+  min(4, cores/2) before numpy loads, unless it is already set. The Python API leaves the environment alone.
+- **The interface tests' fake Gemini clock stays inside `llm`** (#18, #19; thanks, @yinbowen-dc). The fixture replaced
+  `time.sleep` for the whole process, so a subprocess timeout could log fake sleeps before the first request and fail
+  `test_llm_inline_round_trip` / `test_llm_files_api_above_inline_limit` at random. Tests only.
+
+### Docs
+
+- The README opens with the 0.4 launch film and links the earshot site, where every bank sound plays (#10).
+- Two comma splices, in `docs/VALIDATION.md` and `docs/motion-sfx-techniques.md` (#6, #7; thanks, @lunar-me).
+- **Real sound effects, measured** (`eval/semantics/real_effects.py`, `docs/VALIDATION.md` §1): on 195 real licensed
+  one-shots filed by the film job they play, a sound asked by its own title passes 168 times (124 strong), while job
+  words are not heard ("a soft rounded pop, something appearing" passed none of 9 real pops). Describing the job's
+  sound two or three ways and keeping the best reading passes 176 instead of 152 at a slightly better AUC (0.922 vs
+  0.912); the skill says so. Spaced padding of short sounds lifts the title matches (no match 27 -> 20) at the same
+  AUC; it is not shipped, because the verdict bands were set with repeatpad.
+
 ## 0.4.0 - 2026-10-22
 
 Sound for music-led launch films: 51 new recipe-made sounds in the bank (seven new families), a `launch` kit preset

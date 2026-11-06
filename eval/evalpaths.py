@@ -10,6 +10,8 @@ films) is not redistributed. Each script reads the locations from environment va
                                                                                (default <film>/audio/assets)
     EARSHOT_EVAL_REFS    folder with the reference launch films ref_1.mp4 .. ref_7.mp4   (default eval/data/refs)
     EARSHOT_EVAL_SYNTH   folder of the synth engine scripts (synth.py, score.py)         (default eval/data/synth)
+    EARSHOT_EVAL_SFX_LIBRARY  a library of real sound effects labelled by the job they play in a film: library.json
+                         with sounds [{file, title, actions, ears: {action: {query}}}] (default eval/data/sfx/library.json)
 
 local_paths.json may also map single reference films to any file: {"refs": {"ref_1": "/films/a.mp4", ...}}.
 """
@@ -33,6 +35,7 @@ FILM = _get('film_project', 'EARSHOT_EVAL_FILM', os.path.join(HERE, 'data', 'fil
 ASSETS = _get('assets', 'EARSHOT_EVAL_ASSETS', FILM + '/audio/assets')
 REFS_DIR = _get('refs_dir', 'EARSHOT_EVAL_REFS', os.path.join(HERE, 'data', 'refs'))
 SYNTH = _get('synth_scripts', 'EARSHOT_EVAL_SYNTH', os.path.join(HERE, 'data', 'synth'))
+SFX_LIBRARY = _get('sfx_library', 'EARSHOT_EVAL_SFX_LIBRARY', os.path.join(HERE, 'data', 'sfx', 'library.json'))
 REF_IDS = tuple(f'ref_{i}' for i in range(1, 8))
 
 
