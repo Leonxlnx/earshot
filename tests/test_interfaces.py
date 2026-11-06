@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -89,7 +90,8 @@ def fake(monkeypatch):
     def install(*posts, gets=()):
         f = FakeRequests(posts, gets)
         monkeypatch.setattr(llm, '_requests', lambda: f)
-        monkeypatch.setattr(llm.time, 'sleep', lambda s: f.calls.append(('SLEEP', s, {}, {})))
+        clock = SimpleNamespace(time=llm.time.time, sleep=lambda s: f.calls.append(('SLEEP', s, {}, {})))
+        monkeypatch.setattr(llm, 'time', clock)
         return f
     return install
 
@@ -102,6 +104,15 @@ def keyed(monkeypatch):
 
 
 # ---------------------------------------------------------------------------------------------------------- llm
+def test_fake_requests_only_records_llm_sleeps(fake):
+    import time
+    f = fake()
+    time.sleep(0)
+    assert f.calls == []
+    llm.time.sleep(2)
+    assert f.calls == [('SLEEP', 2, {}, {})]
+
+
 def test_llm_off_without_key(monkeypatch, wav, fake):
     monkeypatch.delenv('GEMINI_API_KEY', raising=False)
     monkeypatch.delenv('GOOGLE_API_KEY', raising=False)
