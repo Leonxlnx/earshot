@@ -41,10 +41,10 @@ def _cache(name):
     return os.path.join(d, name)
 
 
-def frame_diff(path):
+def frame_diff(path, cache=True):
     """(fps, d): mean absolute difference (0..1) between consecutive 96x54 grey frames (d[0] = 0), cached"""
     f = _cache('diff_' + hashlib.sha1(f'{audio.file_id(path)}|{FRAME_W}x{FRAME_H}|v1'.encode()).hexdigest()[:20] + '.npz')
-    if os.path.exists(f):
+    if cache and os.path.exists(f):
         try:
             with np.load(f, allow_pickle=False) as z:
                 return float(z['fps']), np.array(z['d'])
@@ -84,9 +84,10 @@ def diff_events(d, fps, ratio=4.0, floor=0.012, big=0.15, gap=0.12):
 
 
 def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
-    """times (s) of picture cuts / big visual changes; method 'diff' (default) or 'scene' (ffmpeg scene score)"""
+    """times (s) of picture cuts / big visual changes; method 'diff' (default) or 'scene' (ffmpeg scene score).
+    cache=False recomputes rather than reusing a saved decode or scene scan."""
     if method == 'diff':
-        fps, d = frame_diff(path)
+        fps, d = frame_diff(path, cache=cache)
         return [round(float(i) / fps, 3) for i in diff_events(d, fps)]
     k = hashlib.sha1(f'{audio.file_id(path)}|{threshold}|{min_gap}|v1'.encode()).hexdigest()[:20]
     f = _cache(f'cuts_{k}.json')
