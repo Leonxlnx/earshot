@@ -9,6 +9,7 @@
 
     python -m earshot.forge.bank build out/forge_v2/*/final -o earshot/forge/bank/forge_v2.json
     python -m earshot.forge.bank build --pluck -o earshot/forge/bank/pluck.json
+    python -m earshot.forge.bank build --forge04 -o earshot/forge/bank/forge04.json   # the 0.4 recipe members
     python -m earshot.forge.bank add-fit model.json --id fit/hit/door --source source.json
     python -m earshot.forge.bank check [IDS ...]   # re-render entries against their stored fingerprints
 
@@ -24,7 +25,7 @@ as different sounds. A bank entry is the final's schema-2 render block (earshot.
 
 Bank file (earshot/forge/bank/*.json, package data; extra files: EARSHOT_BANK, paths joined by os.pathsep: ';' on
 Windows, ':' elsewhere; a missing or unreadable one is a BankError naming it):
-    {"bank": 1, "name": "forge_v2", "version": "forge_v2r6", "earshot": "0.3.0", "note": "...",
+    {"bank": 1, "name": "forge_v2", "version": "forge_v2r6", "earshot": "0.4.0", "note": "...",
      "categories": {"click": {"recipe": "click", "target": "...", "kinds": ["click"], "use": "..."}, ...},
      "entries": {"click/soft": {<entry>}, ...}}
 Entry types:
@@ -49,6 +50,7 @@ new takes of the same member (the noise, jitter and micro-timing change; the cha
 import copy
 import difflib
 import glob
+import hashlib
 import json
 import os
 import re
@@ -106,6 +108,14 @@ CATEGORIES = {
     'pro_typing_run': (['key.run'], 'a whole typed run as one file'),
     'pluck': (['bell', 'text', 'hit'], 'a kalimba tine: tuned melodic notes (bells, motifs, a tonal lockup)'),
     'fit': ([], 'a recipe fitted from a public-domain recording'),
+    # earshot 0.4 (forge04.json): the soft, short, mid-register sounds of music-led launch films
+    'cut_hit': (['hit', 'drop', 'land'], 'a short sub hit with a kick, or a short punchy hit, on a cut (0.2-0.5 s)'),
+    'reverse_swell': (['swell'], 'a reverse cymbal / reverse swell that peaks just after a cut (at most one a film)'),
+    'ui_pop': (['pop', 'land.light'], 'soft rounded mid pops for elements arriving: chips, bubbles, rows'),
+    'knock': (['tock', 'land.light'], 'mid-band wood and plastic knocks (0.1-0.2 s)'),
+    'mallet': (['bell', 'text'], 'short gated mallet notes (glockenspiel, celesta, marimba), a soft pluck, chime runs'),
+    'drip': (['pop'], 'water drops: a bubble whose pitch rises (the audit allows a bubble its climb)'),
+    'shutter': (['snap', 'click'], 'camera shutters: a two-stage mechanical click for snap zooms and whip-cuts'),
 }
 
 # the tuned voices: pluck/<name> = edits of the launch film's forge pick (recipes/pluck.py DEFAULTS = that pick),
@@ -130,9 +140,10 @@ _STATE = {}
 
 
 def _files():
-    """the bank files: the shipped ones (forge_v2 first, then by name), then EARSHOT_BANK's"""
+    """the bank files: the shipped ones (forge_v2 first, the other forge files, then by name), then EARSHOT_BANK's"""
     own = sorted(glob.glob(os.path.join(BANK_DIR, '*.json')),
-                 key=lambda p: (not os.path.basename(p).startswith('forge'), os.path.basename(p)))
+                 key=lambda p: (os.path.basename(p) != 'forge_v2.json', not os.path.basename(p).startswith('forge'),
+                                os.path.basename(p)))
     extra = [p for p in (os.environ.get('EARSHOT_BANK') or '').split(os.pathsep) if p.strip()]
     return own + [os.path.abspath(p) for p in extra]
 
@@ -250,8 +261,8 @@ def renderer(entry, seed=None):
     if kind == 'fit':
         from . import fit as _fit
 
-        def run(edit=None, fit_knobs=None):
-            kn = {'vary': float(entry.get('vary') or 0.0), 'take': True, **(fit_knobs or {})}
+        def run(edit=None, fit_knobs=None):      # bed=False: a take is the sound alone, never a stripped fit's bed
+            kn = {'vary': float(entry.get('vary') or 0.0), 'take': True, 'bed': False, **(fit_knobs or {})}
             if not kn['vary']:
                 kn.pop('vary')
             return _valid(np.asarray(_fit.render(entry['model'], seed=seed, **kn), np.float64), entry)
@@ -585,6 +596,249 @@ def build_pluck(out, version='pluck1', log=print):
     return doc
 
 
+# earshot 0.4: recipe-made members of the new categories and new members of old ones (forge04.json). Each is a palette
+# member of its recipe module (FAMILY / FAMILIES / FAMILY_MID / RUNS by name), rendered on its seed: id -> (recipe
+# module, seed, kinds (the first is the kit role its takes are audited in), note)
+FORGE04_VERSION = 'forge04r1'
+FORGE04 = {
+    'cut_hit/sub': ('cuthit', 4101, ['drop', 'hit'], 'a short sub hit, 225 -> 46 Hz, with a kick and a low punch'),
+    'cut_hit/kick': ('cuthit', 4102, ['drop', 'hit'], 'a kick-led sub hit: the beater lifts it to ~275 Hz'),
+    'cut_hit/punch': ('cuthit', 4103, ['hit', 'land'], 'a short punchy cut hit (0.28 s), two thirds under 150 Hz'),
+    'cut_hit/rumble': ('cuthit', 4104, ['hit'], 'a kick on a slow sub drop into a wide granular rumble (1.4 s)'),
+    'cut_hit/air': ('cuthit', 4105, ['hit'], 'a fast wide sub hit under a sustained bright air band'),
+    'reverse_swell/cymbal': ('revcymbal', 4301, ['swell'], 'a bright wide reverse cymbal: a plateau after the peak, '
+                                                           'then a stop'),
+    'reverse_swell/ring': ('revcymbal', 4302, ['swell'], 'a reverse cymbal that swells harder and rings out'),
+    'reverse_swell/dark': ('revcymbal', 4303, ['swell'], 'a darker, near-mono reverse swell with a low body'),
+    'reverse_swell/short': ('revcymbal', 4304, ['swell'], 'a short bright reverse cymbal for a quick cut (0.33 s '
+                                                          'to the peak)'),
+    'reverse_swell/breath': ('revcymbal', 4305, ['swell'], 'a mid-band reverse breath, half wide (1.3 kHz)'),
+    'ui_pop/soft': ('ui_pop', 1, ['pop', 'land.light'], 'a soft rounded mid pop: 550 Hz, 22 ms onset, t20 75 ms'),
+    'ui_pop/step': ('ui_pop', 1, ['pop'], 'the soft pop a step higher, falling 3 st'),
+    'ui_pop/boop': ('ui_pop', 1, ['pop'], 'a rounder boop falling 9 st'),
+    'ui_pop/blip': ('ui_pop', 1, ['pop'], 'a bright 890 Hz blip, fully decorrelated (L / R correlation ~0.1)'),
+    'ui_pop/fall': ('ui_pop', 1, ['pop'], 'an eased 7 st fall with a faint second pop'),
+    'ui_pop/wide': ('ui_pop', 1, ['pop'], 'a wide 620 Hz pop with a lip click (correlation ~0.5)'),
+    'knock/wood': ('knock', 1, ['tock', 'land.light'], 'a mid-band wooden knock: a 400 Hz block and its faint rattle'),
+    'knock/plastic': ('knock', 1, ['tock'], 'a plastic click that bounces back 18 ms later (2.4 kHz)'),
+    'knock/snap': ('knock', 1, ['tock'], 'a soft contact, then a bright plastic snap with a bounce (3 kHz)'),
+    'knock/desk': ('knock', 1, ['tock', 'land.light'], 'a knuckle on a desk: a low wooden knock with the table '
+                                                       'under it'),
+    'knock/double': ('knock', 1, ['tock'], 'a knock-knock: two wooden taps 55 ms apart'),
+    'mallet/glock': ('mallet', 1, ['bell', 'text'], 'a gated glockenspiel note doubled an octave under (0.35 s)'),
+    'mallet/pluck': ('mallet', 1, ['text', 'bell'], 'a soft, felt-like low pluck'),
+    'mallet/celesta': ('mallet', 1, ['bell', 'text'], 'a wide celesta note (G5, L / R correlation ~0.5), gated'),
+    'mallet/marimba': ('mallet', 1, ['bell', 'text'], 'a short dry wooden marimba note (G4)'),
+    'mallet/flourish': ('mallet', 1, ['bell'], 'a quick three-note chime flourish in an arc, near mono'),
+    'mallet/up4': ('mallet', 1, ['bell'], 'four gated chime notes up a pentatonic scale in skips, 110 ms apart, panned '
+                                          'note by note'),
+    'drip/drop': ('drip', 1, ['pop'], 'a water drop: a 306 Hz bubble rising 8 st within 40 ms, soft onset'),
+    'drip/bubble': ('drip', 1, ['pop'], 'a lower bubble rising 10 st with a daughter bubble'),
+    'drip/plink': ('drip', 1, ['pop'], 'a small high plink rising 3 st'),
+    'drip/bloop': ('drip', 1, ['pop'], "a big drop's slow bloop: ~5 st over 0.1-0.15 s (the audit's drip allowance)"),
+    'drip/tiny': ('drip', 1, ['pop'], 'a tiny fast droplet at 1.15 kHz, 0.1 s'),
+    'shutter/dslr': ('shutter', 1, ['snap', 'click'], 'a camera shutter: latch, 39 ms of curtain travel, the landing '
+                                                      'on a 1.4 kHz box'),
+    'shutter/snap': ('shutter', 1, ['snap', 'click'], 'a dry, bright 2 kHz snap-zoom shutter'),
+    'shutter/mirror': ('shutter', 1, ['snap'], 'a slower mirror-box shutter with an audible travel'),
+    'shutter/film': ('shutter', 1, ['snap'], 'a heavier film camera: a dark box after 95 ms of travel, the body\'s '
+                                             'thump, a spring rattle'),
+    'shutter/quick': ('shutter', 1, ['snap', 'click'], 'a quick double click: release and curtain 21 ms apart'),
+    'notify/mid_tine': ('notify', 1, ['click.confirm', 'bell'], 'a rounded mid ding: a felt-struck tine over its '
+                                                                'octave (690 Hz, 32 ms onset)'),
+    'notify/mid_wood': ('notify', 1, ['click.confirm', 'bell'], 'a soft wooden bar with its octave body, a step '
+                                                                'higher'),
+    'whoosh_big/thump': ('thump', 4201, ['whoosh.long'], 'a big low whoosh that lands with a thump (~80 ms in, rings '
+                                                         '~0.35 s)'),
+    'whoosh_big/thump_deep': ('thump', 4202, ['whoosh.long'], 'the thump-whoosh, deeper and longer'),
+    'whoosh_big/thump_airy': ('thump', 4203, ['whoosh.long'], 'the thump-whoosh, airier'),
+    'riser/dark': ('darkriser', 4401, ['riser'], 'a short dark riser (noise, sub, a speeding stutter), no synth '
+                                                 'sweep'),
+    'riser/build': ('darkriser', 4402, ['riser'], 'a sub-heavy build with crackle and a speeding gate (1.1 s)'),
+    'riser/snatch': ('darkriser', 4403, ['riser'], 'a half-second stutter snatch into a cut'),
+    'swish/bright': ('brightswish', 4501, ['whoosh.short'], 'a bright (~2.4 kHz) quick swish'),
+    'swish/flick': ('brightswish', 4502, ['whoosh.short'], 'a high flick that rises and stops dead, wide'),
+    'whoosh_fast/whip': ('brightswish', 4503, ['whoosh.short'], 'a designed bright whip: a wide ring that falls'),
+    'glitch/burst': ('burstglitch', 4601, ['glitch'], 'crackle, then bright bursts that hit first and speed up'),
+    'glitch/mid': ('burstglitch', 4602, ['glitch'], 'a short mid glitch that hits first'),
+    'glitch/chirp': ('burstglitch', 4603, ['glitch'], 'a pitched data-chirp stutter that hits first'),
+}
+# the largest CLAP cosine of each member's delivered render to any clip of a private set of licensed reference clips
+# (the clips the 0.4 recipes were tuned toward; three excerpt conventions, the largest kept), measured when the file was
+# built: a member is an original made from its recipe when this stays at or under FORGE04_REF_MAX. Each value holds
+# for the render it was measured on only: FORGE04_REF_ON names that render's block (forge04_digest: recipe, fn,
+# params, seed), and build_forge04 refuses a recorded value whose member's block, or whose render against the shipped
+# file's fingerprint, has changed since (measure it again and pass it: ref_clap / --ref-clap)
+FORGE04_REF_MAX = 0.96
+FORGE04_REF_CLAP = {'cut_hit/sub': 0.674, 'cut_hit/kick': 0.593, 'cut_hit/punch': 0.704, 'cut_hit/rumble': 0.665,
+    'cut_hit/air': 0.697, 'reverse_swell/cymbal': 0.565, 'reverse_swell/ring': 0.564, 'reverse_swell/dark': 0.606,
+    'reverse_swell/short': 0.602, 'reverse_swell/breath': 0.576, 'ui_pop/soft': 0.715, 'ui_pop/step': 0.722,
+    'ui_pop/boop': 0.712, 'ui_pop/blip': 0.788, 'ui_pop/fall': 0.744, 'ui_pop/wide': 0.691, 'knock/wood': 0.682,
+    'knock/plastic': 0.839, 'knock/snap': 0.813, 'knock/desk': 0.749, 'knock/double': 0.821, 'mallet/glock': 0.560,
+    'mallet/pluck': 0.532, 'mallet/celesta': 0.625, 'mallet/marimba': 0.565, 'mallet/flourish': 0.629,
+    'mallet/up4': 0.586, 'drip/drop': 0.599, 'drip/bubble': 0.630, 'drip/plink': 0.571, 'drip/bloop': 0.657,
+    'drip/tiny': 0.561, 'shutter/dslr': 0.660, 'shutter/snap': 0.693, 'shutter/mirror': 0.658, 'shutter/film': 0.637,
+    'shutter/quick': 0.705, 'notify/mid_tine': 0.626, 'notify/mid_wood': 0.624, 'whoosh_big/thump': 0.531,
+    'whoosh_big/thump_deep': 0.530, 'whoosh_big/thump_airy': 0.581, 'riser/dark': 0.583, 'riser/build': 0.542,
+    'riser/snatch': 0.608, 'swish/bright': 0.606, 'swish/flick': 0.702, 'whoosh_fast/whip': 0.629,
+    'glitch/burst': 0.714, 'glitch/mid': 0.750, 'glitch/chirp': 0.688}
+FORGE04_REF_ON = {'cut_hit/sub': 'a842072e12', 'cut_hit/kick': '04f0ccb2da', 'cut_hit/punch': '4ad38c718f',
+    'cut_hit/rumble': '174989feb8', 'cut_hit/air': '7d737f0a4e', 'reverse_swell/cymbal': '8d0cdf4fd2',
+    'reverse_swell/ring': '5c66601165', 'reverse_swell/dark': 'f60776413c', 'reverse_swell/short': '571b7b289d',
+    'reverse_swell/breath': '01d59674f1', 'ui_pop/soft': '239df13649', 'ui_pop/step': '8355185610',
+    'ui_pop/boop': 'f2bc82e872', 'ui_pop/blip': 'f33a2978d3', 'ui_pop/fall': '7b92521683',
+    'ui_pop/wide': '97b68cfadd', 'knock/wood': 'e871a566c2', 'knock/plastic': '837d57689f',
+    'knock/snap': '8a2449eb61', 'knock/desk': '7682da31bc', 'knock/double': '6b77d96a84',
+    'mallet/glock': 'd16b587aed', 'mallet/pluck': '6ff0bafc59', 'mallet/celesta': '52086c35ce',
+    'mallet/marimba': '2f1023c99a', 'mallet/flourish': '28fc9494e8', 'mallet/up4': '6affe9d150',
+    'drip/drop': 'a022744543', 'drip/bubble': 'eb98c3ffda', 'drip/plink': 'd1ba69b03d', 'drip/bloop': 'e1a7a8b2a1',
+    'drip/tiny': '849a3e0dfe', 'shutter/dslr': '65d4b4039c', 'shutter/snap': '553b94a48a',
+    'shutter/mirror': '1c1469945f', 'shutter/film': 'da19924b46', 'shutter/quick': '3a14623b70',
+    'notify/mid_tine': '081493ee92', 'notify/mid_wood': '381f6a89bc', 'whoosh_big/thump': 'c7e5eb2b85',
+    'whoosh_big/thump_deep': 'df07f1eabd', 'whoosh_big/thump_airy': '956fd4a4ff', 'riser/dark': '1ad784f257',
+    'riser/build': '1341cf20c3', 'riser/snatch': 'b5538d8e2c', 'swish/bright': 'f17312bd9f',
+    'swish/flick': '2393d879ec', 'whoosh_fast/whip': '131ec99eb6', 'glitch/burst': 'f9ca6c2ee1',
+    'glitch/mid': '97596f865a', 'glitch/chirp': 'd8ca9812c2'}
+FORGE04_TAKES = 6                 # takes audited per member (its seed and the next five) in its first kind's role
+FORGE04_MIN_CLEAN = 5             # of those, at least this many clean (a kit re-rolls the odd one); its own always
+
+
+def _palette(recipe, cat, name):
+    """(fn, complete params) of a palette member of a recipe module, by member name"""
+    import importlib
+    mod = importlib.import_module(f'earshot.forge.recipes.{recipe}')
+    base = dict(getattr(mod, 'DEFAULTS', {}))
+    for c, lst in (getattr(mod, 'FAMILIES', {}) or {}).items():
+        for nm, p in lst:
+            if nm == name:      # a module with a base per category (brightswish, thump) completes it its own way
+                return 'render', (mod.preset_full(c, p) if hasattr(mod, 'preset_full') else {**base, **p})
+    pairs = [(getattr(mod, 'FAMILY', {}), getattr(mod, 'FAMILY_NAMES', {}), '', 'render'),
+             (getattr(mod, 'FAMILY_MID', {}), getattr(mod, 'FAMILY_NAMES_MID', {}), 'mid_', 'render'),
+             (getattr(mod, 'RUNS', {}), getattr(mod, 'RUN_NAMES', {}), '', 'render_run')]
+    for fam, names, pre, fn in pairs:
+        for c, lst in fam.items():
+            for nm, p in zip(names.get(c, []), lst):
+                if pre + nm == name:
+                    return fn, {**(getattr(mod, 'RUN_DEFAULTS', base) if fn == 'render_run' else base), **p}
+    raise BankError(f'{cat}/{name}: no palette member {name!r} in recipes/{recipe}.py')
+
+
+def forge04_entry(sound_id):
+    """the bare render entry of a FORGE04 member (no meta): its palette params on its seed, at -1 dBFS"""
+    recipe, seed, kinds, note = FORGE04[sound_id]
+    cat, name = sound_id.split('/')
+    fn, params = _palette(recipe, cat, name)
+    return {'type': 'forge', 'category': cat, 'member': name, 'recipe': recipe, 'fn': fn, 'params': params,
+            'seed': int(seed), 'peak_db': PEAK_DB, 'gain_db': 0.0, 'kinds': [*kinds], 'notes': note}
+
+
+def _profile(y):
+    """the catalog's model-free measures of a render (recipes/_tonal.measure), JSON-safe"""
+    from .recipes._tonal import measure as tm
+    return {k: (None if v is None else round(float(v), 3)) for k, v in tm(y).items()}
+
+
+def forge04_digest(entry):
+    """the digest of a 0.4 member's render block (recipe, fn, params, seed): what its recorded originality was
+    measured on (FORGE04_REF_ON)"""
+    blk = {k: entry[k] for k in ('recipe', 'fn', 'params', 'seed')}
+    return hashlib.sha1(json.dumps(blk, sort_keys=True, separators=(',', ':')).encode()).hexdigest()[:10]
+
+
+def _forge04_shipped():
+    """the shipped forge04.json's entries (the renders FORGE04_REF_CLAP was measured on), {} without the file"""
+    p = os.path.join(BANK_DIR, 'forge04.json')
+    try:
+        return _read(p)['entries'] if os.path.isfile(p) else {}
+    except (BankError, KeyError, OSError, ValueError):
+        return {}
+
+
+def _forge04_stale(sid, e, y, shipped):
+    """why FORGE04_REF_CLAP's value for a member does not hold for its render now, or None: its block is not the one
+    the value was measured on (FORGE04_REF_ON), or its render differs from the shipped entry's fingerprint (a recipe
+    change under the same params; bank check's tolerances)"""
+    if FORGE04_REF_ON.get(sid) != forge04_digest(e):
+        return 'its params / seed / recipe changed since its originality was measured'
+    old = shipped.get(sid)
+    if old and old.get('meta') and forge04_digest(old) == forge04_digest(e):
+        d = compare_fp(old['meta'], y)
+        if d['len_diff'] != 0 or abs(d['peak_diff_ms']) > 5 or d['env_db'] > 0.5:
+            return (f"its render changed since its originality was measured (against the shipped fingerprint: len "
+                    f"{d['len_diff']:+d}, peak {d['peak_diff_ms']:+.1f} ms, env {d['env_db']:.2f} dB)")
+    return None
+
+
+def build_forge04(out, version=FORGE04_VERSION, ref_clap=None, log=print):
+    """the 0.4 member bank file (forge04.json): every FORGE04 member rendered from its recipe palette, measured (meta,
+    fingerprint, the catalog profile), its takes audited in its role (seed .. seed + FORGE04_TAKES - 1: its own take
+    clean and at least FORGE04_MIN_CLEAN clean) and its originality on record, at most FORGE04_REF_MAX: ref_clap
+    {id: cosine} (fresh measurements of these renders), else FORGE04_REF_CLAP's recorded value, which holds only
+    while the member renders as it did when measured (_forge04_stale: the block in FORGE04_REF_ON, the shipped
+    fingerprint); a stale or missing value is refused, never written as if measured. One member that fails and
+    nothing is written (BankError). Returns the document."""
+    from . import sfx
+    ref_clap = dict(ref_clap or {})
+    shipped = _forge04_shipped()
+    entries, bad, fresh = {}, [], []
+    for sid in FORGE04:
+        e = forge04_entry(sid)
+        x = renderer(e)()
+        y = normalize(x).astype(np.float32)
+        e['meta'] = meta_of(y)
+        e['profile'] = _profile(y)
+        role = e['kinds'][0]
+        clean, codes = [], set()
+        for k in range(FORGE04_TAKES):
+            yk = y if k == 0 else render(e | {'id': sid}, seed=e['seed'] + k, checks=False)[0]
+            c = sfx.check(yk, category=e['category'], role=role, sound=sid)
+            clean.append(bool(c['ok']))
+            codes |= {w['code'] for w in c['warnings']}
+        e['audit'] = {'role': role, 'seeds': [e['seed'], e['seed'] + FORGE04_TAKES - 1], 'clean': int(sum(clean)),
+                      'warnings': sorted(codes)}
+        if not clean[0] or sum(clean) < FORGE04_MIN_CLEAN:
+            bad.append(f"{sid}: {sum(clean)} / {FORGE04_TAKES} takes clean ({', '.join(sorted(codes))})"
+                       + ('; its own take is not' if not clean[0] else ''))
+        stale = None
+        if sid in ref_clap:
+            cos = ref_clap[sid]
+            fresh.append(f"'{sid}': '{forge04_digest(e)}'")
+        else:
+            cos = FORGE04_REF_CLAP.get(sid)
+            stale = _forge04_stale(sid, e, y, shipped) if cos is not None else None
+        if stale:
+            bad.append(f'{sid}: the recorded reference CLAP {cos} is stale: {stale}; measure it again on this render '
+                       'and pass it (ref_clap / --ref-clap)')
+            cos = None
+        elif not isinstance(cos, (int, float)) or isinstance(cos, bool) or cos > FORGE04_REF_MAX:
+            bad.append(f'{sid}: nearest reference CLAP {cos} (needs a measured value <= {FORGE04_REF_MAX})')
+        e['original'] = {'made': 'recipe', 'max_ref_clap': cos}
+        entries[sid] = e
+        if log:
+            log(f"  {sid:26s} {e['meta']['dur_s']:6.3f} s  takes {sum(clean)}/{FORGE04_TAKES}  ref CLAP {cos}")
+    if bad:
+        raise BankError(f'{len(bad)} member(s) refused, nothing written:\n  ' + '\n  '.join(bad))
+    if fresh and log:
+        log('freshly measured originality: record the values in FORGE04_REF_CLAP and these blocks in FORGE04_REF_ON: '
+            + ', '.join(fresh))
+    import importlib
+    cats = {}
+    for sid, e in entries.items():
+        c = e['category']
+        if c in cats or c not in ('cut_hit', 'reverse_swell', 'ui_pop', 'knock', 'mallet', 'drip', 'shutter'):
+            continue
+        kinds, use = CATEGORIES[c]
+        mod = importlib.import_module(f"earshot.forge.recipes.{e['recipe']}")
+        cats[c] = {'recipe': e['recipe'], 'target': getattr(mod, 'TARGET', None), 'kinds': kinds, 'use': use}
+    doc = {'bank': FORMAT, 'name': 'forge04', 'version': version, 'earshot': _version(),
+           'note': 'earshot 0.4 recipe members (render blocks of recipe palettes): the new categories and new members '
+                   'of old ones; each entry carries its catalog profile, its take audit and its originality (the '
+                   'largest CLAP cosine to a private set of licensed reference clips, <= 0.96)',
+           'categories': cats, 'entries': entries}
+    _write(out, doc)
+    return doc
+
+
 FIT_ID = re.compile(r'^fit/[a-z0-9_.]+/[a-z0-9_]+$')
 SOURCE_KEYS = ('id', 'title', 'author', 'license', 'url')
 FREE = ('cc0', 'public domain', 'publicdomain', 'cc-pdm', 'pdm')
@@ -612,6 +866,9 @@ def add_fit(model, sound_id, source, bank_path=None, seed=0, vary=0.0, notes=Non
     if not any(f in lic for f in FREE) and not allow_license:
         raise BankError(f"licence {source['license']!r} is not CC0 / public domain (pass allow_license to keep an "
                         'attribution licence, and credit the source)')
+    if float(vary) and 'vary' not in auto.knobs_of(m):
+        raise BankError(f"a {auto.kind_of(m)} fit without a vary knob (an air-only gesture: no tones to jitter) "
+                        'cannot take vary; leave it at 0 (takes still differ by seed)')
     fe = m.pop('fit_engine', None) or {}
     role = sound_id.split('/')[1]
     e = {'type': 'fit', 'category': 'fit', 'member': sound_id.split('/', 1)[1], 'model': m, 'seed': int(seed),
@@ -684,7 +941,12 @@ def main(argv=None):
     b.add_argument('dirs', nargs='*', help='final folders (globs work), e.g. out/forge_v2/*/final')
     b.add_argument('-o', '--out', required=True)
     b.add_argument('--pluck', action='store_true', help='build the tuned pluck voices instead (no folders)')
-    b.add_argument('--version', help=f'bank version tag (default {FORGE_VERSION}, or pluck1 with --pluck)')
+    b.add_argument('--forge04', action='store_true',
+                   help='build the 0.4 recipe members instead (FORGE04, from the recipe palettes; no folders)')
+    b.add_argument('--version', help=f'bank version tag (default {FORGE_VERSION}, pluck1 with --pluck, '
+                                     f'{FORGE04_VERSION} with --forge04)')
+    b.add_argument('--ref-clap', help='with --forge04: JSON {id: cosine}, the originality freshly measured on the '
+                                      "members' current renders (a member whose recorded value is stale needs one)")
     f = sub.add_parser('add-fit', help='add a fitted recipe (earshot fit model.json) as fit/<role>/<name>')
     f.add_argument('model')
     f.add_argument('--id', required=True, dest='sound_id')
@@ -703,6 +965,12 @@ def main(argv=None):
         if a.cmd == 'build':
             if a.pluck:
                 doc = build_pluck(a.out, version=a.version or 'pluck1')
+            elif a.forge04:
+                ref = None
+                if a.ref_clap:
+                    with open(a.ref_clap, encoding='utf-8') as fh:
+                        ref = json.load(fh)
+                doc = build_forge04(a.out, version=a.version or FORGE04_VERSION, ref_clap=ref)
             else:
                 doc = build(a.dirs, a.out, version=a.version or FORGE_VERSION)
             print(f"wrote {a.out}: {len(doc['entries'])} entries ({doc['version']}), "

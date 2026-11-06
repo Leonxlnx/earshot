@@ -495,11 +495,15 @@ def _end(y, p, n_len, fade=None):
 
 def render(p, r):
     p = {**DEFAULTS, **p}
+    if p.get('ring', 1.0) != 1.0:                         # earshot 0.4: the decay knob (off at 1: no change at all)
+        p = ring_scaled(p)
     st = p['style']
-    n_len = dsp.n_of(p['length'] if st != 'bell' else max(p['length'], 0.5))
+    n_len = dsp.n_of(p['length'] if st != 'bell' else (p['bell_len'] or max(p['length'], 0.5)))
     n = n_len + dsp.n_of(0.05)
     if st == 'bell':
         y = _bell(p, r, n)
+        if p.get('soft', 0.0) > 0:
+            y = _soft(y, p['soft'])
         y = _finish(y, p, r, n_len)
         y = fx.decorrelate(y, p['width'] * 0.5, cut=600.0)
         if p['room'] > 0:
@@ -509,7 +513,10 @@ def render(p, r):
             return _end(y, p, n_len, fade=max(p['fade'], 0.25))
         return _end(y, p, n_len, fade=max(p['fade'], 0.4 * n_len / SR))
     if st == 'chime':                                                      # round 6: a struck material + motif
-        y = _finish(_chime(p, r, n), p, r, n_len)
+        y = _chime(p, r, n)
+        if p.get('soft', 0.0) > 0:
+            y = _soft(y, p['soft'])
+        y = _finish(y, p, r, n_len)
         y = fx.decorrelate(y, p['width'] * 0.5, cut=1200.0)
         if p['verb'] > 0.005:
             wet = fx.reverb(y, r, rt60=p['rt60'], size=0.25, predelay=0.006, damp=0.45, wet=1.0, dry=0.0,
@@ -535,6 +542,8 @@ def render(p, r):
         wet = fx.reverb(send, r, rt60=p['rt60'], size=0.25, predelay=0.006, damp=0.45, wet=1.0, dry=0.0, stereo=True,
                         width=0.4 + p['width'])
         y = np.concatenate([y, np.zeros((len(wet) - len(y), 2))]) + p['verb'] * wet
+    if p.get('soft', 0.0) > 0:
+        y = _soft(y, p['soft'])
     return _end(y, p, n_len)
 
 
@@ -671,3 +680,63 @@ FAMILY_NAMES_R6 = {'pro_notify': ['film_ding', 'fm_bell', 'wood', 'ding_dong', '
 # NOT delivered (held-out bench, one run at 19:10): variety 0.936 -> 0.814, phrase z 2.16 -> 1.45, margin 0.38 -> -0.03;
 # by blind_v2.verdict (no real variety row for pro_notify) that is models 0 up / 2 down, so FAMILY['pro_notify'] stays
 # the round-5 family (out/forge_v2/pro_notify/final/); the round-6 palette is in final_r6/ for a swap by ear.
+
+
+# ------------------------------------------------------------------------------------------------ earshot 0.4: decay
+# The decay knob (earshot 0.4). The music films' rounded mid ding rings 0.36 s
+# (0.24-0.5), 20 dB down 116 ms (25-229) after a 36 ms (16-121) onset, at ~690 Hz with a tonal share of 0.6; the 0.3
+# knob pass got notify/m1 / m3 to 600 Hz and 0.36 s only by fading the end of a 2 s ring (dur), so the ring stayed 2.6x
+# too slow, the onset 3.5x too hard and the audit called every such take truncated. Two keys fix that inside the
+# recipe: `ring` scales every decay constant of the style (bell: decay, early_tau, strike_tau; ding / success:
+# hold_tau, ring_tau, body_tau, air_tau, p3_tau; chime: c_tf, c_ts, c_itau), so a note rings DOWN to silence within its
+# file; `soft` (s) is a felt mallet's onset, a raised-cosine rise over the whole note (mallet and tick included).
+# Both are off by default (ring 1, soft 0): every earlier member renders sample for sample. knobs.py aims `ring` at a
+# t20 target (decay=) and `soft` at an attack target (onset=). bell_len (s, 0 = off) replaces the bell style's 0.5 s
+# minimum file length for a short note (the ring must still reach -45 dB inside it: knobs set it from the decay).
+SPACE.update({'ring': (0.1, 4.0, 'log'), 'soft': (0.0, 0.08), 'bell_len': (0.0, 2.6)})
+DEFAULTS.update({'ring': 1.0, 'soft': 0.0, 'bell_len': 0.0})
+RING_KEYS = {'bell': ('decay', 'early_tau', 'strike_tau'),
+             'ding': ('hold_tau', 'ring_tau', 'body_tau', 'air_tau', 'p3_tau'),
+             'chime': ('c_tf', 'c_ts', 'c_itau')}
+RING_KEYS['success'] = RING_KEYS['ding']
+
+
+def ring_scaled(p, ring=None):
+    """p with every decay constant of its style multiplied by `ring` (p['ring'] when None): the decay knob"""
+    ring = p.get('ring', 1.0) if ring is None else ring
+    if ring == 1.0:
+        return dict(p)
+    keys = RING_KEYS.get(p.get('style', 'ding'), ())
+    return {**p, **{k: p[k] * ring for k in keys if k in p}}
+
+
+def _soft(y, soft):
+    """a felt mallet: a raised-cosine rise over `soft` s on the whole note"""
+    k = min(len(y), dsp.n_of(soft))
+    if k > 1:
+        w = 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, k))
+        y = np.array(y, np.float64)
+        y[:k] *= w[:, None] if y.ndim == 2 else w
+    return y
+
+
+# The earshot 0.4 mid ding: the music films' rounded counter / success ding. A struck bell (style 'bell')
+# cannot get there: its tonal share stays >= 0.8 and its centroid 1.6x high at every hardness (90 candidates: best
+# profile distance 0.64). A struck tine with its octave-under body (style 'chime', c_sub ~0.3-0.4: two lines an octave
+# apart give the films' tonal share of ~0.6 and pull the centroid to ~640-830 Hz) does, with no drive: the decay knob
+# (knobs.apply(decay=116)) and the onset knob (onset=36) set `ring` and `soft`. Profile distance 0.20 / 0.29, all 7 /
+# 6 of 7 features inside the films' IQRs (the earshot 0.4 study).
+_MID = dict(style='chime', drive=0.0, c_motif='single')
+FAMILY_MID = {'mid_ding': [
+    _fam(**{**_MID, 'f0': 830.61, 'mat': 'tine', 'att': 0.00316, 'detune': 0.9, 'verb': 0.255, 'rt60': 0.358,
+            'width': 0.313, 'length': 0.425, 'fade': 0.0435, 'hp': 135.6, 'c_fast': 0.623, 'c_tf': 0.0187,
+            'c_ts': 0.0623, 'c_mallet': -59.0, 'c_hard': 1.0, 'c_bend': 18.8, 'c_sub': 0.45, 'c_index': 1.655,
+            'c_itau': 0.0097, 'ring': 0.82, 'soft': 0.049}),                    # a felt-struck tine over its octave
+    _fam(**{**_MID, 'f0': 880.0, 'mat': 'wood', 'att': 0.00814, 'detune': 1.68, 'verb': 0.35, 'rt60': 0.363,
+            'width': 0.229, 'length': 0.317, 'fade': 0.0613, 'hp': 254.7, 'c_fast': 0.596, 'c_tf': 0.0291,
+            'c_ts': 0.077, 'c_mallet': -25.3, 'c_hard': 0.058, 'c_bend': 22.9, 'c_sub': 0.45, 'c_index': 4.38,
+            'c_itau': 0.0064, 'ring': 0.65, 'soft': 0.047}),                     # a soft wooden bar, a step higher
+# (the two lines an octave apart are near level, so which is the strongest bin flips from take to take: the measured
+# tonal share of one member spans 0.55-0.7 over seeds, its centroid 600-760 Hz; c_sub 0.45 keeps both inside the IQRs)
+]}
+FAMILY_NAMES_MID = {'mid_ding': ['tine', 'wood']}

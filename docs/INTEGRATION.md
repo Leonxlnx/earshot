@@ -18,18 +18,23 @@ audio/score.json  "sfx": {"engine": "auto", "kit": "audio/kit.json"} ------+--> 
 audio/kit.json --scripts/audio/kit.py--> earshot kit render --> audio/kit/*.wav + kit.lock.json --^
 ```
 
-1. **The kit.** `audio/kit.json` starts from a preset (`earshot kit init --preset calm|crisp|minimal`; calm is the
-   default for text-led films) and is edited per film: the lockup hit tuned to the film's root (`edits.pitch`), another
-   member for a role, a fitted sound. Roles are cinetic's cue kinds and their variants (below); `null` roles are not
-   sounded.
+1. **The kit.** `audio/kit.json` starts from a preset (`earshot kit init --preset calm|crisp|minimal|launch`; calm
+   is the default for text-led films, launch for films cut to music) and is edited per film: the lockup hit tuned to
+   the film's root (`edits.pitch`), another member for a role, a fitted sound. Roles are cinetic's cue kinds and their
+   variants (below); `null` roles are not sounded.
 2. **The bridge.** cinetic's `scripts/audio/kit.py` finds earshot (importable in cinetic's Python, `sfx.python` in
    `score.json`, `EARSHOT_PYTHON`, or `earshot` on PATH), runs `earshot kit render audio/kit.json --out audio/kit` in
    one process (cached: an unchanged kit re-renders nothing) and keeps the takes in `audio/kit/`, so the film rebuilds
    on a machine without earshot.
 3. **Placement.** score.py plays one take per event (a new take per event by hash; typing cycles through the takes),
    placed by the sync point the lock measured for the role's `align`: the take's onset on the cue frame, a whoosh's
-   loudest 5 ms on its apex, a riser's end on the hit. `level_db` and the event weight set its level; a cue whose role
-   is `null` is skipped with a report line.
+   loudest 5 ms on its apex, a riser's end on the hit (or its climax, for a riser or swell aligned on its `peak` as
+   the launch preset's are: their 0.4 members fall after the climax). `level_db` and the event weight set its level;
+   a cue whose role is `null` is skipped with a report line. A role with the 0.4 mix keys (the launch preset) asks for more: its
+   `offset_ms` moves the sync point off the frame (`kit.place`), its `bed_db` sets the take against the music under
+   the cue (`kit.bed_level` + `kit.gain_db`, instead of `level_db`), its `min_gap_ms` spaces a run (`kit.space_run`),
+   and the lock's `mix.stop_down` asks for a music dip before hits rather than a duck after them
+   ([docs/SFX.md](SFX.md#mix-keys-04)). A renderer that ignores them still gets valid takes and `level_db`.
 4. **Fallback.** earshot render -> the vendored `audio/kit/` takes -> cinetic's own synth voices with a loud warning.
    The build never fails only because earshot is missing.
 5. **Listening.** `scripts/audio/listen.py` runs `earshot timeline --cues`, `sheet` and `critique` in one process and
@@ -46,7 +51,7 @@ audio/kit.json --scripts/audio/kit.py--> earshot kit render --> audio/kit/*.wav 
 | land / land light | `land` / `land.light` | onset |
 | pop | `pop` | onset |
 | whoosh (short / long move) | `whoosh.short` / `whoosh.long` | peak |
-| suck, riser, swell | `suck`, `riser`, `swell` (off in every preset) | end |
+| suck, riser, swell | `suck`, `riser`, `swell` (off in calm, crisp, minimal; launch sounds riser and swell, both aligned on the peak) | end |
 | drop | `drop` | onset |
 | key / key space / key return | `key` / `key.space` / `key.return` | onset |
 | click / click confirm | `click` / `click.confirm` | onset |

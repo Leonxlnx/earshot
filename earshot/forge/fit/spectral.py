@@ -46,12 +46,20 @@ are noise (or dense grains) shaped by a time-varying spectral envelope. The mode
            bands cannot hold. Helps long steady sounds (the riser: CLAP 0.82 -> 0.88), costs a little on short
            ones (estimation noise), hence off by default.
   fit      what the fit chose: gesture_ms (smoothing), rank, tol_db, fluct_db.
+  finish   True on every fit made by 0.4: auto.render ends such a model's renders with the 0.4 fade-in and -1 dBFS
+           peak limit (auto.finished); a model without it (fitted by 0.3) renders as it did, sample for sample.
+The detail fit (fit(**DETAIL)) keeps a 10 ms gesture to 0.5 dB with no denoise or texture-aware widening and tracks
+up to 100 ridges: pulses, stutter gates and short tonal grains stay in the gesture (the gesture model's noise layer).
 
 Rendering (`render`): each call draws NEW noise (seeded, deterministic per seed), so every render is a fresh but
 statistically identical sound; knobs: length (time-stretch of the gesture, texture rates kept), speed (movement
 speed: shorter, higher by SPEED_OCT octaves per doubling, faster flutter), sweep (scales the spectral centroid's
 excursion around its mean), shift (octaves), tilt (dB / octave about 1 kHz), roughness (texture depth; 0 = smooth
-Gaussian), width (side / pan amount), ridges (tonal ridge gain), gain_db. Level: the gain that puts the EXPECTED
+Gaussian), width (side / pan amount), ridges (tonal ridge gain), gain_db, and the motion knobs, which read the
+gesture's trajectory (`trajectory`: level, centroid, brightness, pan and width per keyframe, the peak and its 20 dB
+rise / fall): doppler (semitones of a pass-by pitch bend, a time warp turning at the peak), proximity (brightness and
+level follow the distance: quieter keyframes get duller), pan (factor on the fitted L/R level differences) and motion
+(a pass-by pan from one side to the other). Level: the gain that puts the EXPECTED
 loudest 50 ms RMS (computed from the gesture: band envelopes, their overlaps, the ridges) on the original's
 (+ gain_db), times the take's own correction to its expected K-weighted energy (BS.1770 weighting, the loudness a
 meter reads). A noise band holds few independent bins over a short gesture, so a take's loudness wanders with the
@@ -91,6 +99,12 @@ NFFTS = (512, 1024, 2048, 4096)
 NFFT_CYCLES = 2.0                           # analysis window ~ this many / bandwidth per band
 FLOOR_DB = 90.0                             # envelope floor below its loudest cell
 SPREAD = 1.0                                # grain amplitude spread (log-normal sigma, nepers)
+# the detail fit (fit(**DETAIL)): a 10 ms gesture kept to 0.5 dB, no denoise and no texture-aware widening, up to 100
+# tonal ridges from 60 Hz that stand 5 dB over their floor for 20 ms. Designed whooshes, risers and swells carry
+# pulses, stutter gates and short tonal grains the smooth default turns into a wash (on the long film gestures it
+# lifted CLAP 0.49 -> 0.87, 0.59 -> 0.74, 0.63 -> 0.81); the gesture model's noise layer (fit/gesture.py)
+DETAIL = {'gesture_ms': 10.0, 'tol_db': 0.5, 'max_keys': 600, 'denoise': False, 'adapt': False, 'max_ridges': 100,
+          'ridge_db': 5.0, 'ridge_ms': 20.0, 'ridge_lo': 60.0}
 
 
 def _workers():
@@ -328,8 +342,11 @@ def _gauss_process(m, fs, rates, spec, rng):
     return z / sd if sd > 0 else z
 
 
-def _clicks(N, rate, rng, spread=SPREAD):
-    """unit-variance Poisson click train: `rate` clicks / s, log-normal amplitudes with random signs"""
+def _clicks(N, rate, rng, spread=SPREAD, norm_ms=0.0):
+    """unit-variance Poisson click train: `rate` clicks / s, log-normal amplitudes with random signs. norm_ms > 0 (a
+    texture's grains['norm_ms']): levelled to unit power over windows of norm_ms, at least GRAIN_NORM_CLICKS clicks
+    long (_local_norm): the clicks keep their spread inside a window, but no stretch of a take is louder than the
+    expectation because one draw put its largest clicks there"""
     k = int(rng.poisson(max(rate, 1e-3) * N / SR))
     c = np.zeros(N)
     if k == 0:
@@ -337,8 +354,32 @@ def _clicks(N, rate, rng, spread=SPREAD):
     pos = rng.integers(0, N, k)
     amp = np.exp(spread * rng.standard_normal(k)) * rng.choice((-1.0, 1.0), k)
     np.add.at(c, pos, amp)
+    if norm_ms > 0:
+        w = int(max(norm_ms * 1e-3 * SR, GRAIN_NORM_CLICKS * SR / max(rate, 1e-3)))
+        if w < N // 2:
+            c = _local_norm(c, w)
     p = np.sqrt((c ** 2).mean())
     return c / p if p > 0 else c
+
+
+GRAIN_NORM_CLICKS = 20.0   # a levelled grain train's window holds at least this many clicks on average
+
+
+def _local_norm(x, w):
+    """x levelled to unit mean power over every w-sample window (centred moving averages of x^2 and of the gain): the
+    realisation's energy follows its expectation, its fine structure stays"""
+    w = max(3, int(w)) | 1
+    p = _movavg(x * x, w)
+    g = 1.0 / np.sqrt(np.maximum(p, 1e-3 * max(float(p.mean()), 1e-30)))
+    return x * _movavg(g, w)
+
+
+def _movavg(v, w):
+    """centred moving average over w (odd) samples, over what is there at the edges"""
+    c = np.concatenate([[0.0], np.cumsum(v)])
+    i = np.arange(len(v))
+    a, b = np.clip(i - w // 2, 0, len(v)), np.clip(i + w // 2 + 1, 0, len(v))
+    return (c[b] - c[a]) / np.maximum(b - a, 1)
 
 
 def _k_gain2(f):
@@ -349,11 +390,12 @@ def _k_gain2(f):
 
 
 def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=False, rate_scale=1.0,
-           rough=1.0, fine=None, fine_shift=0.0, power=False):
+           rough=1.0, fine=None, fine_shift=0.0, power=False, ridge_sig=None):
     """the renderer core. tk (K,) key times in s, env (K, B) density dB. Returns (n,) if mono else (n, 2).
     power=True returns (y, p, pk): the expected channel-mean power of the render, plain and K-weighted ((n,) each:
     the bands' envelopes with their neighbours' overlap, the ridges; flutter has E[mod^2] = 1), the same for every
-    seed (render levels by them)"""
+    seed (render levels by them). ridge_sig (mono only): the ridges already rendered for this seed (_ridge_sig: the
+    texture fit renders one model many times; the ridges draw from their own stream, so the sum is the same)"""
     n = int(n)
     ss = np.random.SeedSequence(abs(int(seed)) % (2 ** 32))
     rA, rB, rC, rM, rR = [np.random.default_rng(s) for s in ss.spawn(5)]
@@ -368,7 +410,7 @@ def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=F
     eA = rA.standard_normal(N)
     if grains and rough > 0:
         dens = float(grains['density']) / max(rough, 1e-3) ** 2   # rougher = sparser clicks
-        eA = _clicks(N, dens * rate_scale, rC)
+        eA = _clicks(N, dens * rate_scale, rC, norm_ms=float(grains.get('norm_ms') or 0.0))
     FA = sfft.rfft(eA, workers=wk)
     FB = None if (mono or stereo is None) else sfft.rfft(rB.standard_normal(N), workers=wk)
     f = np.fft.rfftfreq(N, 1 / SR)
@@ -448,6 +490,9 @@ def _synth(n, tk, env, cents, seed, stereo=None, texture=None, ridges=(), mono=F
         L += amp * gl * (c * nA + s * nB)
         R += amp * gr * (c * nA - s * nB)
 
+    if ridge_sig is not None:
+        L += ridge_sig[:n]
+        ridges = ()
     for rd in ridges or ():
         rt = np.asarray(rd['t'], np.float64)
         fr = np.interp(ts, rt, np.asarray(rd['f'], np.float64))
@@ -719,8 +764,17 @@ def _fit_fine(xm, model, seeds=(41, 42), verbose=False):
 
 
 def fit(x, name=None, n_bands=N_BANDS, tol_db=1.0, max_keys=160, gesture_ms=25.0, max_rank=16, iters=3, diff_frames=3,
-        ridges=True, fine=False, texture=True, stereo=True, seeds=(1, 2), verbose=False):
-    """fit a spectral-noise model to a recording (path or (n,)/(n, 2) 48 kHz array); returns the model dict"""
+        ridges=True, fine=False, texture=True, stereo=True, seeds=(1, 2), max_ridges=4, ridge_db=8.0, ridge_ms=50.0,
+        ridge_lo=400.0, denoise=True, adapt=True, quiet_db=50.0, grain_norm_ms=0.0, grain_halves=False,
+        verbose=False):
+    """fit a spectral-noise model to a recording (path or (n,)/(n, 2) 48 kHz array); returns the model dict.
+    max_ridges / ridge_db / ridge_ms / ridge_lo: how many tonal ridges, how far over the local floor (dB), how long
+    (ms) and from what frequency (Hz) up. denoise=False skips the low-rank denoise and adapt=False the texture-aware
+    widening of the smoothing (the tolerance then stays at tol_db): a detail fit that keeps pulses, clicks and stutter
+    gates as gesture (DETAIL, the gesture model's noise layer) instead of texture statistics. quiet_db: cells this far
+    under the loudest weigh nothing in the keyframe choice (their level between keyframes is interpolated).
+    grain_norm_ms / grain_halves (0.4, the gesture model's air): the grain texture levelled (_clicks) and kept only
+    when the fast log-amplitude variance stands out in both halves of the active span (_fit_texture)"""
     if name is None and isinstance(x, str):
         name = os.path.basename(x)
     x2 = _load(x)
@@ -735,7 +789,9 @@ def fit(x, name=None, n_bands=N_BANDS, tol_db=1.0, max_keys=160, gesture_ms=25.0
 
     rmods = []
     if ridges:
-        for tr in _find_ridges(xm, D, cents):
+        min_frames = max(2, int(round(ridge_ms / (1000.0 * HOP / SR))))
+        for tr in _find_ridges(xm, D, cents, max_ridges=max_ridges, min_prom=ridge_db, min_frames=min_frames,
+                               f_lo=ridge_lo):
             rm, (k, fz, amp) = _ridge_model(tr)
             rmods.append(rm)
             D = _ridge_remove(D, cents, k, fz, amp)
@@ -749,7 +805,7 @@ def fit(x, name=None, n_bands=N_BANDS, tol_db=1.0, max_keys=160, gesture_ms=25.0
         # flutter; a quadratic follows the gesture's own curvature); widen the smoothing while that wander is well
         # above tolerance, the rest is left to the texture statistics
         L1 = _db((_seg_smooth(D, k, on) * bw[:, None]).sum(0))
-        fluct = _wander(L1, k, on)
+        fluct = _wander(L1, k, on) if adapt else 0.0
         if fluct <= 2.0 * tol_db or k >= k_max:
             break
         k = min(k_max, int(np.ceil(k * 1.5)))
@@ -759,17 +815,20 @@ def fit(x, name=None, n_bands=N_BANDS, tol_db=1.0, max_keys=160, gesture_ms=25.0
     act = tgt > top - 70
     Gp0 = tgt + 10 * np.log10(bw)[:, None]
     W = np.clip((Gp0 - (Gp0.max() - 50)) / 25, 0, 1).T                 # (T, B) cell weights
-    # low-rank denoising: keep only the structure that stands above what a noise band's estimate wanders
-    sig = _noise_sigma(n, cents, k, on)
-    sw = float(np.sqrt((W * sig[None] ** 2).sum() / max(W.sum(), 1e-9)))
-    rank = max_rank
     Y = tgt.T
-    for K in range(1, max_rank + 1):
-        Yh = _lowrank(Y, W, K)
-        r = float(np.sqrt((W * (Y - Yh) ** 2).sum() / max(W.sum(), 1e-9)))
-        if r <= sw:
-            rank = K
-            break
+    if denoise:
+        # low-rank denoising: keep only the structure that stands above what a noise band's estimate wanders
+        sig = _noise_sigma(n, cents, k, on)
+        sw = float(np.sqrt((W * sig[None] ** 2).sum() / max(W.sum(), 1e-9)))
+        rank = max_rank
+        for K in range(1, max_rank + 1):
+            Yh = _lowrank(Y, W, K)
+            r = float(np.sqrt((W * (Y - Yh) ** 2).sum() / max(W.sum(), 1e-9)))
+            if r <= sw:
+                rank = K
+                break
+    else:
+        Yh, rank, r, sw = Y, 0, 0.0, 0.0
     # quiet cells (weight < 1) keep their measured level: the low-rank fill there is a guess (a dark corner where
     # the highs have died must stay dark)
     tgtK = np.maximum((W * Yh + (1 - W) * Y).T, top - FLOOR_DB)
@@ -790,14 +849,14 @@ def fit(x, name=None, n_bands=N_BANDS, tol_db=1.0, max_keys=160, gesture_ms=25.0
 
     ild, icc, gw = _stereo_traj(A['stereo'], T, mono or not stereo)
     Gp = Gm + 10 * np.log10(bw)[:, None]
-    wc = np.clip((Gp - (Gp.max() - 50)) / 25, 0, 1).T          # (T, B)
+    wc = np.clip((Gp - (Gp.max() - quiet_db)) / 25, 0, 1).T    # (T, B)
     lvl = _db((10 ** (Gp / 10)).sum(0))
     peak = int(np.argmax(lvl))
     onset = int(np.argmax(lvl > lvl.max() - 30))
     gact = np.clip((lvl - (lvl.max() - 40)) / 20, 0, 1)[:, None] * gw * len(GROUPS)   # (T, G)
     Y = np.concatenate([Gm.T, ild / 2.0, icc * 10.0], 1)
     Wc = np.concatenate([wc, 0.5 * gact, 0.5 * gact], 1)
-    tol = max(tol_db, fluct)
+    tol = max(tol_db, fluct)              # (fluct is 0 with adapt=False)
     keys = _keyframes(Y, Wc, tol, must=(peak, onset), max_keys=max_keys)
 
     model = {
@@ -814,11 +873,12 @@ def fit(x, name=None, n_bands=N_BANDS, tol_db=1.0, max_keys=160, gesture_ms=25.0
         'fine': None,
         'texture': None,
         'ridges': rmods,
+        'finish': True,                   # 0.4 (module doc): auto.render's fade-in and peak limit apply
     }
     if fine:
         model['fine'] = _fit_fine(xm, model, verbose=verbose)
     if texture:
-        model['texture'] = _fit_texture(xm, model, verbose=verbose)
+        model['texture'] = _fit_texture(xm, model, verbose=verbose, grain_norm_ms=grain_norm_ms, halves=grain_halves)
     return model
 
 
@@ -905,6 +965,15 @@ def _texture_stats(xm, Eg, onset_s=None):
     return {'spec': spec, 'kurt': kurt, 'share': share, 'lows': lows, 'halves': halves}
 
 
+def _grains(density, norm_ms=0.0):
+    """a texture's grains entry: {'density' clicks / s, 'spread' (log-normal sigma), 'norm_ms' (> 0 only: the click
+    train levelled over windows this long, _clicks)}"""
+    g = {'density': density, 'spread': SPREAD}
+    if norm_ms > 0:
+        g['norm_ms'] = float(norm_ms)
+    return g
+
+
 def _coherence(st):
     """mean correlation of the low-rate log amplitude between the two loudest active groups"""
     ok = [g for g in range(len(st['share'])) if st['lows'][g] is not None]
@@ -920,15 +989,26 @@ def _coherence(st):
     return float((a * b).sum() / den) if den > 0 else 0.0
 
 
-def _mono_render(model, seed, texture):
+def _mono_render(model, seed, texture, ridge_sig=None):
     cents = centers(model['bands']['n'])
     n = int(round(model['dur'] * SR))
     return _synth(n, model['env']['t'], model['env']['db'], cents, seed, texture=texture,
-                  ridges=model.get('ridges') or (), mono=True, fine=model.get('fine'))
+                  ridges=model.get('ridges') or (), mono=True, fine=model.get('fine'), ridge_sig=ridge_sig)
 
 
-def _avg_stats(model, n, Eg, texture, seeds, onset_s):
-    sts = [_texture_stats(_mono_render(model, s, texture)[:n], Eg, onset_s) for s in seeds]
+def _ridge_sig(model, seed):
+    """the ridges of a mono render (seed) alone: the noise bands rendered 400 dB down"""
+    if not model.get('ridges'):
+        return None
+    cents = centers(model['bands']['n'])
+    n = int(round(model['dur'] * SR))
+    quiet = np.asarray(model['env']['db'], np.float64) * 0.0 - 400.0
+    return _synth(n, model['env']['t'], quiet, cents, seed, ridges=model['ridges'], mono=True)
+
+
+def _avg_stats(model, n, Eg, texture, seeds, onset_s, rsig=None):
+    rsig = rsig or {}
+    sts = [_texture_stats(_mono_render(model, s, texture, rsig.get(s))[:n], Eg, onset_s) for s in seeds]
     spec = np.nanmean(np.stack([s['spec'] for s in sts]), 0)
     kurt = np.nanmean(np.stack([s['kurt'] for s in sts]), 0)
     halves = np.nanmean(np.stack([s['halves'] for s in sts]), 0)
@@ -954,14 +1034,18 @@ def _fit_am(Sr, base, wg, ok, low):
             'depth': [round(float(v), 4) for v in depth], 'coh': round(coh, 3)}
 
 
-def _fit_texture(xm, model, seeds=(31, 32, 33), verbose=False):
+def _fit_texture(xm, model, seeds=(31, 32, 33), verbose=False, grain_norm_ms=0.0, halves=False):
     """texture statistics by analysis-by-synthesis on mono renders of the gesture:
     grains are detected by excess fast (>= 128 Hz) log-amplitude variance (Poisson clicks put variance at every rate,
     flutter does not) and their density is fitted to the std of the log analytic envelope (monotone, stable across
     seeds; kurtosis is not: it is ruled by the largest click); AM is the low-rate (<= 64 Hz) log-amplitude variance
-    beyond what Gaussian noise / the grains already make. Grains and AM are refitted once against each other."""
+    beyond what Gaussian noise / the grains already make. Grains and AM are refitted once against each other.
+    halves=True: grains only when the excess fast variance is there in both halves of the active span too (texture
+    is stationary; one transient of a short sound is not grain texture: AM is judged that way already).
+    grain_norm_ms: the grains' norm_ms (_clicks), in the fit's renders as in the model's"""
     import warnings
     n = len(xm)
+    rsig = {s: _ridge_sig(model, s) for s in seeds} if model.get('ridges') else None
     Eg = _group_env(model, n)
     tk = np.asarray(model['env']['t'])
     lv = np.asarray(model['env']['db']).max(1)
@@ -971,7 +1055,7 @@ def _fit_texture(xm, model, seeds=(31, 32, 33), verbose=False):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', RuntimeWarning)
         Sr = _texture_stats(xm, Eg, onset_s)
-        S0 = _avg_stats(model, n, Eg, None, seeds, onset_s)
+        S0 = _avg_stats(model, n, Eg, None, seeds, onset_s, rsig)
         ok = ~np.isnan(Sr['kurt']) & ~np.isnan(S0['kurt'])
         if not ok.any():
             return None
@@ -987,6 +1071,14 @@ def _fit_texture(xm, model, seeds=(31, 32, 33), verbose=False):
             'lenv_real': rnd(Sr['kurt']), 'lenv_gauss': rnd(S0['kurt']),
             'fast_var_real': rnd(hr), 'fast_var_gauss': rnd(h0), 'fast_ratio': round(hratio, 2)}}
         grainy = hx > max(0.03, 3 * float(np.sum(wg * hsd))) and hratio > 1.5
+        hh = []
+        for h in (0, 1):                             # the fast variance in each half of the active span apart
+            hrh = np.nansum(np.nan_to_num(Sr['halves'][h])[:, high], 1)
+            h0h = np.nansum(np.nan_to_num(S0['halves'][h])[:, high], 1)
+            hh.append(float(np.sum(wg * hrh) / max(np.sum(wg * h0h), 1e-9)))
+        tex['stats']['fast_ratio_halves'] = [round(v, 2) for v in hh]
+        if halves and grainy and min(hh) <= 1.5:
+            grainy = False
         if verbose:
             print('  texture: lenv real', np.round(Sr['kurt'], 2), 'gauss', np.round(S0['kurt'], 2),
                   f'fast var ratio {hratio:.2f}', 'grainy' if grainy else '')
@@ -995,7 +1087,7 @@ def _fit_texture(xm, model, seeds=(31, 32, 33), verbose=False):
             cache = {}
 
             def loss(d):
-                st = _avg_stats(model, n, Eg, {'am': am, 'grains': {'density': d}}, seeds, onset_s)
+                st = _avg_stats(model, n, Eg, {'am': am, 'grains': _grains(d, grain_norm_ms)}, seeds, onset_s, rsig)
                 cache[d] = st
                 return float(np.nansum(wg * (st['kurt'] - Sr['kurt']) ** 2))
             grid = [25, 60, 150, 400, 1000, 2500, 6000, 15000]
@@ -1013,20 +1105,20 @@ def _fit_texture(xm, model, seeds=(31, 32, 33), verbose=False):
         base = S0
         if grainy:
             dens, bl, base = fit_density(None)
-            tex['grains'] = {'density': round(float(dens), 1), 'spread': SPREAD}
+            tex['grains'] = _grains(round(float(dens), 1), grain_norm_ms)
             if verbose:
                 print(f'  grains: density {dens:.0f}/s (lenv loss {bl:.4f})')
         am = _fit_am(Sr, base, wg, ok, low)
         if am is not None and grainy:
             # flutter raises the log-envelope spread too: refit the density with the AM in, then the AM again
             dens, bl, _ = fit_density(am)
-            tex['grains'] = {'density': round(float(dens), 1), 'spread': SPREAD}
-            base = _avg_stats(model, n, Eg, {'grains': tex['grains']}, seeds, onset_s)
+            tex['grains'] = _grains(round(float(dens), 1), grain_norm_ms)
+            base = _avg_stats(model, n, Eg, {'grains': tex['grains']}, seeds, onset_s, rsig)
             am = _fit_am(Sr, base, wg, ok, low)
             if verbose:
                 print(f'  grains refit with AM: density {dens:.0f}/s')
         if am is not None:
-            S1 = _avg_stats(model, n, Eg, {'am': am, 'grains': tex['grains']}, seeds, onset_s)
+            S1 = _avg_stats(model, n, Eg, {'am': am, 'grains': tex['grains']}, seeds, onset_s, rsig)
             spr, sp0, sp1 = [np.nan_to_num(S['spec']) for S in (Sr, base, S1)]
             want = np.maximum(spr[:, low].sum(1) - sp0[:, low].sum(1), 0)
             got = np.maximum(sp1[:, low].sum(1) - sp0[:, low].sum(1), 1e-6)
@@ -1059,9 +1151,95 @@ def _centroid_oct(E, cents, bw):
     return (lw * np.log2(cents)[None]).sum(1) / np.maximum(lw.sum(1), 1e-30), p.sum(1)
 
 
+def trajectory(model):
+    """the gesture's motion per keyframe, as recipes and the motion knobs read it: {'t' (s), 'level_db' (total power,
+    dB re full-scale white noise), 'centroid_hz' (loudness-weighted: the sweep knob's), 'tilt_db_oct' (the density's
+    slope in dB per octave where the energy is: a line through the band densities weighted by the bands' power, over
+    the bands within 40 dB of the keyframe's loudest band; pink noise -3, white 0: brightness apart from the
+    centroid), 'pan_db' (power-weighted L/R level difference over the band groups, + = left), 'width' (1 - power-
+    weighted correlation: 0 mono, 1 uncorrelated), 'peak_s' (the loudest keyframe), 'rise_s' / 'fall_s' (20 dB under
+    the peak to it, it to 20 dB under it)}"""
+    check(model)
+    cents = centers(model['bands']['n'])
+    bw = bandwidths(cents)
+    tk = np.asarray(model['env']['t'], np.float64)
+    E = np.asarray(model['env']['db'], np.float64)
+    co, cp = _centroid_oct(E, cents, bw)
+    lv = _db(cp)
+    lc = np.log2(cents / 1000.0)
+    tilt = np.zeros(len(tk))
+    for i, row in enumerate(E):
+        pb = row + 10 * np.log10(bw)                  # band power (dB)
+        w = 10 ** ((pb - pb.max()) / 10) * (pb > pb.max() - 40.0)
+        mx = (w * lc).sum() / w.sum()
+        tilt[i] = (w * (lc - mx) * row).sum() / max((w * (lc - mx) ** 2).sum(), 1e-9)
+    G = len(GROUPS) - 1
+    pan, wid = np.zeros(len(tk)), np.zeros(len(tk))
+    st = model.get('stereo')
+    if st:
+        gi = _group_of(cents)
+        gp = np.stack([(10 ** (E[:, gi == g] / 10) * bw[gi == g]).sum(1) for g in range(G)], 1)   # (K, G)
+        gp = gp / np.maximum(gp.sum(1, keepdims=True), 1e-30)
+        pan = (gp * np.asarray(st['ild'], np.float64)).sum(1)
+        wid = 1.0 - (gp * np.asarray(st['icc'], np.float64)).sum(1)
+    pk = int(np.argmax(lv))
+    on = int(np.argmax(lv > lv[pk] - 20))
+    loud = np.nonzero(lv[pk:] > lv[pk] - 20)[0]
+    off = pk + int(loud[-1]) if len(loud) else pk
+    return {'t': tk.tolist(), 'level_db': [round(float(v), 2) for v in lv],
+            'centroid_hz': [round(float(2 ** v), 1) for v in co], 'tilt_db_oct': [round(float(v), 2) for v in tilt],
+            'pan_db': [round(float(v), 2) for v in pan], 'width': [round(float(v), 3) for v in wid],
+            'peak_s': float(tk[pk]), 'rise_s': float(tk[pk] - tk[on]), 'fall_s': float(tk[off] - tk[pk])}
+
+
+def _motion_tau(tr, s=1.0):
+    """the time scale (s) of a pass-by at a gesture's peak: a quarter of its 20 dB rise + fall, at least 15 ms"""
+    return max(0.015, 0.25 * (tr['rise_s'] + tr['fall_s']) * s)
+
+
+def bend(y, t_pk, tau, semitones):
+    """a pass-by pitch bend (Doppler) as a time warp of a render ((n,) or (n, c)): read at the rate
+    2^(semitones tanh((t_pk - t) / tau) / 12), anchored at the peak, so the sound approaches higher and recedes lower
+    with the turn at t_pk; the output runs until the input is read out (a receding tail gets longer)"""
+    y = np.asarray(y, np.float64)
+    n = len(y)
+    if not semitones or n < 4:
+        return y
+    a = abs(float(semitones)) / 12
+    m = int(np.ceil(n * 2 ** a)) + 2
+    t = np.arange(m) / SR
+    rate = 2.0 ** (float(semitones) * np.tanh((t_pk - t) / max(tau, 1e-3)) / 12)
+    pos = np.concatenate([[0.0], np.cumsum(rate)[:-1]])
+    j = min(int(round(t_pk * SR)), m - 1)
+    pos += t_pk * SR - pos[j]                         # the peak stays where it was
+    keep = pos <= n - 1
+    m = int(np.nonzero(keep)[0][-1]) + 1 if keep.any() else n
+    idx = np.arange(n)
+    if y.ndim == 1:
+        return np.interp(pos[:m], idx, y, left=0.0, right=0.0)
+    return np.stack([np.interp(pos[:m], idx, y[:, c], left=0.0, right=0.0) for c in range(y.shape[1])], 1)
+
+
+def pass_pan(y, t_pk, tau, amount):
+    """a pass-by pan on an (n, 2) render: constant power, position amount x tanh((t - t_pk) / tau), -1 = left ..
+    +1 = right (unity gains in the centre)"""
+    y = np.asarray(y, np.float64)
+    if not amount:
+        return y
+    t = np.arange(len(y)) / SR
+    a = (np.clip(float(amount) * np.tanh((t - t_pk) / max(tau, 1e-3)), -1, 1) + 1) * np.pi / 4
+    return y * (np.sqrt(2.0) * np.stack([np.cos(a), np.sin(a)], 1))
+
+
 def render(model, seed=0, length=1.0, speed=1.0, sweep=1.0, shift=0.0, tilt=0.0, roughness=1.0, width=1.0,
-           ridges=1.0, gain_db=0.0, level=True, limit=True, steady=True):
+           ridges=1.0, gain_db=0.0, doppler=0.0, proximity=0.0, pan=1.0, motion=0.0, level=True, limit=True,
+           steady=True):
     """render a model: (n, 2) float32 at 48 kHz. New `seed` = new noise, same statistics. See the module doc.
+    Motion knobs (identity at 0 / 1; trajectory() has what they read): doppler (semitones of a pass-by pitch bend
+    turning at the gesture's peak, + = approach higher), proximity (-1..1: a keyframe d dB under the peak is made
+    p x d x (0.5 + 0.15 x octaves over 1 kHz) dB quieter still, floored at 0 dB per band: farther = quieter and duller;
+    negative flattens), pan (factor on the fitted L/R level differences), motion (-1..1: a pass-by pan from one side to
+    the other turning at the peak).
     limit=False skips the -0.5 dBFS sample-peak cap (a per-take gain: the fit engine levels takes itself).
     steady=False levels the take by its own loudest 50 ms (the 0.2 renderer; a hybrid's air layer was fitted so)"""
     check(model)
@@ -1081,10 +1259,13 @@ def render(model, seed=0, length=1.0, speed=1.0, sweep=1.0, shift=0.0, tilt=0.0,
         E = np.stack([np.interp(warp(cents / 2 ** o), ec, row) for o, row in zip(octs, E)])
     if tilt:
         E = E + float(tilt) * np.log2(cents / 1000.0)[None]
+    if proximity:
+        d = np.clip(_db(cp) - _db(cp).max(), -40.0, 0.0)
+        E = E + float(proximity) * d[:, None] * np.maximum(0.5 + 0.15 * np.log2(cents / 1000.0), 0.0)[None]
     st = model.get('stereo')
     if st is not None:
         icc = 1 - float(width) * (1 - np.asarray(st['icc'], np.float64))
-        st = {'ild': np.asarray(st['ild'], np.float64) * float(width), 'icc': np.clip(icc, -1, 1)}
+        st = {'ild': np.asarray(st['ild'], np.float64) * float(width) * float(pan), 'icc': np.clip(icc, -1, 1)}
     rds = []
     if ridges:
         for rd in model.get('ridges') or ():
@@ -1098,6 +1279,10 @@ def render(model, seed=0, length=1.0, speed=1.0, sweep=1.0, shift=0.0, tilt=0.0,
         y *= 10 ** ((model['level_db'] + float(gain_db) - _peak_mean_db(p)) / 20) * _take_gain(y, pk)   # expectation
     elif level:
         y *= 10 ** ((model['level_db'] + float(gain_db) - _peak_rms_db(y)) / 20)
+    if doppler or motion:
+        tr = trajectory(model)
+        t_pk, tau = tr['peak_s'] * s, _motion_tau(tr, s)
+        y = pass_pan(bend(y, t_pk, tau, doppler), t_pk, tau, motion)
     pk = np.abs(y).max()
     if limit and pk > 10 ** (-0.5 / 20):
         y *= 10 ** (-0.5 / 20) / pk
@@ -1153,8 +1338,11 @@ def summary(model):
                  f"{8.686 * max(am['depth']):.1f} dB, coherence {am['coh']:.2f}")
     if tx.get('grains'):
         w.append(f"crackle: {tx['grains']['density']:.0f} grains / s")
-    for rd in model.get('ridges') or ():
+    rds = model.get('ridges') or ()
+    for rd in rds[:4]:
         w.append(f"tonal ridge {rd['f'][0]:.0f} -> {rd['f'][-1]:.0f} Hz over {rd['t'][-1] - rd['t'][0]:.2f} s")
+    if len(rds) > 4:
+        w.append(f'{len(rds) - 4} more ridges')
     w.append(f"{len(json.dumps(model)) / 1024:.1f} kB JSON")
     return '; '.join(w)
 
@@ -1193,7 +1381,8 @@ def to_code(model, var='MODEL'):
     lines.append(f"    'ridges': {model.get('ridges')!r},")
     lines.append('}')
     lines += ['', '', 'def make(seed=0, **knobs):',
-              '    """knobs: length, speed, sweep, shift, tilt, roughness, width, ridges, gain_db"""',
+              '    """knobs: length, speed, sweep, shift, tilt, roughness, width, ridges, gain_db, doppler, proximity, '
+              'pan, motion"""',
               f'    return render({var}, seed=seed, **knobs)', '']
     return '\n'.join(lines)
 

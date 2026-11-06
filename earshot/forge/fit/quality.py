@@ -7,8 +7,9 @@
     fl = floor(lambda s: render(model, seed=s))     # quality(render seed 11, render seed 12): the noise floor
     pair_png('pair.png', original, resynth)         # side-by-side spectrograms + envelopes + 1/3-octave balance
 
-Metrics (both sounds mono-summed; the ORIGINAL's onset trims both by the same amount, so a timing error still counts;
-each is levelled to its own loudest 50 ms RMS, so a level offset is reported apart as `level_db`):
+Metrics (both sounds mono-summed, except the stereo ones; the ORIGINAL's onset trims both by the same amount, so a
+timing error still counts; each is levelled to its own loudest 50 ms RMS, so a level offset is reported apart as
+`level_db`):
   mel_db      multi-resolution log-mel distance: 64 mel bands 30 Hz - 20 kHz, FFT frames 256 / 1024 / 4096 (hop 1/4),
               mean |dB| over the cells within 60 dB of the louder sound's top (floored 80 dB down), averaged over
               the three resolutions (mel_256 / mel_1024 / mel_4096 are reported too). 0 = identical spectrograms.
@@ -24,11 +25,21 @@ each is levelled to its own loudest 50 ms RMS, so a level offset is reported apa
   missing_db  the same the other way (the original has it, the resynthesis does not)
   t40_ms      (original, resynth): peak until the 5 ms envelope first falls 40 dB
   level_db    resynth minus original, loudest 50 ms RMS (dB)
+  side_db     (original, resynth): side / mid energy (dB, floored at -40) over the original's active span (its onset
+              to the end of its tail, fit.space.active_span); M = (L + R) / 2, S = (L - R) / 2, a mono sound has none
+  width_db    per-band width error: mean |difference| of the two sounds' side / mid (dB, each floored at -40) in the
+              octave bands of fit.space.side_powers over that span, weighted by the original's band level (bands
+              within 40 dB of its loudest, linear in dB); 0 = the same width and spread of width over frequency
+  tail_corr   (original, resynth): L/R correlation over the original's tail (fit.space.tail_span: from its loudest
+              10 ms + 30 ms to the end of its tail; None when shorter than 20 ms); a reverberant space decorrelates
+  tail_corr_err  |difference| of the two (0 when either is None)
   clap_cos    (clap=True) cosine of the two CLAP embeddings (1 = the same to CLAP; same-category real refs sit at
               0.4-0.95 to each other)
   describe    (describe=True) the top tag of `earshot describe` of each sound
 `score(q)` folds them into one number for choosing between fits (lower is better). `floor(render_fn)` measures two
-renders of one model with different seeds: a stochastic model can never beat that floor on mel_db.
+renders of one model with different seeds: a stochastic model can never beat that floor on mel_db. Before 0.4 the
+score was mono only: a wide recording re-made as a near-mono one (sines renders of the films' wide dings: side / mid
+-16 dB against -5, tail correlation 0.92 against 0.39) scored as well as a wide one.
 Pure numpy (matplotlib only for pair_png; the CLAP / describe models only when asked).
 """
 import os
@@ -222,6 +233,46 @@ def excess(a, b, tol=6.0, depth=100.0):
     return (float(np.maximum(0.0, EB - EA - tol)[act].mean()), float(np.maximum(0.0, EA - EB - tol)[act].mean()))
 
 
+def _align2(a, b):
+    """a, b as (n, 2) trimmed at a's onset (5 ms lead) and zero-padded to one length (not levelled: the stereo
+    measures are ratios)"""
+    from .space import _stereo
+    A, B = _stereo(a), _stereo(b)
+    on = max(0, onset_index(A.mean(1)) - int(0.005 * SR))
+    A, B = A[on:], B[on:]
+    n = max(len(A), len(B))
+    return np.pad(A, ((0, n - len(A)), (0, 0))), np.pad(B, ((0, n - len(B)), (0, 0)))
+
+
+def stereo(a, b, floor_db=-40.0, depth_db=40.0):
+    """the stereo measures of b against its original a (module doc): {'side_db': (a, b), 'width_db', 'tail_corr':
+    (a, b), 'tail_corr_err'}"""
+    from .space import active_span, corr, side_powers, tail_span
+    A, B = _align2(a, b)
+    if not (np.ndim(a) == 2 or np.ndim(b) == 2) or len(A) < 64:
+        return {'side_db': (floor_db, floor_db), 'width_db': 0.0, 'tail_corr': (None, None), 'tail_corr_err': 0.0}
+    _, _, end = active_span(A)
+    end = max(end, min(len(A), int(0.02 * SR)))
+    side, ratio, level = [], [], []
+    for X in (A, B):
+        P = side_powers(X[:end])
+        pm, ps = P['PM'].sum(1) + 1e-30, P['PS'].sum(1) + 1e-30
+        side.append(round(float(max(floor_db, _db(ps.sum() / pm.sum()))), 2))
+        ratio.append(np.clip(_db(ps / pm), floor_db, 10.0))
+        level.append(_db(pm))
+    w = np.clip((level[0] - level[0].max() + depth_db) / depth_db, 0.0, 1.0)
+    out = {'side_db': tuple(side),
+           'width_db': round(float((w * np.minimum(np.abs(ratio[0] - ratio[1]), 30.0)).sum() / max(w.sum(), 1e-9)), 3)}
+    span = tail_span(A)
+    ca = cb = None
+    if span is not None:
+        i, j = span
+        ca, cb = corr(A[i:j, 0], A[i:j, 1]), corr(B[i:j, 0], B[i:j, 1])
+    out['tail_corr'] = (None if ca is None else round(ca, 4), None if cb is None else round(cb, 4))
+    out['tail_corr_err'] = round(abs(ca - cb), 4) if ca is not None and cb is not None else 0.0
+    return out
+
+
 def quality(original, resynth, clap=False, describe=False):
     """the fit-quality metrics dict of a resynthesis against its original (module doc)"""
     xa, xb = load(original), load(resynth)
@@ -240,6 +291,7 @@ def quality(original, resynth, clap=False, describe=False):
     q['t40_ms'] = (round(t40(a), 1), round(t40(b), 1))
     q['level_db'] = round(peak_rms_db(xb) - peak_rms_db(xa), 2)
     q['len_s'] = (round(len(a) / SR, 4), round(len(b) / SR, 4))
+    q.update(stereo(xa, xb))
     if clap:
         q['clap_cos'] = round(clap_cos(xa, xb), 4)
     if describe:
@@ -247,13 +299,23 @@ def quality(original, resynth, clap=False, describe=False):
     return q
 
 
+WIDTH_W = 0.04            # score per dB of per-band width error (capped at WIDTH_CAP_DB)
+WIDTH_CAP_DB = 20.0
+TAIL_CORR_W = 1.0         # score per unit of tail L/R correlation error
+
+
 def score(q):
     """one number to choose between fits of one recording (lower is better): mel dB + 0.3 x tone dB
     + 8 x (1 - envelope r) + 1 x onset error (octaves, capped at 2) + 1.5 x excess dB + 1 x missing dB
-    [+ 20 x (1 - CLAP cos) when measured]. On the 12 validation refs (in-sample) the model-free part alone chose fits
-    with a mean CLAP cos of 0.927 (the best candidates: 0.944); without excess / missing it chose 0.856"""
+    + 0.04 x width dB (capped at 20) + 1 x tail correlation error [+ 20 x (1 - CLAP cos) when measured].
+    On the 12 validation refs (in-sample) the model-free part alone chose fits with a mean CLAP cos of 0.927 (the best
+    candidates: 0.944); without excess / missing it chose 0.856. The stereo terms (0.4) cost a mono re-make of a wide
+    recording (width 15 dB, tail correlation off by 0.6) about 1.2, what 0.06 of CLAP costs: they decide between
+    candidates that sound alike, not over a clearly closer one (on 29 wide-category dev clips of the replication
+    benchmark they changed no winner). Mono recordings: both are 0"""
     s = (q['mel_db'] + 0.3 * q['tone_db'] + 8.0 * (1.0 - q['env_corr']) + 1.0 * min(q['onset_err'], 2.0)
-         + 1.5 * q.get('excess_db', 0.0) + 1.0 * q.get('missing_db', 0.0))
+         + 1.5 * q.get('excess_db', 0.0) + 1.0 * q.get('missing_db', 0.0)
+         + WIDTH_W * min(q.get('width_db', 0.0), WIDTH_CAP_DB) + TAIL_CORR_W * q.get('tail_corr_err', 0.0))
     if q.get('clap_cos') is not None:
         s += 20.0 * (1.0 - q['clap_cos'])
     return float(s)
@@ -303,6 +365,12 @@ def text(q, fl=None):
          f"(sharpness {q['sharp_db_ms'][0]:.1f} vs {q['sharp_db_ms'][1]:.1f} dB/ms), "
          f"excess {q.get('excess_db', 0):.2f} / missing {q.get('missing_db', 0):.2f} dB, "
          f"t40 {q['t40_ms'][0]:.0f} vs {q['t40_ms'][1]:.0f} ms, level {q['level_db']:+.2f} dB")
+    sd = q.get('side_db')
+    if sd and max(sd) > -40:
+        s += f", side {sd[0]:.0f} vs {sd[1]:.0f} dB (width err {q.get('width_db', 0):.1f} dB)"
+        tc = q.get('tail_corr') or (None, None)
+        if tc[0] is not None and tc[1] is not None:
+            s += f", tail corr {tc[0]:.2f} vs {tc[1]:.2f}"
     if q.get('clap_cos') is not None:
         s += f", CLAP cos {q['clap_cos']:.3f}"
     if q.get('describe'):

@@ -28,7 +28,9 @@
                  swap), and reports the largest climb of the 5-frame median above its running minimum. Measured on
                  the 183 forge v2 finals: it flags pro_zip up / up_hi / arc (+20..64 st), the zip and sweep leads of
                  logo_sting zip_ping and pro_logo_sting sweep_hit (+25, +29 st), and the bubbles pop/2 and pro_pop
-                 bloop (+6 st over 55-75 ms, a physical bubble); falling sweeps and steady bells read 0.
+                 bloop (+6 st over 55-75 ms, a physical bubble); falling sweeps and steady bells read 0. For the
+                 drip category a climb a bubble makes (recipes/drip.allows: at most 14 st, starting within the first
+                 60 ms, done within 250 ms) is a note, not a warning: a drop's pitch rises by design (earshot 0.4)
   stacked,       for a hit (role hit / land): layers() counts separate attacks in a 25 ms RMS envelope (peaks within
   pre_swell      6 dB of the loudest, at least 10 dB of dip between them, in the first 0.5 s) and the pre-swell (from
                  the first frame within 30 dB of the peak to the first within 6 dB): two attacks, or more than
@@ -161,6 +163,12 @@ def live_ms(x, db=-40.0):
     return float((e >= e.max() * 10 ** (db / 10)).sum() * 1000.0 * h / SR)
 
 
+def _bubble(glide):
+    """a climb a water drop's bubble makes (earshot.forge.recipes.drip.allows): the drip category's allowance"""
+    from .recipes import drip
+    return drip.allows(glide)
+
+
 def _ends_on_peak(x):
     m = np.abs(_mono(x))
     return len(m) > 0 and int(np.argmax(m)) >= 0.97 * len(m)
@@ -208,8 +216,11 @@ def check(x, sr=SR, category=None, role=None, sound=None):
         add('tail', f"the tail rises again by {m['bump_db']:.0f} dB (a second event, a roll or a double member)",
             soft=True)
     if g['rise_st'] > GLIDE_ST and (g['to_s'] - g['from_s']) >= GLIDE_MIN_S:
+        bubble = category == 'drip' and _bubble(g)
         add('rising_glide', f"pitch climbs {g['rise_st']:.0f} semitones over {1000 * (g['to_s'] - g['from_s']):.0f} "
-                            f"ms ({g['from_s']:.2f}-{g['to_s']:.2f} s): a rising synth whip reads as cheap")
+                            f"ms ({g['from_s']:.2f}-{g['to_s']:.2f} s)" + (
+                                ': a bubble rising (drip allowance)' if bubble else
+                                ': a rising synth whip reads as cheap'), soft=bubble)
     hit = role in HIT_ROLES
     if hit or category in HIT_CATEGORIES:
         if lay['count'] >= 2:

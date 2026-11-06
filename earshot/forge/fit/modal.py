@@ -19,7 +19,13 @@ What the model holds (a plain JSON-serialisable dict, kind 'modal', version 1):
   crossovers on the ERB-rate axis, `edges` Hz) x breakpoints [t s, dB] (power, linear in dB between breakpoints).
   Each band's power is the original's minus the deterministic part's, so modes + noise keep the band energy.
 - fade_out_s: the recording's linear fade-out (estimated; the modes are fitted un-faded and faded at render).
-- side: per noise band, the side / mid amplitude ratio of a stereo original (None for mono).
+- side: per noise band, the side / mid amplitude ratio of a stereo original (None for mono): one ratio for the whole
+  sound (models from before 0.4 render with it).
+- side_t (0.4, stereo only): the side over time, sines.side_model of the original: per octave band at keyframes
+  after the onset, 'pan' (the side's part coherent with the mid, signed) and 'diffuse' (the rest, re the mid). A
+  static ratio set by a wide attack left the tails too wide (a pop's tail L/R correlation 0.30 against 0.72).
+- coherent (0.4: True on every fit): vary and the knobs keep the structure the fit gave the modes (render below).
+  Models without it, the 0.3 bank's fit entries among them, render exactly as before.
 - fit: diagnostics (mode count, the modes' energy share, the residual's level).
 
 How it fits (`fit`):
@@ -38,15 +44,25 @@ How it fits (`fit`):
 4. per strike the attack ramp that leaves the least residual in the first ms; the sub wave; the contact modes
    (full-rate ESPRIT on the first 2.5 ms of the residual);
 5. band envelopes (analytic-signal power; 0.5 ms smoothing from 8 ms before to 15 ms after onsets, 6 ms after,
-   30 ms in long tails), simplified to breakpoints (Ramer-Douglas-Peucker, 1 dB near strikes, 2 dB in tails).
+   30 ms in long tails; over the PRE_CAP_S before an onset no band rises above its level just before it),
+   simplified to breakpoints (Ramer-Douglas-Peucker, 1 dB near strikes, 2 dB in tails).
 
 render(model, seed, knobs): size (x: mode frequencies / size, decays * size, the noise spectrum shifted with them),
 damping (decays / damping, noise tails shortened), brightness (dB / octave around 1 kHz on modes and noise),
 hardness (x: a shorter contact and +4 dB / octave per doubling on the modes and the attack noise), noise (dB on
 the noise bands), width (x side), room (0..1 wet of a small stochastic room), vary (0..1: seeded jitter of mode
-frequencies / decays / amplitudes, strike timing and noise bands: new takes of the same object), spacing (x the
-time between strikes), gain (dB). seed changes only the noise (and, with vary > 0, the jitter). The side of a
-stereo render is the mid's Hilbert transform shaped per band by `side`.
+frequencies / decays / amplitudes and noise bands: new takes of the same object), spacing (x the time between
+strikes), gain (dB). seed changes only the noise (and, with vary > 0, the jitter). A `coherent` model (0.4) keeps the
+structure the least squares fit gave its modes (close modes, and a later strike's modes, shape and cancel the earlier
+ones' ring): its jitter is a smooth random function of log frequency (6 cosines of 0.25-1.25 cycles per octave), the
+same for every strike, its strikes keep their times, and when a knob moves a strike or a mode's frequency (vary, size,
+spacing) every mode keeps its phase on the first strike's timeline. Without it (models fitted before 0.4) every mode
+is detuned on its own (0.6 % x vary) and the strike times jitter (2 ms x vary): even 0.1 % undid the cancellations, so
+a key's takes rang on 2.5x the recording's tail (on the films' modal and hybrid dev fits the takes' CLAP to the
+recording was 0.75-0.87 against 0.89-0.94 for vary 0; coherent, it is as for vary 0).
+The side of a stereo render is made from the mid: with `side_t` per octave band the band's mid times its pan gain plus
+the band's Hilbert transform times its diffuse gain, both linear between keyframes (which move with the strikes and
+stretch with the decays, the bands with the modes); else the mid's Hilbert transform shaped per band by `side`.
 ring: a take that rings out (default None: on when vary > 0; off, the render keeps the recording's length and
 fade-out, what the fit is measured against). A trimmed recording stops while its modes still ring (a key's release
 70 ms before the cut), and vary lengthens some decays further; with ring the render goes on until every mode is
@@ -54,7 +70,9 @@ RING_DB (60 dB) under the loudest strike's mode sum, at least RING_MIN_S (RING_L
 above RING_LOUD_DB at the cut) and at most RING_EXT x the sound's span longer, and the added stretch fades 60 dB
 (linear in dB) instead of the recording's fade-out (the noise keeps falling at its last slope). A fitted model often
 holds a few faint poles with decays of seconds (noise the fitter took for modes); the cap keeps a take short, the
-fade keeps it from stopping on them. The fit engine's takes (auto.render(take=True), the bank) ring out.
+fade keeps it from stopping on them. The fit engine's takes (auto.render(take=True), the bank) ring out. A coherent
+model's ring-out continues its noise un-faded too, falling at its slope from before the recording's fade-out (from the
+fade, the modes rang on alone in the added stretch: a comb in the tail).
 What it is not for: glides / chirps (a rising pop, a zip) split into many false strikes; designed impacts with long
 reverb tails fit, but the tail is mostly noise bands.
 Pure numpy / scipy.
@@ -82,6 +100,16 @@ RING_EXT = 0.5             # mode sum, at most this x the sound's span (first st
 RING_MIN_S = 0.06          # least this much longer; the added stretch fades RING_DB (linear in dB)
 RING_LOUD_DB = -50.0       # modes still above this at the recording's end (re the loudest strike's mode sum) ...
 RING_LOUD_S = 0.2          # ... get at least this long a fade (a fast fade from a loud ring reads as a cut)
+STRIKE_RAMP_S = 0.00015    # a later strike's modes and contact start over this raised-cosine ramp (7 samples): from
+                           # full amplitude they put a step into the ring of the strikes before it, which the audit
+                           # hears as a click (an impact's 4 takes and its fit clicked at two later strikes). The first
+                           # strike (the onset) keeps its step; a model without 'coherent' (fitted before 0.4: the
+                           # bank's fit entries) renders as before
+RAMPS_MS = (0.0, 0.05, 0.1, 0.2, 0.35, 0.5, 0.8, 1.2)   # the attack ramps a strike's modes may rise over (ms)
+PRE_CAP_S = 0.002          # the noise bands may not rise over this long before an onset (0.4; 0 = as before): the
+                           # analysis smeared a strike's noise up to 1.5 ms ahead of it, 10-20 dB over the recording,
+                           # the main cause of blunt modal onsets (on the films' 27 modal dev clips the onset error
+                           # fell 0.39 -> 0.25 octave, a glockenspiel note's 3.6 -> 0.1; CLAP and mel unchanged)
 
 
 # ------------------------------------------------------------------------------------------------ helpers
@@ -534,11 +562,12 @@ def _rdp(t, v, tol):
     return np.nonzero(keep)[0]
 
 
-def _fit_noise(m, det, ons, tol_db=1.0, edges=NOISE_EDGES, h=NOISE_H):
+def _fit_noise(m, det, ons, tol_db=1.0, edges=NOISE_EDGES, h=NOISE_H, pre_cap=0.0):
     """band envelopes of the stochastic part: per band, the original's power minus the deterministic part's power
     (analytic-signal power, 0.5 ms smoothing from 8 ms before to 15 ms after onsets, 6 ms elsewhere), so the
     rendered modes + noise keep the original's band energy even where the modes misfit; a list per band of [t, dB]
-    breakpoints"""
+    breakpoints. pre_cap (s): over this long before each onset a band stays at its level just before (no rise ahead
+    of the strike)"""
     n = len(m)
     n_fft = sfft.next_fast_len(n + 16384)
     W = _masks(n_fft, edges, h)
@@ -572,6 +601,15 @@ def _fit_noise(m, det, ons, tol_db=1.0, edges=NOISE_EDGES, h=NOISE_H):
         po, pd = bandpow(R, b), bandpow(Rd, b)
         P_all.append(np.maximum(po - pd, 1e-6 * po))
     P_all = np.array(P_all)
+    if pre_cap > 0:                                  # the analysis smears a strike's energy ahead of it (the 0.5 ms
+        step = int(GRID * SR)                        # smoothing, the band filters' pre-ring): over the pre_cap s
+        k_cap = int(round(pre_cap / GRID))           # before an onset no band may rise above its level just before
+        for o in ons:
+            io = int(o // step)
+            a = io - k_cap
+            if a >= 1:
+                ref = P_all[:, max(0, a - 2):a + 1].min(axis=1)
+                P_all[:, a:io + 1] = np.minimum(P_all[:, a:io + 1], ref[:, None])
     fl = 10 * np.log10(P_all.max() + 1e-30) - 100.0
     env = []
     for b in range(len(W)):
@@ -585,7 +623,9 @@ def _fit_noise(m, det, ons, tol_db=1.0, edges=NOISE_EDGES, h=NOISE_H):
 def fit(x, *args, **kw):
     """fit a modal model to a struck / ringing recording (path or 48 kHz array); returns the model dict. Options:
     max_strikes, kmax (ESPRIT order cap per band), nmax (window, decimated samples), passes, skip_ms (the LS starts
-    this long after each onset), prune_db, max_modes (per strike), onset_rel, noise_tol_db, analysis_s, verbose"""
+    this long after each onset), prune_db, max_modes (per strike), onset_rel, noise_tol_db, analysis_s, verbose,
+    ramps (the attack ramps tried, ms), pre_cap_s (no noise rise this long before an onset), side_t (a stereo
+    source: the side over time, model['side_t'])"""
     try:                                   # small matrices: one BLAS thread is ~5x faster than a contended pool
         from threadpoolctl import threadpool_limits
     except ImportError:
@@ -595,7 +635,8 @@ def fit(x, *args, **kw):
 
 
 def _fit(x, max_strikes=10, kmax=16, nmax=384, passes=2, skip_ms=0.5, prune_db=-50.0, max_modes=80, onset_rel=0.2,
-        noise_tol_db=1.0, analysis_s=3.0, attack_ms=2.5, verbose=False):
+        noise_tol_db=1.0, analysis_s=3.0, attack_ms=2.5, verbose=False, ramps=RAMPS_MS, pre_cap_s=PRE_CAP_S,
+        side_t=True):
     X = _load(x)
     m_orig = X.mean(axis=1)
     n = len(m_orig)
@@ -704,7 +745,7 @@ def _fit(x, max_strikes=10, kmax=16, nmax=384, passes=2, skip_ms=0.5, prune_db=-
         base = m - mode_sig
         w0, w1 = o, min(n, o + skip + int(0.0015 * SR))
         best, rb = np.inf, 0.0
-        for rms in (0.0, 0.05, 0.1, 0.2, 0.35, 0.5, 0.8, 1.2):
+        for rms in ramps:
             y = _synth_strike(w1 + int(0.002 * SR), o, fq, tq, aq, pq, rms / 1000) if rows else None
             err = np.sum((base[w0:w1] - (y[w0:w1] if y is not None else 0)) ** 2)
             if err < best * (1 - 1e-9):
@@ -734,8 +775,8 @@ def _fit(x, max_strikes=10, kmax=16, nmax=384, passes=2, skip_ms=0.5, prune_db=-
     model = {'kind': KIND, 'version': VERSION, 'sr': SR, 'length_s': round(n / SR, 6), 'channels': int(X.shape[1]),
              'fade_out_s': fo, 'strikes': strikes, 'sub': sub,
              'noise': {'edges': list(NOISE_EDGES), 'h_erb': NOISE_H,
-                       'env': _fit_noise(m_orig, det, ons, noise_tol_db)},
-             'side': None}
+                       'env': _fit_noise(m_orig, det, ons, noise_tol_db, pre_cap=pre_cap_s)},
+             'side': None, 'coherent': True}
     if X.shape[1] == 2:
         side = 0.5 * (X[:, 0] - X[:, 1])
         n_fft = sfft.next_fast_len(n)
@@ -743,6 +784,9 @@ def _fit(x, max_strikes=10, kmax=16, nmax=384, passes=2, skip_ms=0.5, prune_db=-
         Ms, Ss = np.abs(np.fft.rfft(m_orig, n_fft)) ** 2, np.abs(np.fft.rfft(side, n_fft)) ** 2
         rho = np.sqrt(((W ** 2) @ Ss + 1e-30) / ((W ** 2) @ Ms + 1e-30))
         model['side'] = [round(float(min(v, 1.5)), 4) for v in rho]
+        if side_t:
+            from .sines import side_model
+            model['side_t'] = side_model(X)
     pm = float(np.sum(m_orig ** 2)) + 1e-30
     model['fit'] = {'skip_ms': skip_ms, 'modes': int(sum(len(s['modes']) for s in strikes)),
                     'mode_share_db': round(float(10 * np.log10(np.sum(mode_sig ** 2) / pm + 1e-30)), 2),
@@ -758,6 +802,7 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
     envelope (bands x grid, dB) on a GRID-second grid, the band centres and the output length (samples). ring: when
     a mode outlives the recording's length, render on until every mode is RING_DB down (see render)"""
     rv = np.random.default_rng([int(seed) & 0xFFFFFFFF, 1])
+    coherent = bool(model.get('coherent'))       # a 0.4 fit (module doc); older models keep the per-mode jitter
     st = model['strikes']
     t0 = [s['t'] for s in st]
     tn = []
@@ -765,17 +810,32 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
         if i == 0:
             tn.append(t)
         else:
-            gap = (t - t0[i - 1]) * spacing + vary * 0.002 * rv.standard_normal()
+            gap = (t - t0[i - 1]) * spacing + (0.0 if coherent else vary * 0.002 * rv.standard_normal())
             tn.append(tn[-1] + max(0.003, gap))
+
+    def field():                                  # a smooth random function of log frequency (unit variance)
+        c, p = rv.uniform(0.25, 1.25, 6), rv.uniform(0.0, 2 * np.pi, 6)
+        return lambda fr: np.sqrt(1 / 3) * np.cos(2 * np.pi * np.log2(np.maximum(fr, 20.0))[:, None] * c + p).sum(1)
+    if coherent:
+        jf, jt, ja = field(), field(), field()
+    shifted = coherent and (vary > 0 or size != 1.0 or spacing != 1.0)
     stretch = max(size / damping, 1e-3)
     tilt = brightness + 4.0 * np.log2(max(hardness, 1e-3))
     strikes = []
     for i, s in enumerate(st):
         md = np.array(s['modes'], float).reshape(-1, 4)
+        f0 = md[:, 0]
         k = len(md)
-        f = md[:, 0] / size * (1 + 0.006 * vary * rv.standard_normal(k))
-        tau = md[:, 1] * stretch * np.exp(0.12 * vary * rv.standard_normal(k))
-        a = md[:, 2] * 10 ** ((tilt * np.log2(np.maximum(f, 20.0) / 1000.0) + 1.5 * vary * rv.standard_normal(k)) / 20)
+        if coherent:
+            zf, zt, za = jf(f0), jt(f0), ja(f0)
+        else:
+            zf, zt, za = rv.standard_normal(k), rv.standard_normal(k), rv.standard_normal(k)
+        f = f0 / size * (1 + 0.006 * vary * zf)
+        tau = md[:, 1] * stretch * np.exp(0.12 * vary * zt)
+        a = md[:, 2] * 10 ** ((tilt * np.log2(np.maximum(f, 20.0) / 1000.0) + 1.5 * vary * za) / 20)
+        ph = md[:, 3]
+        if shifted and i > 0:                     # every mode keeps its phase on the first strike's timeline
+            ph = ph + 2 * np.pi * (f * (tn[i] - tn[0]) - f0 * (t0[i] - t0[0]))
         keep = f < 0.47 * SR
         at = np.array(s.get('attack', []), float).reshape(-1, 4)
         fa = at[:, 0] / size
@@ -783,7 +843,7 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
         aa = at[:, 2] * 10 ** ((tilt * np.log2(np.maximum(fa, 20.0) / 1000.0)) / 20)
         ka = fa < 0.47 * SR
         strikes.append((tn[i], s['ramp_ms'] / 1000.0 / max(hardness, 1e-3), f[keep], tau[keep], a[keep],
-                        md[keep, 3], fa[ka], ta[ka], aa[ka], at[ka, 3]))
+                        ph[keep], fa[ka], ta[ka], aa[ka], at[ka, 3]))
     L0 = model['length_s']
     t_last0, t_last = t0[-1], tn[-1]
     length = t_last + (L0 - t_last0) * max(1.0, stretch)
@@ -811,7 +871,8 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
     rel = g_new - tn_a[seg]
     rel_old = np.where(rel < hold, rel, hold + (rel - hold) / stretch)
     told = t0_a[seg] + rel_old
-    end = np.append(t0_a[1:], L0)[seg]
+    # a coherent model's ring-out goes on un-faded like its modes (module doc)
+    end = np.append(t0_a[1:], L0 - (float(model.get('fade_out_s', 0.0)) if ring and coherent else 0.0))[seg]
     new_len = np.append(tn_a[1:] - tn_a[:-1], 1e9)[seg]
     old_len = np.append(t0_a[1:] - t0_a[:-1], 1e9)[seg]
     moved = (stretch != 1.0) | (np.abs(new_len - old_len) > 1e-9)
@@ -841,7 +902,8 @@ def _plan(model, seed, size, damping, brightness, hardness, noise, vary, spacing
     sub = model.get('sub')
     sub = (int(round((tn[0] - t0[0]) * SR)), sub['x']) if sub else None
     return {'strikes': strikes, 'E': E, 'cen': cen, 'edges': edges, 'h': nz['h_erb'], 'n': n_out, 'sub': sub,
-            'fade': 0.0 if ring else float(model.get('fade_out_s', 0.0)), 'ring': ring or None}
+            'fade': 0.0 if ring else float(model.get('fade_out_s', 0.0)), 'ring': ring or None, 'told': told,
+            'coherent': coherent}
 
 
 def _ring_end(strikes, t_end):
@@ -901,7 +963,7 @@ def _ring(L, f, tau, a, ph, block=4096):
 def _modes(plan, n):
     """the strikes' modes (with their contact ramps and contact modes) and the sub wave, summed, faded"""
     y = np.zeros(n)
-    for t, ramp, f, tau, a, ph, fa, ta, aa, pa in plan['strikes']:
+    for i, (t, ramp, f, tau, a, ph, fa, ta, aa, pa) in enumerate(plan['strikes']):
         o = int(round(t * SR))
         if o >= n:
             continue
@@ -911,6 +973,10 @@ def _modes(plan, n):
             k = min(R, len(ys))
             ys[:k] *= 0.5 - 0.5 * np.cos(np.pi * np.arange(k) / R)
         ys += _ring(n - o, fa, ta, aa, pa)                   # the contact: fast modes from the onset, no ramp
+        R = int(round(STRIKE_RAMP_S * SR)) if i and plan.get('coherent') else 0     # ... a later strike's step is a
+        if R > 1:                                            # click (STRIKE_RAMP_S; a 0.4 fit's, older ones as
+            k = min(R, len(ys))                              # they were)
+            ys[:k] *= 0.5 - 0.5 * np.cos(np.pi * np.arange(k) / R)
         y[o:] += ys
     if plan.get('sub'):                                      # the slow pressure pulse (decimated waveform)
         shift, xs = plan['sub']
@@ -952,6 +1018,32 @@ def _room(y, rng, wet, rt60=0.35):
     return out
 
 
+def _side_t(mid, sd, told, size=1.0, sign=1.0):
+    """the side over time (model['side_t']) made from the mid: per octave band (log-frequency triangles that sum to
+    one, the centres / size like the modes) the band's mid times its pan gain plus the band's Hilbert transform times
+    its diffuse gain, the gains read at the original's time of each GRID frame (told: the plan's time map, so the
+    keyframes move with the strikes and stretch with the decays) and linear between frames"""
+    n = len(mid)
+    n_fft = sfft.next_fast_len(n + 8192)
+    F = np.fft.rfft(mid, n_fft)
+    F[0] = 0.0
+    lf = np.log2(np.maximum(np.fft.rfftfreq(n_fft, 1.0 / SR), 1.0))
+    lc = np.log2(np.asarray(sd['bands'], float) / size)
+    eye = np.eye(len(lc))
+    tk = np.asarray(sd['times'], float)
+    grid = np.arange(len(told)) * GRID
+    ts = np.arange(n) / SR
+    side = np.zeros(n)
+    for b in range(len(lc)):
+        W = np.interp(lf, lc, eye[b])
+        pb, db = np.asarray(sd['pan'][b], float), np.asarray(sd['diffuse'][b], float)
+        if np.abs(pb).max() > 1e-4:
+            side += np.interp(ts, grid, np.interp(told, tk, pb)) * np.fft.irfft(F * W, n_fft)[:n]
+        if db.max() > 1e-4:
+            side += np.interp(ts, grid, np.interp(told, tk, db)) * np.fft.irfft(F * W * (-1j * sign), n_fft)[:n]
+    return side
+
+
 def render_model(model, seed=0, size=1.0, damping=1.0, brightness=0.0, hardness=1.0, noise=0.0, width=1.0,
                  room=0.0, vary=0.0, spacing=1.0, gain=0.0, stereo=None, ring=None):
     ring = vary > 0 if ring is None else bool(ring)
@@ -966,11 +1058,13 @@ def render_model(model, seed=0, size=1.0, damping=1.0, brightness=0.0, hardness=
     if two:
         side = np.zeros(n)
         rho = model.get('side')
-        if rho and width > 0:   # the side: the mid's Hilbert transform (uncorrelated with it at zero lag, same
+        sign = -1.0 if np.random.default_rng([s, 3]).uniform() < 0.5 else 1.0
+        if model.get('side_t') and width > 0:          # the side over time (0.4), made from the mid
+            side = _side_t(mid, model['side_t'], plan['told'], size, sign) * width
+        elif rho and width > 0:   # the side: the mid's Hilbert transform (uncorrelated with it at zero lag, same
             n_fft = sfft.next_fast_len(n + 16384)            # envelope), shaped per band by the original's
             W = _masks(n_fft, plan['edges'], plan['h'])      # side / mid ratio
             gain_f = np.sqrt(((np.asarray(rho) ** 2)[:, None] * W ** 2).sum(0)) * width
-            sign = -1.0 if np.random.default_rng([s, 3]).uniform() < 0.5 else 1.0
             H = np.fft.rfft(mid, n_fft) * gain_f * (-1j * sign)
             H[0] = 0.0
             side = np.fft.irfft(H, n_fft)[:n]
@@ -1027,7 +1121,7 @@ def summary(model):
     return '\n'.join(lines)
 
 
-_CODE_FUNCS = (_plan, _ring_end, _masks, _ring, _modes, _noise, _room, render_model)
+_CODE_FUNCS = (_plan, _ring_end, _masks, _ring, _modes, _noise, _room, _side_t, render_model)
 
 
 def _literal(model):
@@ -1050,6 +1144,10 @@ def _literal(model):
         out.append(f'        {json.dumps(env, separators=(",", ":"))},')
     out.append('    ]},')
     out.append(f"    'side': {model['side']!r},")
+    if model.get('coherent'):
+        out.append("    'coherent': True,   # vary and the knobs keep the modes' structure (0.4)")
+    if model.get('side_t'):
+        out.append(f"    'side_t': {json.dumps(model['side_t'], separators=(',', ':'))},   # the side over time")
     sub = model.get('sub')
     out.append(f"    'sub': {json.dumps(sub, separators=(',', ':')) if sub else None},   # waveform under 20 Hz")
     out.append('}')
@@ -1065,7 +1163,8 @@ def to_code(model, name='sound'):
             f'noise=, width=, room=, vary=, spacing=, gain=) -> float array at 48 kHz.\n"""\n')
     body = [head, 'import sys', '', 'import numpy as np', 'from scipy import fft as sfft', 'from scipy import signal', '',
             f'SR = {SR}', f'GRID = {GRID!r}', f'SUB_DEC = {SUB_DEC}', f'RING_DB = {RING_DB!r}', f'RING_EXT = {RING_EXT!r}',
-            f'RING_MIN_S = {RING_MIN_S!r}', f'RING_LOUD_DB = {RING_LOUD_DB!r}', f'RING_LOUD_S = {RING_LOUD_S!r}', '',
+            f'RING_MIN_S = {RING_MIN_S!r}', f'RING_LOUD_DB = {RING_LOUD_DB!r}', f'RING_LOUD_S = {RING_LOUD_S!r}',
+            f'STRIKE_RAMP_S = {STRIKE_RAMP_S!r}', '',
             _literal(model), '', '']
     for fn in _CODE_FUNCS:
         body.append(inspect.getsource(fn))
