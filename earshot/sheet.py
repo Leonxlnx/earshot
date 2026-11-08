@@ -337,8 +337,7 @@ def sheet(path, out_png, video=None, cues=None, start=None, end=None, detail='no
            'events': len(r['events']), 'cuts': len(r.get('cuts') or []), 'timeline_summary': r['summary']}
     res['summary'] = (f"Wrote {res['png']} ({w_px}x{h_px}): {fmt_t(t0)}-{fmt_t(t1)}, {n_thumbs} frames, "
                       f"{len(placed)} of {len(items)} tagged events labelled, {len(r['events'])} event ticks, "
-                      f"{res['cuts']} cut lines. Open it with an image viewer / Read tool."
-                      ).encode('ascii', 'backslashreplace').decode()
+                      f"{res['cuts']} cut lines. Open it with an image viewer / Read tool.")
     res['text'] = res['summary'] + '\n\nTimeline: ' + r['summary']
     return res
 
