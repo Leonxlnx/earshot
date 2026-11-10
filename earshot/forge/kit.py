@@ -87,7 +87,7 @@ import time
 
 import numpy as np
 
-from ..report import emit
+from ..report import emit, read_json
 
 SR = 48000
 SCHEMA = 1
@@ -144,11 +144,10 @@ def preset(name):
 def load(kit):
     """a kit dict from a path (or the dict itself), validated: KitError lists every problem"""
     if isinstance(kit, str):
-        with open(kit, encoding='utf-8') as fh:
-            try:
-                kit = json.load(fh)
-            except json.JSONDecodeError as e:
-                raise KitError(f'{kit}: not JSON ({e})') from None
+        try:
+            kit = read_json(kit)
+        except ValueError as e:   # bad JSON, or bytes in no encoding JSON allows
+            raise KitError(f'{kit}: not JSON ({e})') from None
     bad = problems(kit)
     if bad:
         raise KitError('invalid kit: ' + '; '.join(bad))

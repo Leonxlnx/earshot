@@ -225,6 +225,25 @@ def test_kit_check_and_problems(tmp_path):
         kit.load(bad)
 
 
+@pytest.mark.parametrize('encoding', ['utf-8', 'utf-8-sig', 'utf-16'])
+def test_a_kit_file_is_read_as_windows_tools_write_it(tmp_path, encoding):
+    """a kit saved by Notepad or Windows PowerShell 5.1 starts with a byte order mark, or is UTF-16"""
+    spec = {'kit': 1, 'roles': {'tick': {'sound': 'tap/finger'}}}
+    f = tmp_path / 'kit.json'
+    f.write_text(json.dumps(spec), encoding=encoding)
+    assert kit.load(str(f))['roles'] == kit.load(spec)['roles']
+
+
+def test_a_kit_file_that_is_not_json_is_one_kit_error(tmp_path):
+    f = tmp_path / 'kit.json'
+    f.write_bytes(b'{"kit": 1, "roles": ')
+    with pytest.raises(kit.KitError, match='not JSON'):
+        kit.load(str(f))
+    f.write_bytes(bytes([0x80, 0x81]) + b' is not text in any encoding JSON allows')
+    with pytest.raises(kit.KitError, match='not JSON'):
+        kit.load(str(f))
+
+
 @pytest.mark.parametrize('spec,match', [
     ({'sound': 'tap/finger', 'level_db': None}, 'level_db must be a number'),
     ({'sound': 'tap/finger', 'level_db': True}, 'level_db must be a number'),

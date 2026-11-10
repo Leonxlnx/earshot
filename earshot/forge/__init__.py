@@ -63,7 +63,7 @@ import time
 import numpy as np
 
 from .. import audio
-from ..report import emit
+from ..report import emit, read_json
 from . import recipes as _recipes_pkg   # first import binds earshot.forge.recipes to the package; the function below
                                          # rebinds it once, for good (later imports hit sys.modules and leave it)
 
@@ -755,8 +755,7 @@ def add_cli(sub):
             if not name or not a.params:
                 print('usage: earshot forge --render <recipe> --params file.json [--seeds 1 2 3] [--dir out]')
                 return 2
-            with open(a.params, encoding='utf-8') as fh:
-                params = json.load(fh)
+            params = read_json(a.params)
             refs = resolve_refs(a.refs, a.refset, log=print)
             r = render_params(name, params, a.seeds, a.outdir or '.', refs)
             lines = [f"rendered {sum(1 for f in r['files'] if f['file'])} sound(s) of {r['recipe']}:"]
