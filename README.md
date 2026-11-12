@@ -51,6 +51,8 @@ $ earshot critique film.mp4
 
 ## What it does
 
+Optional example: [Fish Audio voice previews through Monid](docs/MONID.md) ([Monid docs](https://docs.monid.ai?utm_source=github&utm_medium=oss-pr&utm_campaign=leonxlnx-earshot)).
+
 | command | what an agent gets |
 |---|---|
 | `describe FILE` | what it sounds like: calibrated tags (z) with the closest alternative readings, AudioSet labels, measurements |
