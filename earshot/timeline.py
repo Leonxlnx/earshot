@@ -1237,6 +1237,9 @@ def _load_range(path, pr, start, end):
     if not pr.get('codec'):                                    # picture only: analyse silence of the same length
         fdur = float(pr.get('duration') or 0)
         t0, t1 = max(0.0, float(start or 0)), min(fdur, float(end)) if end is not None else fdur
+        if round(t1 * SR) <= round(t0 * SR):
+            raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
+                             f'{name} is {fdur:.2f} s long')
         return np.zeros((int(round(fdur * SR)), 2), np.float32), 0.0, t0, t1, fdur
     if start is None and end is None:
         x = audio.load(path)
