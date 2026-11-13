@@ -1270,9 +1270,11 @@ def _analyse(path, pr, video, cue_list, cue_fps, start, end, cfg, reuse):
     t = lap('loudness_s', t)
     silent = bool(loud['digital_silence'])
     ev_c = [] if silent else detect_events(xc, lead=c0 == 0)
-    lv = level_envs(xc)
+    # Picture-only context is known silence: there can be no level peak or beat grid.
+    lv = level_envs(xc) if pr.get('codec') else {}
     t = lap('events_s', t)
-    grid = music_grid(audio.to_mono(xc))
+    # For known zero input, retain music_grid's short/long silent notes without scanning the whole film.
+    grid = music_grid(audio.to_mono(xc if pr.get('codec') else xc[:5 * SR]))
     t = lap('beats_s', t)
     cuts, fps = [], None
     if video:
