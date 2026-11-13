@@ -313,6 +313,7 @@ def render(sound_id, seed=None, dur=None, apex=None, pitch=None, peak_db=PEAK_DB
     final); dur / apex (s), pitch ('E5' or Hz) aim it through the recipe's own parameters (earshot.forge.knobs);
     peak_db = its sample peak (0 dBFS or less); weight scales that by 6 dB per doubling (1 = peak_db, 0.5 = 6 dB
     down; a level over 0 dBFS is refused: level()). sr (one of SRS) != 48000 resamples the finished take (soxr).
+    The sample peak is set after conversion. Loudness and the audit use a 48 kHz analysis copy.
     checks=False skips the model-free audit (meta['checks'] None)."""
     lv = level(peak_db, weight)
     sr = check_sr(sr)
@@ -330,14 +331,19 @@ def render(sound_id, seed=None, dur=None, apex=None, pitch=None, peak_db=PEAK_DB
     y = normalize(x, level_db).astype(np.float32)
     meta = {'id': sid, 'seed': int(e['seed'] if seed is None else seed), 'sr': int(sr), **measure(y),
             'edits': edits, 'checks': None}
-    if checks:
-        from . import sfx
-        meta['checks'] = sfx.check(y, category=e.get('category'), sound=sid)
-        add_warning(meta['checks'], knobs.pitch_warning(edits))
     if int(sr) != SR:
         import soxr
-        y = np.asarray(soxr.resample(y, SR, int(sr)), np.float32)
-        meta['dur_s'] = round(len(y) / int(sr), 4)
+        from .polish import lufs_max
+        # The final sample rate can introduce new peaks; set the requested level after conversion.
+        y = normalize(soxr.resample(y, SR, int(sr)), level_db).astype(np.float32)
+        meta.update(times(y, sr))
+        meta['peak_db'] = round(float(20 * np.log10(np.abs(y).max() + 1e-12)), 2)
+        # Loudness and the artifact audit use a 48 kHz analysis copy, not a mislabelled final array.
+        meta['lufs_m_max'] = round(float(lufs_max(soxr.resample(y.astype(np.float64), sr, SR))), 2)
+    if checks:
+        from . import sfx
+        meta['checks'] = sfx.check(y, sr=sr, category=e.get('category'), sound=sid)
+        add_warning(meta['checks'], knobs.pitch_warning(edits))
     return y, meta
 
 
