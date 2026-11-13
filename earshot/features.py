@@ -6,9 +6,9 @@
 
 Fields (all optional: short sounds skip what needs length):
   duration, peak_dbfs, true_peak_dbtp (4x oversampled), rms_dbfs, lufs (BS.1770 integrated), lra_lu, short_term_max_lufs,
-  clipped_samples, dc, noise_floor_dbfs (10th pct of 20 ms RMS), dynamic_range_db, digital_silence_frac (samples at
-  exactly zero, |x| < 1e-6: code-generated audio often has long stretches of it, but so do trimmed, gated or
-  noise-reduced real recordings (59% of one licensed real-recording library) - weak evidence on its own),
+  clipped_samples, dc, noise_floor_dbfs (10th pct of 20 ms RMS), dynamic_range_db, digital_silence_frac (fraction of sample frames where
+  every channel has |sample| < 1e-6; phase cancellation or one silent channel is not digital silence; edit / fade /
+  gate padding is common in real recordings, so this is weak evidence by itself),
   side_to_mid_db + correlation (stereo width; None for mono-identical channels), attack_ms (10% -> 90% rise of the
   first event on a 5 ms RMS envelope: ~4 ms floor for an instant onset), decay_ms (overall peak -> 30 dB down on a
   10 ms RMS envelope, staying down for 20 ms; see envelope_times), brightness_hz (median over active frames of the magnitude-weighted spectral
@@ -200,7 +200,7 @@ def measure(src, music=False, start=None, end=None, light=False):
     r20 = frame_rms(m, int(0.02 * SR))
     r['noise_floor_dbfs'] = round(db(np.percentile(r20, 10)), 1)
     r['dynamic_range_db'] = round(db(r20.max()) - r['noise_floor_dbfs'], 1)
-    r['digital_silence_frac'] = round(float(np.mean(np.abs(m) < 1e-6)), 4)
+    r['digital_silence_frac'] = round(float(np.mean(np.all(np.abs(x) < 1e-6, axis=1))), 4)
     mid, side = (x[:, 0] + x[:, 1]) / 2, (x[:, 0] - x[:, 1]) / 2
     sm = float(np.sqrt(np.mean(side ** 2)))
     r['side_to_mid_db'] = round(db(sm) - db(np.sqrt(np.mean(mid ** 2)) + 1e-12), 1) if sm > 1e-7 else None
