@@ -15,6 +15,7 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 
 import numpy as np
 
@@ -92,7 +93,11 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
     k = hashlib.sha1(f'{audio.file_id(path)}|{threshold}|{min_gap}|v2'.encode()).hexdigest()[:20]
     f = _cache(f'cuts_{k}.json')
     if cache and os.path.exists(f):
-        return json.load(open(f))
+        try:
+            with open(f) as saved:
+                return json.load(saved)
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            pass  # a missing, unreadable or interrupted cache is not a failed scan
     p = subprocess.run(['ffmpeg', '-hide_banner', '-nostdin', '-i', path, '-an', '-vf',
                         f"scale=320:-2,select='gt(scene,{threshold})',showinfo", '-f', 'null', '-'],
                        capture_output=True, text=True, errors='replace')
@@ -103,7 +108,21 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
     for t in ts:
         if not out or t - out[-1] >= min_gap:
             out.append(round(t, 3))
-    json.dump(out, open(f, 'w'))
+    tmp = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', dir=os.path.dirname(f),
+                                         prefix=os.path.basename(f) + '.', suffix='.tmp', delete=False) as saved:
+            tmp = saved.name
+            json.dump(out, saved)
+        audio.replace_quietly(tmp, f)
+    except OSError:
+        pass  # caching is optional; the scan itself succeeded
+    finally:
+        if tmp is not None:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
     return out
 
 
