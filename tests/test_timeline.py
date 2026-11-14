@@ -161,6 +161,15 @@ def test_sheet_png(wav, no_models, tmp_path, monkeypatch):
     assert z['start'] == 2.0 and os.path.exists(z['png'])
 
 
+def test_sheet_summary_names_the_png_as_written(wav, no_models, tmp_path, monkeypatch):
+    # the summary tells the agent to open the PNG: its path must be the real one, not ASCII-escaped
+    monkeypatch.setattr(tl.config, 'EMB_CACHE', str(tmp_path / 'emb'))
+    p = wav(click_track(np.arange(0.5, 4, 0.5), 4.0), 'beat.wav')
+    out = tmp_path / 'résumé 音' / 'sheet.png'
+    r = sheet_mod.sheet(p, str(out), width=1000)
+    assert os.path.exists(r['png']) and r['summary'].startswith(f"Wrote {r['png']} (")
+
+
 def test_label_staggering_never_overlaps():
     items = [((1, -k), 1.0 + 0.01 * k, f'HIT label number {k}') for k in range(30)]
     placed = tl_rows = sheet_mod._place_labels(items, 0.0, 10.0, 1800, 10.0, 4)
