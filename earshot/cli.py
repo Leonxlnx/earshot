@@ -14,6 +14,8 @@ import sys
 
 # command -> module (order = order in --help)
 COMMANDS = {
+    'make': 'make',              # make a sound in code from a request in words, or a whole set from a spec
+    'sounds': 'make',            # the catalogue of sounds make can make
     'describe': 'describe',      # what does this sound like? tags + measurements
     'match': 'match',            # how well does a sound match a text description (calibrated)
     'rank': 'search',            # rank many files by a description

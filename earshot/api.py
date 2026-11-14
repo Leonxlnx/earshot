@@ -7,6 +7,7 @@
     api.timeline('soundtrack.wav', video='film.mp4')
     api.sfx_render('whoosh_fast/crisp', 'w.wav', dur=0.8, apex=0.32)   # the sound bank (earshot.forge.bank)
     api.kit_render('audio/kit.json', 'audio/kit')                       # a film's kit: takes + kit.lock.json
+    api.make('a soft success chime', 'success.ogg')                     # a sound made from words (earshot.make)
 """
 import importlib
 
@@ -21,6 +22,8 @@ _FUNCS = {
     'sfx_check': ('forge.sfx', 'sfx_check'), 'kit_init': ('forge.kit', 'kit_init'),
     'kit_render': ('forge.kit', 'kit_render'), 'kit_check': ('forge.kit', 'kit_check'),
     'kit_audition': ('forge.kit', 'kit_audition'),
+    # sounds made from a request in words (no models): earshot.make
+    'make': ('make', 'make'), 'make_set': ('make', 'make_set'), 'sounds': ('make', 'sounds'),
 }
 
 
