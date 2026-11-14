@@ -1,0 +1,64 @@
+name: Fast tests (no models)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      EARSHOT_OFFLINE: '1'
+      HF_HUB_OFFLINE: '1'
+      TRANSFORMERS_OFFLINE: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+      MPLBACKEND: Agg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      EARSHOT_HOME: ${{ runner.temp }}/earshot
+      NUMBA_CACHE_DIR: ${{ runner.temp }}/earshot-numba
+      MPLCONFIGDIR: ${{ runner.temp }}/earshot-mpl
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install media tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y ffmpeg
+          ffmpeg -version
+          ffprobe -version
+          node --version
+      - name: Create a reduced test environment
+        run: |
+          python -m venv .venv-fast
+          .venv-fast/bin/python -m pip --isolated install --no-cache-dir --only-binary=:all: --index-url https://pypi.org/simple -r tests/requirements-fast.txt
+          .venv-fast/bin/python -m pip --isolated install --no-deps --no-build-isolation --no-cache-dir -e .
+          .venv-fast/bin/python - <<'PY'
+          import importlib.util
+          import shutil
+          for module in ('torch', 'transformers'):
+              assert importlib.util.find_spec(module) is None, module
+          for executable in ('ffmpeg', 'ffprobe', 'node'):
+              assert shutil.which(executable), executable
+          PY
+      - name: Run the existing default fast suite
+        run: |
+          mkdir -p "$EARSHOT_HOME" "$NUMBA_CACHE_DIR" "$MPLCONFIGDIR"
+          .venv-fast/bin/python -m pytest -q -p no:cacheprovider -rs tests
