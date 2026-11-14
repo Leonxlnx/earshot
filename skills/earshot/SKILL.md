@@ -212,7 +212,7 @@ its scores are one model's opinion: confirm every fix with timeline / ab.
 | cosine | raw CLAP similarity | never a probability; compare only for the same sound and query |
 | AudioSet labels (0..1) | independent per-class probabilities from the AST tagger | good for broad classes; hears only up to 8 kHz |
 | p_real / verdict | real or pro-produced vs code-synthesized, from a small fitted model | strong evidence, not proof; read its evidence list; thresholds differ for clips (<= 6 s) and long files (named in each summary) |
-| digital_silence_frac | share of exact-zero samples | weak alone: edit / fade padding is common in real recordings |
+| digital_silence_frac | share of sample frames with every channel below 1e-6 in absolute amplitude | weak alone: edit / fade padding is common in real recordings |
 | typicality z (compare) | distance to the reference set vs the refs' own spread | >= -1 fits the set, < -2 outlier |
 | sync offset_ms, chance | sound minus picture per cut / cue; what random edits would score | trust when well above chance |
 | critique status | value vs the range of 7 professional launch films (loudness: web-delivery practice; true peak <= -1 dBTP for a master, <= 0 dBTP for decoded AAC / MP3, which already holds the codec overshoot) | a range, not a target: ok = inside what pros do |
