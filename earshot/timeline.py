@@ -62,7 +62,7 @@ import numpy as np
 from scipy import ndimage, signal
 
 from . import audio, config, features
-from .report import emit, fmt_t, to_json
+from .report import emit, fmt_t, read_json, to_json
 
 SR = audio.SR
 SPAN_VERSION = 1               # bump when an excerpt / embedding definition changes (per-span model cache)
@@ -555,7 +555,7 @@ def read_cues(cues):
     if isinstance(cues, str):
         s = cues.strip()
         if os.path.exists(s):
-            cues = json.load(open(s, encoding='utf-8'))
+            cues = read_json(s)
         elif s[:1] in '[{':
             cues = json.loads(s)
         else:

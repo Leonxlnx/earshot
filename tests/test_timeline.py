@@ -98,6 +98,17 @@ def test_read_cues_formats(tmp_path):
     assert tl.read_cues(None) == ([], None)
 
 
+@pytest.mark.parametrize('encoding', ['utf-8', 'utf-8-sig', 'utf-16'])
+def test_read_cues_reads_a_file_as_windows_tools_write_it(tmp_path, encoding):
+    """Windows PowerShell 5.1 writes a byte order mark with `Out-File -Encoding utf8` and UTF-16 with `>`; json.load
+    on a UTF-8 text file refuses the first ("Unexpected UTF-8 BOM") and cannot decode the second"""
+    f = tmp_path / 'cues.json'
+    f.write_text(json.dumps({'fps': 60, 'events': [{'f': 120, 'kind': 'hit', 'id': 'café'}]},
+                            ensure_ascii=False), encoding=encoding)
+    cues, fps = tl.read_cues(str(f))
+    assert fps == 60 and cues == [{'t': 2.0, 'kind': 'hit', 'id': 'café'}]
+
+
 def test_sync_offsets_status_and_chance():
     ev = [{'t': t, 'prominence_db': p, 'shape': 'hit'} for t, p in ((1.000, 12), (2.030, 12), (3.300, 2), (5.0, 12))]
     s = tl.sync([1.004, 2.0, 3.25, 4.0], ev, beats=[1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0], frame_s=1 / 60)
