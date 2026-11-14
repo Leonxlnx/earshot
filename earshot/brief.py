@@ -39,6 +39,8 @@ VOICE_PHRASES = {'music box': 'music_box', 'electric piano': 'electric_piano', '
                  'wind chimes': 'wind_chime', 'thumb piano': 'kalimba', 'upright bass': 'upright_bass',
                  'double bass': 'upright_bass'}
 LOOP_WORDS = ('loop', 'looping', 'loopable', 'seamless', 'looped')
+CONTEXT_WORDS = ('for', 'when', 'while', 'as', 'after', 'before', 'during', 'whenever', 'once')
+CONTEXT_WEIGHT, WORD_WEIGHT, HINT_WEIGHT = 0.5, 0.7, 0.35
 FIELD_WEIGHT = (('uses', 3.0), ('name', 2.2), ('says', 1.6), ('tags', 1.2))
 _rev = None
 
@@ -102,9 +104,12 @@ def concepts_of(text):
 
 def read(text):
     """a request as a brief (module doc): {'text', 'concepts', 'words', 'axes', 'material', 'voice', 'domain', 'dur',
-    'pitch', 'key', 'scale', 'n', 'loop', 'unknown'}; absent things are None / empty"""
-    b = {'text': text, 'concepts': [], 'words': [], 'axes': {}, 'material': None, 'voice': None, 'domain': None,
-         'dur': None, 'pitch': None, 'key': None, 'scale': None, 'n': None, 'loop': False, 'unknown': []}
+    'pitch', 'key', 'scale', 'n', 'loop', 'unknown'}; absent things are None / empty. `concepts` are the sound or job
+    asked for, `context` the canonical words after "for" / "when" (where it plays: they count half), `hints` the
+    adjectives (they break ties between members of a family: "crisp" finds whoosh_fast/crisp)"""
+    b = {'text': text, 'concepts': [], 'context': [], 'words': [], 'hints': [], 'axes': {}, 'material': None,
+         'voice': None, 'domain': None, 'dur': None, 'pitch': None, 'key': None, 'scale': None, 'n': None,
+         'loop': False, 'unknown': []}
     m = KEY.search(text)
     if m:
         b['key'] = m.group(1)[0].upper() + m.group(1)[1:]
@@ -133,9 +138,11 @@ def read(text):
             b['voice'] = v
             low = low.replace(ph, ' ')
     rev, toks = _reverse(), WORD.findall(low)
-    i, scale = 0, 1.0
+    i, scale, ctx = 0, 1.0, False
     while i < len(toks):
         t = toks[i]
+        if t in CONTEXT_WORDS and b['concepts']:
+            ctx = True                 # "an impact FOR a logo reveal": what follows is where it plays, not what it is
         if t in L.NEGATIONS:
             scale *= L.NEGATIONS[t]
         elif t in L.INTENSIFIERS and i + 1 < len(toks) and (modifier(toks[i + 1]) or toks[i + 1] in L.INTENSIFIERS):
@@ -148,8 +155,8 @@ def read(text):
                     continue
                 c = rev.get(' '.join(seg)) or rev.get(' '.join(stem(p) for p in seg))
                 if c and (n > 1 or not modifier(t)):
-                    if c not in b['concepts']:
-                        b['concepts'].append(c)
+                    if c not in b['concepts'] + b['context']:
+                        b['context' if ctx else 'concepts'].append(c)
                     i += n - 1
                     hit = True
                     break
@@ -167,6 +174,8 @@ def read(text):
             if not hit and modifier(t):
                 for ax, d in L.MODIFIERS[modifier(t)].items():
                     b['axes'][ax] = b['axes'].get(ax, 0.0) + d * scale
+                if scale > 0:
+                    b['hints'].append(modifier(t))
                 hit = True
             if not hit and t not in L.STOP and not t.isdigit():
                 b['words'].append(stem(t))
@@ -220,18 +229,21 @@ def rank(b, rows=None, top=8, idx=None):
             rows = registry.rows()
         idx = index(rows)
     docs, idf = idx
-    q = list(dict.fromkeys(b['concepts'] + b['words']))
+    q = {**{w: HINT_WEIGHT for w in b.get('hints', ())}, **{w: WORD_WEIGHT for w in b['words']},
+         **{w: CONTEXT_WEIGHT for w in b.get('context', ())}, **{w: 1.0 for w in b['concepts']}}
     out = []
     for row, t in docs:
         score, why = 0.0, []
-        for w in q:
+        for w, qw in q.items():
             for field, fw in FIELD_WEIGHT:
                 if w in t[field]:
-                    score += fw * idf.get(w, 1.0) * (1.0 if w in b['concepts'] else 0.7)
-                    why.append(w)
+                    score += fw * idf.get(w, 1.0) * qw
+                    if qw > HINT_WEIGHT:
+                        why.append(w)
                     break
-        if score <= 0:
+        if not why:
             continue
+        score *= row.get('prior', 1.0)
         if b['domain'] and b['domain'] in row['domains']:
             score *= 1.2
         mat = b['material']

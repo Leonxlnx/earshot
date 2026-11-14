@@ -35,7 +35,7 @@ AXES = ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')
 KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud', 'whoosh', 'rise', 'fall', 'zap',
          'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
-MODULES = ()          # the design modules of this package, in catalogue order (filled as they are written)
+MODULES = ('bank',)   # the design modules of this package, in catalogue order
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
@@ -47,8 +47,9 @@ class Design:
     """one catalogue entry (module doc); `allows` = audit findings that are this sound's design (e.g. a power-up's
     rising pitch), reported as notes instead of warnings"""
 
-    def __init__(self, id, fn, kind, says, uses, tags, domains, dur, pitch, axes, voice, material, loop, allows):
-        self.id, self.fn, self.kind = id, fn, kind
+    def __init__(self, id, fn, kind, says, uses, tags, domains, dur, pitch, axes, voice, material, loop, allows,
+                 prior):
+        self.id, self.fn, self.kind, self.prior = id, fn, kind, float(prior)
         self.says, self.uses, self.tags, self.domains = tuple(says), tuple(uses), tuple(tags), tuple(domains)
         self.dur, self.pitch, self.axes = dur, pitch, tuple(axes)
         self.voice, self.material, self.loop, self.allows = voice, material, bool(loop), tuple(allows)
@@ -56,14 +57,16 @@ class Design:
     def row(self):
         return {'id': self.id, 'kind': self.kind, 'says': list(self.says), 'uses': list(self.uses),
                 'tags': list(self.tags), 'domains': list(self.domains), 'dur_s': self.dur, 'pitch': self.pitch,
-                'axes': list(self.axes), 'voice': self.voice, 'material': self.material, 'loop': self.loop}
+                'axes': list(self.axes), 'voice': self.voice, 'material': self.material, 'loop': self.loop,
+                'prior': self.prior}
 
 
 def design(id, *, kind, says, uses=(), tags=(), domains=(), dur=None, pitch=None, axes=(), voice=None, material=None,
-           loop=False, allows=()):
+           loop=False, allows=(), prior=1.0):
     """register a design (module doc). id = 'family/name', lower case; kind one of KINDS; says: 2-3 descriptions of
     the sound; dur: its usual length in s; pitch: its default note when it has one; voice / material: its default
-    when it can be played by several"""
+    when it can be played by several; prior: its weight when a request fits several designs equally (1 = normal,
+    above 1 = the family's first choice)"""
     fam, _, name = id.partition('/')
     if not (fam and name and id == id.lower() and ' ' not in id):
         raise ValueError(f'bad design id {id!r}: use family/name in lower case')
@@ -76,7 +79,8 @@ def design(id, *, kind, says, uses=(), tags=(), domains=(), dur=None, pitch=None
     def wrap(fn):
         if id in _designs:
             raise ValueError(f'design {id} is defined twice')
-        _designs[id] = Design(id, fn, kind, says, uses, tags, domains, dur, pitch, axes, voice, material, loop, allows)
+        _designs[id] = Design(id, fn, kind, says, uses, tags, domains, dur, pitch, axes, voice, material, loop, allows,
+                              prior)
         return fn
     return wrap
 
