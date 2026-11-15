@@ -42,7 +42,8 @@ FIGURES = {
     'error/double': dict(kind='chime', says=('the same low note struck twice quickly, a dull double knock of a tone',
                                              'two short low repeated notes'),
                          uses=('error', 'blocked', 'forbidden', 'not allowed', 'invalid'),
-                         fig=dict(steps=(0, 0), gap=0.12, root='F4', vel=0.55, vels=(1.0, 0.85), gate=0.07, last=0.16, accent=0)),
+                         fig=dict(steps=(0, 0), gap=0.12, root='F4', vel=0.55, vels=(1.0, 0.85), gate=0.07, last=0.16, accent=0,
+                                  voice='marimba', avoid=('metal', 'glass', 'synth'))),
     'warning/pulse': dict(kind='chime', says=('the same mid note twice, an even two-pulse signal', 'two repeated short notes calling for attention'),
                           uses=('warning', 'caution', 'attention', 'alert'),
                           fig=dict(steps=(0, 0), gap=0.16, root='F5', vel=0.6, gate=0.09, last=0.28, accent=None)),
@@ -101,21 +102,24 @@ FIGURES = {
 }
 figure.register(design, FIGURES, domains=('ui', 'game'))
 
-# material ticks: one short strike of a small object, for taps and detents that should not be a note
-TICKS = {'wood': ('wood_block', 'C6', 'a small dry wooden tick', 'a short knock on a little wooden block'),
-         'glass': ('glass_clink', 'D6', 'a small bright glass tick', 'a light tap on a glass'),
-         'metal': ('metal_ping', 'E6', 'a small metallic tick', 'a light tap on a thin piece of metal')}
+# material ticks: one short strike of a small object, for taps and detents that should not be a note.
+# (voice, note, damped after s or None = its own short ring, says). Heard by earshot's ears, a glass damped early and
+# every small metal bar or plate read as an electronic blip; a glass left to ring and a coin read as what they are.
+TICKS = {'wood': ('wood_block', 'C6', 0.05, 'a small dry wooden tick', 'a short knock on a little wooden block'),
+         'glass': ('glass_clink', 'D6', None, 'a light tap on a glass', 'a small bright glass clink'),
+         'metal': ('coin', 'E9', None, 'a small metallic tick, a coin clink', 'a coin tapped on a hard surface')}
 
 
-def _tick(voice, note):
+def _tick(voice, note, damp):
     def fn(c, r):
-        y = voices.play(voice, c.hz(note), vel=0.4 * c.db('energy', 7.0), dur=0.05 * c.lerp('ring', 0.5, 3.0, 1.0, log=True),
-                        r=r, vary=c.vary, **c.axes('bright', 'hard', 'size', 'width'))
+        dur = None if damp is None and c.ring >= 0 else (damp or 0.25) * c.lerp('ring', 0.4, 3.0, 1.0, log=True)
+        y = voices.play(voice, c.hz(note), vel=0.4 * c.db('energy', 7.0), dur=dur, r=r, vary=c.vary,
+                        **c.axes('bright', 'hard', 'size', 'width'))
         return space.room(y, 'booth', amount=c.space)
     return fn
 
 
-for _m, (_v, _n, _a, _b) in TICKS.items():
+for _m, (_v, _n, _d, _a, _b) in TICKS.items():
     design(f'tick/{_m}', kind='tick', says=(_a, _b), uses=('tap', 'tick', 'click', 'detent', 'select', 'timer'),
-           tags=(_m,), domains=('ui', 'game', 'motion'), dur=0.08, pitch=_n, material=_m,
-           axes=('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy'))(_tick(_v, _n))
+           tags=(_m,), domains=('ui', 'game', 'motion'), dur=0.08 if _d else 0.3, pitch=_n, material=_m,
+           axes=('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy'))(_tick(_v, _n, _d))

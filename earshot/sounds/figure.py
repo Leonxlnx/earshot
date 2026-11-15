@@ -17,28 +17,36 @@ import numpy as np
 from ..synth import phrase, space, voices
 
 DEFAULT_VOICE = 'vibraphone'
+SUSTAIN_FLOOR = 0.11              # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
 
 
 def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, last=0.6, accent=-1, room='room',
-         degrees=False, spread=0.25, voice=None):
+         degrees=False, spread=0.25, voice=None, avoid=()):
     """a figure as stereo audio. steps: semitones above the root (or scale degrees of the theme's scale with
     degrees=True), one per note; gap: seconds between note starts (a number, or one per interval); vel: how hard it
     is played (0..1), vels: each note's share of it; gate: seconds an inner note sounds before it is damped (None =
     until just after the next one starts), last: seconds the final note rings; accent: the note that leads (index,
     -1 = the last, None = none); room: the space it sits in (the theme's space wins); spread: how far the notes sit
-    apart in the stereo field; voice: the figure's own default voice"""
+    apart in the stereo field; voice: the figure's own default voice; avoid: materials whose voices cannot carry this
+    figure (two short low notes on a metal bar are heard as an electronic beep): a theme's voice of such a material
+    gives way to the figure's own"""
     v = c.voice or voice or DEFAULT_VOICE
+    if avoid and voices.info(v).get('material') in avoid:
+        v = voice or DEFAULT_VOICE
     hz = c.degrees(steps, root) if degrees else c.semis(steps, root)
     k = len(hz)
     speed = c.lerp('motion', 1.4, 0.7, 1.0, log=True)
     gaps = [float(g) * speed for g in (np.broadcast_to(gap, (max(1, k - 1),)) if k > 1 else [])]
     ring = c.lerp('ring', 0.45, 2.2, 1.0, log=True)
+    # a sustaining voice (a metal bar, a bell, a pad) damped after a few tens of ms is a bare tone burst, which is
+    # heard as an electronic beep: such a voice keeps each note long enough to be heard as its instrument
+    floor = SUSTAIN_FLOOR if float(voices.info(v).get('ring_s') or 0.0) > 1.0 else 0.0
     t, notes = 0.0, []
     for i, f in enumerate(hz):
         if i == k - 1:
-            d = last * ring
+            d = max(last * ring, 1.6 * floor)
         else:
-            d = (gate if gate is not None else gaps[i] * 1.15) * min(ring, 1.5)
+            d = max((gate if gate is not None else gaps[i] * 1.15) * min(ring, 1.5), floor)
         notes.append((t, f, 1.0 if vels is None else vels[i], d))
         if i < k - 1:
             t += gaps[i]
