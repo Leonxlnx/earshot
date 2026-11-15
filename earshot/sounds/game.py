@@ -69,11 +69,13 @@ FIGURES = {
         fig=dict(steps=(7, 3, 0, -5), gap=(0.17, 0.17, 0.24), root='C5', vel=0.5, vels=(1.0, 0.92, 0.85, 0.9),
                  last=1.1, room='hall', accent=0)),
     'checkpoint/chime': dict(
-        kind='figure', says=('three rising notes: root, fifth and octave, the last ringing', 'a calm open three-note chime'),
+        kind='figure', says=('three rising notes: root, fifth and octave, the last ringing',
+                             'a calm open three-note chime'),
         uses=('checkpoint', 'save point', 'progress saved', 'flag', 'milestone'),
         fig=dict(steps=(0, 7, 12), gap=0.1, root='D5', vel=0.55, vels=(0.8, 0.9, 1.0), last=0.85, room='studio')),
     'secret/reveal': dict(
-        kind='figure', says=('a quick rising whole-tone run, a mysterious flourish', 'five fast notes climbing in whole steps'),
+        kind='figure', says=('a quick rising whole-tone run, a mysterious flourish',
+                             'five fast notes climbing in whole steps'),
         allows=('rising_glide',),            # five discrete notes a whole step apart read as one glide to the audit
         uses=('secret', 'discover', 'mystery', 'hidden', 'reveal', 'unlock'),
         fig=dict(steps=(0, 2, 4, 6, 8), gap=0.062, root='A5', vel=0.48, vels=(0.7, 0.78, 0.85, 0.92, 1.0), last=0.8,

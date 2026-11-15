@@ -635,13 +635,24 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                              'product: soft, glass, wood, felt, tine, metal, '
                                                              'electric, digital, retro')] = None,
               pitch: Annotated[str | None, Field(description='a note ("C5") or Hz for a tonal sound')] = None,
-              dur: Annotated[float | None, Field(description='length in seconds', gt=0)] = None,
+              dur: Annotated[float | None, Field(description='seconds: how long a figure of notes sounds, the hold '
+                                                             'of a pad, the length of a loop (each has a shortest '
+                                                             'one) or a whoosh; a single struck sound (a tap, a hit) '
+                                                             'rings as it rings: it ignores dur and says so',
+                                                 gt=0)] = None,
               voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound, e.g. '
                                                              '"kalimba", "felt_piano", "soft_pluck"')] = None,
+              material: Annotated[str | None, Field(description='what a tap, click or knock is made of, e.g. '
+                                                                '"wood", "glass", "metal", "plastic"; on a tonal '
+                                                                'sound it picks the voice (wood: a marimba)')] = None,
+              loop: Annotated[bool | None, Field(description='false: an ambience or other loop once, with a fade '
+                                                             'in and out, instead of a seamless loop')] = None,
               seed: Annotated[int, Field(description='another take of the same sound')] = 0,
-              listen: Annotated[bool, Field(description='let the listening models choose among the best three '
-                                                        'designs and report what the result is heard as (loads the '
-                                                        'models: 20-60 s the first time)')] = False,
+              listen: Annotated[bool, Field(description="also rank the whole catalogue by how each design sounds "
+                                                        "like the request (CLAP against earshot's sound atlas), "
+                                                        "blended into the choice of words, and report what the "
+                                                        "written sound is heard as (loads the model: 20-40 s the "
+                                                        "first time, then it stays warm)")] = False,
               full: Full = False) -> str:
     """Make a sound in code from a request in words and write it to a file (no models, about a second; nothing is
     downloaded and no recorded audio is used). Covers interface sounds (taps, toggles, success, error,
@@ -653,7 +664,8 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
     when it needs several that belong together. Everything made is free to use in any product."""
     from . import make as M
     return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
-                             dur=dur, voice=voice, seed=seed, listen=listen), full, _summary_only(M.make))
+                             dur=dur, voice=voice, material=material, loop=loop, seed=seed, listen=listen), full,
+                _summary_only(M.make))
 
 
 def tool_make_set(out: Annotated[str, Field(description='absolute path of the folder for the files and '
@@ -670,7 +682,10 @@ def tool_make_set(out: Annotated[str, Field(description='absolute path of the fo
                   theme: Annotated[str | None, Field(description='one voice, key and room for the whole set: soft, '
                                                                  'glass, wood, felt, tine, metal, electric, '
                                                                  'digital, retro')] = None,
-                  format: Annotated[str, Field(description='wav, ogg, mp3, m4a, webm or flac')] = 'wav',
+                  format: Annotated[str, Field(description='wav, ogg (Vorbis), webm (Opus), m4a (AAC), mp3 or flac; '
+                                                           'several with commas, e.g. "webm,mp3": every sound in '
+                                                           'each, a browser plays the first it can. Loops: not mp3 '
+                                                           'or m4a (a gap at the seam)')] = 'wav',
                   sprite: Annotated[str | None, Field(description='also pack the set into one file with a howler-'
                                                                   'style map, e.g. "sprite.webm"')] = None,
                   full: Full = False) -> str:

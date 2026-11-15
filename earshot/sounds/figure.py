@@ -18,7 +18,6 @@ voice made of it.
 import numpy as np
 
 from ..forge import dsp
-
 from ..synth import phrase, space, voices
 
 DEFAULT_VOICE = 'vibraphone'
@@ -40,7 +39,7 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     figure (two short low notes on a metal bar are heard as an electronic beep): a theme's voice of such a material
     gives way to the figure's own; a voice asked for by name is always played; longest: seconds after which the
     figure has faded out whatever the voice (a hover or a tap on a piano must not ring for a second: the fade
-    starts at 55 % of it; `ring` scales it, a requested length replaces it)"""
+    starts at 55 % of it; `ring` scales it, a requested length overrides it)"""
     v = c.voice or voice or DEFAULT_VOICE
     if avoid and c._voice is None and voices.info(v).get('material') in avoid:     # a voice asked for by name
         v = voice or DEFAULT_VOICE                                                 # is played as asked
@@ -77,7 +76,7 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
                     spread=spread * c.lerp('width', 0.0, 2.2, 1.0), **c.axes('bright', 'hard', 'size'), ring=c.ring)
     if want and len(y) < 0.75 * want * dsp.SR:
         c.used.discard('dur')            # the voice rings shorter than the length asked for: say it was not kept
-    cut = dsp.n_of(want if want else longest * ring) if (want or longest) else None
+    cut = dsp.n_of(longest * ring) if (longest and not want) else None    # a requested length is kept as asked
     if cut and len(y) > cut:
         y = y[:cut]
         k = max(2, int(0.45 * cut))

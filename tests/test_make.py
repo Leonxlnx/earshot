@@ -5,6 +5,7 @@ files with a byte order mark, the catalogue listing, the command line, and packi
 file goes to tmp_path."""
 import json
 import os
+import shutil
 
 import numpy as np
 import pytest
@@ -99,6 +100,67 @@ def test_make_a_loop_once(tmp_path):
     assert np.abs(y[0]).max() < 1e-4 and np.abs(y[-1]).max() < 1e-4
 
 
+def test_make_says_what_the_sound_leaves_out(tmp_path):
+    """usability log: "a water drop into a warm chime" gave a logo bell and never mentioned the water drop"""
+    res = make('a short calm logo sound, a water drop into a warm chime', str(tmp_path / 'b.wav'))
+    assert res['sound'].startswith('logo') and res['not_in_sound'] == ['water drop']
+    assert 'not in this sound: water drop' in res['summary'].splitlines()
+    res = make('a soft success chime for a finance app', str(tmp_path / 's.wav'))
+    assert res['not_in_sound'] == [] and 'not in this sound' not in res['summary']
+
+
+def test_make_why_and_unknown_never_show_a_stem_or_a_word_twice(tmp_path):
+    """usability log: `[lak, water]` next to `not understood: lake`"""
+    want = 'gentle water, small waves on a lake shore, calm'
+    res = make(want, str(tmp_path / 'w.wav'), dur=2, loop=False)          # once, short: the words are the point
+    shown = res['summary'].splitlines()[0].rsplit('[', 1)[1].rstrip(']').split(', ')
+    assert shown == res['why'] and 'lak' not in res['why'] and not set(res['why']) & set(res['unknown'])
+    assert 'lake' in res['why'] and 'lake' not in res['unknown']
+    s = make_set({'sounds': [{'name': 'amb', 'want': want + ', one-shot', 'dur': 2}]}, out=str(tmp_path / 's'))
+    lines = s['summary'].splitlines()
+    why = lines[1].rsplit('[', 1)[1].rstrip(']').split(', ')
+    assert 'lake' in why and 'lak' not in why
+    assert not any(ln.strip().startswith('not understood:') and 'lake' in ln for ln in lines)
+
+
+def test_also_is_filled_from_the_catalogue(tmp_path):
+    """usability log: no `also:` when the ranking had a single candidate"""
+    from earshot import brief
+    from earshot.make import alternatives, guess
+    b = brief.read('crickets at night')
+    one = [{'id': 'night/crickets', 'score': 5.0, 'why': ['night']}]
+    alts = alternatives(b, one, 'night/crickets')
+    assert len(alts) == 3 and 'night/crickets' not in alts and len(set(alts)) == 3
+    assert all(registry.get(a).loop for a in alts)                     # a loop's alternatives loop
+    two = one + [{'id': 'rain/tent', 'score': 1.0, 'why': ['ambience']}]
+    assert alternatives(b, two, 'night/crickets')[0] == 'rain/tent'     # the ranked candidates first
+    tap = alternatives(brief.read('a tap'), [{'id': 'tap/tone', 'score': 1.0, 'why': ['tap']}], 'tap/tone')
+    assert len(tap) == 3 and not any(registry.get(a).loop for a in tap)
+    # a guess says so on the alternatives' line
+    vague = [{'id': 'a/x', 'score': 2.0, 'why': ['airy']}]
+    line = guess({'listened': False}, vague, ['b/y', 'c/z'])
+    assert line.startswith('also: b/y, c/z (the pick is a guess: no job or sound word matched') and '\n' not in line
+    res = make('crickets at night', str(tmp_path / 'n.wav'), dur=2, loop=False)
+    assert len(res['also']) == 3 and 'also: ' + ', '.join(res['also']) in res['summary']
+    assert sum(1 for ln in res['summary'].splitlines() if 'also' in ln) == 1
+
+
+def test_a_struck_sound_says_it_ignores_dur(tmp_path):
+    res = make(out=str(tmp_path / 'h.wav'), sound='hit/metal', dur=2.5)
+    assert res['takes'][0]['dur_s'] < 1.5 and 'not used by this sound: dur' in res['summary']
+    res = make(out=str(tmp_path / 'f.wav'), sound='success/rise', dur=1.0)
+    assert 'dur' not in res['takes'][0].get('ignored', [])
+
+
+def test_help_names_the_codecs_and_what_dur_does(capsys):
+    with pytest.raises(SystemExit):
+        cli.main(['make', '--help'])
+    text = ' '.join(capsys.readouterr().out.split())
+    for bit in ('ogg = Vorbis', 'webm = Opus', 'm4a = AAC', 'webm,mp3', 'a figure of notes', 'hold of a pad',
+                'length of a loop', 'ignores --dur'):
+        assert bit in text, bit
+
+
 # ---- make_set
 
 def _check_manifest(folder, n):
@@ -163,6 +225,47 @@ def test_make_set_spec_file_with_a_byte_order_mark(tmp_path):
     man = _check_manifest(str(tmp_path / 'set'), 2)
     assert man['theme'] == 'wood' and man['format'] == 'flac'
     assert {r['name']: r.get('pitch') for r in man['sounds']}['ok'][0] == 'G'      # the wood theme's key
+
+
+def test_make_set_in_several_formats_with_a_sprite_in_each(tmp_path):
+    """usability log: Ogg Vorbis alone does not play in older Safari; a set is written in every format asked for"""
+    for i, fmt in enumerate(('flac,wav', ['flac', 'wav'])):
+        out = str(tmp_path / f's{i}')
+        spec = {'format': fmt, 'sprite': 'sprite.flac',
+                'sounds': [{'name': 'tap', 'sound': 'tap/tone'}, {'name': 'ok', 'want': 'a soft success chime'}]}
+        res = make_set(spec, out=out)
+        man = _check_manifest(out, 2)
+        assert man['format'] == 'flac' and man['formats'] == ['flac', 'wav']
+        for r in man['sounds']:
+            assert r['file'] == r['name'] + '.flac' and r['files'] == [r['name'] + '.flac', r['name'] + '.wav']
+            a, b = (_read(os.path.join(out, f))[0] for f in r['files'])
+            assert a.shape == b.shape
+        assert sorted(os.path.basename(f) for f in res['files']) == ['ok.flac', 'ok.wav', 'tap.flac', 'tap.wav']
+        assert res['summary'].splitlines()[0].endswith('(flac, wav), manifest.json')
+        assert res['summary'].splitlines()[1].startswith('tap.{flac,wav}: tap/tone')
+        with open(os.path.join(out, 'sprite.json'), encoding='utf-8') as fh:
+            mp = json.load(fh)
+        assert mp['src'] == ['sprite.flac', 'sprite.wav'] and set(mp['sprite']) == {'tap', 'ok'}
+        assert all(os.path.isfile(os.path.join(out, s)) for s in mp['src'])
+        assert sf.info(os.path.join(out, 'sprite.flac')).frames == sf.info(os.path.join(out, 'sprite.wav')).frames
+    out, p = str(tmp_path / 'cli'), tmp_path / 'spec.json'
+    p.write_text(json.dumps({'sounds': [{'name': 'coin', 'sound': 'coin/chip'}]}), encoding='utf-8')
+    assert cli.main(['make', '--spec', str(p), '--format', 'wav,flac', '-o', out]) == 0
+    assert os.path.isfile(os.path.join(out, 'coin.flac')) and os.path.isfile(os.path.join(out, 'coin.wav'))
+    with pytest.raises(ValueError, match='unknown audio format aiff'):
+        make_set({'format': 'wav,aiff', 'sounds': [{'name': 'a', 'sound': 'tap/tone'}]}, out=str(tmp_path / 'x'))
+
+
+def test_loops_in_padded_formats_are_warned_about(tmp_path):
+    from earshot.make import _seam
+    assert _seam(['rain'], ['ogg', 'webm', 'wav']) is None and _seam([], ['mp3']) is None
+    line = _seam(['rain'], ['webm', 'mp3', 'm4a'])
+    assert line.startswith('rain: a loop in mp3 / m4a has a gap at its seam') and 'ogg, webm, wav or flac' in line
+    if shutil.which('ffmpeg'):
+        res = make(out=str(tmp_path / 'r.mp3'), sound='rain/tent', dur=8)
+        assert res['summary'].splitlines()[-1].startswith('r.mp3: a loop in mp3 has a gap at its seam')
+        res = make(out=str(tmp_path / 'once.mp3'), sound='rain/tent', dur=3, loop=False)
+        assert 'gap at its seam' not in res['summary']
 
 
 def test_make_set_refuses_unknown_fields_and_missing_names(tmp_path):

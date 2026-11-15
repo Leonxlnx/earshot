@@ -257,6 +257,8 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     # a voice or material that is the design's own was honoured by choosing the design ("a kalimba note", "8-bit")
     own = {k for k, v in (('voice', d.voice), ('material', d.material))
            if request.get(k) and (request[k] == v or request[k] in d.tags)}
+    if c._dur and not (0.75 * c._dur <= meta['dur_s'] <= 1.5 * c._dur + 0.5):
+        c.used.discard('dur')        # read but not kept: a struck sound rings as it rings, a loop has a shortest length
     ignored = sorted(c.asked - c.used - own)
     if ignored:
         meta['ignored'] = ignored

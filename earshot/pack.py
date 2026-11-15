@@ -22,16 +22,19 @@ GAP_S = 0.25
 AUDIO = ('.wav', '.flac', '.ogg', '.mp3', '.m4a', '.webm')
 
 
-def pack(files, out, gap=GAP_S, mono=False, names=None, loops=()):
+def pack(files, out, gap=GAP_S, mono=False, names=None, loops=(), ys=None):
     """lay `files` (paths, or a folder: every audio file in it, by name) end to end into `out` (format by its
-    extension, see earshot.synth.master.write) and write the map next to it as <out stem>.json:
-    {'summary', 'file', 'map', 'sprite'}. names: one per file (default: the file names without extension); loops:
-    the names that loop"""
+    extension, see earshot.synth.master.write; a list of paths writes the same sprite in each format, and the map's
+    `src` lists them in that order, the first playable one wins) and write the map next to the first as
+    <out stem>.json: {'summary', 'file' (the first), 'files', 'map', 'sprite'}. names: one per file (default: the
+    file names without extension); loops: the names that loop; ys: the sounds themselves, one per file, instead of
+    reading the files (a set packs what it rendered, not a lossy file decoded again)"""
     from . import audio
     from .synth import master
+    outs = [out] if isinstance(out, str) else list(out)
     if isinstance(files, str):
         folder = files
-        man, rows, sprites = os.path.join(folder, 'manifest.json'), [], {os.path.basename(out)}
+        man, rows, sprites = os.path.join(folder, 'manifest.json'), [], {os.path.basename(o) for o in outs}
         if os.path.isfile(man):
             with open(man, encoding='utf-8') as fh:
                 rows = [s for s in json.load(fh).get('sounds', []) if os.path.isfile(os.path.join(folder, s['file']))]
@@ -56,22 +59,25 @@ def pack(files, out, gap=GAP_S, mono=False, names=None, loops=()):
     if len(set(names)) != len(names):
         raise ValueError('two sounds of a sprite share a name')
     parts, sprite, t = [], {}, 0.0
-    for f, name in zip(files, names):
-        y = np.asarray(audio.load(f), np.float64)
+    for k, (f, name) in enumerate(zip(files, names)):
+        y = np.asarray(audio.load(f) if ys is None else ys[k], np.float64)
         y = y if y.ndim == 2 else np.stack([y, y], 1)
         loop = name in loops
         sprite[name] = [round(t * 1000), round(len(y) / master.SR * 1000)] + ([True] if loop else [])
         pad = np.zeros((int(round((gap * 4 if loop else gap) * master.SR)), 2))
         parts += [y, pad]
         t += (len(y) + len(pad)) / master.SR
-    master.write(out, np.concatenate(parts[:-1]), mono=mono, bits=16)
-    mp = os.path.splitext(out)[0] + '.json'
+    y = np.concatenate(parts[:-1])
+    for o in outs:
+        master.write(o, y, mono=mono, bits=16)
+    mp = os.path.splitext(outs[0])[0] + '.json'
     with open(mp, 'w', encoding='utf-8', newline='\n') as fh:
-        json.dump({'src': [os.path.basename(out)], 'sprite': sprite}, fh, indent=1)
+        json.dump({'src': [os.path.basename(o) for o in outs], 'sprite': sprite}, fh, indent=1)
         fh.write('\n')
-    kb = os.path.getsize(out) / 1024
-    return {'summary': f'{len(files)} sounds in {out} ({t - gap:.1f} s, {kb:.0f} kB), map {os.path.basename(mp)}',
-            'file': out, 'map': mp, 'sprite': sprite}
+    kb = ', '.join(f'{os.path.getsize(o) / 1024:.0f} kB' for o in outs)
+    shown = outs[0] if len(outs) == 1 else ' + '.join([outs[0]] + [os.path.basename(o) for o in outs[1:]])
+    return {'summary': f'{len(files)} sounds in {shown} ({t - gap:.1f} s, {kb}), map {os.path.basename(mp)}',
+            'file': outs[0], 'files': outs, 'map': mp, 'sprite': sprite}
 
 
 def add_cli(sub):

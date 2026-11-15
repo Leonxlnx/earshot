@@ -375,6 +375,9 @@ def _compose(b):
                 b[k] = [x for x in b[k] if x != c2 or c2 == r]
             k = lists[0]
             b[k] = list(dict.fromkeys(r if x == a else x for x in b[k]))
+            said = [b['written'][x] for x in (a, c2) if x in b.get('written', {})]
+            if said:
+                b['written'].setdefault(r, ' '.join(said))
 
 
 def _next_concept(toks, i):
@@ -398,33 +401,36 @@ def _next_concept(toks, i):
 def read(text):
     """a request as a brief (module doc): {'text', 'concepts', 'parts', 'context', 'refs', 'not', 'words', 'hints',
     'axes', 'dir', 'material', 'voice', 'domain', 'dur', 'dur_max', 'pitch', 'key', 'scale', 'n', 'notes', 'loop',
-    'unknown', 'context_words'}; absent things are None / empty. `concepts` are the sound or job asked for (the head
-    first), `parts` what the request says it has ("with a soft shimmer"), `context` the canonical words after "for" /
+    'unknown', 'context_words', 'written', 'framed'}; absent things are None / empty. `concepts` are the sound or job
+    asked for (the head first), `parts` what the request says it has ("with a soft shimmer"), `context` the canonical words after "for" /
     "when" (where it plays; `context_words` the plain words there), `refs` what it is compared with ("duller than an
     on-switch"), `not` the jobs the request rules out ("not an error"), `hints` the adjectives (they break ties
     between members of a family: "crisp" finds whoosh_fast/crisp), `dir` +1 for a rising gesture and -1 for a falling
-    one, `dur_max` a ceiling ("under 80 ms"), `notes` the number of notes of a figure ("a two-note chime")"""
+    one, `dur_max` a ceiling ("under 80 ms"), `notes` the number of notes of a figure ("a two-note chime"), `written`
+    the words as the request wrote them ({canonical word or stemmed word: 'water drop'}; `shown`), `framed` the jobs
+    named only in a comparison or in the event before the sound is named ("sound when the player grabs a boost")"""
     b = {'text': text, 'concepts': [], 'parts': [], 'context': [], 'refs': [], 'not': [], 'words': [], 'hints': [],
          'axes': {},
          'dir': 0, 'material': None, 'voice': None, 'domain': None, 'dur': None, 'dur_max': None, 'pitch': None,
-         'key': None, 'scale': None, 'n': None, 'notes': None, 'loop': None, 'unknown': []}
+         'key': None, 'scale': None, 'n': None, 'notes': None, 'loop': None, 'unknown': [], 'written': {},
+         'framed': []}
     toks = tokens(_numbers(b, text))
     n_tok = len(toks)
     st = {'scale': 1.0, 'neg': False, 'where': 'concepts', 'than': False, 'opposite': False, 'head': False,
-          'any': False, 'object': False, 'simile': False, 'skipped': 0}
+          'any': False, 'object': False, 'simile': False, 'skipped': 0, 'event': False}
     domains, particles, src, ctx_words, outcomes = {}, [], {}, set(), []
     if _old_device(toks):
         b['material'] = 'retro'            # "old Nintendo games", "an ancient home computer"
     phrasal, skip = _phrasal(toks), set()
 
-    def add(c, tok, where=None):
+    def add(c, tok, where=None, said=None):
         if st['object'] and st['where'] == 'concepts':
             where, st['object'] = 'parts', False    # "parrying an attack": the attack is what is parried
         if st['simile'] and st['where'] == 'concepts':
             where = 'parts'                         # "a thump, like a door slamming": a comparison describes it
         where = where if where and st['where'] == 'concepts' else st['where']
         if st['opposite']:
-            c, st['opposite'] = L.OPPOSITE.get(c, c), False
+            c, st['opposite'], said = L.OPPOSITE.get(c, c), False, None
         if st['neg']:
             if c not in b['not']:
                 b['not'].append(c)
@@ -433,6 +439,10 @@ def read(text):
         if all(c not in b[k] for k in ('concepts', 'parts', 'context')):
             b[where].append(c)
             src[c] = tok
+            if said:
+                b['written'].setdefault(c, said)
+            if st['simile'] or st['event']:
+                b['framed'].append(c)               # named in a comparison or the event: not the sound itself
         if where == 'concepts' and c not in L.GENERIC:
             st['head'] = True
         if where == 'concepts':
@@ -452,7 +462,7 @@ def read(text):
             i += 1
             continue
         if t in PUNCT:
-            st.update(than=False, neg=False, scale=1.0, simile=False)
+            st.update(than=False, neg=False, scale=1.0, simile=False, event=False)
             if st['where'] == 'parts':
                 st['where'] = 'concepts'
             i += 1
@@ -492,6 +502,8 @@ def read(text):
             st['where'] = 'context'        # "an impact FOR a logo reveal": where it plays, not what it is
             i += 1
             continue
+        if t in CONTEXT_WORDS:
+            st['event'] = True             # "sound when the player grabs ...": the event, said before the sound
         if st['any'] and t == 'with' and st['where'] == 'concepts':
             st['where'] = 'parts'          # "a bell WITH an airy whoosh": a part of it
             i += 1
@@ -520,14 +532,14 @@ def read(text):
             continue
         if i in phrasal:                   # "picking something up", "putting a window away"
             c, k = phrasal[i]
-            add(c, c)
+            add(c, c, said=f'{t} {toks[k]}')
             skip.add(k)
             st.update(scale=1.0, neg=False)
             i += 1
             continue
         j, hit = _match(toks, i)
         if hit:
-            key = _key(toks[i:j])
+            key, said = _key(toks[i:j]), ' '.join(toks[i:j])
             if 'm' in hit:
                 axes(hit['m'], st['scale'])
             if 'p' in hit and not st['neg']:
@@ -546,9 +558,9 @@ def read(text):
                 if player or (follow is not None and follow not in VOICE_OK):
                     c = hit.pop('c', None)     # "a bass boom": the instrument word only colours the boom
                     if c and not player:
-                        add(c, key, 'parts')
+                        add(c, key, 'parts', said)
                 else:
-                    add('voice:' + v, key)
+                    add('voice:' + v, key, said=said)
             if 'c' in hit and not ('v' in hit and hit['c'] not in VOICE_OK):
                 c, where = hit['c'], None
                 if j < n_tok and toks[j] in L.ENVELOPE_WORDS:
@@ -557,7 +569,7 @@ def read(text):
                     where = 'parts'            # "grabs a speed boost": the thing grabbed is the sound
                 elif j - i == 1 and t in L.COLOUR_WORDS:
                     where = 'parts'            # "a windy zip": the weather colours the sound
-                add(c, key, where)
+                add(c, key, where, said)
                 nx = toks[j] if j < n_tok else None
                 if (key in _status_keys() and not st['simile'] and st['where'] == 'concepts'
                         and (nx is None or nx in PUNCT or nx in L.STOP or nx in CONTEXT_WORDS
@@ -596,6 +608,7 @@ def read(text):
         if not hit and not t.isdigit() and t not in L.STOP:
             if not st['neg']:
                 b['words'].append(stem(t))
+                b['written'].setdefault(stem(t), t)
                 if st['where'] == 'context':
                     ctx_words.add(stem(t))
             b['unknown'].append(t)
@@ -613,6 +626,10 @@ def read(text):
                 break
     if domains:
         b['domain'] = max(domains, key=lambda k: domains[k])
+    for c, tok in src.items():                        # the words of a job carry over to what it means here
+        x = _sense().get((b['domain'], tok))
+        if x and c in b['written']:
+            b['written'].setdefault(x, b['written'][c])
     for k in ('concepts', 'parts', 'context'):         # "fails a stage" in a game is a loss, not an error
         b[k] = [x for x in (_sense().get((b['domain'], src.get(c)), c) for c in b[k]) if x]
     _compose(b)
@@ -760,6 +777,42 @@ def named(why):
     if 'voices' not in _cache:
         _cache['voices'] = frozenset(L.VOICES.values())
     return any(w in L.CONCEPTS or w in _cache['voices'] for w in why)
+
+
+def shown(b, why):
+    """rank's `why` as a reader sees it: canonical words as they are, a plain word as the request wrote it (never
+    its stem: 'lake', not 'lak'), a voice without its prefix; each once"""
+    said = b.get('written') or {}
+    out = [w if w in L.CONCEPTS else said.get(w, w.replace('voice:', '')) for w in why]
+    return list(dict.fromkeys(out))
+
+
+def _families():
+    """the canonical words that name a family of the catalogue: the sounds and jobs a design exists for"""
+    idx = _default_index()
+    if _cache.get('fam_key') != id(idx):
+        _cache['fam_key'] = id(idx)
+        _cache['families'] = frozenset().union(*(t['family'] for t in idx[1]))
+    return _cache['families']
+
+
+def uncovered(b, why):
+    """the sounds and jobs the request names (its head and parts, as written) that the words a design was picked
+    for (rank's `why`) do not include: "a water drop into a warm chime" answered by a bell leaves out the water drop.
+    Only a word that names a family of the catalogue counts (a sound some design exists for: water, waves, whoosh,
+    sparkle; not 'cue', 'item' or a verb such as 'grabs'), and not a generic one (lexicon.GENERIC) nor the shape of
+    a short sound ('ping', 'pluck': lexicon.SOUND_NOUNS, which any struck design is); a job counts as
+    covered when its broader word decided ('swish' by a whoosh). Context ("for a logo"), the event and comparisons
+    (`framed`: "when the player grabs a boost", "like a door slamming"), voices, adjectives, materials and numbers
+    never count, nor a job the reader inferred without the request naming it"""
+    seen, said, out = set(why), b.get('written') or {}, []
+    for c in list(b['concepts']) + list(b.get('parts', ())):
+        if (c not in said or c in seen or L.BROADER.get(c) in seen or c in L.GENERIC or said[c] in L.SOUND_NOUNS
+                or c in b.get('framed', ()) or c not in _families()):
+            continue
+        if said[c] not in out:
+            out.append(said[c])
+    return out
 
 
 def blend(b, lexical, semantic, idx):

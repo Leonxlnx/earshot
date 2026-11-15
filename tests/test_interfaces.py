@@ -454,6 +454,28 @@ def test_mcp_server_registers_all_tools():
     assert ann.get('open_world_hint', ann.get('openWorldHint')) is True
 
 
+def test_mcp_make_tools_describe_listen_and_take_material_loop_and_formats(tmp_path):
+    """usability review: the make tool's `listen` described an old behaviour, `material` and `loop` were missing,
+    and make_set could write one format only"""
+    import anyio
+    tools = {t.name: t for t in anyio.run(mcp_server.build().list_tools)}
+    props = (getattr(tools['make'], 'input_schema', None) or tools['make'].inputSchema)['properties']
+    assert {'material', 'loop', 'listen', 'dur'} <= set(props)
+    listen = ' '.join(props['listen']['description'].split())
+    assert 'best three' not in listen and 'atlas' in listen and 'blended' in listen and 'heard as' in listen
+    assert 'once' in props['loop']['description'] and 'ignores dur' in props['dur']['description']
+    fmt = (getattr(tools['make_set'], 'input_schema', None) or tools['make_set'].inputSchema)['properties']['format']
+    assert all(w in fmt['description'] for w in ('Vorbis', 'Opus', 'AAC', 'webm,mp3'))
+    text = mcp_server.tool_make('rain on a tent', str(tmp_path / 'r.wav'), sound='rain/tent', dur=2.0, loop=False)
+    assert text.startswith('r.wav: rain/tent') and 'seamless loop' not in text
+    text = mcp_server.tool_make('a knock', str(tmp_path / 'k.wav'), sound='tick/wood', material='glass')
+    assert 'not used by this sound: material' in text
+    text = mcp_server.tool_make_set(str(tmp_path / 'set'), sounds=[{'name': 'tap', 'sound': 'tap/tone'}],
+                                    format='wav,flac')
+    assert text.splitlines()[0].endswith('(wav, flac), manifest.json')
+    assert (tmp_path / 'set' / 'tap.wav').is_file() and (tmp_path / 'set' / 'tap.flac').is_file()
+
+
 # one person's taste written as a rule for every agent (issue #1); conditional, generic phrasing such as "when the user
 # wants real sound" stays allowed
 PREFERENCE_AS_RULE = re.compile(

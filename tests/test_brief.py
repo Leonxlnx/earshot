@@ -270,6 +270,34 @@ def test_instrument_before_a_sound_noun():
     assert 'voice:marimba' in brief.read('one marimba hit')['concepts']
 
 
+# ---- what a user sees: words as written, and what a pick leaves out
+
+def test_why_shows_words_as_written_never_stems():
+    """usability log: a stemmed 'lake' showed as `[lak, water]` next to `not understood: lake`"""
+    b = brief.read('gentle water, small waves on a lake shore, calm')
+    assert b['written']['lak'] == 'lake' and b['written']['water'] == 'water'
+    assert brief.shown(b, ['lak', 'water', 'waves', 'voice:kalimba', 'lak']) == ['lake', 'water', 'waves', 'kalimba']
+    b = brief.read('calm water at evening, gentle lapping waves')
+    assert brief.shown(b, ['lap', 'water']) == ['lapping', 'water']
+    assert brief.read('a short calm logo sound, a water drop into a warm chime')['written']['water'] == 'water drop'
+
+
+def test_uncovered_names_the_sounds_a_pick_leaves_out():
+    b = brief.read('a short calm logo sound, a water drop into a warm chime')
+    assert brief.uncovered(b, ['logo', 'bell']) == ['water drop']
+    assert brief.uncovered(b, ['logo', 'water', 'bell']) == []
+    b = brief.read('calm water at evening, gentle lapping waves, quiet ambience')
+    assert brief.uncovered(b, ['lap', 'water', 'waves', 'ambience']) == ['evening']   # evening is the night scene
+    # axes, materials, numbers and context never count; nor the event, a comparison or the shape of a short sound
+    assert brief.uncovered(brief.read('a soft wooden tap, 80 ms, for a logo reveal'), ['tap']) == []
+    assert brief.uncovered(brief.read('sound when the player grabs a speed boost'), ['power_up']) == []
+    assert brief.uncovered(brief.read('a huge thump, like a door slamming'), ['impact']) == []
+    assert brief.uncovered(brief.read("a calm 'you're saved here' ping"), ['success']) == []
+    # a job covered by its broader word: a swish by a whoosh
+    b = brief.read('a short airy swish')
+    assert 'swish' in b['concepts'] and brief.uncovered(b, [L.BROADER['swish']]) == []
+
+
 # anchor requests (own wording, not from any eval set) -> accepted id prefixes of the first result
 ANCHORS = [
     # interface

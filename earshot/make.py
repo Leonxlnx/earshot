@@ -19,12 +19,13 @@ each design sounds like the request (earshot.sounds.atlas, blended by earshot.br
 the written sound is heard as. When the model is already loaded in the process (the MCP server keeps it warm), the
 blend is used without asking.
 
-The result says what was chosen and why, what else would fit (`also`), and which words were not understood, so one
-call is usually enough. When the pick is a guess (no job or sound word matched and nothing sounds like the request,
-or another kind of sound fits almost as well), one line says so and names the closest alternatives, to be asked for
-by `sound=<id>`. Everything rendered is the caller's to use, in any product, without credit.
+The result says what was chosen and why, the sounds the request named that it leaves out (`not in this sound`),
+what else would fit (`also`, always up to three), and which words were not understood, so one call is usually
+enough. When the pick is a guess (no job or sound word matched and nothing sounds like the request, or another kind
+of sound fits almost as well), the `also` line says so, to be asked for by `sound=<id>`. Everything rendered is the caller's to use, in any product, without credit.
 """
 import json
+import math
 import os
 
 from . import brief
@@ -34,6 +35,10 @@ from .report import emit, read_json
 SET_FIELDS = ('name', 'want', 'sound', 'pitch', 'dur', 'voice', 'material', 'seed', 'n', 'axes', 'lufs')
 TRIES = 4
 GUESS_Z, GUESS_HAIR = 2.0, 0.06     # `guess`: semantic support, and how close another family may come (share)
+# formats whose encoder pads the start and end of a file and records it only in a note some players ignore (the LAME
+# tag of an mp3, the edit list of an m4a); Vorbis (granule positions) and Opus in WebM (pre-skip and discard padding)
+# carry it in the stream itself. A 384000-sample loop decodes raw to +1920 samples as mp3 and +1024 as m4a
+PADDED = ('mp3', 'm4a')
 
 
 def _paths(out, n, fmt):
@@ -87,13 +92,13 @@ def choose(want, sound=None, top=4, listen=False, **over):
     return b, brief.rank(b, top=top, semantic=sem)
 
 
-def guess(b, cands):
-    """one line when the pick rests on weak evidence, else None: no job or sound word matched and the request does
-    not sound like the pick (z under GUESS_Z, or not listened), or the best design of another family is within
-    GUESS_HAIR (a share of the pick's score) of it: members of one family tie often and harmlessly. Names the closest
-    designs of other families first. Thresholds chosen on the development request sets (660 requests, top 8 ranked):
-    lexical ranking, 32 % of wrong first picks flagged and 10 % of right ones; blended, 36 % and 8 %"""
-    if len(cands) < 2 or cands[0]['score'] is None:
+def doubt(b, cands):
+    """why the pick rests on weak evidence, or None: no job or sound word matched and the request does not sound
+    like the pick (z under GUESS_Z, or not listened), or the best design of another family is within GUESS_HAIR (a
+    share of the pick's score) of it: members of one family tie often and harmlessly. Thresholds chosen on the
+    development request sets (660 requests, top 8 ranked): lexical ranking, 32 % of wrong first picks flagged and
+    10 % of right ones; blended, 36 % and 8 %"""
+    if not cands or cands[0]['score'] is None:
         return None
     top = cands[0]
     fam = top['id'].split('/')[0]
@@ -103,10 +108,71 @@ def guess(b, cands):
     close = bool(others) and top['score'] - others[0]['score'] <= GUESS_HAIR * abs(top['score'])
     if (named or heard) and not close:
         return None
-    why = 'another kind of sound fits almost as well' if close else 'no job or sound word matched' + (
+    return 'another kind of sound fits almost as well' if close else 'no job or sound word matched' + (
         ' and it does not clearly sound like the request' if b.get('listened') else '')
-    alts = ', '.join(c['id'] for c in (others + [c for c in cands[1:] if c not in others])[:3])
-    return f'a guess ({why}); also close: {alts}. Name the one you want with sound=<id>'
+
+
+def alternatives(b, cands, pick, k=3, others_first=False):
+    """up to k designs besides the pick: the ranked candidates first (other families first when the pick is a
+    guess), then the rest of the catalogue that shares the pick's family, then its kind, then the request's domain
+    (the pick's when the request names none), the nearest in usual length first; always as the pick loops or not,
+    and chip sound or not"""
+    from .sounds import registry
+    fam = pick.split('/')[0]
+    ranked = [c['id'] for c in cands if c['id'] != pick]
+    if others_first:
+        ranked = [i for i in ranked if i.split('/')[0] != fam] + [i for i in ranked if i.split('/')[0] == fam]
+    out = list(dict.fromkeys(ranked))[:k]
+    if len(out) >= k:
+        return out
+    d = registry.get(pick)
+    doms = {b['domain']} if b.get('domain') else set(d.domains)
+    rest = [r for r in registry.rows() if r['id'] != pick and r['id'] not in out and r['loop'] == d.loop
+            and brief.chip(r) == brief.chip(d.row())]
+    rest.sort(key=lambda r: (abs(math.log((r['dur_s'] or 1.0) / (d.dur or 1.0))), r['id']))
+    for near in (lambda r: r['id'].split('/')[0] == fam, lambda r: r['kind'] == d.kind,
+                 lambda r: doms & set(r['domains'])):
+        out += [r['id'] for r in rest if near(r) and r['id'] not in out][:k - len(out)]
+    return out
+
+
+def guess(b, cands, also=None):
+    """the alternatives line when the pick is a guess (`doubt`), else None: the alternatives (default: the ranked
+    candidates, other families first) and why the pick is a guess, on one line"""
+    why = doubt(b, cands)
+    if why is None:
+        return None
+    if also is None:
+        fam = cands[0]['id'].split('/')[0]
+        also = [c['id'] for c in cands[1:] if c['id'].split('/')[0] != fam]
+        also = (also + [c['id'] for c in cands[1:] if c['id'] not in also])[:3]
+    return f"also: {', '.join(also)} (the pick is a guess: {why}; name the one you want with sound=<id>)"
+
+
+def _formats(fmt):
+    """the formats of a set: 'webm,mp3', ['webm', 'mp3'] or 'ogg' -> a list, in order, each once"""
+    from .synth import master
+    parts = fmt if isinstance(fmt, (list, tuple)) else str(fmt).split(',')
+    out = list(dict.fromkeys(str(f).strip().lstrip('.').lower() for f in parts if str(f).strip()))
+    bad = [f for f in out if f not in master.FORMATS]
+    if bad or not out:
+        raise ValueError(f'unknown audio format {", ".join(bad) or repr(fmt)}: one or more of '
+                         f'{", ".join(master.FORMATS)}, with commas (webm,mp3)')
+    return out
+
+
+def _unknown(b, why):
+    """the words of the request that found nothing: not those the design was picked for (by their stem)"""
+    return [w for w in b['unknown'] if brief.stem(w) not in why]
+
+
+def _seam(names, fmts):
+    """the line that warns about loops in a padded format (mp3, m4a), or None"""
+    lossy = [f for f in fmts if f in PADDED]
+    if not (names and lossy):
+        return None
+    return (f"{', '.join(names)}: a loop in {' / '.join(lossy)} has a gap at its seam in players that ignore the "
+            "encoder's padding note; for loops use ogg, webm, wav or flac")
 
 
 def _request(b, theme):
@@ -143,9 +209,10 @@ def _heard(path, queries):
 
 def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False, fmt=None, mono=False, lufs=None,
          sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, loop=None, **axes):
-    """make the sound a request asks for and write it: {'summary', 'sound', 'files', 'why', 'also', 'unknown',
-    'takes': [meta ...]} (+ 'heard' with listen). want: the request in words; sound: a design id instead of (or on
-    top of) the words; out: the file to write (its extension picks the format: wav, flac, ogg, mp3, m4a, webm;
+    """make the sound a request asks for and write it: {'summary', 'sound', 'files', 'why', 'also', 'not_in_sound',
+    'unknown', 'takes': [meta ...]} (+ 'heard' with listen); `not_in_sound`: the sounds or jobs the request named
+    that the chosen design was not picked for, as written ("water drop"), `also`: up to three alternatives. want:
+    the request in words; sound: a design id instead of (or on top of) the words; out: the file to write (its extension picks the format: wav, flac, ogg, mp3, m4a, webm;
     none = `<sound>.wav` in the working folder); n takes get `_1 .. _n` before the extension; theme: a preset name
     or dict (earshot.sounds.theme); lufs: a momentary-max loudness instead of the -1 dBFS peak; pitch / dur / voice /
     material and the axes (bright, hard, ring, size, space, width, energy, motion) override what the words say."""
@@ -175,12 +242,15 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if listen and heard is None:
         heard = _heard(paths[0] if paths[0].lower().endswith(('.wav', '.flac')) else _tmp_wav(pick['id'], seed, req),
                        ([want] if want else []) + list(registry.get(pick['id']).says))
-    why = ', '.join(dict.fromkeys(pick['why']))
-    lines = [_line(t, t['file'], why if i == 0 else '') for i, t in enumerate(takes)]
-    also = [c['id'] for c in cands if c['id'] != pick['id']][:3]
-    hint = None if sound else guess(b, cands)
-    if hint:
-        lines.append(hint)
+    why = brief.shown(b, pick['why'])
+    lines = [_line(t, t['file'], ', '.join(why) if i == 0 else '') for i, t in enumerate(takes)]
+    missing = [] if sound else brief.uncovered(b, pick['why'])
+    if missing:
+        lines.append(f"not in this sound: {', '.join(missing)}")
+    reason = None if sound else doubt(b, cands)
+    also = [] if sound else alternatives(b, cands, pick['id'], others_first=reason is not None)
+    if reason:
+        lines.append(guess(b, cands, also))
     elif also:
         lines.append('also: ' + ', '.join(also))
     if b.get('listen_note'):
@@ -190,11 +260,15 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     ign = sorted(set().union(*(set(t.get('ignored') or ()) for t in takes)))
     if ign:
         lines.append(f"not used by this sound: {', '.join(ign)}")
-    unknown = [w for w in b['unknown'] if brief.stem(w) not in pick['why']]      # words that found nothing
+    unknown = _unknown(b, pick['why'])
     if unknown:
         lines.append(f"not understood: {', '.join(unknown)}")
-    res = {'summary': '\n'.join(lines), 'sound': pick['id'], 'files': paths, 'why': pick['why'], 'also': also,
-           'unknown': unknown, 'takes': takes}
+    seam = _seam([os.path.basename(t['file']) for t in takes if t.get('loop')],
+                 {os.path.splitext(p)[1].lower().lstrip('.') for p in paths})
+    if seam:
+        lines.append(seam)
+    res = {'summary': '\n'.join(lines), 'sound': pick['id'], 'files': paths, 'why': why, 'also': also,
+           'not_in_sound': missing, 'unknown': unknown, 'takes': takes}
     if heard:
         res['heard'] = heard
     return res
@@ -211,8 +285,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     """a whole set of sounds from one spec, as one family: {'summary', 'files', 'manifest', 'sounds': [...]}.
     spec: a dict, the path of a JSON file, or the name of a ready-made set (earshot.sounds.sets: ui, game, arcade,
     film):
-        {"set": "ui", "theme": "glass" | {...}, "format": "ogg", "out": "public/sounds", "mono": true, "lufs": -18,
-         "sprite": "sprite.webm",
+        {"set": "ui", "theme": "glass" | {...}, "format": ["webm", "mp3"], "out": "public/sounds", "mono": true,
+         "lufs": -18, "sprite": "sprite.webm",
          "sounds": [{"name": "tap", "want": "a soft tap for buttons"},
                     {"name": "success", "want": "a happy two-note success chime", "dur": 0.5, "axes": {"bright": 0.2}}]}
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
@@ -220,7 +294,11 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). The sounds are levelled against
     each other by loudness (`lufs`: the loudest allowed; default -16 for the set's loudest sound, each design's
     own weight under it), `manifest.json` in the folder lists every file with its sound, length and level, and
-    "sprite" also packs them into one file with a map (earshot.pack)."""
+    "sprite" also packs them into one file with a map (earshot.pack). format (or fmt): one format or several
+    ("webm,mp3" or a list): every sound is written once per format, the manifest's `file` is the first and `files`
+    all of them, and a sprite named with one of them (or no extension) is written in each, its map's `src` listing
+    them in that order (a browser plays the first it can). The result also carries `also` and `not_in_sound` by
+    the name of each sound asked for in words; the summary shows them only where the pick is in doubt."""
     from .sounds import registry
     from .synth import master
     from .sounds import sets
@@ -243,10 +321,10 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
                          'every sound of a set needs its own "name"')
     out = out or spec.get('out') or 'sounds'
     theme = theme or spec.get('theme')
-    fmt = (fmt or spec.get('format') or 'wav').lstrip('.')
+    fmts = _formats(fmt or spec.get('format') or 'wav')
     mono = spec.get('mono', False) if mono is None else mono
     top = lufs if lufs is not None else spec.get('lufs', -16.0)
-    rows, lines = [], []
+    rows, lines, ys, alts, missed = [], [], [], {}, {}
     for it in items:
         b, cands = choose(it.get('want'), it.get('sound'), pitch=it.get('pitch'), dur=it.get('dur'),
                           voice=it.get('voice'), material=it.get('material'), axes=it.get('axes'))
@@ -255,28 +333,51 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
         d = registry.get(cands[0]['id'])
         level = it.get('lufs', top + WEIGHT.get(d.kind, -4.0))
         k = int(it.get('n') or b['n'] or 1)
-        for p in _paths(os.path.join(out, f'{it["name"]}.{fmt}'), k, fmt):
+        for p in _paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0]):
             y, meta = take(d.id, int(it.get('seed', seed)) + len(rows), _request(b, theme), lufs=level)
-            master.write(p, y, mono=mono and not d.loop, bits=16 if fmt == 'wav' else 24)
-            rows.append({'name': os.path.splitext(os.path.basename(p))[0], 'file': os.path.basename(p),
-                         'sound': d.id, 'dur_s': meta['dur_s'], 'lufs_max': meta['lufs_max'], 'loop': d.loop,
+            stem = os.path.splitext(p)[0]
+            files = [master.write(f'{stem}.{f}', y, mono=mono and not d.loop, bits=16 if f == 'wav' else 24)
+                     for f in fmts]
+            ys.append(y)
+            rows.append({'name': os.path.basename(stem), 'file': os.path.basename(files[0]),
+                         'files': [os.path.basename(f) for f in files], 'sound': d.id, 'dur_s': meta['dur_s'],
+                         'lufs_max': meta['lufs_max'], 'loop': bool(meta.get('loop', False)),
                          'ok': meta['checks']['ok'], **({'pitch': meta['pitch']} if meta.get('pitch') else {})})
-            lines.append(_line(meta, p, ', '.join(dict.fromkeys(cands[0]['why']))))
-            if b['unknown']:
-                lines.append(f"  not understood: {', '.join(b['unknown'])}")
+            shown = p if len(fmts) == 1 else f'{stem}.{{{",".join(fmts)}}}'
+            lines.append(_line(meta, shown, ', '.join(brief.shown(b, cands[0]['why']))))
+        if it.get('sound'):
+            continue
+        missing, unknown = brief.uncovered(b, cands[0]['why']), _unknown(b, cands[0]['why'])
+        reason = doubt(b, cands)
+        alts[it['name']] = alternatives(b, cands, d.id, others_first=reason is not None)
+        if missing:
+            missed[it['name']] = missing
+            lines.append(f"  not in this sound: {', '.join(missing)}")
+        if (missing or reason) and alts[it['name']]:      # only where the pick is in doubt: a set stays short
+            lines.append('  ' + (guess(b, cands, alts[it['name']]) or 'also: ' + ', '.join(alts[it['name']])))
+        if unknown:
+            lines.append(f"  not understood: {', '.join(unknown)}")
     man = os.path.join(out, 'manifest.json')
     with open(man, 'w', encoding='utf-8', newline='\n') as fh:
-        json.dump({'theme': theme, 'format': fmt, 'sounds': rows}, fh, indent=1)
+        json.dump({'theme': theme, 'format': fmts[0], 'formats': fmts, 'sounds': rows}, fh, indent=1)
         fh.write('\n')
-    head = f'{len(rows)} sounds in {out} ({fmt}), manifest.json'
-    res = {'files': [os.path.join(out, r['file']) for r in rows], 'manifest': man, 'sounds': rows}
+    head = f'{len(rows)} sounds in {out} ({", ".join(fmts)}), manifest.json'
+    res = {'files': [os.path.join(out, f) for r in rows for f in r['files']], 'manifest': man, 'sounds': rows,
+           'also': alts, 'not_in_sound': missed}
+    seam = _seam([r['name'] for r in rows if r['loop']], fmts)
+    if seam:
+        lines.append(seam)
     sprite = sprite or spec.get('sprite')
     if sprite:
         from .pack import pack
-        sp = pack(res['files'], os.path.join(out, os.path.basename(sprite)), mono=mono,
-                  loops=[r['name'] for r in rows if r['loop']])
+        stem, ext = os.path.splitext(os.path.join(out, os.path.basename(sprite)))
+        ext = ext.lower().lstrip('.')
+        outs = [f'{stem}.{f}' for f in fmts] if not ext or ext in fmts else [f'{stem}.{ext}']
+        sp = pack([os.path.join(out, r['file']) for r in rows], outs, mono=mono,
+                  loops=[r['name'] for r in rows if r['loop']], ys=ys)
         lines.append(sp['summary'])
         res['sprite'] = sp['file']
+        res['sprites'] = sp['files']
     if skipped:
         lines.append(f"not in this catalogue, left out: {', '.join(skipped)}")
     return {'summary': '\n'.join([head] + lines), **res}
@@ -314,14 +415,20 @@ def add_cli(sub):
                                           'm4a, webm). With --spec: the folder')
     p.add_argument('--spec', help='a JSON file describing a whole set (earshot.make.make_set)')
     p.add_argument('--set', dest='set_name', help='a ready-made set: ui, game, arcade or film (one family, one call)')
-    p.add_argument('--format', help='with --spec / --set: the file format of the set (wav, ogg, mp3, m4a, webm, flac)')
+    p.add_argument('--format', help='with --spec / --set: the format of the set, or several with commas (webm,mp3: '
+                                    'every sound in each; a browser plays the first it can). ogg = Vorbis, webm = '
+                                    'Opus, m4a = AAC, mp3; wav and flac are lossless. Loops: not mp3 or m4a (their '
+                                    'padding leaves a gap at the seam)')
     p.add_argument('--sprite', help='with --spec / --set: also pack the set into this one file with a map')
     p.add_argument('--sound', help='a design id from `earshot sounds` instead of (or on top of) the words')
     p.add_argument('--n', type=int, default=1, help='how many takes (file_1 .. file_n)')
     p.add_argument('--seed', type=int, default=0)
     p.add_argument('--theme', help='a theme preset (soft, glass, wood, felt, tine, metal, electric, digital, retro)')
     p.add_argument('--pitch', help='a note (C5) or Hz')
-    p.add_argument('--dur', type=float, help='length in seconds')
+    p.add_argument('--dur', type=float, help='seconds: how long a figure of notes sounds, the hold of a pad, the '
+                                             'length of a loop (each has a shortest one) or a whoosh; a single '
+                                             'struck sound (a tap, a hit) rings as it rings: it ignores --dur and '
+                                             'says so ("not used by this sound: dur")')
     p.add_argument('--voice', help='the instrument or patch of a tonal sound')
     p.add_argument('--material', help='what a tap, click or knock is made of')
     for a in ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion'):
