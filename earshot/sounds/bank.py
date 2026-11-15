@@ -4,8 +4,8 @@ so `earshot make` finds a whoosh, a riser or a key press the same way it finds e
 A bank entry keeps its id (`whoosh_fast/crisp`). It answers to `pitch` and `dur` where its recipe has those knobs
 (earshot.forge.knobs: the recipe's own parameters move, nothing is resampled); the axes are not wired to bank
 recipes. Members that only carry a number in the bank (`pop/3`, `shimmer/m2`) are left out of the catalogue: they
-stay reachable through `earshot sfx`. Bank sounds rank a little under designs written for the catalogue (prior 0.9;
-the stylised `pro_` families 0.8), so a request that fits both gets the newer design.
+stay reachable through `earshot sfx`. Bank sounds rank under designs written for the catalogue (prior 0.8; the
+stylised `pro_` families 0.7), so a request that fits both gets the newer design.
 """
 import re
 
@@ -87,7 +87,7 @@ def register():
         design(row['id'], kind=kind, says=says, uses=uses, tags=(cat.replace('pro_', ''), words, 'bank'),
                domains=domains, dur=round(float(row['end_s'] or row['dur_s']), 3),
                pitch=(pk.get('note') or '').split(' ')[0] or None, allows=allows,
-               prior=0.8 if cat.startswith('pro_') else 0.9)(_render(row['id'], takes))
+               prior=0.7 if cat.startswith('pro_') else 0.8)(_render(row['id'], takes))
 
 
 register()

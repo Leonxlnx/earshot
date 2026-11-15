@@ -70,7 +70,9 @@ def register(design, table, domains, axes=('bright', 'hard', 'ring', 'size', 'sp
         n = len(fig.get('steps', (0,)))
         g = fig.get('gap', 0.09)
         dur = float(np.sum(np.broadcast_to(g, (max(1, n - 1),)))) * (n > 1) + fig.get('last', 0.6)
-        design(sid, kind=f['kind'], says=f['says'], uses=f['uses'], tags=tuple(f.get('tags', ())) + ('tonal',),
+        # a figure of pitched notes is what requests call a chime, a ding or a bell, whatever its job
+        uses = tuple(f['uses']) + (('chime',) if f['kind'] in ('chime', 'figure', 'note', 'stinger') else ())
+        design(sid, kind=f['kind'], says=f['says'], uses=uses, tags=tuple(f.get('tags', ())) + ('tonal',),
                domains=f.get('domains', domains), dur=round(dur, 2), pitch=fig.get('root', 'C6'), axes=axes,
                voice=fig.get('voice') or DEFAULT_VOICE, allows=f.get('allows', ()), prior=f.get('prior', 1.0))(fn)
 

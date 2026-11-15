@@ -649,7 +649,8 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
     impacts, risers, braams, logos), instrument notes, pads and ambience loops. The answer names the design chosen
     and why, what else would fit (`also`), and any words that were not understood, so one call is usually enough;
     call again with `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to
-    steer. Everything made is free to use in any product."""
+    steer. Use it whenever a product, a game or a film needs a sound and no recording is at hand; use make_set
+    when it needs several that belong together. Everything made is free to use in any product."""
     from . import make as M
     return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
                              dur=dur, voice=voice, seed=seed, listen=listen), full, _summary_only(M.make))
@@ -692,7 +693,8 @@ def tool_sounds(search: Annotated[str | None, Field(description='words to rank t
                                                                 '"note"')] = None,
                 full: Full = False) -> str:
     """List the sounds `make` can make (no models, instant): id, usual length and what each sounds like. Filter with
-    search, domain or family: the whole catalogue is several hundred lines."""
+    search, domain or family: the whole catalogue is several hundred lines. Use it to see what exists before naming
+    a `sound` in make or make_set; a plain request in words to make does not need it."""
     from . import make as M
     if not (search or domain or family):
         def fams():
@@ -703,7 +705,7 @@ def tool_sounds(search: Annotated[str | None, Field(description='words to rank t
             r['text'] = f"{len(r['sounds'])} sounds in {len(by)} families (search, domain or family lists them): " \
                 + '; '.join(f"{f}: {', '.join(m[:6])}{' ...' if len(m) > 6 else ''}" for f, m in by.items())
             return r
-        return _run('sounds', {}, full, lambda: dict(fams(), brief=True))
+        return _run('sounds', {}, full, lambda: (lambda r: dict(r, summary=r['text'], brief=True))(fams()))
     return _run('sounds', dict(search=search, domain=domain, family=family), full, _summary_only(M.sounds))
 
 
