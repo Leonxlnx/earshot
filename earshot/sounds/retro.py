@@ -10,7 +10,7 @@ from .registry import design
 
 # chip generator -> (design id, kind, the jobs it plays, audit findings that are its design)
 SOUNDS = {
-    'coin': ('coin/chip', 'chime', ('coin', 'pickup', 'collect', 'score'), ('rising_glide',)),
+    'coin': ('coin/chip', 'chime', ('coin', 'pickup', 'collect', 'score', 'ding'), ('rising_glide',)),
     'pickup': ('pickup/chip', 'chime', ('pickup', 'item', 'collect', 'heal'), ('rising_glide',)),
     'jump': ('jump/chip', 'zap', ('jump', 'hop'), ('rising_glide',)),
     'double_jump': ('jump/chip_double', 'zap', ('double jump', 'jump', 'dash'), ('rising_glide', 'tail')),

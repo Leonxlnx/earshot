@@ -22,7 +22,7 @@ FIGURES = {
         kind='chime', says=('one small bright bell note with a faint octave above', 'a single soft high ding'),
         uses=('coin', 'pickup', 'collect', 'point'),
         fig=dict(steps=(0, 12), gap=0.012, root='E6', vel=0.5, vels=(1.0, 0.4), last=0.35, accent=0, spread=0.0,
-                 voice='celesta')),
+                 voice='glockenspiel')),
     'pickup/blip': dict(
         kind='chime', says=('three very fast rising plucked notes', 'a tiny quick upward run of notes'),
         uses=('pickup', 'item', 'collect', 'grab', 'ammo'), prior=1.1,

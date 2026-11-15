@@ -69,9 +69,9 @@ SCENES = {
 }
 ONCE = {
     'thunder/clap': ('thunder', {}, 7.0, ('a clap of thunder and a rolling rumble', 'thunder cracking overhead', 'a thunderclap'),
-                     ('thunder', 'lightning', 'storm', 'thunderclap')),
+                     ('thunder', 'lightning', 'storm', 'thunderclap', 'boom', 'crack')),
     'thunder/distant': ('thunder', dict(distance=0.8), 8.0, ('distant thunder rumbling', 'a far-off storm', 'low rolling thunder'),
-                        ('thunder', 'distant storm', 'rumble')),
+                        ('thunder', 'distant storm', 'rumble', 'boom')),
 }
 # what the audit finds in any scene of many small events and is the scene: single loud drops and crackles (clicks),
 # events after a lull (tail), a bird's or a bubble's rising chirp (rising_glide), the comb of a steady insect or chime
