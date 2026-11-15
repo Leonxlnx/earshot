@@ -161,6 +161,16 @@ def _dull(r, seconds, f, tau, attack=0.002, q=1.1):
     return dsp.fade(_norm(x), 0.0, min(0.03, 0.3 * seconds))
 
 
+def _heel(r, k, attack=0.002, tau=0.02, top=1100.0):
+    """a heel or a boot landing: 30-60 ms of broadband low noise (the shoe, the foot and the floor under it), weighted
+    toward 80-250 Hz but with no pitch of its own. Peak 1"""
+    n = dsp.n_of(0.12)
+    x = r.standard_normal(n) * _env(n, attack, _vary(r, tau, 0.2))
+    x = dsp.butter(x, 'low', top * k.f ** 0.5, order=2)
+    x = dsp.peq(x, 130 * k.f, 6.0, 0.7)
+    return dsp.fade(_norm(x), 0.0, 0.03)
+
+
 def _knock(r, lo, hi, tau):
     """a small piece landing: a noise knock in lo..hi Hz with a broad low resonance, a few ms long. Peak 1"""
     x = _burst(r, 8 * tau, lo, hi, tau, attack=0.001) + 0.6 * _dull(r, 8 * tau, 1.5 * lo, 1.5 * tau, 0.001)
@@ -224,28 +234,34 @@ def _aeolian(r, seconds, peak, fall, v_peak, d, r_in=0.3, r_out=1.0, sections=8,
     return dsp.fade(_norm(y), 0.002, 0.2 * seconds)
 
 
-def _creak(r, seconds, rate, modes, jitter=0.07, stick=0.08, sharp=0.6):
-    """stick-slip friction (a hinge, a lid): a train of slips whose rate follows the drive (`rate`: Hz per sample;
-    5-20 ms periods are a creak, 1-3 ms a squeak), with period jitter, stuck episodes and uneven slips, each slip
-    ringing the body's modes ((freqs, taus, amps)). Mono, peak 1"""
+def _creak(r, seconds, rate, formants, jitter=0.25, skip=0.1, stuck=0.04, grain=0.0015):
+    """stick-slip friction (a hinge, a lid, cold snow): slips at a rate that follows the drive (`rate`: Hz per
+    sample; 5-20 ms periods are a creak, 1-3 ms a squeak) but never steadily: each period jitters, a slip is now
+    and then missed (skip), the surfaces now and then hold for 20-60 ms (stuck), and every slip is a short burst of
+    noise of its own size, not an impulse. The bursts excite the body's broad resonances (formants: (Hz, q, gain)).
+    A periodic train of identical clicks through sharp modes would be a buzzing tone; this is a rough, wandering
+    creak (Farnell, creaking door). Mono, peak 1"""
     n = dsp.n_of(seconds)
-    pulses = np.zeros(n)
+    exc = np.zeros(n)
+    top = rate.max() + 1e-9
     i = 0
-    while True:
-        f = rate[min(i, n - 1)]
+    while i < n:
+        f = rate[i]
         if f <= 1.0:
             i += dsp.n_of(0.004)
-        else:
-            i += max(2, int(SR / f * (1 + jitter * r.standard_normal())))
-        if i >= n:
-            break
-        if f > 1.0 and r.uniform() > stick:
-            pulses[i] += (1 + 0.3 * r.standard_normal()) * (f / rate.max()) ** 0.5
-    fr, ta, am = modes
-    ir = dsp.modal(fr, ta, am, max(0.02, 6 * max(ta)), r, jitter=0.0)
-    ir = ir * _env(len(ir), 0.0004 / max(sharp, 0.1), 1.0)
-    y = signal.fftconvolve(pulses, ir)[:n]
-    return dsp.fade(_norm(y), 0.002, 0.04)
+            continue
+        if r.uniform() < stuck:
+            i += dsp.n_of(r.uniform(0.02, 0.06))
+            continue
+        i += max(2, int(SR / f * (1 + jitter * r.standard_normal())))
+        if i >= n or r.uniform() < skip:
+            continue
+        L = max(4, dsp.n_of(grain * r.uniform(0.6, 1.6)))
+        size = np.exp(np.clip(0.4 * r.standard_normal(), -0.8, 0.5))
+        seg = r.standard_normal(L) * np.hanning(L) * (f / top) ** 0.5 * size
+        exc[i:i + L] += seg[:n - i]
+    y = sum(g * dsp.svf(exc, fc, q, 'bandn') for fc, q, g in formants)
+    return dsp.fade(_norm(dsp.butter(y, 'low', 5000.0)), 0.002, 0.04)     # a lone slip, unfiltered, is a click
 
 
 def _disperse(x, a=-0.88, stages=200):
@@ -423,28 +439,29 @@ def jump_heavy(c, r):
               'a muffled footfall'),
         uses=('land', 'landing', 'touch down', 'drop down'), domains=DOM, dur=0.25, axes=AXES)
 def land_soft(c, r):
-    """feet landing: the heel contact (a few ms, soft shoe on ground) through the ground's low thump, two feet a
-    few ms apart, grit kicked by the landing (power-law grains), a cloth flap"""
+    """feet landing: two heels a few ms apart, each a broadband low thud (soft soles on ground: no pitch), the
+    contact's scuff, grit kicked by the landing (power-law grains), a cloth flap"""
     k = _k(c)
     T = 0.28 * k.L
     n = dsp.n_of(T)
-    thump = _thump(r, T, 120 * k.f, 68 * k.f, 0.025, 0.045 * k.L, attack=0.003 * k.tc, harm=0.3)
-    contact = _burst(r, 0.06, 120 * k.f, 1600, 0.012 * k.tc, attack=0.0015 * k.tc)
+    thump = _heel(r, k, 0.003 * k.tc, 0.035 * k.L, 900)
+    contact = _burst(r, 0.06, 150 * k.f, 2500, 0.01 * k.tc, attack=0.0015 * k.tc)
     gap = r.uniform(0.006, 0.02)
     m = r.integers(10, 20)
     tg = r.uniform(0.002, 0.05, m) ** 1.0
     grit = _grains(r, n, tg, _power(r, m, 0.02, 0.5) * 0.4, _logu(r, 1500, 6500, m),
-                   r.uniform(1.0, 3.0, m), r.uniform(0.0005, 0.002, m))
+                   r.uniform(0.7, 1.5, m), r.uniform(0.001, 0.002, m))
     cloth = _burst(r, 0.08, 2000, 7000, 0.02, attack=0.004)
-    y = _mix([(thump, 0, 0 + k.lo), (contact, 0, -9 + k.h), (thump, gap, -12 + k.lo), (contact, gap, -15 + k.h),
-              (cloth, 0.004, -22)])
+    body = _thump(r, 0.2, 110 * k.f, 70 * k.f, 0.02, 0.04 * k.L, attack=0.003, harm=0.3)
+    y = _mix([(thump, 0, 0 + k.lo), (body, 0, -6 + k.lo), (contact, 0, -8 + k.h), (thump, gap, -12 + k.lo),
+              (contact, gap, -14 + k.h), (cloth, 0.004, -15)])
     y = fx.saturate(y, 4.0, 'tanh', level='rms')                                # the rare noise peak tamed
-    return _out(c, y, _norm(grit) * 10 ** ((-18 + k.h) / 20) * np.abs(y).max(), room='room', spread=0.25)
+    return _out(c, y, _norm(grit) * 10 ** ((-14 + k.h) / 20) * np.abs(y).max(), room='room', spread=0.25)
 
 
 @design('land/heavy', kind='thud', says=('a heavy body thudding onto the ground with a deep boom',
                                         'a deep thud with dust and a short rattle', 'a big heavy landing impact'),
-        uses=('land', 'heavy landing', 'stomp', 'ground pound', 'slam'), domains=DOM, dur=0.7, axes=AXES)
+        uses=('land', 'heavy landing', 'stomp', 'ground pound'), domains=DOM, dur=0.7, axes=AXES)
 def land_heavy(c, r):
     """a heavy body lands: a sub thud (the ground and the body, pitch falling as the floor relaxes), the knock of
     the contact through the floor's modes, dust (low-passed noise swelling a little after), then a short rattle of
@@ -514,35 +531,30 @@ def _step(c, r, surface):
         layers.append((_burst(r, 0.03, 1500, 6000, 0.008, attack=0.003), tt + 0.01, -22))
         y = _mix(layers, T)
     elif surface == 'stone':
+        # a hard sole on stone: the heel thud with a sharp broadband tick on top, a scuff of grit as the foot rolls
         layers = []
         for t0, v in ((th, hv), (tt, tv)):
-            tick = _burst(r, 0.02, 1200, 6000 * k.f ** 0.5, 0.0012 * k.tc, attack=0.0002)
-            heel = _strike(r, _logu(r, 1800, 7500, 9) * k.f ** 0.5, r.uniform(0.002, 0.005, 9),
-                           r.uniform(0.3, 1.0, 9), 0.04, 0.0003 * k.tc)          # a hard heel: a few short modes
-            thump = _dull(r, 0.08, 110 * k.f, 0.018)
+            tick = _burst(r, 0.02, 1500, 9000 * k.f ** 0.5, 0.0015 * k.tc, attack=0.0002)
             g = 20 * np.log10(v)
-            layers += [(tick, t0, g + k.h), (heel, t0, g - 6 + k.h), (thump, t0, g - 3 + k.lo)]
-        m = r.integers(8, 16)
-        ev = _grains(r, n, tt + r.uniform(0.0, 0.035, m), _power(r, m, 0.05, 1.0) * 0.3,
-                     _logu(r, 2500, 8000, m), r.uniform(1, 2.5, m), r.uniform(0.0004, 0.0015, m))
+            layers += [(_heel(r, k, 0.0015, 0.015), t0, g - 2 + k.lo), (tick, t0, g - 3 + k.h)]
+        layers.append((_burst(r, 0.06, 1200, 7000, 0.015, attack=0.006), tt + 0.008, -16))
+        m = r.integers(10, 20)
+        ev = _grains(r, n, tt + r.uniform(0.0, 0.04, m), _power(r, m, 0.05, 1.0) * 0.3,
+                     _logu(r, 2000, 7000, m), r.uniform(0.7, 1.5, m), r.uniform(0.001, 0.002, m))
         y = _mix(layers, T)
-        ev = _norm(ev) * 10 ** (-22 / 20)
+        ev = _norm(ev) * np.abs(y).max() * 10 ** (-16 / 20)
         room = 'studio'
     elif surface == 'metal':
+        # a boot on a steel deck: the boot's thud, the plate ringing dull (dense low modes damped by the weight on
+        # it, 0.1-0.4 s) under a rough band of noise, the grating rattling; a 2 ms rubber contact keeps the top soft
         layers = []
-        f0 = _vary(r, 520 * k.f, 0.06)
-        rat = np.concatenate([[1.0, 1.73, 2.33, 3.91, 4.11, 6.3, 6.71, 8.91, 10.07], r.uniform(1.2, 20, 12)])
-        rat = rat * (1 + 0.02 * r.standard_normal(len(rat)))
         for t0, v in ((th, hv), (tt, tv)):
-            fr = f0 * rat
-            amp = r.uniform(0.3, 1.0, len(fr)) * (fr / f0) ** -0.3
-            plate = _strike(r, fr, 0.045 * k.ring * (fr / 1000) ** -0.5, amp, 0.3, 0.0009 * k.tc, grit=0.5)
-            plate = _norm(plate + 0.5 * _burst(r, 0.3, 800, 9000, 0.02, attack=0.0003))
-            thump = _dull(r, 0.1, 110 * k.f, 0.02)
+            plate = _cloud(r, 160 * k.f, 2600 * k.f, 40, 0.07 * k.ring, 0.015, 0.4, 0.002 * k.tc, tilt=-4.0,
+                           rough=0.7)
             g = 20 * np.log10(v)
-            rattle = [(_knock(r, 1200 * k.f, 7000, 0.004), t0 + d, g - 8 - 4 * i)        # the grating rattling
-                      for i, d in enumerate(np.cumsum(r.uniform(0.008, 0.02, 3)))]
-            layers += [(plate, t0, g), (thump, t0, g - 5 + k.lo)] + rattle
+            rattle = [(_knock(r, 900 * k.f, 5000, 0.004), t0 + d, g - 12 - 3 * i)        # the grating rattling
+                      for i, d in enumerate(np.cumsum(r.uniform(0.01, 0.025, 3)))]
+            layers += [(_heel(r, k, 0.0015, 0.02), t0, g + k.lo), (plate, t0, g - 3)] + rattle
         y = _mix(layers, T + 0.1)
     elif surface == 'gravel':
         # PhISEM (Cook): stones colliding at a Poisson rate that follows the rise of the force, power-law energies
@@ -557,37 +569,41 @@ def _step(c, r, surface):
         y = _mix([(grind, 0, -10), (thump, th, -9 + k.lo)], T)
         ev = ev * 10 ** (k.h / 3 / 20)
     elif surface == 'snow':
-        # compaction (Fontana and Bresin 2003): crumpling events whose rate grows through the stance, power-law energy
+        # compaction (Fontana and Bresin 2003): crumpling events whose rate grows through the stance, power-law
+        # energy; cold snow also squeaks: short stick-slip episodes of the grains rubbing (periods near 1 ms)
         comp = np.cumsum(F) / SR
-        tt_ = _rate_times(r, n, F * (0.3 + comp / comp.max()), 6000.0, 4000.0 / F.max())
+        tt_ = _rate_times(r, n, F * (0.3 + comp / comp.max()), 8000.0, 5000.0 / F.max())
         m = len(tt_)
-        ev = _grains(r, n, tt_, _power(r, m, 0.02, 1.0, 1.5), _logu(r, 400, 5000, m) * k.f ** 0.5,
-                     r.uniform(1.0, 2.5, m), r.uniform(0.001, 0.004, m), sharp=0.8)
-        ev = _norm(dsp.butter(ev, 'low', 6000))
-        thump = _dull(r, 0.12, 120 * k.f, 0.03, attack=0.008)
-        y = _mix([(thump, th, -20 + k.lo)], T)
-        room = 'room'
+        ev = _grains(r, n, tt_, _power(r, m, 0.02, 1.0, 1.5), _logu(r, 500, 4500, m) * k.f ** 0.5,
+                     r.uniform(0.7, 1.5, m), r.uniform(0.001, 0.003, m), sharp=0.8)
+        ev = _norm(ev)
+        squeak = np.zeros(n)
+        for _ in range(r.integers(1, 3)):
+            a, d = r.uniform(th + 0.01, tt + 0.03), r.uniform(0.015, 0.04)
+            rate = np.where((_t(n) > a) & (_t(n) < a + d), _vary(r, 900, 0.2) * k.f ** 0.5, 0.0)
+            squeak += _creak(r, T, rate, [(_vary(r, 1800, 0.2), 3.0, 1.0), (3200, 3.0, 0.5)], jitter=0.2, stuck=0.0)
+        y = _mix([(_heel(r, k, 0.008, 0.03, 600), th, -8 + k.lo), (squeak, 0, -9 + k.h)], T)
+        ev = ev * np.abs(y).max() * 1.2
     else:      # grass
-        # no heel transient: a high swish following the force (slow 30-60 ms attack) and sparse blade rustles
-        swish = dsp.butter(r.standard_normal(n), 'high', 2200 * k.f ** 0.5) * np.sqrt(F)
-        swish = dsp.svf(swish, 5000, 0.6, 'low')
-        tt_ = _rate_times(r, n, F, 3000.0, 1800.0 / F.max())
+        # a soft crunch: many small dry events (blades and stalks snapping, 2-6 kHz, broad, no pitch) at a rate
+        # following the force, over a soft heel; almost no tone at all
+        tt_ = _rate_times(r, n, F, 6000.0, 3500.0 / F.max())
         m = len(tt_)
-        ev = _grains(r, n, tt_, _power(r, m, 0.05, 1.0, 1.5), _logu(r, 1200, 8000, m),
-                     r.uniform(1.0, 2.5, m), r.uniform(0.001, 0.004, m), sharp=0.6)
-        thump = _dull(r, 0.12, 100 * k.f, 0.03, attack=0.006)
-        y = _mix([(swish, 0, -8 + k.h / 2), (thump, th, -12 + k.lo)], T)
-        ev = _norm(ev) * np.abs(y).max()
+        ev = _grains(r, n, tt_, _power(r, m, 0.05, 1.0, 1.5), _logu(r, 2000, 6500, m),
+                     r.uniform(0.6, 1.2, m), r.uniform(0.001, 0.002, m), sharp=0.9)
+        swish = dsp.butter(r.standard_normal(n), 'high', 2500) * np.sqrt(F)
+        y = _mix([(_heel(r, k, 0.006, 0.025, 700), th, -9 + k.lo), (swish, 0, -20 + k.h / 2)], T)
+        ev = _norm(ev) * np.abs(y).max() * 1.6
     return _out(c, y, ev, room=room, spread=0.2)
 
 
 STEPS = {
-    'grass': ('a soft footstep in grass, a brushing rustle', 'feet swishing through grass'),
+    'grass': ('a soft crunchy footstep in dry grass', 'a foot stepping on grass and leaves'),
     'wood': ('a footstep on a wooden floor, heel then toe', 'a hollow knock of a shoe on floorboards'),
     'stone': ('a hard footstep on stone, a sharp heel click', 'a shoe tapping on a concrete floor'),
     'gravel': ('a crunchy footstep on gravel', 'feet crunching on loose stones'),
-    'snow': ('a muffled crunching footstep in snow', 'a boot compacting fresh snow'),
-    'metal': ('a footstep on a metal grating, a ringing clank', 'a boot on a metal plate floor'),
+    'snow': ('a crunchy squeaky footstep in snow', 'a boot crunching into packed snow'),
+    'metal': ('a heavy boot step on a metal floor', 'a footstep on a steel plate, a dull metallic clunk'),
 }
 
 
@@ -606,7 +622,7 @@ for _s, _says in STEPS.items():
 # ------------------------------------------------------------------------------------------------ swings and dashes
 @design('dash/air', kind='whoosh', says=('a fast short whoosh of air that drops in pitch as it passes',
                                         'a quick swoosh rushing by', 'a fast air swish'),
-        uses=('dash', 'dodge', 'sprint', 'swish', 'quick whoosh'), domains=DOM, dur=0.4, axes=AXES)
+        uses=('dash', 'dodge', 'sprint', 'lunge', 'speed burst'), domains=DOM, dur=0.4, axes=AXES)
 def dash_air(c, r):
     """a fast body rushing past the ear: air turbulence with a faint wandering whistle carried past at 55 m/s and
     under a metre (fx.doppler: the pitch falls fastest at the closest point, the level peaks sharply with 1 / r),
@@ -696,18 +712,21 @@ def hit_punch(c, r):
     return _out(c, y, room='room', spread=0.2)
 
 
-@design('hit/slap', kind='hit', says=('a sharp slap of a hand on skin', 'a bright stinging smack', 'a flat crisp slap'),
+@design('hit/slap', kind='hit', says=('a sharp slap of a hand on skin', 'a crisp smack', 'a face slap'),
         uses=('slap', 'hit', 'smack', 'clap'), domains=DOM, dur=0.2, axes=AXES)
 def hit_slap(c, r):
     """an open hand on skin: the air trapped between them is pushed out in a few ms, a broad crack peaking at
-    1-4 kHz, with the slight body of the cheek or arm below it and a short room"""
+    1-4 kHz, the fingers landing 2-5 ms after the palm, the slight body of the cheek or arm below, a short room"""
     k = _k(c)
     T = 0.2 * k.L
-    crack = _burst(r, 0.06, 800 * k.f ** 0.5, 6000, 0.006 * k.tc, attack=0.0003)
-    crack = dsp.peq(crack, _vary(r, 2200, 0.15) * k.f ** 0.5, 6.0, 1.2)
-    skin = _cloud(r, 250 * k.f, 1100 * k.f, 8, 0.02, 0.008, 0.1, 0.0015 * k.tc)
-    thump = _dull(r, 0.1, 220 * k.f, 0.02)
-    y = _mix([(crack, 0, 0 + k.h / 2), (skin, 0, -6), (thump, 0, -10 + k.lo)], T)
+    crack = _burst(r, 0.05, 700 * k.f ** 0.5, 9000, _vary(r, 0.004, 0.3) * k.tc, attack=0.0002)
+    crack = dsp.peq(crack, _vary(r, 2500, 0.15) * k.f ** 0.5, 5.0, 1.0)
+    fingers = _burst(r, 0.03, 1500, 9000, 0.0025 * k.tc, attack=0.0002)
+    skin = _cloud(r, 250 * k.f, 1400 * k.f, 12, r.uniform(0.01, 0.035), 0.006, 0.12, 0.001 * k.tc)   # cheek or arm
+    thump = _dull(r, 0.1, 250 * k.f, 0.015)
+    crack = dsp.butter(crack, 'high', 900.0)
+    y = _mix([(crack, 0, 0 + k.h / 2), (fingers, r.uniform(0.002, 0.008), r.uniform(-8, -2) + k.h / 2),
+              (skin, 0, r.uniform(-15, -9)), (thump, 0, -20 + k.lo)], T)
     return _out(c, y, room='room', spread=0.25)
 
 
@@ -1050,15 +1069,45 @@ def laser_beam(c, r):
 
 
 # ------------------------------------------------------------------------------------------------ doors and chests
-def _latch(r, k, size=1.0):
-    """a small metal latch: a few modes at 1.8-6 kHz struck by steel, short"""
-    f = _logu(r, 1800, 6000, 4) * k.f ** 0.4 / size
+def _slips(r, seconds, rate, modes, jitter=0.15, stick=0.15):
+    """a lid's hinge: single slips at a jittered rate that follows the drive, each ringing the lid's modes ((freqs,
+    taus, amps), dying between slips). Heard through earshot's ears as a creaking lid (z 3.1), where the same
+    model on a door read as a tone: a lid creaks slower and lower. Mono, peak 1"""
+    n = dsp.n_of(seconds)
+    pulses = np.zeros(n)
+    i = 0
+    while True:
+        f = rate[min(i, n - 1)]
+        i += dsp.n_of(0.004) if f <= 1.0 else max(2, int(SR / f * (1 + jitter * r.standard_normal())))
+        if i >= n:
+            break
+        if f > 1.0 and r.uniform() > stick:
+            pulses[i] += (1 + 0.3 * r.standard_normal()) * (f / rate.max()) ** 0.5
+    fr, ta, am = modes
+    ir = dsp.modal(fr, ta, am, max(0.02, 6 * max(ta)), r, jitter=0.0) * _env(dsp.n_of(max(0.02, 6 * max(ta))),
+                                                                              0.0007, 1.0)
+    return dsp.fade(_norm(signal.fftconvolve(pulses, ir)[:n]), 0.002, 0.04)
+
+
+def _ping_latch(r, k):
+    """the hasp of a chest: a few short metal modes at 1.8-6 kHz struck by steel"""
+    f = _logu(r, 1800, 6000, 4) * k.f ** 0.4
     return _strike(r, f, r.uniform(0.004, 0.015, 4), r.uniform(0.4, 1, 4), 0.06, 0.00015 * k.tc, grit=0.6)
 
 
-def _door_modes(r, k, lo=110, hi=1800, count=8):
-    f = np.sort(_logu(r, lo, hi, count)) * k.f
-    return f, 0.008 * (f / 300) ** -0.4, r.uniform(0.3, 1, count) * (f / lo) ** -0.3   # dies between slips
+def _latch(r, k, size=1.0):
+    """a small metal latch: a snap of noise with a few short modes at 1.5-7 kHz in it (a bolt in its housing is
+    damped by the wood around it: 2-6 ms), never a clean ping"""
+    f = _logu(r, 1500, 7000, 8) * k.f ** 0.4 / size
+    y = _strike(r, f, r.uniform(0.002, 0.006, 8), r.uniform(0.4, 1, 8), 0.06, 0.00015 * k.tc, grit=0.6)
+    return _norm(y + 0.8 * _burst(r, 0.06, 1000, 9000, 0.004, attack=0.0002))
+
+
+def _panel(r, k, low=1.0):
+    """the broad resonances of a wooden panel a hinge creaks through: (Hz, q, gain), a little different per door"""
+    base = np.array([170.0, 420.0, 880.0, 1700.0, 3100.0]) * low * k.f
+    return [(f * np.exp(0.08 * r.standard_normal()), q, g) for f, q, g in
+            zip(base, (2.0, 2.5, 3.0, 3.0, 2.5), (1.0, 0.9, 0.7, 0.45, 0.25))]
 
 
 @design('door/open', kind='object', says=('a wooden door creaking open with a latch click', 'a creaky old door opening',
@@ -1066,7 +1115,7 @@ def _door_modes(r, k, lo=110, hi=1800, count=8):
         uses=('door', 'door open', 'creak', 'open'), domains=DOM, dur=1.1, axes=AXES)
 def door_open(c, r):
     """a wooden door: the handle and latch (two metal clicks and the knock of the bolt freeing), then the hinge
-    creaking (stick-slip at a slip rate that follows the swing: slow-fast-slow) through the door's board modes, and
+    creaking (stick-slip at a slip rate that follows the swing: slow-fast-slow) through the door's panel, and
     the air the door pushes"""
     k = _k(c)
     T = 1.15 * k.L
@@ -1075,17 +1124,14 @@ def door_open(c, r):
     t0, t1 = 0.16, 0.16 + _vary(r, 0.8, 0.05) * k.L
     v = np.clip((t - t0) / (t1 - t0), 0, 1)
     speed = np.sin(np.pi * v) ** 1.5 * (t < t1)
-    rate = (35 + 150 * speed * (1 + 0.2 * k.e)) * (speed > 0.03) / k.f ** 0.5
+    rate = (25 + 110 * speed * (1 + 0.2 * k.e)) * (speed > 0.03) / k.f ** 0.5
     rate = rate * np.exp(0.35 * dsp.wander(T, r, 5.0)[:n])         # the grip of the hinge changes as it turns
-    creak = _creak(r, T, rate, _door_modes(r, k), jitter=0.15, stick=0.15)
+    creak = _creak(r, T, rate, _panel(r, k), grain=0.0025)
     rub = dsp.butter(r.standard_normal(n), 'band', (300 * k.f, 3000 * k.f)) * speed
-    squeak = _creak(r, T, rate * _vary(r, 6.0, 0.15) * (speed > 0.4), ([_vary(r, 950, 0.1) * k.f], [0.015], [1]),
-                    jitter=0.04, stick=0.15)
     move = dsp.butter(r.standard_normal(n), 'band', (70 * k.f, 450 * k.f)) * speed
     knock = _cloud(r, 120 * k.f, 1500 * k.f, 20, 0.02, 0.006, 0.15, 0.002 * k.tc)
     y = _mix([(_latch(r, k), 0, -6 + k.h), (_latch(r, k, 1.2), 0.085, -3 + k.h), (knock, 0.09, -9),
-              (creak * speed, 0, -2), (squeak * speed, 0, -26), (_norm(move), 0, -14 + k.lo),
-              (_norm(rub), 0, -20)], T)
+              (creak * speed, 0, -2), (_norm(move), 0, -14 + k.lo), (_norm(rub), 0, -18)], T)
     return _out(c, dsp.fade(y, 0.0, 0.06), room='room', spread=0.3)
 
 
@@ -1152,9 +1198,10 @@ def chest_open(c, r):
     v = np.clip((t - t0) / (t1 - t0), 0, 1)
     speed = np.sin(np.pi * v) ** 1.3 * (t < t1)
     rate = (28 + 90 * speed) * (speed > 0.03) / k.f ** 0.5 * np.exp(0.35 * dsp.wander(T, r, 5.0)[:n])
-    creak = _creak(r, T, rate, _door_modes(r, k, 140, 2000, 8), jitter=0.15, stick=0.15)
+    f = np.sort(_logu(r, 140, 2000, 8)) * k.f
+    creak = _slips(r, T, rate, (f, 0.008 * (f / 300) ** -0.4, r.uniform(0.3, 1, 8) * (f / 140) ** -0.3))
     knock = _cloud(r, 140 * k.f, 1800 * k.f, 24, 0.025, 0.007, 0.2, 0.002 * k.tc)
-    y = _mix([(_latch(r, k), 0, -4 + k.h), (creak * speed, 0, -3), (knock, t1, -5 + k.lo)], T)
+    y = _mix([(_ping_latch(r, k), 0, -4 + k.h), (creak * speed, 0, -3), (knock, t1, -5 + k.lo)], T)
     m = r.integers(16, 24)
     ts = np.sort(t1 * 0.45 + r.uniform(0, 0.55, m) ** 1.3 * (T - t1 * 0.45 - 0.35))
     root = 523.25 * 2 ** (r.integers(-2, 3) / 12)
@@ -1370,12 +1417,12 @@ def teleport_in(c, r):
     t = _t(n)
     burst = dsp.svf(_air(T, r, center=2000, flutter=0.3), np.geomspace(5000 * k.f, 500 * k.f, n), 1.8, 'bandn')
     burst = dsp.fade(_norm(burst * _env(n, 0.006, 0.12 * k.ring)), 0.0, 0.05)
-    whoomp = _thump(r, 0.25, 160 * k.f, 90 * k.f, 0.03, 0.06, harm=0.2)
-    m = r.integers(12, 18)
-    ts = 0.02 + np.sort(r.uniform(0, 0.4, m) ** 1.5)
-    gl = _sparkle(r, n, ts, 1046.5, 2200, 9000, decay=(0.05, 0.18), spread=1.0, rise=1 - ts / ts.max())
-    y = _mix([(_pop(r, k, 600), 0, 0 + k.h), (burst, 0.004, -4), (whoomp, 0, -10 + k.lo)], T)
-    return _out(c, y, _norm(gl) * np.abs(y).max() * 10 ** (-3 / 20), room='room', spread=0.5)
+    whoomp = _dull(r, 0.25, 140 * k.f, 0.05)
+    m = r.integers(26, 36)
+    ts = 0.01 + np.sort(r.uniform(0, 0.75, m) ** 1.6) * 0.6 * k.L
+    gl = _sparkle(r, n, ts, 1046.5, 2200, 9000, decay=(0.06, 0.22), spread=1.0, rise=1 - ts / ts.max())
+    y = _mix([(_pop(r, k, 600), 0, -3 + k.h), (burst, 0.004, -5), (whoomp, 0, -10 + k.lo)], T)
+    return _out(c, y, _norm(gl) * np.abs(y).max() * 1.2, room='plate', spread=0.5)
 
 
 def _pad(r, k, root, seconds, level_db):
