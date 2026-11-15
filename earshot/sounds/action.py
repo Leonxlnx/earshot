@@ -705,7 +705,7 @@ def whoosh_pass(c, r):
 @design('hit/punch', kind='hit',
         says=('a punch landing on a body, a fast heavy thwack', 'a fist hitting flesh with a thud',
               'a meaty smack'),
-        uses=('punch', 'hit', 'melee', 'kick', 'smack', 'impact'), domains=DOM, dur=0.3, axes=AXES)
+        uses=('punch', 'hit', 'melee', 'karate kick', 'smack', 'impact'), domains=DOM, dur=0.3, axes=AXES)
 def hit_punch(c, r):
     """a fist on a body: the slap of skin (a short mid crack), the flesh and the chest below it (a dense, heavily
     damped body of modes at 150-700 Hz struck by a soft 3 ms contact), a pitch-dropping thump for weight, cloth"""

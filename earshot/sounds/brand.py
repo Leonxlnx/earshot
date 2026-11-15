@@ -23,7 +23,7 @@ FIGURES = {
     'logo/motif': dict(
         kind='stinger', says=('a four-note melodic signature that ends high and rings',
                               'up a fifth, down to the third, up to the octave'),
-        uses=('logo', 'brand', 'jingle', 'mnemonic', 'signature', 'sting'), allows=('tail',),
+        uses=('logo', 'brand', 'mnemonic', 'signature', 'sting'), allows=('tail',),
         fig=dict(steps=(0, 7, 4, 12), gap=(0.17, 0.17, 0.2), root='C5', vel=0.6, vels=(0.9, 1.0, 0.85, 1.0), last=2.0,
                  room='hall', spread=0.4)),
     'startup/rise': dict(

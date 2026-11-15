@@ -19,7 +19,7 @@ FIGURES = {
         uses=('coin', 'pickup', 'collect', 'score', 'money'), prior=1.15,
         fig=dict(steps=(0, 5), gap=0.07, root='B5', vel=0.6, vels=(0.8, 1.0), last=0.45, voice='glockenspiel')),
     'coin/soft': dict(
-        kind='chime', says=('one small bright bell note with a faint octave above', 'a single soft high ding'),
+        kind='chime', says=('one small high note with a faint octave above', 'a single soft high note'),
         uses=('coin', 'pickup', 'collect', 'point'),
         fig=dict(steps=(0, 12), gap=0.012, root='E6', vel=0.5, vels=(1.0, 0.4), last=0.35, accent=0, spread=0.0)),
     'pickup/blip': dict(
@@ -56,7 +56,7 @@ FIGURES = {
     # ---- endings
     'win/fanfare': dict(
         kind='stinger', says=('a rising six-note major fanfare ending on a long high chord',
-                              'a triumphant ascending phrase of bell-like notes'),
+                              'a triumphant ascending phrase'),
         uses=('win', 'victory', 'level complete', 'stage clear', 'fanfare', 'triumph', 'quest complete'),
         prior=1.1, allows=('tail',),
         fig=dict(steps=(0, 4, 7, 12, 16, 19, 24), gap=(0.095, 0.095, 0.095, 0.21, 0.15, 0.0), root='C5', vel=0.66,
@@ -69,7 +69,7 @@ FIGURES = {
                  last=1.1, room='hall', accent=0)),
     'checkpoint/chime': dict(
         kind='figure', says=('three rising notes: root, fifth and octave, the last ringing',
-                             'a calm open three-note chime'),
+                             'a calm open three-note figure'),
         uses=('checkpoint', 'save point', 'progress saved', 'flag', 'milestone'),
         fig=dict(steps=(0, 7, 12), gap=0.1, root='D5', vel=0.55, vels=(0.8, 0.9, 1.0), last=0.85, room='studio')),
     'secret/reveal': dict(

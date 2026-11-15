@@ -423,7 +423,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
 # a kind's level under the loudest sound of a set (LU): the more often a sound plays, the quieter it sits
 WEIGHT = {'tap': -10.0, 'tick': -12.0, 'click': -9.0, 'pop': -7.0, 'note': -5.0, 'chime': -3.0, 'figure': -2.0,
           'hit': -1.0, 'thud': -3.0, 'whoosh': -5.0, 'rise': -3.0, 'fall': -3.0, 'zap': -3.0, 'boom': 0.0,
-          'noise': -8.0, 'texture': -12.0, 'bed': -14.0, 'pad': -10.0, 'stinger': 0.0, 'voice': -5.0, 'object': -6.0}
+          'noise': -8.0, 'texture': -12.0, 'bed': -14.0, 'pad': -10.0, 'stinger': 0.0, 'voice': -5.0, 'object': -6.0,
+          'music': -8.0}
 
 
 def sounds(search=None, domain=None, kind=None, family=None):

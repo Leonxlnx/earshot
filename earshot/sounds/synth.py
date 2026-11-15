@@ -43,7 +43,7 @@ SOUNDS = {
                                                            'a rising noise swoosh transition'),
                     ('riser', 'sweep', 'transition', 'whoosh', 'build'), ('motion',), ('truncated',)),
     'stab/chord': ('stab', 'hit', 0.18, (0,), {}, ('a short punchy synthesizer chord stab', 'a minor chord synth hit'),
-                   ('stab', 'accent', 'hit', 'beat'), ('motion', 'music'), ()),
+                   ('stab', 'accent', 'hit', 'rhythm'), ('motion', 'music'), ()),
     'zap/laser': ('zap', 'zap', 0.25, (0,), {}, ('a science fiction laser shot, a descending synth zap with a body',
                                                  'a designed laser zap'),
                   ('laser', 'zap', 'shoot', 'blaster'), ('game', 'motion'), ()),

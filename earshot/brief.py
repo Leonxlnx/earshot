@@ -555,7 +555,7 @@ def read(text):
                 b['material'] = b['material'] or hit['p']
             if 'o' in hit:
                 domains[hit['o']] = domains.get(hit['o'], 0) + 2
-            if 'd' in hit:
+            if 'd' in hit and st['where'] != 'context':     # "a riser before the drop" still rises
                 b['dir'] += hit['d'] * (1 if st['scale'] > 0 else -1)
             if 'v' in hit:
                 v = hit['v']
@@ -574,7 +574,7 @@ def read(text):
                 c, where = hit['c'], None
                 if j < n_tok and toks[j] in L.ENVELOPE_WORDS:
                     where = 'parts'            # "a short shimmering decay": how it ends, not what it is
-                elif c in L.VERB_JOBS and _next_concept(toks, j):
+                elif c in L.VERB_JOBS and _next_concept(toks, j) not in (None, c):
                     where = 'parts'            # "grabs a speed boost": the thing grabbed is the sound
                 elif j - i == 1 and t in L.COLOUR_WORDS:
                     where = 'parts'            # "a windy zip": the weather colours the sound
@@ -682,9 +682,10 @@ def _terms(row):
     """a design's words by field ({'uses', 'name', 'says', 'tags'}: sets), its own jobs ('family': its family's
     concept; 'first': its first use), what it feels like ('feel': hint words) and which way it moves ('dir')"""
     t = {f: set() for f in FIELD_WEIGHT}
-    feel, d = set(), 0
+    feel, d, alias = set(), 0, set()
     fam, _, nm = row['id'].partition('/')
-    for field, texts in (('uses', row['uses']), ('name', (fam, nm)), ('says', row['says']),
+    sense = L.FAMILY_SENSE.get(fam)              # 'rise/air' is a riser, 'crash/dark' a cymbal
+    for field, texts in (('uses', row['uses']), ('name', (sense or fam, nm)), ('says', row['says']),
                          ('tags', list(row['tags']) + [row['kind'], row.get('material') or ''])):
         for s in texts:
             c, rest, f, dd = _parse_plain(str(s).replace('_', ' '))
@@ -695,6 +696,10 @@ def _terms(row):
                 t['tags'].update(rest)                      # day'; "day" alone only as much as a tag
             else:
                 t[field].update(rest)
+            if field == 'uses' and len(c) == 1 and not rest and s != (row.get('voice') or '').replace('_', ' '):
+                own = {stem(w) for w in c[0].split('_')}    # a job by another word for it ('beat', 'menu music' are
+                #                                             music) is that job said so; a note's voice is a voice
+                alias.update(f'fam:{stem(w)}:{c[0]}' for w in content if stem(w) not in own)
             if field == 'uses' and len(content) == 1:
                 t[field].add('sw:' + stem(content[0]))     # the word itself, also when it names a job
             feel.update(f)
@@ -709,11 +714,14 @@ def _terms(row):
         v = L.VOICE_FAMILIES.get(part)
         if v and fam in ('mallet', 'pluck'):
             t['uses'].add('voice:' + v)
-    t['family'] = set(_parse_plain(fam.replace('_', ' '))[0])
+    t['family'] = {sense} if sense else set(_parse_plain(fam.replace('_', ' '))[0])
     for c in list(t['uses'] | t['family']):        # a swish is also a whoosh, a sub drop also an impact
         if c in L.BROADER and L.BROADER[c] not in t['uses']:
             t['tags'].add(L.BROADER[c])
-    t['exact'] = fam if fam in L.CONCEPTS else None             # 'power_up/chip' is a power-up by name
+    t['exact'] = sense or (fam if fam in L.CONCEPTS else None)  # 'power_up/chip' is a power-up by name
+    # a family named by another word for its job: 'tock/wood' is a knock that "a tock" asks for by name
+    t['alias'] = alias | {f'fam:{stem(fam)}:{c}' for c in t['family'] if '_' not in fam
+                          and stem(fam) not in {stem(w) for w in c.split('_')}}   # not 'coins/', the coin by its plural
     t['mats'] = {L.MATERIALS[w] for s in list(row['says']) + [nm] + list(row['tags'])
                  for w in tokens(str(s).replace('_', ' ')) if w in L.MATERIALS}
     if row.get('material'):
@@ -741,10 +749,13 @@ def index(rows):
         for w in t['feel']:
             inv.setdefault('feel:' + w, []).append((k, FIELD_WEIGHT['says']))
             df['feel:' + w] = df.get('feel:' + w, 0) + 1
+        for w in t['alias']:
+            inv.setdefault(w, []).append((k, FIRST_USE_BONUS))     # the job called by the request's word
+            df[w] = df.get(w, 0) + 1
     n = max(1, len(rows))
     # a job the request names is not less telling for being common in the catalogue: canonical words get a flatter
     # weight than plain words
-    return rows, terms, inv, {w: 1.0 + (CONCEPT_IDF if w in L.CONCEPTS or w.startswith('voice:') else 1.0)
+    return rows, terms, inv, {w: 1.0 + (CONCEPT_IDF if w in L.CONCEPTS or w.startswith(('voice:', 'fam:')) else 1.0)
                               * math.log(n / k) for w, k in df.items()}
 
 
@@ -776,12 +787,18 @@ def _query(b):
     head = next((c for c in b['concepts'] if c not in L.GENERIC), None)
     for c in b['concepts']:
         q[c] = HEAD_WEIGHT if c == head else max(q.get(c, 0.0), CONCEPT_WEIGHT)
+        for w in said.get(c, '').split():           # "a tock": the family called so ('tock/', a knock) by name
+            if w not in ARTICLES:
+                q[f'fam:{stem(w)}:{c}'] = q[c]
     for c, w in list(q.items()):
         up = L.BROADER.get(c)
         if up and up not in q and w >= CONTEXT_WEIGHT:
             q[up] = BROADER_WEIGHT * w
-    if b.get('dir') and not (b['concepts'] or b.get('parts') or b.get('context')):
-        q['riser' if b['dir'] > 0 else 'downlifter'] = CONTEXT_WEIGHT   # "something that keeps climbing"
+    if not (b['concepts'] or b.get('parts') or b.get('context')):
+        if b.get('dir'):
+            q['riser' if b['dir'] > 0 else 'downlifter'] = CONTEXT_WEIGHT   # "something that keeps climbing"
+        elif b.get('loop'):
+            q['music'] = PART_WEIGHT                                       # "a loop for a video": music
     return q
 
 
@@ -927,7 +944,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             if w.startswith('sw:') and k not in why:
                 continue                  # a word said only breaks ties between designs found otherwise
             score[k] = score.get(k, 0.0) + qw * idf.get(w, 1.0) * fw
-            if not w.startswith(('feel:', 'sw:')):
+            if not w.startswith(('feel:', 'sw:', 'fam:')):
                 why.setdefault(k, []).append(w.replace('voice:', ''))
     mat, dom, loop = b.get('material'), b.get('domain'), b.get('loop')
     pool = ([k for k in score if k in why] or [k for k in score if dom in rows[k].get('domains', ())]
@@ -953,6 +970,8 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             s *= 1.0 if retro else 0.05 if only_retro else 0.25   # chip sound asked for: only chip
         elif retro:
             s *= 0.35                                          # chip sound only when asked for
+        if row.get('kind') == 'music' and q.get('music', 0.0) < PART_WEIGHT:
+            s *= 0.35         # music only when asked for (not only where it plays): its other jobs say where it plays
         elif mat and mat in t['mats']:
             s *= 1.3
         if loop and not row.get('loop'):
@@ -1016,18 +1035,38 @@ def _said_seq(text):
 
 def _compound(sid, seq):
     """True when a request says a design's name followed by its family, word for word: "a warm pad", "tiny drip",
-    "punch cut hit" (the head noun last, as English compounds go), and not after "with", "and" or "of" in its
-    clause ("a swell of airy chimes and a warm pad": a part, not the sound)"""
+    "punch cut hit" (the head noun last, as English compounds go, and a noun: "deep booming" is no boom/deep), and
+    not after "with", "and" or "of" in its clause ("a swell of airy chimes and a warm pad": a part, not the sound)"""
     fam, name = sid.split('/')
     want = [stem(p) for p in name.split('_')] + [stem(p) for p in fam.split('_')]
     stems = [s for s, _ in seq]
     for k in range(len(stems) - len(want) + 1):
-        if stems[k:k + len(want)] == want:
+        last = seq[k + len(want) - 1][1] if stems[k:k + len(want)] == want else None
+        if last and (last == fam.split('_')[-1] or not modifier(last)):
             before = [w for _, w in seq[:k]]
             clause = before[len(before) - before[::-1].index(','):] if ',' in before else before
             if not set(clause) & {'with', 'and', 'of'}:
                 return True
     return False
+
+
+def _twin(sid, out, idx):
+    """the member of the same name in a family that answers the same job and ranks above sid's ("a deep impact":
+    the bank's impact/deep is named word for word, but boom/deep, the film family's deep member, ranks above it), or
+    None"""
+    if not idx:
+        return None
+    if _cache.get('pos_key') != id(idx):
+        _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(idx[0])}
+    pos, terms = _cache['pos'], idx[1]
+    fam, name, jobs = sid.split('/')[0], _name_words(sid), terms[pos[sid]]['family']
+    for r in out:
+        if r['id'] == sid:
+            return None
+        t = terms[pos[r['id']]]
+        if r['id'].split('/')[0] != fam and _name_words(r['id']) == name and jobs & (t['family'] | t['uses']):
+            return r['id']
+    return None
 
 
 def _named_member(b, out, idx=None):
@@ -1054,6 +1093,7 @@ def _named_member(b, out, idx=None):
         full.append((len(_name_words(i)) + len(_family_words(i)), score.get(i, 0.0), -k, i))
     if full:
         sid = max(full)[3]
+        sid = _twin(sid, out, idx) or sid
         if out and out[0]['id'] == sid:
             return out
         old = next((r for r in out if r['id'] == sid), {'id': sid, 'why': []})

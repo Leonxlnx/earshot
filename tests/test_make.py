@@ -145,7 +145,7 @@ def test_also_is_filled_from_the_catalogue(tmp_path):
         assert len(part.split(' (', 1)[1]) <= 44, part                 # about 40 characters each
     res = make('pause menu open', str(tmp_path / 'p.wav'))
     s = res['summary']
-    assert 'also (the pick is a guess' in s and 'open/lift (two soft notes rising a fifth)' in s
+    assert 'also (the pick is a guess' in s and 'open/lift' in s     # "menu open" is a job of open/lift: the pick
     res = make('crickets at night', str(tmp_path / 'n.wav'), dur=2, loop=False)
     assert len(res['also']) == 3 and 'also: ' + ', '.join(res['also']) in res['summary']
     assert sum(1 for ln in res['summary'].splitlines() if 'also' in ln) == 1

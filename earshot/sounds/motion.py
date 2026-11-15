@@ -586,7 +586,7 @@ def boom_deep(c, r):
 
 @design('boom/short', kind='boom',
         says=('a short deep sub hit', 'a tight low punchy thud', 'a quick bass drum boom'),
-        uses=('impact', 'hit on a cut', 'low hit', 'punch', 'cut'), domains=FILM, dur=0.42, axes=RING)
+        uses=('impact', 'hit on a cut', 'cut', 'accent'), domains=FILM, dur=0.42, axes=RING)
 def boom_short(c, r):
     """a hit on a cut: a sub that rises in 14 ms (the films' sub hits swell in, they do not click), falls from 106
     to 56 Hz within 35 ms and is gone in under half a second, the dull knock of the contact and a faint tick on
@@ -635,7 +635,7 @@ def boom_wide(c, r):
 
 @design('slam/title', kind='hit',
         says=('a hard dry slam', 'a heavy object slammed onto a desk', 'a short punchy wooden bang'),
-        uses=('impact', 'title slam', 'slam', 'text hit', 'stamp'), domains=DOM, dur=0.34, axes=RING)
+        uses=('impact', 'title slam', 'slam', 'text slam', 'stamp'), domains=DOM, dur=0.34, axes=RING)
 def slam_title(c, r):
     """a title landing hard: a board struck by a 0.8 ms contact (its 30 modes between 150 Hz and 3 kHz ring
     50-280 ms, the upper ones dying first), the dull crack of the contact, and a short low thump under them that
@@ -710,8 +710,8 @@ def _tremor(n, w, lo, hi, depth):
 
 @design('rise/air', kind='rise',
         says=('a rising rush of air that opens up and gets brighter', 'a noise riser building up',
-              'wind swelling to a peak'),
-        uses=('riser', 'build', 'noise riser', 'transition', 'uplifter'), domains=FILM, dur=2.0, axes=MOVE,
+              'air swelling to a peak'),
+        uses=('riser', 'build', 'noise riser', 'reveal', 'transition', 'uplifter'), domains=FILM, dur=2.0, axes=MOVE,
         prior=1.1)
 def rise_air(c, r):
     """a noise riser with no pitch in it, in two layers that leave the band between 2 and 5 kHz thin (as the
@@ -764,7 +764,7 @@ def rise_tension(c, r):
         says=('a reversed cymbal swelling up to an abrupt stop', 'a backwards shimmering swell',
               'a reverse crash building'),
         uses=('reverse', 'reverse swell', 'riser', 'swell into a cut', 'reverse cymbal'), domains=FILM, dur=1.5,
-        axes=BASE, prior=1.15)
+        axes=BASE, prior=1.05)
 def rise_reverse(c, r):
     """the tail of a struck sheet of metal played backwards: 44 inharmonic modes between 380 Hz and 11 kHz and the
     wash around them, each decaying at its own rate (the high ones faster), so in reverse the low ones swell first
@@ -795,9 +795,9 @@ def rise_reverse(c, r):
 
 @design('fall/air', kind='fall',
         says=('a rush of air falling away and fading out', 'a whoosh trailing off and getting darker',
-              'wind dying down'),
+              'air dying away'),
         uses=('downlifter', 'fall', 'exit', 'after a hit', 'wind down'), domains=FILM, dur=1.6, axes=MOVE,
-        prior=1.15)
+        prior=1.1)
 def fall_air(c, r):
     """what follows a hit: air that is full within the first 7 % of the length and then falls away, in two layers
     that leave the band between 2 and 5 kHz thin: a body whose hump sinks three and a half octaves from 1.6 kHz
@@ -944,7 +944,8 @@ def pop_pluck(c, r):
 
 @design('tock/wood', kind='tick',
         says=('a tiny wooden tick', 'a small dry tock of wood', 'a light tap on a wooden block'),
-        uses=('tick', 'tap', 'snap into place', 'detent', 'lock'), domains=DOM, dur=0.2, material='wood', axes=RING)
+        uses=('tock', 'tick', 'tap', 'snap into place', 'detent', 'lock'), domains=DOM, dur=0.2, material='wood',
+        axes=RING)
 def tock_wood(c, r):
     """a small piece of wood tapped with another (a 0.2 ms contact): a bar's first three modes from 1.5 kHz
     (free-bar ratios 1 : 2.76 : 5.40, 20-60 ms) inside a cloud of 30 short ones up to 7 kHz, the tick of the
@@ -962,7 +963,7 @@ def tock_wood(c, r):
 
 @design('tock/glass', kind='tick',
         says=('a tiny glass tick', 'a small bright tink of glass', 'a light tap on a glass'),
-        uses=('tick', 'tap', 'snap into place', 'detent', 'select'), domains=DOM, dur=0.25, material='glass',
+        uses=('tick', 'tap', 'tock', 'snap into place', 'detent', 'select'), domains=DOM, dur=0.25, material='glass',
         axes=RING, allows=('ring',))      # glass rings in steady partials: the comb detector reads any such tone as one
 def tock_glass(c, r):
     """a small thick piece of glass tapped with something hard (a 0.09 ms contact): the modes of a disc from
@@ -1064,7 +1065,7 @@ def shine_sweep(c, r):
 @design('sparkle/burst', kind='chime',
         says=('a small burst of bright sparkles', 'a quick scatter of tiny high chimes', 'a short twinkling flurry'),
         uses=('sparkle', 'shimmer', 'twinkle', 'burst', 'magic'), domains=DOM, dur=0.6, pitch='C7', axes=RING,
-        prior=0.8)
+        prior=0.95)
 def sparkle_burst(c, r):
     """a handful of bright grains thrown at once: about 25 small struck bars (more with energy) whose arrivals thin
     out exponentially after the first and largest one, power-law sizes (a big grain is lower and rings longer), on
@@ -1178,7 +1179,7 @@ def type_run(c, r):
         says=('a soft swell into a clean low hit with a bright chime on top', 'a short reveal sting with a bell chord',
               'a whoosh, a thump and a ringing chime'),
         uses=('logo', 'reveal', 'sting', 'logo reveal', 'title reveal'), domains=DOM, dur=1.5, pitch='C6',
-        voice='celesta', axes=RING, prior=1.15)
+        voice='celesta', axes=RING, prior=1.05)
 def sting_reveal(c, r):
     """a reveal in three parts that share one moment: air that swells over the first 30 % of the length and stops,
     a soft clean hit where it stops (a thump falling to 52 Hz and the puff of air around it), and on the hit a
@@ -1238,7 +1239,7 @@ def sting_tech(c, r):
         says=('a soft thump with a warm piano chord ringing out', 'a mellow piano chord over a low bump',
               'a gentle closing chord on a felt piano'),
         uses=('logo', 'sting', 'end card', 'outro', 'reveal'), domains=DOM, dur=2.2, pitch='C4', voice='felt_piano',
-        axes=RING, prior=1.1)
+        axes=RING, prior=1.15)
 def sting_soft(c, r):
     """an end card: the soft thump of thump/soft and, 6 ms after it, an open chord of the voice (root, fifth and
     the third an octave up, rolled by 15 ms, played softly) that is held for most of the length and released"""

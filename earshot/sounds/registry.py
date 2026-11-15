@@ -33,9 +33,10 @@ from ..forge import dsp, knobs
 
 AXES = ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')
 KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud', 'whoosh', 'rise', 'fall', 'zap',
-         'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object')
+         'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object', 'music')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
-MODULES = ('ui', 'game', 'action', 'object', 'drums', 'brand', 'synth', 'nature', 'tonal', 'retro', 'bank')
+MODULES = ('ui', 'game', 'action', 'object', 'motion', 'drums', 'brand', 'synth', 'nature', 'beds', 'tonal', 'retro',
+           'bank')
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
@@ -43,7 +44,7 @@ SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pen
 VOICE_OF = {'wood': 'marimba', 'glass': 'glockenspiel', 'metal': 'vibraphone', 'soft': 'felt_piano',
             'digital': 'glass_pluck', 'retro': 'square_lead'}
 # the loudest a finished sound may be at full peak (momentary-max LUFS), by kind: beds sit low by nature
-LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0}
+LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0, 'music': -16.0}
 _designs = {}
 _loaded = False
 

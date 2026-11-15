@@ -85,7 +85,7 @@ SCENES = {
                        ('space hum', 'spaceship', 'engine room', 'server room', 'reactor', 'sci-fi ambience')),
     'crackle/vinyl': ('crackle', {}, ('vinyl record crackle', 'crackling static from an old record',
                                       'soft pops and crackle'),
-                      ('vinyl', 'record crackle', 'lo-fi', 'old radio', 'static')),
+                      ('vinyl', 'record crackle', 'vinyl crackle', 'old radio', 'static')),
     'sparkle/magic': ('sparkle', {}, ('a magical shimmering sparkle', 'twinkling chimes in the air',
                                       'fairy dust glitter'),
                       ('sparkle', 'magic', 'shimmer', 'fairy', 'enchanted', 'glitter')),

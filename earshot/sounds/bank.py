@@ -55,6 +55,9 @@ CATEGORIES = {
     'pro_shimmer': ('texture', ('shimmer', 'sparkle', 'magic'), ('motion', 'game'), ('tail',)),
 }
 NUMBERED = re.compile(r'^(m?\d+|ding_\d+)$')
+# members that are the first answer to a bare request whatever the newer designs: a plain "tap" or "click" in an
+# interface is a soft tactile touch, not a note (the newer tap/tone is tonal)
+FIRST = {'tap/soft': 1.05, 'click/soft': 1.0}
 
 
 def _render(sound_id, takes):
@@ -87,7 +90,7 @@ def register():
         design(row['id'], kind=kind, says=says, uses=uses, tags=(cat.replace('pro_', ''), words, 'bank'),
                domains=domains, dur=round(float(row['end_s'] or row['dur_s']), 3),
                pitch=(pk.get('note') or '').split(' ')[0] or None, allows=allows,
-               prior=0.7 if cat.startswith('pro_') else 0.8)(_render(row['id'], takes))
+               prior=FIRST.get(row['id'], 0.7 if cat.startswith('pro_') else 0.8))(_render(row['id'], takes))
 
 
 register()

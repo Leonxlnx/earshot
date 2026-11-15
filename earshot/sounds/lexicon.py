@@ -125,8 +125,9 @@ CONCEPTS = {
     'dash': ('dodge', 'dodge roll', 'dodge-roll', 'sprint', 'lunge', 'dart', 'speed burst', 'speed-burst',
              'air burst', 'burst of air'),
     'swing': ('sword swing', 'sword', 'greatsword', 'broadsword', 'longsword', 'claymore', 'slash', 'blade', 'katana', 'axe swing', 'club swing', 'sword slash'),
-    'hit': ('punch', 'jab', 'uppercut', 'strike', 'smack', 'slap', 'kick', 'attack', 'melee', 'bash', 'whack', 'sock',
-            'socked', 'thwack', 'fist', 'fighting', 'brawl', 'beat up', 'land a punch', 'land a hit', 'land a jab',
+    'hit': ('punch', 'jab', 'uppercut', 'strike', 'smack', 'slap', 'attack', 'melee', 'bash', 'whack', 'sock',
+            'socked', 'thwack', 'fist', 'fighting', 'brawl', 'beat up', 'karate kick', 'roundhouse kick', 'flying kick',
+            'land a punch', 'land a hit', 'land a jab',
             'land a blow', 'landing a punch', 'landing a hit', 'landing a jab', 'landing a blow'),
     'clang': ('clank', 'clonk', 'metal hit', 'metal impact', 'metallic hit', 'sword hit', 'clash', 'sword clash',
               'sword on armour', 'sword on armor', 'sword on shield', 'blade on metal'),
@@ -227,7 +228,8 @@ CONCEPTS = {
     'braam': ('bwaaam', 'bwaam', 'braaam', 'horn blast', 'brass blast', 'trailer horn', 'inception horn', 'horn hit',
               'foghorn', 'fog horn', 'brass hit', 'horn'),
     'logo': ('logo reveal', 'logo sting', 'brand', 'branding', 'sonic logo', 'audio logo', 'sound logo', 'mnemonic',
-             'ident', 'signature', 'jingle', 'sonic identity', 'brand sound', 'company logo', 'audio branding'),
+             'ident', 'signature', 'sonic identity', 'brand sound', 'company logo', 'audio branding'),
+    'sting': ('stinger', 'music sting', 'musical sting', 'stab sting'),
     'glitch': ('glitchy', 'stutter', 'digital noise', 'error glitch', 'distortion', 'datamosh', 'static burst',
                'malfunction', 'freaking out', 'freak out', 'bitcrush', 'corrupted', 'data corruption'),
     'shimmer': ('sparkle', 'twinkle', 'twinkly', 'glitter', 'glittery', 'shine', 'glint', 'gleam', 'fairy dust',
@@ -252,8 +254,29 @@ CONCEPTS = {
     'crackle': ('crackling', 'crackly'),
     'pluck': ('plucky', 'string pluck', 'strum', 'plink', 'plinky', 'twang'),
     'piano': ('grand piano', 'upright piano', 'felt piano', 'piano key', 'piano note', 'piano tone'),
-    'bass': ('bass note', 'sub', 'sub bass', 'low end', 'bassline', '808', 'bass string'),
-    'drum': ('kick drum', 'snare', 'percussion', 'beat', 'drum hit'),
+    'bass': ('bass note', 'sub', 'sub bass', 'low end', 'bassline', '808 bass', 'bass string'),
+    # ---- drums and percussion (a family each; 'crash' in a request is a collision unless drums are around it)
+    'drum': ('percussion', 'drum hit', 'drums', 'drum kit', 'drum sound', 'percussive', 'acoustic drum'),
+    'kick_drum': ('kick drum', 'kick', 'bass drum', 'kick 808', '808 kick', '808', 'four on the floor',
+                  'kick on the downbeat'),
+    'snare': ('snare drum', 'snares', 'backbeat', 'snare hit', 'snare crack'),
+    'rimshot': ('rim shot', 'rim'),
+    'cross_stick': ('cross-stick', 'cross stick', 'side stick', 'sidestick', 'rim click', 'rim knock'),
+    'tom': ('tom tom', 'tom-tom', 'floor tom', 'rack tom', 'drum fill', 'tom fill'),
+    'hihat': ('hi-hat', 'hi hat', 'hat', 'closed hat', 'open hat', 'hh', 'hats'),
+    'cymbal': ('cymbals', 'crash cymbal', 'ride cymbal', 'splash cymbal', 'china cymbal', 'cymbal crash',
+               'ride bell', 'cymbal hit'),
+    'clap': ('handclap', 'hand clap', 'clapping', 'applause', 'claps'),
+    'finger_snap': ('finger snap', 'snap fingers', 'snapping fingers', 'finger click', 'fingersnap',
+                    'snap your fingers', 'snapping your fingers'),
+    'shaker': ('egg shaker', 'maraca', 'maracas'),
+    'tambourine': ('tamb', 'timbrel'),
+    'conga': ('congas', 'tumba'),
+    'bongo': ('bongos',),
+    'cajon': ('box drum',),
+    'clave': ('claves',),
+    'drum_roll': ('drum roll', 'drumroll', 'snare roll', 'press roll'),
+    'count_in': ('count in', 'count-in', 'count off', 'drumsticks', 'stick click', 'sticks clicking'),
     'note': ('single note', 'one note', 'tone'),
     'paper': ('page', 'sheet', 'sheet of paper', 'card', 'envelope', 'rustle', 'paper rustle', 'flip through',
               'flipping through', 'notebook', 'book', 'page turn', 'page flip', 'flip pages', 'flipping pages',
@@ -298,13 +321,20 @@ CONCEPTS = {
                    'underwater bubbles', 'bubbles', 'scuba', 'snorkel', 'diving deep', 'head under water'),
     'ambience': ('ambient', 'background', 'atmosphere', 'soundscape', 'environment', 'backdrop', 'atmos',
                  'background bed', 'bed'),
+    # ---- music under something: a bed with chords, a beat or a tune, not one note and not an ambience
+    'music': ('background music', 'music bed', 'bed music', 'soundtrack', 'underscore', 'film score', 'music score',
+              'backing track', 'background track', 'music loop', 'music track', 'lo-fi beat', 'lofi beat',
+              'lo-fi music', 'lofi music', 'lo-fi hip hop', 'beat', 'beats', 'jingle', 'menu music', 'game music',
+              'level music', 'elevator music', 'hold music', 'ambient music', 'chill music', 'instrumental', 'bgm',
+              'drum loop', 'beat loop',
+              'music for a video', 'video music', 'theme music', 'title music', 'loading music'),
     # ---- what a request calls any short sound: names the kind, not the job
     'cue': ('alert', 'alert tone', 'audio cue', 'sound cue', 'signal', 'earcon', 'ui sound', 'feedback sound',
-            'tune', 'melody', 'music sting', 'stinger', 'sting'),
+            'tune', 'melody'),
 }
 
 # concepts that say what kind of thing is wanted without saying which: they do not end the head of a request
-GENERIC = frozenset(('ambience', 'note', 'beep', 'bell', 'open', 'achievement', 'cue', 'thud'))
+GENERIC = frozenset(('ambience', 'note', 'beep', 'bell', 'open', 'achievement', 'cue', 'thud', 'sting'))
 # words of a short sound: an instrument named just before one is played ("a kalimba ping", "a marimba hit")
 SOUND_NOUNS = frozenset(('ping', 'ding', 'chime', 'plink', 'tone', 'hit', 'note', 'pluck', 'tap', 'tick', 'knock',
                          'bonk', 'plonk', 'strike', 'pling', 'tink', 'blip', 'boop', 'beep', 'sound', 'cue'))
@@ -341,13 +371,21 @@ STATUS_WORDS = frozenset(('finished', 'done', 'complete', 'completed', 'failed',
                           'approved', 'declined', 'rejected', 'denied'))
 # two jobs that together mean a third: (a, b) -> c ("losing the buff" is a power-down; "the timer is done" a timer)
 COMPOSE = {('lose', 'power_up'): 'power_down', ('lose', 'shield'): 'power_down', ('timer', 'success'): 'timer',
-           ('lose', 'heal'): 'hurt', ('countdown', 'success'): 'countdown'}
+           ('lose', 'heal'): 'hurt', ('countdown', 'success'): 'countdown', ('cymbal', 'reverse'): 'reverse'}
 # a concept that implies a broader one: the broader one is added at BROADER_WEIGHT
 BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggle', 'menu_select': 'menu',
            'menu_back': 'back', 'coin': 'pickup', 'gem': 'pickup', 'service_bell': 'bell', 'level_up': 'power_up',
            'one_up': 'power_up', 'receive': 'notify', 'cue': 'notify', 'thud': 'impact', 'clock': 'tick',
            'sub_drop': 'impact', 'braam': 'impact',
-           'swish': 'whoosh', 'coin_object': 'coin', 'glass_object': 'bell', 'countdown': 'timer'}
+           'swish': 'whoosh', 'coin_object': 'coin', 'glass_object': 'bell', 'countdown': 'timer',
+           'kick_drum': 'drum', 'snare': 'drum', 'rimshot': 'drum', 'cross_stick': 'rimshot', 'tom': 'drum',
+           'hihat': 'drum', 'cymbal': 'drum',
+           'drum_roll': 'drum', 'sting': 'cue'}
+# a family whose name means something else in a request, or nothing: the job the family is for ('rise' and 'fall'
+# are directions, a 'crash' family is the cymbal though "a crash" is a collision, the one 'drum' family the roll,
+# a 'bed' the music under a video, not an ambience)
+FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride': 'cymbal', 'kick': 'kick_drum',
+                'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music'}
 # "the opposite of X", "like X but the other way"
 OPPOSITE = {'riser': 'downlifter', 'switch_on': 'switch_off', 'open': 'close', 'next': 'back', 'send': 'receive',
             'power_up': 'power_down', 'win': 'lose', 'success': 'error', 'jump': 'land', 'unlock': 'lock',
@@ -415,6 +453,7 @@ MODIFIERS = {
     'sweet': dict(bright=0.2, hard=-0.3), 'nostalgic': dict(bright=-0.2), 'bubbly': dict(motion=0.3, hard=-0.3),
     'rumbly': dict(size=0.6, bright=-0.4), 'menacing': dict(bright=-0.5, size=0.5), 'foreboding': dict(bright=-0.5, size=0.4),
     'serious': dict(bright=-0.2, size=0.2), 'ominous': dict(bright=-0.6, size=0.6), 'scary': dict(bright=-0.5, size=0.5),
+    'booming': dict(size=0.6, energy=0.3),
     'dramatic': dict(size=0.5, energy=0.5, space=0.3), 'satisfying': dict(hard=0.1, size=0.1), 'tactile': dict(hard=0.2, space=-0.3),
     'reverb': dict(space=0.7), 'echo': dict(space=0.8), 'tail': dict(ring=0.5), 'room': dict(space=0.4),
 }
@@ -438,7 +477,8 @@ MATERIALS = {'wood': 'wood', 'wooden': 'wood', 'woody': 'wood', 'organic': 'wood
              'retro': 'retro', '8-bit': 'retro', '8bit': 'retro', '16-bit': 'retro', 'chiptune': 'retro',
              'chip': 'retro', 'arcade': 'retro', 'pixel': 'retro', 'nes': 'retro', 'snes': 'retro', 'gameboy': 'retro',
              'old-school': 'retro', 'oldschool': 'retro', 'square-wave': 'retro', 'cartridge': 'retro',
-             'bitcrushed': 'retro', 'bottle': 'glass', 'sine': 'digital', 'sawtooth': 'digital',
+             'bitcrushed': 'retro', 'bottle': 'glass', 'sine': 'digital', 'sawtooth': 'digital', 'electro': 'digital',
+             '808': 'digital',
              'nintendo': 'retro', 'atari': 'retro', 'commodore': 'retro', 'c64': 'retro', 'nes-style': 'retro',
              'mirror': 'glass', 'vase': 'glass', 'fence': 'wood', 'chair': 'wood', 'plank': 'wood', 'crate': 'wood',
              'barrel': 'wood', 'anvil': 'metal', 'helmet': 'metal', 'ceramic': 'glass', 'porcelain': 'glass'}
@@ -446,7 +486,8 @@ MATERIALS = {'wood': 'wood', 'wooden': 'wood', 'woody': 'wood', 'organic': 'wood
 MATERIAL_PHRASES = {'square wave': 'retro', 'old school': 'retro', 'old game': 'retro', 'old computer': 'retro',
                     'old console': 'retro', 'old video game': 'retro', 'pixel art': 'retro', 'game boy': 'retro',
                     'old cartridge': 'retro', 'old nes': 'retro', 'sine wave': 'digital', 'saw wave': 'digital',
-                    'sawtooth wave': 'digital'}
+                    'sawtooth wave': 'digital', 'drum machine': 'digital', 'beat machine': 'digital',
+                    '808 kick': 'digital', 'kick 808': 'digital'}
 # phrases that describe the envelope or the place, not a job: {phrase: {axis: delta}}
 PHRASE_MODIFIERS = {'sharp attack': dict(hard=0.6), 'hard attack': dict(hard=0.6), 'fast attack': dict(hard=0.5),
                     'quick attack': dict(hard=0.5), 'soft attack': dict(hard=-0.6), 'slow attack': dict(hard=-0.7),
@@ -456,7 +497,8 @@ PHRASE_MODIFIERS = {'sharp attack': dict(hard=0.6), 'hard attack': dict(hard=0.6
                     'up close': dict(space=-0.6)}
 # a word whose job depends on the domain: (domain, word) -> concept, '' for none ("fails a stage" in a game is a
 # loss; a "card" in an app is a component, not paper)
-DOMAIN_SENSE = {('game', 'fail'): 'lose', ('game', 'failure'): 'lose', ('ui', 'sheet'): 'open',
+DOMAIN_SENSE = {('music', 'crash'): 'cymbal', ('game', 'kick'): 'hit',
+                ('game', 'fail'): 'lose', ('game', 'failure'): 'lose', ('ui', 'sheet'): 'open',
                 ('game', 'collapse'): 'break', ('motion', 'collapse'): 'break', ('ui', 'slide out'): 'open',
                 ('ui', 'slide in'): 'open', ('game', 'activate'): 'power_up', ('game', 'jingle'): 'cue',
                 ('game', 'enable'): 'power_up', ('ui', 'page'): '', ('ui', 'card'): '', ('game', 'star'): 'coin',
@@ -528,7 +570,8 @@ DOMAIN_WORDS = {'ui': 'ui', 'app': 'ui', 'website': 'ui', 'site': 'ui', 'web': '
                 'ambience': 'ambience', 'ambient': 'ambience', 'background': 'ambience', 'atmosphere': 'ambience',
                 'soundscape': 'ambience', 'loop': 'ambience',
                 'music': 'music', 'melody': 'music', 'chord': 'music', 'note': 'music', 'jingle': 'music',
-                'song': 'music', 'track': 'music'}
+                'song': 'music', 'track': 'music', 'drum': 'music', 'drums': 'music', 'drummer': 'music',
+                'kit': 'music', 'cymbal': 'music', 'cymbals': 'music', 'percussion': 'music', 'band': 'music'}
 # phrases that only say where a sound plays: read as the domain, never as the paper, shot or screen in them
 DOMAIN_PHRASES = {'title card': 'motion', 'end card': 'motion', 'lower third': 'motion', 'product shot': 'motion',
                   'hero shot': 'motion', 'title screen': 'game', 'home screen': 'ui', 'lock screen': 'ui',

@@ -210,7 +210,8 @@ def test_fallback_by_feel(idx):
 def test_fallback_by_direction(idx):
     b = brief.read('something that rises and rises')
     assert not b['concepts'] and b['dir'] == 1
-    assert brief.rank(b, idx=idx, top=1)[0]['id'].startswith(('riser/', 'pro_riser/', 'sweep/', 'sub/', 'braam/'))
+    assert brief.rank(b, idx=idx, top=1)[0]['id'].startswith(('rise/', 'riser/', 'pro_riser/', 'sweep/', 'sub/',
+                                                                    'braam/'))
 
 
 def test_length_biases_the_ranking(idx):
@@ -289,9 +290,18 @@ def test_a_member_named_in_the_request_is_the_one_chosen():
              and all(_sayable(p, registry.get(ids[0])) or p in L.CONCEPTS for p in fam.split('_'))
              for sid in ids if _sayable(sid.split('/')[1], registry.get(sid))]
     assert len(cases) > 60
+    terms = {r['id']: t for r, t in zip(*brief._default_index()[:2])}
+
+    def twin(got, sid):
+        """the member of the same name in a family that answers the same job ("deep impact": boom/deep, the film
+        family's, ranks above the bank's impact/deep)"""
+        return (got.split('/')[1] == sid.split('/')[1] and got.split('/')[0] != sid.split('/')[0]
+                and terms[sid]['family'] & (terms[got]['family'] | terms[got]['uses']))
     wrong = [(text, sid, [r['id'] for r in brief.rank(brief.read(text), top=1)]) for text, sid in cases]
-    wrong = [w for w in wrong if w[2] != [w[1]]]
+    wrong = [w for w in wrong if w[2] != [w[1]] and not (w[2] and twin(w[2][0], w[1]))]
     assert not wrong, wrong
+    assert brief.rank(brief.read('a deep impact'), top=1)[0]['id'] == 'boom/deep'
+    assert brief.rank(brief.read('a metal impact'), top=1)[0]['id'] == 'impact/metal'      # no film member 'metal'
     assert brief.rank(brief.read('a warm pad chord in F'), top=1)[0]['id'] == 'pad/warm'
     b = brief.read('a warm pad chord in F')
     assert b['axes'].get('bright', 0) < 0                                         # warm still darkens
@@ -377,7 +387,7 @@ ANCHORS = [
     ('incoming chat message', ('receive/', 'notify/')),
     ('checkbox switched on', ('toggle/', 'switch/')),
     ('turning a setting off', ('toggle/', 'switch/')),
-    ('page swipe in a photo gallery', ('swipe/', 'swish/', 'paper/')),
+    ('page swipe in a photo gallery', ('swipe/', 'swish/', 'paper/', 'slide/', 'flick/')),
     ('keyboard typing clicks for a chat box', ('typing_key/', 'pro_typing_key/', 'text/')),
     ('moving a file to the trash', ('delete/', 'paper/')),
     ('hovering over a navigation link', ('hover/', 'hover_tick/', 'pro_hover_tick/')),
@@ -406,12 +416,12 @@ ANCHORS = [
     ('diving into a lake', ('splash/',)),
     # motion
     ('a fast whoosh for a title transition', ('whoosh', 'swish/')),
-    ('tension riser before the chorus hits', ('riser/', 'pro_riser/', 'sub/swell', 'braam/swell')),
-    ('a deep trailer impact under the title card', ('impact/', 'pro_impact/', 'braam/', 'cut_hit/')),
-    ('logo reveal sting', ('logo/', 'logo_sting/', 'pro_logo_sting/')),
+    ('tension riser before the chorus hits', ('rise/', 'riser/', 'pro_riser/', 'sub/swell', 'braam/swell')),
+    ('a deep trailer impact under the title card', ('boom/', 'impact/', 'pro_impact/', 'braam/', 'cut_hit/')),
+    ('logo reveal sting', ('sting/', 'logo/', 'logo_sting/', 'pro_logo_sting/')),
     ('digital glitch for a cyberpunk edit', ('glitch/', 'pro_glitch/')),
-    ('a heavy bass drop', ('sub_drop/', 'pro_sub_drop/')),
-    ('reverse cymbal into the cut', ('reverse_swell/',)),
+    ('a heavy bass drop', ('fall/sub', 'sub_drop/', 'pro_sub_drop/')),
+    ('reverse cymbal into the cut', ('rise/reverse', 'reverse_swell/')),
     ('fairy dust sparkle over a product shot', ('shimmer/', 'pro_shimmer/', 'sparkle/', 'gem/')),
     # ambience
     ('gentle rain on a tent, looping', ('rain/tent',)),
@@ -442,5 +452,90 @@ ANCHORS = [
 
 @pytest.mark.parametrize('text,prefixes', ANCHORS)
 def test_anchor(idx, text, prefixes):
+    r = brief.rank(brief.read(text), idx=idx, top=3)
+    assert r and r[0]['id'].startswith(prefixes), (text, r)
+
+
+# anchors for the families added after round two (motion, drums, music beds): own wording, plain and casual
+NEW_ANCHORS = [
+    # motion
+    ('a whoosh as the logo flies in', ('whoosh/', 'swoosh/')),
+    ('swoosh out when the card leaves the screen', ('swoosh/out',)),
+    ('quick flick for a text change', ('flick/',)),
+    ('a riser before the drop', ('rise/',)),
+    ('noise riser into the reveal', ('rise/air',)),
+    ('downlifter after the big hit', ('fall/',)),
+    ('a cinematic boom for the title', ('boom/',)),
+    ('a deep impact', ('boom/deep',)),
+    ('title slam', ('slam/',)),
+    ('a soft thump as the card lands', ('thump/', 'knock/soft')),
+    ('sub drop right after the cut', ('fall/sub', 'sub_drop/')),
+    ('reverse cymbal', ('rise/reverse', 'reverse_swell/')),
+    ('a cymbal played backwards into the cut', ('rise/reverse', 'reverse_swell/')),
+    ('a quick suck in before the cut', ('suck/',)),
+    ('a soft pop when the icon appears', ('pop/',)),
+    ('bubble pop', ('pop/bubble',)),
+    ('a wooden tock when the tile snaps into place', ('tock/wood', 'knock/soft')),
+    ('a glint on the logo', ('shine/glint',)),
+    ('shimmer sweeping across the screen', ('shine/sweep',)),
+    ('sparkle burst', ('sparkle/burst',)),
+    ('a short glitch', ('glitch/',)),
+    ('soft typing under kinetic text', ('type/',)),
+    ('logo sting', ('sting/', 'logo/')),
+    ('a tech sting for an app reveal', ('sting/tech',)),
+    ('a panel sliding in', ('slide/panel',)),
+    # drums
+    ('a punchy kick drum', ('kick/',)),
+    ('kick for a hip hop track', ('kick/',)),
+    ('a crisp snare for the backbeat', ('snare/',)),
+    ('rimshot', ('rim/shot',)),
+    ('cross stick on the snare', ('rim/click',)),
+    ('closed hi-hat', ('hat/closed',)),
+    ('open hihat', ('hat/open',)),
+    ('a crash cymbal at the end of the fill', ('crash/',)),
+    ('crash on the drums', ('crash/',)),
+    ('ride cymbal ping', ('ride/ping',)),
+    ('floor tom', ('tom/floor',)),
+    ('a drum fill on the toms', ('tom/',)),
+    ('hand clap', ('clap/',)),
+    ('people clapping together', ('clap/group',)),
+    ('snapping fingers', ('snap/finger',)),
+    ('egg shaker', ('shaker/',)),
+    ('tambourine', ('tambourine/',)),
+    ('conga slap', ('conga/slap',)),
+    ('bongos', ('bongo/',)),
+    ('cajon', ('cajon/',)),
+    ('claves', ('clave/',)),
+    ('drumroll before the winner is announced', ('drum/roll',)),
+    ('the drummer counting in with the sticks', ('sticks/count',)),
+    ('an 808 kick', ('kick/electro',)),
+    ('drum machine clap', ('clap/electro',)),
+    ('a drum hit', ('tom/', 'kick/', 'snare/')),
+    # music beds
+    ('some background music for my app demo', ('bed/tech',)),
+    ('a music bed under a product video', ('bed/',)),
+    ('chill lo-fi beat to study to', ('bed/warm',)),
+    ('a seamless loop for my explainer video', ('bed/',)),
+    ('menu music for a casual mobile game', ('bed/playful', 'bed/cozy')),
+    ('chiptune level music', ('bed/8bit',)),
+    ('cinematic underscore for a trailer', ('bed/cinematic',)),
+    ('soundtrack for a cozy farming game', ('bed/cozy',)),
+    ('tense music while the countdown runs', ('bed/tension',)),
+    ('upbeat corporate music', ('bed/bright',)),
+    ('a house beat for a fitness ad', ('bed/pulse',)),
+    ('calm background music for a meditation app', ('bed/calm',)),
+    ('a jingle', ('bed/',)),
+    ('a beat', ('bed/',)),
+    ('music', ('bed/',)),
+    # and what music words must not take
+    ('a single piano note', ('note/felt_piano', 'note/grand_piano')),
+    ('a warm synth pad', ('pad/',)),
+    ('rain in the background', ('rain/',)),
+    ('warm sustained chords under a voice-over, not music', ('pad/',)),
+]
+
+
+@pytest.mark.parametrize('text,prefixes', NEW_ANCHORS)
+def test_new_family_anchor(idx, text, prefixes):
     r = brief.rank(brief.read(text), idx=idx, top=3)
     assert r and r[0]['id'].startswith(prefixes), (text, r)

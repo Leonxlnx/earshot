@@ -130,8 +130,8 @@ def _kick(c, r, name, f, beater, t60, damp, fall, strike, click_db, radius, room
 @design('kick/soft', kind='thud',
         says=('a soft round kick drum, a felt beater on a damped bass drum', 'a gentle muffled bass drum thump',
               'a warm low drum thud'),
-        uses=('drum', 'kick drum', 'beat', 'logo', 'soft impact', 'heartbeat', 'pulse'), tags=('drums', 'kit'),
-        domains=DOM, dur=0.6, pitch='A1', axes=AXES)
+        uses=('drum', 'kick drum', 'logo', 'soft impact', 'heartbeat', 'pulse'), tags=('drums', 'kit'),
+        domains=DOM, dur=0.6, pitch='A1', axes=AXES, prior=1.03)
 def kick_soft(c, r):
     """a felt beater on a kick with a pillow in it: a long soft contact (no click to speak of), struck in the
     centre (the (0,n) thud), heavy damping on the upper modes, a short ring"""
@@ -141,7 +141,7 @@ def kick_soft(c, r):
 @design('kick/punch', kind='thud',
         says=('a tight punchy kick drum with a clear click', 'a hard rock kick drum hit',
               'a short bass drum with a sharp beater attack'),
-        uses=('drum', 'kick drum', 'beat', 'impact', 'hit', 'accent', 'downbeat'), tags=('drums', 'kit'),
+        uses=('drum', 'kick drum', 'impact', 'hit', 'accent', 'downbeat'), tags=('drums', 'kit'),
         domains=DOM, dur=0.5, pitch='A#1', axes=AXES)
 def kick_punch(c, r):
     """a plastic beater on a damped 22-inch kick: a short contact (the click of the batter head), a little off
@@ -152,7 +152,7 @@ def kick_punch(c, r):
 @design('kick/deep', kind='thud',
         says=('a big open bass drum booming', 'a large deep kick drum with a long low ring',
               'a deep resonant drum boom'),
-        uses=('drum', 'kick drum', 'beat', 'impact', 'boom', 'logo', 'trailer hit'), tags=('drums', 'kit'),
+        uses=('drum', 'kick drum', 'impact', 'boom', 'logo', 'trailer hit'), tags=('drums', 'kit'),
         domains=DOM, dur=1.2, pitch='F1', axes=AXES)
 def kick_deep(c, r):
     """a 24-inch kick with no pillow and a resonant front head: the low modes ring for most of a second, the
@@ -163,7 +163,7 @@ def kick_deep(c, r):
 @design('kick/electro', kind='thud',
         says=('an electronic kick drum with a long booming sub tail', 'a deep synthesized bass drum boom',
               'a drum machine kick with a falling pitch'),
-        uses=('drum', 'kick drum', 'beat', 'drop', 'bass hit', 'logo', 'trap', 'hip hop', 'edm'),
+        uses=('drum', 'kick drum', 'drop', 'bass hit', 'logo', 'trap', 'hip hop', 'edm'),
         tags=('drums', 'electronic'), domains=DOM, dur=1.0, pitch='F#1', axes=AXES)
 def kick_electro(c, r):
     """the synthetic kick (kick_synth): a sine falling 2.6 octaves onto its pitch in two stages, a long sub tail,
@@ -209,8 +209,8 @@ def _snare(c, r, name, f, t60, damp, gap, release, wire_db, strike=0.32, beater=
 @design('snare/tight', kind='hit',
         says=('a tight snare drum hit', 'a crisp snare drum crack with a short buzz of the wires',
               'a stick hitting a snare drum'),
-        uses=('drum', 'snare', 'beat', 'hit', 'accent', 'backbeat', 'cut'), tags=('drums', 'kit'), domains=DOM,
-        dur=0.4, pitch='B3', axes=AXES)
+        uses=('drum', 'snare', 'hit', 'accent', 'backbeat', 'cut'), tags=('drums', 'kit'), domains=DOM,
+        dur=0.4, pitch='B3', axes=AXES, prior=1.03)
 def snare_tight(c, r):
     """a 14-inch snare tuned high (the (0,1) near 250 Hz), lightly damped, wires tight to the bottom head: a
     crack, a short bright buzz that follows the head and a little shell"""
@@ -220,7 +220,7 @@ def snare_tight(c, r):
 @design('snare/fat', kind='hit',
         says=('a fat low snare drum with a long buzz', 'a deep snare drum hit with loose rattling wires',
               'a big snare drum crack'),
-        uses=('drum', 'snare', 'beat', 'hit', 'backbeat', 'accent'), tags=('drums', 'kit'), domains=DOM, dur=0.6,
+        uses=('drum', 'snare', 'hit', 'backbeat', 'accent'), tags=('drums', 'kit'), domains=DOM, dur=0.6,
         pitch='F#3', axes=AXES)
 def snare_fat(c, r):
     """a deep snare tuned low with the wires loose: the head rings longer, the wires engage earlier and bounce
@@ -233,7 +233,7 @@ def snare_fat(c, r):
 @design('snare/brush', kind='hit',
         says=('a soft brush tap on a snare drum', 'a jazz brush hitting a snare, a soft swish with a gentle buzz',
               'a wire brush on a drum'),
-        uses=('drum', 'snare', 'brush', 'jazz', 'soft hit', 'tap', 'beat'), tags=('drums', 'kit'), domains=DOM,
+        uses=('drum', 'snare', 'brush', 'jazz', 'soft hit', 'tap'), tags=('drums', 'kit'), domains=DOM,
         dur=0.35, pitch='A3', axes=AXES)
 def snare_brush(c, r):
     """a wire brush: its bristles land over a few milliseconds (some 50 small contacts, each a tiny stroke), so
@@ -266,7 +266,7 @@ def snare_brush(c, r):
 @design('snare/electro', kind='hit',
         says=('an electronic snare drum from a drum machine', 'a synthesized snare, a tone and a burst of noise',
               'a drum machine snare hit'),
-        uses=('drum', 'snare', 'beat', 'backbeat', 'edm', 'hip hop', 'hit'), tags=('drums', 'electronic'),
+        uses=('drum', 'snare', 'backbeat', 'edm', 'hip hop', 'hit'), tags=('drums', 'electronic'),
         domains=DOM, dur=0.35, pitch='F#3', axes=AXES)
 def snare_electro(c, r):
     """the synthetic snare (snare_synth): two tuned tones and a burst of filtered noise with its own longer
@@ -285,7 +285,7 @@ def snare_electro(c, r):
         says=('a snare drum rimshot, a loud ringing crack', 'a stick hitting the rim and the head of a snare at once',
               'a sharp metallic snare crack'),
         uses=('drum', 'snare', 'rimshot', 'accent', 'hit', 'impact', 'cut'), tags=('drums', 'kit'), domains=DOM,
-        dur=0.5, pitch='B3', axes=AXES)
+        dur=0.5, pitch='B3', axes=AXES, prior=1.03)
 def rim_shot(c, r):
     """a rimshot: the stick lands on the head near the edge and across the metal hoop in the same instant: the
     hoop rings (its in-plane bending modes from 820 Hz, a few tenths of a second) with a hard metal crack, the
@@ -297,7 +297,7 @@ def rim_shot(c, r):
 
 @design('rim/click', kind='click',
         says=('a cross-stick click on a snare drum', 'a dry woody rim click', 'a hollow wooden knock on a drum rim'),
-        uses=('drum', 'rim', 'click', 'beat', 'bossa nova', 'ballad', 'tick', 'count'), tags=('drums', 'kit'),
+        uses=('drum', 'rim', 'cross-stick', 'click', 'bossa nova', 'ballad', 'tick', 'count'), tags=('drums', 'kit'),
         domains=DOM, dur=0.25, pitch='B3', axes=AXES)
 def rim_click(c, r):
     """a cross-stick: the stick lies on the head with its butt across the hoop and is lifted and dropped onto
@@ -342,7 +342,7 @@ def _tom(c, r, name, note, t60, radius, dur):
 
 @design('tom/high', kind='hit',
         says=('a high tom drum hit', 'a small tom-tom with a short pitched ring', 'a stick on a high rack tom'),
-        uses=('drum', 'tom', 'fill', 'beat', 'hit', 'accent'), tags=('drums', 'kit'), domains=DOM, dur=0.8,
+        uses=('drum', 'tom', 'fill', 'hit', 'accent'), tags=('drums', 'kit'), domains=DOM, dur=0.8,
         pitch='F#3', axes=AXES)
 def tom_high(c, r):
     """a 10-inch rack tom"""
@@ -351,8 +351,8 @@ def tom_high(c, r):
 
 @design('tom/mid', kind='hit',
         says=('a medium tom drum hit', 'a tom-tom with a round pitched ring', 'a stick on a rack tom'),
-        uses=('drum', 'tom', 'fill', 'beat', 'hit', 'accent'), tags=('drums', 'kit'), domains=DOM, dur=1.0,
-        pitch='C#3', axes=AXES)
+        uses=('drum', 'tom', 'fill', 'hit', 'accent'), tags=('drums', 'kit'), domains=DOM, dur=1.0,
+        pitch='C#3', axes=AXES, prior=1.03)
 def tom_mid(c, r):
     """a 12-inch rack tom"""
     return _tom(c, r, 'tom/mid', 'C#3', 0.9, 0.155, 1.3)
@@ -360,7 +360,7 @@ def tom_mid(c, r):
 
 @design('tom/floor', kind='hit',
         says=('a deep floor tom hit', 'a big low tom drum with a long ring', 'a stick on a floor tom'),
-        uses=('drum', 'tom', 'fill', 'beat', 'hit', 'impact', 'tribal'), tags=('drums', 'kit'), domains=DOM, dur=1.4,
+        uses=('drum', 'tom', 'fill', 'hit', 'impact', 'tribal'), tags=('drums', 'kit'), domains=DOM, dur=1.4,
         pitch='F#2', axes=AXES)
 def tom_floor(c, r):
     """a 16-inch floor tom"""
@@ -388,8 +388,8 @@ def _hat(c, r, name, vel, t60, sizzle, gap, dur, beater='tip', shimmer=0.6, chic
 @design('hat/closed', kind='tick',
         says=('a closed hi-hat, a short tight chick', 'a stick tapping closed hi-hat cymbals',
               'a crisp short metallic tick of a hi-hat'),
-        uses=('drum', 'hi-hat', 'beat', 'tick', 'groove', 'rhythm'), tags=('drums', 'kit'), domains=DOM, dur=0.2,
-        axes=AXES)
+        uses=('drum', 'hi-hat', 'tick', 'groove', 'rhythm'), tags=('drums', 'kit'), domains=DOM, dur=0.2,
+        axes=AXES, prior=1.03)
 def hat_closed(c, r):
     """two 14-inch plates clamped together: their contact drains every mode in a tenth of a second or less
     (choke), and while they ring they buzz against each other (sizzle): a short tight chick after the tick"""
@@ -400,7 +400,7 @@ def hat_closed(c, r):
 @design('hat/open', kind='hit',
         says=('an open hi-hat, a sizzling cymbal wash', 'a stick hitting a loose open hi-hat',
               'a bright metallic sizzle ringing out'),
-        uses=('drum', 'hi-hat', 'beat', 'groove', 'accent', 'swish'), tags=('drums', 'kit'), domains=DOM, dur=1.0,
+        uses=('drum', 'hi-hat', 'groove', 'accent', 'swish'), tags=('drums', 'kit'), domains=DOM, dur=1.0,
         axes=AXES)
 def hat_open(c, r):
     """the two plates a few millimetres apart: they ring for a second, and the larger motion of a struck plate
@@ -412,7 +412,7 @@ def hat_open(c, r):
 @design('hat/pedal', kind='tick',
         says=('a hi-hat closed with the foot pedal, a soft chick', 'two cymbals clapped together softly',
               'a soft short metallic chick'),
-        uses=('drum', 'hi-hat', 'beat', 'groove', 'tick', 'rhythm'), tags=('drums', 'kit'), domains=DOM, dur=0.15,
+        uses=('drum', 'hi-hat', 'groove', 'tick', 'rhythm'), tags=('drums', 'kit'), domains=DOM, dur=0.15,
         axes=AXES)
 def hat_pedal(c, r):
     """the pedal brings the top plate down onto the bottom one: metal on metal but no stick (a faint tick), the
@@ -430,7 +430,7 @@ def hat_pedal(c, r):
 @design('hat/electro', kind='tick',
         says=('an electronic hi-hat tick from a drum machine', 'a short synthesized metallic hi-hat',
               'a crisp drum machine hat'),
-        uses=('drum', 'hi-hat', 'beat', 'trap', 'edm', 'tick', 'rhythm'), tags=('drums', 'electronic'), domains=DOM,
+        uses=('drum', 'hi-hat', 'trap', 'edm', 'tick', 'rhythm'), tags=('drums', 'electronic'), domains=DOM,
         dur=0.12, axes=AXES)
 def hat_electro(c, r):
     """the synthetic hi-hat (hat_synth): six inharmonic square waves through two band-passes and a high-pass, a
@@ -460,8 +460,8 @@ def _cym(c, r, name, vel, f_lo, f_hi, t60, tilt, shimmer, cross, dur, bell=0.0, 
 
 @design('crash/bright', kind='hit',
         says=('a bright crash cymbal', 'a loud shimmering cymbal crash', 'a splashy metallic cymbal hit'),
-        uses=('drum', 'crash', 'cymbal', 'accent', 'impact', 'finale', 'reveal', 'transition'),
-        tags=('drums', 'kit'), domains=DOM, dur=3.0, axes=AXES, allows=('ring',))
+        uses=('drum', 'crash cymbal', 'cymbal', 'accent', 'impact', 'finale', 'reveal', 'transition'),
+        tags=('drums', 'kit'), domains=DOM, dur=3.0, axes=AXES, allows=('ring',), prior=1.03)
 def crash_bright(c, r):
     """a thin 16-inch crash hit on the edge with the stick's shoulder: a fast bright wash whose energy climbs
     into the top within 50-100 ms of the hit, then a two- to three-second decay"""
@@ -472,7 +472,7 @@ def crash_bright(c, r):
 
 @design('crash/dark', kind='hit',
         says=('a dark crash cymbal', 'a deep washy cymbal crash', 'a large trashy cymbal hit'),
-        uses=('drum', 'crash', 'cymbal', 'accent', 'impact', 'finale', 'transition'), tags=('drums', 'kit'),
+        uses=('drum', 'crash cymbal', 'cymbal', 'accent', 'impact', 'finale', 'transition'), tags=('drums', 'kit'),
         domains=DOM, dur=4.0, axes=AXES, allows=('ring',))
 def crash_dark(c, r):
     """a heavier 19-inch crash: lower modes, longer, less top; the wash swells more slowly"""
@@ -484,8 +484,8 @@ def crash_dark(c, r):
 @design('ride/ping', kind='hit',
         says=('a ride cymbal ping', 'a stick tapping a ride cymbal, a clear ping with a long shimmer',
               'a bright metallic ping that rings on'),
-        uses=('drum', 'ride', 'cymbal', 'jazz', 'groove', 'beat', 'rhythm'), tags=('drums', 'kit'), domains=DOM,
-        dur=3.0, axes=AXES, allows=('ring',))
+        uses=('drum', 'ride', 'cymbal', 'jazz', 'groove', 'rhythm'), tags=('drums', 'kit'), domains=DOM,
+        dur=3.0, axes=AXES, allows=('ring',), prior=1.03)
 def ride_ping(c, r):
     """the stick's tip on the bow of a heavy 21-inch ride: a clear tick and ping, little wash (a thick plate:
     the coupling is weak at this level), a long even decay"""
@@ -565,8 +565,8 @@ def _claps(c, r, people, spread_s, vel, flat=False):
 
 @design('clap/hands', kind='hit',
         says=('a single hand clap', 'two hands clapping once', 'a sharp clap of palms'),
-        uses=('clap', 'applause', 'beat', 'accent', 'success', 'attention'), tags=('drums', 'body'), domains=DOM,
-        dur=0.2, axes=AXES)
+        uses=('clap', 'applause', 'accent', 'success', 'attention'), tags=('drums', 'body'), domains=DOM,
+        dur=0.2, axes=AXES, prior=1.03)
 def clap_hands(c, r):
     """one clap: the palms slap together over a millisecond or two and the air pushed out of the cupped space
     between them rings at 1-2 kHz (a broad peak); a small room"""
@@ -578,7 +578,7 @@ def clap_hands(c, r):
 @design('clap/group', kind='hit',
         says=('a group of people clapping together once', 'several hand claps at once, a crowd clap',
               'a layered clap of many hands'),
-        uses=('clap', 'applause', 'beat', 'accent', 'success', 'crowd'), tags=('drums', 'body'), domains=DOM,
+        uses=('clap', 'applause', 'accent', 'success', 'crowd'), tags=('drums', 'body'), domains=DOM,
         dur=0.35, axes=AXES, allows=('stacked',))
 def clap_group(c, r):
     """ten to thirteen people clapping hard on the same beat: the claps scattered 5-25 ms apart (a timing spread
@@ -591,7 +591,7 @@ def clap_group(c, r):
 @design('clap/electro', kind='hit',
         says=('an electronic hand clap from a drum machine', 'a synthesized clap, a few quick bursts of noise',
               'a drum machine clap with a short tail'),
-        uses=('clap', 'beat', 'backbeat', 'edm', 'hip hop', 'accent'), tags=('drums', 'electronic'), domains=DOM,
+        uses=('clap', 'backbeat', 'edm', 'hip hop', 'accent'), tags=('drums', 'electronic'), domains=DOM,
         dur=0.3, axes=AXES, allows=('stacked',))
 def clap_electro(c, r):
     """the synthetic clap (clap_synth): four bursts of band-passed noise 10 ms apart and a tail; ring = the tail,
@@ -606,7 +606,7 @@ def clap_electro(c, r):
 
 @design('snap/finger', kind='click',
         says=('a finger snap', 'someone snapping their fingers once', 'a sharp crisp finger click'),
-        uses=('snap', 'click', 'beat', 'select', 'attention', 'cool'), tags=('drums', 'body'), domains=DOM, dur=0.15,
+        uses=('snap', 'click', 'select', 'attention', 'cool'), tags=('drums', 'body'), domains=DOM, dur=0.15,
         axes=AXES)
 def snap_finger(c, r):
     """a snap: the thumb slips off the middle finger (a faint skin hiss), the finger strikes the palm's base and
@@ -629,8 +629,8 @@ def _shell(c, r):
 @design('shaker/tick', kind='tick',
         says=('a single shake of a shaker', 'one short stroke of an egg shaker, a quick chk',
               'a small rattle of beads in a shell'),
-        uses=('shaker', 'beat', 'rhythm', 'tick', 'groove', 'percussion'), tags=('drums', 'hand percussion'),
-        domains=DOM, dur=0.2, axes=AXES)
+        uses=('shaker', 'rhythm', 'tick', 'groove', 'percussion'), tags=('drums', 'hand percussion'),
+        domains=DOM, dur=0.2, axes=AXES, prior=1.03)
 def shaker_tick(c, r):
     """one stroke: the beads slide across the shell for 40-60 ms (a thin rustle) and then hit the far wall all
     at once (a dense burst), thinning out into single grains as they settle"""
@@ -646,7 +646,7 @@ def shaker_tick(c, r):
 @design('shaker/roll', kind='noise',
         says=('a shaker being shaken steadily', 'a continuous rhythmic rattle of an egg shaker',
               'beads rattling back and forth in a shell'),
-        uses=('shaker', 'groove', 'rhythm', 'percussion', 'beat', 'loop'), tags=('drums', 'hand percussion'),
+        uses=('shaker', 'groove', 'rhythm', 'percussion', 'loop'), tags=('drums', 'hand percussion'),
         domains=DOM, dur=2.0, axes=AXES, allows=('tail',))
 def shaker_roll(c, r):
     """a steady shake for dur s: strokes at about 8 a second (the forward one stronger: the hand's accent),
@@ -685,8 +685,8 @@ def _tamb(c, r, strokes, n, head=0.0, shake=0.0):
 @design('tambourine/hit', kind='hit',
         says=('a tambourine struck once', 'a hand hitting a tambourine, a bright jingle',
               'a burst of small metal jingles'),
-        uses=('tambourine', 'beat', 'accent', 'backbeat', 'percussion', 'success'), tags=('drums', 'hand percussion'),
-        domains=DOM, dur=0.6, axes=AXES)
+        uses=('tambourine', 'accent', 'backbeat', 'percussion', 'success'), tags=('drums', 'hand percussion'),
+        domains=DOM, dur=0.6, axes=AXES, prior=1.03)
 def tambourine_hit(c, r):
     """the palm strikes the head: a short thud of the small head and the hand's slap, and every pair of jingles
     on the frame is thrown apart and clashes again and again, faster and weaker (restitution), each pair a dished
@@ -748,8 +748,8 @@ def _hand(c, r, name, note, stroke, radius, t60, dur):
 @design('conga/open', kind='hit',
         says=('an open conga tone', 'a hand striking a conga drum, a round ringing note',
               'a warm pitched hand drum hit'),
-        uses=('conga', 'latin', 'groove', 'percussion', 'beat', 'rhythm'), tags=('drums', 'hand percussion'),
-        domains=DOM, dur=0.6, pitch='E3', axes=AXES)
+        uses=('conga', 'latin', 'groove', 'percussion', 'rhythm'), tags=('drums', 'hand percussion'),
+        domains=DOM, dur=0.6, pitch='E3', axes=AXES, prior=1.03)
 def conga_open(c, r):
     """an open tone on an 11-inch conga"""
     return _out(c, r, _hand(c, r, 'conga/open', 'E3', 'open', 0.14, 0.42, 0.8), 'room', 0.0)
@@ -758,7 +758,7 @@ def conga_open(c, r):
 @design('conga/slap', kind='hit',
         says=('a conga slap, a sharp high crack of a hand on a drum', 'a slapped conga, short and popping',
               'a hand slapping a drum head'),
-        uses=('conga', 'latin', 'accent', 'percussion', 'beat', 'slap'), tags=('drums', 'hand percussion'),
+        uses=('conga', 'latin', 'accent', 'percussion', 'slap'), tags=('drums', 'hand percussion'),
         domains=DOM, dur=0.3, pitch='E3', axes=AXES)
 def conga_slap(c, r):
     """a slap on the conga"""
@@ -767,7 +767,7 @@ def conga_slap(c, r):
 
 @design('bongo/high', kind='hit',
         says=('a high bongo hit', 'a small hand drum with a bright pitched pop', 'fingers striking a bongo'),
-        uses=('bongo', 'latin', 'groove', 'percussion', 'beat', 'rhythm', 'tap'), tags=('drums', 'hand percussion'),
+        uses=('bongo', 'latin', 'groove', 'percussion', 'rhythm', 'tap'), tags=('drums', 'hand percussion'),
         domains=DOM, dur=0.35, pitch='G4', axes=AXES)
 def bongo_high(c, r):
     """an open tone on the small (7-inch) bongo: high, short, bright"""
@@ -814,8 +814,8 @@ def _cajon(c, r, stroke):
 @design('cajon/bass', kind='thud',
         says=('a cajon bass tone, a deep thump on a wooden box drum', 'a palm striking the middle of a cajon',
               'a low woody box drum thud'),
-        uses=('cajon', 'acoustic', 'groove', 'beat', 'percussion', 'kick drum'), tags=('drums', 'hand percussion'),
-        domains=DOM, dur=0.5, axes=AXES)
+        uses=('cajon', 'acoustic', 'groove', 'percussion', 'kick drum'), tags=('drums', 'hand percussion'),
+        domains=DOM, dur=0.5, axes=AXES, prior=1.03)
 def cajon_bass(c, r):
     """the palm in the middle of the tapa"""
     return _out(c, r, _cajon(c, r, 'bass'), 'room', 0.0)
@@ -824,7 +824,7 @@ def cajon_bass(c, r):
 @design('cajon/slap', kind='hit',
         says=('a cajon slap, a sharp snare-like crack on a wooden box', 'fingers slapping the top edge of a cajon',
               'a woody crack with a buzz of wires'),
-        uses=('cajon', 'acoustic', 'groove', 'beat', 'percussion', 'snare'), tags=('drums', 'hand percussion'),
+        uses=('cajon', 'acoustic', 'groove', 'percussion', 'snare'), tags=('drums', 'hand percussion'),
         domains=DOM, dur=0.4, axes=AXES)
 def cajon_slap(c, r):
     """the fingers at the top edge of the tapa"""
