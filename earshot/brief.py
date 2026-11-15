@@ -26,7 +26,9 @@ with the tables in earshot.sounds.lexicon, without any model:
 `rank` scores every design by what it shares with the request: a design's jobs (`uses`) count most, then its name,
 then how it is described (`says`) and tagged; rare words count more than common ones (idf), the design's own family
 job gets a bonus, and the result is scaled by the design's prior, the domain, material, loop, length and direction.
-`why` names the words that decided.
+`why` names the words that decided. `rank(b, semantic=atlas.zmap(text))` blends in how much each design sounds like
+the request (earshot.sounds.atlas, CLAP; `blend`): a named job keeps its lexical winner, a request that only
+describes a sound is decided by the sound, and the hard filters (chip sound, loop, a job ruled out) still hold.
 """
 import math
 import re
@@ -78,6 +80,9 @@ FAMILY_BONUS, EXACT_BONUS, FIRST_USE_BONUS = 1.2, 0.3, 0.6
 CONCEPT_IDF = 0.6                  # how much rarity counts for canonical words (1 = as for plain words)
 STRETCH_KINDS = ('bed', 'pad', 'texture')   # rendered at any length asked for
 LENGTH_SLOPE = 0.15                # how much a length mismatch costs per octave beyond the free half octave
+# the blend of the lexical score with the semantic z (`blend`; chosen on eval/requests.json + requests_b.json)
+LEX_FLOOR, LEX_POWER, SEM_WEIGHT, Z_FLOOR, Z_SAYS = 1.0, 0.25, 0.4, -1.0, 2.5
+UNNAMED_LEX = 0.25                 # the most a lexical score counts in the blend when no job or sound word matched
 _rev = None
 _cache = {}
 
@@ -733,12 +738,80 @@ def length_fit(b, row):
     return f
 
 
-def rank(b, rows=None, top=8, idx=None):
+def chip(row):
+    """True for a chip-sound design (8-bit, retro)"""
+    return 'retro' in row['tags'] or row.get('material') == 'retro'
+
+
+def excluded(b, row, t):
+    """True when the request's hard filters rule a design out whatever it sounds like: chip sound asked for and the
+    design is not one (or the other way round), a loop asked for and the design is a one-shot, or the design plays a
+    job the request rules out ("not an error")"""
+    if (b.get('material') == 'retro') != chip(row):
+        return True
+    if b.get('loop') and not row.get('loop'):
+        return True
+    return any(c in t['uses'] or c in t['name'] for c in b.get('not', ()))
+
+
+def named(why):
+    """True when the words that decided a design (rank's `why`) include a job or a sound (a canonical word or a
+    voice), not only adjectives and plain words"""
+    if 'voices' not in _cache:
+        _cache['voices'] = frozenset(L.VOICES.values())
+    return any(w in L.CONCEPTS or w in _cache['voices'] for w in why)
+
+
+def blend(b, lexical, semantic, idx):
+    """lexical ranking and semantic z (earshot.sounds.atlas.zmap: {id: z}) as one ranking (module doc of
+    earshot.sounds.atlas; constants chosen on the development request sets, eval/requests*.json):
+        score = lexical / max(best lexical, LEX_FLOOR) ** LEX_POWER + SEM_WEIGHT * max(z, Z_FLOOR)
+    A request that names a job or a sound has a high best lexical score: dividing by its power < 1 keeps the lexical
+    gaps of a named job larger than the spread of z, so the job's winner stays. When no word of the request matched
+    any design and the lexical ranking is by feel alone ("a thin airy streak fading away"), the lexical scores are
+    scaled to at most UNNAMED_LEX instead, under the spread of z: z decides, adjectives break ties. A design the
+    hard filters exclude (`excluded`) cannot gain from z (only lose); a design that matched no word gets the semantic
+    part scaled by its length fit"""
+    rows, terms = idx[0], idx[1]
+    lex = {r['id']: r for r in lexical}
+    s1 = max([r['score'] for r in lexical] or [0.0])
+    feel = set(b.get('hints', ()))
+    worded = any(w not in feel for r in lexical[:1] for w in r['why'])
+    norm = max(s1, LEX_FLOOR) ** LEX_POWER if worded else max(s1, LEX_FLOOR) / UNNAMED_LEX
+    out = []
+    for k, row in enumerate(rows):
+        z = semantic.get(row['id'])
+        r = lex.get(row['id'])
+        s = r['score'] if r else 0.0
+        if z is None:
+            sem = 0.0
+        else:
+            sem = max(z, Z_FLOOR)
+            if excluded(b, row, terms[k]):
+                sem = min(sem, 0.0)
+            elif r is None and sem > 0:
+                sem *= length_fit(b, row)
+        if r is None and sem <= 0:
+            continue
+        why = list(r['why']) if r else []
+        if z is not None and z >= Z_SAYS:
+            why.append(f'sounds like it (z {z:+.1f})')
+        out.append({'id': row['id'], 'score': round(s / norm + SEM_WEIGHT * sem, 3), 'why': why,
+                    'lex': s, 'z': None if z is None else round(z, 2)})
+    out.sort(key=lambda x: (-x['score'], x['id']))
+    return out
+
+
+def rank(b, rows=None, top=8, idx=None, semantic=None):
     """the designs that answer a brief, best first: [{'id', 'score', 'why'}]. rows: catalogue rows (default: every
     design; the index of the whole catalogue is built once and kept); a design must share at least one word with
-    the request to be listed; when none does, the designs closest in feel are listed"""
+    the request to be listed; when none does, the designs closest in feel are listed. semantic: {id: z} of how
+    much each design sounds like the request (earshot.sounds.atlas.zmap), blended in (`blend`; the rows then also
+    carry 'lex' and 'z'); None = the lexical ranking alone"""
     if idx is None:
         idx = index(rows) if rows is not None else _default_index()
+    if semantic is not None:
+        return blend(b, rank(b, top=None, idx=idx), semantic, idx)[:top]
     rows, terms, inv, idf = idx
     q = _query(b)
     score, why = {}, {}
@@ -750,16 +823,13 @@ def rank(b, rows=None, top=8, idx=None):
     mat, dom, loop = b.get('material'), b.get('domain'), b.get('loop')
     pool = ([k for k in score if k in why] or [k for k in score if dom in rows[k].get('domains', ())]
             or list(score))                            # nothing named: the closest in feel, in the request's domain
-
-    def chip(k):
-        return 'retro' in rows[k]['tags'] or rows[k].get('material') == 'retro'
-    if mat == 'retro' and not any(chip(k) for k in pool):
+    if mat == 'retro' and not any(chip(rows[k]) for k in pool):
         # chip sound asked for and no chip design shares a word: every chip design, by feel and direction
-        pool = [k for k in range(len(rows)) if chip(k)]
+        pool = [k for k in range(len(rows)) if chip(rows[k])]
         for k in pool:
             score[k] = 1.0 + score.get(k, 0.0)
             why.setdefault(k, ['retro'])
-    is_retro = [chip(k) for k in pool]
+    is_retro = [chip(rows[k]) for k in pool]
     only_retro = mat == 'retro' and any(is_retro)
     out = []
     for k, retro in zip(pool, is_retro):

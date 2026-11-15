@@ -14,11 +14,15 @@ What happens: the request is read (earshot.brief: the job or sound, the feeling 
 material or voice, numbers such as length, pitch and key), the catalogue is ranked (earshot.sounds), the best design
 is rendered with those controls, audited without models (clicks, cut tails, clipping, DC) and re-rolled on another
 seed if the audit fails, then written in the format of the file name. No model is loaded and nothing is downloaded:
-a call takes about a second. `--listen` adds earshot's ears (the models, 20-40 s once): the best three designs are
-rendered and the one heard closest to the request is kept, with its verdict in the result.
+a call takes about a second. `--listen` adds earshot's ears (CLAP, 20-40 s once): the ranking also weighs how much
+each design sounds like the request (earshot.sounds.atlas, blended by earshot.brief.blend), and the result says what
+the written sound is heard as. When the model is already loaded in the process (the MCP server keeps it warm), the
+blend is used without asking.
 
 The result says what was chosen and why, what else would fit (`also`), and which words were not understood, so one
-call is usually enough. Everything rendered is the caller's to use, in any product, without credit.
+call is usually enough. When the pick is a guess (no job or sound word matched and nothing sounds like the request,
+or another kind of sound fits almost as well), one line says so and names the closest alternatives, to be asked for
+by `sound=<id>`. Everything rendered is the caller's to use, in any product, without credit.
 """
 import json
 import os
@@ -29,6 +33,7 @@ from .report import emit, read_json
 
 SET_FIELDS = ('name', 'want', 'sound', 'pitch', 'dur', 'voice', 'material', 'seed', 'n', 'axes', 'lufs')
 TRIES = 4
+GUESS_Z, GUESS_HAIR = 2.0, 0.06     # `guess`: semantic support, and how close another family may come (share)
 
 
 def _paths(out, n, fmt):
@@ -51,9 +56,23 @@ def _line(meta, path, why):
     return f"{os.path.basename(path)}: {meta['id']} ({', '.join(bits)})" + (f" [{why}]" if why else '')
 
 
-def choose(want, sound=None, top=4, **over):
+def semantic(want, listen=None):
+    """({id: z} of how much each design sounds like the request, or None; a note when listening was asked for and
+    could not be done). listen: True = use earshot.sounds.atlas (loads CLAP once), None = only when the model is
+    already loaded in this process (the MCP server keeps it warm), False = never"""
+    from .sounds import atlas
+    if not want or listen is False or (listen is None and not atlas.warm()):
+        return None, None
+    try:
+        return atlas.zmap(want), None
+    except atlas.AtlasError as e:
+        return None, (f'not listened: {e}' if listen else None)
+
+
+def choose(want, sound=None, top=4, listen=False, **over):
     """(brief, candidates) of a request: the brief with explicit arguments laid over it, and the ranked designs
-    ([{'id', 'score', 'why'}]); `sound` names a design and skips the ranking"""
+    ([{'id', 'score', 'why'}, + 'lex' and 'z' when blended with how they sound: `semantic`]); `sound` names a design
+    and skips the ranking. b['listened'] says whether the semantic blend was used, b['listen_note'] why not"""
     from .sounds import registry
     b = brief.read(want or '')
     for k in ('pitch', 'dur', 'voice', 'material'):
@@ -63,7 +82,31 @@ def choose(want, sound=None, top=4, **over):
         b['axes'][a] = max(-1.0, min(1.0, b['axes'].get(a, 0.0) + float(v)))
     if sound:
         return b, [{'id': registry.get(sound).id, 'score': None, 'why': ['named']}]
-    return b, brief.rank(b, top=top)
+    sem, b['listen_note'] = semantic(want, listen)
+    b['listened'] = sem is not None
+    return b, brief.rank(b, top=top, semantic=sem)
+
+
+def guess(b, cands):
+    """one line when the pick rests on weak evidence, else None: no job or sound word matched and the request does
+    not sound like the pick (z under GUESS_Z, or not listened), or the best design of another family is within
+    GUESS_HAIR (a share of the pick's score) of it: members of one family tie often and harmlessly. Names the closest
+    designs of other families first. Thresholds chosen on the development request sets (660 requests, top 8 ranked):
+    lexical ranking, 32 % of wrong first picks flagged and 10 % of right ones; blended, 36 % and 8 %"""
+    if len(cands) < 2 or cands[0]['score'] is None:
+        return None
+    top = cands[0]
+    fam = top['id'].split('/')[0]
+    others = [c for c in cands[1:] if c['id'].split('/')[0] != fam]
+    named = brief.named(top['why'])
+    heard = top.get('z') is not None and top['z'] >= GUESS_Z
+    close = bool(others) and top['score'] - others[0]['score'] <= GUESS_HAIR * abs(top['score'])
+    if (named or heard) and not close:
+        return None
+    why = 'another kind of sound fits almost as well' if close else 'no job or sound word matched' + (
+        ' and it does not clearly sound like the request' if b.get('listened') else '')
+    alts = ', '.join(c['id'] for c in (others + [c for c in cands[1:] if c not in others])[:3])
+    return f'a guess ({why}); also close: {alts}. Name the one you want with sound=<id>'
 
 
 def _request(b, theme):
@@ -110,7 +153,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     from .synth import master
     if not (want or sound):
         raise ValueError('say what sound you want (want=...) or name one (sound=...)')
-    b, cands = choose(want, sound, pitch=pitch, dur=dur, voice=voice, material=material, axes=axes)
+    b, cands = choose(want, sound, top=8, listen=True if listen else None, pitch=pitch, dur=dur, voice=voice,
+                      material=material, axes=axes)
     if loop is False:
         b['loop'] = False
     if not cands:
@@ -119,19 +163,7 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     n = int(b['n'] or n)
     req = _request(b, theme)
     heard = None
-    if listen and len(cands) > 1 and not sound:
-        import tempfile
-        best = None
-        with tempfile.TemporaryDirectory() as tmp:
-            for c in cands[:3]:
-                y, meta = take(c['id'], seed, req, lufs)
-                p = master.write(os.path.join(tmp, 'c.wav'), y)
-                h = _heard(p, [want] + list(registry.get(c['id']).says))
-                if best is None or h['z'] > best[0]['z']:
-                    best = (h, c)
-        heard, pick = best
-    else:
-        pick = cands[0]
+    pick = cands[0]
     if b.get('dur_max') and 'dur' not in req and (registry.get(pick['id']).dur or 0) > b['dur_max']:
         req['dur'] = b['dur_max']                # "under 150 ms": only shortens a design that is longer
     paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
@@ -146,8 +178,13 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     why = ', '.join(dict.fromkeys(pick['why']))
     lines = [_line(t, t['file'], why if i == 0 else '') for i, t in enumerate(takes)]
     also = [c['id'] for c in cands if c['id'] != pick['id']][:3]
-    if also:
+    hint = None if sound else guess(b, cands)
+    if hint:
+        lines.append(hint)
+    elif also:
         lines.append('also: ' + ', '.join(also))
+    if b.get('listen_note'):
+        lines.append(b['listen_note'])
     if heard:
         lines.append(f"heard as: {heard['query']!r} (z {heard['z']:+.1f}, {heard['verdict']})")
     ign = sorted(set().union(*(set(t.get('ignored') or ()) for t in takes)))
@@ -293,8 +330,9 @@ def add_cli(sub):
     p.add_argument('--mono', action='store_true')
     p.add_argument('--no-loop', action='store_true', help='an ambience once, with a fade in and out, instead of a '
                                                           'seamless loop')
-    p.add_argument('--listen', action='store_true', help='let the models pick among the best three and say what '
-                                                         'the result is heard as (loads them: 20-40 s)')
+    p.add_argument('--listen', action='store_true', help='also rank by how each design sounds (CLAP against the '
+                                                         'sound atlas) and say what the result is heard as (loads '
+                                                         'the model: 20-40 s)')
     common(p)
     p.set_defaults(func=_run_make)
     q = sub.add_parser('sounds', help='the catalogue of sounds `earshot make` can make')
