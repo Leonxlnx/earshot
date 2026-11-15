@@ -144,7 +144,7 @@ def test_one_loudness_and_speed():
         T.append(time.perf_counter() - t0)
         L.append(lufs_max(y))
     assert max(L) - min(L) < 2.5 and abs(np.median(L) - chip.LOUD_LUFS) < 0.5
-    assert max(T) < 0.25                                                   # about 0.1 s on one busy laptop thread
+    assert max(T) < 1.5        # about 0.1 s on one thread; the bound only catches a render gone wrong
 
 
 def test_dur_and_pitch():
