@@ -270,6 +270,58 @@ def test_instrument_before_a_sound_noun():
     assert 'voice:marimba' in brief.read('one marimba hit')['concepts']
 
 
+def _sayable(word, d):
+    """a member name a person would say: a lexicon word or a word of the design's own description"""
+    tables = (L.MODIFIERS, L.MATERIALS, L.VOICES, L.CONCEPTS)
+    said = {w for s in d.says for w in brief.words(s)}
+    syn = {w for v in L.CONCEPTS.values() for p in v for w in p.split()}
+    return word.isalpha() and len(word) > 2 and (any(word in t for t in tables) or word in said or word in syn)
+
+
+def test_a_member_named_in_the_request_is_the_one_chosen():
+    """"a warm pad chord" is pad/warm, though "warm" is an adjective: for every family of several members, the
+    request "<member name> <family word>" ranks that member first"""
+    from earshot.sounds import registry
+    fams = {}
+    for sid in registry.ids():
+        fams.setdefault(sid.split('/')[0], []).append(sid)
+    cases = [(f"{sid.split('/')[1]} {fam.replace('_', ' ')}", sid) for fam, ids in fams.items() if len(ids) > 1
+             and all(_sayable(p, registry.get(ids[0])) or p in L.CONCEPTS for p in fam.split('_'))
+             for sid in ids if _sayable(sid.split('/')[1], registry.get(sid))]
+    assert len(cases) > 60
+    wrong = [(text, sid, [r['id'] for r in brief.rank(brief.read(text), top=1)]) for text, sid in cases]
+    wrong = [w for w in wrong if w[2] != [w[1]]]
+    assert not wrong, wrong
+    assert brief.rank(brief.read('a warm pad chord in F'), top=1)[0]['id'] == 'pad/warm'
+    b = brief.read('a warm pad chord in F')
+    assert b['axes'].get('bright', 0) < 0                                         # warm still darkens
+
+
+def test_why_shows_only_the_requests_own_words():
+    """`[table, coin_object, coin]`, `[glass_object, bell]`, `[level_up, win, power_up]` showed internal names"""
+    for text in ('coins on a table', 'glasses clinking', 'level up', 'a big win, level up!', 'a warm pad chord'):
+        b = brief.read(text)
+        for r in brief.rank(b, top=3):
+            shown = brief.shown(b, r['why'])
+            assert shown and not any('_' in w or ':' in w for w in shown), (text, shown)
+            words_ = ' '.join(shown).split()
+            assert len(words_) == len(set(words_)), (text, shown)                 # a word once
+            assert all(w in text.lower() for w in shown if not w.startswith('sounds like')), (text, shown)
+    assert brief.shown(brief.read('level up'), ['level_up', 'power_up']) == ['level up']
+
+
+def test_job_phrases_match_inflected_and_reordered():
+    for text in ('a page turning', 'turning a page', 'pages turn', 'turned the page'):
+        assert brief.rank(brief.read(text), top=1)[0]['id'] == 'paper/page', text
+    assert brief.stem('levelling') == brief.stem('leveled') == brief.stem('level')
+    assert brief.stem('spelling') == 'spell'
+    for text, fam in (('level up', 'level_up'), ('levelling up', 'level_up'), ('leveled up', 'level_up'),
+                      ('power up', 'power_up'), ('powering up', 'power_up'), ('game over', 'lose'),
+                      ('pick up', 'pickup'), ('picking it up', 'pickup')):
+        got = brief.rank(brief.read(text), top=1)[0]['id']
+        assert got.split('/')[0] in (fam, 'coin') if fam == 'pickup' else got.startswith(fam + '/'), (text, got)
+
+
 def test_a_job_of_several_words_counts_only_as_a_whole():
     """a multi-word `uses` phrase is found by the whole phrase; one of its words alone counts only as a tag"""
     rows = [dict(id='a/x', kind='chime', says=['a plain chime', 'a small chime'], uses=['order ready'], tags=[],
@@ -364,6 +416,9 @@ ANCHORS = [
     # ambience
     ('gentle rain on a tent, looping', ('rain/tent',)),
     ('forest ambience by day with birds', ('forest/',)),        # game log: 'rainy day' once won it by "day"
+    ('ocean waves on a beach', ('waves/sand',)),                # a beach without another word is sand
+    ('a warm pad chord in F', ('pad/warm',)),
+    ('a page turning', ('paper/page',)),
     ('crickets on a summer night', ('night/',)),
     ('waves rolling over pebbles', ('waves/pebbles',)),
     ('busy city traffic in the distance', ('city/',)),

@@ -115,11 +115,11 @@ def test_make_why_and_unknown_never_show_a_stem_or_a_word_twice(tmp_path):
     res = make(want, str(tmp_path / 'w.wav'), dur=2, loop=False)          # once, short: the words are the point
     shown = res['summary'].splitlines()[0].rsplit('[', 1)[1].rstrip(']').split(', ')
     assert shown == res['why'] and 'lak' not in res['why'] and not set(res['why']) & set(res['unknown'])
-    assert 'lake' in res['why'] and 'lake' not in res['unknown']
+    assert 'lake' in ' '.join(res['why']).split() and 'lake' not in res['unknown']
     s = make_set({'sounds': [{'name': 'amb', 'want': want + ', one-shot', 'dur': 2}]}, out=str(tmp_path / 's'))
     lines = s['summary'].splitlines()
     why = lines[1].rsplit('[', 1)[1].rstrip(']').split(', ')
-    assert 'lake' in why and 'lak' not in why
+    assert 'lake' in ' '.join(why).split() and 'lak' not in why
     assert not any(ln.strip().startswith('not understood:') and 'lake' in ln for ln in lines)
 
 

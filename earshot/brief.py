@@ -73,7 +73,7 @@ TOGGLE_ON_NEXT = ('in', 'for', 'at', 'when', 'with', 'and', 'sound', 'click', 's
 SCOPE_END = ('sound', 'sounds', 'noise', 'noises', 'thing', 'effect', 'sfx', 'but')
 # weights of the query's parts and of the fields of a design
 HEAD_WEIGHT, CONCEPT_WEIGHT, PART_WEIGHT, CONTEXT_WEIGHT, BROADER_WEIGHT, REF_WEIGHT = 1.0, 0.8, 0.6, 0.5, 0.4, 0.25
-WORD_WEIGHT, HINT_WEIGHT, AXIS_WEIGHT = 0.6, 0.35, 0.12
+WORD_WEIGHT, HINT_WEIGHT, AXIS_WEIGHT, SAID_WEIGHT = 0.6, 0.35, 0.12, 0.005
 FIELD_WEIGHT = {'uses': 3.0, 'name': 2.2, 'says': 1.6, 'tags': 1.2}
 # the design's own family named in the request (by its very name: + EXACT_BONUS); its first job
 FAMILY_BONUS, EXACT_BONUS, FIRST_USE_BONUS = 1.2, 0.3, 0.6
@@ -82,7 +82,8 @@ STRETCH_KINDS = ('bed', 'pad', 'texture')   # rendered at any length asked for
 LENGTH_SLOPE = 0.15                # how much a length mismatch costs per octave beyond the free half octave
 # the blend of the lexical score with the semantic z (`blend`; chosen on eval/requests.json + requests_b.json)
 LEX_FLOOR, LEX_POWER, SEM_WEIGHT, Z_FLOOR, Z_SAYS = 1.0, 0.25, 0.4, -1.0, 2.5
-UNNAMED_LEX = 0.25                 # the most a lexical score counts in the blend when no job or sound word matched
+MEMBER_SHARE = 0.8                 # how close a member named in the request must score to the family's best
+UNNAMED_LEX = 0.25                # the most a lexical score counts in the blend when no job or sound word matched
 _rev = None
 _cache = {}
 
@@ -99,6 +100,8 @@ def stem(w):
         if (w.endswith(end) and len(w) - len(end) >= 3 and not (end == 's' and w.endswith(('ss', 'us', 'is')))
                 and not (end == 'ed' and w.endswith('eed'))):
             w = w[:len(w) - len(end)] + keep
+            if end in ('ing', 'ed') and len(w) >= 6 and w.endswith('ell'):
+                w = w[:-1]                # British doubling: 'levelling', 'cancelled' (not 'spelling')
             break
     if len(w) > 3 and w.endswith('e') and not w.endswith(('ee', 'ie')):
         w = w[:-1]
@@ -544,6 +547,10 @@ def read(text):
             key, said = _key(toks[i:j]), ' '.join(toks[i:j])
             if 'm' in hit:
                 axes(hit['m'], st['scale'])
+            elif j - i > 1:                # "a warm pad": the adjective inside a name still moves its axis
+                for w in toks[i:j]:
+                    if modifier(w):
+                        axes(L.MODIFIERS[modifier(w)], st['scale'])
             if 'p' in hit and not st['neg']:
                 b['material'] = b['material'] or hit['p']
             if 'o' in hit:
@@ -648,8 +655,9 @@ def read(text):
 
 
 def phrase_key(words_):
-    """the key of a phrase of several words: the stems of its content words ('rainy day' -> 'rainy day')"""
-    return ' '.join(stem(w) for w in words_ if w not in L.STOP and w not in PUNCT)
+    """the key of a phrase of several words: the stems of its content words in alphabetical order, so that an
+    inflected form or another word order finds it ('page turn', "turning a page", "pages turned" -> 'pag turn')"""
+    return ' '.join(sorted(stem(w) for w in words_ if w not in L.STOP and w not in PUNCT))
 
 
 def _phrases(toks, written):
@@ -687,6 +695,8 @@ def _terms(row):
                 t['tags'].update(rest)                      # day'; "day" alone only as much as a tag
             else:
                 t[field].update(rest)
+            if field == 'uses' and len(content) == 1:
+                t[field].add('sw:' + stem(content[0]))     # the word itself, also when it names a job
             feel.update(f)
             if field in ('says', 'name'):
                 d += dd
@@ -755,6 +765,9 @@ def _query(b):
     for w in b['words']:
         q[w] = max(q.get(w, 0.0), WORD_WEIGHT * (0.5 if w in ctx else 1.0))
     said = b.get('written') or {}
+    for k, w in _said_words(b.get('text')).items():     # the very words said break ties between the designs of
+        if w not in L.STOP:                             # a job: "ocean waves on a beach" is the one whose job is
+            q['sw:' + k] = SAID_WEIGHT                  # 'beach' itself, not the one with 'pebble beach'
     for p in b.get('phrases', ()):
         q[p] = WORD_WEIGHT * (0.5 if set(said.get(p, '').split()) & ctx else 1.0)
     for key, wt in (('refs', REF_WEIGHT), ('context', CONTEXT_WEIGHT), ('parts', PART_WEIGHT)):
@@ -814,11 +827,18 @@ def named(why):
 
 
 def shown(b, why):
-    """rank's `why` as a reader sees it: canonical words as they are, a plain word as the request wrote it (never
-    its stem: 'lake', not 'lak'), a voice without its prefix; each once"""
-    said = b.get('written') or {}
-    out = [w if w in L.CONCEPTS else said.get(w, w.replace('voice:', '')) for w in why]
-    return list(dict.fromkeys(out))
+    """rank's `why` as a reader sees it: every word as the request wrote it ('coins', not coin_object; 'lake', not
+    the stem 'lak'; 'level up' for a phrase), a broader job by the request's word that led to it, anything else
+    (a voice, an adjective) without its prefix or underscore; each once"""
+    said = dict(b.get('written') or {})
+    for c in [c for k in ('concepts', 'parts', 'context') for c in b.get(k, ())]:
+        if L.BROADER.get(c) and c in said:
+            said.setdefault(L.BROADER[c], said[c])      # 'bell' found through "glasses" shows as "glasses"
+    plain = _said_words(b.get('text'))
+    out = [said.get(w) or plain.get(w.replace('sw:', '')) or w.replace('voice:', '').replace('ph:', '')
+           .replace('_', ' ') for w in why]
+    out = list(dict.fromkeys(out))
+    return [w for w in out if not any(w != o and f' {w} ' in f' {o} ' for o in out)]   # a word once
 
 
 def _families():
@@ -898,14 +918,16 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     if idx is None:
         idx = index(rows) if rows is not None else _default_index()
     if semantic is not None:
-        return blend(b, rank(b, top=None, idx=idx), semantic, idx)[:top]
+        return _named_member(b, blend(b, rank(b, top=None, idx=idx), semantic, idx), idx)[:top]
     rows, terms, inv, idf = idx
     q = _query(b)
     score, why = {}, {}
-    for w, qw in q.items():
+    for w, qw in sorted(q.items(), key=lambda kv: kv[0].startswith('sw:')):
         for k, fw in inv.get(w, ()):
+            if w.startswith('sw:') and k not in why:
+                continue                  # a word said only breaks ties between designs found otherwise
             score[k] = score.get(k, 0.0) + qw * idf.get(w, 1.0) * fw
-            if not w.startswith('feel:'):
+            if not w.startswith(('feel:', 'sw:')):
                 why.setdefault(k, []).append(w.replace('voice:', ''))
     mat, dom, loop = b.get('material'), b.get('domain'), b.get('loop')
     pool = ([k for k in score if k in why] or [k for k in score if dom in rows[k].get('domains', ())]
@@ -941,4 +963,115 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
         out.append({'id': row['id'], 'score': round(s, 3),
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
-    return out[:top]
+    return _named_member(b, out, idx)[:top]
+
+
+def _name_words(sid):
+    """the stems of the words of a design's own name ('pad/warm' -> {'warm'}, 'logo_sting/soft_bloom' -> {'soft',
+    'bloom'})"""
+    return {stem(p) for p in sid.split('/', 1)[1].split('_') if p.isalpha()}
+
+
+def _family_words(sid):
+    """the stems of the words of a design's family ('cut_hit/kick' -> {'cut', 'hit'})"""
+    return {stem(p) for p in sid.split('/', 1)[0].split('_') if p.isalpha()}
+
+
+def _said_words(text):
+    """{stem: word} of the words a request says of its own sound (no articles): not what a negation reaches ("not
+    soft"), nor a comparison ("like someone tapped it", "than a click"); none at all when it asks for the opposite
+    of what it names ("the next-step sound but the other way")"""
+    said = {}
+    for s, t in _said_seq(text):
+        if s:
+            said.setdefault(s, t)
+    return said
+
+
+def _said_seq(text):
+    """the words of `_said_words` in order, as (stem, word); (None, None) where a word was left out, so that only
+    words said next to each other are next to each other"""
+    toks = tokens(text or '')
+    if 'opposite' in toks or any(w in ' '.join(toks) for w in OTHER_WAY):
+        return []
+    seq, neg, aside = [], 0, False
+    for i, t in enumerate(toks):
+        nxt = toks[i + 1] if i + 1 < len(toks) else None
+        if t in ARTICLES and not aside and not neg:
+            continue
+        if t in PUNCT:
+            neg, aside = 0, False
+        elif t in L.NEGATIONS:
+            neg = 2
+        elif t == 'than' or (t == 'like' and nxt not in LIKE_JOB_NEXT and nxt is not None and nxt not in PUNCT):
+            aside = True
+        elif not aside and not neg:   # stop words too: toggle/off, notify/single are named by them
+            seq.append((stem(t), t))
+            continue
+        elif neg and t not in ARTICLES:
+            neg -= 1
+        seq.append((None, ',' if t in PUNCT else None))
+    return seq
+
+
+def _compound(sid, seq):
+    """True when a request says a design's name followed by its family, word for word: "a warm pad", "tiny drip",
+    "punch cut hit" (the head noun last, as English compounds go), and not after "with", "and" or "of" in its
+    clause ("a swell of airy chimes and a warm pad": a part, not the sound)"""
+    fam, name = sid.split('/')
+    want = [stem(p) for p in name.split('_')] + [stem(p) for p in fam.split('_')]
+    stems = [s for s, _ in seq]
+    for k in range(len(stems) - len(want) + 1):
+        if stems[k:k + len(want)] == want:
+            before = [w for _, w in seq[:k]]
+            clause = before[len(before) - before[::-1].index(','):] if ',' in before else before
+            if not set(clause) & {'with', 'and', 'of'}:
+                return True
+    return False
+
+
+def _named_member(b, out, idx=None):
+    """a ranking where a design the request names by its own words comes first: "tiny drip", "a metal impact" (its
+    name and then its family said word for word, as the request's own sound: `_said_seq`, `_compound`) is that
+    design unless something rules it out (the hard filters, a direction against the request's); else the family
+    that won is answered by the member the request names: "a warm pad chord" is pad/warm, though "warm" is an
+    adjective (it still moves its axis) and the words of another member may score a little higher (MEMBER_SHARE).
+    Among the ranked members of the first design's family, the one whose name shares the most words with the
+    request goes first (then by score); the order of everything else stays"""
+    seq = _said_seq(b.get('text'))
+    said = {s: t for s, t in reversed(seq) if s}
+    rows, terms = (idx[0], idx[1]) if idx else ((), ())
+    score = {r['id']: r['score'] for r in out}
+    full = []
+    for k, row in enumerate(rows):
+        i = row['id']
+        if not (_name_words(i) and _compound(i, seq)) or excluded(b, row, terms[k]):
+            continue
+        if b.get('dir') and terms[k]['dir'] == -b['dir']:
+            continue
+        if terms[k]['family'] & set(b.get('parts', ())) and not terms[k]['family'] & set(b['concepts']):
+            continue                  # "... with airy chimes and a warm pad": a part of the sound, not the sound
+        full.append((len(_name_words(i)) + len(_family_words(i)), score.get(i, 0.0), -k, i))
+    if full:
+        sid = max(full)[3]
+        if out and out[0]['id'] == sid:
+            return out
+        old = next((r for r in out if r['id'] == sid), {'id': sid, 'why': []})
+        words_ = [said[w] for w in sorted((_name_words(sid) | _family_words(sid)) & said.keys())]
+        best = dict(old, score=out[0]['score'] if out else 1.0, why=list(dict.fromkeys(old['why'] + words_)))
+        return [best] + [r for r in out if r['id'] != sid]
+    if not out:
+        return out
+    said = {s: t for s, t in said.items() if t not in L.STOP}     # "in a platformer" does not name teleport/in
+    fam = out[0]['id'].split('/')[0]
+    hits = [(len(_name_words(r['id']) & said.keys()), r['score'], -i) for i, r in enumerate(out)
+            if r['id'].split('/')[0] == fam]
+    n, _, neg = max(hits)
+    pos = -neg
+    if (n == 0 or pos == 0 or len(_name_words(out[0]['id']) & said.keys()) >= n
+            or out[pos]['score'] < MEMBER_SHARE * out[0]['score']):
+        return out
+    best = dict(out[pos], score=out[0]['score'])
+    named_ = [said[w] for w in sorted(_name_words(best['id']) & said.keys())]
+    best['why'] = list(dict.fromkeys(list(best['why']) + named_))
+    return [best] + out[:pos] + out[pos + 1:]
