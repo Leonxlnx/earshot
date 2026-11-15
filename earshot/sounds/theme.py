@@ -50,9 +50,9 @@ def get(theme=None):
         return dict(THEMES[theme], name=theme)
     t = dict(theme)
     base = t.pop('base', None)
-    out = dict(THEMES[base], name=base) if base else {}
     if base is not None and base not in THEMES:
         raise ValueError(f'unknown theme {base!r}: one of {", ".join(THEMES)}')
+    out = dict(THEMES[base], name=base) if base else {}
     bad = [k for k in t if k not in FIELDS + ('name',)]
     if bad:
         raise ValueError(f'unknown theme fields {bad}: {", ".join(FIELDS)}')

@@ -17,6 +17,8 @@ voice made of it.
 """
 import numpy as np
 
+from ..forge import dsp
+
 from ..synth import phrase, space, voices
 
 DEFAULT_VOICE = 'vibraphone'
@@ -36,10 +38,10 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     -1 = the last, None = none); room: the space it sits in (the theme's space wins); spread: how far the notes sit
     apart in the stereo field; voice: the figure's own default voice; avoid: materials whose voices cannot carry this
     figure (two short low notes on a metal bar are heard as an electronic beep): a theme's voice of such a material
-    gives way to the figure's own"""
+    gives way to the figure's own; a voice asked for by name is always played"""
     v = c.voice or voice or DEFAULT_VOICE
-    if avoid and voices.info(v).get('material') in avoid:
-        v = voice or DEFAULT_VOICE
+    if avoid and c._voice is None and voices.info(v).get('material') in avoid:     # a voice asked for by name
+        v = voice or DEFAULT_VOICE                                                 # is played as asked
     c.played = v
     if not degrees and c.scale() in MINOR:       # in a minor key the thirds, sixths and sevenths are the minor ones
         steps = [MINOR_STEP.get(s % 12, s % 12) + 12 * (s // 12) for s in steps]
@@ -56,7 +58,9 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
         last, ring = max(0.04, want - sum(gaps)), 1.0
     # a sustaining voice (a metal bar, a bell, a pad) damped after a few tens of ms is a bare tone burst, which is
     # heard as an electronic beep: such a voice keeps each note long enough to be heard as its instrument
-    floor = SUSTAIN_FLOOR if float(voices.info(v).get('ring_s') or 0.0) > 1.0 else 0.0
+    info = voices.info(v)                # an instrument that rings over a second, or a patch that sustains
+    sustains = float(info.get('ring_s') or 0.0) > 1.0 or info.get('kind') in ('bell', 'pad', 'key', 'lead')
+    floor = SUSTAIN_FLOOR if sustains else 0.0
     t, notes = 0.0, []
     for i, f in enumerate(hz):
         if i == k - 1 or gaps[i] <= CHORD_GAP:           # the last note, and a note the next one joins as a chord
@@ -69,6 +73,8 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     level = float(np.clip(vel * c.db('energy', 7.0), 0.05, 1.0))
     y = phrase.play(notes, v, r, vel=level, vary=c.vary, accent=accent if k > 1 else None,
                     spread=spread * c.lerp('width', 0.0, 2.2, 1.0), **c.axes('bright', 'hard', 'size'), ring=c.ring)
+    if want and len(y) < 0.75 * want * dsp.SR:
+        c.used.discard('dur')            # the voice rings shorter than the length asked for: say it was not kept
     return space.room(y, c.room(room), amount=c.space, r=r)
 
 

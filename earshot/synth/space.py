@@ -52,6 +52,7 @@ def tone(y, r):
     m = next_fast_len(end)                     # pink noise is shaped by an FFT: an awkward length costs 0.2 s
     for ch in range(2):
         nz = dsp.butter(dsp.noise(m / dsp.SR, r, 'pink')[:end], 'high', 120.0)
+        nz /= np.sqrt(np.mean(nz ** 2)) + 1e-12            # the high-pass took about 40 % of its energy
         out[:, ch] += dsp.fade(nz, 0.003, 0.08) * pk * 10 ** (TONE_DB / 20)
     k = min(end, dsp.n_of(0.08))
     out[end - k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
@@ -59,9 +60,10 @@ def tone(y, r):
 
 
 def room(y, name='room', amount=0.0, r=None):
-    """y (mono or stereo) in the named space, returned stereo and as long as y plus the tail. amount -1..1 moves the
-    tail's level (-1 = dry, 0 = the space as designed, +1 = 8 dB more) and its length (x 0.6 .. x 1.6). r: the
-    generator the room's floor is drawn from (default: one fixed by the sound's length)"""
+    """y (mono or stereo) in the named space, returned stereo: the sound and its tail, ending 80 ms after it has
+    fallen 60 dB under its peak (silence at the end of y is not kept). amount -1..1 moves the tail's level (-1 = dry,
+    0 = the space as designed, +1 = 8 dB more) and its length (x 0.6 .. x 1.6). r: the generator the room's floor
+    is drawn from (default: one fixed by the sound's length)"""
     if name not in SPACES:
         raise ValueError(f'unknown space {name!r}: one of {", ".join(SPACES)}')
     y = np.asarray(y, np.float64)
