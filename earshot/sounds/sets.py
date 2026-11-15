@@ -30,11 +30,11 @@ SETS = {
         ('power_down', 'power_down/chip'), ('one_up', 'one_up/chip'), ('level_up', 'level_up/chip'),
         ('win', 'win/chip'), ('lose', 'lose/chip'), ('text', 'text/chip'))),
     'film': dict(says='a product film or motion-design piece: moves, arrivals, hits and a logo', theme=None, sounds=(
-        ('whoosh', 'whoosh_fast/crisp'), ('swish', 'swish/soft'), ('swipe', 'swipe/paper'),
-        ('pop', 'ui_pop/soft'), ('tick', 'pro_hover_tick/soft'), ('click', 'click/soft'),
-        ('type', 'typing_key/light'), ('shutter', 'shutter/dslr'), ('hit', 'cut_hit/punch'),
-        ('impact', 'impact/deep'), ('drop', 'sub_drop/punch'), ('riser', 'riser/tension'),
-        ('swell', 'reverse_swell/cymbal'), ('chime', 'success/rise'), ('logo', 'logo/bloom'))),
+        ('whoosh', 'whoosh/fast'), ('whoosh_soft', 'whoosh/soft'), ('slide', 'slide/panel'), ('pop', 'pop/soft'),
+        ('tick', 'tock/wood'), ('click', 'click/soft'), ('type', 'typing_key/light'), ('shutter', 'shutter/dslr'),
+        ('hit', 'slam/title'), ('impact', 'boom/deep'), ('drop', 'fall/sub'), ('riser', 'rise/air'),
+        ('swell', 'rise/reverse'), ('glint', 'shine/glint'), ('chime', 'success/rise'), ('sting', 'sting/reveal'),
+        ('logo', 'logo/bloom'))),
 }
 
 
