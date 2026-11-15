@@ -132,6 +132,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         heard, pick = best
     else:
         pick = cands[0]
+    if b.get('dur_max') and 'dur' not in req and (registry.get(pick['id']).dur or 0) > b['dur_max']:
+        req['dur'] = b['dur_max']                # "under 150 ms": only shortens a design that is longer
     paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
     takes = []
     for i, p in enumerate(paths):
