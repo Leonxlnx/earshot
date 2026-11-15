@@ -439,24 +439,35 @@ def jump_heavy(c, r):
               'a muffled footfall'),
         uses=('land', 'landing', 'touch down', 'drop down'), domains=DOM, dur=0.25, axes=AXES)
 def land_soft(c, r):
-    """feet landing: two heels a few ms apart, each a broadband low thud (soft soles on ground: no pitch), the
-    contact's scuff, grit kicked by the landing (power-law grains), a cloth flap"""
+    """two feet landing on packed earth 10-35 ms apart: each a broadband low thud of the sole, the leg and the
+    ground (no pitch: a sine here is a kick drum), the earth crunching under it (PhISEM grains at a rate that
+    follows the rise of the force, Cook 2002), the soles sliding a little as the weight settles (a rough scuff),
+    and the clothes catching up with the body"""
     k = _k(c)
-    T = 0.28 * k.L
+    T = 0.3 * k.L
     n = dsp.n_of(T)
-    thump = _heel(r, k, 0.003 * k.tc, 0.035 * k.L, 900)
-    contact = _burst(r, 0.06, 150 * k.f, 2500, 0.01 * k.tc, attack=0.0015 * k.tc)
-    gap = r.uniform(0.006, 0.02)
-    m = r.integers(10, 20)
-    tg = r.uniform(0.002, 0.05, m) ** 1.0
-    grit = _grains(r, n, tg, _power(r, m, 0.02, 0.5) * 0.4, _logu(r, 1500, 6500, m),
-                   r.uniform(0.7, 1.5, m), r.uniform(0.001, 0.002, m))
-    cloth = _burst(r, 0.08, 2000, 7000, 0.02, attack=0.004)
-    body = _thump(r, 0.2, 110 * k.f, 70 * k.f, 0.02, 0.04 * k.L, attack=0.003, harm=0.3)
-    y = _mix([(thump, 0, 0 + k.lo), (body, 0, -6 + k.lo), (contact, 0, -8 + k.h), (thump, gap, -12 + k.lo),
-              (contact, gap, -14 + k.h), (cloth, 0.004, -15)])
-    y = fx.saturate(y, 4.0, 'tanh', level='rms')                                # the rare noise peak tamed
-    return _out(c, y, _norm(grit) * 10 ** ((-14 + k.h) / 20) * np.abs(y).max(), room='room', spread=0.25)
+    t = _t(n)
+    gap = r.uniform(0.01, 0.035)
+    layers, F = [], np.zeros(n)
+    for t0, g in ((0.0, 0.0), (gap, r.uniform(-5.0, -2.0))):
+        rise = _vary(r, 0.014, 0.2) * k.tc
+        u = t - t0
+        F += 10 ** (g / 20) * np.where(u < 0, 0.0, np.where(u < rise, np.sin(0.5 * np.pi * u / rise) ** 2,
+                                                             np.exp(-((u - rise) / (0.05 * k.L)) ** 2)))
+        layers += [(_heel(r, k, 0.003 * k.tc, 0.03 * k.L, 1300), t0, g + k.lo / 2),
+                   (_dull(r, 0.15, 95 * k.f, 0.03 * k.L), t0, g - 7 + k.lo)]
+    dF = np.maximum(np.gradient(F) * SR, 0.0)
+    tg = np.concatenate([_rate_times(r, n, dF, 3000.0, 900.0 / (dF.max() + 1e-9)),
+                         _rate_times(r, n, F, 600.0, 250.0 / F.max())])
+    m = len(tg)
+    crunch = _grains(r, n, tg, _power(r, m, 0.03, 1.0, 1.6), _logu(r, 600, 4500, m) * k.f ** 0.5,
+                     r.uniform(1.0, 3.0, m), r.uniform(0.001, 0.003, m), sharp=0.9)
+    ts = gap + r.uniform(0.01, 0.03)
+    scuff = _burst(r, 0.12, 500 * k.f, 5000, 0.035, attack=0.012) * (1 + 0.6 * dsp.wander(0.12, r, 60.0))
+    cloth = _burst(r, 0.1, 1500, 7000, 0.025, attack=0.006)
+    y = _mix(layers + [(scuff, ts, -15 + k.h / 2), (cloth, 0.012, -20)], T)
+    y = fx.saturate(y, 3.0, 'tanh', level='rms')                                # the rare noise peak tamed
+    return _out(c, y, _norm(crunch) * 10 ** ((-9 + k.h) / 20) * np.abs(y).max(), room='room', spread=0.25)
 
 
 @design('land/heavy', kind='thud', says=('a heavy body thudding onto the ground with a deep boom',
@@ -715,18 +726,24 @@ def hit_punch(c, r):
 @design('hit/slap', kind='hit', says=('a sharp slap of a hand on skin', 'a crisp smack', 'a face slap'),
         uses=('slap', 'hit', 'smack', 'clap'), domains=DOM, dur=0.2, axes=AXES)
 def hit_slap(c, r):
-    """an open hand on skin: the air trapped between them is pushed out in a few ms, a broad crack peaking at
-    1-4 kHz, the fingers landing 2-5 ms after the palm, the slight body of the cheek or arm below, a short room"""
+    """an open hand on skin: the air trapped between them is pushed out in a few ms, a broad crack whose colour is
+    the cupped hand's air pocket (a Helmholtz-like resonance at 0.7-2 kHz, q 1.5-3: flatter is higher and drier); the
+    palm and the fingers do not land at once, so the crack is two to four contacts spread over 1-20 ms, a
+    different spread every time; the flesh under it gives a short meaty smack at 150-400 Hz and the skin a short
+    bright splat (15 ms of 1.5-9 kHz noise); a short room"""
     k = _k(c)
-    T = 0.2 * k.L
-    crack = _burst(r, 0.05, 700 * k.f ** 0.5, 9000, _vary(r, 0.004, 0.3) * k.tc, attack=0.0002)
-    crack = dsp.peq(crack, _vary(r, 2500, 0.15) * k.f ** 0.5, 5.0, 1.0)
-    fingers = _burst(r, 0.03, 1500, 9000, 0.0025 * k.tc, attack=0.0002)
-    skin = _cloud(r, 250 * k.f, 1400 * k.f, 12, r.uniform(0.01, 0.035), 0.006, 0.12, 0.001 * k.tc)   # cheek or arm
-    thump = _dull(r, 0.1, 250 * k.f, 0.015)
-    crack = dsp.butter(crack, 'high', 900.0)
-    y = _mix([(crack, 0, 0 + k.h / 2), (fingers, r.uniform(0.002, 0.008), r.uniform(-8, -2) + k.h / 2),
-              (skin, 0, r.uniform(-15, -9)), (thump, 0, -20 + k.lo)], T)
+    T = 0.22 * k.L
+    pocket = _logu(r, 700, 2000, 1)[0] * k.f ** 0.5
+    layers = []
+    for i, dt in enumerate(np.concatenate([[0.0], np.sort(r.uniform(0.001, 0.02, r.integers(1, 4)))])):
+        crack = _burst(r, 0.06, 500 * k.f ** 0.5, 10000, _vary(r, 0.005, 0.35) * k.tc, attack=0.0002)
+        crack = 0.6 * dsp.svf(crack, pocket * r.uniform(0.85, 1.2), r.uniform(1.5, 3.0), 'bandn') + crack
+        layers.append((crack, dt, (0.0 if i == 0 else r.uniform(-9, -2)) + k.h / 2))
+    meat = _dull(r, 0.08, _vary(r, 260, 0.3) * k.f, _vary(r, 0.012, 0.3), attack=0.0008, q=1.6)
+    skin = _cloud(r, 250 * k.f, 1400 * k.f, 12, r.uniform(0.006, 0.015), 0.006, 0.12, 0.001 * k.tc)   # cheek or arm
+    splat = _burst(r, 0.08, 1500, 9000, _vary(r, 0.015, 0.3), attack=0.001)     # the skin and the air after it
+    y = _mix(layers + [(meat, 0.0005, r.uniform(-12, -8) + k.lo), (skin, 0, r.uniform(-18, -12)),
+                       (splat, 0.001, r.uniform(-14, -9))], T)
     return _out(c, y, room='room', spread=0.25)
 
 
@@ -793,16 +810,20 @@ def hit_crit(c, r):
 @design('hurt/thud', kind='thud', says=('a dull muffled thud', 'a soft heavy body blow', 'a low dull impact'),
         uses=('hurt', 'damage', 'player hit', 'take damage'), domains=DOM, dur=0.35, axes=AXES)
 def hurt_thud(c, r):
-    """a neutral damage cue with no voice: a dull body whose pitch falls further than a punch's (220 -> 75 Hz over
-    80 ms: it reads as down), a padded low-mid knock and no crack at all"""
+    """a neutral damage cue with no voice: a blow on a padded body. The torso answers as a heavily damped box (a
+    cloud of low modes at 70-450 Hz, t60 40-120 ms, struck by a soft 4-6 ms contact), the blow pushes the air out
+    of the clothes and the chest (a short low whump of noise), the cloth and skin give a dull slap at the contact
+    and no crack at all; a sine under it only for weight (a falling sine on its own is a kick drum)"""
     k = _k(c)
     T = 0.38 * k.L * k.ring ** 0.5
-    body = _thump(r, T, _vary(r, 220, 0.05) * k.f, 75 * k.f, 0.06, 0.08 * k.L * k.ring, attack=0.003, harm=0.35)
-    dull = _dull(r, T, 140 * k.f, 0.06 * k.L * k.ring, attack=0.002)
-    pad = _cloud(r, 160 * k.f, 900 * k.f, 16, 0.02, 0.008, 0.2, 0.004 * k.tc)
-    puff = _burst(r, 0.1, 150, 1200 * k.f, 0.03, attack=0.004)
-    y = _mix([(dull, 0, 0 + k.lo / 2), (body, 0, -4), (pad, 0, -4 + k.h / 2), (puff, 0, -9)], T)
-    return _out(c, dsp.butter(y, 'low', 2500 * k.f ** 0.5), room='room', spread=0.15)
+    torso = _cloud(r, 70 * k.f, 450 * k.f, 24, 0.03 * k.ring, 0.01, T, 0.005 * k.tc, tilt=-2.0, rough=0.7)
+    whump = _dull(r, T, _vary(r, 110, 0.15) * k.f, 0.05 * k.L * k.ring, attack=0.003, q=0.9)
+    slap = _burst(r, 0.06, 250 * k.f, 2200, _vary(r, 0.008, 0.3) * k.tc, attack=0.0012 * k.tc)
+    body = _thump(r, T, _vary(r, 150, 0.08) * k.f, 80 * k.f, 0.05, 0.07 * k.L * k.ring, attack=0.004, harm=0.2)
+    cloth = _burst(r, 0.12, 900, 5000, 0.03, attack=0.005)
+    y = _mix([(torso, 0, 0), (whump, 0, -2 + k.lo / 2), (slap, 0, -7 + k.h / 2), (body, 0, -11 + k.lo),
+              (cloth, 0.004, -20)], T)
+    return _out(c, dsp.butter(y, 'low', 3500 * k.f ** 0.5), room='room', spread=0.15)
 
 
 @design('shield/block', kind='hit',
@@ -1103,35 +1124,49 @@ def _latch(r, k, size=1.0):
     return _norm(y + 0.8 * _burst(r, 0.06, 1000, 9000, 0.004, attack=0.0002))
 
 
-def _panel(r, k, low=1.0):
-    """the broad resonances of a wooden panel a hinge creaks through: (Hz, q, gain), a little different per door"""
-    base = np.array([170.0, 420.0, 880.0, 1700.0, 3100.0]) * low * k.f
-    return [(f * np.exp(0.08 * r.standard_normal()), q, g) for f, q, g in
-            zip(base, (2.0, 2.5, 3.0, 3.0, 2.5), (1.0, 0.9, 0.7, 0.45, 0.25))]
+def _hinge(r, k, rate, ring=1.0):
+    """a hinge creaking through a door (stick-slip, texture.stick_slip): the force is a sawtooth at the slip rate
+    (Hz per sample), unsteady (10 % jitter per period, drops of uneven size, the hinge now and then holding for
+    40-120 ms), and its bright edges ring the door's few strong panel modes (300-1500 Hz, q 7-14: a board's t60 of
+    30-60 ms) and the pin and leaf of the hinge itself (2-3.5 kHz). A sawtooth through formants is a pitched voice;
+    the jitter, the uneven drops and the holds make it a creak, not a tone. Mono, peak 1"""
+    x, _ = _tex().stick_slip(r, rate, jitter=0.1, hold=0.018, hold_s=(0.04, 0.12), rough=0.45)
+    x = x - dsp.butter(x, 'low', 20.0)
+    modes = np.sort(_logu(r, 300, 1500, 5)) * k.f ** 0.5
+    y = sum(r.uniform(0.5, 1.0) * dsp.svf(x, f, r.uniform(7, 14) * ring ** 0.5, 'bandn') for f in modes)
+    y = y + 0.6 * dsp.svf(x, 170 * k.f, 2.0, 'bandn')                                  # the whole board
+    pin = dsp.svf(x, _vary(r, 2600, 0.15), 6.0, 'bandn')
+    edge = dsp.butter(x, 'high', 3000.0)
+    y = _norm(y) + 0.25 * _norm(pin) + 0.12 * _norm(edge)
+    return dsp.fade(_norm(dsp.butter(y, 'low', 7000.0)), 0.002, 0.03)
 
 
 @design('door/open', kind='object', says=('a wooden door creaking open with a latch click', 'a creaky old door opening',
                                          'a door handle turning and hinges creaking'),
-        uses=('door', 'door open', 'creak', 'open'), domains=DOM, dur=1.1, axes=AXES)
+        uses=('door', 'door open', 'creak', 'open'), domains=DOM, dur=1.1, axes=AXES,
+        allows=('rising_glide',))      # the creak climbs as the door swings faster: stick-slip follows the speed
 def door_open(c, r):
     """a wooden door: the handle and latch (two metal clicks and the knock of the bolt freeing), then the hinge
-    creaking (stick-slip at a slip rate that follows the swing: slow-fast-slow) through the door's panel, and
-    the air the door pushes"""
+    creaking (_hinge: a stick-slip sawtooth whose rate follows the swing, 30 Hz as it starts to 150-200 Hz at speed,
+    wandering and now and then jumping as the grip changes, with holds) through the door's panel, and the low air
+    the door pushes"""
     k = _k(c)
     T = 1.15 * k.L
     n = dsp.n_of(T)
     t = _t(n)
-    t0, t1 = 0.16, 0.16 + _vary(r, 0.8, 0.05) * k.L
+    t0, t1 = 0.17, 0.17 + _vary(r, 0.8, 0.08) * k.L
     v = np.clip((t - t0) / (t1 - t0), 0, 1)
-    speed = np.sin(np.pi * v) ** 1.5 * (t < t1)
-    rate = (25 + 110 * speed * (1 + 0.2 * k.e)) * (speed > 0.03) / k.f ** 0.5
-    rate = rate * np.exp(0.35 * dsp.wander(T, r, 5.0)[:n])         # the grip of the hinge changes as it turns
-    creak = _creak(r, T, rate, _panel(r, k), grain=0.0025)
-    rub = dsp.butter(r.standard_normal(n), 'band', (300 * k.f, 3000 * k.f)) * speed
-    move = dsp.butter(r.standard_normal(n), 'band', (70 * k.f, 450 * k.f)) * speed
+    speed = np.sin(np.pi * v ** 0.8) ** 1.2 * (t > t0) * (t < t1)
+    jumps = np.ones(n)                                       # the grip changes: the creak leaps to another register
+    for tj in np.sort(r.uniform(t0 + 0.1, t1 - 0.1, r.integers(1, 4))):
+        jumps[t > tj] *= r.choice([0.7, 1.35, 1.5])
+    rate = (28 + 150 * speed ** 0.8 * (1 + 0.2 * k.e)) * jumps / k.f ** 0.5
+    rate = rate * np.exp(0.2 * dsp.wander(T, r, 3.0)[:n]) * (speed > 0.04)
+    creak = _hinge(r, k, rate, k.ring) * (0.35 + 0.65 * speed ** 0.5)
+    move = dsp.butter(r.standard_normal(n), 'band', (70 * k.f, 350 * k.f)) * speed
     knock = _cloud(r, 120 * k.f, 1500 * k.f, 20, 0.02, 0.006, 0.15, 0.002 * k.tc)
     y = _mix([(_latch(r, k), 0, -6 + k.h), (_latch(r, k, 1.2), 0.085, -3 + k.h), (knock, 0.09, -9),
-              (creak * speed, 0, -2), (_norm(move), 0, -14 + k.lo), (_norm(rub), 0, -18)], T)
+              (creak, 0, 0), (_norm(move), 0, -20 + k.lo)], T)
     return _out(c, dsp.fade(y, 0.0, 0.06), room='room', spread=0.3)
 
 
@@ -1491,32 +1526,47 @@ def magic_cast(c, r):
                                              'the earth shaking'),
         uses=('rumble', 'earthquake', 'quake', 'tremor', 'ground shake'), domains=DOM, dur=2.0, axes=AXES, loop=True)
 def rumble_quake(c, r):
-    """the ground shaking, as a seamless loop: low noise (30-150 Hz) heaving in slow waves, a grinding mid band
-    following it, and loose things rattling in bursts that cluster where the shaking is strongest (wrapped round)"""
+    """the ground shaking, as a seamless loop: low noise (25-200 Hz) heaving in slow waves, and on it what makes a
+    rumble a quake and not a band of noise: irregular low events (rocks and beams shifting: dull knocks at
+    50-250 Hz, a few ringing in the structure) and loose things chattering (a window, a shelf of dishes: each an
+    object with its own few modes, knocked 4-12 times at 9-25 Hz while the shaking lifts it), all clustered where
+    the shaking is strongest; every event wraps round the loop"""
+    tex = _tex()
     k = _k(c)
     L = c.seconds(2.0)
     n = dsp.n_of(L)
     heave = 1 + _cmod(r, n, (0.7, 1.3, 2.1, 3.4), 0.6)
-    low = _cnoise(r, n, 30 * k.f, 260 * k.f, tilt=-4.0) * heave
-    grind = _cnoise(r, n, 120 * k.f, 3000 * k.f, tilt=-4.5) * heave ** 2
-    m = r.poisson(70 * L * (1 + 0.5 * k.e))
-    tr = r.uniform(0, L, m)
-    hv = np.interp(tr, _t(n), heave)
-    keep = r.uniform(0, heave.max(), m) < hv
-    tr = tr[keep]
-    # rattles: six bands of loop noise, each gated by the decaying envelopes of the events that fall in it
+    low = _cnoise(r, n, 25 * k.f, 200 * k.f, tilt=-4.0) * heave
+    grind = _cnoise(r, n, 120 * k.f, 2000 * k.f, tilt=-4.5) * heave ** 2
+    hv = heave / heave.max()
+
+    def when(rate):          # Poisson times over the loop, thinned by the shaking (louder where it heaves)
+        t = r.uniform(0, L, r.poisson(rate * L))
+        return t[r.uniform(size=len(t)) < np.interp(t, _t(n), hv) ** 2]
+    ev = np.zeros((n, 2))
+    tk = when(14.0 * (1 + 0.5 * k.e))                     # rocks and beams shifting
+    a = _power(r, len(tk), 0.1, 1.0, 1.8) * np.interp(tk, _t(n), hv)
+    pan = r.uniform(-0.8, 0.8, len(tk))
+    tex.bursts(ev, tk, 3.0 * a, pan, _logu(r, 50, 250, len(tk)) * k.f, r.uniform(1.2, 3.0, len(tk)),
+               r.uniform(0.004, 0.02, len(tk)), r, 0.8)
+    big = a > 0.4
+    tex.rings(ev, tk[big], 0.6 * a[big], pan[big], _logu(r, 70, 300, big.sum()) * k.f,
+              r.uniform(0.03, 0.08, big.sum()), 0.002)
     rat = np.zeros((n, 2))
-    band = r.integers(0, 6, len(tr))
-    g = _power(r, len(tr), 0.05, 1.0, 1.7)
-    kern = _env(dsp.n_of(0.03), 0.001, 0.004)
-    for b in range(6):
-        e = np.zeros(n)
-        np.add.at(e, (tr[band == b] * SR).astype(int) % n, g[band == b])
-        e = np.real(sfft.ifft(sfft.fft(e) * sfft.fft(kern, n)))           # circular: events wrap round
-        f = 250 * 1.47 ** b * k.f
-        rat += np.stack([_cnoise(r, n, 0.8 * f, 1.25 * f) * e for _ in range(2)], 1)
-    y = fx.decorrelate(low * 10 ** ((0 + k.lo) / 20) + grind * 10 ** (-15 / 20), 0.4)
-    y = y + _norm(rat) * np.abs(y).max() * 10 ** ((-9 + k.h) / 20)
+    for obj in range(4):              # four loose things (a door in its frame, a window, things on a shelf), each
+        f0 = _logu(r, 200, 700, 1)[0] if obj < 2 else _logu(r, 900, 2500, 1)[0]      # knocking in bursts: dull,
+        p0 = r.uniform(-0.7, 0.7)                                                     # damped knocks, not pings
+        for tb in when(1.6 * (1 + 0.5 * k.e)):
+            m = int(r.integers(4, 13))
+            th = (tb + np.cumsum(r.uniform(0.04, 0.11, m))) % L
+            g = r.uniform(0.3, 1.0, m) * np.sin(np.pi * (np.arange(m) + 0.5) / m)
+            for f, w in ((f0, 1.0), (2.3 * f0, 0.5)):
+                tex.bursts(rat, th, w * g, p0, f * np.exp(0.05 * r.standard_normal(m)), r.uniform(2.0, 4.0),
+                           r.uniform(0.002, 0.005, m), r, 0.3)
+    y = fx.decorrelate(low * 10 ** ((0 + k.lo) / 20) + grind * 10 ** (-20 / 20), 0.4)
+    top = np.abs(y).max()
+    ev = _circ(lambda x: dsp.butter(x, 'low', 700.0), ev)          # a knock in the ground has no top
+    y = y + _norm(ev) * top * 10 ** ((-3 + k.lo / 2) / 20) + _norm(rat) * top * 10 ** ((-10 + k.h) / 20)
     return _loop_out(c, y, room='room')
 
 

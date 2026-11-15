@@ -260,6 +260,28 @@ def test_fire_crackles_in_bursts_over_a_roar_that_grows_with_the_fire():
     assert np.corrcoef(lo, hi)[0, 1] > 0.3                            # a crackle is broadband: bands rise together
 
 
+def test_stick_slip_is_a_sawtooth_at_the_drive_rate_with_holds():
+    rate = np.full(SR, 150.0)
+    rate[:SR // 10] = 0.0                                             # not moving yet: silent
+    f, ts = tx.stick_slip(dsp.rng(3), rate, jitter=0.05)
+    g, _ = tx.stick_slip(dsp.rng(3), rate, jitter=0.05)
+    assert np.array_equal(f, g) and np.isfinite(f).all()
+    assert abs(len(ts) - 0.9 * 150) < 8 and ts.min() > 0.1
+    assert np.abs(f[:SR // 10]).max() == 0.0
+    d = np.diff(f)
+    assert -d.min() > 5 * d.max()                                     # slow rise, sudden drop: the bright edge
+    _, held = tx.stick_slip(dsp.rng(3), rate, jitter=0.05, hold=0.05, hold_s=(0.03, 0.06))
+    assert np.diff(held).max() > 0.025 > np.diff(ts).max()            # the surfaces now and then hold
+
+
+def test_city_is_vehicles_passing_and_intensity_makes_it_busier():
+    quiet, busy = _bed('city', 5.0, intensity=-1.0), _bed('city', 5.0, intensity=1.0)
+    assert not np.allclose(quiet, busy)
+    assert _centroid(busy) > _centroid(quiet)                        # more tyres, a fuller drone
+    lvl = _envelope(busy, 150, 1000, 0.25)
+    assert np.percentile(lvl, 90) / np.percentile(lvl, 10) > 1.6      # swells of single vehicles, not a steady band
+
+
 def test_water_bands_move_on_their_own_and_size_goes_from_plinks_to_a_roar():
     brook = _bed('stream')
     lo, hi = _envelope(brook, 1000, 1500), _envelope(brook, 4000, 6000)

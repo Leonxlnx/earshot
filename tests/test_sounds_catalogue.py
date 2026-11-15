@@ -22,8 +22,8 @@ HALF = {a: 0.5 for a in registry.AXES}
 TRIES = (0, 101, 202, 303)                     # the seeds make.take tries before it gives up
 # designs whose audit fails on every seed make tries, at default settings (none at the time of writing)
 AUDIT_FAILS = {}
-CONTROL_FAILS = {'city/distant': ('energy (the scene\'s intensity) declared but without effect: the raw render at '
-                                  'energy -1 and at +0.5 (and at -0.5 and +0.5) is the same; only +1 changes it')}
+# designs whose controls test is a known failure (none at the time of writing)
+CONTROL_FAILS = {}
 
 
 def _fast(sid):

@@ -246,6 +246,52 @@ def bursts(out, t, gain, pan, f, q, length, r, sharp=1.0, wrap=True):
     return out
 
 
+def stick_slip(r, rate, jitter=0.05, hold=0.0, hold_s=(0.03, 0.1), rough=0.25, edge=0.00015):
+    """the friction force of stick-slip (a hinge, a peeling tape, a bowed string, a wet finger on glass): while the
+    surfaces stick the force builds up linearly, at the slip it drops at once, so the force is a sawtooth whose
+    edges are the bright part. One slip per period of `rate` (Hz per sample, as long as the output; under 5 Hz
+    nothing moves), each period moved by `jitter` of itself, now and then (`hold`: the chance per slip) the
+    surfaces holding for hold_s s, after which the next slip is bigger (more force was stored); the drops vary
+    log-normally by `rough`. The ramp of a slip starts at most one period before it, so a held contact is silent.
+    edge = the fall time of a slip in s. Returns (force (n,) mono, slip times s).
+        f, ts = texture.stick_slip(dsp.rng(1), np.full(48000, 120.0), jitter=0.06, hold=0.02)"""
+    rate = np.asarray(rate, np.float64)
+    n = len(rate)
+    ts, amps, ps = [], [], []
+    i, stored = 0, 0.0
+    while i < n:
+        f = rate[i]
+        if f < 5.0:
+            i += SR // 500
+            continue
+        if hold and r.uniform() < hold:
+            gap = r.uniform(*hold_s)
+            i += int(gap * SR)
+            stored = min(gap * f, 3.0)
+            continue
+        p = SR / f * max(0.3, 1 + jitter * r.standard_normal())
+        i += max(3, int(p))
+        if i >= n:
+            break
+        ts.append(i)
+        ps.append(p)
+        amps.append(np.exp(rough * r.standard_normal()) * (1 + 0.3 * stored))
+        stored = 0.0
+    out = np.zeros(n)
+    if not ts:
+        return out, np.zeros(0)
+    s, a, p = np.array(ts, np.float64), np.array(amps), np.array(ps)
+    e = max(1.0, edge * SR)
+    start = np.maximum(np.concatenate([[0.0], s[:-1]]), s - p) + 1.0
+    peak = np.maximum(s - e, start + 1.0)
+    knots = np.stack([start, peak, s], 1).ravel()
+    vals = np.stack([np.zeros_like(a), a, np.zeros_like(a)], 1).ravel()
+    knots = np.maximum.accumulate(knots)
+    j = np.arange(n)
+    out = np.interp(j, knots, vals, left=0.0, right=0.0)
+    return out, s / SR
+
+
 # ------------------------------------------------------------------------------------------------ noise textures
 def band_noise(n, r, centres, env, side=0.7):
     """stereo Gaussian noise as a sum of bands, each multiplied by its own envelope: the engine of every wash, roar and
@@ -382,8 +428,10 @@ SURFACES = {
     # one; drips: gutter or canopy drip sources
     'leaves': dict(tick=(4300, 1.0, 2.2, 0.3, 1.0), body=(280, 800, 3.0, 0.8, 1.5), modes=None, bubble=0.0,
                    wash=(3800, 4.0, 5.0), near=(0.8, 4.0), drips=2, indoors=False),
-    'roof': dict(tick=(5200, 1.2, 0.5, 1.0, 0.6), body=None, modes=(28, 320, 5200, 26.0, 1.0), bubble=0.0,
-                 wash=(1900, 3.0, 5.0), near=(1.2, 5.0), drips=2, indoors=True),
+    # a roof is a sheet heard from under it: every drop drums on it (a short low thud of the panel and a short
+    # ping of its many modes, damped by the battens), and the roof hides most of the far rain (wash_db)
+    'roof': dict(tick=(4200, 1.2, 0.5, 1.0, 0.4), body=(110, 330, 2.5, 1.4, 5.0), modes=(36, 500, 4800, 20.0, 1.0),
+                 bubble=0.0, wash=(1900, 3.0, 5.0), near=(1.2, 5.0), drips=2, indoors=True, wash_db=-9.0),
     'window': dict(tick=(6500, 2.0, 0.35, 1.0, 1.0), body=(170, 520, 2.0, 0.6, 2.5), modes=(10, 1700, 6200, 16.0, 0.35),
                    bubble=0.0, wash=(1100, 3.0, 6.5), near=(0.8, 2.5), drips=1, indoors=True),
     'street': dict(tick=(5000, 0.9, 0.9, 0.8, 1.0), body=(450, 1100, 2.0, 0.4, 1.2), modes=None, bubble=0.3,
@@ -489,7 +537,8 @@ def _rain(n, r, c):
     # here, and with levels falling as 1 / distance every doubling of distance adds the same energy: the wash is
     # the loud part. It sits 16 dB under the peaks of the nearest drops (22 in a drizzle, 10 in a downpour), with
     # the middle ring of drops just under it as its grain.
-    wash *= _top(near) / _rms(wash) * 10 ** ((-16.0 + 6.0 * heavy + 6.0 * c['distance'] - 3.0 * surf['indoors']) / 20)
+    wash *= _top(near) / _rms(wash) * 10 ** ((-16.0 + 6.0 * heavy + 6.0 * c['distance'] - 3.0 * surf['indoors']
+                                              + surf.get('wash_db', 0.0)) / 20)
     y = near * 10 ** (-0.6 * c['distance']) + mid * (0.5 * _rms(wash) / _rms(mid)) + wash
     if surf['indoors']:
         y = _space(y, 0.3, 0.12, 22, size=0.3)
@@ -505,7 +554,7 @@ PLACES = {
     # room: reverb of an interior
     'open': dict(bed=(190.0, 3.0, 5.5), top=(4500.0, -30.0), turb=0.20, howl=0.15, tones=(300.0, 470.0),
                  whoosh=(230.0, 520.0), room=0.0),
-    'trees': dict(bed=(300.0, 3.0, 5.0), top=(5000.0, -30.0), turb=0.26, howl=0.2, tones=(380.0, 610.0),
+    'trees': dict(bed=(500.0, 3.0, 5.0), top=(5000.0, -36.0), turb=0.36, howl=0.2, tones=(380.0, 610.0),
                   whoosh=(300.0, 720.0), room=0.0),
     'window': dict(bed=(140.0, 2.5, 7.5), top=(3000.0, -44.0), turb=0.26, howl=0.5, tones=(265.0, 400.0, 655.0),
                    whoosh=(170.0, 340.0), room=0.14),
@@ -560,16 +609,18 @@ def _wind(n, r, c):
     y += whoosh * (0.8 * level / _rms(whoosh))
     if c['place'] == 'trees':
         leaves = np.zeros((n, 2))
-        lam = 1400.0 * (speed / 7.0) ** 3                     # leaf contacts per second and tree at the mean speed
+        # leaves are papery flaps (1.5-8 kHz, about a millisecond each) whose rate goes as v^3: the rustle swells
+        # and falls with every gust, tree by tree, and stands well out of the bed (it is what says "trees")
+        lam = 900.0 * (speed / 7.0) ** 3                      # leaf contacts per second and tree at the mean speed
         for pan in (-0.85, -0.35, 0.3, 0.8):
             v = _delayed(rel, r.uniform(0.1, 1.2) + 0.5 * pan * lag, dur) * np.exp(0.15 * drift(dur, r, 0.2, 3.0))
             cap = min(lam, 4000.0)
             t, _ = arrivals(r, cap * v ** 3, dur)
             a = sizes(r, len(t), 0.15, 6.0, 'lognormal', 0.7)
             bursts(leaves, t, a * _val(v, t, dur), _pans(r, len(t), 0.3, pan + r.uniform(-0.1, 0.1)),
-                   6000.0 * a ** -0.3 * r.uniform(0.6, 1.5, len(t)), r.uniform(0.8, 2.2, len(t)),
-                   0.0008 * a ** 0.5 * r.uniform(0.6, 1.6, len(t)), r, 0.2)
-        y += leaves * (0.3 * (speed / 7.0) ** 0.5 * 10 ** (-0.5 * far) * level / _rms(leaves))
+                   4500.0 * a ** -0.3 * r.uniform(0.6, 1.6, len(t)), r.uniform(1.0, 3.0, len(t)),
+                   0.001 * a ** 0.5 * r.uniform(0.6, 1.6, len(t)), r, 0.3)
+        y += leaves * (0.8 * (speed / 7.0) ** 0.5 * 10 ** (-0.5 * far) * level / _rms(leaves))
     howl = (place['howl'] if c['howl'] is None else c['howl']) * (1 - far)
     if howl > 0:
         tones = np.zeros((n, 2))
@@ -600,10 +651,12 @@ def _fire(n, r, c):
     centres = _bands(40.0, 14000.0, 10)
     roar = _levels(centres, 220.0 * 10 ** (-0.35 * size), 3.0, 7.0)
     hiss = _levels(centres, 5200.0, 6.0, 3.0)[:, None] * envelopes(dur, r, 10, 0.8, 0.5, 2.0, 25.0, 0.5)
-    env = np.hypot(roar[:, None] * flame[None, :] * 10 ** (0.6 * size), 0.22 * hiss * np.sqrt(flame)[None, :])
+    # the hiss of escaping gas belongs to a big fire; a small one is a quiet flutter of its roar under the crackles
+    env = np.hypot(roar[:, None] * flame[None, :] * 10 ** (0.6 * size),
+                   0.22 * 10 ** (1.2 * min(size, 0.0)) * hiss * np.sqrt(flame)[None, :])
     y = band_noise(n, r, centres, env, np.linspace(0.4, 1.0, 10))
     spread = 0.2 + 0.4 * (size + 1)                           # stereo width of the fire: 0.2 candle .. 1
-    busy = 16.0 * 10 ** ((0.6 if size > 0 else 1.5) * size + 0.5 * c['intensity'])        # crackles per second
+    busy = 16.0 * 10 ** ((0.6 if size > 0 else 0.8) * size + 0.5 * c['intensity'])        # crackles per second
     episodes = np.exp(0.6 * drift(dur, r, 0.05, 1.0, 1.0) - 0.18)
     t, gen = arrivals(r, busy * flame ** 1.5 * episodes, dur, cluster=0.55, spread=0.012)
     k = len(t)
@@ -627,7 +680,8 @@ def _fire(n, r, c):
         bursts(wood, ts, r.uniform(0.7, 4.0, len(ts)), np.clip(pp[sparks] + 0.2 * r.standard_normal(len(ts)), -1, 1),
                r.uniform(3500.0, 9000.0, len(ts)), 1.5, 0.0004, r)
     if k:                                                     # the bed under the crackles: 10 dB under their peaks
-        y *= _top(wood) / _rms(y) * 10 ** ((-10.0 + 6.0 * size) / 20)       # at a campfire, less under a big roar
+        y *= _top(wood) / _rms(y) * 10 ** ((-10.0 + 6.0 * size + 6.0 * min(size, 0.0)) / 20)      # at a campfire;
+        #                                     less under a big roar, more under a small fire (a quiet flutter)
     y = _space(y + wood, 0.4, 0.05, 25)
     far = max(c['distance'], 0.0)
     return _filt(y, _lp(16000.0 * 10 ** (-0.6 * far), 1)) if far else y
@@ -1001,27 +1055,63 @@ def _room_tone(n, r, c):
 
 
 def _city(n, r, c):
-    """A city from a distance: the sum of traffic too far to tell apart. A steady low rumble (air absorption has
-    taken the highs), the drone of many engines as narrow low bands, and slow swells of tyre noise as denser traffic
-    passes somewhere, each drifting across the stereo field; no horn, no single car, no event."""
-    dur = n / SR
+    """A city from a distance: under a low, smooth drone of traffic too far to tell apart (air absorption has taken
+    the highs), single vehicles pass one after another on the nearer roads, each a slow swell (level as 1 / r over
+    a pass of a few seconds, gliding across the stereo field) of its engine (a low harmonic tone at the firing
+    rate, 25-70 Hz, falling a few % by Doppler as it goes by) and its tyres (a hump at 400-1000 Hz); now and then
+    a nearer car's tyre hiss swells and fades, and rarely a far horn sounds in the reverberant street. intensity is
+    how busy it is: more vehicles, a fuller and brighter drone, more horns."""
+    dur, busy = n / SR, c['intensity']
     m = int(round(dur * CR))
     tt = np.arange(m) / CR
     centres = _bands(30.0, 10000.0, 10)
-    f = centres[:, None]
-    base = _levels(centres, 70.0, 2.5, 8.0)[:, None] * envelopes(dur, r, 10, 0.15, 0.5, 0.03, 0.5, 1.2)
-    power = np.repeat((base ** 2)[:, :, None], 2, axis=2)
-    for tp in arrivals(r, 0.22 * 10 ** (0.4 * c['intensity']), dur)[0]:
-        width, tyre, level = r.uniform(2.0, 4.5), r.uniform(250.0, 600.0), 0.5 * np.exp(0.35 * r.standard_normal())
-        tau = (tt - tp + dur / 2) % dur - dur / 2
-        bump = level * np.exp(-0.5 * (tau / width) ** 2)
-        th = (np.clip(r.uniform(-0.8, 0.8) + r.uniform(-0.25, 0.25) * tau / width, -1, 1) + 1) * np.pi / 4
-        swell = (_hump(f, tyre, 3.0, 7.0) * np.sqrt(f / tyre) * bump[None, :]) ** 2
-        power[:, :, 0] += swell * (2 * np.cos(th) ** 2)[None, :]
-        power[:, :, 1] += swell * (2 * np.sin(th) ** 2)[None, :]
-    y = band_noise(n, r, centres, np.sqrt(power), np.linspace(0.6, 1.0, 10))
+    base = _levels(centres, 70.0 * 1.6 ** busy, 2.5, 8.0 - 1.5 * busy)[:, None] * envelopes(dur, r, 10, 0.12, 0.6,
+                                                                                            0.03, 0.4, 1.2)
+    y = band_noise(n, r, centres, base, np.linspace(0.6, 1.0, 10))
     hum = _resonances(n, r, (58.0, 87.0, 116.0, 174.0), (1.0, 0.8, 0.6, 0.3), 25.0)      # many engines, one drone
-    y += hum * (0.5 * _rms(y) / _rms(hum))
+    y += hum * (0.35 * _rms(y) / _rms(hum))
+    t = np.arange(n) / SR
+    cars = np.zeros((n, 2))
+    passes = arrivals(r, 0.35 * 2.0 ** busy, dur)[0]
+    for k, tp in enumerate(passes):
+        v, d = r.uniform(9.0, 20.0), r.uniform(15.0, 45.0)            # m/s; m from the line of the road
+        tau = (t - tp + dur / 2) % dur - dur / 2                      # around the circle: the loop has no seam
+        x = v * tau
+        rr = np.hypot(x, d)
+        gain = (d / rr) ** 1.3 * np.cos(np.pi * tau / dur) ** 2 * np.exp(0.4 * r.standard_normal())
+        f0 = r.uniform(25.0, 70.0) / (1 + v * x / rr / 343.0)         # Doppler: higher coming, lower going
+        cyc = np.sum(f0) / SR
+        ph = 2 * np.pi * np.cumsum(f0 * (round(cyc) / cyc)) / SR + r.uniform(0, 2 * np.pi)     # whole cycles: loops
+        eng = sum(h ** -0.9 * np.sin(h * ph + r.uniform(0, 2 * np.pi)) for h in range(1, 7))
+        eng = eng * (1 + 0.2 * _at(drift(dur, r, 2.0, 12.0), n))
+        tyre = _svf(r.standard_normal(n), r.uniform(400.0, 1000.0), 0.7, 'bandn') * 2.0
+        th = (np.clip(r.choice([-1.0, 1.0]) * np.clip(x / (2 * d), -1, 1) * 0.8, -1, 1) + 1) * np.pi / 4
+        s = (eng + tyre) * gain
+        cars[:, 0] += s * np.cos(th)
+        cars[:, 1] += s * np.sin(th)
+    if len(passes):
+        y += _filt(cars, _lp(1500.0, 2)) * (6.0 * _rms(y) / _rms(cars) * min(1.0, np.sqrt(len(passes) * 4.0 / dur)))
+    hiss = np.zeros((n, 2))
+    for tp in arrivals(r, 0.07 * 2.0 ** busy, dur)[0]:               # a nearer car on the main road
+        tau = (t - tp + dur / 2) % dur - dur / 2
+        g = np.exp(-0.5 * (tau / r.uniform(0.8, 1.6)) ** 2)
+        _put(hiss, _svf(r.standard_normal(n), r.uniform(900.0, 1800.0), 0.8, 'bandn') * g, 0.0, 1.0,
+             r.uniform(-0.7, 0.7))
+    if hiss.any():
+        y += hiss * (0.35 * _rms(y) / _rms(hiss) * np.sqrt(0.07 * 2.0 ** busy * dur / 3.0))
+    horns = np.zeros((n, 2))
+    for tp in arrivals(r, 0.12 * 2.5 ** busy, dur)[0]:               # a far horn, one or two blasts
+        f = r.uniform(330.0, 470.0)
+        for b in range(int(r.integers(1, 3))):
+            L = r.uniform(0.25, 0.7)
+            u = np.arange(dsp.n_of(L)) / SR
+            ph = 2 * np.pi * f * u
+            tone = sum(h ** -1.0 * (np.sin(h * ph) + 0.8 * np.sin(h * 1.26 * ph)) for h in range(1, 6))
+            _put(horns, tone * np.sin(np.pi * np.minimum(u / 0.03, 1) / 2) * np.minimum((L - u) / 0.05, 1),
+                 tp + b * (L + r.uniform(0.08, 0.2)), 1.0, r.uniform(-0.6, 0.6))
+    if horns.any():
+        horns = _space(_filt(horns, _lp(1500.0, 2)), 1.6, 1.5, 26)
+        y += horns * (0.9 * _top(y) / _top(horns))
     far = max(c['distance'], 0.0)
     return _filt(y, _lp(3000.0 * 10 ** (-0.8 * far), 1))
 

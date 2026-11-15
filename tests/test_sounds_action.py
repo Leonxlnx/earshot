@@ -103,3 +103,38 @@ def test_countdown_go_is_a_fifth_above_and_longer():
     beep, go = registry.get('countdown/beep'), registry.get('countdown/go')
     assert abs(12 * np.log2(registry.Controls(go).hz() / registry.Controls(beep).hz()) - 7) < 0.01
     assert go.dur > 2 * beep.dur
+
+
+def _f0(m, lo, hi, t0, t1, frame=0.04):
+    """(f0 Hz, harmonicity 0..1) every half frame from t0 to t1 s: the autocorrelation peak between 1 / hi and 1 / lo"""
+    out = []
+    n = int(frame * dsp.SR)
+    for s in np.arange(t0, t1 - frame, frame / 2):
+        i = int(s * dsp.SR)
+        a = np.fft.irfft(np.abs(np.fft.rfft(m[i:i + n] * np.hanning(n), 4 * n)) ** 2)
+        l0, l1 = int(dsp.SR / hi), int(dsp.SR / lo)
+        j = l0 + np.argmax(a[l0:l1])
+        out.append((dsp.SR / j, a[j] / a[0]))
+    return np.array(out)
+
+
+@pytest.mark.parametrize('seed', [1, 2])
+def test_door_creak_is_pitched_but_wanders(seed):
+    """a stick-slip creak: most of the swing has a slip rate (20-250 Hz) the ear hears as pitch, and it wanders"""
+    p = _f0(dsp.butter(_mono(_raw('door/open', seed)), 'low', 2000.0), 20, 250, 0.3, 0.8)
+    voiced = p[p[:, 1] > 0.3]
+    assert len(voiced) >= 0.6 * len(p)
+    assert voiced[:, 0].max() / voiced[:, 0].min() > 1.5
+
+
+def test_slaps_differ_from_take_to_take():
+    a, b = _env(_raw('hit/slap', 1)), _env(_raw('hit/slap', 2))
+    k = min(len(a), len(b))
+    assert np.corrcoef(a[:k], b[:k])[0, 1] < 0.98
+
+
+def test_quake_has_events_over_its_rumble():
+    m = _mono(_raw('rumble/quake', 1))
+    e = _env(dsp.butter(m, 'band', (150, 700), order=4), 240)
+    e = e - e.mean()
+    assert np.mean(e ** 4) / np.mean(e ** 2) ** 2 > 5.0          # knocks and rattles stand out (noise: about 3)

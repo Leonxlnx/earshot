@@ -110,3 +110,15 @@ def test_ticktock_keeps_its_length_and_beats():
 def test_energy_adds_coins_and_level():
     lo, hi = _raw('coins/handful', 2, energy=-0.8), _raw('coins/handful', 2, energy=0.8)
     assert np.sqrt(np.mean(hi ** 2)) > np.sqrt(np.mean(lo ** 2))
+
+
+def test_tape_peel_is_a_pitched_screech():
+    """stick-slip at 0.35-1.6 kHz: the peel has a period the ear hears as a pitch, not a hiss"""
+    m = _mono(_raw('tape/peel', 1))
+    n = dsp.n_of(0.02)
+    h = []
+    for i in range(dsp.n_of(0.3), dsp.n_of(0.7), n):
+        a = np.fft.irfft(np.abs(np.fft.rfft(m[i:i + n] * np.hanning(n), 4 * n)) ** 2)
+        lag = slice(int(dsp.SR / 2500), int(dsp.SR / 250))
+        h.append(a[lag].max() / a[0])
+    assert np.median(h) > 0.3

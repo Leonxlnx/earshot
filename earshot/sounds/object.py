@@ -74,12 +74,12 @@ def _out(c, r, y, room='room', spread=0.3, tilt=0.0):
 # those few peaks limited, so every seed lands at the same loudness once it is levelled by its peak. The values are
 # the lowest crest of six takes of each design as built (a take is limited by 0-3 dB, on its loudest contacts).
 CREST = {'coin/drop': 11.4, 'coin/flip': 10.7, 'coins/handful': 13.6, 'glass/clink': 17.0, 'glass/set': 16.7,
-         'cup/set': 16.3, 'paper/page': 12.0, 'paper/card': 18.6, 'paper/crumple': 14.0, 'paper/tear': 16.6,
+         'cup/set': 16.3, 'paper/page': 12.0, 'paper/card': 18.6, 'paper/crumple': 14.0, 'paper/tear': 15.5,
          'book/close': 16.5, 'cards/shuffle': 13.2, 'dice/roll': 16.8, 'chips/stack': 16.0, 'water/drop': 14.9,
-         'water/pour': 9.5, 'bottle/open': 12.1, 'cork/pop': 19.1, 'clock/tick': 20.6, 'switch/light': 23.2,
+         'water/pour': 9.5, 'bottle/open': 14.8, 'cork/pop': 19.1, 'clock/tick': 20.6, 'switch/light': 23.2,
          'switch/push': 20.8, 'pen/click': 19.0, 'zipper/pull': 12.4, 'keys/jingle': 10.8, 'scissors/snip': 15.5,
-         'match/strike': 11.8, 'drawer/slide': 13.7, 'knock/door': 14.8, 'bell/desk': 9.4, 'bell/shop': 5.7,
-         'bell/bike': 5.5, 'stamp/press': 18.3, 'tape/peel': 7.0, 'stapler/press': 18.2}
+         'match/strike': 11.5, 'drawer/slide': 13.7, 'knock/door': 14.8, 'bell/desk': 9.4, 'bell/shop': 5.7,
+         'bell/bike': 5.5, 'stamp/press': 18.3, 'tape/peel': 11.4, 'stapler/press': 18.2}
 
 
 def _crest(y):
@@ -346,6 +346,16 @@ def _power(r, k, lo, hi, shape=1.4):
     return (lo ** p + u * (hi ** p - lo ** p)) ** (1 / p)
 
 
+def _tex():
+    from ..synth import texture        # lazy: only the friction designs need it
+    return texture
+
+
+def _logu(r, lo, hi, k):
+    """k values log-uniform in lo..hi"""
+    return np.exp(r.uniform(np.log(lo), np.log(hi), k))
+
+
 def _poisson(r, rate, t0, t1, peak):
     """Poisson arrivals in [t0, t1) at rate(t) events/s (a function, at most `peak`), by thinning"""
     k = r.poisson(max(peak * (t1 - t0), 0.0))
@@ -600,7 +610,7 @@ def _breaks(r, v, rate, lo=1e-3, shape=1.4):
         says=('a page of a book being turned, a papery swish and flap', 'paper rustling as a page flips over',
               'turning a page of a magazine'),
         uses=('paper', 'swipe', 'next', 'page turn', 'read'), tags=('paper', 'foley'), domains=DOM, dur=0.6,
-        axes=AXES)
+        axes=AXES, allows=('clicks',))       # the crackles of a bending sheet are single sharp events
 def paper_page(c, r):
     """a page turned: the corner peeled up (a few crackles), the sheet bending over fast (rustle at speed^1.5 with
     its top opening as it speeds up, crackles at a rate that follows the bending, the air it pushes), and the
@@ -680,25 +690,36 @@ def paper_crumple(c, r):
         uses=('paper', 'delete', 'discard', 'rip', 'tear'), tags=('paper', 'foley'), domains=DOM, dur=0.6,
         axes=AXES, allows=('clicks',))     # a tear is a cloud of fibre breaks: clicks are the sound
 def paper_tear(c, r):
-    """a tear: fibres break at the moving front, 1-3 thousand per second, as the front advances in stick-slip
-    jumps (70-180 per second, faster as the tear speeds up), so the breaks come in clusters: the rasp of a rip.
-    Break sizes follow a power law; the sheet's halves flutter under it; a last bigger crack where it separates,
-    and the two halves swinging apart"""
+    """a tear: the front does not run smoothly, it advances in stick-slip jumps, and every jump snaps a bundle of
+    fibres at once: a short grain of crackle within a millisecond, and the force on the sheet drops in a step
+    (texture.stick_slip). The jumps come at 90-350 per second, faster as the tear speeds up, very irregular and now
+    and then caught for a few ms, so the rip has a rough pitch that climbs with the speed; between them single
+    fibres break in a fine crackle. The steps ring the sheet (broad paper resonances at 1-5 kHz) and set the two
+    halves fluttering (a low papery flap that follows the jumps); a last bigger crack where it separates, and the
+    halves swinging apart"""
     k = _k(c)
     T = _vary(r, 0.42, 0.05) * k.L * 1.15 ** -k.e
     n = dsp.n_of(T + 0.18)
     t_ = _t(n)
-    v = np.clip(0.35 + 0.65 * (t_ / T) ** 0.6, 0, 1) * _speed(n, 0.0, T, 0.25)
-    slip = np.cumsum((70.0 + 110.0 * v) * (1 + 0.15 * dsp.wander(n / SR, r, 20.0)[:n])) / SR
-    cluster = (0.5 + 0.5 * np.cos(2 * np.pi * slip)) ** 4 / 0.273             # mean 1 over a cycle, peak 3.66
-    t, a = _breaks(r, v * cluster / 3.66, 3.66 * 2000.0 * 1.3 ** k.e, shape=1.6)
-    rasp = _crackle(r, n, t, a, 900.0, 10000.0, 0.0003)
-    sheet = dsp.butter(r.standard_normal(n), 'band', (250.0, 1200.0)) * v * cluster ** 0.5
+    v = np.clip(0.3 + 0.7 * (t_ / T) ** 0.6, 0, 1) * _speed(n, 0.0, T, 0.25)
+    rate = (90.0 + 260.0 * v * 1.15 ** k.e) * np.exp(0.15 * dsp.wander(n / SR, r, 15.0)[:n]) * (v > 0.05) / k.L
+    x, ts = _tex().stick_slip(r, rate, jitter=0.3, hold=0.04, hold_s=(0.004, 0.02), rough=0.7, edge=5e-5)
+    snap = dsp.butter(x, 'high', 600.0)
+    sheet = sum(g * dsp.svf(snap, f, q, 'bandn') for f, q, g in
+                zip(_vary(r, 1.0, 0.1) * np.array([1300.0, 2600.0, 4300.0]) * k.f ** 0.5, (1.5, 2.0, 2.0),
+                    (1.0, 0.8, 0.5)))
+    tb = np.repeat(ts, 3) + r.exponential(0.0008, 3 * len(ts))          # a bundle: a few fibres within a ms
+    bundles = _crackle(r, n, tb, np.exp(0.6 * r.standard_normal(len(tb))), 800.0, 9000.0, 0.0008)
+    t, a = _breaks(r, v, 900.0 * 1.3 ** k.e, shape=1.6)
+    fibres = _crackle(r, n, t, a, 1500.0, 10000.0, 0.0003)
+    flap = dsp.svf(dsp.butter(x, 'low', 900.0), _vary(r, 350.0, 0.2) * k.f, 1.2, 'bandn')
     end = _burst(r, 0.02, 1500.0, 9000.0, 0.002, 0.0003)
     m = dsp.n_of(0.15)
     part = dsp.butter(r.standard_normal(m), 'band', (300.0, 2500.0)) * _speed(m, 0.0, 0.15, 1.0)
-    y = _mix([(rasp, 0, 0 + k.h), (sheet, 0, -14), (end, T, -4), (part, T, -18)])
+    y = _mix([(bundles, 0, 0 + k.h), (sheet, 0, -8 + k.h), (fibres, 0, -6), (flap, 0, -12), (end, T, -4),
+              (part, T, -18)])
     return _out(c, r, y, 'booth', 0.4)
+
 
 
 @_design('book/close', kind='object',
@@ -920,7 +941,15 @@ def bottle_open(c, r):
     tr = r.uniform(0.03, 0.06)
     tcr = r.uniform(0.0, tr, 30)
     crimp = _crackle(r, n, tcr, np.sqrt(_power(r, 30, 0.01, 1.0, 1.4)), 2000.0, 9000.0, 0.0003)
-    gas = _burst(r, 0.5 * k.L, 1500.0, 10000.0, 0.09 * k.L * 1.4 ** k.e, 0.002)
+    # the gas: a jet through the gap under the cap, its noise peaking at St U / D (U falls with the pressure as the
+    # headspace empties, so the psst falls from about 6 to 2 kHz as it dies: a jet, not static)
+    m = dsp.n_of(0.5 * k.L)
+    tg = _t(m)
+    tau = _vary(r, 0.05, 0.15) * k.L * 1.4 ** k.e
+    p = np.exp(-tg / tau)
+    jet = dsp.svf(dsp.butter(r.standard_normal(m), 'high', 700.0), (1800.0 + 4500.0 * p ** 0.5) * k.f ** 0.3, 1.3,
+                  'bandn')
+    gas = dsp.fade(jet * p ** 0.8 * _env(m, 0.0015, 10.0) * np.exp(0.2 * dsp.wander(m / SR, r, 40.0)[:m]), 0.0, 0.05)
     pulse = _burst(r, 0.003, 200.0, 8000.0, 0.0008, 0.0002)
     m = dsp.n_of(0.06)
     neck = dsp.svf(np.pad(pulse, (0, m - len(pulse))), 1100.0 * k.f, 5.0, 'bandn')
@@ -931,7 +960,7 @@ def bottle_open(c, r):
     tf = tr + 0.02 + r.exponential(0.25, int(260 * 1.3 ** k.e))
     fizz = _crackle(r, n, tf, np.exp(0.5 * r.standard_normal(len(tf))) * np.exp(-(tf - tr) / 0.4), 3000.0, 12000.0,
                     0.0002, 0.7)
-    y = _mix([(tick, 0, -8), (crimp, 0, -12), (gas, tr, 0 + 2 * k.e), (neck, tr, -6 + k.h), (clinks, 0, -8),
+    y = _mix([(tick, 0, -8), (crimp, 0, -12), (gas, tr, -2 + 2 * k.e), (neck, tr, 0 + k.h), (clinks, 0, -8),
               (thud, 0, -14), (fizz, 0, -20)])
     return _out(c, r, y, 'room', 0.3)
 
@@ -1242,32 +1271,35 @@ def scissors_snip(c, r):
         uses=('fire', 'ignite', 'start', 'light', 'magic'), tags=('wood', 'fire', 'foley'), domains=DOM, dur=1.0,
         axes=AXES, allows=('clicks',))     # the scrape and the sparks are made of tiny clicks
 def match_strike(c, r):
-    """a match: its head scraped across the striker (60-110 ms of dense friction crackle through the cardboard
-    box), the head flashing alight (a quick pop of the chemicals), the flare: a burst of combustion noise that
-    blooms and dies in a few tenths of a second with a soft low whump of expanding air and a spray of sparks
-    (crackle at a falling rate), then the small flame burning quietly"""
+    """a match: its head scraped across the striker (60-110 ms of rough, bright friction: dense crackle through the
+    cardboard box), the head catching (a soft pff of the chemicals), then the flare: the flame grows from the head
+    in about 100 ms, a soft whoosh of combustion noise whose level and brightness swell together and fall back, and
+    settles into a small flame: low noise fluttering at the flicker rate of a flame a few mm across (buoyant puffing,
+    1.5 / sqrt(d) Hz: 10-14 Hz, Cetegen & Ahmed 1993), with a few late sparks"""
     k = _k(c)
     sc = _vary(r, 0.085, 0.15)
-    T = 1.0 * k.L
+    T = 1.1 * k.L
     n = dsp.n_of(T)
     v = _speed(n, 0.0, sc, 0.8)
-    t, a = _breaks(r, v, 2500.0)
-    scratch = _crackle(r, n, t, a, 500.0, 6000.0, 0.0009, 0.2)
+    t, a = _breaks(r, v, 3000.0)
+    scratch = _crackle(r, n, t, a, 1200.0, 9000.0, 0.0006, 0.2)
     box = _ring(r, _cloud(r, 200.0, 1500.0, 10, 0.03, 0.01), 0.06, 3e-4)
-    rub = signal.fftconvolve(dsp.butter(r.standard_normal(n), 'band', (600.0, 4000.0)) * v, box)[:n]
+    rub = signal.fftconvolve(dsp.butter(r.standard_normal(n), 'band', (1500.0, 7000.0)) * v, box)[:n]
     fl = sc + r.uniform(0.0, 0.015)
-    pop = _burst(r, 0.03, 400.0, 8000.0, 0.004, 0.0003)
+    pff = _burst(r, 0.06, 300.0, 4000.0, 0.02, 0.004)
     m = dsp.n_of(T - fl)
-    flare = dsp.butter(r.standard_normal(m), 'band', (150.0, 2500.0)) * _env(m, 0.012, 0.16 * k.L) * np.exp(
-        0.9 * dsp.wander(m / SR, r, 30.0)[:m])
-    whump = _ring(r, _modes([90.0 * k.f, 160.0 * k.f], [0.15, 0.1], [1.0, 0.5]), 0.3, 0.008, 0.0)
-    ts = fl + r.exponential(0.12, int(90 * 1.4 ** k.e))
-    sparks = _crackle(r, n, ts, np.exp(0.5 * r.standard_normal(len(ts))) * np.exp(-(ts - fl) / 0.1), 2000.0,
-                      9000.0, 0.0003, 0.5)
-    burn = dsp.butter(r.standard_normal(m), 'band', (120.0, 900.0)) * np.exp(
-        0.4 * dsp.wander(m / SR, r, 8.0)[:m]) * _env(m, 0.05, 0.5) * np.clip((T - fl - _t(m)) / 0.15, 0, 1)
-    y = _mix([(scratch, 0, 0 + k.h), (rub, 0, -8), (pop, fl, -4), (flare, fl, -3), (whump, fl, -8),
-              (sparks, 0, -6), (_bed(burn), fl, -24, False)])
+    tf = _t(m)
+    grow = _vary(r, 0.1, 0.15)
+    swell = np.where(tf < grow, np.sin(0.5 * np.pi * tf / grow) ** 2, 0.35 + 0.65 * np.exp(-(tf - grow) / 0.12))
+    flick = _vary(r, 12.0, 0.1)
+    flutter = 1 + 0.45 * np.sin(2 * np.pi * flick * tf + 1.5 * dsp.wander(m / SR, r, 4.0)[:m]) * (tf > grow)
+    roar = dsp.butter(r.standard_normal(m), 'band', (90.0, 6000.0), 1)
+    roar = dsp.svf(roar, 350.0 + 1600.0 * (swell - 0.35 * (tf > grow)) * k.f ** -0.3, 0.8, 'low')
+    flame = roar * swell * flutter * np.exp(0.15 * dsp.wander(m / SR, r, 20.0)[:m])
+    flame *= np.clip((T - fl - tf) / 0.12, 0, 1)
+    ts = fl + grow + r.exponential(0.2, int(r.integers(4, 10) * 1.4 ** k.e))
+    sparks = _crackle(r, n, ts, np.exp(0.5 * r.standard_normal(len(ts))), 2000.0, 8000.0, 0.0004, 0.4)
+    y = _mix([(scratch, 0, 0 + k.h), (rub, 0, -6), (pff, fl, -8), (flame, fl, -1), (sparks, 0, -14)])
     return _out(c, r, y, 'room', 0.3)
 
 
@@ -1454,28 +1486,34 @@ def stamp_press(c, r):
 @_design('tape/peel', kind='object',
         says=('sticky tape being pulled off a roll', 'adhesive tape peeling with a raspy screech',
               'packing tape stretched off the roll'),
-        uses=('tape', 'peel', 'pack', 'unwrap', 'open'), tags=('plastic', 'foley'), domains=DOM, dur=0.8, axes=AXES)
+        uses=('tape', 'peel', 'pack', 'unwrap', 'open'), tags=('plastic', 'foley'), domains=DOM, dur=0.8, axes=AXES,
+        allows=('rising_glide',))      # the screech climbs as the pull speeds up: the slip rate follows it
 def tape_peel(c, r):
-    """tape peeled for dur s: the adhesive lets go in stick-slip (Bikerman; the peel front jumps at 0.6-2.2 kHz,
-    faster as it is pulled faster, with a little jitter and held moments, which is what makes it a rasp and
-    not a tone), every slip a small click into the stretched film and the roll it comes off (a cardboard core under
-    many layers: damped low modes); the adhesive's fibrils snap in a fine crackle under it"""
+    """tape peeled for dur s: the adhesive lets go in stick-slip (the peel front jumps; Cortet et al. 2007), so
+    the force on the film is a sawtooth (texture.stick_slip) at a rate that follows the pull, 350 Hz as it starts
+    to 1.2-1.6 kHz at speed: a pitched screech. Its roughness is a second, slower stick-slip of the whole strip
+    (the front runs in bursts at 40-90 Hz: the screech is gated by them) and 8 % of jitter per period. The
+    sawtooth's edges ring the stretched film (bright, 2-6 kHz) and the roll it comes off (a cardboard core under
+    many layers: damped modes at 300-1400 Hz); the adhesive's fibrils snap in a fine crackle under it"""
     k = _k(c)
     T = c.seconds(0.8)
     n = dsp.n_of(T + 0.1)
     t_ = _t(n)
-    v = np.clip(t_ / 0.18, 0, 1) ** 0.7 * np.clip((T - t_) / 0.05, 0, 1) * (1 + 0.15 * dsp.wander(n / SR, r, 5.0)[:n])
+    v = np.clip(t_ / 0.15, 0, 1) ** 0.7 * np.clip((T - t_) / 0.05, 0, 1) * (1 + 0.15 * dsp.wander(n / SR, r, 5.0)[:n])
     v = np.maximum(v, 0.0) * 1.15 ** k.e
-    ts = _train(r, (600.0 + 1600.0 * v) / k.L, 0.12, 0.06)
-    a = np.interp(ts, t_, v) ** 0.7 * np.exp(0.4 * r.standard_normal(len(ts)))
-    film = _cloud(r, 1200.0 * k.f, 9000.0, 12, 0.03, 0.008)
-    roll = _cloud(r, 250.0 * k.f, 1400.0 * k.f, 10, 0.03, 0.01)
-    irs = [_ring(r, film, 0.02, 3e-5 * k.tc) + 0.5 * _ring(r, roll, 0.02, 2e-4) for _ in range(3)]
-    peel = _through(r, n, ts, a, irs, 0.2)
+    tex = _tex()
+    x, _ = tex.stick_slip(r, (350.0 + 1000.0 * v) * (v > 0.03) / k.L, jitter=0.08, rough=0.4, edge=4e-5)
+    g, _ = tex.stick_slip(r, (40.0 + 50.0 * v) * (v > 0.03), jitter=0.2, hold=0.05, hold_s=(0.01, 0.04), rough=0.4)
+    gate = 0.25 + 0.75 * (g / (g.max() + 1e-12)) ** 0.5
+    x = dsp.butter(x, 'high', 250.0) * gate
+    film = sum(w * dsp.svf(x, f, 3.0, 'bandn') for f, w in zip(_logu(r, 2000, 6000, 3), (1.0, 0.8, 0.6)))
+    roll = sum(w * dsp.svf(x, f, 6.0, 'bandn') for f, w in zip(_logu(r, 300 * k.f, 1400 * k.f, 3), (1.0, 0.8, 0.6)))
+    peel = _norm(film) + 0.7 * _norm(roll) + 0.3 * _norm(x)
     tf, af = _breaks(r, np.minimum(v, 1.0), 2500.0)
     fibrils = _crackle(r, n, tf, af, 2000.0, 9000.0, 0.0003, 0.4)
-    y = _mix([(peel, 0, 0 + k.h), (fibrils, 0, -20)])
+    y = _mix([(dsp.fade(dsp.butter(peel, 'low', 9000.0), 0.002, 0.03), 0, 0 + k.h), (fibrils, 0, -20)])
     return _out(c, r, y, 'room', 0.25)
+
 
 
 @_design('stapler/press', kind='object',

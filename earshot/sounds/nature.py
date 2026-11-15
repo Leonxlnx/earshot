@@ -16,7 +16,7 @@ from .registry import design
 SCENES = {
     'rain/window': ('rain', dict(surface='window'), ('steady rain on a window pane', 'rain tapping on glass',
                                                      'rain heard from indoors'),
-                    ('rain', 'rainy day', 'cozy', 'storm outside')),
+                    ('rain', 'rainy weather', 'cozy', 'storm outside')),
     'rain/leaves': ('rain', dict(surface='leaves'), ('soft rain falling on leaves', 'gentle rain in a forest',
                                                      'rain pattering on foliage'),
                     ('rain', 'forest rain', 'drizzle', 'garden')),
