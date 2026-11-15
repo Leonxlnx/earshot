@@ -44,6 +44,8 @@ def _line(meta, path, why):
     if meta.get('voice'):
         bits.append(meta['voice'])
     bits.append(f"{meta['lufs_max']:.0f} LUFS")
+    if meta.get('loop'):
+        bits.append('seamless loop')
     chk = meta.get('checks') or {}
     bits.append('clean' if chk.get('ok', True) else 'audit: ' + '; '.join(w['msg'] for w in chk['warnings'])[:120])
     return f"{os.path.basename(path)}: {meta['id']} ({', '.join(bits)})" + (f" [{why}]" if why else '')
@@ -72,6 +74,8 @@ def _request(b, theme):
         th = dict(th or {})
         th.update({k: b[k] for k in ('key', 'scale') if b.get(k)})
     req = {k: b[k] for k in ('pitch', 'dur', 'voice', 'material') if b.get(k) is not None}
+    if b.get('loop') is False:
+        req['loop'] = False
     return {**req, **b['axes'], 'theme': th}
 
 
@@ -95,7 +99,7 @@ def _heard(path, queries):
 
 
 def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False, fmt=None, mono=False, lufs=None,
-         sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, **axes):
+         sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, loop=None, **axes):
     """make the sound a request asks for and write it: {'summary', 'sound', 'files', 'why', 'also', 'unknown',
     'takes': [meta ...]} (+ 'heard' with listen). want: the request in words; sound: a design id instead of (or on
     top of) the words; out: the file to write (its extension picks the format: wav, flac, ogg, mp3, m4a, webm;
@@ -107,6 +111,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if not (want or sound):
         raise ValueError('say what sound you want (want=...) or name one (sound=...)')
     b, cands = choose(want, sound, pitch=pitch, dur=dur, voice=voice, material=material, axes=axes)
+    if loop is False:
+        b['loop'] = False
     if not cands:
         raise ValueError(f'no sound in the catalogue answers {want!r}: `earshot sounds` lists what there is; name '
                          'the sound itself (a chime, a click, a whoosh, rain) or the job it plays (success, coin, logo)')
@@ -145,10 +151,11 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     ign = sorted(set().union(*(set(t.get('ignored') or ()) for t in takes)))
     if ign:
         lines.append(f"not used by this sound: {', '.join(ign)}")
-    if b['unknown']:
-        lines.append(f"not understood: {', '.join(b['unknown'])}")
+    unknown = [w for w in b['unknown'] if brief.stem(w) not in pick['why']]      # words that found nothing
+    if unknown:
+        lines.append(f"not understood: {', '.join(unknown)}")
     res = {'summary': '\n'.join(lines), 'sound': pick['id'], 'files': paths, 'why': pick['why'], 'also': also,
-           'unknown': b['unknown'], 'takes': takes}
+           'unknown': unknown, 'takes': takes}
     if heard:
         res['heard'] = heard
     return res
@@ -282,6 +289,8 @@ def add_cli(sub):
         p.add_argument(f'--{a}', type=float, help='-1 .. 1, 0 = as designed')
     p.add_argument('--lufs', type=float, help='momentary-max loudness instead of a -1 dBFS peak')
     p.add_argument('--mono', action='store_true')
+    p.add_argument('--no-loop', action='store_true', help='an ambience once, with a fade in and out, instead of a '
+                                                          'seamless loop')
     p.add_argument('--listen', action='store_true', help='let the models pick among the best three and say what '
                                                          'the result is heard as (loads them: 20-40 s)')
     common(p)
@@ -307,4 +316,5 @@ def _run_make(args):
                               sprite=args.sprite), args)
     return _emit(make(args.want, args.output, sound=args.sound, n=args.n, seed=args.seed, theme=args.theme,
                       listen=args.listen, mono=args.mono, lufs=args.lufs, pitch=args.pitch, dur=args.dur,
-                      voice=args.voice, material=args.material, **_axes(args)), args)
+                      voice=args.voice, material=args.material, loop=False if args.no_loop else None,
+                      **_axes(args)), args)

@@ -109,7 +109,7 @@ def read(text):
     adjectives (they break ties between members of a family: "crisp" finds whoosh_fast/crisp)"""
     b = {'text': text, 'concepts': [], 'context': [], 'words': [], 'hints': [], 'axes': {}, 'material': None,
          'voice': None, 'domain': None, 'dur': None, 'pitch': None, 'key': None, 'scale': None, 'n': None,
-         'loop': False, 'unknown': []}
+         'loop': None, 'unknown': []}
     m = KEY.search(text)
     if m:
         b['key'] = m.group(1)[0].upper() + m.group(1)[1:]
@@ -161,7 +161,8 @@ def read(text):
                     hit = True
                     break
             if t in LOOP_WORDS:
-                b['loop'] = hit = True
+                b['loop'] = scale > 0            # "no loop", "not looping": once, with fades
+                hit = True
             if t in L.DOMAIN_WORDS:
                 b['domain'] = b['domain'] or L.DOMAIN_WORDS[t]
                 hit = hit or t not in rev
@@ -254,7 +255,7 @@ def rank(b, rows=None, top=8, idx=None):
                 score *= 0.5                                   # chip sound only when asked for, and then only chip
         elif 'retro' in row['tags']:
             score *= 0.6
-        if b['loop'] != bool(row['loop']):
+        if bool(b['loop']) != bool(row['loop']):
             score *= 0.5 if b['loop'] else 0.8
         out.append({'id': row['id'], 'score': round(score, 3), 'why': why})
     out.sort(key=lambda r: (-r['score'], r['id']))

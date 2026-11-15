@@ -35,7 +35,7 @@ AXES = ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')
 KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud', 'whoosh', 'rise', 'fall', 'zap',
          'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
-MODULES = ('ui', 'game', 'brand', 'synth', 'tonal', 'retro', 'bank')   # the design modules, in catalogue order
+MODULES = ('ui', 'game', 'brand', 'synth', 'nature', 'tonal', 'retro', 'bank')   # the design modules, in order
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
@@ -121,7 +121,8 @@ class Controls:
     """what one render was asked for, as a design reads it (module doc). Axes are attributes (c.bright ...);
     `used` collects what the design read"""
 
-    def __init__(self, d, pitch=None, dur=None, voice=None, material=None, theme=None, vary=0.35, **axes):
+    def __init__(self, d, pitch=None, dur=None, voice=None, material=None, theme=None, vary=0.35, loop=None,
+                 **axes):
         bad = [k for k in axes if k not in AXES]
         if bad:
             raise ValueError(f'unknown controls {bad}: the axes are {", ".join(AXES)}')
@@ -136,6 +137,7 @@ class Controls:
                       if v is not None and v != 0.0}
         self.used = set()
         self.played = None           # the voice a design really played, when it is not the one asked for
+        self.loop = d.loop and loop is not False      # a looping design renders once, with fades, on loop=False
 
     def __getattr__(self, name):
         if name in AXES:
@@ -215,7 +217,7 @@ def seed_of(id, seed):
 
 def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     """one finished take of a design: (y, meta). request: pitch, dur, voice, material, theme (a dict, see theme.py),
-    vary and the axes. y is float64, stereo (n, 2) or mono (n,), levelled (master.finish). meta: id, kind, seed, dur_s,
+    vary, loop (False = a looping design once, with fades) and the axes. y is float64, stereo (n, 2) or mono (n,), levelled (master.finish). meta: id, kind, seed, dur_s,
     peak_dbfs, lufs_max, pitch / voice / material when the design used them, `ignored` (what was asked for and not
     read), and the audit (`checks`: forge.sfx.check, with the design's `allows` as notes). Level: the true peak at
     peak_db, held under the kind's loudest level (LOUDEST); or exactly `lufs` (momentary max) when given."""
@@ -223,7 +225,7 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     d = get(id)
     c = Controls(d, **request)
     y = d.fn(c, dsp.rng(seed_of(id, seed)))
-    y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=d.loop, cap=LOUDEST.get(d.kind, LOUDEST['']))
+    y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=c.loop, cap=LOUDEST.get(d.kind, LOUDEST['']))
     meta = {'id': id, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1)}
     if 'pitch' in c.used and (d.pitch or c._pitch):
@@ -235,17 +237,20 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     ignored = sorted(c.asked - c.used)
     if ignored:
         meta['ignored'] = ignored
+    if d.loop:
+        meta['loop'] = c.loop
     if check:
-        meta['checks'] = audit(y, d)
+        meta['checks'] = audit(y, d, c.loop)
     return y, meta
 
 
-def audit(y, d):
+def audit(y, d, loop=None):
     """the model-free audit of a take (forge.sfx.check): {'ok', 'warnings', 'notes'}; findings the design allows
     (its rising pitch, its hard stop) are notes"""
     from ..forge import sfx
     c = sfx.check(y, role='hit' if d.kind in ('hit', 'thud', 'boom') else None)
-    allows = d.allows + (('edge', 'truncated') if d.loop else ())     # a loop runs into its own start
+    allows = d.allows + (('edge', 'truncated') if (d.loop if loop is None else loop) else ())   # a loop runs
+    #                                                                                 into its own start
     if d.pitch:
         allows += ('ring',)        # the comb detector reads any steady harmonic tone as a comb: a note is one
     warn = [w for w in c.get('warnings', []) if w.get('code') not in allows]
