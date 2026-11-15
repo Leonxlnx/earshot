@@ -18,6 +18,7 @@ from ..synth import phrase, space, voices
 
 DEFAULT_VOICE = 'vibraphone'
 SUSTAIN_FLOOR = 0.11              # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
+CHORD_GAP = 0.03                  # s: notes this close are one chord (or a grace note): the earlier one rings on
 
 
 def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, last=0.6, accent=-1, room='room',
@@ -25,7 +26,8 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     """a figure as stereo audio. steps: semitones above the root (or scale degrees of the theme's scale with
     degrees=True), one per note; gap: seconds between note starts (a number, or one per interval); vel: how hard it
     is played (0..1), vels: each note's share of it; gate: seconds an inner note sounds before it is damped (None =
-    until just after the next one starts), last: seconds the final note rings; accent: the note that leads (index,
+    until just after the next one starts), last: seconds the final note rings (and every note of a chord: notes
+    closer than CHORD_GAP); accent: the note that leads (index,
     -1 = the last, None = none); room: the space it sits in (the theme's space wins); spread: how far the notes sit
     apart in the stereo field; voice: the figure's own default voice; avoid: materials whose voices cannot carry this
     figure (two short low notes on a metal bar are heard as an electronic beep): a theme's voice of such a material
@@ -43,7 +45,7 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     floor = SUSTAIN_FLOOR if float(voices.info(v).get('ring_s') or 0.0) > 1.0 else 0.0
     t, notes = 0.0, []
     for i, f in enumerate(hz):
-        if i == k - 1:
+        if i == k - 1 or gaps[i] <= CHORD_GAP:           # the last note, and a note the next one joins as a chord
             d = max(last * ring, 1.6 * floor)
         else:
             d = max((gate if gate is not None else gaps[i] * 1.15) * min(ring, 1.5), floor)

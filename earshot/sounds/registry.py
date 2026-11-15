@@ -35,7 +35,7 @@ AXES = ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')
 KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud', 'whoosh', 'rise', 'fall', 'zap',
          'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
-MODULES = ('ui', 'tonal', 'retro', 'bank')   # the design modules of this package, in catalogue order
+MODULES = ('ui', 'game', 'brand', 'tonal', 'retro', 'bank')   # the design modules, in catalogue order
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
@@ -250,3 +250,12 @@ def audit(y, d):
     warn = [w for w in c.get('warnings', []) if w.get('code') not in allows]
     notes = list(c.get('notes', [])) + [w for w in c.get('warnings', []) if w.get('code') in allows]
     return {'ok': not warn, 'warnings': warn, 'notes': notes}
+
+
+def voices_says(voice):
+    """the descriptions of a voice itself (earshot.synth.voices), [] for none: what a tonal design sounds like
+    besides its figure"""
+    if not voice:
+        return []
+    from ..synth import voices
+    return list(voices.info(voice)['says'][:2])
