@@ -270,6 +270,25 @@ def test_instrument_before_a_sound_noun():
     assert 'voice:marimba' in brief.read('one marimba hit')['concepts']
 
 
+def test_a_job_of_several_words_counts_only_as_a_whole():
+    """a multi-word `uses` phrase is found by the whole phrase; one of its words alone counts only as a tag"""
+    rows = [dict(id='a/x', kind='chime', says=['a plain chime', 'a small chime'], uses=['order ready'], tags=[],
+                 domains=['ui'], dur_s=0.5, loop=False),
+            dict(id='b/y', kind='chime', says=['a plain chime', 'a small chime'], uses=['ready'], tags=[],
+                 domains=['ui'], dur_s=0.5, loop=False)]
+    ix = brief.index(rows)
+    terms = ix[1][0]
+    assert 'ph:order ready' in terms['uses'] and 'ready' not in terms['uses'] and 'ready' in terms['tags']
+    assert brief.rank(brief.read('ready'), idx=ix)[0]['id'] == 'b/y'            # "ready" alone: the one-word job
+    top = brief.rank(brief.read('order ready'), idx=ix)[0]
+    assert top['id'] == 'a/x' and 'ph:order ready' in top['why']
+    b = brief.read('your order is ready, a ding')
+    assert 'ph:order ready' in b['phrases'] and brief.shown(b, ['ph:order ready']) == ['order ready']
+    assert 'ph:order ding' not in b['phrases']                                   # never across a clause
+    # the request that found it: "day" no longer reaches a rain loop through a phrase
+    assert brief.rank(brief.read('forest ambience by day with birds'))[0]['id'].startswith('forest/')
+
+
 # ---- what a user sees: words as written, and what a pick leaves out
 
 def test_why_shows_words_as_written_never_stems():
@@ -344,6 +363,7 @@ ANCHORS = [
     ('fairy dust sparkle over a product shot', ('shimmer/', 'pro_shimmer/', 'sparkle/', 'gem/')),
     # ambience
     ('gentle rain on a tent, looping', ('rain/tent',)),
+    ('forest ambience by day with birds', ('forest/',)),        # game log: 'rainy day' once won it by "day"
     ('crickets on a summer night', ('night/',)),
     ('waves rolling over pebbles', ('waves/pebbles',)),
     ('busy city traffic in the distance', ('city/',)),

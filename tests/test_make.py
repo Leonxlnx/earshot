@@ -136,10 +136,16 @@ def test_also_is_filled_from_the_catalogue(tmp_path):
     assert alternatives(b, two, 'night/crickets')[0] == 'rain/tent'     # the ranked candidates first
     tap = alternatives(brief.read('a tap'), [{'id': 'tap/tone', 'score': 1.0, 'why': ['tap']}], 'tap/tone')
     assert len(tap) == 3 and not any(registry.get(a).loop for a in tap)
-    # a guess says so on the alternatives' line
+    # a guess says so on the alternatives' line, each with what it sounds like (game log: bare ids cost a search)
     vague = [{'id': 'a/x', 'score': 2.0, 'why': ['airy']}]
-    line = guess({'listened': False}, vague, ['b/y', 'c/z'])
-    assert line.startswith('also: b/y, c/z (the pick is a guess: no job or sound word matched') and '\n' not in line
+    line = guess({'listened': False}, vague, ['open/lift', 'chest/open'])
+    assert line.startswith('also (the pick is a guess: no job or sound word matched): '
+                           'open/lift (two soft notes rising a fifth), chest/open (') and '\n' not in line
+    for part in line.split('): ', 1)[1].split('), ')[:-1]:
+        assert len(part.split(' (', 1)[1]) <= 44, part                 # about 40 characters each
+    res = make('pause menu open', str(tmp_path / 'p.wav'))
+    s = res['summary']
+    assert 'also (the pick is a guess' in s and 'open/lift (two soft notes rising a fifth)' in s
     res = make('crickets at night', str(tmp_path / 'n.wav'), dur=2, loop=False)
     assert len(res['also']) == 3 and 'also: ' + ', '.join(res['also']) in res['summary']
     assert sum(1 for ln in res['summary'].splitlines() if 'also' in ln) == 1
@@ -256,7 +262,7 @@ def test_make_set_in_several_formats_with_a_sprite_in_each(tmp_path):
         make_set({'format': 'wav,aiff', 'sounds': [{'name': 'a', 'sound': 'tap/tone'}]}, out=str(tmp_path / 'x'))
 
 
-def test_loops_in_padded_formats_are_warned_about(tmp_path):
+def test_a_single_loop_in_a_padded_format_is_warned_about(tmp_path):
     from earshot.make import _seam
     assert _seam(['rain'], ['ogg', 'webm', 'wav']) is None and _seam([], ['mp3']) is None
     line = _seam(['rain'], ['webm', 'mp3', 'm4a'])
@@ -266,6 +272,61 @@ def test_loops_in_padded_formats_are_warned_about(tmp_path):
         assert res['summary'].splitlines()[-1].startswith('r.mp3: a loop in mp3 has a gap at its seam')
         res = make(out=str(tmp_path / 'once.mp3'), sound='rain/tent', dur=3, loop=False)
         assert 'gap at its seam' not in res['summary']
+
+
+def test_a_set_writes_loops_only_in_formats_that_keep_the_seam(tmp_path):
+    """game log: `webm,mp3` wrote mp3 loops and then warned; the user made flac by hand"""
+    from earshot.make import _loop_formats
+    assert _loop_formats(['webm', 'mp3']) == ['webm', 'flac'] and _loop_formats(['mp3', 'm4a']) == ['flac']
+    assert _loop_formats(['flac', 'mp3', 'wav']) == ['flac', 'wav'] and _loop_formats(['ogg']) == ['ogg']
+    if not shutil.which('ffmpeg'):
+        return
+    out = str(tmp_path / 's')
+    spec = {'format': 'wav,mp3', 'sprite': 'sprite.wav',
+            'sounds': [{'name': 'tap', 'sound': 'tap/tone'}, {'name': 'rain', 'sound': 'rain/tent', 'dur': 8}]}
+    res = make_set(spec, out=out)
+    rows = {r['name']: r for r in _check_manifest(out, 2)['sounds']}
+    assert rows['tap']['files'] == ['tap.wav', 'tap.mp3'] and rows['rain']['files'] == ['rain.wav', 'rain.flac']
+    assert not os.path.exists(os.path.join(out, 'rain.mp3')) and os.path.isfile(os.path.join(out, 'rain.flac'))
+    lines = res['summary'].splitlines()
+    k = next(i for i, ln in enumerate(lines) if ln.startswith('rain.{wav,flac}: rain/tent'))
+    assert lines[k + 1] == '  a loop: flac instead of mp3, which leaves a gap at the seam'
+    assert 'gap at its seam' not in res['summary']
+    with open(os.path.join(out, 'sprite.json'), encoding='utf-8') as fh:
+        mp = json.load(fh)
+    assert mp['src'] == ['sprite.wav', 'sprite.mp3'] and mp['sprite']['rain'][2] is True    # one map for both
+
+
+def test_a_set_says_when_two_names_get_one_design(tmp_path):
+    """game log: "losing a life" and "game over" both became lose/descend, and nothing said so"""
+    spec = {'sounds': [{'name': 'lose_life', 'want': 'losing a life, a sad falling figure'},
+                       {'name': 'game_over', 'want': 'game over, gentle and sad'},
+                       {'name': 'tap', 'sound': 'tap/tone'}, {'name': 'tap2', 'sound': 'tap/tone'}]}
+    res = make_set(spec, out=str(tmp_path / 's'))
+    lines = res['summary'].splitlines()
+    assert [r['sound'] for r in res['sounds']][:2] == ['lose/descend', 'lose/descend']
+    k = next(i for i, ln in enumerate(lines) if ln.startswith('game_over.wav'))
+    assert lines[k + 1].startswith('  same design as lose_life: ask for a different one with "sound" (the nearest: ')
+    other = lines[k + 1].rsplit(': ', 1)[1].rstrip(')')
+    assert other != 'lose/descend' and not _chip(other)
+    k = next(i for i, ln in enumerate(lines) if ln.startswith('tap2.wav'))
+    assert lines[k + 1].startswith('  same design as tap: ')
+    assert sum('same design' in ln for ln in lines) == 2
+
+
+def _chip(sid):
+    from earshot import brief
+    return brief.chip(registry.get(sid).row())
+
+
+def test_help_says_what_a_spec_is(capsys):
+    with pytest.raises(SystemExit):
+        cli.main(['make', '--help'])
+    text = ' '.join(capsys.readouterr().out.split())
+    for bit in ('"sounds": [{"name": "tap", "want": "a soft tap"}', 'docs/MAKE.md has every field',
+                'rewrites its files and manifest.json'):
+        assert bit in text, bit
+    assert 'earshot.make.make_set' not in text
 
 
 def test_make_set_refuses_unknown_fields_and_missing_names(tmp_path):

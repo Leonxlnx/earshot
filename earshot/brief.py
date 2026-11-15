@@ -401,14 +401,16 @@ def _next_concept(toks, i):
 def read(text):
     """a request as a brief (module doc): {'text', 'concepts', 'parts', 'context', 'refs', 'not', 'words', 'hints',
     'axes', 'dir', 'material', 'voice', 'domain', 'dur', 'dur_max', 'pitch', 'key', 'scale', 'n', 'notes', 'loop',
-    'unknown', 'context_words', 'written', 'framed'}; absent things are None / empty. `concepts` are the sound or job
-    asked for (the head first), `parts` what the request says it has ("with a soft shimmer"), `context` the canonical words after "for" /
-    "when" (where it plays; `context_words` the plain words there), `refs` what it is compared with ("duller than an
-    on-switch"), `not` the jobs the request rules out ("not an error"), `hints` the adjectives (they break ties
-    between members of a family: "crisp" finds whoosh_fast/crisp), `dir` +1 for a rising gesture and -1 for a falling
-    one, `dur_max` a ceiling ("under 80 ms"), `notes` the number of notes of a figure ("a two-note chime"), `written`
-    the words as the request wrote them ({canonical word or stemmed word: 'water drop'}; `shown`), `framed` the jobs
-    named only in a comparison or in the event before the sound is named ("sound when the player grabs a boost")"""
+    'unknown', 'context_words', 'written', 'framed', 'phrases'}; absent things are None / empty. `concepts` are the
+    sound or job asked for (the head first), `parts` what the request says it has ("with a soft shimmer"), `context`
+    the canonical words after "for" / "when" (where it plays; `context_words` the plain words there), `refs` what it
+    is compared with ("duller than an on-switch"), `not` the jobs the request rules out ("not an error"), `hints`
+    the adjectives (they break ties between members of a family: "crisp" finds whoosh_fast/crisp), `dir` +1 for a
+    rising gesture and -1 for a falling one, `dur_max` a ceiling ("under 80 ms"), `notes` the number of notes of a
+    figure ("a two-note chime"), `written` the words as the request wrote them ({canonical word or stemmed word:
+    'water drop'}; `shown`), `framed` the jobs named only in a comparison or in the event before the sound is named
+    ("sound when the player grabs a boost"), `phrases` the runs of content words a design's multi-word job is
+    matched against (`_phrases`)"""
     b = {'text': text, 'concepts': [], 'parts': [], 'context': [], 'refs': [], 'not': [], 'words': [], 'hints': [],
          'axes': {},
          'dir': 0, 'material': None, 'voice': None, 'domain': None, 'dur': None, 'dur_max': None, 'pitch': None,
@@ -641,7 +643,31 @@ def read(text):
     b['axes'] = {a: round(max(-1.0, min(1.0, v)), 2) for a, v in b['axes'].items() if abs(v) >= 0.05}
     b['dir'] = (b['dir'] > 0) - (b['dir'] < 0)
     b['context_words'] = sorted(ctx_words)
+    b['phrases'] = _phrases(toks, b['written'])
     return b
+
+
+def phrase_key(words_):
+    """the key of a phrase of several words: the stems of its content words ('rainy day' -> 'rainy day')"""
+    return ' '.join(stem(w) for w in words_ if w not in L.STOP and w not in PUNCT)
+
+
+def _phrases(toks, written):
+    """the keys ('ph:' + phrase_key) of every run of 2 to 4 content words inside one clause of a request: what a
+    design's multi-word job ('order ready', 'stutter into a cut') is matched against as a whole; `written` gets
+    each run as the request wrote it"""
+    out, run = [], []
+    for t in toks + [',']:
+        if t in PUNCT:
+            for n in range(2, 5):
+                for k in range(len(run) - n + 1):
+                    key = 'ph:' + phrase_key(run[k:k + n])
+                    out.append(key)
+                    written.setdefault(key, ' '.join(run[k:k + n]))
+            run = []
+        elif t not in L.STOP:
+            run.append(t)
+    return list(dict.fromkeys(out))
 
 
 def _terms(row):
@@ -655,7 +681,12 @@ def _terms(row):
         for s in texts:
             c, rest, f, dd = _parse_plain(str(s).replace('_', ' '))
             t[field].update(c)
-            t[field].update(rest)
+            content = [w for w in tokens(str(s).replace('_', ' ')) if w not in L.STOP and w not in PUNCT]
+            if field == 'uses' and len(content) > 1 and rest:
+                t[field].add('ph:' + phrase_key(content))   # a job of several words counts as a whole: 'rainy
+                t['tags'].update(rest)                      # day'; "day" alone only as much as a tag
+            else:
+                t[field].update(rest)
             feel.update(f)
             if field in ('says', 'name'):
                 d += dd
@@ -723,6 +754,9 @@ def _query(b):
     ctx = set(b.get('context_words', ()))
     for w in b['words']:
         q[w] = max(q.get(w, 0.0), WORD_WEIGHT * (0.5 if w in ctx else 1.0))
+    said = b.get('written') or {}
+    for p in b.get('phrases', ()):
+        q[p] = WORD_WEIGHT * (0.5 if set(said.get(p, '').split()) & ctx else 1.0)
     for key, wt in (('refs', REF_WEIGHT), ('context', CONTEXT_WEIGHT), ('parts', PART_WEIGHT)):
         for c in b.get(key, ()):
             q[c] = max(q.get(c, 0.0), wt)
@@ -773,10 +807,10 @@ def excluded(b, row, t):
 
 def named(why):
     """True when the words that decided a design (rank's `why`) include a job or a sound (a canonical word or a
-    voice), not only adjectives and plain words"""
+    voice, or a job of several words matched as a whole), not only adjectives and plain words"""
     if 'voices' not in _cache:
         _cache['voices'] = frozenset(L.VOICES.values())
-    return any(w in L.CONCEPTS or w in _cache['voices'] for w in why)
+    return any(w in L.CONCEPTS or w in _cache['voices'] or w.startswith('ph:') for w in why)
 
 
 def shown(b, why):
