@@ -17,7 +17,9 @@ from words (no models, about a second, nothing downloaded, no recorded audio). T
    `make_set` with `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft
    tap"}, ...]` (fields: name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs). One voice, key and
    room for all, levels balanced, `manifest.json` written. Themes: soft, glass, wood, felt, tine, metal, electric,
-   digital, retro.
+   digital, retro. From the CLI, your own list is a JSON file: `{"set": "ui", "theme": "felt", "format":
+   "webm,mp3", "sounds": [{"name": "tap", "want": "a soft tap"}, ...]}`, then `earshot make --spec FILE -o FOLDER`
+   (a re-run rewrites the files and `manifest.json`; it does not delete files of names you removed).
 3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20),
    then `--sound ID`. Never list the whole catalogue (457 lines).
 
@@ -32,8 +34,9 @@ always; a mood or a paraphrase misses about one time in four. To steer, re-ask w
 - `x.ogg: design/id (0.88 s, G5, vibraphone, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
   `clean` means not usable: make it again with another `seed`.
 - `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
-- `also: ... (the pick is a guess: ...)`: treat the pick as unverified; choose from the alternatives by their
-  names, or re-ask naming the sound or the job.
+- `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified; choose an alternative
+  by its words and call again with `--sound ID`, or re-ask naming the sound or the job.
+- `same design as NAME: ... (the nearest: ID)` (sets): two names got one design; give the second `"sound": ID`.
 - `not in this sound: WORDS`: part of the request is not in this file (one call, one sound); make it separately.
 - `not used by this sound: ...`: the design ignored that control or could not keep that length; fine unless it
   mattered, then pick another design.
@@ -43,7 +46,8 @@ always; a mood or a paraphrase misses about one time in four. To steer, re-ask w
 **Web**: `earshot make --set ui --theme soft -o public/sounds --format webm,mp3 --sprite sprite`, then load
 `sprite.json` (howler.js format, `src` lists webm first). Ogg Vorbis does not play in Safari before 18.4.
 **Loops**: ambience loops seamlessly by default (`--dur` sets its length); say "no loop" (or `--no-loop`) for a
-film's bed. Never ship a loop as mp3 or m4a.
+film's bed. Never ship a loop as mp3 or m4a: a set with `webm,mp3` writes loops as flac instead (`a loop: flac
+instead of mp3` is expected, not an error).
 **`--listen`** (`listen=true`): also ranks by how designs sound and adds `heard as: ... (z)`; it loads a model
 (20-40 s). Use it only when a describe-the-sound request came back as a guess.
 

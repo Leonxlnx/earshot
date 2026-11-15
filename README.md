@@ -69,16 +69,14 @@ also: step/grass, step/metal, step/snow
 $ earshot make "a soft wooden success chime for a finance app, 400 ms, in D" -o wood.wav
 wood.wav: success/rise (0.49 s, D5, marimba, -14 LUFS, clean) [success, bell]
 also: success/done, success/fifth, success/triad
-
-$ earshot make "a water drop and a coin" -o dropcoin.wav
-dropcoin.wav: coin/bright (0.69 s, B5, glockenspiel, -14 LUFS, clean) [coin, pickup]
-not in this sound: water drop
-also: water/drop, water/pour, coins/handful (the pick is a guess: another kind of sound fits almost as well; name the one you want with sound=<id>)
 ```
 
-The last lines are the honest part of the answer: one call makes one sound, so the water drop is a second call
-(`--sound water/drop`). A control the design cannot keep (a length on a struck sound) comes back as `not used by this
-sound`. Name the sound or the job and the first pick is right for nearly every request; describe a mood or
+The lines after the first are the honest part of the answer. One call makes one sound: a request that names two
+says `not in this sound: ...` for the other. When the pick rests on weak evidence the alternatives come with a few
+words each, `also (the pick is a guess: no job or sound word matched): open/lift (two soft notes rising a fifth),
+bottle/open (a bottle cap prised off with a hiss of ...), ... Name one with sound=<id>`. A control the design cannot
+keep (a length on a struck sound) comes back as `not used by this sound`.
+Name the sound or the job and the first pick is right for nearly every request; describe a mood or
 paraphrase and about one request in four needs that second call ([How good is it?](#how-good-is-it)).
 
 ### Themes and sets
@@ -102,7 +100,8 @@ quieter) with a `manifest.json`: `ui` (16 interface sounds), `game` (22: menus, 
   rumble and a chip engine are seamless loops: rendered around a circle, so the file repeats with no seam and no cut
   event. `--dur` sets the loop's length; `--no-loop` (or "no loop") renders the scene once with a fade in and out,
   for a film. Write loops as ogg, webm, wav or flac: an mp3 or m4a loop has a gap at its seam in players that
-  ignore the encoder's padding, and `make` warns.
+  ignore the encoder's padding: a single `make` warns, and a set written as `webm,mp3` writes its loops as flac in
+  place of the mp3.
 - **Formats**: the extension picks it: wav and flac (24-bit; 16-bit in sets) directly; ogg (Vorbis), webm (Opus),
   m4a (AAC) and mp3 through ffmpeg. A set takes several at once (`--format webm,mp3`), and its sprite map lists them
   in order. For the web write `webm,mp3` (or `webm,m4a`): Ogg Vorbis does not play in Safari before 18.4. 48 kHz
@@ -477,7 +476,8 @@ Tools: `make` (want, out, sound, n, theme, pitch, dur, voice, material, loop, se
 sounds, theme, format: one or several such as `"webm,mp3"`, sprite) and `sounds` (no models; their answer is the
 summary text alone unless `full=true`; once a listening tool or `earshot mcp --warm` has loaded CLAP in the server,
 `make` also ranks by how the designs sound); `measure`, `describe`, `match`, `rank`, `find`, `compare`, `ab`,
-`realness`, `timeline`, `sheet`, `critique`, `doctor`, `llm_critique`; and the bank, `sfx_list`, `sfx_render`, `kit_render`. Models load on the first listening
+`realness`, `timeline`, `sheet`, `critique`, `doctor`, `llm_critique`; and the bank, `sfx_list`, `sfx_render`,
+`kit_render`. Models load on the first listening
 call and stay warm. On a slow machine start Claude Code with `MCP_TIMEOUT=60000`. The optional `llm_critique` tool
 reads `GEMINI_API_KEY` from the environment; never write a literal key into a file.
 
@@ -532,12 +532,14 @@ What earshot cannot do or judge is in [docs/LIMITS.md](docs/LIMITS.md).
 - **Made sounds, heard by earshot's own models** (each design against two or three plain descriptions of itself, in
   a forced choice against "a cheap synthesizer beep", "a video game blip", "an 8-bit chiptune sound", "a harsh
   buzzing tone" and "white noise static"): of the 248 designs new in 1.0, 240 are heard as their own description (z
-  >= 2), 187 strongly (z >= 3), and 233 win the forced choice. The 0.4 bank's glockenspiel and marimba notes scored z
+  >= 2), 187 strongly (z >= 3), and 233 win the forced choice (counted before the weakest ones were rebuilt). The 0.4
+  bank's glockenspiel and marimba notes scored z
   2.2 and 2.6 on the same test; the 1.0 notes 4.6 and 5.1. This is a measurement by models, not a listening test by
   people: nobody has run one on the 1.0 sounds yet.
 - **Understanding requests**: on 220 held-out requests written by someone who never saw the catalogue (half long
   descriptions that never name the sound, half casual), the first pick is right for 71.4 % and one of the top three
-  for 80.5 % (74.1 % / 82.3 % with `--listen`); on the 660 development requests 92.5-97.3 %. Terse requests that
+  for 80.0 % (74.1 % / 82.3 % with `--listen`, measured before the last small fixes); on the 660 development
+  requests 92.5-97.3 %. Terse requests that
   name the job or the sound ("coin pickup", "error beep") were right for all 110 intents of the development set.
 - **Pianos and mallets calibrated** against freely usable recordings (University of Iowa Musical Instrument Samples;
   VSCO-2 Community Edition, CC0), note by note; no recording and no per-recording data is in the repository. Before,
@@ -558,7 +560,7 @@ What earshot cannot do or judge is in [docs/LIMITS.md](docs/LIMITS.md).
 
 `make` draws on a fixed catalogue: it chooses and shapes designs, it does not compose music, speak, or invent a sound
 no design covers. A request that describes a mood or paraphrases a sound is understood less well than one that names
-it. Its weakest sounds are some foley (an opening door, a struck match, tearing paper) and steady noise beds, which
+it. Its weakest sounds are tearing paper, distant city traffic, wind in trees and steady noise beds in general, which
 earshot's models hear as close to noise. earshot hears through two open models and a set of measurements.
 Trustworthy: loudness, timing and sync to picture, "is this the kind of sound I asked for" on single exposed sounds,
 picking among candidates, obvious code-synthesized sources. Hints only: tags of events inside a busy mix, music genre

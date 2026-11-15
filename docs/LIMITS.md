@@ -83,8 +83,8 @@ a sound getting better.
 - Music beyond figures: no melodies, beats, songs or scores. Notes, chords of a pad, short motifs and logos only.
 - Speech, voices, animals (other than the insects and birds inside a few ambience scenes), vehicles (other than a
   chip engine and distant traffic), weapons beyond game shots and lasers.
-- Make two sounds in one call. "A water drop and a coin" makes one of them and says `not in this sound: water drop`;
-  ask again for the other, or make a set.
+- Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
+  `not in this sound: ...` for the other; ask again for it, or make a set.
 - Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
   a length it cannot keep, come back as `not used by this sound`. A material picks the voice of a tonal sound only
   among six (wood, glass, metal, soft, digital, retro); other materials ("plastic", "ceramic") only steer the
@@ -98,15 +98,18 @@ a sound getting better.
 - Choose by taste. The ranking reads words, not the product; two good designs for one job can differ a lot. Use
   `also`, `--sound`, `--listen` and a person's ears.
 
-**Where it is weak** (below z 2 for their own description, or losing the forced choice against cheap-synth and noise
-descriptions, in the lab's measurement): an opening door, a soft landing, a slap, a struck match, tearing paper,
-peeling tape, a bottle opening, rain on a roof, a small fire, distant city traffic (heard as noise) and a low rumble.
-Steady noise beds in general sit close to "noise" for the models, which says as much about the models as about the
+**Where it is weak** (in the lab's measurement by earshot's models). Tearing paper (z 1.6-2.5 for its own
+description), distant city traffic (0.9-1.4, heard as noise) and wind in trees (about 2.0) are still not convincing
+to the models; a bottle opening sits at about 2.3. An opening door, a soft landing, a slap, a dull hurt, a ground
+rumble, a struck match, peeling tape, rain on a roof and a small fire were weak (1.0-2.4) and were rebuilt: re-heard
+on two seeds each they reach 2.1-3.3, plausible rather than strong. Steady noise beds in general sit close to
+"noise" for the models, which says as much about the models as about the
 beds; judge beds by ear. Single short notes of sustaining metal or synth voices damped early read as beeps, which is
 why figures keep them at least 110 ms long and the tap, hover and menu move play wood on such a voice.
 
 **Requests.** The reader is a lexicon and rules, not a language model (`--listen` adds CLAP). On 220 held-out
-requests by someone who never saw the catalogue the first pick was right for 71.4 % (74.1 % with `--listen`), and
+requests by someone who never saw the catalogue the first pick was right for 71.4 % (74.1 % with `--listen`,
+measured before the last small fixes), and
 for interface requests only 54.5 %; requests that name the job or the sound did far better than long descriptions
 of a sound and casual paraphrases ([VALIDATION.md](VALIDATION.md#8-made-sounds-10)). Unusual phrasings, typos and
 moods ("something warm and hopeful") read worse than short plain requests ("a soft success chime", "coin pickup,
@@ -115,8 +118,12 @@ still be wrong: read the design id against the job. `make --set` and `make_set` 
 server. One request is one sound; a set is a spec.
 
 **Formats.** Ogg Vorbis does not play in Safari before 18.4: for the web write `webm,mp3` (or `webm,m4a`). An mp3 or
-m4a loop has a gap at its seam in players that ignore the encoder's padding note; `make` warns, and loops belong in
-ogg, webm, wav or flac.
+m4a loop has a gap at its seam in players that ignore the encoder's padding note: a single `make` to mp3 warns, and
+a set with several formats writes its loops as flac in place of mp3 / m4a; loops belong in ogg, webm, wav or flac.
+The sprite holds every sound in every sprite format, so a loop inside an mp3 sprite keeps the gap. ffmpeg 8 prints
+"Error parsing Opus packet header" when it decodes any webm / Opus file it wrote itself (a plain sine tone too); the
+files decode in full, so the message is not a sign of a broken file. Re-running a spec into the same folder rewrites
+its files and `manifest.json` but does not delete the files of names removed from the spec.
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. Long ambience loops take seconds to render (12-20 s loops

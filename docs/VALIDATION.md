@@ -154,11 +154,13 @@ For comparison, the 0.4 bank's glockenspiel and marimba notes scored z 2.2 and 2
 same test; the 1.0 notes of those instruments 4.6 and 5.1. The 209 bank sounds in the catalogue were not re-heard for
 1.0 (their own measurements are in [SFX.md](SFX.md) and [FORGE_V2.md](FORGE_V2.md)).
 
-Below z 2 or losing the forced choice: an opening door (`door/open`), a soft landing (`land/soft`), a slap
-(`hit/slap`), a struck match (`match/strike`), tearing paper (`paper/tear`), peeling tape (`tape/peel`), a bottle
-opening (`bottle/open`), rain on a roof (`rain/roof`), a small fire (`fire/small`), distant city traffic
-(`city/distant`, heard as noise) and a low rumble (`rumble/quake`). Steady noise beds in general sit close to "noise"
-for the models. [LIMITS.md](LIMITS.md) lists them for users.
+The table is from before the weakest sounds were rebuilt. Those were: an opening door (`door/open`), a soft landing
+(`land/soft`), a slap (`hit/slap`), a dull hurt, a ground rumble (`rumble/quake`), a struck match (`match/strike`),
+peeling tape (`tape/peel`), rain on a roof (`rain/roof`) and a small fire (`fire/small`), at z 1.0-2.4 for their own
+descriptions; rebuilt and re-heard on two seeds each, they reach z 2.1-3.3. A bottle opening (`bottle/open`) is
+unchanged at about 2.3. Tearing paper (`paper/tear`, 1.6-2.5), distant city traffic (`city/distant`, 0.9-1.4, heard
+as noise) and wind in trees (`wind/trees`, about 2.0) are still not convincing to the models. Steady noise beds in
+general sit close to "noise" for the models. [LIMITS.md](LIMITS.md) lists them for users.
 
 **Calibration of the pianos and mallets.** The struck and string models were compared note by note with freely usable
 recordings: the University of Iowa Musical Instrument Samples (a grand piano, a vibraphone, a marimba, a xylophone)
@@ -182,8 +184,9 @@ sustaining metal, glass or electric one (a voice asked for by name is played as 
 struck once read as blips, while a coin and a glass left to ring read as objects: `tick/metal` is a coin and
 `tick/glass` rings.
 
-These listening numbers were taken before the last changes to the smallest figures (tap, hover, toggles, steps and
-menu move now fade out within a fixed time whatever the voice) and were not re-taken after them.
+These catalogue-wide listening numbers (the table above) were taken before the weakest sounds were rebuilt and before
+the last changes to the smallest figures (tap, hover, toggles, steps and menu move now fade out within a fixed time
+whatever the voice), and were not re-taken after them.
 
 **Understanding requests.** Three sets of requests were written by someone who never saw the catalogue: A (440
 requests for 110 intents, in four styles) and B (220) were used to develop the reader (`earshot/brief.py`, the
@@ -194,10 +197,10 @@ belongs to a family accepted for its intent (several families can be right: a co
 
 | set | first pick right | right among the top three |
 |---|---|---|
-| A (development, 440) | 92.5 % | 95.9 % |
+| A (development, 440) | 92.5 % | 96.1 % |
 | B (development, 220) | 97.3 % | 99.1 % |
-| C (held out, 220) | 71.4 % | 80.5 % |
-| C, the atlas blended in (`--listen`, or the MCP server once CLAP is loaded) | 74.1 % | 82.3 % |
+| C (held out, 220) | 71.4 % | 80.0 % |
+| C, the atlas blended in (`--listen`, or the MCP server once CLAP is loaded; measured before the last two rounds of small fixes) | 74.1 % | 82.3 % |
 
 Terse requests that name the job or the sound ("coin pickup", "error beep") are right for all 110 intents of set A.
 On C by group (first pick): interface 54.5 %, game 70.9 %, motion 60.0 %, ambience 87.5 %, instruments 83.3 %,

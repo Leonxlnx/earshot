@@ -39,19 +39,22 @@ ends with the words that decided, as you wrote them (`[success, bell]`, or `[nam
 |---|---|---|
 | `not in this sound: ...` | sounds or jobs the request named that the chosen design does not cover | ask for them in a second call, or pick from `also` |
 | `also: ...` | up to three alternatives, always: the next ranked designs, then the nearest of the same family, kind or domain | take one with `--sound ID` if the pick does not fit the job |
-| `also: ... (the pick is a guess: ...)` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high; the alternatives then come from other families first | read the alternatives and name one with `--sound ID`, or re-ask naming the sound or the job |
+| `also (the pick is a guess: ...): id (a few words), ... Name one with sound=<id>` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high; the alternatives then come from other families first, each with the start of its description | name one with `--sound ID`, or re-ask naming the sound or the job |
 | `not used by this sound: ...` | controls the request set that this design does not read, or a length it could not keep (a struck sound rings as it rings; a marimba cannot ring 2 s) | leave it, or ask for a design that has that control |
 | `not understood: ...` | words that matched nothing in the catalogue or the lexicon | rephrase if they mattered |
-| `x.mp3: a loop in mp3 has a gap at its seam ...` | a loop written as mp3 or m4a | write loops as ogg, webm, wav or flac |
+| `x.mp3: a loop in mp3 has a gap at its seam ...` | a single `make` of a loop to mp3 or m4a | write loops as ogg, webm, wav or flac |
+| `  a loop: flac instead of mp3, which leaves a gap at the seam` | in a set with several formats, a loop was written as flac in place of mp3 / m4a | nothing |
+| `  same design as NAME: ask for a different one with "sound" (the nearest: ID)` | in a set, two names got the same design | give the second one `"sound": ID`, or reword its `want` |
 | `heard as: '...' (z +x.x, verdict)` | with `--listen` only (below) | |
 | `not listened: ...` | `--listen` was asked and the model or the atlas is missing | `earshot doctor` |
 
-```
-$ earshot make "a water drop and a coin" -o dropcoin.wav
-dropcoin.wav: coin/bright (0.69 s, B5, glockenspiel, -14 LUFS, clean) [coin, pickup]
-not in this sound: water drop
-also: water/drop, water/pour, coins/handful (the pick is a guess: another kind of sound fits almost as well; name the one you want with sound=<id>)
+A guess line, as `make` writes it (the alternatives without a guess stay bare ids):
 
+```
+also (the pick is a guess: no job or sound word matched): open/lift (two soft notes rising a fifth), bottle/open (a bottle cap prised off with a hiss of ...), chest/open (...). Name one with sound=<id>
+```
+
+```
 $ earshot make "a marimba success chime, 2 seconds" -o mar2.wav
 mar2.wav: success/rise (0.55 s, G5, marimba, -14 LUFS, clean) [success, bell]
 also: success/triad, success/done, success/fifth
@@ -111,7 +114,8 @@ file starts when its sound does (within 2 ms) and ends faded, never cut.
 mp3 (128k), m4a (AAC, 96k) and webm (Opus, 64k) go through ffmpeg, which must be on PATH for them. For the web: Ogg
 Vorbis does not play in Safari before 18.4, so write `webm,mp3` (or `webm,m4a`) and let the browser take the first
 it can play. Loops: mp3 and m4a encoders pad the start and end and record it only in a note some players ignore, so
-a loop written as mp3 or m4a has a gap at its seam there (`make` warns); write loops as ogg, webm, wav or flac.
+a loop written as mp3 or m4a has a gap at its seam there. A single `make` to mp3 or m4a warns; a set with several
+formats writes its loops as flac in place of mp3 / m4a. Write loops as ogg, webm, wav or flac.
 
 ```
 $ earshot make "campfire" -o fire.mp3 --dur 16
@@ -160,7 +164,8 @@ piano does not ring for a second. The set above took about 20 s on one thread.
 **Several formats.** `--format webm,mp3` (a list or a comma string in a spec, in the MCP tool) writes every sound
 once per format; `manifest.json` names each sound's `file` (the first format) and `files` (all), and the set's
 `formats`. A sprite named without an extension, or with one of the set's formats, is written in each format, and
-its map's `src` lists them in that order: a browser or howler.js plays the first it can.
+its map's `src` lists them in that order: a browser or howler.js plays the first it can. A loop is the exception:
+in place of mp3 or m4a it is written once as flac (below).
 
 **The ready-made sets** (`earshot.sounds.sets`; file name -> design):
 
@@ -213,14 +218,19 @@ tap.{webm,mp3}: tap/tone (0.29 s, D6, marimba, -26 LUFS, clean) [named]
 success.{webm,mp3}: success/rise (0.54 s, D5, marimba, -19 LUFS, clean) [2-note, success, bell]
 coin_1.{webm,mp3}: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin, pickup]
 coin_2.{webm,mp3}: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin, pickup]
-rain.{webm,mp3}: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
-rain: a loop in mp3 has a gap at its seam in players that ignore the encoder's padding note; for loops use ogg, webm, wav or flac
-19 sounds in myset\sprite.webm + sprite.mp3 (24.3 s, 205 kB, 369 kB), map sprite.json
+...
 ```
 
-The rain loop plays without a seam from `rain.webm` and from the sprite's webm; in the mp3 it may not.
+(Output shortened: this run predates the loop rule below; its rain and sprite lines are left out.) A loop in a set
+with several formats is written as flac in place of mp3 or m4a, once, and says so under its line: here
+`rain.{webm,flac}` and `  a loop: flac instead of mp3, which leaves a gap at the seam`; its manifest `files` list
+what was written. The sprite still holds every sound in every sprite format: the loop plays without a seam from the
+sprite's webm, and may not from its mp3. Two names that get the same design are flagged under the second:
+`  same design as lose_life: ask for a different one with "sound" (the nearest: <id>)`.
 
-An unknown field is an error that lists the fields. A design id of a set that this catalogue does not have is left
+Re-running a spec into the same folder rewrites its files and `manifest.json`; it does not delete the files of names
+removed from the spec. An unknown field is an error that lists the fields. A design id of a set that this catalogue
+does not have is left
 out and named on the last line.
 
 ## sounds
@@ -317,7 +327,8 @@ What is recognised:
 - **The job or the sound.** A job ("success", "coin pickup", "logo reveal", "level complete") or a sound ("chime",
   "whoosh", "rain"), often both, mapped to canonical words, the longest phrase first. The first one named is the
   head of the request. What follows "with" describes a part of it, what follows "for", "when", "during" ... once
-  the head is named is where it plays: both count less.
+  the head is named is where it plays: both count less. A multi-word job of a design ("page turn", "saw lead")
+  matches only as the whole phrase; its single words count no more than a tag.
 - **Feelings as axes.** Adjectives become offsets on [the eight axes](#the-eight-axes) ("soft" lowers hard and
   energy, "darker" lowers bright, "bigger" raises size, "longer" raises ring, "drier" lowers space), and also
   hints that break ties inside a family ("crisp" finds `whoosh_fast/crisp`). Intensifiers scale them ("a little",
@@ -385,10 +396,10 @@ request counts as right when the first pick belongs to a family accepted for its
 
 | set | first pick right | right among the top three |
 |---|---|---|
-| A (development, 440) | 92.5 % | 95.9 % |
+| A (development, 440) | 92.5 % | 96.1 % |
 | B (development, 220) | 97.3 % | 99.1 % |
-| C (held out, 220) | 71.4 % | 80.5 % |
-| C with the atlas blended in (`--listen`) | 74.1 % | 82.3 % |
+| C (held out, 220) | 71.4 % | 80.0 % |
+| C with the atlas blended in (`--listen`; measured before the last two rounds of small fixes) | 74.1 % | 82.3 % |
 
 Terse requests that name the job or the sound ("coin pickup", "error beep") are right for all 110 intents of set A.
 On C, by group (first pick): interface 54.5 %, game 70.9 %, motion 60.0 %, ambience 87.5 %, instruments 83.3 %,
@@ -573,7 +584,8 @@ The snippet loads the first file of `src`; to fall back, try `map.src[1]` when d
 map is the options as they are: `new Howl({src: map.src.map(f => '/sounds/' + f), sprite:
 map.sprite}).play('success')`, and howler picks the first format the browser plays. Browsers start audio only after
 a user gesture, hence `ctx.resume()` in the click. Keep frequent sounds (taps, hovers) rare in practice; the set
-levels them low already. A loop in a sprite is safe in the webm; not in the mp3 (the seam).
+levels them low already. A loop's own file is webm and flac; inside the sprite it is safe in the webm, not in the
+mp3 (the seam).
 
 ## Recipe: a game
 

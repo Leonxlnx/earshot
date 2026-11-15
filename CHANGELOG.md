@@ -32,8 +32,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   the ranking and reports what the written sound is heard as; the MCP server's `make` blends it in without being
   asked once CLAP is loaded. Rebuilt with `python -m earshot.sounds.atlas build --work DIR`.
 - **Understanding requests, measured**: on 220 held-out requests written by someone who never saw the catalogue the
-  first pick is right for 71.4 % and one of the top three for 80.5 % (74.1 % / 82.3 % with the atlas); 92.5 % and
-  97.3 % on the two development sets ([docs/VALIDATION.md](docs/VALIDATION.md#8-made-sounds-10)).
+  first pick is right for 71.4 % and one of the top three for 80.0 % (74.1 % / 82.3 % with the atlas, measured before
+  the last small fixes); 92.5 % and 97.3 % on the two development sets
+  ([docs/VALIDATION.md](docs/VALIDATION.md#8-made-sounds-10)).
 - **Reading requests** (`earshot/brief.py`, `earshot/sounds/lexicon.py`): jobs and sounds to canonical words, the
   head of a request and its parts and context, feelings as offsets on eight shared axes (bright, hard, ring, size,
   space, width, energy, motion) with intensifiers, negation ("not harsh", "not an error"), "the opposite of",
@@ -53,7 +54,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   set in one call, levelled against each other by kind (the loudest at -16 LUFS momentary max, a tap 10 LU under,
   a bed 14), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
   every sound in each, the manifest's `files` and `formats`, the sprite in each format with its map's `src` in that
-  order. For the web, `webm,mp3`: Ogg Vorbis does not play in Safari before 18.4.
+  order. For the web, `webm,mp3`: Ogg Vorbis does not play in Safari before 18.4. A loop in such a set is written
+  as flac in place of mp3 / m4a (their padding leaves a gap at the seam); a second name that gets the same design
+  as an earlier one is flagged, with the nearest other design. A guess's alternatives carry a few words each.
 - **`earshot pack`** (`earshot/pack.py`, `--sprite` on a set): many sounds in one file with a map in the format
   howler.js reads; loops are marked and get a longer gap. On a set's folder it packs exactly the manifest's sounds
   and leaves out an earlier sprite.
