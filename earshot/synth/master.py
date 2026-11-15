@@ -64,11 +64,52 @@ def loudness(y):
     return polish.lufs_max(np.asarray(y, np.float64))
 
 
-def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66.0, loop=False, cap=None):
+BODY = 3.5                       # dB under the peak at which the loudest 5 ms of a lifted one-shot sit
+
+
+def _body_db(y):
+    """the level of the loudest 5 ms of y (RMS over both channels, dBFS)"""
+    k = max(2, dsp.n_of(0.005))
+    p = np.mean(np.atleast_2d(y.T).T ** 2, axis=1)
+    c = np.concatenate([[0.0], np.cumsum(p)])
+    return float(10 * np.log10(np.max(c[k:] - c[:-k]) / k + 1e-30)) if len(p) > k else float(
+        10 * np.log10(p.mean() + 1e-30))
+
+
+def _fold(y, peak_db, knee=0.5, loop=False):
+    """y with everything above `knee` of the ceiling folded smoothly under it (tanh), at four times the sample rate
+    so the corner makes no aliases: for a spike of a millisecond this is not heard as distortion. A loop is
+    resampled around its seam, so the seam stays what it was."""
+    from scipy import signal
+    c = 10 ** (peak_db / 20)
+    y = np.asarray(y, np.float64)
+    pad = min(64, len(y)) if loop else 0
+    if pad:
+        y = np.concatenate([y[-pad:], y, y[:pad]])
+    up = signal.resample_poly(y, 4, 1, axis=0)
+    a = np.abs(up) / c
+    hot = a > knee
+    a[hot] = knee + (1.0 - knee) * np.tanh((a[hot] - knee) / (1.0 - knee))
+    out = signal.resample_poly(np.sign(up) * a * c, 1, 4, axis=0)[:len(y)]
+    if pad:
+        return out[pad:len(out) - pad]
+    k = min(len(out), 16)            # the resampling filter rings a little before the first sample: start from zero
+    w = 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, k))
+    out[:k] *= w if out.ndim == 1 else w[:, None]
+    return out
+
+
+def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66.0, loop=False, cap=None, lift=0.0,
+           sparse=0.0):
     """a made sound as it ships: non-finite or silent renders refused, the low end cut under `low_cut` Hz (no DC, no
     rumble that small speakers turn into distortion), leading silence dropped, a `fade_in` s start from zero, the
     silent end trimmed and faded; then the level: the true peak at peak_db, but no louder than `cap` LUFS
-    (momentary max: a dense sound at full peak is far louder than a tap at full peak); or with `lufs` the
+    (momentary max: a dense sound at full peak is far louder than a tap at full peak). A short (< 1 s), peaky sound
+    (a tap, a click, a tick) at full peak is barely heard: one spike of a millisecond holds its body 15 dB down.
+    `lift` dB is the most such a sound is raised: until its loudest 5 ms sit `BODY` dB under the peak, the spike
+    above folded over smoothly (_fold: unlike a limiter's dip this leaves the strike as bright as it was). `sparse`
+    dB is the same for a long sound held under its cap by a few peaks (a fire's cracks over a quiet bed): raised
+    as long as no more than 0.3 % of its samples reach into the fold. Or with `lufs` the
     momentary-max loudness at that value with the peaks limited to peak_db. A loop keeps its length and both ends
     (no trim, no fades)."""
     y = np.array(y, np.float64)
@@ -84,13 +125,39 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
         if a > 1:
             w = 0.5 - 0.5 * np.cos(np.linspace(0, np.pi, a))
             y[:a] *= w if y.ndim == 1 else w[:, None]
+        whole = y
         y = trim(y, tail_db)
     if lufs is None:
-        y = y * 10 ** ((peak_db - true_peak_db(y)) / 20)
+        to_peak = 10 ** ((peak_db - true_peak_db(y)) / 20)
+        y = y * to_peak
         over = loudness(y) - cap if cap is not None else 0.0
-        return y * 10 ** (-over / 20) if over > 0 else y
-    y = y * 10 ** ((lufs - loudness(y)) / 20)
-    return fx.limit(y, ceiling_db=peak_db) if true_peak_db(y) > peak_db else y
+        if over > 0:
+            return y * 10 ** (-over / 20)
+        short = len(y) < dsp.n_of(1.0)   # a longer sound (a count-in, a roll) keeps its dynamics and its tail
+        if lift and short and cap is not None and not loop:
+            up = min(lift, peak_db - BODY - _body_db(y), -over)
+            if up > 0.5:             # the tail is cut where it is silent under the raised body, not under the spike
+                y = trim(_fold(whole * (to_peak * 10 ** (up / 20)), peak_db), tail_db)
+                y = y * 10 ** (min(0.0, peak_db - true_peak_db(y)) / 20)
+                over = loudness(y) - cap
+                return y * 10 ** (-over / 20) if over > 0 else y
+        if sparse and cap is not None and not short:
+            q = 20 * np.log10(np.percentile(np.abs(y), 99.7) + 1e-12)
+            up = min(sparse, peak_db - 6.0 - q, -over)
+            if up > 0.5:
+                y = _fold(y * 10 ** (up / 20), peak_db, loop=loop)
+                y = y * 10 ** (min(0.0, peak_db - true_peak_db(y)) / 20)
+                over = loudness(y) - cap
+                return y * 10 ** (-over / 20) if over > 0 else y
+        return y
+    for k in range(6):                   # a limited peak takes loudness with it: a peaky tap is raised again, with a
+        y = y * 10 ** ((lufs - loudness(y)) / 20)                            # fast limiter after the first pass
+        if true_peak_db(y) <= peak_db:
+            return y
+        y = fx.limit(y, ceiling_db=peak_db, **({} if k == 0 else dict(lookahead=0.001, release=0.01)))
+        if lufs - loudness(y) < 0.3:
+            return y
+    return y
 
 
 def write(path, y, sr=SR, mono=False, bits=24, bitrate=None):

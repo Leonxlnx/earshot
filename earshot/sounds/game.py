@@ -62,11 +62,13 @@ FIGURES = {
         fig=dict(steps=(0, 4, 7, 12, 16, 19, 24), gap=(0.095, 0.095, 0.095, 0.21, 0.15, 0.0), root='C5', vel=0.66,
                  vels=(0.75, 0.8, 0.85, 0.95, 0.95, 1.0, 0.75), last=1.4, room='hall', accent=5, spread=0.5)),
     'lose/descend': dict(
-        kind='stinger', says=('four slow falling notes of a minor chord, a sad short phrase',
-                              'a descending melancholy line that ends low'),
+        kind='stinger', says=('three falling notes of a minor chord landing on a low minor chord that rings out',
+                              'a descending sad phrase that ends on a dark held chord'),
         uses=('lose', 'game over', 'death', 'defeat', 'fail', 'time up'), prior=1.1, allows=('tail',),
-        fig=dict(steps=(7, 3, 0, -5), gap=(0.17, 0.17, 0.24), root='C5', vel=0.5, vels=(1.0, 0.92, 0.85, 0.9),
-                 last=1.1, room='hall', accent=0)),
+        # the line falls through the minor triad and lands an octave down on the full chord (root, minor third,
+        # fifth rolled 12 ms apart), held longest and loudest: the fall reads at once, the ending is weighty
+        fig=dict(steps=(7, 3, 0, -12, -9, -5), gap=(0.16, 0.16, 0.22, 0.012, 0.012), root='C5', vel=0.58,
+                 vels=(0.9, 0.85, 0.8, 1.0, 0.75, 0.7), last=1.4, room='hall', accent=3, spread=0.3)),
     'checkpoint/chime': dict(
         kind='figure', says=('three rising notes: root, fifth and octave, the last ringing',
                              'a calm open three-note figure'),

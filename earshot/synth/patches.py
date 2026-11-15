@@ -51,15 +51,20 @@ def _mix(takes):
 
 # ------------------------------------------------------------------------------------------------ plucks and keys
 def _soft_pluck(f, vel, dur, r, c):
-    """a triangle pair a few cents apart with a quiet saw under a ladder that opens 3 octaves for the first 50 ms
-    and closes onto the fundamental: a bright instant, then a round sine-like body"""
+    """a triangle pair a few cents apart with a saw under a ladder that opens 3 octaves for the first 50 ms and
+    settles a little above the fundamental, so the second to fourth harmonics stay (-8 to -20 dB: a round tone
+    that is not a bare sine); a sine an octave down gives it body in the low mids, a breath of noise through the
+    open filter marks the attack, and the note decays over about 1.5 s and releases over 0.6 s. The owner heard the
+    darker first version as "dull" and "technical" next to the bell timbres he dislikes; this keeps it soft (no
+    inharmonic partials, nothing above 4 kHz but the breath) and makes it fuller."""
     g, h = _x(c, 'ring', 1.3) * _reg(f, 0.25), _x(c, 'hard', -2.0)
     return voice.analog(
         f, vel, dur, r, drift=1.5, slew=0.0012,
-        osc=(dict(shape='tri', voices=2, detune=3.5 * (1 + c['motion']), spread=0.2, level=0.9, phase=0.25),
-             dict(shape='saw', level=0.45, phase=0.5)),
-        sub=0.2 * _x(c, 'size', 1.5), cutoff=330 * _x(c, 'bright', 1.3), keytrack=0.9, res=0.06, env=3.4, vel_cut=1.8,
-        fenv=(0.001, 0.22 * g, 0.0, 0.2 * g), fcurve=(2.0, 6.0, 5.0), amp=(0.004 * h, 1.1 * g, 0.0, 0.4 * g))
+        osc=(dict(shape='tri', voices=2, detune=4.5 * (1 + c['motion']), spread=0.45, level=0.9, phase=0.25),
+             dict(shape='saw', level=0.6, phase=0.5)),
+        sub=0.42 * _x(c, 'size', 1.5), noise=0.05 * _x(c, 'bright', 1.0), noise_width=0.6,
+        cutoff=900 * _x(c, 'bright', 1.3), keytrack=0.9, res=0.08, env=2.3, vel_cut=1.5,
+        fenv=(0.001, 0.3 * g, 0.0, 0.25 * g), fcurve=(2.0, 6.0, 5.0), amp=(0.003 * h, 1.5 * g, 0.0, 0.6 * g))
 
 
 def _glass_pluck(f, vel, dur, r, c):

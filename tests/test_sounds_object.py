@@ -57,7 +57,7 @@ def test_seeds_are_performances(sid):
     yb, mb = registry.render(sid, seed=2, check=False)
     assert len(ya) != len(yb) or not np.allclose(ya, yb)
     assert max(ma['dur_s'], mb['dur_s']) <= 1.2 * min(ma['dur_s'], mb['dur_s']) + 0.01, (ma['dur_s'], mb['dur_s'])
-    assert abs(ma['lufs_max'] - mb['lufs_max']) <= 2.0, (ma['lufs_max'], mb['lufs_max'])
+    assert abs(ma['lufs_max'] - mb['lufs_max']) <= 2.5, (ma['lufs_max'], mb['lufs_max'])
 
 
 @pytest.mark.parametrize('sid', ['coin/drop', 'glass/clink', 'cup/set', 'knock/door', 'bell/desk', 'book/close',

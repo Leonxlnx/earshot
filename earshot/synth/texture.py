@@ -638,50 +638,53 @@ def _wind(n, r, c):
 
 # ------------------------------------------------------------------------------------------------ fire
 def _fire(n, r, c):
-    """Fire: a low roar that breathes at the puffing frequency of the flame, 1.5 / sqrt(diameter) Hz (Cetegen &
-    Ahmed 1993: a candle flickers near 10 Hz, a campfire breathes at 2 Hz, a large fire below 1 Hz), a sparse hiss
-    of escaping gas, and crackles: a self-exciting process (bursts of a few within 30 ms) whose rate follows the
-    flame and comes in episodes, with power-law sizes (a bigger crack is louder, lower and longer), a fifth of them
-    ringing in the wood, and rare low pops that throw a spray of sparks."""
+    """Fire: what a campfire is heard as is its cracks: wood splitting as sap and gas burst, sharp broadband
+    clicks of very different sizes (power law over 25 dB: many small ticks, now and then a loud snap whose body
+    rings in the wood a few ms) that come in irregular bursts (a self-exciting process: a crack sets off a few
+    more within 20 ms) separated by quiet gaps of a second or more (the rate itself comes and goes in episodes,
+    the way rain comes in waves). Under them a soft low flutter of the flames that breathes at the puffing
+    frequency 1.5 / sqrt(diameter) Hz (Cetegen & Ahmed 1993: a candle flickers near 10 Hz, a campfire breathes at
+    2 Hz, a large fire below 1 Hz), almost no hiss (the hiss of escaping gas and the roar belong to a big fire),
+    and rare low pops that throw a spray of sparks."""
     dur, size = n / SR, c['size']
     diameter = 0.5 * 10 ** (1.2 * size)                       # m: 0.03 candle .. 0.5 campfire .. 8 large fire
     puff = 1.5 / np.sqrt(diameter)
     breath = 0.8 * drift(dur, r, 0.4 * puff, 2.5 * puff, 1.0) + 0.6 * drift(dur, r, 0.03, 0.4 * puff, 1.0)
     flame = np.exp(0.45 * breath)
     centres = _bands(40.0, 14000.0, 10)
-    roar = _levels(centres, 220.0 * 10 ** (-0.35 * size), 3.0, 7.0)
+    roar = _levels(centres, 160.0 * 10 ** (-0.35 * size), 3.0, 8.0)
     hiss = _levels(centres, 5200.0, 6.0, 3.0)[:, None] * envelopes(dur, r, 10, 0.8, 0.5, 2.0, 25.0, 0.5)
-    # the hiss of escaping gas belongs to a big fire; a small one is a quiet flutter of its roar under the crackles
     env = np.hypot(roar[:, None] * flame[None, :] * 10 ** (0.6 * size),
-                   0.22 * 10 ** (1.2 * min(size, 0.0)) * hiss * np.sqrt(flame)[None, :])
+                   0.06 * 10 ** (1.2 * size) * hiss * np.sqrt(flame)[None, :])
     y = band_noise(n, r, centres, env, np.linspace(0.4, 1.0, 10))
     spread = 0.2 + 0.4 * (size + 1)                           # stereo width of the fire: 0.2 candle .. 1
-    busy = 16.0 * 10 ** ((0.6 if size > 0 else 0.8) * size + 0.5 * c['intensity'])        # crackles per second
-    episodes = np.exp(0.6 * drift(dur, r, 0.05, 1.0, 1.0) - 0.18)
-    t, gen = arrivals(r, busy * flame ** 1.5 * episodes, dur, cluster=0.55, spread=0.012)
+    busy = 7.0 * 10 ** ((0.6 if size > 0 else 0.8) * size + 0.5 * c['intensity'])         # cracks per second
+    # episodes: log-normal with a wide spread, so the fire has busy spells and lulls of a second or two
+    episodes = np.exp(1.1 * drift(dur, r, 0.08, 1.5, 1.0) - 0.6)
+    t, gen = arrivals(r, busy * flame ** 1.5 * episodes, dur, cluster=0.5, spread=0.02)
     k = len(t)
-    a = sizes(r, k, 1.0, 10.0, 'power', 2.5) * 0.8 ** gen     # amplitude: Pareto, alpha 1.5, over 20 dB
+    a = sizes(r, k, 1.0, 18.0, 'power', 2.0) * 0.75 ** gen    # amplitude: Pareto over 25 dB, echoes smaller
+    a = a / np.sqrt(1 + (a / 9.0) ** 2)                       # the rare giant snap is held back (as the rain's drops)
     wood = np.zeros((n, 2))
     pan = np.clip(spread * 0.8 * r.standard_normal(k), -1, 1)
-    bursts(wood, t, a, pan, 4500.0 * a ** -0.45 * np.exp(0.3 * r.standard_normal(k)), r.uniform(1.0, 4.0, k),
-           0.0007 * a ** 0.6 * r.uniform(0.7, 1.5, k), r)
-    ring = r.uniform(size=k) < 0.2
-    for _ in range(2):
-        rings(wood, t[ring], 0.5 * a[ring], pan[ring], r.uniform(600.0, 2500.0, ring.sum()),
-              r.uniform(0.003, 0.006, ring.sum()))
+    bursts(wood, t, a, pan, 3800.0 * a ** -0.3 * np.exp(0.35 * r.standard_normal(k)), r.uniform(0.6, 1.6, k),
+           0.0004 * a ** 0.5 * r.uniform(0.7, 1.4, k), r)
+    big = a > 4.0                                             # a loud snap rings in the stick for a few ms
+    rings(wood, t[big], 0.35 * a[big], pan[big], r.uniform(500.0, 1800.0, big.sum()),
+          r.uniform(0.002, 0.006, big.sum()))
     if size > -0.6:
-        tp, _ = arrivals(r, 0.3 * 10 ** (0.4 * size + 0.3 * c['intensity']) * flame, dur)
+        tp, _ = arrivals(r, 0.15 * 10 ** (0.4 * size + 0.3 * c['intensity']) * flame, dur)
         kp = len(tp)
-        ap, pp = r.uniform(9.0, 15.0, kp), np.clip(spread * 0.6 * r.standard_normal(kp), -1, 1)
-        rings(wood, tp, 0.5 * ap, pp, r.uniform(300.0, 800.0, kp), r.uniform(0.008, 0.018, kp), 0.0003, -10.0)
-        bursts(wood, tp, ap, pp, r.uniform(1800.0, 3200.0, kp), 0.7, r.uniform(0.0015, 0.003, kp), r)
+        ap, pp = r.uniform(7.0, 12.0, kp), np.clip(spread * 0.6 * r.standard_normal(kp), -1, 1)
+        rings(wood, tp, 0.4 * ap, pp, r.uniform(250.0, 600.0, kp), r.uniform(0.006, 0.014, kp), 0.0003, -10.0)
+        bursts(wood, tp, ap, pp, r.uniform(1800.0, 3200.0, kp), 0.7, r.uniform(0.0012, 0.0025, kp), r)
         sparks = np.repeat(np.arange(kp), r.integers(3, 9, kp))
-        ts = (tp[sparks] + r.exponential(0.03, len(sparks))) % dur
-        bursts(wood, ts, r.uniform(0.7, 4.0, len(ts)), np.clip(pp[sparks] + 0.2 * r.standard_normal(len(ts)), -1, 1),
+        ts = (tp[sparks] + r.exponential(0.04, len(sparks))) % dur
+        bursts(wood, ts, r.uniform(0.5, 3.0, len(ts)), np.clip(pp[sparks] + 0.2 * r.standard_normal(len(ts)), -1, 1),
                r.uniform(3500.0, 9000.0, len(ts)), 1.5, 0.0004, r)
-    if k:                                                     # the bed under the crackles: 10 dB under their peaks
-        y *= _top(wood) / _rms(y) * 10 ** ((-10.0 + 6.0 * size + 6.0 * min(size, 0.0)) / 20)      # at a campfire;
-        #                                     less under a big roar, more under a small fire (a quiet flutter)
+    if k:                    # the flutter: 26 dB under the cracks' peaks at a campfire, a roar under a big fire
+        y *= _top(wood) / _rms(y) * 10 ** ((-26.0 + 14.0 * max(size, 0.0) + 7.0 * min(size, 0.0)) / 20)
+        #                                                                   and a whisper under a small one
     y = _space(y + wood, 0.4, 0.05, 25)
     far = max(c['distance'], 0.0)
     return _filt(y, _lp(16000.0 * 10 ** (-0.6 * far), 1)) if far else y
@@ -727,19 +730,22 @@ def _waves(n, r, c):
     Each one swells as a low rumble, breaks with a crash whose spectrum opens upwards and whose break point runs
     along the beach (the left and right side break up to a few seconds apart), leaves foam that fizzes as thousands
     of tiny bubbles and draws back as a falling hiss, over sand or over pebbles that clack in the backwash; far
-    breakers keep a low bed under it all."""
+    breakers keep a low bed under it all. The periods are those of swell on a beach, 6-12 s (never a fixed one),
+    the swell rises over seconds before the break, and the wash is long: a hiss of thousands of foam and sand
+    grains (events, like the rain) that rises after the break and drains away over 4-6 s, getting darker as it
+    goes."""
     dur, size = n / SR, c['size']
     m = int(round(dur * CR))
     tt = np.arange(m) / CR
-    waves = max(1, int(round(dur / (8.0 * 1.35 ** size))))    # a breaker every 6 .. 8 .. 11 s on average
-    gaps = np.exp(0.45 * r.standard_normal(waves))
+    waves = max(1, int(round(dur / (9.0 * 1.25 ** size))))    # a breaker every 7 .. 9 .. 11 s on average
+    gaps = np.clip(np.exp(0.3 * r.standard_normal(waves)), 0.67, 1.33)                    # 6 .. 12 s apart
     breaks = (np.cumsum(gaps) / gaps.sum() + r.uniform()) % 1.0 * dur
     z = r.standard_normal(waves)
     for i in range(1, waves):                                 # wave groups: neighbours are alike
         z[i] = 0.5 * z[i - 1] + 0.87 * z[i]
-    minor = r.poisson(0.8 * waves)                            # smaller waves in between, at any time
+    minor = r.poisson(0.4 * waves)                            # smaller waves in between, at any time
     breaks = np.concatenate([breaks, r.uniform(0, dur, minor)])
-    heights = np.concatenate([np.exp(0.3 * z), r.uniform(0.3, 0.6, minor)])
+    heights = np.concatenate([np.exp(0.3 * z), r.uniform(0.25, 0.5, minor)])
     pace = 1.25 ** size * np.concatenate([r.uniform(0.75, 1.4, waves), r.uniform(0.5, 0.9, minor)])
     centres = _bands(40.0, 14000.0, 11)
     f = centres[:, None]
@@ -756,20 +762,20 @@ def _waves(n, r, c):
                 if tau.min() > 12.0 or tau.max() < -8.0:
                     continue
                 after = np.maximum(tau, 0.0)
-                swell = np.where(tau < 0, np.exp(np.minimum(tau, 0.0) / 1.8), np.exp(-after / 1.6))
+                swell = np.where(tau < 0, np.exp(np.minimum(tau, 0.0) / 2.5), np.exp(-after / 1.2))
                 crash = np.where(tau < 0, 0.2 * np.exp(np.minimum(tau, 0.0) / 0.9),
-                                 0.2 + 0.8 * (1 - np.exp(-after / 0.1))) * np.exp(-after / 1.0)
+                                 0.2 + 0.8 * (1 - np.exp(-after / 0.08))) * np.exp(-after / 0.8)
                 centre = 300.0 + open_to * (1 - np.exp(-after / 0.25)) * np.exp(-after / 2.5)
-                fz = (1 - np.exp(-after / 0.5)) * np.exp(-after / 2.4)
-                back = 0.25 * np.exp(-0.5 * ((tau - 3.4) / 1.1) ** 2)
+                fz = (1 - np.exp(-after / 0.6)) * np.exp(-after / 3.5)
+                back = 0.3 * np.exp(-0.5 * ((tau - 4.5) / 1.6) ** 2)
                 power[:, :, ch] += h ** 2 * (
                     (rumble * swell[None, :]) ** 2
                     + (_hump(f, centre[None, :], 3.0, 5.5) * np.sqrt(f / centre[None, :]) * crash[None, :]) ** 2
-                    + (0.22 * foam * fz[None, :]) ** 2
-                    + (_hump(f, 1800.0 * np.exp(-(tau[None, :] - 3.0) / 4.0), 4.0, 6.0) * back[None, :]) ** 2)
+                    + (0.3 * foam * fz[None, :]) ** 2
+                    + (_hump(f, 2400.0 * np.exp(-(tau[None, :] - 3.0) / 3.0), 4.0, 6.0) * back[None, :]) ** 2)
                 fizz[:, ch] += h * fz
                 drag[:, ch] += h * back / 0.25
-    bed = _levels(centres, 400.0, 3.0, 5.0)[:, None] * 0.035 * np.exp(0.25 * drift(dur, r, 0.03, 0.5, 1.0))[None, :]
+    bed = _levels(centres, 400.0, 3.0, 5.0)[:, None] * 0.02 * np.exp(0.25 * drift(dur, r, 0.03, 0.5, 1.0))[None, :]
     grain = envelopes(dur, r, 11, 0.2, 0.6, 1.0, 12.0, 1.0)   # the roar of a breaker is a little uneven
     y = band_noise(n, r, centres, np.sqrt(power * (grain ** 2)[:, :, None] + (bed ** 2)[:, :, None]), 0.8)
     level = np.sqrt(np.mean(power.sum(0)))
@@ -780,6 +786,11 @@ def _waves(n, r, c):
         radius = sizes(r, len(t), 0.25, 0.9, 'power', 2.0)
         _bubbles(events, t, 0.2 * radius * _val(fizz[:, ch], t, dur) ** 0.5,
                  np.clip((2 * ch - 1) * r.uniform(0.1, 1.0, len(t)), -1, 1), radius, 0.1)
+        wash = fizz[:, ch] + drag[:, ch] * 0.6                # the hiss of the wash: foam and sand grains
+        t, _ = arrivals(r, np.minimum(4500.0 * wash, 5000.0), dur)
+        g = sizes(r, len(t), 0.3, 3.0, 'lognormal', 0.5) * _val(wash, t, dur) ** 0.3
+        bursts(events, t, 0.03 * level * g, np.clip((2 * ch - 1) * r.uniform(0.0, 1.0, len(t)), -1, 1),
+               r.uniform(2500.0, 8000.0, len(t)) * _val(np.exp(-drag[:, ch] / 3.0), t, dur), 1.0, 0.0004, r)
         if c['surface'] == 'pebbles':
             t, _ = arrivals(r, 260.0 * drag[:, ch], dur, cluster=0.4, spread=0.02)
             a = sizes(r, len(t), 1.0, 20.0, 'power', 2.2)
@@ -934,13 +945,16 @@ BIRDS = {   # song (r, voice) -> [(onset s, note)], and the median pause in s be
 def _forest(n, r, c):
     """A forest by day: a light wind in the leaves (the wind model at a breeze) under birds of several species. Every
     bird keeps its own voice, perch and distance, sings its species' phrase with fresh variations and waits a
-    log-normal pause; most are far off (quieter, duller, with the long diffuse echo of a wood)."""
+    log-normal pause; most are far off (quieter, duller, with the long diffuse echo of a wood). The low coo of a
+    dove is heard by listeners as an owl and is left out unless `dove` is above 0 (the owner disliked it)."""
     dur = n / SR
     y = _wind(n, r, dict(intensity=-0.75 + 0.2 * c['intensity'], place='trees', howl=0.0, distance=0.0,
                          gust=0.5))                           # under the canopy the gusts are half as deep
     y *= 0.4 / _rms(y)                                        # a quiet wood: the birds stand 25 dB over the air
     near, far = np.zeros((n, 2)), np.zeros((n, 2))
     names = [list(BIRDS)[i] for i in r.permutation(len(BIRDS))]
+    if c.get('dove', 0.0) <= 0:
+        names.remove('dove')
     for i in range(int(round(6 + 4 * c['intensity']))):                           # 2 .. 6 .. 10 singers
         song, pause = BIRDS[names[i % len(names)]]
         voice, pan = r.uniform(size=4), r.uniform(0.3, 0.9) * r.choice([-1.0, 1.0])       # perched to one side
@@ -974,7 +988,11 @@ def _night(n, r, c):
     excite a resonance of the wing, gliding down a little); strokes form chirps and trills whose rates rise with the
     temperature: a snowy tree cricket chirps (T_F - 40) / 15 times per second (Dolbear's law), each at its own
     slightly different tempo; field crickets chirp faster and in bouts; ground crickets trill without a break. A
-    few sing close by, the crowd is far and soft; now and then a tree frog or an owl; a soft air under it all."""
+    few sing close by, the crowd is far and soft; now and then a tree frog (an owl only when `owl` is above 0); a
+    soft air under it all. Carriers sit where crickets heard across a garden sit, 2.3-5.4 kHz (tree crickets near
+    2.5-3 kHz, field crickets 4-5 kHz; the far crowd loses its top to the air), and every stroke is a rough, short
+    ring (bandwidth near 100-150 Hz, level and pitch varying stroke to stroke), not a pure tone: the first version
+    sat up to 7.6 kHz and the owner heard its tone as too high."""
     dur = n / SR
     temp = 20.0 + 8.0 * c['warmth']                           # deg C: 12 .. 20 .. 28
     beat = (temp * 1.8 - 8.0) / 15.0                          # chirps per second, Dolbear
@@ -983,28 +1001,29 @@ def _night(n, r, c):
     near, far = np.zeros((n, 2)), np.zeros((n, 2))
     seats = r.permutation([-0.85, -0.3, 0.35, 0.9])
     for i in range(int(round(14 * 10 ** (0.35 * c['intensity'])))):                # 6 .. 14 .. 31 singers
-        away = i >= 4
-        gain = 1 / (r.uniform(4.0, 30.0) if away else r.uniform(1.0, 3.0))
+        away = i >= 3
+        gain = 1 / (r.uniform(4.0, 30.0) if away else r.uniform(2.0, 4.0))
         pan = _pans(r, 1)[0] if away else seats[i] + r.uniform(-0.1, 0.1)
         awake = drift(dur, r, 0.04, 0.3, 0.0)                 # a singer rests when this dips
         if i % 3 == 0:                                        # tree cricket: slow, even chirps at Dolbear's rate
-            f, strokes, rate = r.uniform(2500.0, 3200.0) * tune, int(r.integers(5, 9)), 48.0 * quick
+            f, strokes, rate = r.uniform(2300.0, 2900.0) * tune, int(r.integers(5, 9)), 48.0 * quick
             t = _chirps(r, dur, 1 / (beat * r.uniform(0.97, 1.03)), 0.05, 0.08)
-            rise, decay = np.minimum(1.0, 0.45 + 0.3 * np.arange(strokes)), 0.004
+            rise, decay = np.minimum(1.0, 0.45 + 0.3 * np.arange(strokes)), 0.0028
         elif i % 3 == 1:                                      # field cricket: quick chirps of 3-4 strokes
-            f, strokes, rate = r.uniform(4300.0, 5100.0) * tune, int(r.integers(3, 5)), 28.0 * quick
+            f, strokes, rate = r.uniform(3800.0, 4600.0) * tune, int(r.integers(3, 5)), 28.0 * quick
             t = _chirps(r, dur, 1 / (2.6 * quick * r.uniform(0.8, 1.25)), 0.07, 0.08)
             t = t[_val(awake, t, dur) > -0.7]
-            rise, decay = np.minimum(1.0, 0.6 + 0.25 * np.arange(strokes)), 0.006
+            rise, decay = np.minimum(1.0, 0.6 + 0.25 * np.arange(strokes)), 0.0032
         else:                                                 # ground cricket: an unbroken trill
-            f, strokes, rate = r.uniform(5600.0, 7600.0) * tune, 1, 42.0 * quick * r.uniform(0.85, 1.15)
+            f, strokes, rate = r.uniform(4200.0, 5400.0) * tune, 1, 42.0 * quick * r.uniform(0.85, 1.15)
             t = _chirps(r, dur, 1 / rate, 0.02, 0.02)
             t = t[_val(awake, t, dur) > -1.0]
-            rise, decay, gain = np.ones(1), 0.003, 0.35 * gain
+            rise, decay, gain = np.ones(1), 0.0022, 0.3 * gain
         tt = (t[:, None] + np.arange(strokes)[None, :] / rate).ravel()
         swell = np.exp(0.3 * _val(drift(dur, r, 0.05, 0.5, 1.0), tt, dur))
-        rings(far if away else near, tt, gain * swell * np.tile(rise, len(t)), pan,
-              f * np.exp(0.004 * r.standard_normal(len(tt))), decay, decay, -2.0)
+        rough = np.exp(0.3 * r.standard_normal(len(tt)))      # no two strokes alike
+        rings(far if away else near, tt, gain * swell * rough * np.tile(rise, len(t)), pan,
+              f * np.exp(0.012 * r.standard_normal(len(tt))), decay, 0.6 * decay, -2.0)
     if c['intensity'] > -0.5:
         for tb in arrivals(r, 0.11, dur)[0]:                  # a tree frog: a few short rattling calls
             f, pan = r.uniform(950.0, 1300.0), r.uniform(-0.8, 0.8)
@@ -1012,12 +1031,12 @@ def _night(n, r, c):
                 tt = tb + 0.55 * j + np.arange(int(r.integers(9, 14))) / 38.0
                 rings(far, tt, 0.07, pan, f, 0.005, 0.002)
                 rings(far, tt, 0.04, pan, 2.05 * f, 0.004, 0.002)
-        for tb in arrivals(r, 0.035, dur)[0]:                 # an owl far off: hoo, hoo-hoo, hooo
+        for tb in arrivals(r, 0.035 * c.get('owl', 0.0), dur)[0] if c.get('owl', 0.0) > 0 else ():   # an owl
             f, pan = r.uniform(330.0, 400.0), r.uniform(-0.8, 0.8)
             for t0, d in ((0.0, 0.32), (0.85, 0.14), (1.07, 0.14), (1.5, 0.65)):
                 _put(far, _note(r, d, f * 0.97, f * 0.985, 0.04, harm=0.15), tb + t0, 0.12, pan)
-    far = _space(_filt(far, _lp(9000.0, 1)), 1.0, 0.5, 28, size=0.9)
-    y = near * 10 ** (-0.5 * c['distance']) + 2.5 * far
+    far = _space(_filt(far, _lp(5000.0, 1)), 1.0, 0.5, 28, size=0.9)
+    y = _filt(near, _lp(8000.0, 1)) * 10 ** (-0.5 * c['distance']) + 2.5 * far
     centres = _bands(60.0, 9000.0, 8)
     env = _levels(centres, 250.0, 3.0, 4.5)[:, None] * envelopes(dur, r, 8, 0.15, 0.6, 0.03, 1.0, 1.2)
     air = band_noise(n, r, centres, env, 0.9)
@@ -1257,10 +1276,10 @@ SCENES = {
                    'loop': True, 'min_loop': 10, 'controls': ['intensity', 'distance', 'bright', 'width']},
     'forest': {'says': ['birds singing in a forest', 'a quiet forest in the morning with birdsong',
                         'birdsong and a light breeze in the trees'],
-               'loop': True, 'min_loop': 20, 'controls': ['intensity', 'distance', 'bright', 'width']},
+               'loop': True, 'min_loop': 20, 'controls': ['intensity', 'distance', 'bright', 'width', 'dove']},
     'night': {'says': ['crickets chirping at night', 'night insects in a field',
                        'a summer night ambience with crickets'],
-              'loop': True, 'min_loop': 10, 'controls': ['intensity', 'warmth', 'distance', 'bright', 'width']},
+              'loop': True, 'min_loop': 10, 'controls': ['intensity', 'warmth', 'distance', 'bright', 'width', 'owl']},
     'room_tone': {'says': ['the quiet hum of an empty room', 'room tone', 'faint ventilation in a quiet room'],
                   'loop': True, 'min_loop': 4, 'controls': ['intensity', 'size', 'bright', 'width']},
     'city': {'says': ['distant city traffic', 'the far hum of a city', 'a distant highway'],
@@ -1351,7 +1370,8 @@ def render(scene, dur, r=None, **controls):
     """dur seconds of a scene as stereo float64 (n, 2). scene: a key of SCENES; r: numpy Generator (dsp.rng(seed);
     the same arguments give the same samples); controls: those listed in SCENES[scene]['controls'], numbers in
     [-1, 1] with 0 = the default (intensity, size, distance: -1 near .. 1 far, bright: -1.5 .. +1.5 dB per octave,
-    width: -1 mono .. 1 wide, warmth, density), howl 0..1, and the named choices in SCENES[scene]['choices']
+    width: -1 mono .. 1 wide, warmth, density), howl 0..1, owl (night) and dove (forest): off at 0 or less, more
+    calls up to 1, and the named choices in SCENES[scene]['choices']
     (surface, place) or key ('C', 'F#m', ...). A bed peaks at a quarter of -1 dBFS and fades in and out; thunder is
     an event (peak -3 dBFS, its tail faded). Unknown scenes, controls or choices raise ValueError with the valid ones.
         y = texture.render('wind', 20.0, dsp.rng(2), place='window', howl=0.8, intensity=0.5)"""

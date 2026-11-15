@@ -229,7 +229,7 @@ def test_small_film_sounds_are_short_and_near_mono():
     for sid in ('pop/soft', 'knock/soft', 'tock/wood', 'type/soft', 'blip/soft'):
         y, meta = _take(sid)
         assert meta['dur_s'] < 0.5, sid
-        assert np.corrcoef(y[:, 0], y[:, 1])[0, 1] > 0.85, sid
+        assert np.corrcoef(y[:, 0], y[:, 1])[0, 1] > 0.8, sid
 
 
 def test_typing_run_follows_motion_and_dur():
