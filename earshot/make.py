@@ -3,7 +3,8 @@
     earshot make "a soft success chime for a finance app" -o public/success.ogg
     earshot make "coin pickup, bright" -o sfx/coin.wav --n 3            # coin_1.wav .. coin_3.wav: three takes
     earshot make "rain on a window" -o rain.ogg --dur 20                # a seamless loop
-    earshot make --spec sounds.json --out public/sounds                 # a whole set in one call (see `spec`)
+    earshot make --set ui --theme glass -o public/sounds --format ogg   # a ready-made set as one family
+    earshot make --spec sounds.json -o public/sounds                    # your own set in one call (make_set)
     earshot sounds --search "notification"                              # the catalogue, compact
 
     from earshot.make import make, make_set
@@ -160,24 +161,35 @@ def _tmp_wav(sound, seed, req):
     return master.write(os.path.join(tempfile.mkdtemp(), 'heard.wav'), y)
 
 
-def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None):
+def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None, sprite=None):
     """a whole set of sounds from one spec, as one family: {'summary', 'files', 'manifest', 'sounds': [...]}.
-    spec: a dict or the path of a JSON file:
-        {"theme": "glass" | {...}, "format": "ogg", "out": "public/sounds", "mono": true, "lufs": -18,
+    spec: a dict, the path of a JSON file, or the name of a ready-made set (earshot.sounds.sets: ui, game, arcade,
+    film):
+        {"set": "ui", "theme": "glass" | {...}, "format": "ogg", "out": "public/sounds", "mono": true, "lufs": -18,
+         "sprite": "sprite.webm",
          "sounds": [{"name": "tap", "want": "a soft tap for buttons"},
                     {"name": "success", "want": "a happy two-note success chime", "dur": 0.5, "axes": {"bright": 0.2}}]}
-    Each sound takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice,
-    material, seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). The sounds are levelled
-    against each other by loudness (`lufs`: the loudest allowed; default -16 for the set's loudest sound, each
-    design's own weight under it), and `manifest.json` in the folder lists every file with its sound, length and
-    level."""
+    "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
+    takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
+    seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). The sounds are levelled against
+    each other by loudness (`lufs`: the loudest allowed; default -16 for the set's loudest sound, each design's
+    own weight under it), `manifest.json` in the folder lists every file with its sound, length and level, and
+    "sprite" also packs them into one file with a map (earshot.pack)."""
     from .sounds import registry
     from .synth import master
+    from .sounds import sets
     if isinstance(spec, str):
-        spec = read_json(spec)
-    items = spec.get('sounds') or []
+        spec = {'set': spec} if spec in sets.SETS else read_json(spec)
+    items, skipped = list(spec.get('sounds') or []), []
+    if spec.get('set'):
+        base = sets.get(spec['set'])
+        theme = theme or spec.get('theme') or base['theme']
+        named = {it.get('name') for it in items}
+        have = set(registry.ids())
+        skipped = [n for n, sid in base['sounds'] if sid not in have and n not in named]
+        items = [{'name': n, 'sound': sid} for n, sid in base['sounds'] if sid in have and n not in named] + items
     if not items:
-        raise ValueError('the spec has no "sounds"')
+        raise ValueError('the spec has no "sounds" and names no "set"')
     bad = [f'{it.get("name", i)}: {k}' for i, it in enumerate(items) for k in it if k not in SET_FIELDS]
     names = [it.get('name') for it in items]
     if bad or None in names or len(set(names)) != len(names):
@@ -211,8 +223,17 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None)
         json.dump({'theme': theme, 'format': fmt, 'sounds': rows}, fh, indent=1)
         fh.write('\n')
     head = f'{len(rows)} sounds in {out} ({fmt}), manifest.json'
-    return {'summary': '\n'.join([head] + lines), 'files': [os.path.join(out, r['file']) for r in rows],
-            'manifest': man, 'sounds': rows}
+    res = {'files': [os.path.join(out, r['file']) for r in rows], 'manifest': man, 'sounds': rows}
+    sprite = sprite or spec.get('sprite')
+    if sprite:
+        from .pack import pack
+        sp = pack(res['files'], os.path.join(out, os.path.basename(sprite)), mono=mono,
+                  loops=[r['name'] for r in rows if r['loop']])
+        lines.append(sp['summary'])
+        res['sprite'] = sp['file']
+    if skipped:
+        lines.append(f"not in this catalogue, left out: {', '.join(skipped)}")
+    return {'summary': '\n'.join([head] + lines), **res}
 
 
 # a kind's level under the loudest sound of a set (LU): the more often a sound plays, the quieter it sits
@@ -246,6 +267,9 @@ def add_cli(sub):
     p.add_argument('-o', '--output', help='the file to write; its extension picks the format (wav, flac, ogg, mp3, '
                                           'm4a, webm). With --spec: the folder')
     p.add_argument('--spec', help='a JSON file describing a whole set (earshot.make.make_set)')
+    p.add_argument('--set', dest='set_name', help='a ready-made set: ui, game, arcade or film (one family, one call)')
+    p.add_argument('--format', help='with --spec / --set: the file format of the set (wav, ogg, mp3, m4a, webm, flac)')
+    p.add_argument('--sprite', help='with --spec / --set: also pack the set into this one file with a map')
     p.add_argument('--sound', help='a design id from `earshot sounds` instead of (or on top of) the words')
     p.add_argument('--n', type=int, default=1, help='how many takes (file_1 .. file_n)')
     p.add_argument('--seed', type=int, default=0)
@@ -277,9 +301,10 @@ def _emit(res, args):
 
 
 def _run_make(args):
-    if args.spec:
-        return _emit(make_set(args.spec, out=args.output, theme=args.theme, seed=args.seed,
-                              mono=True if args.mono else None, lufs=args.lufs), args)
+    if args.spec or args.set_name:
+        return _emit(make_set(args.spec or args.set_name, out=args.output, theme=args.theme, fmt=args.format,
+                              seed=args.seed, mono=True if args.mono else None, lufs=args.lufs,
+                              sprite=args.sprite), args)
     return _emit(make(args.want, args.output, sound=args.sound, n=args.n, seed=args.seed, theme=args.theme,
                       listen=args.listen, mono=args.mono, lufs=args.lufs, pitch=args.pitch, dur=args.dur,
                       voice=args.voice, material=args.material, **_axes(args)), args)

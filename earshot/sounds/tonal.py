@@ -17,9 +17,10 @@ ROOM = {'metal': 'studio', 'tine': 'room', 'wood': 'room', 'glass': 'studio', 'f
 def _note(voice, room):
     def fn(c, r):
         dur = c.seconds()                    # the design's own length caps a bell's or a bowl's half-minute ring
+        own = {'space': c.space} if room == 'dry' else {}        # a patch alone keeps its own delay and reverb
         y = voices.play(voice, c.hz(), vel=min(1.0, 0.65 * c.db('energy', 7.0)), dur=dur, r=r, vary=c.vary,
-                        **c.axes('bright', 'hard', 'ring', 'size', 'width', 'motion'))
-        return space.room(y, c.room(room), amount=c.space, r=r)
+                        **c.axes('bright', 'hard', 'ring', 'size', 'width', 'motion'), **own)
+        return y if own else space.room(y, c.room(room), amount=c.space, r=r)
     return fn
 
 

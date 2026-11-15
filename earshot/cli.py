@@ -16,6 +16,7 @@ import sys
 COMMANDS = {
     'make': 'make',              # make a sound in code from a request in words, or a whole set from a spec
     'sounds': 'make',            # the catalogue of sounds make can make
+    'pack': 'pack',              # many sounds in one file with a map (an audio sprite)
     'describe': 'describe',      # what does this sound like? tags + measurements
     'match': 'match',            # how well does a sound match a text description (calibrated)
     'rank': 'search',            # rank many files by a description

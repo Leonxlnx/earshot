@@ -24,6 +24,7 @@ _FUNCS = {
     'kit_audition': ('forge.kit', 'kit_audition'),
     # sounds made from a request in words (no models): earshot.make
     'make': ('make', 'make'), 'make_set': ('make', 'make_set'), 'sounds': ('make', 'sounds'),
+    'pack': ('pack', 'pack'),
 }
 
 

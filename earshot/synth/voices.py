@@ -8,7 +8,8 @@ pianos (earshot.synth.strings) and synthesizer patches (earshot.synth.patches).
 
 A design names a voice instead of an engine, so a figure (a success chime, a notification motif, a logo) can be
 played by any of them and a theme can swap the voice of a whole set. Controls are the shared axes in [-1, 1]
-(0 = the voice as built); a voice ignores the ones it does not have.
+(0 = the voice as built); a voice ignores the ones it does not have. A synthesizer patch is played without its
+own delay and reverb unless `space` is given, so every voice of a set sits in the one room its design adds.
 """
 import importlib
 
@@ -82,6 +83,8 @@ def play(voice, pitch=None, vel=0.7, dur=None, r=None, **controls):
     mod = importlib.import_module(f'earshot.synth.{v["engine"]}')
     hz = clamp(voice, knobs.hz(v['default_pitch'] if pitch is None else pitch))
     kw = {k: float(c) for k, c in controls.items() if k in takes and c is not None}
-    if v['engine'] == 'patches' and dur is None:
-        dur = HOLD.get(v.get('kind'), 0.3)
+    if v['engine'] == 'patches':
+        kw.setdefault('space', -1.0)       # a patch comes without its own delay and reverb unless asked: the design
+        if dur is None:                    # that plays it puts every voice in one shared room
+            dur = HOLD.get(v.get('kind'), 0.3)
     return getattr(mod, fn)(voice, hz, vel=float(vel), dur=dur, r=r if r is not None else dsp.rng(0), **kw)
