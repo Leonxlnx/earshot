@@ -72,7 +72,7 @@ BEDS = {
                             'a calm sparse keyboard loop that barely moves'),
                   ('background music', 'music', 'focus', 'timer', 'landing page', 'minimal', 'work', 'study',
                    'loading'), ('ambient', 'minimal')),
-    'bed/cinematic': ('cinematic', ('a low drone under slow swelling string chords with a distant low drum hit',
+    'bed/cinematic': ('cinematic', ('a low drone under slow swelling string chords with a soft distant boom',
                                     'slow atmospheric cinematic underscore', 'a dark emotional film score bed'),
                       ('background music', 'music', 'cinematic', 'underscore', 'trailer', 'film', 'documentary',
                        'intro', 'emotional', 'epic'), ('film', 'score')),
@@ -138,4 +138,4 @@ for _id, (_style, _says, _uses, _tags) in BEDS.items():
            voice=next((p['voice'] for p in _st['parts'] if p.get('main')), None),
            material='retro' if _style == '8bit' else None, loop=True,
            allows=ALLOWS + (('silence',) if _style == '8bit' else ()),
-           prior=1.1 if _style == 'calm' else 1.0)(_bed(_style))        # calm: the bed for plain "background music"
+           prior=1.15 if _style == 'calm' else 1.0)(_bed(_style))       # calm: the bed for plain "background music"

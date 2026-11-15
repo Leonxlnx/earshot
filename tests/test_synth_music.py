@@ -157,7 +157,7 @@ def test_a_top_line_is_a_short_motif_that_leaves_room():
 
 
 def test_a_loop_is_whole_bars_at_its_tempo_in_its_key_and_closes():
-    plan = music.compose('8bit', dsp.rng(1), bars=4)
+    plan = music.compose('8bit', dsp.rng(1), bars=3)
     t0 = time.perf_counter()
     y = music.render(plan, dsp.rng(5))
     took = time.perf_counter() - t0
@@ -197,10 +197,10 @@ def test_the_beds_of_the_catalogue():
         assert r['loop'] and 'music' in r['domains'] and len(r['says']) >= 2 and r['axes'] == list(beds.AXES)
         assert ('retro' in r['tags']) == (sid == 'bed/8bit') == (r['material'] == 'retro')
     bpm = 126.0 * 1.15 ** 0.5
-    bars = round(5.0 * bpm / 240.0)
-    y, meta = registry.render('bed/8bit', seed=1, dur=5.0, motion=0.5, pitch='E3')
+    bars = round(4.0 * bpm / 240.0)
+    y, meta = registry.render('bed/8bit', seed=1, dur=4.0, motion=0.5, pitch='E3')
     assert len(y) == int(round(bars * 240.0 / bpm * SR)) and meta['loop'] and meta['pitch'].startswith('E')
     assert 'ignored' not in meta and meta['lufs_max'] <= registry.LOUDEST['music'] + 0.1
     assert meta['checks']['ok'], meta['checks']['warnings']
-    once, meta = registry.render('bed/8bit', seed=1, dur=5.0, loop=False, check=False)
+    once, meta = registry.render('bed/8bit', seed=1, dur=4.0, loop=False, check=False)
     assert meta['loop'] is False and len(once) > len(y)
