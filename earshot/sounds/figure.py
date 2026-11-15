@@ -35,6 +35,7 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     v = c.voice or voice or DEFAULT_VOICE
     if avoid and voices.info(v).get('material') in avoid:
         v = voice or DEFAULT_VOICE
+    c.played = v
     hz = c.degrees(steps, root) if degrees else c.semis(steps, root)
     k = len(hz)
     speed = c.lerp('motion', 1.4, 0.7, 1.0, log=True)

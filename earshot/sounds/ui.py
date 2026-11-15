@@ -93,13 +93,14 @@ FIGURES = {
                       uses=('undo', 'back', 'previous', 'return'),
                       fig=dict(steps=(2, 0), gap=0.055, root='A5', vel=0.36, vels=(1.0, 0.85), gate=0.05, last=0.15, accent=0)),
     # ---- the smallest ones: one short note of a sustaining metal bar or a synthesizer is a bare tone burst, heard as
-    # an electronic beep, so these keep to struck wood unless the theme's voice is itself short (wood, tines, strings)
+    # an electronic beep, so these keep to struck wood unless the theme's voice is itself short (wood, tines,
+    # strings) or the theme is a synthesizer's, where a soft blip is the point
     'tap/tone': dict(kind='tap', says=('one very short muted note, a soft tonal tap', 'a tiny damped blip of a note'),
                      uses=('tap', 'button press', 'click', 'select', 'key'), prior=1.1,
-                     fig=dict(steps=(0,), root='C6', vel=0.36, last=0.07, room='booth', voice='marimba', avoid=('metal', 'glass', 'synth', 'electric'))),
+                     fig=dict(steps=(0,), root='C6', vel=0.36, last=0.07, room='booth', voice='marimba', avoid=('metal', 'glass', 'electric'))),
     'hover/tone': dict(kind='tick', says=('one extremely short quiet high note, a faint tonal tick', 'a tiny soft high blip'),
                        uses=('hover', 'focus', 'highlight', 'scroll tick'),
-                       fig=dict(steps=(0,), root='G6', vel=0.2, last=0.04, room='booth', voice='marimba', avoid=('metal', 'glass', 'synth', 'electric'))),
+                       fig=dict(steps=(0,), root='G6', vel=0.2, last=0.04, room='booth', voice='marimba', avoid=('metal', 'glass', 'electric'))),
 }
 figure.register(design, FIGURES, domains=('ui', 'game'))
 

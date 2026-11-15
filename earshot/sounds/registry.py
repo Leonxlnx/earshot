@@ -35,7 +35,7 @@ AXES = ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')
 KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud', 'whoosh', 'rise', 'fall', 'zap',
          'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
-MODULES = ('ui', 'game', 'brand', 'tonal', 'retro', 'bank')   # the design modules, in catalogue order
+MODULES = ('ui', 'game', 'brand', 'synth', 'tonal', 'retro', 'bank')   # the design modules, in catalogue order
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
@@ -135,6 +135,7 @@ class Controls:
         self.asked = {k for k, v in dict(pitch=pitch, dur=dur, voice=voice, material=material, **axes).items()
                       if v is not None and v != 0.0}
         self.used = set()
+        self.played = None           # the voice a design really played, when it is not the one asked for
 
     def __getattr__(self, name):
         if name in AXES:
@@ -228,7 +229,7 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     if 'pitch' in c.used and (d.pitch or c._pitch):
         meta['pitch'] = knobs.note(c.hz())
     if 'voice' in c.used:
-        meta['voice'] = c.voice
+        meta['voice'] = c.played or c.voice
     if 'material' in c.used and c.material:
         meta['material'] = c.material
     ignored = sorted(c.asked - c.used)

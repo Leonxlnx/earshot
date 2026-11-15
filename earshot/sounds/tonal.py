@@ -25,6 +25,8 @@ def _note(voice, room):
 
 
 for _v, _i in voices.table().items():
+    if _i['engine'] == 'patches' and _i.get('kind') in ('pad', 'hit', 'fx'):
+        continue                         # finished sounds, not instruments: earshot.sounds.synth names them
     _words = _v.replace('_', ' ')
     design(f'note/{_v}', kind='note', says=tuple(_i['says'][:3]) if len(_i['says']) > 1 else (_i['says'][0], f'a {_words} note'),
            uses=(_words, 'note', 'tone'), tags=(_i.get('material') or 'synth', _i.get('kind') or 'instrument', 'tonal'),
