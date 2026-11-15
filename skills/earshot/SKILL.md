@@ -1,10 +1,58 @@
 ---
 name: earshot
-description: Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, making a sound in code and improving it by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
+description: Make sounds with earshot whenever a product, game, page, animation or film needs a sound and no recording is at hand - interface sounds (taps, toggles, success, error, notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit), motion-design effects (whooshes, impacts, risers, logos), instrument notes, pads and ambience loops, one at a time (earshot make) or as one themed family (earshot make --set / make_set). Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, searching a recipe by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
 ---
 
 # earshot: ears for an agent
 
+earshot has two halves. **Make**: ask for a sound in words and earshot renders it in code (no models, about a
+second, nothing downloaded, no recorded audio). **Listen**: describe, match, find, measure and critique sound you
+cannot hear (two models, 20-40 s to load). Making comes first below; the listening loops follow.
+
+## Make a sound (earshot make)
+Use it whenever something needs a sound and no recording is given. Everything it renders is free to use in any
+product, commercial too, without credit; say so if the user asks.
+
+**Which call.**
+- One sound: `earshot make "WORDS" -o path/file.ogg` (MCP `make`: `want` + absolute `out`, optional `sound`, `n`,
+  `theme`, `pitch`, `dur`, `voice`, `seed`, `listen`; feelings go in the words). One call per sound.
+- Several sounds that belong together (a product's interface, a game's effects, a film's kit): one `make --set` or
+  one `make --spec` call, never a loop of single `make` calls. They then share one voice, key and room and are
+  levelled against each other. `earshot make --set ui|game|arcade|film --theme NAME -o FOLDER --format ogg
+  [--sprite sprite.webm]`; for your own list, MCP `make_set` with `sounds: [{"name": "tap", "want": "a soft tap"},
+  ...]` (fields: name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs) or a JSON spec file
+  (`docs/MAKE.md`).
+- `earshot sounds --search WORDS` only when you must name an exact design id; a request in words does not need it.
+  Never list the whole catalogue (457 lines).
+- `--listen` only when the choice matters and the first answer looks off (a wrong `also`, an unexpected design): it
+  loads the models (20-40 s) to pick among the best three and adds a `heard as` line with a z. Not for every call.
+
+**How to ask.** Name the sound or the job it plays, then the feel, then numbers:
+`"a soft success chime for a finance app"`, `"coin pickup, bright, 8-bit"`, `"a deep impact for a logo reveal with a
+long tail"`, `"rain on a window"` with `--dur 20`, `"a kalimba note in E"`, `"three variations of a footstep on
+gravel"`. Feelings are offsets on eight axes (bright, hard, ring, size, space, width, energy, motion): "softer",
+"darker", "bigger", "longer", "drier", "not harsh", "not too loud". Chip sound only with "8-bit" / "retro" /
+"chiptune" / "arcade" or `--theme retro`. Ambience is a seamless loop unless "no loop" / `--no-loop` (a film's bed).
+For a theme across separate calls pass the same `--theme` (soft, glass, wood, felt, tine, metal, electric, digital,
+retro). To steer, re-ask with adjectives or numbers, or take an `also` design with `--sound ID`; do not browse the
+catalogue to find a better one.
+
+**Keep token use low.** One call per sound or one per set. The answer is the summary text (three lines for one
+sound); do not ask for `--json` / `full=true` unless you need the measurements. Do not read the written audio back.
+
+**Check afterwards** (in the answer, no extra call):
+- `clean` on each file line, or `audit: ...`: a warned take (click, cut tail, clipping) is not usable; re-ask with
+  another `--seed` or another design.
+- `not understood: WORDS`: those words did nothing; rephrase them in plainer terms (the sound, the job, an
+  adjective) if they mattered.
+- `not used by this sound: ...`: the chosen design ignores those controls. Common cases: a material ("wooden") is
+  never a control (use `--theme wood` or `--voice marimba`); figures ignore `dur`; bank sounds ignore the axes.
+- `also: ...`: if the chosen id does not fit the job, take one of these with `--sound`.
+Report what you made with its line: `success.ogg: success/rise (0.88 s, G5, vibraphone, -14 LUFS, clean)`. Do not
+say how it sounds beyond its descriptions and, with `--listen`, the heard-as verdict; the sounds are measured by
+earshot's own models, not tested by people.
+
+## Listen
 You cannot hear. Never say how audio sounds, or that a sound "fits", without an earshot reading behind it, and quote
 the number when you report ("strong match, z +3.9; p_real 0.96; -14.2 LUFS"). earshot runs locally on CPU (audio
 never leaves the machine, except with the optional `llm` command) and caches every embedding and result on disk.
@@ -26,8 +74,10 @@ Two ways in, same functions:
   "env": {"EARSHOT_THREADS": "3", "GEMINI_API_KEY": "${GEMINI_API_KEY:-}"}}}}` (the key line only for the optional
   llm tool; Claude Code fills it from the user's environment, other clients may need the key set in the environment
   that launches them: never write a literal key into a project file).
-  Tools: measure, describe, match, rank, find, compare, ab, realness, timeline, sheet, critique, doctor,
-  llm_critique; the sound bank (no models): sfx_list, sfx_render, kit_render (Loop 5). Pass absolute paths; `full=true` returns all JSON. The server answers within a few seconds, longer on a cold or
+  Tools: make, make_set, sounds (no models; above); measure, describe, match, rank, find, compare, ab, realness,
+  timeline, sheet, critique, doctor, llm_critique; the sound bank (no models): sfx_list, sfx_render, kit_render
+  (Loop 5). Pass absolute paths; `full=true` returns all JSON. The server answers within a few seconds, longer on a
+  cold or
   busy machine; if Claude Code shows no earshot tools, start it with `MCP_TIMEOUT=60000` (PowerShell:
   `$env:MCP_TIMEOUT=60000; claude`). `earshot mcp --warm` preloads the models at startup.
 If the machine is shared, set `EARSHOT_THREADS=2-3` (or `--threads 2` on any command). The first model call of a
@@ -93,9 +143,11 @@ including the audio of an mp4 (a video with no audio track says so). Errors are 
   take plus the silence between them. Then `earshot timeline after.wav` and compare the event lines and sync stats
   with the old run. Change one thing at a time.
 
-## Loop 4: make a sound in code (earshot forge)
-Use this when the user wants a sound **made**, not chosen: an AI that hears can write synthesis code, listen, and
-improve it. Every sample must be computed (no recorded audio inside, not even an impulse response); real recordings
+## Loop 4: write a new recipe and improve it by listening (earshot forge)
+Use this when `earshot make` has no design for the sound and the user wants one written and refined against real
+reference recordings: an AI that hears can write synthesis code, listen, and improve it. It takes minutes per round;
+for an ordinary sound use `earshot make` instead. Every sample must be computed (no recorded audio inside, not even
+an impulse response); real recordings
 are only the references the critic compares with.
 1. Write or pick a recipe in `earshot/forge/recipes/<name>.py`: `SPACE` (parameter ranges), `DEFAULTS`, `TARGET`,
    `ALTS` (realistic confusions) and `render(params, r) -> 48 kHz array`, built from `earshot.forge.dsp` (modal

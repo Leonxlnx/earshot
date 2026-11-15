@@ -5,7 +5,7 @@ other jobs running). Full tables, data descriptions and "what was tuned on what"
 this page is the summary. Data: the Clawd film's licensed recordings (219 used + 125 rejected Freesound/Mixkit files),
 its finished 60 s soundtrack with every placement logged, the code-synthesized score that project retired, renders
 of the Cinetic synth engine, independent numpy generators, and 7 professional launch films (measured locally, never
-committed).
+committed). Section 8 covers the sounds earshot makes (1.0): measured by its own models and audits, not by people.
 
 ## 1. Matching descriptions, ranking, finding moments ([eval/semantics/RESULTS.md](../eval/semantics/RESULTS.md))
 `EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py analyze` (tuning library) and `... heldout`.
@@ -117,3 +117,78 @@ decode cache, and `mix_report.json` byte-identical. (`--cache` must point to a w
 ## 7. Tests
 `.venv/Scripts/python.exe -m pytest -q` (fast; synthetic fixtures, no network) and `--slow` (loads the models / long
 end-to-end runs). At release: 128 passed, 14 skipped (slow) in ~65 s; the 14 slow tests also pass (~3 min).
+(Measured for 0.4; the 1.0 test files are listed in `tests/`.)
+
+## 8. Made sounds (1.0)
+
+What these numbers are: measurements of earshot's own listening models (CLAP and the realness head, the same ones
+`match` and `realness` use) and model-free audits, taken in the project's lab on 2026-11-15 on one laptop thread. They
+are not a listening test by people. Nobody has run a listening test with people on the 1.0 sounds yet, so "premium" is
+a claim about measurements and construction, not about a blind test. The models can be pleased without a sound
+getting better (section [Goodhart](../README.md#search-by-listening-earshot-forge)); the designs were built from
+physics and checked against the models, not tuned to them. The lab scripts and renders are not in the repository; the
+method is below so it can be repeated with `earshot match`.
+
+**Method.** Every design new in 1.0 (248: the modules `ui`, `figure` via ui / game / brand, `tonal`, `synth`,
+`retro`, `action`, `object`, `nature`) rendered once at its defaults on seed 1 (loops at 10 s), written as 16-bit WAV.
+Each render was matched against its own `says` (two or three plain descriptions of the sound, plus the descriptions
+of the voice it played) and, in a forced choice, against "a cheap synthesizer beep", "a video game blip", "an 8-bit
+chiptune sound", "a harsh buzzing tone" and "white noise static" (chip designs against "white noise static", "a dial
+tone" and "a harsh buzzing tone": chip sound is meant to sound like chip sound). A design is *heard* as itself when
+its best own description reaches z >= 2, *strongly* at z >= 3 (the verdict bands of `earshot match`, section 1), and
+it *wins* when its own description takes at least half of the forced choice (`p_vs_alts` >= 0.5).
+
+| group | n | heard (z >= 2) | strong (z >= 3) | wins the forced choice |
+|---|---|---|---|---|
+| figures (interface, game, brand) | 45 | 45 | 42 | 42 |
+| notes (36 instruments, 15 patches) | 51 | 51 | 45 | 51 |
+| synthesizer | 14 | 14 | 14 | 14 |
+| chip | 24 | 24 | 23 | 24 |
+| action | 47 | 43 | 24 | 44 |
+| objects | 36 | 35 | 19 | 32 |
+| ambience | 28 | 25 | 19 | 23 |
+| material ticks | 3 | 3 | 1 | 3 |
+| **all new designs** | **248** | **240** | **187** | **233** |
+
+For comparison, the 0.4 bank's glockenspiel and marimba notes scored z 2.2 and 2.6 for their own description on the
+same test; the 1.0 notes of those instruments 4.6 and 5.1. The 209 bank sounds in the catalogue were not re-heard for
+1.0 (their own measurements are in [SFX.md](SFX.md) and [FORGE_V2.md](FORGE_V2.md)).
+
+Below z 2 or losing the forced choice: an opening door (`door/open`), a soft landing (`land/soft`), a slap
+(`hit/slap`), a struck match (`match/strike`), tearing paper (`paper/tear`), peeling tape (`tape/peel`), a bottle
+opening (`bottle/open`), rain on a roof (`rain/roof`), a small fire (`fire/small`), distant city traffic
+(`city/distant`, heard as noise) and a low rumble (`rumble/quake`). Steady noise beds in general sit close to "noise"
+for the models. [LIMITS.md](LIMITS.md) lists them for users.
+
+**Calibration of the pianos and mallets.** The struck and string models were compared note by note with freely usable
+recordings: the University of Iowa Musical Instrument Samples (a grand piano, a vibraphone, a marimba, a xylophone)
+and VSCO-2 Community Edition (CC0: an upright piano, a glockenspiel, a marimba, a xylophone). The laws of the models
+(partial levels, decay by partial, the soundboard knock, rise times) were set from several notes each, never fitted
+to one; the comments marked `[cal]` in `earshot/synth/struck.py` and `strings.py` give the measured values. No
+recording and no per-recording data is in the repository. Before, the two pianos were heard as "an electric piano"
+(z 2.5 and 2.8 for their own description); after, z 3.7-4.4, and they win the forced choice against "an electric
+piano note" on 6 of 8 notes. The realness model scores them 0.82-0.98 ("real or pro-produced").
+
+**A room has a tone.** Every sound placed in one of the shared rooms gets a noise floor 68 dB under its peak (pink
+noise above 120 Hz, per channel, until the sound has died: `earshot/synth/space.py`). Without it the models heard the
+same notes as less real and less like themselves: on vibraphone, marimba and piano notes and three interface figures
+the match to their own description rose by 0.6 to 1.1 z, and the realness score from 0.03-0.26 to 0.20-0.66, with a
+floor (measured at -66 dB); noise that only followed the sound's envelope did less.
+
+**Lessons the lab measured, now in the code.** A sustaining metal bar or synth note damped after less than about
+110 ms is heard as an electronic beep: figures keep such notes at least that long (`figure.SUSTAIN_FLOOR`), and the
+smallest taps (`tap/tone`, `hover/tone`) use wood unless the theme's voice is short. Small metal plates and bars
+struck once read as blips, while a coin and a glass left to ring read as objects: `tick/metal` is a coin and
+`tick/glass` rings.
+
+**Understanding requests.** A test set of 440 requests over 110 intents, written by someone who had not seen the
+catalogue, scores how often `make` picks a design that answers the request.
+
+<!-- RANKING NUMBERS: lead fills in -->
+
+**The audit.** Every take `make` writes passes `forge.sfx.check` (clicks, cut tails, clipping, DC, comb ring, rising
+glides, stacked attacks) or is re-rolled on up to three more seeds; the line says `clean` or names the warnings.
+
+**Speed** (one thread, no models): a single `make` takes about 1-2 s including Python start-up; a 16-sound interface
+set with ogg files and a sprite about 25 s; ambience loops of 12-20 s take 3-10 s to render. `--listen` loads the two
+models once (20-40 s).

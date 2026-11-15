@@ -1,5 +1,82 @@
 # Changelog
 
+## 1.0.0 - 2026-11-15
+
+earshot makes sounds. An agent asks for a sound in words and earshot renders it in code, with no recorded audio, no
+model and no network: interface sounds, game sounds, motion-design effects, instrument notes, synth pads and ambience
+loops, one at a time or as a themed family with a sprite for the web. 248 new designs on five synthesis engines join
+the 209 named sounds of the bank in one catalogue of 457. Their quality numbers are measurements by earshot's own
+models and model-free audits, not a listening test by people
+([docs/VALIDATION.md](docs/VALIDATION.md#8-made-sounds-10)).
+Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. No new required dependencies.
+
+### Added
+
+- **`earshot make "WORDS" -o FILE`** (`earshot/make.py`, MCP `make`, `api.make`): the request is read, the catalogue
+  ranked, the best design rendered with the request's controls, audited (clicks, cut tails, clipping, DC, comb ring,
+  rising glides, stacked attacks; a failed take is re-rendered on up to three more seeds) and written as wav, flac,
+  ogg, mp3, m4a or webm. The answer is three lines: the design and why, what else would fit (`also`), and the words
+  `not understood` or controls `not used by this sound`. `--n` takes, `--seed`, `--sound ID`, `--theme`, `--pitch`,
+  `--dur`, `--voice`, the eight axes, `--lufs`, `--mono`, `--no-loop`. `--listen` loads the listening models to pick
+  among the best three and says what the result is heard as. A single `make` takes about 1-2 s on one thread.
+- **Reading requests** (`earshot/brief.py`, `earshot/sounds/lexicon.py`): jobs and sounds to canonical words, the
+  head of a request and its parts and context, feelings as offsets on eight shared axes (bright, hard, ring, size,
+  space, width, energy, motion) with intensifiers, negation ("not harsh", "not an error"), "the opposite of",
+  comparisons, voices named as the instrument or as the player, materials, "8-bit" as a hard filter for chip sound,
+  lengths and ceilings, pitches, keys, counts of takes and notes, loop or one-shot, domains. No model.
+- **The catalogue** (`earshot/sounds/`: `registry.py` with the `@design` contract, `earshot sounds`, MCP `sounds`):
+  45 figures for interfaces, games and brands that any voice can play (`ui.py`, `game.py`, `brand.py` on
+  `figure.py`); 51 single notes of 36 instruments and 15 patches (`tonal.py`); 14 synthesizer sounds (`synth.py`:
+  pads, a drone, braams, risers, a stab, zaps); 24 chip sounds (`retro.py`); 47 action sounds (`action.py`: jumps,
+  landings, steps on six surfaces, swings, hits, explosions, shots, doors, breaks, splashes, magic); 36 object sounds
+  (`object.py`: coins, glasses, paper, cards, dice, water, clocks, switches, keys, bells ...); 28 ambience scenes
+  (`nature.py`, seamless loops); 3 material ticks. The bank's 209 named members join it (`bank.py`) and rank under
+  the new designs.
+- **Themes and sets** (`earshot/sounds/theme.py`, `sets.py`): nine theme presets (soft, glass, wood, felt, tine,
+  metal, electric, digital, retro) give a family one voice, key, room and axis offsets; four ready-made sets (`ui`
+  16, `game` 22, `arcade` 16, `film` 15). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a whole
+  set in one call, levelled against each other by kind (the loudest at -16 LUFS momentary max, a tap 10 LU under,
+  a bed 14), with `manifest.json`.
+- **`earshot pack`** (`earshot/pack.py`, `--sprite` on a set): many sounds in one file with a map in the format
+  howler.js reads; loops are marked and get a longer gap.
+- **The engines** (`earshot/synth/`): struck instruments from modes, damping laws and a Hertz contact (`modal.py`,
+  `struck.py`); strings, pianos and electric pianos as stiff-string modes with two polarisations, a felt hammer, a
+  body and a pickup (`strings.py`); a synthesizer with band-limited oscillators, unison with drift, a ladder filter,
+  FM operators, chorus and echo, and 28 patches (`voice.py`, `patches.py`); band-limited chip sound with 24
+  generators (`chip.py`); ambience from event statistics and band-wise noise, rendered as seamless loops
+  (`texture.py`); every voice behind one call (`voices.py`), figures played like a person (`phrase.py`), seven shared
+  rooms with a tone of their own (`space.py`) and the finish and file formats (`master.py`).
+- **Calibration**: the pianos and mallet instruments were compared note by note with freely usable recordings
+  (University of Iowa Musical Instrument Samples; VSCO-2 Community Edition, CC0) and the laws of the models set from
+  several notes; no recording and no per-recording data is in the repository. Heard by earshot's models, the pianos
+  went from "an electric piano" (z 2.5 and 2.8 for their own description) to z 3.7-4.4.
+- **Docs**: [docs/MAKE.md](docs/MAKE.md) (the reference of `make`, `sounds`, `pack`, the spec, themes, axes, the
+  request language, the catalogue, the voices, recipes for a web page, a game and a film, how to add a design);
+  VALIDATION section 8; LIMITS "Making sounds"; the earshot skill's making half.
+- **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
+  (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
+
+### Changed
+
+- **The README** puts making first and listening second; the 0.4 and 0.3 notes moved to a short history.
+- **Package metadata**: version 1.0.0, development status Beta, a description and keywords for both halves.
+- **Picture-only timelines and frame differences use far less memory** (#31; thanks, @liugedragon).
+- **Licence of rendered audio** (answers #21): the code is MIT; everything earshot renders (`make`, `sfx`, `kit`,
+  `forge`) belongs to whoever rendered it: free for any use, commercial too, without credit. The README says so.
+
+### Fixed
+
+- **`sheet` names the PNG by its real path** (#22; thanks, @Bortlesboat): the summary printed it ASCII-escaped.
+- **Cue, kit and params JSON files with a byte order mark or in UTF-16 load** (#24, closes #23; thanks,
+  @anascherif). Windows PowerShell 5.1 writes UTF-8 with a byte order mark (`Out-File -Encoding utf8`) and UTF-16
+  (`>`); `timeline --cues`, `kit render / check` and `forge --render --params` failed on such files.
+- **A damaged scene-cut cache is scanned again** and written atomically (#26; thanks, @liugedragon).
+- **`timeline --fresh` bypasses the decode and frame caches** too: it decodes the audio and scans the picture again
+  (#27; thanks, @liugedragon).
+- **Digital silence is counted across all channels** (#29; thanks, @liugedragon): `digital_silence_frac` is the share
+  of frames where every channel is under 1e-6; one silent channel or phase cancellation no longer counts.
+- **An empty picture-only range is an error** (#30; thanks, @liugedragon), not an empty timeline.
+
 ## 0.4.1 - 2026-11-06
 
 Fixes from the community, thanks to @SmitMachhi, @yinbowen-dc, @kyexyz and @lunar-me, and a measurement of how

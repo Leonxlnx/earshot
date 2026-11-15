@@ -9,10 +9,11 @@ Python API (models load lazily on first use and stay warm):
     earshot.timeline('soundtrack.wav', video='film.mp4')
 
 or explicitly: `from earshot import api` / `from earshot.describe import describe`.
+Sounds made from a request in words (no models): `from earshot.make import make; make('a soft success chime', 'a.wav')`.
 """
 import importlib
 
-__version__ = '0.4.1'
+__version__ = '1.0.0'
 
 # modules that are callable as their main function (see _callable.py)
 _CALLABLE = {'describe', 'match', 'compare', 'realness', 'timeline', 'sheet', 'critique', 'profile'}

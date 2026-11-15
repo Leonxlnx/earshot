@@ -4,16 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earshot"
-version = "0.4.1"
-description = "Ears for coding agents: describe, match, search, compare, time-align and critique sound files an agent cannot hear."
+version = "1.0.0"
+description = "Ears for coding agents: make sound effects, notes and ambience in code from a request in words, and describe, match, search, measure and critique sound an agent cannot hear."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Leon Lin" }]
 keywords = ["audio", "sound", "ai-agents", "mcp", "claude-code", "clap", "audio-analysis", "sound-design",
-            "video", "procedural-audio", "cpu"]
+            "sound-effects", "procedural-audio", "synthesis", "game-audio", "ui-sounds", "audio-sprite", "video",
+            "cpu"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
@@ -24,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Multimedia :: Sound/Audio :: Analysis",
   "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
+  "Topic :: Games/Entertainment",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
