@@ -20,6 +20,7 @@ score from 0.03-0.26 to 0.20-0.66 with a floor at -66 dB; noise that only follow
 The 'dry' space, and amount -1, stay without it.
 """
 import numpy as np
+from scipy.fft import next_fast_len
 
 from ..forge import dsp, fx
 
@@ -48,8 +49,9 @@ def tone(y, r):
     live = np.nonzero(m >= pk * 10 ** (TONE_END_DB / 20))[0]
     end = min(len(y), int(live[-1]) + dsp.n_of(0.08))
     out = np.array(y[:end])
+    m = next_fast_len(end)                     # pink noise is shaped by an FFT: an awkward length costs 0.2 s
     for ch in range(2):
-        nz = dsp.butter(dsp.noise(end / dsp.SR, r, 'pink')[:end], 'high', 120.0)
+        nz = dsp.butter(dsp.noise(m / dsp.SR, r, 'pink')[:end], 'high', 120.0)
         out[:, ch] += dsp.fade(nz, 0.003, 0.08) * pk * 10 ** (TONE_DB / 20)
     k = min(end, dsp.n_of(0.08))
     out[end - k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
