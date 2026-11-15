@@ -21,8 +21,7 @@ FIGURES = {
     'coin/soft': dict(
         kind='chime', says=('one small bright bell note with a faint octave above', 'a single soft high ding'),
         uses=('coin', 'pickup', 'collect', 'point'),
-        fig=dict(steps=(0, 12), gap=0.012, root='E6', vel=0.5, vels=(1.0, 0.4), last=0.35, accent=0, spread=0.0,
-                 voice='glockenspiel')),
+        fig=dict(steps=(0, 12), gap=0.012, root='E6', vel=0.5, vels=(1.0, 0.4), last=0.35, accent=0, spread=0.0)),
     'pickup/blip': dict(
         kind='chime', says=('three very fast rising plucked notes', 'a tiny quick upward run of notes'),
         uses=('pickup', 'item', 'collect', 'grab', 'ammo'), prior=1.1,
@@ -37,7 +36,7 @@ FIGURES = {
         kind='figure', says=('a soft slow rising arpeggio of a major ninth chord', 'five gentle rising notes'),
         uses=('heal', 'restore', 'health', 'potion', 'revive', 'recover'),
         fig=dict(steps=(0, 4, 7, 11, 14), gap=0.09, root='G5', vel=0.42, vels=(0.8, 0.85, 0.9, 0.95, 1.0),
-                 last=1.0, room='hall', voice='vibraphone', spread=0.5)),
+                 last=1.0, room='hall', spread=0.5)),
     # ---- power
     'power_up/rise': dict(
         kind='figure', says=('a quick rising arpeggio over two octaves', 'seven fast notes climbing a major chord'),
@@ -79,7 +78,7 @@ FIGURES = {
         allows=('rising_glide',),            # five discrete notes a whole step apart read as one glide to the audit
         uses=('secret', 'discover', 'mystery', 'hidden', 'reveal', 'unlock'),
         fig=dict(steps=(0, 2, 4, 6, 8), gap=0.062, root='A5', vel=0.48, vels=(0.7, 0.78, 0.85, 0.92, 1.0), last=0.8,
-                 room='studio', voice='celesta', spread=0.5)),
+                 room='studio', spread=0.5)),
     # ---- menus
     'menu/move': dict(
         kind='tick', says=('one very short soft note, a small tonal blip', 'a tiny muted high note'),

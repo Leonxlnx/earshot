@@ -177,7 +177,7 @@ def test_a_minor_key_turns_the_major_third_minor():
 @pytest.mark.parametrize('want', [0.3, 1.0])
 def test_a_length_sets_how_long_a_figure_sounds(want):
     """the figure sounds for the length asked; what follows is the damped note's release and the room (< 0.35 s)"""
-    y, meta = registry.render('success/rise', dur=want)
+    y, meta = registry.render('success/rise', voice='vibraphone', dur=want)        # a voice that can ring that long
     assert 'dur' not in meta.get('ignored', [])
     e = np.abs(y).max(1)
     end = np.nonzero(e >= e.max() * 10 ** (-30 / 20))[0][-1] / SR       # where it has fallen 30 dB

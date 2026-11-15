@@ -1,5 +1,8 @@
 """Tonal designs as figures: a few notes in time, played by whichever voice the request or the theme names.
 
+The default voice is a soft rounded pluck: clean and quiet, the register of product sound. A bell, a glockenspiel
+or a chime plays only when the request or the theme asks for one.
+
 A confirmation, a notification, a toggle or a logo is a gesture (which way it moves, by which interval, how fast,
 where the weight falls); the instrument is a second, independent choice. Keeping the two apart is what lets one
 catalogue serve a glassy finance app, a wooden meditation timer and an 8-bit game, and what makes a themed set sound
@@ -20,7 +23,7 @@ import numpy as np
 from ..forge import dsp
 from ..synth import phrase, space, voices
 
-DEFAULT_VOICE = 'vibraphone'
+DEFAULT_VOICE = 'soft_pluck'
 SUSTAIN_FLOOR = 0.11              # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
 CHORD_GAP = 0.03                  # s: notes this close are one chord (or a grace note): the earlier one rings on
 MINOR = ('minor', 'minor_pentatonic')

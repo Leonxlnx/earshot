@@ -75,7 +75,7 @@ def test_make_nothing_answers(tmp_path):
 
 
 def test_explicit_arguments_override_the_words(tmp_path):
-    words = 'a success chime in D, 2 seconds'
+    words = 'a success chime on a vibraphone in D, 2 seconds'       # a voice that can ring for two seconds
     base = make(words, str(tmp_path / 'a.wav'))['takes'][0]
     assert base['pitch'].startswith('D') and base['dur_s'] >= 2.0
     res = make(words, str(tmp_path / 'b.wav'), sound=base['id'], pitch='A5', voice='kalimba', dur=0.5)
