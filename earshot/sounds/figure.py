@@ -55,7 +55,7 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     level = float(np.clip(vel * c.db('energy', 7.0), 0.05, 1.0))
     y = phrase.play(notes, v, r, vel=level, vary=c.vary, accent=accent if k > 1 else None,
                     spread=spread * c.lerp('width', 0.0, 2.2, 1.0), **c.axes('bright', 'hard', 'size'), ring=c.ring)
-    return space.room(y, c.room(room), amount=c.space)
+    return space.room(y, c.room(room), amount=c.space, r=r)
 
 
 def register(design, table, domains, axes=('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')):

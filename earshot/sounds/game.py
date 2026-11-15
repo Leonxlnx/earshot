@@ -82,7 +82,7 @@ FIGURES = {
     'menu/move': dict(
         kind='tick', says=('one very short soft note, a small tonal blip', 'a tiny muted high note'),
         uses=('menu', 'cursor', 'menu move', 'option', 'hover'),
-        fig=dict(steps=(0,), root='A5', vel=0.32, last=0.06, room='booth')),
+        fig=dict(steps=(0,), root='A5', vel=0.32, last=0.06, room='booth', voice='marimba', avoid=('metal', 'glass', 'synth', 'electric'))),
     'menu/select': dict(
         kind='chime', says=('two very quick notes leaping up a fifth', 'a short bright upward two-note blip'),
         uses=('menu select', 'confirm', 'start', 'accept', 'ok'),

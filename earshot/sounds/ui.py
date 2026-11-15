@@ -92,13 +92,14 @@ FIGURES = {
     'back/step': dict(kind='chime', says=('two tiny notes a whole step down, a small backward tick', 'a minimal falling two-note blip'),
                       uses=('undo', 'back', 'previous', 'return'),
                       fig=dict(steps=(2, 0), gap=0.055, root='A5', vel=0.36, vels=(1.0, 0.85), gate=0.05, last=0.15, accent=0)),
-    # ---- the smallest ones
+    # ---- the smallest ones: one short note of a sustaining metal bar or a synthesizer is a bare tone burst, heard as
+    # an electronic beep, so these keep to struck wood unless the theme's voice is itself short (wood, tines, strings)
     'tap/tone': dict(kind='tap', says=('one very short muted note, a soft tonal tap', 'a tiny damped blip of a note'),
                      uses=('tap', 'button press', 'click', 'select', 'key'), prior=1.1,
-                     fig=dict(steps=(0,), root='C6', vel=0.36, last=0.07, room='booth')),
+                     fig=dict(steps=(0,), root='C6', vel=0.36, last=0.07, room='booth', voice='marimba', avoid=('metal', 'glass', 'synth', 'electric'))),
     'hover/tone': dict(kind='tick', says=('one extremely short quiet high note, a faint tonal tick', 'a tiny soft high blip'),
                        uses=('hover', 'focus', 'highlight', 'scroll tick'),
-                       fig=dict(steps=(0,), root='G6', vel=0.2, last=0.04, room='booth')),
+                       fig=dict(steps=(0,), root='G6', vel=0.2, last=0.04, room='booth', voice='marimba', avoid=('metal', 'glass', 'synth', 'electric'))),
 }
 figure.register(design, FIGURES, domains=('ui', 'game'))
 
@@ -115,7 +116,7 @@ def _tick(voice, note, damp):
         dur = None if damp is None and c.ring >= 0 else (damp or 0.25) * c.lerp('ring', 0.4, 3.0, 1.0, log=True)
         y = voices.play(voice, c.hz(note), vel=0.4 * c.db('energy', 7.0), dur=dur, r=r, vary=c.vary,
                         **c.axes('bright', 'hard', 'size', 'width'))
-        return space.room(y, 'booth', amount=c.space)
+        return space.room(y, 'booth', amount=c.space, r=r)
     return fn
 
 

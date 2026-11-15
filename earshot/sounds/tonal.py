@@ -19,7 +19,7 @@ def _note(voice, room):
         dur = c.seconds()                    # the design's own length caps a bell's or a bowl's half-minute ring
         y = voices.play(voice, c.hz(), vel=min(1.0, 0.65 * c.db('energy', 7.0)), dur=dur, r=r, vary=c.vary,
                         **c.axes('bright', 'hard', 'ring', 'size', 'width', 'motion'))
-        return space.room(y, c.room(room), amount=c.space)
+        return space.room(y, c.room(room), amount=c.space, r=r)
     return fn
 
 

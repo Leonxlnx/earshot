@@ -47,7 +47,8 @@ def _render(name, pitched):
 
 for _name, (_id, _kind, _uses, _allows) in SOUNDS.items():
     _s = chip.SOUNDS[_name]
-    # a low or thin pulse reads as isolated steps to the click detector: that is the timbre, not a fault
+    # a low or thin pulse reads as isolated steps to the click detector and its harmonics as a comb to the ring
+    # detector: that is the timbre, not a fault
     design(_id, kind=_kind, says=tuple(_s['says'][:3]), uses=_uses, tags=('retro', 'chip', '8-bit', 'arcade'),
            domains=('game',), dur=_s['dur_s'], pitch='C6' if _s['pitched'] else None, material='retro',
-           axes=('bright', 'energy'), loop=bool(_s.get('loop')), allows=_allows + ('clicks',))(_render(_name, _s['pitched']))
+           axes=('bright', 'energy'), loop=bool(_s.get('loop')), allows=_allows + ('clicks', 'ring'))(_render(_name, _s['pitched']))
