@@ -8,7 +8,8 @@ Make a set of sounds with earshot: $ARGUMENTS
 1. Read the words: a ready-made set (`ui` 16 interface sounds, `game` 22, `arcade` 16 chip sounds, `film` 15
    motion-design sounds), a theme (soft, glass, wood, felt, tine, metal, electric, digital, retro), and any sounds of
    their own (each a `name` for the file and a `want` in words). Pick the folder this project keeps sounds in, else
-   `sounds/`; format `ogg` for a web project, `wav` otherwise, unless the words name one.
+   `sounds/`; format `webm,mp3` for a web project (every browser plays one of the two), `wav` otherwise, unless the
+   words name one.
 2. Call the `make_set` tool of the earshot MCP server once, with `out` = the absolute folder, `set`, `theme`,
    `format` and, for sounds of their own, `sounds: [{"name": "tap", "want": "a soft tap"}, ...]`. If no earshot MCP
    server is connected, run `earshot make --set NAME --theme THEME -o FOLDER --format FMT`, or write the list as a

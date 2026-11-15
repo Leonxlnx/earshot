@@ -14,13 +14,13 @@ $ earshot make "a soft success chime for a finance app" -o success.ogg
 success.ogg: success/rise (0.88 s, G5, vibraphone, -14 LUFS, clean) [success, bell]
 also: success/done, success/fifth, success/triad
 
-$ earshot make --set ui --theme glass -o public/sounds --format ogg --sprite sprite.webm
-16 sounds in public/sounds (ogg), manifest.json
-tap.ogg: tap/tone (0.47 s, D6, marimba, -26 LUFS, clean) [named]
-toggle_on.ogg: toggle/up (0.52 s, D6, glockenspiel, -19 LUFS, clean) [named]
+$ earshot make --set ui --theme glass -o public/sounds --format webm,mp3 --sprite sprite
+16 sounds in public/sounds (webm, mp3), manifest.json
+tap.{webm,mp3}: tap/tone (0.47 s, D6, marimba, -26 LUFS, clean) [named]
+toggle_on.{webm,mp3}: toggle/up (0.51 s, D6, glockenspiel, -19 LUFS, clean) [named]
 ...
-error.ogg: error/fall (0.69 s, D5, glockenspiel, -19 LUFS, clean) [named]
-16 sounds in public/sounds\sprite.webm (14.5 s, 152 kB), map sprite.json
+error.{webm,mp3}: error/fall (0.69 s, D5, glockenspiel, -19 LUFS, clean) [named]
+16 sounds in public/sounds\sprite.webm + sprite.mp3 (14.4 s, 150 kB, 226 kB), map sprite.json
 
 $ earshot make "rain on a window" -o rain.ogg --dur 20
 rain.ogg: rain/window (20.00 s, -22 LUFS, seamless loop, clean) [window, rain]
@@ -31,14 +31,16 @@ $ earshot describe enter.ogg
   (z +5.4), a soft key release click (z +3.6) ... [clear reading]. peak -0.1 dBFS, brightness 1.5 kHz ...
 ```
 
-`make` loads no model and takes about a second. Add `--listen` and earshot's own ears choose among the three best
-designs and say what the result is heard as (the models load once, 20-40 s).
+`make` loads no model and takes about a second. Add `--listen` and the choice also weighs how each design sounds
+(CLAP against an atlas of the whole catalogue), and the answer says what the result is heard as (the model loads
+once, 20-40 s).
 
 ## Make sounds
 
 `earshot make` reads a request, ranks a catalogue of 457 sound designs, renders the best one in code, audits it
-without models (clicks, cut tails, clipping, DC) and writes the file. One call answers in three lines: what was
-chosen and why, what else would fit (`also`), and which words were not understood or not used. The full reference:
+without models (clicks, cut tails, clipping, DC) and writes the file. One call answers in a few lines: what was
+chosen and why, what else would fit (`also`, with a note when the pick is a guess), what the request named that the
+sound does not cover, and which words were not understood or not used. The full reference:
 [docs/MAKE.md](docs/MAKE.md).
 
 ### Asking in words
@@ -49,8 +51,8 @@ chosen and why, what else would fit (`also`), and which words were not understoo
 | feelings | offsets on eight shared axes: bright, hard, ring, size, space, width, energy, motion | `"a much bigger, darker whoosh"`: size +0.84, bright -0.6 |
 | negation, comparison | "not harsh", "not too loud", "the opposite of a success sound", "like a ..." | `"the opposite of a success sound"` -> `error/fall` |
 | voice | the instrument that plays a tonal sound, or a single note of it | `"a success chime on a kalimba"`, `"a kalimba note in E"` |
-| material | steers the ranking ("wooden", "glass", "8-bit"); "8-bit", "retro", "chiptune" allow only chip sound | `"8-bit coin pickup"` -> `coin/chip` |
-| numbers | length, pitch, key, how many takes, how many notes | `"400 ms"`, `"C6"`, `"in D"`, `"three variations"`, `"two-note"` |
+| material | picks the voice of a tonal sound (wooden: a marimba) and steers the ranking; "8-bit", "retro", "chiptune" allow only chip sound | `"8-bit coin pickup"` -> `coin/chip` |
+| numbers | length, pitch, key (a minor key makes a figure minor), how many takes, how many notes | `"400 ms"`, `"C6"`, `"in D minor"`, `"three variations"`, `"two-note"` |
 | loop or not | ambience loops by default; "no loop" or `--no-loop` renders it once with fades | `"rain on a tent, no loop"` |
 
 Options win over the words: `--pitch`, `--dur`, `--voice` and `--bright` ... `--motion` (each -1 .. 1) are laid over
@@ -59,19 +61,25 @@ what the words say, and `--sound ID` takes a design by name. Re-ask with adjecti
 
 ```
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
-step_1.ogg: step/gravel (0.30 s, -21 LUFS, clean) [gravel, footstep]
+step_1.ogg: step/gravel (0.31 s, -21 LUFS, clean) [gravel, footstep]
 step_2.ogg: step/gravel (0.32 s, -18 LUFS, clean)
 step_3.ogg: step/gravel (0.30 s, -19 LUFS, clean)
 also: step/grass, step/metal, step/snow
 
 $ earshot make "a soft wooden success chime for a finance app, 400 ms, in D" -o wood.wav
-wood.wav: success/rise (0.91 s, D5, vibraphone, -14 LUFS, clean) [success, bell]
+wood.wav: success/rise (0.49 s, D5, marimba, -14 LUFS, clean) [success, bell]
 also: success/done, success/fifth, success/triad
-not used by this sound: dur, material
+
+$ earshot make "a water drop and a coin" -o dropcoin.wav
+dropcoin.wav: coin/bright (0.69 s, B5, glockenspiel, -14 LUFS, clean) [coin, pickup]
+not in this sound: water drop
+also: water/drop, water/pour, coins/handful (the pick is a guess: another kind of sound fits almost as well; name the one you want with sound=<id>)
 ```
 
-The last line is the honest part of the answer: a figure takes its length from its notes, and no design reads a
-material in 1.0, so for a wooden chime ask with `--theme wood` or `--voice marimba`.
+The last lines are the honest part of the answer: one call makes one sound, so the water drop is a second call
+(`--sound water/drop`). A control the design cannot keep (a length on a struck sound) comes back as `not used by this
+sound`. Name the sound or the job and the first pick is right for nearly every request; describe a mood or
+paraphrase and about one request in four needs that second call ([How good is it?](#how-good-is-it)).
 
 ### Themes and sets
 
@@ -87,14 +95,18 @@ quieter) with a `manifest.json`: `ui` (16 interface sounds), `game` (22: menus, 
 
 ### Sprites, loops, formats
 
-- **Sprites**: `--sprite sprite.webm` on a set, or `earshot pack FOLDER -o sprite.ogg`, lays every sound in one file
+- **Sprites**: `--sprite sprite` on a set, or `earshot pack FOLDER -o sprite.webm`, lays every sound in one file
   with a map in the format howler.js reads (`{"src": [...], "sprite": {name: [offset_ms, duration_ms, loop]}}`). A
-  page loads one file instead of twenty.
-- **Loops**: 26 of the 28 ambience scenes (not the thunder), a clock, a heartbeat, a laser beam, an earthquake rumble and a chip engine are
-  seamless loops: rendered around a circle, so the file repeats with no seam and no cut event. `--dur` sets the
-  loop's length; `--no-loop` renders the scene once with a fade in and out, for a film.
-- **Formats**: the extension picks it: wav and flac (24-bit; 16-bit in sets) directly, ogg, mp3, m4a and webm
-  through ffmpeg. 48 kHz stereo, or `--mono`.
+  page loads one file instead of twenty. `pack` on a set's folder packs exactly the manifest's sounds.
+- **Loops**: 26 of the 28 ambience scenes (not the thunder), a clock, a heartbeat, a laser beam, an earthquake
+  rumble and a chip engine are seamless loops: rendered around a circle, so the file repeats with no seam and no cut
+  event. `--dur` sets the loop's length; `--no-loop` (or "no loop") renders the scene once with a fade in and out,
+  for a film. Write loops as ogg, webm, wav or flac: an mp3 or m4a loop has a gap at its seam in players that
+  ignore the encoder's padding, and `make` warns.
+- **Formats**: the extension picks it: wav and flac (24-bit; 16-bit in sets) directly; ogg (Vorbis), webm (Opus),
+  m4a (AAC) and mp3 through ffmpeg. A set takes several at once (`--format webm,mp3`), and its sprite map lists them
+  in order. For the web write `webm,mp3` (or `webm,m4a`): Ogg Vorbis does not play in Safari before 18.4. 48 kHz
+  stereo, or `--mono`.
 - **Loudness**: a single sound peaks at -1 dBFS true peak but no louder than -14 LUFS momentary max (pads and
   textures -18, beds -22); `--lufs` sets it exactly. In a set the loudest sound sits at -16 LUFS and each kind under
   it (a tap 10 LU under, a bed 14).
@@ -461,9 +473,11 @@ Or in any client's `.mcp.json`:
   "env": {"EARSHOT_THREADS": "3"}}}}
 ```
 
-Tools: `make`, `make_set` and `sounds` (no models; their answer is the summary text alone unless `full=true`);
-`measure`, `describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `sheet`, `critique`,
-`doctor`, `llm_critique`; and the bank, `sfx_list`, `sfx_render`, `kit_render`. Models load on the first listening
+Tools: `make` (want, out, sound, n, theme, pitch, dur, voice, material, loop, seed, listen), `make_set` (out, set,
+sounds, theme, format: one or several such as `"webm,mp3"`, sprite) and `sounds` (no models; their answer is the
+summary text alone unless `full=true`; once a listening tool or `earshot mcp --warm` has loaded CLAP in the server,
+`make` also ranks by how the designs sound); `measure`, `describe`, `match`, `rank`, `find`, `compare`, `ab`,
+`realness`, `timeline`, `sheet`, `critique`, `doctor`, `llm_critique`; and the bank, `sfx_list`, `sfx_render`, `kit_render`. Models load on the first listening
 call and stay warm. On a slow machine start Claude Code with `MCP_TIMEOUT=60000`. The optional `llm_critique` tool
 reads `GEMINI_API_KEY` from the environment; never write a literal key into a file.
 
@@ -486,7 +500,7 @@ server above (`earshot mcp` with `EARSHOT_THREADS=3`; skip `claude mcp add` then
 ```python
 from earshot.make import make, make_set, sounds
 make('a deep impact for a logo reveal with a long tail', 'hit.wav')   # the same result as the CLI, as a dict
-make_set('ui', out='public/sounds', theme='glass', fmt='ogg', sprite='sprite.webm')   # + sprite.json
+make_set('ui', out='public/sounds', theme='glass', fmt='webm,mp3', sprite='sprite')   # + sprite.json
 from earshot import sounds as catalogue
 y, meta = catalogue.render('coin/bright', seed=2, pitch='B5', bright=0.3)   # stereo float64 at 48 kHz, audited
 from earshot.pack import pack
@@ -521,6 +535,10 @@ What earshot cannot do or judge is in [docs/LIMITS.md](docs/LIMITS.md).
   >= 2), 187 strongly (z >= 3), and 233 win the forced choice. The 0.4 bank's glockenspiel and marimba notes scored z
   2.2 and 2.6 on the same test; the 1.0 notes 4.6 and 5.1. This is a measurement by models, not a listening test by
   people: nobody has run one on the 1.0 sounds yet.
+- **Understanding requests**: on 220 held-out requests written by someone who never saw the catalogue (half long
+  descriptions that never name the sound, half casual), the first pick is right for 71.4 % and one of the top three
+  for 80.5 % (74.1 % / 82.3 % with `--listen`); on the 660 development requests 92.5-97.3 %. Terse requests that
+  name the job or the sound ("coin pickup", "error beep") were right for all 110 intents of the development set.
 - **Pianos and mallets calibrated** against freely usable recordings (University of Iowa Musical Instrument Samples;
   VSCO-2 Community Edition, CC0), note by note; no recording and no per-recording data is in the repository. Before,
   both pianos were heard as "an electric piano" (z 2.5 and 2.8 for their own description); after, z 3.7-4.4, and they
@@ -539,8 +557,9 @@ What earshot cannot do or judge is in [docs/LIMITS.md](docs/LIMITS.md).
 ## Limits
 
 `make` draws on a fixed catalogue: it chooses and shapes designs, it does not compose music, speak, or invent a sound
-no design covers. Its weakest sounds are some foley (an opening door, a struck match, tearing paper) and steady noise
-beds, which earshot's models hear as close to noise. earshot hears through two open models and a set of measurements.
+no design covers. A request that describes a mood or paraphrases a sound is understood less well than one that names
+it. Its weakest sounds are some foley (an opening door, a struck match, tearing paper) and steady noise beds, which
+earshot's models hear as close to noise. earshot hears through two open models and a set of measurements.
 Trustworthy: loudness, timing and sync to picture, "is this the kind of sound I asked for" on single exposed sounds,
 picking among candidates, obvious code-synthesized sources. Hints only: tags of events inside a busy mix, music genre
 and mood. It cannot judge taste or emotion, provenance or licences, speech content, or anything above 14 kHz from the
@@ -548,7 +567,8 @@ models. Details in [docs/LIMITS.md](docs/LIMITS.md).
 
 ## History
 
-- **1.0** adds making: `make`, `make --set`, `sounds`, `pack` and 248 new designs on five synthesis engines.
+- **1.0** adds making: `make`, `make --set`, `sounds`, `pack`, 248 new designs on five synthesis engines, and the
+  Claude Code plugin.
 - **0.4** added the sound of music-led launch films to the bank (51 sounds, the `launch` kit preset) and re-made `fit`
   against professional sound effects. [The 0.4 launch film](https://github.com/Leonxlnx/earshot/releases/tag/v0.4.0)
   (35 s) uses bank takes placed with the launch kit; [the earshot site](https://leonxlnx.github.io/earshot-site/)
@@ -573,13 +593,16 @@ earshot/            the package: CLI, Python API, MCP server, CPU model wrappers
     fit/            recording -> code: modal / sines / spectral fitters, quality metrics, recipe codegen
     bank/, kits/    the sound bank (render blocks + fingerprints, no audio) and the kit presets: earshot sfx / kit
   gallery.py        the static listening page
-  data/             vocabulary + calibration stats, realness model weights, launch profile (numbers only, no media)
+  data/             vocabulary + calibration stats, realness model weights, launch profile, the sound atlas
+                    (sounds_atlas.npz: CLAP embeddings of every design; numbers only, no media)
 skills/earshot/     agent skill: how to make sounds and listen with earshot
 skills/real-sound/  agent skill: real-recordings soundtracks (scripts, templates, prompts, references)
 docs/               MAKE, VALIDATION, LIMITS, FORGE_V2, FIT, SFX, the motion-SFX study, launch-video playbook,
                     design notes
+.claude-plugin/     the Claude Code plugin and its marketplace; commands/: /earshot:make, /earshot:make-set
 eval/               evaluation scripts and results per area (see eval/README.md)
-tests/              pytest (fast by default; --slow loads the models)
+tests/              pytest: fast by default, no models (the catalogue contract, rooms and finishing, voices, make /
+                    sets / pack, the atlas, the listening tools); --slow loads the models
 ```
 
 No audio or video is stored in this repo. The evaluation data (licensed recordings and third-party films) and the

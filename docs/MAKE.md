@@ -33,14 +33,30 @@ also: coin/soft, coin/drop, coin/flip
 
 The answer is the whole result. Each file gets one line: the design chosen, its length, the note and voice it
 played, its momentary-max loudness, `seamless loop` for a loop, and `clean` or the audit's warnings; the first line
-ends with the words that decided (`[success, bell]`, or `[named]` for `--sound`). Then up to three more lines:
+ends with the words that decided, as you wrote them (`[success, bell]`, or `[named]` for `--sound`). Then:
 
-| line | meaning |
-|---|---|
-| `also: ...` | the next designs in the ranking; ask again with `--sound ID` to take one |
-| `not used by this sound: ...` | controls the request set that this design does not read (bank sounds read no axes) |
-| `not understood: ...` | words that matched nothing in the catalogue or the lexicon |
-| `heard as: '...' (z +x.x, verdict)` | with `--listen` only (below) |
+| line | meaning | what to do |
+|---|---|---|
+| `not in this sound: ...` | sounds or jobs the request named that the chosen design does not cover | ask for them in a second call, or pick from `also` |
+| `also: ...` | up to three alternatives, always: the next ranked designs, then the nearest of the same family, kind or domain | take one with `--sound ID` if the pick does not fit the job |
+| `also: ... (the pick is a guess: ...)` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high; the alternatives then come from other families first | read the alternatives and name one with `--sound ID`, or re-ask naming the sound or the job |
+| `not used by this sound: ...` | controls the request set that this design does not read, or a length it could not keep (a struck sound rings as it rings; a marimba cannot ring 2 s) | leave it, or ask for a design that has that control |
+| `not understood: ...` | words that matched nothing in the catalogue or the lexicon | rephrase if they mattered |
+| `x.mp3: a loop in mp3 has a gap at its seam ...` | a loop written as mp3 or m4a | write loops as ogg, webm, wav or flac |
+| `heard as: '...' (z +x.x, verdict)` | with `--listen` only (below) | |
+| `not listened: ...` | `--listen` was asked and the model or the atlas is missing | `earshot doctor` |
+
+```
+$ earshot make "a water drop and a coin" -o dropcoin.wav
+dropcoin.wav: coin/bright (0.69 s, B5, glockenspiel, -14 LUFS, clean) [coin, pickup]
+not in this sound: water drop
+also: water/drop, water/pour, coins/handful (the pick is a guess: another kind of sound fits almost as well; name the one you want with sound=<id>)
+
+$ earshot make "a marimba success chime, 2 seconds" -o mar2.wav
+mar2.wav: success/rise (0.55 s, G5, marimba, -14 LUFS, clean) [success, bell]
+also: success/triad, success/done, success/fifth
+not used by this sound: dur
+```
 
 | option | what it does |
 |---|---|
@@ -49,14 +65,16 @@ ends with the words that decided (`[success, bell]`, or `[named]` for `--sound`)
 | `--seed S` | another take of the same sound (default 0); the same arguments always give the same samples |
 | `--sound ID` | a design id from `earshot sounds` instead of the ranking; the words still set feel and numbers |
 | `--theme NAME` | a theme preset ([Themes](#themes)): voice, key, room and axis offsets shared by a product's sounds |
-| `--pitch`, `--dur` | a note (`C5`) or Hz; seconds. Override the words |
-| `--voice`, `--material` | the instrument or patch of a tonal sound ([Voices](#voices)); a material (ranking only, below) |
+| `--pitch` | a note (`C5`) or Hz. Overrides the words |
+| `--dur` | seconds: how long a figure of notes sounds, the hold of a pad, the length of a loop (each has a shortest one) or a whoosh; a single struck sound (a tap, a hit) rings as it rings and says `not used by this sound: dur` |
+| `--voice` | the instrument or patch of a tonal sound ([Voices](#voices)); a voice asked for by name is always played |
+| `--material` | what a tap, click or knock is made of; on a tonal sound without a voice it picks the voice made of it (wood: marimba, glass: glockenspiel, metal: vibraphone, soft: felt_piano, digital: glass_pluck, retro: square_lead) |
 | `--bright` ... `--motion` | the axes, -1 .. 1, added to what the words say ([The eight axes](#the-eight-axes)) |
 | `--lufs L` | a momentary-max loudness instead of the default level |
 | `--mono` | sum to one channel |
 | `--no-loop` | an ambience once, with a fade in and out, instead of a seamless loop |
-| `--listen` | render the best three designs, keep the one earshot's models hear closest to the request (below) |
-| `--json` | the full result: files, chosen id, `why`, `also`, `unknown`, every take's measurements and audit |
+| `--listen` | also rank by how each design sounds (the sound atlas, below) and say what the result is heard as |
+| `--json` | the full result: files, chosen id, `why`, `also`, `not_in_sound`, `unknown`, every take's measurements and audit |
 
 **What happens.** `earshot.brief` reads the words into a brief (the job or sound, the feel as axis offsets, a
 material or voice, numbers, the key); `brief.rank` scores every design; the best is rendered with those controls
@@ -73,50 +91,76 @@ earshot make: error: ValueError: no sound in the catalogue answers 'a frobnicati
 there is; name the sound itself (a chime, a click, a whoosh, rain) or the job it plays (success, coin, logo)
 ```
 
-**`--listen`** adds earshot's ears: the best three designs are rendered and matched (`earshot match`) against the
-request and their own descriptions; the one with the highest z is written, and the result gains `heard as: '<the
-description that fit best>' (z +x.x, verdict)`. It loads the two listening models (20-40 s once per process; in the
-MCP server they stay loaded). With `--sound` there is nothing to choose, and it only reports the reading.
+**`--listen` and the sound atlas.** `earshot/data/sounds_atlas.npz` (numbers only) holds a CLAP embedding of every
+design's default render and of its own descriptions. With `--listen`, the request's CLAP text embedding is scored
+against it (a z per design over the whole atlas) and blended into the ranking (`earshot.brief.blend`): a named job
+keeps its word-based winner, a request that only describes a sound is decided by how the designs sound, and the hard
+filters (chip sound, loop, a job ruled out) still hold. The written sound is then matched (`earshot match`) against
+the request and its own descriptions, and the result gains `heard as: '<the description that fit best>' (z +x.x,
+verdict)`. It loads CLAP once (20-40 s); the MCP server's `make` blends the atlas in without being asked once the
+model is loaded in that process. `make --set` and `make_set` rank by words only. The atlas must be rebuilt after
+designs are added or re-voiced: `python -m earshot.sounds.atlas build --work DIR`, repeated until it says it is done
+(`python -m earshot.sounds.atlas status` checks it).
 
 **Level.** A single sound is set to a true peak of -1 dBFS, but no louder than -14 LUFS momentary max (pads and
 textures -18, beds -22): a dense sound at full peak is far louder than a tap at full peak. `--lufs` sets the
-momentary-max loudness exactly, with the peaks limited to -1 dBFS. wav and flac are written directly (24-bit); ogg
-(Vorbis 96k), mp3 (128k), m4a (AAC 96k) and webm (Opus 64k) go through ffmpeg, which must be on PATH for them. Files
-are 48 kHz stereo unless `--mono`; every file starts when its sound does (within 2 ms) and ends faded, never cut.
+momentary-max loudness exactly, with the peaks limited to -1 dBFS. Files are 48 kHz stereo unless `--mono`; every
+file starts when its sound does (within 2 ms) and ends faded, never cut.
+
+**Formats.** wav and flac are written directly (24-bit; 16-bit wav in a set) and are lossless; ogg (Vorbis, 96k),
+mp3 (128k), m4a (AAC, 96k) and webm (Opus, 64k) go through ffmpeg, which must be on PATH for them. For the web: Ogg
+Vorbis does not play in Safari before 18.4, so write `webm,mp3` (or `webm,m4a`) and let the browser take the first
+it can play. Loops: mp3 and m4a encoders pad the start and end and record it only in a note some players ignore, so
+a loop written as mp3 or m4a has a gap at its seam there (`make` warns); write loops as ogg, webm, wav or flac.
+
+```
+$ earshot make "campfire" -o fire.mp3 --dur 16
+fire.mp3: fire/camp (16.00 s, -22 LUFS, seamless loop, clean) [fire]
+also: fire/large, fire/small, match/strike
+fire.mp3: a loop in mp3 has a gap at its seam in players that ignore the encoder's padding note; for loops use ogg, webm, wav or flac
+```
 
 **Speed** (one thread, no models): a single `make` takes about 1-2 s including Python start-up; ambience loops of
 12-20 s take 3-10 s to render.
 
 In Python: `from earshot.make import make; make('a deep impact for a logo reveal', 'hit.wav', size=0.3)` returns the
-same result as a dict (`summary`, `sound`, `files`, `why`, `also`, `unknown`, `takes`, and `heard` with
-`listen=True`). `make()` also takes `sr` and `bits` for the written file.
+same result as a dict (`summary`, `sound`, `files`, `why`, `also`, `not_in_sound`, `unknown`, `takes`, and `heard`
+with `listen=True`). `make()` also takes `sr` and `bits` for the written file.
 
 ## A whole set
 
 ```
-earshot make --set ui|game|arcade|film [-o FOLDER] [--theme NAME] [--format ogg] [--sprite sprite.webm] [--mono]
+earshot make --set ui|game|arcade|film [-o FOLDER] [--theme NAME] [--format webm,mp3] [--sprite sprite] [--mono]
              [--lufs L] [--seed S]
 earshot make --spec sounds.json [-o FOLDER] [--theme NAME] [--format ...] [--sprite ...]
 ```
 
 ```
-$ earshot make --set ui --theme glass -o public/sounds --format ogg --sprite sprite.webm
-16 sounds in public/sounds (ogg), manifest.json
-tap.ogg: tap/tone (0.47 s, D6, marimba, -26 LUFS, clean) [named]
-hover.ogg: hover/tone (0.43 s, D6, marimba, -28 LUFS, clean) [named]
-toggle_on.ogg: toggle/up (0.52 s, D6, glockenspiel, -19 LUFS, clean) [named]
+$ earshot make --set ui --theme glass -o public/sounds --format webm,mp3 --sprite sprite
+16 sounds in public/sounds (webm, mp3), manifest.json
+tap.{webm,mp3}: tap/tone (0.47 s, D6, marimba, -26 LUFS, clean) [named]
+hover.{webm,mp3}: hover/tone (0.42 s, D6, marimba, -28 LUFS, clean) [named]
+toggle_on.{webm,mp3}: toggle/up (0.51 s, D6, glockenspiel, -19 LUFS, clean) [named]
 ...
-success.ogg: success/rise (0.82 s, D5, glockenspiel, -19 LUFS, clean) [named]
-complete.ogg: success/triad (1.07 s, D5, glockenspiel, -18 LUFS, clean) [named]
-warning.ogg: warning/pulse (0.72 s, D5, glockenspiel, -19 LUFS, clean) [named]
-error.ogg: error/fall (0.69 s, D5, glockenspiel, -19 LUFS, clean) [named]
-delete.ogg: delete/drop (0.54 s, D5, glockenspiel, -19 LUFS, clean) [named]
-16 sounds in public/sounds\sprite.webm (14.5 s, 152 kB), map sprite.json
+success.{webm,mp3}: success/rise (0.83 s, D5, glockenspiel, -19 LUFS, clean) [named]
+complete.{webm,mp3}: success/triad (1.08 s, D5, glockenspiel, -18 LUFS, clean) [named]
+warning.{webm,mp3}: warning/pulse (0.72 s, D5, glockenspiel, -19 LUFS, clean) [named]
+error.{webm,mp3}: error/fall (0.69 s, D5, glockenspiel, -19 LUFS, clean) [named]
+delete.{webm,mp3}: delete/drop (0.54 s, D5, glockenspiel, -19 LUFS, clean) [named]
+16 sounds in public/sounds\sprite.webm + sprite.mp3 (14.4 s, 150 kB, 226 kB), map sprite.json
 ```
 
 Every sound of a set shares the theme: one voice, one key, one room. The tap and hover above play marimba, not the
-theme's glockenspiel: one short note of a sustaining metal bar is heard as an electronic beep, so the smallest
-figures keep to struck wood unless the theme's voice is itself short. The set took about 25-35 s on one thread.
+theme's glockenspiel: one short note of a sustaining metal, glass or electric voice is heard as an electronic beep,
+so the tap, the hover and the menu move use struck wood when the default or theme voice is one of those (a voice
+asked for by name is always played). The smallest figures (tap, hover, toggles, next / back steps, menu move) also
+fade out within a fixed time (0.14-0.32 s before the room, scaled by `ring`) whatever the voice, so a hover on a
+piano does not ring for a second. The set above took about 20 s on one thread.
+
+**Several formats.** `--format webm,mp3` (a list or a comma string in a spec, in the MCP tool) writes every sound
+once per format; `manifest.json` names each sound's `file` (the first format) and `files` (all), and the set's
+`formats`. A sprite named without an extension, or with one of the set's formats, is written in each format, and
+its map's `src` lists them in that order: a browser or howler.js plays the first it can.
 
 **The ready-made sets** (`earshot.sounds.sets`; file name -> design):
 
@@ -140,13 +184,15 @@ figures keep to struck wood unless the theme's voice is itself short. The set to
 | tick, texture | -12 | bed | -14 |
 
 A set's wav files are 16-bit; `--mono` leaves loops stereo. `manifest.json` in the folder lists every file with its
-design, length, loudness, loop flag, pitch and whether its audit was clean.
+design, length, loudness, loop flag, pitch and whether its audit was clean. A sound asked for in words gets its
+`not in this sound`, guess and `also` lines only where the pick is in doubt, so a set's answer stays short; the
+result (`--json`) carries `also` and `not_in_sound` for every such sound.
 
 **The spec** (a JSON file for `--spec`, or a dict for `make_set`; the MCP tool `make_set` takes `set`, `sounds`,
 `theme`, `format` and `sprite`):
 
 ```json
-{"set": "ui", "theme": {"base": "wood", "key": "D"}, "format": "ogg", "sprite": "sprite.webm",
+{"set": "ui", "theme": {"base": "wood", "key": "D"}, "format": ["webm", "mp3"], "sprite": "sprite",
  "sounds": [{"name": "success", "want": "a happy two-note success chime", "dur": 0.5, "axes": {"bright": 0.2}},
             {"name": "coin", "want": "coin pickup", "n": 2},
             {"name": "rain", "sound": "rain/window", "dur": 12}]}
@@ -156,20 +202,23 @@ design, length, loudness, loop flag, pitch and whether its audit was clean.
 |---|---|
 | `set` | start from a ready-made set; `sounds` then adds to it or replaces a sound of the same name |
 | `theme` | a preset name or a theme dict (`base` + changes) |
-| `format`, `out`, `mono`, `lufs`, `sprite` | file format, folder, mono, the loudest level, a sprite file name |
+| `format`, `out`, `mono`, `lufs`, `sprite` | file format(s) (a string, "webm,mp3" or a list), folder, mono, the loudest level, a sprite file name |
 | `sounds[]` | each: `name` (the file name, required, unique) and `want` (words) and / or `sound` (an id), plus `pitch`, `dur`, `voice`, `material`, `seed`, `n`, `axes` ({axis: -1 .. 1}), `lufs` (this sound's own level) |
 
 ```
 $ earshot make --spec spec.json -o myset
-19 sounds in myset (ogg), manifest.json
-tap.ogg: tap/tone (0.28 s, D6, marimba, -26 LUFS, clean) [named]
+19 sounds in myset (webm, mp3), manifest.json
+tap.{webm,mp3}: tap/tone (0.29 s, D6, marimba, -26 LUFS, clean) [named]
 ...
-success.ogg: success/rise (0.54 s, D5, marimba, -19 LUFS, clean) [2-note, success, bell]
-coin_1.ogg: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin, pickup]
-coin_2.ogg: coin/bright (0.33 s, D6, marimba, -19 LUFS, clean) [coin, pickup]
-rain.ogg: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
-19 sounds in myset\sprite.webm (24.3 s, 200 kB), map sprite.json
+success.{webm,mp3}: success/rise (0.54 s, D5, marimba, -19 LUFS, clean) [2-note, success, bell]
+coin_1.{webm,mp3}: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin, pickup]
+coin_2.{webm,mp3}: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin, pickup]
+rain.{webm,mp3}: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
+rain: a loop in mp3 has a gap at its seam in players that ignore the encoder's padding note; for loops use ogg, webm, wav or flac
+19 sounds in myset\sprite.webm + sprite.mp3 (24.3 s, 205 kB, 369 kB), map sprite.json
 ```
+
+The rain loop plays without a seam from `rain.webm` and from the sprite's webm; in the mp3 it may not.
 
 An unknown field is an error that lists the fields. A design id of a set that this catalogue does not have is left
 out and named on the last line.
@@ -218,11 +267,13 @@ earshot pack FILES... | FOLDER -o sprite.EXT [--gap 0.25] [--mono]
 ```
 
 ```
-$ earshot make --set arcade -o assets/arcade --format wav
-16 sounds in assets/arcade (wav), manifest.json
+$ earshot make --set arcade -o assets/arcade --format ogg --sprite sprite.ogg
+16 sounds in assets/arcade (ogg), manifest.json
 ...
-$ earshot pack assets/arcade -o assets/arcade.ogg
-16 sounds in assets/arcade.ogg (14.2 s, 113 kB), map arcade.json
+16 sounds in assets/arcade\sprite.ogg (14.2 s, 111 kB), map sprite.json
+
+$ earshot pack assets/arcade -o assets/arcade_all.webm
+16 sounds in assets/arcade_all.webm (14.2 s, 150 kB), map arcade_all.json
 ```
 
 `pack` lays sounds end to end in one file with `gap` seconds of silence between them (lossy codecs smear a little
@@ -230,13 +281,16 @@ in time; without a gap the tail of one sound leaks into the next) and writes the
 `<name>.json` in the format howler.js reads:
 
 ```json
-{"src": ["arcade.ogg"], "sprite": {"coin": [0, 537], "explosion": [787, 974], "hurt": [2011, 333], ...}}
+{"src": ["arcade_all.webm"], "sprite": {"menu_move": [0, 192], "menu_select": [442, 280], "menu_back": [972, 234], ...}}
 ```
 
-Each entry is `[offset_ms, duration_ms]`, and `[offset_ms, duration_ms, true]` for a loop. Given a folder, it packs
-every audio file in it sorted by name and reads `manifest.json` for the loops, which get four times the gap. It
-skips only the file it is writing: pack into a new name or another folder, or an earlier sprite in that folder is
-packed too. In Python: `from earshot.pack import pack; pack('public/sounds', 'public/sprite.webm')`.
+Each entry is `[offset_ms, duration_ms]`, and `[offset_ms, duration_ms, true]` for a loop; loops get four times the
+gap. Given a folder with a `manifest.json` (a set made by `make`), it packs exactly the manifest's sounds in the
+manifest's order and leaves out an earlier sprite (any file a sprite map in the folder names), as above: 16 sounds,
+not the earlier `sprite.ogg` as a seventeenth. A folder without a manifest packs every audio file in it by name,
+again leaving out sprites. `make --set ... --sprite` packs what it rendered, not the lossy files decoded again. In
+Python: `from earshot.pack import pack; pack('assets/arcade', 'assets/arcade_all.webm')`, or a list of outputs
+(`['sprite.webm', 'sprite.mp3']`) for the same sprite in several formats.
 
 ## The request language
 
@@ -272,15 +326,20 @@ What is recognised:
   one to avoid; "the opposite of X" and "X but the other way" turn X into its opposite; "like a ..." is a
   comparison; what follows "than" is a reference and is skipped.
 - **Material and voice.** An instrument named as the thing itself ("a kalimba note", "marimba hit") asks for a
-  note of that voice; one named as the player ("a success chime on a kalimba") sets the voice of a figure.
-  Material words ("wooden", "glass", "metal") steer the ranking toward designs of that material; no design reads a
-  material as a control in 1.0, so a figure keeps its voice and the line says `not used by this sound: material`.
-  For a wooden chime, ask with `--theme wood` or `--voice marimba`.
-- **Numbers.** Lengths ("400 ms", "2 seconds", "half a second"; "under 80 ms" is a ceiling that prefers shorter
-  designs and cuts nothing), a pitch ("C6", "440 Hz", "middle C"), a key ("in D", "in the key of Bb minor"), how
-  many takes ("three variations", "5 versions", "a few takes"; at most 12) and how many notes ("a two-note chime",
-  "three rising notes", "twice"). A key moves a tonal design's root to the nearest note of that key; the scale is
-  recorded, and no design in 1.0 builds its steps from it.
+  note of that voice; one named as the player ("a success chime on a kalimba") sets the voice of a figure, and a
+  voice asked for by name is always played. Material words ("wooden", "glass", "metal", "soft", "digital",
+  "8-bit") steer the ranking toward designs of that material, and on a tonal design with no voice asked for they
+  pick the voice made of it: wood a marimba, glass a glockenspiel, metal a vibraphone, soft a felt piano, digital a
+  glass pluck, retro a square lead (`registry.VOICE_OF`; this wins over the theme's voice). A voice or material
+  that chose the design is not reported as unused.
+- **Numbers.** Lengths ("400 ms", "2 seconds", "half a second") set how long a figure sounds before its room dies
+  away, how long a pad is held, how long a loop or a whoosh is; a length a design cannot keep (a marimba cannot
+  ring 2 s, a struck sound has no length) is reported as `not used by this sound: dur`. "Under 300 ms" is a
+  ceiling: it prefers shorter designs and shortens only a design that is longer, as a length. A pitch ("C6", "440
+  Hz", "middle C"), a key ("in D", "in the key of Bb minor"), how many takes ("three variations", "5 versions", "a
+  few takes"; at most 12) and how many notes ("a two-note chime", "three rising notes", "twice"). A key moves a
+  tonal design's root to the nearest note of that key; a minor key (in the request or the theme) turns a figure's
+  major thirds, sixths and sevenths into minor ones.
 - **Direction.** "rising", "falling", "going up" ... prefer designs whose gesture moves that way.
 - **Loop or not.** "loop", "seamless", "looping", "endless" ask for a loop; "no loop", "one-shot" for the scene
   once.
@@ -296,23 +355,46 @@ also: success/done, success/fifth, success/triad
 not understood: squishy
 ```
 
-What reached the render and what did not, on two real calls:
+What reached the render, on real calls:
 
 ```
 $ earshot make "a soft wooden success chime for a finance app, 400 ms, in D" -o wood.wav
-wood.wav: success/rise (0.91 s, D5, vibraphone, -14 LUFS, clean) [success, bell]
+wood.wav: success/rise (0.49 s, D5, marimba, -14 LUFS, clean) [success, bell]
 also: success/done, success/fifth, success/triad
-not used by this sound: dur, material
 
 $ earshot make "a success chime on a kalimba, softer" -o kal.wav
 kal.wav: success/rise (0.69 s, G5, kalimba, -14 LUFS, clean) [success, bell]
 also: success/done, success/fifth, success/triad
+
+$ earshot make "a two-note success chime in D minor" -o minor.wav
+minor.wav: success/rise (0.90 s, D5, vibraphone, -14 LUFS, clean) [2-note, success, bell]
+also: success/fifth, success/done, success/triad
+
+$ earshot make "a kalimba note in E" -o kalimba.wav
+kalimba.wav: note/kalimba (1.06 s, E5, -14 LUFS, clean) [kalimba, note]
+also: pluck/kalimba, pluck/kalimba_ring, pluck/kalimba_soft
 ```
 
-Figures read no `dur` (their length comes from their notes; "longer" raises ring, which lets the notes sound
-longer); the key D moved the root from G5 to D5.
+"Wooden" played a marimba, "400 ms" made the figure 0.49 s with its room, and the key D moved the root from G5 to
+D5. In D minor, `success/rise` (a major third up) rises a minor third.
 
-<!-- RANKING NUMBERS: lead fills in -->
+**How well requests are understood.** Three sets of requests were written by someone who never saw the catalogue: A
+(440 requests for 110 intents, in four styles) and B (220) were used to develop the reader; C (220: half long
+descriptions of a sound that never name it, half casual requests) was held out and scored once, at the end. A
+request counts as right when the first pick belongs to a family accepted for its intent.
+
+| set | first pick right | right among the top three |
+|---|---|---|
+| A (development, 440) | 92.5 % | 95.9 % |
+| B (development, 220) | 97.3 % | 99.1 % |
+| C (held out, 220) | 71.4 % | 80.5 % |
+| C with the atlas blended in (`--listen`) | 74.1 % | 82.3 % |
+
+Terse requests that name the job or the sound ("coin pickup", "error beep") are right for all 110 intents of set A.
+On C, by group (first pick): interface 54.5 %, game 70.9 %, motion 60.0 %, ambience 87.5 %, instruments 83.3 %,
+objects 100 %. Name the sound or the job and the pick is right; describe a mood or paraphrase and one request in
+four needs a second call, which is what `also`, the guess note and `--sound ID` are for. The guess note flags about
+a third of wrong first picks and about one in ten right ones.
 
 ## The eight axes
 
@@ -355,12 +437,13 @@ The fields of a theme dict (`{"base": "wood", "key": "D"}` changes a preset; a d
 | `key`, `scale` | the key every tonal design is moved into (C, C#, Db ... B); the scale (major, minor, pentatonic, minor_pentatonic, lydian, dorian, whole_tone) |
 | `space` | the room: dry, booth, room, studio, hall, plate, cathedral (`earshot/synth/space.py`) |
 | `axes` | offsets added to every request's axes |
-| `material` | the material of the theme's taps and clicks |
+| `material` | the material of the theme's taps and clicks (recorded; the voice is what plays the figures) |
 | `says` | a description, for people |
 
-In 1.0 no design reads `material` or `scale` as a control: the voice, key, space and axes are what a theme changes.
-The words of a request lay their key over the theme's. A figure whose shape a voice cannot carry gives way to its
-own voice (a tap or hover on a metal or glass theme plays marimba, as above).
+A minor scale (`minor`, `minor_pentatonic`) turns every figure's major thirds, sixths and sevenths into minor ones;
+the other scales leave the figures' intervals as designed. The words of a request lay their key and scale over the
+theme's, and a material or voice in the request wins over the theme's voice. The tap, hover and menu move give way
+to struck wood on a metal, glass or electric theme voice (as above).
 
 ## The catalogue, family by family
 
@@ -369,9 +452,9 @@ Ids are `family/name`; the family is what the sound is or does, the name its cha
 
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
-| interface figures (`sounds/ui.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `toggle/up`, `open/lift`, `send/lift`, `tap/tone`, `hover/tone`, `purchase/chime`, `like/twinkle` ... | confirmations, errors, warnings, notifications, toggles, navigation | all 8 axes, pitch (the root), voice |
-| game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice |
-| brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice |
+| interface figures (`sounds/ui.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `toggle/up`, `open/lift`, `send/lift`, `tap/tone`, `hover/tone`, `purchase/chime`, `like/twinkle` ... | confirmations, errors, warnings, notifications, toggles, navigation | all 8 axes, pitch (the root), voice or material, dur |
+| game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
+| brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
 | material ticks (`sounds/ui.py`) | 3 | `tick/wood`, `tick/glass`, `tick/metal` | taps and detents that should not be a note | 7 axes (not motion), pitch |
 | notes (`sounds/tonal.py`) | 51 | `note/<voice>`: 36 instruments and 15 synth patches | a named instrument, a product's own motifs | all 8 axes, pitch, dur |
 | synthesizer (`sounds/synth.py`) | 14 | `pad/warm`, `pad/air`, `pad/glass`, `pad/strings`, `drone/dark`, `sub/swell`, `braam/hit`, `braam/swell`, `riser/tone`, `sweep/noise`, `stab/chord`, `zap/laser`, `power_up/synth`, `power_down/synth` | finished synth sounds for motion design and games | all 8 axes, pitch (root), dur (held) |
@@ -459,16 +542,17 @@ pitch outside is moved by octaves.
 | noise_sweep | patches (fx) | synth | C4-C6 | C5 | a white noise sweep |
 
 The pads, hits and effects patches are finished sounds (`pad/*`, `braam/*`, `zap/laser` ...), not `note/*` designs.
-A sustaining voice (a metal bar, a bell, a pad) keeps every note of a figure at least 110 ms long, the last 1.6
-times that: damped earlier it is heard as an electronic beep.
+A sustaining voice (an instrument that rings over a second, or a bell, pad, key or lead patch) keeps every note of a
+figure at least 110 ms long, the last 1.6 times that: damped earlier it is heard as an electronic beep.
 
 ## Recipe: a web page
 
 ```bash
-earshot make --set ui --theme soft -o public/sounds --format webm --sprite sprite.webm
+earshot make --set ui --theme soft -o public/sounds --format webm,mp3 --sprite sprite
 ```
 
-One request loads every sound. With the Web Audio API and the map:
+Ogg Vorbis does not play in Safari before 18.4; webm (Opus) with an mp3 (or m4a) beside it plays everywhere, and the
+map lists `sprite.webm` first. One request loads every sound. With the Web Audio API and the map:
 
 ```js
 const ctx = new AudioContext();
@@ -485,17 +569,17 @@ function play(name) {
 document.querySelector('#save').addEventListener('click', () => { ctx.resume(); play('success'); });
 ```
 
-With howler.js the map is the `sprite` option as it is: `new Howl({src: ['/sounds/sprite.webm'], sprite:
-map.sprite}).play('success')`. Browsers start audio only after a user gesture, hence `ctx.resume()` in the click.
-Not every browser decodes every codec: `pack` writes the same sounds as .mp3 or .m4a too (`earshot pack
-public/sounds -o public/sprite.mp3`). Keep frequent sounds (taps, hovers) rare in practice; the set levels them low
-already.
+The snippet loads the first file of `src`; to fall back, try `map.src[1]` when decoding fails. With howler.js the
+map is the options as they are: `new Howl({src: map.src.map(f => '/sounds/' + f), sprite:
+map.sprite}).play('success')`, and howler picks the first format the browser plays. Browsers start audio only after
+a user gesture, hence `ctx.resume()` in the click. Keep frequent sounds (taps, hovers) rare in practice; the set
+levels them low already. A loop in a sprite is safe in the webm; not in the mp3 (the seam).
 
 ## Recipe: a game
 
 ```
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
-step_1.ogg: step/gravel (0.30 s, -21 LUFS, clean) [gravel, footstep]
+step_1.ogg: step/gravel (0.31 s, -21 LUFS, clean) [gravel, footstep]
 step_2.ogg: step/gravel (0.32 s, -18 LUFS, clean)
 step_3.ogg: step/gravel (0.30 s, -19 LUFS, clean)
 also: step/grass, step/metal, step/snow
@@ -510,7 +594,8 @@ also: fire/large, fire/small, match/strike
   what the sound is. Single takes are levelled to their own peak, so pick-at-random sets are better made as a set
   (`"n": 8` in a spec), where every take gets the kind's level.
 - **Loops for levels.** Ambience is a seamless loop by default: the file repeats with no seam and no cut event
-  (rendered around a circle). Longer loops repeat less obviously; each scene has a shortest sensible length.
+  (rendered around a circle). Longer loops repeat less obviously; each scene has a shortest sensible length. Ship
+  loops as ogg, webm, wav or flac, not mp3 or m4a.
 - **One family.** `--set game` (modern, kalimba theme) or `--set arcade` (chip); add or replace sounds with a spec.
   Levels inside a set follow the kind table above: a coin sits under an explosion, a step under a coin.
 - **Chip sound** only when the request asks for it ("8-bit", "retro", "chiptune", "arcade") or the theme is retro.
@@ -559,4 +644,6 @@ same samples). Return mono `(n,)` or stereo `(n, 2)` at 48 kHz at any level; `re
 fades, the tail trim, the level and the audit. `says` describes the sound as a listener would (never its job), `uses`
 lists the jobs it plays, `axes` names exactly the axes the function reads, and `allows` lists audit findings that are
 the design (`rising_glide`, `stacked`, `pre_swell`, `tail`, `truncated`). Every design should answer to `energy` and
-two more axes in a way a listener would agree with, and two seeds should give different, equally good takes.
+two more axes in a way a listener would agree with, and two seeds should give different, equally good takes. Then
+rebuild the sound atlas (`python -m earshot.sounds.atlas build --work DIR`, repeated until done) so `--listen` knows
+the new design, and run the catalogue's contract tests (`tests/test_sounds_catalogue.py`).

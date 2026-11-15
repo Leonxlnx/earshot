@@ -5,52 +5,52 @@ description: Make sounds with earshot whenever a product, game, page, animation 
 
 # earshot: ears for an agent
 
-earshot has two halves. **Make**: ask for a sound in words and earshot renders it in code (no models, about a
-second, nothing downloaded, no recorded audio). **Listen**: describe, match, find, measure and critique sound you
-cannot hear (two models, 20-40 s to load). Making comes first below; the listening loops follow.
+## Making sounds
+When a product, game, page or film needs a sound and no recording is given, make it: earshot renders it in code
+from words (no models, about a second, nothing downloaded, no recorded audio). This part is complete on its own.
 
-## Make a sound (earshot make)
-Use it whenever something needs a sound and no recording is given. Everything it renders is free to use in any
-product, commercial too, without credit; say so if the user asks.
+**The three calls** (CLI, or the MCP tools of the same names; MCP paths absolute):
+1. One sound: `earshot make "WORDS" -o sounds/success.ogg` (MCP `make`: `want`, `out`; optional `sound`, `n`,
+   `theme`, `pitch`, `dur`, `voice`, `material`, `loop`, `seed`). One call per sound.
+2. Several that belong together (an interface, a game, a film's kit): ONE call, never a loop of `make`.
+   `earshot make --set ui|game|arcade|film --theme NAME -o FOLDER --format webm,mp3 --sprite sprite`, or MCP
+   `make_set` with `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft
+   tap"}, ...]` (fields: name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs). One voice, key and
+   room for all, levels balanced, `manifest.json` written. Themes: soft, glass, wood, felt, tine, metal, electric,
+   digital, retro.
+3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20),
+   then `--sound ID`. Never list the whole catalogue (457 lines).
 
-**Which call.**
-- One sound: `earshot make "WORDS" -o path/file.ogg` (MCP `make`: `want` + absolute `out`, optional `sound`, `n`,
-  `theme`, `pitch`, `dur`, `voice`, `seed`, `listen`; feelings go in the words). One call per sound.
-- Several sounds that belong together (a product's interface, a game's effects, a film's kit): one `make --set` or
-  one `make --spec` call, never a loop of single `make` calls. They then share one voice, key and room and are
-  levelled against each other. `earshot make --set ui|game|arcade|film --theme NAME -o FOLDER --format ogg
-  [--sprite sprite.webm]`; for your own list, MCP `make_set` with `sounds: [{"name": "tap", "want": "a soft tap"},
-  ...]` (fields: name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs) or a JSON spec file
-  (`docs/MAKE.md`).
-- `earshot sounds --search WORDS` only when you must name an exact design id; a request in words does not need it.
-  Never list the whole catalogue (457 lines).
-- `--listen` only when the choice matters and the first answer looks off (a wrong `also`, an unexpected design): it
-  loads the models (20-40 s) to pick among the best three and adds a `heard as` line with a z. Not for every call.
+**How to ask.** Name the sound or the job first, then feelings, material, numbers, key:
+`"a soft success chime for a finance app"`, `"coin pickup, bright, 8-bit"`, `"a deep impact for a logo reveal"`,
+`"a wooden notification, 400 ms, in D minor"`, `"three variations of a footstep on gravel"`. Feelings: "softer",
+"darker", "bigger", "longer", "drier", "not harsh". A material picks the voice (wooden: marimba, glass, metal,
+soft, digital). Chip sound only with "8-bit" / "retro" / "chiptune". Naming the sound or the job is right almost
+always; a mood or a paraphrase misses about one time in four. To steer, re-ask with adjectives, not by browsing.
 
-**How to ask.** Name the sound or the job it plays, then the feel, then numbers:
-`"a soft success chime for a finance app"`, `"coin pickup, bright, 8-bit"`, `"a deep impact for a logo reveal with a
-long tail"`, `"rain on a window"` with `--dur 20`, `"a kalimba note in E"`, `"three variations of a footstep on
-gravel"`. Feelings are offsets on eight axes (bright, hard, ring, size, space, width, energy, motion): "softer",
-"darker", "bigger", "longer", "drier", "not harsh", "not too loud". Chip sound only with "8-bit" / "retro" /
-"chiptune" / "arcade" or `--theme retro`. Ambience is a seamless loop unless "no loop" / `--no-loop` (a film's bed).
-For a theme across separate calls pass the same `--theme` (soft, glass, wood, felt, tine, metal, electric, digital,
-retro). To steer, re-ask with adjectives or numbers, or take an `also` design with `--sound ID`; do not browse the
-catalogue to find a better one.
+**Read the answer** (no extra call; ask for `--json` / `full=true` only if you need measurements):
+- `x.ogg: design/id (0.88 s, G5, vibraphone, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
+  `clean` means not usable: make it again with another `seed`.
+- `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
+- `also: ... (the pick is a guess: ...)`: treat the pick as unverified; choose from the alternatives by their
+  names, or re-ask naming the sound or the job.
+- `not in this sound: WORDS`: part of the request is not in this file (one call, one sound); make it separately.
+- `not used by this sound: ...`: the design ignored that control or could not keep that length; fine unless it
+  mattered, then pick another design.
+- `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
+- `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
 
-**Keep token use low.** One call per sound or one per set. The answer is the summary text (three lines for one
-sound); do not ask for `--json` / `full=true` unless you need the measurements. Do not read the written audio back.
+**Web**: `earshot make --set ui --theme soft -o public/sounds --format webm,mp3 --sprite sprite`, then load
+`sprite.json` (howler.js format, `src` lists webm first). Ogg Vorbis does not play in Safari before 18.4.
+**Loops**: ambience loops seamlessly by default (`--dur` sets its length); say "no loop" (or `--no-loop`) for a
+film's bed. Never ship a loop as mp3 or m4a.
+**`--listen`** (`listen=true`): also ranks by how designs sound and adds `heard as: ... (z)`; it loads a model
+(20-40 s). Use it only when a describe-the-sound request came back as a guess.
 
-**Check afterwards** (in the answer, no extra call):
-- `clean` on each file line, or `audit: ...`: a warned take (click, cut tail, clipping) is not usable; re-ask with
-  another `--seed` or another design.
-- `not understood: WORDS`: those words did nothing; rephrase them in plainer terms (the sound, the job, an
-  adjective) if they mattered.
-- `not used by this sound: ...`: the chosen design ignores those controls. Common cases: a material ("wooden") is
-  never a control (use `--theme wood` or `--voice marimba`); figures ignore `dur`; bank sounds ignore the axes.
-- `also: ...`: if the chosen id does not fit the job, take one of these with `--sound`.
-Report what you made with its line: `success.ogg: success/rise (0.88 s, G5, vibraphone, -14 LUFS, clean)`. Do not
-say how it sounds beyond its descriptions and, with `--listen`, the heard-as verdict; the sounds are measured by
-earshot's own models, not tested by people.
+Everything earshot renders is free to use in any product, commercial too, without credit. Do not say how a made
+sound sounds beyond its descriptions and a `heard as` verdict: it was measured by models, not tested by people.
+
+The rest of this file is about listening: judging, choosing and checking sound you cannot hear.
 
 ## Listen
 You cannot hear. Never say how audio sounds, or that a sound "fits", without an earshot reading behind it, and quote

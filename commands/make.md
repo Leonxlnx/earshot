@@ -6,7 +6,8 @@ argument-hint: "[the sound in words, e.g. a soft success chime for a finance app
 Make this sound with earshot: $ARGUMENTS
 
 1. Pick the file: the folder this project keeps sounds in (for example `public/sounds/` or `assets/audio/`), else
-   `sounds/`; a short name from the job (`success.ogg`); `.ogg` for a web project, `.wav` otherwise, unless the
+   `sounds/`; a short name from the job (`success.mp3`); `.mp3` for a web project (`.webm` for a loop: an mp3 loop
+   has a gap at its seam), `.wav` otherwise, unless the
    request names a format.
 2. Call the `make` tool of the earshot MCP server once, with `want` = the request as written and `out` = the absolute
    path. If no earshot MCP server is connected, run `earshot make "REQUEST" -o PATH` instead. No `full=true`,

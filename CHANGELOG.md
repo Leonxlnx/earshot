@@ -15,10 +15,25 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **`earshot make "WORDS" -o FILE`** (`earshot/make.py`, MCP `make`, `api.make`): the request is read, the catalogue
   ranked, the best design rendered with the request's controls, audited (clicks, cut tails, clipping, DC, comb ring,
   rising glides, stacked attacks; a failed take is re-rendered on up to three more seeds) and written as wav, flac,
-  ogg, mp3, m4a or webm. The answer is three lines: the design and why, what else would fit (`also`), and the words
-  `not understood` or controls `not used by this sound`. `--n` takes, `--seed`, `--sound ID`, `--theme`, `--pitch`,
-  `--dur`, `--voice`, the eight axes, `--lufs`, `--mono`, `--no-loop`. `--listen` loads the listening models to pick
-  among the best three and says what the result is heard as. A single `make` takes about 1-2 s on one thread.
+  ogg, mp3, m4a or webm. The answer is a few lines: the design and the words that chose it (as written), the sounds
+  or jobs of the request it does not cover (`not in this sound`), up to three alternatives (`also`, always, with a
+  note when the pick is a guess, to be taken with `sound=<id>`), controls `not used by this sound` (also a length a
+  design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
+  `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
+  `--mono`, `--no-loop`. A single `make` takes about 1-2 s on one thread.
+- **Voices, keys and lengths from the words**: a material without a voice picks the voice made of it (wood a
+  marimba, glass a glockenspiel, metal a vibraphone, soft a felt piano, digital a glass pluck, retro a square lead);
+  a voice asked for by name is always played; a minor key in the request or theme turns a figure's major thirds,
+  sixths and sevenths into minor ones; a length sets how long a figure sounds, and "under 300 ms" shortens only a
+  design that is longer. The smallest figures (tap, hover, toggles, steps, menu move) fade out within a fixed time
+  whatever the voice; the tap, hover and menu move use struck wood on a sustaining metal, glass or electric voice.
+- **The sound atlas** (`earshot/sounds/atlas.py`, `earshot/data/sounds_atlas.npz`, numbers only): a CLAP embedding of
+  every design's default render and of its descriptions. `--listen` (MCP `listen`) blends how each design sounds into
+  the ranking and reports what the written sound is heard as; the MCP server's `make` blends it in without being
+  asked once CLAP is loaded. Rebuilt with `python -m earshot.sounds.atlas build --work DIR`.
+- **Understanding requests, measured**: on 220 held-out requests written by someone who never saw the catalogue the
+  first pick is right for 71.4 % and one of the top three for 80.5 % (74.1 % / 82.3 % with the atlas); 92.5 % and
+  97.3 % on the two development sets ([docs/VALIDATION.md](docs/VALIDATION.md#8-made-sounds-10)).
 - **Reading requests** (`earshot/brief.py`, `earshot/sounds/lexicon.py`): jobs and sounds to canonical words, the
   head of a request and its parts and context, feelings as offsets on eight shared axes (bright, hard, ring, size,
   space, width, energy, motion) with intensifiers, negation ("not harsh", "not an error"), "the opposite of",
@@ -36,9 +51,12 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   metal, electric, digital, retro) give a family one voice, key, room and axis offsets; four ready-made sets (`ui`
   16, `game` 22, `arcade` 16, `film` 15). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a whole
   set in one call, levelled against each other by kind (the loudest at -16 LUFS momentary max, a tap 10 LU under,
-  a bed 14), with `manifest.json`.
+  a bed 14), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
+  every sound in each, the manifest's `files` and `formats`, the sprite in each format with its map's `src` in that
+  order. For the web, `webm,mp3`: Ogg Vorbis does not play in Safari before 18.4.
 - **`earshot pack`** (`earshot/pack.py`, `--sprite` on a set): many sounds in one file with a map in the format
-  howler.js reads; loops are marked and get a longer gap.
+  howler.js reads; loops are marked and get a longer gap. On a set's folder it packs exactly the manifest's sounds
+  and leaves out an earlier sprite.
 - **The engines** (`earshot/synth/`): struck instruments from modes, damping laws and a Hertz contact (`modal.py`,
   `struck.py`); strings, pianos and electric pianos as stiff-string modes with two polarisations, a felt hammer, a
   body and a pickup (`strings.py`); a synthesizer with band-limited oscillators, unison with drift, a ladder filter,
@@ -52,11 +70,14 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   went from "an electric piano" (z 2.5 and 2.8 for their own description) to z 3.7-4.4.
 - **Docs**: [docs/MAKE.md](docs/MAKE.md) (the reference of `make`, `sounds`, `pack`, the spec, themes, axes, the
   request language, the catalogue, the voices, recipes for a web page, a game and a film, how to add a design);
-  VALIDATION section 8; LIMITS "Making sounds"; the earshot skill's making half.
+  VALIDATION section 8; LIMITS "Making sounds"; the earshot skill opens with a self-contained making part.
 - **Claude Code plugin** (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `commands/`): the
   repository is a plugin and its own marketplace (`/plugin marketplace add Leonxlnx/earshot`, `/plugin install
   earshot@earshot`): the two skills, the MCP server from the installed `earshot`, `/earshot:make` and
   `/earshot:make-set`.
+- **Tests** for the catalogue contract, the rooms and finishing, the voices, `make` / sets / `pack` and the atlas
+  (`tests/test_sounds_catalogue.py`, `test_synth_space.py`, `test_synth_voices.py`, `test_make.py`,
+  `test_sounds_atlas.py`); the long renders and the tests that load CLAP run with `--slow`.
 - **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
 

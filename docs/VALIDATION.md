@@ -177,18 +177,45 @@ floor (measured at -66 dB); noise that only followed the sound's envelope did le
 
 **Lessons the lab measured, now in the code.** A sustaining metal bar or synth note damped after less than about
 110 ms is heard as an electronic beep: figures keep such notes at least that long (`figure.SUSTAIN_FLOOR`), and the
-smallest taps (`tap/tone`, `hover/tone`) use wood unless the theme's voice is short. Small metal plates and bars
+tap, hover and menu move (`tap/tone`, `hover/tone`, `menu/move`) use struck wood when the default or theme voice is a
+sustaining metal, glass or electric one (a voice asked for by name is played as asked). Small metal plates and bars
 struck once read as blips, while a coin and a glass left to ring read as objects: `tick/metal` is a coin and
 `tick/glass` rings.
 
-**Understanding requests.** A test set of 440 requests over 110 intents, written by someone who had not seen the
-catalogue, scores how often `make` picks a design that answers the request.
+These listening numbers were taken before the last changes to the smallest figures (tap, hover, toggles, steps and
+menu move now fade out within a fixed time whatever the voice) and were not re-taken after them.
 
-<!-- RANKING NUMBERS: lead fills in -->
+**Understanding requests.** Three sets of requests were written by someone who never saw the catalogue: A (440
+requests for 110 intents, in four styles) and B (220) were used to develop the reader (`earshot/brief.py`, the
+lexicon, the designs' `uses`) and the guess thresholds; C (220: half long descriptions of a sound that never name it,
+half casual requests) was held out and scored once, at the end. A request counts as right when the first pick
+belongs to a family accepted for its intent (several families can be right: a coin pickup may be `coin/*` or
+`pickup/*`). The request sets and the scoring script are in the lab, not in the repository.
+
+| set | first pick right | right among the top three |
+|---|---|---|
+| A (development, 440) | 92.5 % | 95.9 % |
+| B (development, 220) | 97.3 % | 99.1 % |
+| C (held out, 220) | 71.4 % | 80.5 % |
+| C, the atlas blended in (`--listen`, or the MCP server once CLAP is loaded) | 74.1 % | 82.3 % |
+
+Terse requests that name the job or the sound ("coin pickup", "error beep") are right for all 110 intents of set A.
+On C by group (first pick): interface 54.5 %, game 70.9 %, motion 60.0 %, ambience 87.5 %, instruments 83.3 %,
+objects 100 %. The reading: name the sound or the job and the pick is right; describe a mood or paraphrase and one
+request in four needs a second call, which is what the `also` line, the guess note and `sound=<id>` are for. The
+guess note (`the pick is a guess: ...`) flags about a third of the wrong first picks and about one in ten of the
+right ones. Development numbers are optimistic by construction; C is the number to quote.
 
 **The audit.** Every take `make` writes passes `forge.sfx.check` (clicks, cut tails, clipping, DC, comb ring, rising
 glides, stacked attacks) or is re-rolled on up to three more seeds; the line says `clean` or names the warnings.
 
 **Speed** (one thread, no models): a single `make` takes about 1-2 s including Python start-up; a 16-sound interface
-set with ogg files and a sprite about 25 s; ambience loops of 12-20 s take 3-10 s to render. `--listen` loads the two
-models once (20-40 s).
+set with ogg files and a sprite about 25 s (in webm and mp3 with a sprite in both, 20 s on the run in
+[MAKE.md](MAKE.md)); ambience loops of 12-20 s take 3-10 s to render. `--listen` loads CLAP once (20-40 s).
+
+**Tests.** The making half has model-free tests for the catalogue contract (a clean levelled render that passes its
+audit, the axes a design declares are the axes it reads, takes that vary, themes, materials, minor keys, figure
+lengths, loops, loudness caps), the rooms and finishing, the voices, `make` / sets / `pack`, and the atlas
+(`tests/test_sounds_catalogue.py`, `test_synth_space.py`, `test_synth_voices.py`, `test_make.py`,
+`test_sounds_atlas.py`, `test_brief.py`, and one file per engine). The fast run renders the short designs; the long
+ones (beds, pads, ringing notes, logos), the bank and the atlas tests that load CLAP run with `--slow`.

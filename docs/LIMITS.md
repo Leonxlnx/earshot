@@ -83,13 +83,18 @@ a sound getting better.
 - Music beyond figures: no melodies, beats, songs or scores. Notes, chords of a pad, short motifs and logos only.
 - Speech, voices, animals (other than the insects and birds inside a few ambience scenes), vehicles (other than a
   chip engine and distant traffic), weapons beyond game shots and lasers.
-- Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read come
-  back as `not used by this sound`. In 1.0 no design reads a material ("wooden", "glass") or a theme's scale: material
-  words only steer the ranking, and "in D minor" moves a figure to D without making it minor. Figures read no length
-  (their notes set it; "longer" lengthens the ring). Bank sounds read pitch and length where their recipe has those
-  knobs, and no axes. "Under 80 ms" prefers short designs and cuts nothing.
-- Exact lengths everywhere: one-shots end where their tail has died, so a requested `dur` is the design's own
-  reading of it (a held note, a loop's length), not a hard cut.
+- Make two sounds in one call. "A water drop and a coin" makes one of them and says `not in this sound: water drop`;
+  ask again for the other, or make a set.
+- Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
+  a length it cannot keep, come back as `not used by this sound`. A material picks the voice of a tonal sound only
+  among six (wood, glass, metal, soft, digital, retro); other materials ("plastic", "ceramic") only steer the
+  ranking. A theme's scale changes a figure only when it is minor (thirds, sixths and sevenths); pentatonic, lydian,
+  dorian and whole-tone themes leave the intervals as designed. Bank sounds read pitch and length where their recipe
+  has those knobs, and no axes.
+- Exact lengths. A length sets how long a figure sounds before its room dies away, so the file runs longer than the
+  number (and "under 300 ms" on a notification gave a 0.76 s file with its room); a struck one-shot (a tap, a hit)
+  rings as it rings, and a voice cannot ring longer than it does (a marimba chime asked for 2 s came out 0.55 s);
+  both say `not used by this sound: dur`. A loop has a shortest length per scene.
 - Choose by taste. The ranking reads words, not the product; two good designs for one job can differ a lot. Use
   `also`, `--sound`, `--listen` and a person's ears.
 
@@ -98,15 +103,25 @@ descriptions, in the lab's measurement): an opening door, a soft landing, a slap
 peeling tape, a bottle opening, rain on a roof, a small fire, distant city traffic (heard as noise) and a low rumble.
 Steady noise beds in general sit close to "noise" for the models, which says as much about the models as about the
 beds; judge beds by ear. Single short notes of sustaining metal or synth voices damped early read as beeps, which is
-why figures keep them at least 110 ms long and the smallest taps play wood.
+why figures keep them at least 110 ms long and the tap, hover and menu move play wood on such a voice.
 
-**Requests.** The reader is a lexicon and rules, not a language model: unusual phrasings, typos, long sentences
-with several sounds in them and words outside its tables read worse than short plain requests ("a soft success
-chime", "coin pickup, 8-bit", "rain on a window, 20 s"). One request is one sound; a set is a spec.
+**Requests.** The reader is a lexicon and rules, not a language model (`--listen` adds CLAP). On 220 held-out
+requests by someone who never saw the catalogue the first pick was right for 71.4 % (74.1 % with `--listen`), and
+for interface requests only 54.5 %; requests that name the job or the sound did far better than long descriptions
+of a sound and casual paraphrases ([VALIDATION.md](VALIDATION.md#8-made-sounds-10)). Unusual phrasings, typos and
+moods ("something warm and hopeful") read worse than short plain requests ("a soft success chime", "coin pickup,
+8-bit", "rain on a window, 20 s"). The guess note catches about a third of the wrong picks, so a pick without it can
+still be wrong: read the design id against the job. `make --set` and `make_set` rank by words only, even in the MCP
+server. One request is one sound; a set is a spec.
+
+**Formats.** Ogg Vorbis does not play in Safari before 18.4: for the web write `webm,mp3` (or `webm,m4a`). An mp3 or
+m4a loop has a gap at its seam in players that ignore the encoder's padding note; `make` warns, and loops belong in
+ogg, webm, wav or flac.
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. Long ambience loops take seconds to render (12-20 s loops
-3-10 s on one thread). `pack FOLDER` packs every audio file in the folder except the one it writes, including an
-earlier sprite: pack into a new name or another folder. The lab's reference recordings and renders are not in the
-repository: the calibration can be checked against the comments in `earshot/synth/struck.py` and `strings.py`, not
-re-run from the repo alone.
+3-10 s on one thread). The sound atlas (`earshot/data/sounds_atlas.npz`) is built from each design's default render:
+after designs are added or re-voiced it is stale until rebuilt (`python -m earshot.sounds.atlas build --work DIR`,
+repeated until done), and `--listen` then ranks by old sounds. The lab's reference recordings, renders and request
+sets are not in the repository: the calibration can be checked against the comments in `earshot/synth/struck.py`
+and `strings.py`, and the request numbers cannot be re-run from the repo alone.
