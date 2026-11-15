@@ -492,7 +492,8 @@ GLASS_F = 1150.0   # Hz: the (2,0) rim mode of a stemmed wine glass (earshot.syn
 @_design('glass/clink', kind='object',
         says=('two wine glasses clinking together in a toast', 'a bright glass clink that rings on',
               'cheers, glasses touching with a crystal ting'),
-        uses=('glass_object', 'cheers', 'toast', 'celebration', 'success'), tags=('glass', 'foley'), domains=DOM,
+        uses=('glass_object', 'cheers', 'propose a toast', 'celebration', 'success'),
+        tags=('glass', 'foley'), domains=DOM,
         dur=0.9, axes=AXES)
 def glass_clink(c, r):
     """two stemmed glasses touched rim to rim: one contact of a few hundredths of a millisecond (glass on glass)
@@ -838,7 +839,8 @@ def chips_stack(c, r):
 @_design('water/drop', kind='object',
         says=('a single drop of water falling into still water, a liquid plink', 'a water droplet plopping into a bowl',
               'a drip into a sink'),
-        uses=('water', 'drop', 'drip', 'pop', 'notify'), tags=('water', 'foley'), domains=DOM, dur=0.3, axes=AXES,
+        uses=('water', 'drop', 'drip', 'pop', 'notify', 'hydration', 'drink logged'),
+        tags=('water', 'foley'), domains=DOM, dur=0.3, axes=AXES,
         allows=('rising_glide', 'tail'))    # a bubble's pitch rises as it nears the surface; the jet drop follows
 def water_drop(c, r):
     """a drop into still water: the impact itself (a tick of a fraction of a millisecond, high), then 2-5 ms later
@@ -937,7 +939,8 @@ def bottle_open(c, r):
 @_design('cork/pop', kind='pop',
         says=('a cork popping out of a bottle with a hollow pop', 'a wine bottle uncorked, a squeak and a pop',
               'a champagne cork pop and a hiss'),
-        uses=('pop', 'celebration', 'open', 'win', 'cork'), tags=('glass', 'foley'), domains=DOM, dur=0.6,
+        uses=('cork', 'pop', 'celebration', 'open', 'win', 'goal reached', 'champagne'),
+        tags=('glass', 'foley'), domains=DOM, dur=0.6,
         axes=AXES, allows=('rising_glide',))     # the cork's squeak climbs as it slides faster: stick-slip
 def cork_pop(c, r):
     """a cork eased out: it squeaks in the glass neck (stick-slip at a slip rate climbing from about 120 to 420 Hz as
@@ -1167,7 +1170,7 @@ def zipper_pull(c, r):
 @_design('keys/jingle', kind='object',
         says=('a small bunch of keys jingling', 'metal keys on a key ring shaken and clinking',
               'keys rattling in a hand'),
-        uses=('keys', 'unlock', 'lock', 'jingle', 'home'), tags=('metal', 'foley'), domains=DOM, dur=0.9, axes=AXES,
+        uses=('keyring', 'unlock', 'lock', 'home', 'keys'), tags=('metal', 'foley'), domains=DOM, dur=0.9, axes=AXES,
         allows=('tail', 'stacked', 'ring'))       # many key contacts; ringing brass keys are a comb to the detector
 def keys_jingle(c, r):
     """four or five keys on a ring, shaken two or three times (energy): every shake throws the keys against each
@@ -1306,7 +1309,8 @@ def drawer_slide(c, r):
 @_design('knock/door', kind='object',
         says=('knuckles knocking three times on a wooden door', 'someone knocking at the door, knock knock knock',
               'three knocks on a door'),
-        uses=('knock', 'door', 'notify', 'visitor', 'attention'), tags=('wood', 'foley'), domains=DOM, dur=0.8,
+        uses=('knock', 'door', 'notify', 'visitor', 'attention', 'join request', 'someone at the door'),
+        tags=('wood', 'foley'), domains=DOM, dur=0.8,
         axes=AXES, allows=('tail', 'stacked', 'ring'))      # three knocks; the door's low modes ring
 def knock_door(c, r):
     """three knuckle knocks on a door: one door (a wide panel: dense modes from 70 Hz to 2 kHz, the low ones ringing
@@ -1341,7 +1345,8 @@ def _dome(r, f0, n, tc, angle, built, k, support=0.8, material='steel', kind=DOM
 @_design('bell/desk', kind='object',
         says=('a reception desk bell rung once, a bright ding', 'a hotel service bell, a clear metallic ding',
               'someone tapping a counter bell'),
-        uses=('bell', 'notify', 'service', 'attention', 'success', 'ding'), tags=('metal', 'foley'), domains=DOM,
+        uses=('bell', 'service', 'notify', 'attention', 'success', 'order up', 'new order', 'order ready'),
+        tags=('metal', 'foley'), domains=DOM,
         dur=2.4, axes=AXES)
 def bell_desk(c, r):
     """a counter bell: the palm pushes the plunger (a dull knock in the base), the spring-loaded clapper hits the

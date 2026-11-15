@@ -135,7 +135,8 @@ def test_like_as_comparison_and_as_job():
 
 def test_opposites():
     assert brief.read('the opposite of a riser')['concepts'] == ['downlifter']
-    assert 'back' in brief.read('like the next-step sound but going the other way')['concepts']
+    b = brief.read('like the next-step sound but going the other way')
+    assert 'back' in b['concepts'] + b['parts'] and 'next' not in b['concepts'] + b['parts']
 
 
 def test_toggle_particles():
@@ -204,6 +205,69 @@ def test_retro_is_a_hard_filter(idx):
 
 def test_fallback_by_feel(idx):
     assert brief.rank(brief.read('something soft and warm'), idx=idx, top=3)
+
+
+def test_fallback_by_direction(idx):
+    b = brief.read('something that rises and rises')
+    assert not b['concepts'] and b['dir'] == 1
+    assert brief.rank(b, idx=idx, top=1)[0]['id'].startswith(('riser/', 'pro_riser/', 'sweep/', 'sub/', 'braam/'))
+
+
+def test_length_biases_the_ranking(idx):
+    """a ceiling or a length pushes down designs much longer (or shorter) than asked; beds are exempt"""
+    rows = {r['id']: r for r in idx[0]}
+    short = brief.read('whoosh for a card sliding in, under 300 ms')
+    assert short['dur_max'] == pytest.approx(0.3)
+    first = brief.rank(short, idx=idx, top=1)[0]['id']
+    assert rows[first]['dur_s'] <= 0.9, first
+    assert brief.length_fit(short, rows['whoosh/pass']) < 0.8
+    assert brief.length_fit(brief.read('rain, 20 seconds'), rows['rain/window']) == 1.0
+    assert brief.length_fit(brief.read('a riser, 2 seconds'), {'dur_s': 2.5, 'kind': 'rise'}) == 1.0
+    assert brief.length_fit(brief.read('a tap, 2 seconds'), {'dur_s': 0.06, 'kind': 'tap'}) < 0.7
+
+
+# ---- reading: round-two classes
+
+def test_separable_verbs():
+    assert 'pickup' in brief.read('picking something up in a game')['concepts']
+    assert 'close' in brief.read('putting a window away, soft')['concepts']
+    assert 'hover' in brief.read('when the mouse floats over a link')['concepts']
+
+
+def test_old_device_means_chip_sound():
+    assert brief.read('the jingle from old Nintendo games')['material'] == 'retro'
+    assert brief.read('a beep like an ancient home computer')['material'] == 'retro'
+    assert brief.read('an old wooden door')['material'] == 'wood'
+
+
+def test_outcome_words():
+    assert brief.read('upload finished successfully')['concepts'][0] == 'success'
+    assert brief.read('erasing a saved recipe')['concepts'][0] == 'delete'
+    assert brief.read('a massive kaboom, like fireworks gone wrong')['concepts'][0] == 'explosion'
+
+
+def test_composed_jobs():
+    assert brief.read('losing the speed buff')['concepts'][0] == 'power_down'
+    assert 'success' not in brief.read('a ring that says the egg timer is done')['concepts']
+
+
+def test_more_negations_and_weather():
+    assert 'jump' in brief.read("a gentle ping that won't make people jump")['not']
+    b = brief.read('a fast windy zip')
+    assert 'wind' in b['parts'] and 'wind' not in b['concepts']
+
+
+def test_similes_and_domain_phrases():
+    b = brief.read('a huge thump, like a door slamming in a movie')
+    assert 'door' in b['parts'] and 'door' not in b['concepts']
+    assert 'paper' not in brief.read('an impact under the title card')['context']
+    assert 'paper' not in brief.read('a pop when a card appears in the app')['concepts']
+    assert 'drone' == brief.read('an ominous low bed for a documentary')['concepts'][0]
+
+
+def test_instrument_before_a_sound_noun():
+    assert 'voice:kalimba' in brief.read('a kalimba ping for a meditation app')['concepts']
+    assert 'voice:marimba' in brief.read('one marimba hit')['concepts']
 
 
 # anchor requests (own wording, not from any eval set) -> accepted id prefixes of the first result

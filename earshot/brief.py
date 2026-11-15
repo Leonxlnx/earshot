@@ -64,7 +64,7 @@ LIKE_JOB_NEXT = ('button', 'buttons', 'sound', 'tap', 'icon', 'animation', 'reac
                  'feedback', 'click', 'action', 'and')
 VOICE_PARAM_PREV = ('on', 'by', 'played', 'using', 'with', 'via', 'through')
 # the sounds an instrument itself makes: "a piano key", "a bass note", "a bell ding" ask for a note of the voice
-VOICE_OK = frozenset(('note', 'bass', 'piano', 'pluck', 'bell', 'beep', 'knock', 'hit', 'tap'))
+VOICE_OK = frozenset(('note', 'bass', 'piano', 'pluck', 'bell', 'beep', 'knock', 'hit', 'tap', 'cue'))
 HYPHEN_SUFFIX = ('like', 'ish', 'style', 'styled', 'esque', 'type', 'themed', 'y')
 OTHER_WAY = ('other way', 'the other way', 'opposite way', 'reverse direction', 'other direction')
 TOGGLE_ON_NEXT = ('in', 'for', 'at', 'when', 'with', 'and', 'sound', 'click', 'snap', 'state', 'mode')
@@ -76,6 +76,8 @@ FIELD_WEIGHT = {'uses': 3.0, 'name': 2.2, 'says': 1.6, 'tags': 1.2}
 # the design's own family named in the request (by its very name: + EXACT_BONUS); its first job
 FAMILY_BONUS, EXACT_BONUS, FIRST_USE_BONUS = 1.2, 0.3, 0.6
 CONCEPT_IDF = 0.6                  # how much rarity counts for canonical words (1 = as for plain words)
+STRETCH_KINDS = ('bed', 'pad', 'texture')   # rendered at any length asked for
+LENGTH_SLOPE = 0.15                # how much a length mismatch costs per octave beyond the free half octave
 _rev = None
 _cache = {}
 
@@ -108,10 +110,10 @@ def _reverse():
     """{kind: {stemmed phrase: value}} over the lexicon tables, and {kind + '=': {exact phrase: value}} (an exact
     form wins over a stemmed one: 'firing' is a shot, though it stems like 'fire'; where two stem alike, the shorter
     form wins: 'blocking' is 'block', a shield, not 'blocked', an error). Kinds: 'c' concept, 'v' voice,
-    'd' direction, 'm' an adjective phrase ({axis: delta}), 'p' a material phrase"""
+    'd' direction, 'm' an adjective phrase ({axis: delta}), 'p' a material phrase, 'o' a domain phrase"""
     global _rev
     if _rev is None:
-        r = {k + s: {} for k in 'cvdmp' for s in ('', '=')}
+        r = {k + s: {} for k in 'cvdmpo' for s in ('', '=')}
         size = {}
 
         def put(kind, phrase, val):
@@ -126,7 +128,8 @@ def _reverse():
         for canon, others in L.CONCEPTS.items():
             for w in others:
                 put('c', w, canon)
-        for table, kind in ((L.VOICES, 'v'), (L.DIRECTION, 'd'), (L.PHRASE_MODIFIERS, 'm'), (L.MATERIAL_PHRASES, 'p')):
+        for table, kind in ((L.VOICES, 'v'), (L.DIRECTION, 'd'), (L.PHRASE_MODIFIERS, 'm'), (L.MATERIAL_PHRASES, 'p'),
+                            (L.DOMAIN_PHRASES, 'o')):
             for w, v in table.items():
                 put(kind, w, v)
         _rev = r
@@ -148,7 +151,7 @@ def _match(toks, i):
     for n in range(len(idx), 0, -1):
         seg = [toks[k] for k in idx[:n]]
         key, exact = _key(seg), ' '.join(seg)
-        for kind in 'cvdmp':
+        for kind in 'cvdmpo':
             if kind in found:
                 continue
             val = rev[kind + '='].get(exact, rev[kind].get(key))
@@ -193,7 +196,7 @@ def _known(t):
 
 def tokens(text):
     """the words and clause marks of a text, lower case; possessives dropped; a hyphenated word nothing knows is
-    split into its parts ('xylophone-ish' -> 'xylophone', 'bloop-bloop-bloop' -> 'bloop')"""
+    split into its parts ('xylophone-ish' -> 'xylophone', 'womp-womp' -> 'womp womp')"""
     out = []
     for t in TOKEN.findall(text.lower().replace('’', "'")):
         if t.endswith("'s") and t not in L.STOP:
@@ -202,7 +205,7 @@ def tokens(text):
             parts = [p for p in t.split('-') if p]
             while len(parts) > 1 and parts[-1] in HYPHEN_SUFFIX:
                 parts.pop()
-            out.extend(dict.fromkeys(parts))
+            out.extend(parts)
         else:
             out.append(t)
     return out
@@ -306,6 +309,69 @@ def _figure_words(text):
     return out
 
 
+def _status_keys():
+    """the stemmed outcome words (lexicon.STATUS_WORDS)"""
+    if 'status' not in _cache:
+        _cache['status'] = {_key(w.split()) for w in L.STATUS_WORDS}
+    return _cache['status']
+
+
+def _domain(t):
+    """the domain a word names (lexicon.DOMAIN_WORDS, also from its plural or verb form), or None"""
+    if 'domain' not in _cache:
+        _cache['domain'] = {stem(w): d for w, d in L.DOMAIN_WORDS.items()}
+    return L.DOMAIN_WORDS.get(t) or _cache['domain'].get(stem(t))
+
+
+def _sense():
+    """{(domain, stemmed phrase): concept} of lexicon.DOMAIN_SENSE"""
+    if 'sense' not in _cache:
+        _cache['sense'] = {(d, _key(w.split())): c for (d, w), c in L.DOMAIN_SENSE.items()}
+    return _cache['sense']
+
+
+def _old_device(toks):
+    """True when an old-sounding word comes within three words before a device word ("old Nintendo games")"""
+    for i, t in enumerate(toks):
+        if t in L.OLD_WORDS:
+            for u in toks[i + 1:i + 4]:
+                if u in PUNCT:
+                    break
+                if u in L.OLD_DEVICES:
+                    return True
+    return False
+
+
+def _phrasal(toks):
+    """{verb index: (concept, particle index)} of separable verbs with words between verb and particle
+    ("picking something up", "putting a window away", "the mouse floats over"); adjacent ones are phrases"""
+    if 'phrasal' not in _cache:
+        _cache['phrasal'] = {stem(v): parts for v, parts in L.PHRASAL.items()}
+    table, out = _cache['phrasal'], {}
+    for i, t in enumerate(toks):
+        parts = L.PHRASAL.get(t) or table.get(stem(t))
+        if not parts:
+            continue
+        for k in range(i + 2, min(i + 5, len(toks))):
+            if toks[k] in PUNCT:
+                break
+            if toks[k] in parts:
+                out[i] = (parts[toks[k]], k)
+                break
+    return out
+
+
+def _compose(b):
+    """two jobs that together mean a third (lexicon.COMPOSE): the first is replaced, the second dropped"""
+    for (a, c2), r in L.COMPOSE.items():
+        lists = [k for k in ('concepts', 'parts', 'context') if a in b[k]]
+        if lists and any(c2 in b[k] for k in ('concepts', 'parts', 'context')):
+            for k in ('concepts', 'parts', 'context'):
+                b[k] = [x for x in b[k] if x != c2 or c2 == r]
+            k = lists[0]
+            b[k] = list(dict.fromkeys(r if x == a else x for x in b[k]))
+
+
 def _next_concept(toks, i):
     """the concept of the next content word from token i on (adjectives, materials, domains and fillers skipped),
     or None"""
@@ -318,7 +384,7 @@ def _next_concept(toks, i):
             continue
         t = toks[i]
         if t in CONTEXT_WORDS or t in PLACE_WORDS or t in ('with', 'to', 'but', 'than') or not (
-                modifier(t) or t in L.MATERIALS or t in L.STOP or t in L.INTENSIFIERS or t in L.DOMAIN_WORDS):
+                modifier(t) or t in L.MATERIALS or t in L.STOP or t in L.INTENSIFIERS or _domain(t)):
             return None
         i += 1
     return None
@@ -340,12 +406,17 @@ def read(text):
     toks = tokens(_numbers(b, text))
     n_tok = len(toks)
     st = {'scale': 1.0, 'neg': False, 'where': 'concepts', 'than': False, 'opposite': False, 'head': False,
-          'any': False, 'object': False}
-    domains, particles, src, ctx_words = {}, [], {}, set()
+          'any': False, 'object': False, 'simile': False, 'skipped': 0}
+    domains, particles, src, ctx_words, outcomes = {}, [], {}, set(), []
+    if _old_device(toks):
+        b['material'] = 'retro'            # "old Nintendo games", "an ancient home computer"
+    phrasal, skip = _phrasal(toks), set()
 
     def add(c, tok, where=None):
         if st['object'] and st['where'] == 'concepts':
             where, st['object'] = 'parts', False    # "parrying an attack": the attack is what is parried
+        if st['simile'] and st['where'] == 'concepts':
+            where = 'parts'                         # "a thump, like a door slamming": a comparison describes it
         where = where if where and st['where'] == 'concepts' else st['where']
         if st['opposite']:
             c, st['opposite'] = L.OPPOSITE.get(c, c), False
@@ -356,7 +427,7 @@ def read(text):
             return
         if all(c not in b[k] for k in ('concepts', 'parts', 'context')):
             b[where].append(c)
-            src[c] = stem(tok)
+            src[c] = tok
         if where == 'concepts' and c not in L.GENERIC:
             st['head'] = True
         if where == 'concepts':
@@ -372,8 +443,11 @@ def read(text):
         t = toks[i]
         nxt = toks[i + 1] if i + 1 < n_tok else None
         prev = toks[i - 1] if i else None
+        if i in skip:                       # the particle of a separable verb already read
+            i += 1
+            continue
         if t in PUNCT:
-            st.update(than=False, neg=False, scale=1.0)
+            st.update(than=False, neg=False, scale=1.0, simile=False)
             if st['where'] == 'parts':
                 st['where'] = 'concepts'
             i += 1
@@ -399,15 +473,17 @@ def read(text):
         seg3 = ' '.join(toks[i:i + 3])
         way = next((w for w in OTHER_WAY if seg3 == w or seg3.startswith(w + ' ')), None)
         if way:                            # "like the next-step sound but going the other way"
-            b['concepts'] = [L.OPPOSITE.get(c, c) for c in b['concepts']]
+            for k in ('concepts', 'parts'):
+                b[k] = [L.OPPOSITE.get(c, c) for c in b[k]]
             b['dir'] = -b['dir']
             i += len(way.split())
             continue
         if t == 'like' and not (nxt in LIKE_JOB_NEXT or nxt is None or nxt in PUNCT
                                 or (prev in ARTICLES and nxt not in ARTICLES)):
-            i += 1                         # "like a whisper of a click": a comparison, not the job "like"
+            st['simile'] = True            # "like a whisper of a click": a comparison, not the job "like"
+            i += 1
             continue
-        if st['any'] and (t in CONTEXT_WORDS or t == 'to' or (t in PLACE_WORDS and nxt in ARTICLES)):
+        if st['head'] and (t in CONTEXT_WORDS or t == 'to' or (t in PLACE_WORDS and nxt in ARTICLES)):
             st['where'] = 'context'        # "an impact FOR a logo reveal": where it plays, not what it is
             i += 1
             continue
@@ -437,12 +513,22 @@ def read(text):
             st.update(scale=1.0, neg=False)
             i += 1
             continue
+        if i in phrasal:                   # "picking something up", "putting a window away"
+            c, k = phrasal[i]
+            add(c, c)
+            skip.add(k)
+            st.update(scale=1.0, neg=False)
+            i += 1
+            continue
         j, hit = _match(toks, i)
         if hit:
+            key = _key(toks[i:j])
             if 'm' in hit:
                 axes(hit['m'], st['scale'])
             if 'p' in hit and not st['neg']:
                 b['material'] = b['material'] or hit['p']
+            if 'o' in hit:
+                domains[hit['o']] = domains.get(hit['o'], 0) + 2
             if 'd' in hit:
                 b['dir'] += hit['d'] * (1 if st['scale'] > 0 else -1)
             if 'v' in hit:
@@ -450,23 +536,32 @@ def read(text):
                 b['voice'] = b['voice'] or v
                 player = prev in VOICE_PARAM_PREV or (prev in ARTICLES and i > 1 and toks[i - 2] in VOICE_PARAM_PREV)
                 follow = None if hit.get('c') in VOICE_OK and j - i > 1 else _next_concept(toks, j)
+                if j < n_tok and toks[j] in L.SOUND_NOUNS:
+                    follow = None              # "a kalimba ping": a note of the instrument
                 if player or (follow is not None and follow not in VOICE_OK):
                     c = hit.pop('c', None)     # "a bass boom": the instrument word only colours the boom
                     if c and not player:
-                        add(c, t, 'parts')
+                        add(c, key, 'parts')
                 else:
-                    add('voice:' + v, t)
+                    add('voice:' + v, key)
             if 'c' in hit and not ('v' in hit and hit['c'] not in VOICE_OK):
                 c, where = hit['c'], None
                 if j < n_tok and toks[j] in L.ENVELOPE_WORDS:
                     where = 'parts'            # "a short shimmering decay": how it ends, not what it is
                 elif c in L.VERB_JOBS and _next_concept(toks, j):
                     where = 'parts'            # "grabs a speed boost": the thing grabbed is the sound
-                add(c, t, where)
+                elif j - i == 1 and t in L.COLOUR_WORDS:
+                    where = 'parts'            # "a windy zip": the weather colours the sound
+                add(c, key, where)
+                nx = toks[j] if j < n_tok else None
+                if (key in _status_keys() and not st['simile'] and st['where'] == 'concepts'
+                        and (nx is None or nx in PUNCT or nx in L.STOP or nx in CONTEXT_WORDS
+                             or _key([nx]) in _status_keys())):
+                    outcomes.append(c)         # "upload finished.": an outcome said of its subject
             if st['where'] == 'context':
                 ctx_words.update(toks[i:j])
-            if j - i == 1 and t in L.DOMAIN_WORDS and st['scale'] > 0:
-                dm = L.DOMAIN_WORDS[t]
+            if j - i == 1 and _domain(t) and st['scale'] > 0:
+                dm = _domain(t)
                 domains[dm] = domains.get(dm, 0) + (2 if t in L.DOMAIN_STRONG else 1)
             if j - i == 1 and t in L.MATERIALS and not st['neg']:
                 b['material'] = b['material'] or L.MATERIALS[t]
@@ -475,8 +570,8 @@ def read(text):
             i = j
             continue
         hit = False
-        if t in L.DOMAIN_WORDS and st['scale'] > 0:
-            dm = L.DOMAIN_WORDS[t]
+        if _domain(t) and st['scale'] > 0:
+            dm = _domain(t)
             domains[dm] = domains.get(dm, 0) + (2 if t in L.DOMAIN_STRONG else 1)
             hit = True
         if t in L.MATERIALS and not st['neg']:
@@ -489,6 +584,8 @@ def read(text):
                 b['hints'].extend(h for h in _feel(m) if h not in b['hints'])
             hit = True
         if not hit and t in L.STOP and t not in SCOPE_END:
+            if t in CONTEXT_WORDS or t in PLACE_WORDS:
+                st.update(neg=False, skipped=0)   # a negation does not reach past "in a ...", "for ..."
             i += 1
             continue                       # articles and fillers keep a pending negation or intensifier
         if not hit and not t.isdigit() and t not in L.STOP:
@@ -497,7 +594,11 @@ def read(text):
                 if st['where'] == 'context':
                     ctx_words.add(stem(t))
             b['unknown'].append(t)
-        st.update(scale=1.0, neg=False)
+            if st['neg'] and st['skipped'] < 2:
+                st['skipped'] += 1             # "won't make people jump": the negation reaches the verb
+                i += 1
+                continue
+        st.update(scale=1.0, neg=False, skipped=0)
         i += 1
     named = set(b['concepts']) | set(b['parts']) | set(b['context'])
     if named & {'toggle', 'light_switch'} and not named & {'switch_on', 'switch_off'}:
@@ -508,11 +609,14 @@ def read(text):
     if domains:
         b['domain'] = max(domains, key=lambda k: domains[k])
     for k in ('concepts', 'parts', 'context'):         # "fails a stage" in a game is a loss, not an error
-        b[k] = [L.DOMAIN_SENSE.get((b['domain'], src.get(c)), c) for c in b[k]]
-    status = [c for c in b['concepts'][1:] if c in L.STATUS]
-    if status and b['concepts'][0] not in L.STATUS:    # "upload finished": the outcome is the job
+        b[k] = [x for x in (_sense().get((b['domain'], src.get(c)), c) for c in b[k]) if x]
+    _compose(b)
+    if 'ambience' in b['concepts'] and 'drone' not in b['concepts'] and set(b['hints']) & L.DARK_MOODS:
+        b['concepts'].insert(0, 'drone')               # "an ominous low bed" is a drone
+    status = [c for c in outcomes if c in b['concepts'][1:]]
+    if status:                                         # "upload finished": the outcome is the job
         b['concepts'] = status[:1] + [c for c in b['concepts'] if c != status[0]]
-    b['axes'] ={a: round(max(-1.0, min(1.0, v)), 2) for a, v in b['axes'].items() if abs(v) >= 0.05}
+    b['axes'] = {a: round(max(-1.0, min(1.0, v)), 2) for a, v in b['axes'].items() if abs(v) >= 0.05}
     b['dir'] = (b['dir'] > 0) - (b['dir'] < 0)
     b['context_words'] = sorted(ctx_words)
     return b
@@ -607,7 +711,26 @@ def _query(b):
         up = L.BROADER.get(c)
         if up and up not in q and w >= CONTEXT_WEIGHT:
             q[up] = BROADER_WEIGHT * w
+    if b.get('dir') and not (b['concepts'] or b.get('parts') or b.get('context')):
+        q['riser' if b['dir'] > 0 else 'downlifter'] = CONTEXT_WEIGHT   # "something that keeps climbing"
     return q
+
+
+def length_fit(b, row):
+    """how well a design's usual length fits the length asked for (1 = fits): a soft factor, down to 0.5 for a
+    design several times longer (or shorter) than asked, or much longer than a ceiling ("under 300 ms"). A usual
+    length is approximate, so twice or half the length asked for is free; a ceiling is firmer (half an octave over
+    it is free). Beds, pads, textures and loops are exempt: they are rendered at any length"""
+    d = row.get('dur_s')
+    if not d or row.get('loop') or row.get('kind') in STRETCH_KINDS:
+        return 1.0
+    f = 1.0
+    if b.get('dur'):
+        r = abs(math.log2(max(b['dur'], 0.01) / d))
+        f *= max(0.5, 1.0 - LENGTH_SLOPE * max(0.0, r - 1.0))
+    if b.get('dur_max') and d > b['dur_max']:
+        f *= max(0.5, 1.0 - 1.6 * LENGTH_SLOPE * max(0.0, math.log2(d / b['dur_max']) - 0.5))
+    return f
 
 
 def rank(b, rows=None, top=8, idx=None):
@@ -624,8 +747,9 @@ def rank(b, rows=None, top=8, idx=None):
             score[k] = score.get(k, 0.0) + qw * idf.get(w, 1.0) * fw
             if not w.startswith('feel:'):
                 why.setdefault(k, []).append(w.replace('voice:', ''))
-    pool = [k for k in score if k in why] or list(score)
     mat, dom, loop = b.get('material'), b.get('domain'), b.get('loop')
+    pool = ([k for k in score if k in why] or [k for k in score if dom in rows[k].get('domains', ())]
+            or list(score))                            # nothing named: the closest in feel, in the request's domain
 
     def chip(k):
         return 'retro' in rows[k]['tags'] or rows[k].get('material') == 'retro'
@@ -654,12 +778,7 @@ def rank(b, rows=None, top=8, idx=None):
             s *= 1.3
         if loop and not row.get('loop'):
             s *= 0.6
-        d = row.get('dur_s')
-        if d and not row.get('loop'):
-            if b.get('dur'):
-                s *= 1.0 - 0.05 * min(4.0, abs(math.log2(max(b['dur'], 0.01) / d)))
-            if b.get('dur_max') and d > 1.5 * b['dur_max']:
-                s *= 0.85
+        s *= length_fit(b, row)
         if b.get('dir'):
             s *= 0.92 if not t['dir'] else 1.35 if b['dir'] == t['dir'] else 0.7
         out.append({'id': row['id'], 'score': round(s, 3),
