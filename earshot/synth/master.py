@@ -64,11 +64,13 @@ def loudness(y):
     return polish.lufs_max(np.asarray(y, np.float64))
 
 
-def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66.0, loop=False):
+def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66.0, loop=False, cap=None):
     """a made sound as it ships: non-finite or silent renders refused, the low end cut under `low_cut` Hz (no DC, no
     rumble that small speakers turn into distortion), leading silence dropped, a `fade_in` s start from zero, the
-    silent end trimmed and faded; then the level: the true peak at peak_db, or with `lufs` the momentary-max loudness
-    at that value with the peaks limited to peak_db. A loop keeps its length and both ends (no trim, no fades)."""
+    silent end trimmed and faded; then the level: the true peak at peak_db, but no louder than `cap` LUFS
+    (momentary max: a dense sound at full peak is far louder than a tap at full peak); or with `lufs` the
+    momentary-max loudness at that value with the peaks limited to peak_db. A loop keeps its length and both ends
+    (no trim, no fades)."""
     y = np.array(y, np.float64)
     if not np.isfinite(y).all():
         raise ValueError('the render has non-finite samples')
@@ -84,7 +86,9 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
             y[:a] *= w if y.ndim == 1 else w[:, None]
         y = trim(y, tail_db)
     if lufs is None:
-        return y * 10 ** ((peak_db - true_peak_db(y)) / 20)
+        y = y * 10 ** ((peak_db - true_peak_db(y)) / 20)
+        over = loudness(y) - cap if cap is not None else 0.0
+        return y * 10 ** (-over / 20) if over > 0 else y
     y = y * 10 ** ((lufs - loudness(y)) / 20)
     return fx.limit(y, ceiling_db=peak_db) if true_peak_db(y) > peak_db else y
 

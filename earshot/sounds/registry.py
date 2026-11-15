@@ -35,10 +35,12 @@ AXES = ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion')
 KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud', 'whoosh', 'rise', 'fall', 'zap',
          'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
-MODULES = ('bank',)   # the design modules of this package, in catalogue order
+MODULES = ('ui', 'tonal', 'retro', 'bank')   # the design modules of this package, in catalogue order
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
+# the loudest a finished sound may be at full peak (momentary-max LUFS), by kind: beds sit low by nature
+LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0}
 _designs = {}
 _loaded = False
 
@@ -195,6 +197,10 @@ class Controls:
         self.used.add('voice')
         return self._voice or self._theme.get('voice') or self._d.voice
 
+    def room(self, default='room'):
+        """the space a design sits in: the theme's, else the design's own (earshot.synth.space)"""
+        return self._theme.get('space') or default
+
     @property
     def material(self):
         self.used.add('material')
@@ -210,12 +216,13 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     """one finished take of a design: (y, meta). request: pitch, dur, voice, material, theme (a dict, see theme.py),
     vary and the axes. y is float64, stereo (n, 2) or mono (n,), levelled (master.finish). meta: id, kind, seed, dur_s,
     peak_dbfs, lufs_max, pitch / voice / material when the design used them, `ignored` (what was asked for and not
-    read), and the audit (`checks`: forge.sfx.check, with the design's `allows` as notes)."""
+    read), and the audit (`checks`: forge.sfx.check, with the design's `allows` as notes). Level: the true peak at
+    peak_db, held under the kind's loudest level (LOUDEST); or exactly `lufs` (momentary max) when given."""
     from ..synth import master
     d = get(id)
     c = Controls(d, **request)
     y = d.fn(c, dsp.rng(seed_of(id, seed)))
-    y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=d.loop)
+    y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=d.loop, cap=LOUDEST.get(d.kind, LOUDEST['']))
     meta = {'id': id, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1)}
     if 'pitch' in c.used and (d.pitch or c._pitch):
@@ -238,6 +245,8 @@ def audit(y, d):
     from ..forge import sfx
     c = sfx.check(y, role='hit' if d.kind in ('hit', 'thud', 'boom') else None)
     allows = d.allows + (('edge', 'truncated') if d.loop else ())     # a loop runs into its own start
+    if d.pitch:
+        allows += ('ring',)        # the comb detector reads any steady harmonic tone as a comb: a note is one
     warn = [w for w in c.get('warnings', []) if w.get('code') not in allows]
     notes = list(c.get('notes', [])) + [w for w in c.get('warnings', []) if w.get('code') in allows]
     return {'ok': not warn, 'warnings': warn, 'notes': notes}
