@@ -1,0 +1,22 @@
+{
+  "name": "earshot",
+  "version": "1.0.0",
+  "description": "Make sound effects, notes and ambience in code from a request in words, and describe, match, measure and critique sound an agent cannot hear.",
+  "author": {
+    "name": "Leon Lin"
+  },
+  "homepage": "https://github.com/Leonxlnx/earshot",
+  "repository": "https://github.com/Leonxlnx/earshot",
+  "license": "MIT",
+  "keywords": ["audio", "sound", "sound-effects", "sound-design", "procedural-audio", "synthesis", "game-audio",
+               "ui-sounds", "audio-analysis", "mcp"],
+  "mcpServers": {
+    "earshot": {
+      "command": "earshot",
+      "args": ["mcp"],
+      "env": {
+        "EARSHOT_THREADS": "3"
+      }
+    }
+  }
+}

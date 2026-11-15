@@ -53,6 +53,10 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **Docs**: [docs/MAKE.md](docs/MAKE.md) (the reference of `make`, `sounds`, `pack`, the spec, themes, axes, the
   request language, the catalogue, the voices, recipes for a web page, a game and a film, how to add a design);
   VALIDATION section 8; LIMITS "Making sounds"; the earshot skill's making half.
+- **Claude Code plugin** (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `commands/`): the
+  repository is a plugin and its own marketplace (`/plugin marketplace add Leonxlnx/earshot`, `/plugin install
+  earshot@earshot`): the two skills, the MCP server from the installed `earshot`, `/earshot:make` and
+  `/earshot:make-set`.
 - **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
 

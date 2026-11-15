@@ -467,6 +467,20 @@ Tools: `make`, `make_set` and `sounds` (no models; their answer is the summary t
 call and stay warm. On a slow machine start Claude Code with `MCP_TIMEOUT=60000`. The optional `llm_critique` tool
 reads `GEMINI_API_KEY` from the environment; never write a literal key into a file.
 
+### Claude Code plugin
+
+The repository is also a Claude Code plugin and its own marketplace. Install the tool first (above): the plugin
+starts the `earshot` on your PATH and installs nothing itself. Then, in Claude Code:
+
+```
+/plugin marketplace add Leonxlnx/earshot
+/plugin install earshot@earshot
+```
+
+(or `/plugin install earshot --marketplace Leonxlnx/earshot` in one step). It brings the two skills below, the MCP
+server above (`earshot mcp` with `EARSHOT_THREADS=3`; skip `claude mcp add` then) and two commands:
+`/earshot:make WORDS` makes one sound into the project, `/earshot:make-set ui|game|arcade|film [theme]` a whole set.
+
 ### Python
 
 ```python
