@@ -59,7 +59,7 @@ def _add(name, low, high, default, says, ring_s, position, options=None, **spec)
                   pitch^-track (small bars are lighter and are played with harder mallets).
                   Or release: the seconds a plucked tine takes to slip off the nail or pin
       knee, order radiation efficiency (modal.radiation); knee_x: the knee as a multiple of the pitch
-      tick        click, grit and ring time of modal.contact_noise
+      tick        click, grit and ring time of modal.contact_noise (and, as a fourth, the Hz its grit starts at)
       resonator   function pitch -> the tube or box under the bar (q, boost_db, load, detune of modal.resonator)
       body, direct  soundboard modes that colour every partial (modal.body_response)
       knock       (level, modes): what the stroke makes of the thing the instrument sits on or is played through
@@ -75,9 +75,14 @@ def _add(name, low, high, default, says, ring_s, position, options=None, **spec)
 # the pair of materials (a 25 mm plastic ball on steel 6e8, on rosewood across the grain 2e8, glass on glass 7e9,
 # an iron clapper on bell bronze 4e10); the wound and felted ones are set to the contact times reported for a medium
 # stroke (cord on aluminium 0.6 ms, yarn on rosewood 1 - 3 ms, felt hammers about 0.7 ms).
+# [cal] Two mallets are set from recordings (lab renders/calib, 2026-11; anechoic single notes of the University of
+# Iowa MIS and far-miked ones of VSCO-2 CE). Yarn: wound over a core, it stiffens like felt (p 3.5), 1 ms on the bar at
+# a loud stroke, 1.5 ms at half the speed: the second mode of a C4 marimba bar comes 17 dB closer to its fundamental
+# from mf to ff. Hard rubber: 0.2 ms, so the third mode of a xylophone bar (5 - 6 kHz at C6) is still struck: it lies
+# 17 - 21 dB under the fundamental in notes of both sources.
 _MALLET = {
-    'plastic': (0.012, 6.0e8, 1.5), 'brass': (0.012, 2.0e9, 1.5), 'hard rubber': (0.025, 2.2e8, 1.5),
-    'cord': (0.030, 1.9e9, 2.0), 'yarn': (0.032, 3.0e8, 2.0), 'felt': (0.006, 1.2e10, 2.5),
+    'plastic': (0.012, 6.0e8, 1.5), 'brass': (0.012, 2.0e9, 1.5), 'hard rubber': (0.025, 9.0e8, 1.5),
+    'cord': (0.030, 1.9e9, 2.0), 'yarn': (0.032, 1.3e13, 3.5), 'felt': (0.006, 1.2e10, 2.5),
     'chime hammer': (0.25, 3.0e9, 1.5), 'wood': (0.030, 1.0e9, 1.5), 'clapper': (0.050, 2.2e8, 1.5),
     'iron clapper': (15.0, 4.0e10, 1.5), 'suede': (0.060, 1.0e9, 2.0), 'nail': (0.002, 5.0e7, 1.5),
     'finger': (0.020, 1.5e8, 2.0), 'pan stick': (0.015, 8.0e7, 1.5), 'drumstick': (0.045, 4.0e8, 1.5),
@@ -97,15 +102,20 @@ _FIELD = '-1 = the centre of the note field (mostly the note), +1 = its edge (mo
 #   mode 3   5.29             5.11             4.86
 #   T60 f1   8 s              4 s              2 s        (steel bars ring 5 - 15 s low, 1 - 3 s at the top)
 #   torsion  4.1, 8.2 x f0    2.5, 5.0         1.8, 3.6   (weak, -25 dB)
+# [cal] Five notes of one glockenspiel (VSCO-2 CE, C6 to C8): a bar this small hardly radiates its fundamental, so in
+# the first 100 ms modes 2 and 3 stand as high as it (-2 and 0 dB at C6, +5 and 0 at G6; `order`, `strike`) and the
+# first 20 ms have their centroid near 6 kHz; mode 2 falls 50 dB/s at C6, 90 at G6, 130 at C7 (`cord`); between the
+# modes the stroke leaves a hiss at 4 - 8 kHz, 20 - 30 dB under the note, that is still there 60 ms later (`tick`).
+# Its bars measure 2.94 : 5.54 at C6 falling to 2.68 at C8, above the 2.71 : 5.15 kept here from Rossing.
 def _glockenspiel(f0, x, vel):
     return modal.bar_modes(f0, x, 0.0095, 0.032, 5100.0, 8)
 
 
 _add('glockenspiel', 'C5', 'C8', 'C6',
      ['a glockenspiel note', 'a small steel bar struck with a hard mallet, bright and ringing',
-      'orchestra bells playing one high clear note'], 5.6, _BAR,
-     modes=_glockenspiel, strike=(0.46, 0.5, 0.224), material='steel', support=(0.66, 0.33), loss=0.64, cord=50.0,
-     mallet='plastic', speed=4.0, track=0.15, knee=3400.0, order=0.5, tick=(0.25, 0.04, 0.002), damper=0.18,
+      'orchestra bells playing one high clear note'], 4.6, _BAR,
+     modes=_glockenspiel, strike=(0.42, 0.5, 0.224), material='steel', support=(0.66, 0.33), loss=0.64, cord=25.0,
+     mallet='plastic', speed=4.0, track=0.15, knee=3400.0, order=1.5, tick=(0.25, 0.1, 0.04, 3000.0), damper=0.18,
      extent=0.5)
 
 
@@ -139,7 +149,12 @@ _add('celesta', 'C4', 'C8', 'C5',
 #            F3 175 Hz        C5 523 Hz        F6 1397 Hz
 #   mode 2   3.99             3.99             3.90       (tuned two octaves up to about C6)
 #   mode 3   10.2             9.6              8.9        (tuned near 10 only on the low bars)
-#   T60 f1   18 s             8 s              3.5 s      (pedal down, motor off; 10 - 40 s reported low)
+#   T60 f1   22 s             16 s             11 s       (pedal down, motor off; 10 - 40 s reported low)
+# [cal] Five anechoic notes of one vibraphone (University of Iowa MIS, C3 to C6, mf and ff at C4): the fundamental
+# falls 2.5 - 2.7 dB/s at C3 and C4 and 4.2 - 4.3 dB/s at C5 and C6, so the top rings almost as long as the bottom
+# (`support`, `loss`); its envelope peaks 63 ms after the stroke at C4, 41 ms at C5, 15 ms at C6: some 17 - 22
+# periods (the tube's q); the bars are struck in the middle, on the node of mode 2, which lies 19 - 36 dB under the
+# fundamental while mode 3 reaches -4 dB at ff (`strike`).
 def _vibraphone(f0, x, vel):
     second = _over(f0, ('F3', 3.99), ('C6', 3.99), ('F6', 3.90))
     third = _over(f0, ('F3', 10.2), ('C4', 9.9), ('C5', 9.6), ('C6', 9.2), ('F6', 8.9))
@@ -147,15 +162,16 @@ def _vibraphone(f0, x, vel):
 
 
 def _vibraphone_tube(f0):
-    return {'q': 40.0, 'boost_db': _over(f0, ('F3', 10.0), ('C5', 7.0), ('F6', 3.0)),
+    return {'q': _over(f0, ('F3', 18.0), ('C4', 10.0), ('F6', 9.0)),
+            'boost_db': _over(f0, ('F3', 10.0), ('C5', 7.0), ('F6', 3.0)),
             'load': _over(f0, ('F3', 0.8), ('F6', 0.5)), 'detune': 0.003}
 
 
 _add('vibraphone', 'F3', 'F6', 'F4',
      ['a vibraphone note', 'an aluminium bar struck with a soft mallet, a long mellow ringing tone',
-      'a vibraphone with a slow shimmering sustain'], 9.9, _BAR,
+      'a vibraphone with a slow shimmering sustain'], 19.0, _BAR,
      options={'motor': 'tremolo of the resonator discs in Hz, 3 - 8 is usual; 0 = motor off (default)'},
-     modes=_vibraphone, strike=(0.44, 0.5, 0.224), material='aluminium', support=(0.1, 0.33), loss=1.52, cord=6.0,
+     modes=_vibraphone, strike=(0.485, 0.5, 0.224), material='aluminium', support=(0.14, 0.0), loss=0.375, cord=6.0,
      order=0.7, mallet='cord', speed=3.5, track=0.25, knee=2500.0, tick=(0.1, 0.03, 0.003), resonator=_vibraphone_tube,
      damper=0.22, extent=0.4)
 
@@ -166,6 +182,12 @@ _add('vibraphone', 'F3', 'F6', 'F4',
 #   mode 2   4.00             4.00             4.00       (falls to 3.6 by C7: the top bars are too short to tune)
 #   mode 3   10.0             9.7              8.6
 #   T60 f1   3.5 s            1.5 s            0.42 s     (with resonator; about twice that without, after Bork)
+# [cal] Four anechoic notes with yarn mallets (University of Iowa MIS, C3 to C5) agree with these ring times (C4:
+# 1.45 - 1.57 s; C5: 1.0 s) and with the tube's bloom (the envelope peaks after 160, 75, 35 ms at C3, C4, C5). The
+# bars are struck near the middle, between the antinode of mode 3 and the node of mode 2: at ff mode 2 lies 8, 13 and
+# 43 dB under the fundamental at C3, C4, C5 and mode 3 of the C3 bar as high as its fundamental (`strike`); one pair
+# of mallets plays the whole instrument (`track`). Seven far-miked notes of another marimba (VSCO-2 CE) ring 2.5
+# times as long and are brighter still: not followed.
 def _marimba(f0, x, vel):
     second = _over(f0, ('C2', 4.0), ('C6', 4.0), ('C7', 3.6))
     third = _over(f0, ('C2', 10.0), ('C3', 9.9), ('C4', 9.7), ('C5', 9.3), ('C6', 8.6), ('C7', 7.6))
@@ -180,8 +202,8 @@ def _marimba_tube(f0):
 _add('marimba', 'C2', 'C7', 'C4',
      ['a marimba note', 'a wooden bar struck with a soft yarn mallet, warm and round',
       'a low wooden mallet percussion note with a hollow resonance'], 1.3, _BAR,
-     modes=_marimba, strike=(0.40, 0.5, 0.224), material='rosewood', support=(0.15, -0.8), loss=0.6, cord=6.0,
-     mallet='yarn', speed=3.0, track=0.3, knee=1800.0, tick=(0.1, 0.08, 0.005), resonator=_marimba_tube,
+     modes=_marimba, strike=(0.46, 0.5, 0.224), material='rosewood', support=(0.15, -0.8), loss=0.6, cord=6.0,
+     mallet='yarn', speed=3.0, track=0.0, knee=1800.0, tick=(0.1, 0.08, 0.005), resonator=_marimba_tube,
      damper=0.07, extent=0.4)
 
 
@@ -191,6 +213,9 @@ _add('marimba', 'C2', 'C7', 'C4',
 #   mode 2   3.00             3.00             2.80       (tuned a twelfth up to about C7)
 #   mode 3   6.1              5.9              5.4        (not tuned; measured 6 - 7 low, the uniform bar at the top)
 #   T60 f1   1.3 s            0.45 s           0.10 s     (0.5 - 1.5 s reported; partial 3 dies 2 - 4 times faster)
+# [cal] Two anechoic notes (University of Iowa MIS, C5 and C7, hard rubber, ff) and six far-miked ones (VSCO-2 CE,
+# G5 to C8): the fundamental of C5 falls 62 dB/s, as here; struck near the middle, mode 2 lies 21 dB (Iowa C5), 5 to
+# 65 dB (VSCO) under the fundamental and mode 3 17 - 21 dB under it up to C6 (`strike`, the hard rubber mallet).
 def _xylophone(f0, x, vel):
     second = _over(f0, ('F4', 3.0), ('C7', 3.0), ('C8', 2.8))
     third = _over(f0, ('F4', 6.1), ('C6', 5.9), ('C8', 5.4))
@@ -205,7 +230,7 @@ def _xylophone_tube(f0):
 _add('xylophone', 'F4', 'C8', 'C6',
      ['a xylophone note', 'a hard wooden bar struck with a hard mallet, short, dry and bright',
       'a sharp wooden mallet percussion note'], 0.4, _BAR,
-     modes=_xylophone, strike=(0.38, 0.5, 0.224), material='rosewood', support=(0.2, 0.0), loss=0.6, cord=8.0,
+     modes=_xylophone, strike=(0.46, 0.5, 0.224), material='rosewood', support=(0.2, 0.0), loss=0.6, cord=8.0,
      mallet='hard rubber', speed=4.0, track=0.2, knee=2200.0, tick=(0.3, 0.14, 0.003), resonator=_xylophone_tube,
      damper=0.06, extent=0.4)
 
@@ -631,8 +656,7 @@ def _voice(name, f0, vel, c, r, seconds=None, dur=None):
         fk = fk * 2.0 ** (-0.4 * c['size'])
         y += modal.ring(fk, np.pi * fk / qk, level * gk * drive, n, max(tau, 2e-4), expo).imag.T
 
-    click, grit, ring_s = S['tick']
-    tick = modal.contact_noise(tau, r, expo, click, grit, ring_s) * drive
+    tick = modal.contact_noise(tau, r, expo, *S['tick']) * drive
     k = min(n, len(tick))
     y[:k] += tick[:k, None]
     if c.get('buzz', 0.0) > 0:

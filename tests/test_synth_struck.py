@@ -275,3 +275,48 @@ def test_options_and_chord():
     assert c.shape[1] == 2 and np.abs(c).max() <= 0.9 + 1e-9 and np.abs(c[0]).max() == 0.0
     solo = struck.note('marimba', 'G3', 0.8)
     assert len(c) >= len(solo) + int(0.1 * SR) - 2
+
+
+# ----------------------------------------------------------------------------- laws calibrated against recordings
+# Anechoic single notes of the University of Iowa MIS (marimba, vibraphone, xylophone) and notes of VSCO-2 CE
+# (glockenspiel, marimba, xylophone): the [cal] comments in struck.py. No recording is needed to check them.
+def mode_db(name, pitch, vel, ratio, tol=0.03):
+    """level of the mode near ratio x the pitch in the first 100 ms, dB re the fundamental"""
+    x = struck.note(name, pitch, vel, 1.0).mean(axis=1)
+    return peak_near(x, ratio * hz(pitch), tol, 0.1)[1] - peak_near(x, hz(pitch), 0.01, 0.1)[1]
+
+
+def test_tuned_bars_are_struck_near_the_middle():
+    assert -20 < mode_db('marimba', 'C4', 0.9, 4.0) < -8             # recorded with yarn at ff: -13.5 dB
+    assert -14 < mode_db('marimba', 'C3', 0.9, 4.0) < -3             # -8 dB
+    assert mode_db('marimba', 'C3', 0.9, 9.9) > -8                   # mode 3 of a low bar stands as high as mode 1
+    loud = mode_db('vibraphone', 'C4', 0.95, 3.99)
+    assert -30 < loud < -14                                          # recorded at ff: -21 dB
+    assert mode_db('vibraphone', 'C4', 0.95, 9.9) > loud             # and mode 3 above it: -4 dB
+    assert mode_db('xylophone', 'C5', 0.9, 3.0) < -6                 # recorded: -21 dB (anechoic), -5 .. -37 (far)
+    assert mode_db('xylophone', 'C6', 0.9, 5.9) > -32                # the hard mallet still reaches mode 3: -21 dB
+
+
+def test_a_wound_mallet_stiffens_with_the_stroke():
+    assert mode_db('marimba', 'C4', 0.9, 4.0) > mode_db('marimba', 'C4', 0.3, 4.0) + 8     # recorded mf to ff: 17 dB
+
+
+def test_vibraphone_rings_long_to_the_top_and_its_tube_fills_in_some_20_periods():
+    rings = [t60_of(struck.note('vibraphone', p, 0.5).mean(axis=1), hz(p)) for p in ('C4', 'C5', 'C6')]
+    assert 15 < rings[0] < 27 and 11 < rings[1] < 21 and 9 < rings[2] < 18, rings     # recorded: 20, 15, 14 s
+    for p, lo, hi in (('C4', 40, 95), ('C5', 22, 62)):               # recorded: the envelope peaks after 63, 41 ms
+        x = struck.note('vibraphone', p, 0.5, 1.0).mean(axis=1)
+        w = int(0.02 * SR)
+        het = x * np.exp(-2j * np.pi * hz(p) * np.arange(len(x)) / SR)
+        env = np.abs(np.lib.stride_tricks.sliding_window_view(het, w)[::w // 8] @ np.hanning(w))
+        assert lo < (np.argmax(env) * (w // 8) + w // 2) / SR * 1e3 < hi, p
+
+
+def test_glockenspiel_attack_is_its_upper_modes():
+    x = struck.note('glockenspiel', 'C6', 0.6).mean(axis=1)
+    f0 = hz('C6')
+    assert abs(mode_db('glockenspiel', 'C6', 0.6, 2.71)) < 9         # recorded: mode 2 at -2 dB (C6), +5 dB (G6)
+    assert mode_db('glockenspiel', 'C6', 0.6, 5.2, 0.04) > -9        # mode 3 at 0 dB
+    f2, _ = peak_near(x, 2.71 * f0, 0.03, 0.3)
+    assert 35 < 60 / t60_of(x, f2, 0.02) < 130                       # mode 2 falls 50 dB/s at C6, 90 at G6
+    assert centroid(x, 0.02) > 4000 > 1.5 * centroid(x[int(0.3 * SR):], 0.1)      # 6 kHz at first, then the note

@@ -237,3 +237,108 @@ def test_a_four_second_piano_note_renders_fast():
         y = S.note('grand_piano', 'C4', dur=4.0)
         best = min(best, time.perf_counter() - t)
     assert len(y) >= 4 * SR and best < 0.6, best
+
+
+# ----------------------------------------------------------------------------- laws calibrated against recordings
+# What single notes of a grand (University of Iowa MIS) and of an upright (VSCO-2 CE) agree on: the [cal] comment
+# in strings.py. The bounds are the recordings' ranges with a margin; no recording is needed to check them.
+PIANOS = ('grand_piano', 'felt_piano')
+STIFF = {'grand_piano': {'C2': 7.4e-5, 'C4': 3.8e-4, 'C6': 2.6e-3, 'C7': 8.6e-3},
+         'felt_piano': {'C2': 1.3e-4, 'C4': 6.8e-4, 'C6': 4.7e-3, 'C7': 1.5e-2}}
+_takes = {}
+
+
+def take(name, pitch, vel=0.5, dur=0.6):
+    """a note rendered once for all the checks that look at it"""
+    key = (name, pitch, vel, dur)
+    if key not in _takes:
+        _takes[key] = S.note(name, pitch, vel=vel, dur=dur)
+    return _takes[key]
+
+
+def stretched(f0, B, count):
+    k = np.arange(1, count + 1)
+    return k * f0 * np.sqrt((1 + B * k * k) / (1 + B))
+
+
+def partials_db(name, pitch, vel, count):
+    """levels of partials 1 .. count in dB re the strongest of them, from 0.03 .. 0.23 s"""
+    seg = mono(take(name, pitch, vel))[int(0.03 * SR):int(0.23 * SR)]
+    nf = 1 << 17
+    F = np.abs(np.fft.rfft(seg * np.hanning(len(seg)), nf))
+    f, f0 = np.fft.rfftfreq(nf, 1 / SR), S._pitch(pitch)
+    top = [F[slice(*np.searchsorted(f, [g - 0.2 * f0, g + 0.2 * f0]))].max()
+           for g in stretched(f0, STIFF[name][pitch], count)]
+    return 20 * np.log10(np.array(top) / max(top))
+
+
+def between_db(name, pitch, vel, t0):
+    """power between the partials from 150 to 1500 Hz in the 50 ms after t0, in dB re that window's whole power: the
+    band filled at the median density found more than 0.3 f0 away from every partial"""
+    seg = mono(take(name, pitch, vel))[int(t0 * SR):int((t0 + 0.05) * SR)]
+    nf = 1 << 15
+    P = np.abs(np.fft.rfft(seg * np.hanning(len(seg)), nf)) ** 2
+    f, f0 = np.fft.rfftfreq(nf, 1 / SR), S._pitch(pitch)
+    band = (f >= 150) & (f < 1500)
+    gap = band & (np.abs(f[:, None] - stretched(f0, STIFF[name][pitch], 80)[None, :]).min(axis=1) > 0.3 * f0)
+    return 10 * np.log10(np.median(P[gap]) * band.sum() / P[f > 40].sum())
+
+
+def fund_db(y, f0):
+    """level of the fundamental over time, dB per sample: the note shifted down by f0 and averaged over 30 ms"""
+    k = int(0.03 * SR)
+    z = np.cumsum(mono(y) * np.exp(-2j * np.pi * f0 * np.arange(len(y)) / SR))
+    return 20 * np.log10(np.abs(z[k:] - z[:-k]) / k + 1e-12)
+
+
+def fall_s(y, f0, by=12.0):
+    """seconds the fundamental takes to fall its first `by` dB"""
+    db = fund_db(y, f0)
+    start = int(0.03 * SR)
+    return (start + int(np.argmax(db[start:] < db[:int(0.2 * SR)].max() - by))) / SR
+
+
+@pytest.mark.parametrize('name', PIANOS)
+def test_piano_prompt_sound_quickens_up_the_keyboard(name):
+    t = [fall_s(S.note(name, p, vel=0.6, dur=1.5), S._pitch(p)) for p in ('C3', 'C4', 'C5', 'C6')]
+    assert t[0] > t[1] > t[2] > t[3], t
+    assert 12 / 40 < t[1] < 12 / 14, t                              # recorded at C4: 16 to 32 dB per second
+    assert 12 / 85 < t[2] < 12 / 30, t                              # at C5: 43 to 48
+    assert 12 / 140 < t[3] < 12 / 45, t                             # at C6: 60 to 100
+
+
+@pytest.mark.parametrize('name', PIANOS)
+def test_piano_aftersound_takes_over_some_25_db_down(name):
+    f0 = S._pitch('C4')
+    db = fund_db(S.note(name, 'C4', vel=0.6, dur=7.5), f0)
+    down = db[:int(0.2 * SR)].max() - db[int(2.5 * SR):int(3.5 * SR)].max()
+    assert 18 < down < 36, down                                     # recorded 3 s into a C4: 28 to 32 dB down
+    assert rate(db, 3.5, 6.5) < 8                                   # and from there it sinks slowly
+
+
+@pytest.mark.parametrize('name', PIANOS)
+def test_piano_knock_follows_the_note_and_is_gone_in_a_moment(name):
+    at = [between_db(name, 'C4', v, 0.0) for v in (0.2, 0.5, 0.9)]
+    assert all(-32 < x < -15 for x in at), at                       # recorded at mf and ff: -21 to -27 dB
+    assert max(at) - min(at) < 7, at                                # the board answers the blow: no louder when soft
+    assert at[1] - between_db(name, 'C4', 0.5, 0.15) > 15           # recorded: 22 to 26 dB less after 150 ms
+    assert between_db(name, 'C6', 0.5, 0.0) > at[1]                 # and more of the note in the treble
+
+
+@pytest.mark.parametrize('name', PIANOS)
+def test_piano_spectrum_has_no_ping_a_pure_treble_and_a_weak_low_fundamental(name):
+    soft, loud = partials_db(name, 'C4', 0.2, 16), partials_db(name, 'C4', 0.9, 16)
+    assert soft[8:].max() < -40, soft                               # recorded at pp and mf: -45 to -62 dB
+    assert loud[4:8].mean() > soft[4:8].mean() + 6                  # the felt hardens with the blow
+    assert partials_db(name, 'C6', 0.5, 3)[1] < -12                 # recorded: partial 2 of C6 at -18 to -27 dB
+    assert partials_db(name, 'C7', 0.5, 3)[1] < -22                 # of C7 at -34 to -41 dB
+    assert partials_db(name, 'C2', 0.5, 8)[0] < -15                 # the board is deaf at 65 Hz: -26 and -39 dB
+
+
+@pytest.mark.parametrize('name', PIANOS)
+def test_piano_attack_is_a_board_filling_not_a_click(name):
+    m = mono(take(name, 'C4', 0.5))[:int(0.3 * SR)]
+    k = int(0.003 * SR)
+    e = np.sqrt(np.maximum(signal.fftconvolve(m * m, np.ones(k) / k)[:len(m)], 0.0))
+    rise = (np.argmax(e > 0.9 * e.max()) - np.argmax(e > 0.1 * e.max())) / SR * 1e3
+    assert 4 < rise < 40, rise                                      # recorded: 13 to 25 ms from 10 % to 90 %

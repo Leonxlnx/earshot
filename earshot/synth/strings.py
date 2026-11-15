@@ -80,11 +80,11 @@ INSTRUMENTS = {
 #
 #   note                  B          T60 partial 1         T60 near 3 kHz   attack     centroid mf / ff (Hz)
 #   grand piano C2        7e-5       13 s, then 35 s       1.5 s            3-12 ms    500-900 / 800-1400
-#   grand piano C4        3.8e-4     6.5 s, then 20 s      1.5 s            2-8 ms     600-1100 / 1000-1700
-#   grand piano C7        8.6e-3     0.9 s, then 3 s       -                1-5 ms     2300-3000 / 2600-3600
+#   grand piano C4        3.8e-4     2.5 s, then 25 s      1.5 s            8-25 ms    350-550 / 450-700
+#   grand piano C7        8.6e-3     1.5 s, then 3 s       -                1-5 ms     2000-2400 / 2100-2600
 #   felt piano C2         1.3e-4     11 s, then 30 s       0.9 s            5-20 ms    250-450 / 350-700
-#   felt piano C4         6.8e-4     5.5 s, then 16 s      0.9 s            5-20 ms    350-600 / 500-900
-#   felt piano C6         4.7e-3     2 s, then 6 s         -                2-8 ms     1050-1500 / 1100-1700
+#   felt piano C4         6.8e-4     3 s, then 20 s        0.9 s            8-30 ms    280-450 / 350-600
+#   felt piano C6         4.7e-3     0.7 s, then 5 s       -                2-25 ms    1050-1300 / 1050-1400
 #   electric piano F2     harmonic   14 s                  ("bell" 0.5 s)   3-12 ms    150-400 / 300-900
 #   electric piano C4     harmonic   7 s                   ("bell" 0.3 s)   3-10 ms    350-600 / 600-1100
 #   electric piano C6     harmonic   3 s                   ("bell" 0.15 s)  2-6 ms     1100-1500 / 1300-1900
@@ -97,6 +97,26 @@ INSTRUMENTS = {
 # A partial's T60 is 6.91 / rate. Rates follow rate = a + b1 f + b2 f^2 per string (air, internal friction) plus what
 # the bridge takes from the polarisation that moves it; the T60 near 3 kHz of nylon strings follows from the loss
 # factors of [V]. mf is vel 0.5, ff vel 1.
+#
+# [cal] The pianos are also calibrated against recordings (lab renders/calib, 2026-11): eight single notes of a
+# 2.1 m grand (University of Iowa MIS: C2 to C7, and pp / mf / ff at C4, microphones a hand's breadth over the
+# strings) and seven of an upright (VSCO-2 CE: C2 to C6, three dynamics at C4). What the notes of both agree on:
+#   prompt sound   the fundamental falls its first 12 dB at 12-20 dB/s at C3, 16-32 at C4, 43-48 at C5 and 60-100
+#                  at C6 (the 8-10 dB/s of [M] is the slope of the whole first seconds); then the aftersound takes
+#                  over 22-30 dB down and falls 2-3 dB/s, and the unison beats more the higher the note
+#                  (bridge, bridge_h, pol, detune)
+#   knock          between the partials from 150 to 1500 Hz the first 50 ms hold -21 to -27 dB of the note's
+#                  power at C4, at mf and ff alike (it is board and case answering the blow, so it follows the
+#                  note), -13 to -15 dB at C6 and -7 dB at C7; 150 ms later 22-26 dB less; little above 2 kHz
+#                  (cloud, diffuse, knock, knock_hz, knock_vel, case)
+#   spectrum       the partials above 3 kHz of a C4 at mf lie 47 dB under its fundamental (30 dB in the upright),
+#                  with no hiss between them (rough); from C5 up the fundamental stands nearly alone, partial 2 of
+#                  C6 at -18 to -27 dB and of C7 at -34 dB (h_stiff above C4); the fundamental of C2 lies 26 to
+#                  39 dB under its strongest partial (hp); the tilt of the board (flat, lp, lp_order)
+#   attack         the 3 ms envelope of a C4 takes 13-25 ms from 10 % to 90 % of its peak (cloud, diffuse)
+# Both libraries kept their recording level, and mf lies 11-15 dB under ff and pp another 13-20 dB lower: mf is a
+# hammer at about 1 m/s (vel 0.3 here), ff one near 5 m/s. The centroids and attack times of the two C4 rows and
+# the C7 row above are those measured on these notes; the other rows are still literature values.
 
 _KEYS = (21, 36, 60, 84, 96, 108)                    # A0 C2 C4 C6 C7 C8: where the piano tables are given
 
@@ -110,47 +130,59 @@ _GRAND = dict(
     B=((21, 2.8e-4), (28, 1.2e-4), (36, 7.4e-5), (48, 1.6e-4), (60, 3.8e-4), (72, 9.5e-4), (84, 2.6e-3),
        (96, 8.6e-3), (108, 2.5e-2)),
     strings=((29, 1), (41, 2), (200, 3)),           # one string per note up to key 29, two up to 41, then three
-    detune=0.08,                                    # spread of a tuned unison, Hz at the fundamental
+    # spread of a tuned unison, Hz at the fundamental: close to one cent from C4 up [cal]
+    detune=((21, 0.06), (48, 0.08), (60, 0.14), (72, 0.27), (84, 0.4), (108, 0.8)),
     uneven=0.15,                                    # how unequally the hammer meets the strings of a unison
     # b2: 2.5e-7 s is the wire alone [C]; the rest is what bridge and board take at high frequencies, set so that
     # the band near 3 kHz of a mid-range note falls 60 dB in about 1.5 s (partial 10 of C4: some 40 dB/s)
     loss=(_tab(0.14, 0.15, 0.2, 0.6, 1.2, 2.4), 0.0, _tab(4.5e-7, 4.5e-7, 4.5e-7, 1e-7, 4e-8, 2e-8)),
-    bridge=((21, 0.24), (36, 0.19), (60, 0.3), (72, 0.38), (84, 0.8), (96, 2.1), (108, 4.5)), bridge_h=0.15,
-    bridge_fc=2500.0, pol=(0.25, 0.6),
+    # what one string alone loses to the bridge, 1/s: the prompt sound of the unison [cal]
+    bridge=((21, 0.24), (36, 0.19), (48, 0.45), (60, 0.85), (72, 0.75), (84, 1.8), (96, 1.5), (108, 3.0)),
+    bridge_h=0.05, bridge_fc=2500.0, pol=(0.3, 0.6),
     # Hammer and string, per string of the unison: masses, impedances and striking points of Chaigne & Askenfelt
-    # 1994 at C2, C4, C7, extended to both ends. The felt is close to theirs at a force of 20 N, with an exponent a
-    # quarter higher (inside the measured 2.2-3.5) and stiffening with the speed of compression (h_hyst, s/m: Stulov's
-    # hysteresis in its simplest form), so that it is as soft at pianissimo as contact times and spectra say. rough is
-    # the grain of the felt: the share of the force that fluctuates during the contact (the hiss in the knock).
+    # 1994 at C2, C4, C7, extended to both ends. The felt is close to theirs at a force of 20 N up to C4 and softer
+    # above it [cal], with an exponent a quarter higher (inside the measured 2.2-3.5) and stiffening with the speed of
+    # compression (h_hyst, s/m: Stulov's hysteresis in its simplest form), so that it is as soft at pianissimo as
+    # contact times and spectra say. rough is the grain of the felt: the share of the force that fluctuates during
+    # the contact; it is what a soft note has above 3 kHz, and no more than that [cal].
     h_mass=_tab(10.5e-3, 4.9e-3, 2.97e-3, 2.4e-3, 2.2e-3, 2.0e-3),
-    h_stiff=_tab(1.67e8, 7.0e8, 8.2e9, 2.9e11, 1.76e12, 8.1e12), h_exp=_tab(2.45, 2.55, 2.75, 3.05, 3.25, 3.45),
-    h_hyst=0.15, rough=0.04, z=_tab(12.0, 3.8, 2.06, 2.0, 1.98, 1.9),
+    h_stiff=_tab(1.67e8, 7.0e8, 8.2e9, 7.0e10, 4.0e11, 2.0e12), h_exp=_tab(2.45, 2.55, 2.75, 3.05, 3.25, 3.45),
+    h_hyst=0.15, rough=0.008, z=_tab(12.0, 3.8, 2.06, 2.0, 1.98, 1.9),
     strike=_tab(0.12, 0.12, 0.12, 0.085, 0.0625, 0.05),
     speed=(0.3, 5.0, 1.6),                          # hammer speed m/s at vel 0 and 1, and the curve between
     damp=((21, 0.45), (40, 0.25), (60, 0.12), (88, 0.06)), damp_top=88.5, damp_at=0.16,     # no dampers above E6
-    hp=45.0, flat=1400.0, lp=3800.0, modes=(), cloud=(48.0, 9000.0, 17.0, 0.028, 22.0, 18.0, 0.5),
+    # the board [cal]: level from 350 Hz up for the long bridge (the bass bridge keeps its rise to 1400 Hz), 12 dB
+    # per octave down above 2.6 kHz, deaf below 100 Hz and, at the stiff treble end of the bridge, below some
+    # hundred Hz; its modes carry twice the smooth path, ring with a loss factor near 2 % and reach the
+    # microphones in any phase
+    hp=((84, 100.0), (96, 500.0), (108, 1000.0)), flat=((48, 1400.0), (60, 350.0)), lp=2600.0, lp_order=2, modes=(),
+    cloud=(60.0, 8000.0, 17.0, 0.028, 50.0, 90.0, 2.0), diffuse=1.0,
     bridge_k=0.11, pan=0.22, spread=0.75, sym=0.3,
-    knock=_tab(-30.0, -28.0, -22.0, -15.0, -10.0, -6.0), knock_hz=1500.0, case=(150.0, 6000.0, 60, 0.08, 0.012),
-    felt=None, release=-38.0)
+    # the blow through action, keybed and case: as loud against the note at every dynamic [cal]
+    knock=((21, -30.0), (36, -28.0), (48, -24.0), (60, -18.0), (72, -19.0), (84, -15.0), (96, -20.0), (108, -16.0)),
+    knock_hz=600.0, knock_vel=0.0, case=(150.0, 2500.0, 60, 0.5, 0.2), felt=None, release=-38.0)
 
 _FELT = dict(
     _GRAND, seed=12,
-    B=tuple((k, 1.8 * b) for k, b in _GRAND['B']), detune=0.15, uneven=0.3,
+    B=tuple((k, 1.8 * b) for k, b in _GRAND['B']), uneven=0.3,
+    detune=((21, 0.09), (48, 0.12), (60, 0.2), (72, 0.4), (84, 0.6), (108, 1.2)),
     loss=(_tab(0.17, 0.18, 0.25, 0.75, 1.5, 3.0), 0.0, _tab(7e-7, 7e-7, 7e-7, 2e-7, 8e-8, 5e-8)),
-    bridge=((21, 0.27), (36, 0.22), (60, 0.34), (72, 0.43), (84, 0.9), (96, 2.3), (108, 5.0)),
+    bridge=((21, 0.27), (36, 0.2), (48, 0.2), (60, 0.42), (72, 0.85), (84, 2.2), (96, 1.7), (108, 3.4)),
     # an upright's lighter hammers striking through the felt strip of the practice rail: a softer, lossier spring
     h_mass=_tab(9.0e-3, 4.2e-3, 2.6e-3, 2.1e-3, 1.9e-3, 1.8e-3),
-    h_stiff=_tab(3.6e7, 1.5e8, 1.8e9, 6.0e10, 3.8e11, 1.7e12), h_exp=_tab(2.65, 2.75, 2.95, 3.25, 3.45, 3.65),
-    h_hyst=0.3, rough=0.03,
+    h_stiff=_tab(9.0e7, 3.8e8, 4.5e9, 6.0e10, 3.8e11, 1.7e12), h_exp=_tab(2.65, 2.75, 2.95, 3.25, 3.45, 3.65),
+    h_hyst=0.3,
     speed=(0.25, 4.2, 1.6),
-    hp=80.0, flat=450.0, lp=2600.0, cloud=(85.0, 7000.0, 22.0, 0.03, 20.0, 16.0, 0.6), pan=0.15, spread=0.6,
-    sym=0.2, knock=_tab(-26.0, -23.0, -18.0, -12.0, -8.0, -4.0), knock_hz=1200.0, case=(140.0, 5000.0, 60, 0.07, 0.012),
-    felt=(-30.0, 120.0, 1400.0), release=-34.0)
+    hp=((72, 130.0), (84, 300.0), (96, 600.0), (108, 1000.0)), flat=450.0, lp=2600.0,
+    cloud=(85.0, 7000.0, 22.0, 0.03, 50.0, 90.0, 2.0), pan=0.15, spread=0.6, sym=0.2,
+    knock=((21, -28.0), (36, -26.0), (48, -22.0), (60, -16.0), (72, -17.0), (84, -13.0), (96, -18.0), (108, -14.0)),
+    case=(140.0, 2500.0, 60, 0.5, 0.2), felt=(-30.0, 120.0, 1400.0), release=-34.0)
 
 _PLUCK = dict(
     kind='pluck', strings=((200, 1),), detune=0.0, bridge_h=0.25, bridge_fc=3000.0, pol=(0.0, 0.3), fc_vel=1.6,
     stop_loss=0.0, open=None, damp=0.07, damp_top=200.0, damp_at=None, bridge_k=0.03, pan=0.0,
-    spread=0.7, sym=0.0, knock=None, knock_hz=300.0, case=None, felt=None, release=-44.0, modes=())
+    spread=0.7, sym=0.0, knock=None, knock_hz=300.0, knock_vel=8.0, case=None, felt=None, release=-44.0, modes=(),
+    lp_order=1, diffuse=0.0)
 
 _SPEC = {
     'grand_piano': _GRAND,
@@ -218,13 +250,13 @@ _SPEC = {
     'dulcimer': dict(
         _GRAND, seed=28, B=((50, 3e-5), (86, 1.5e-4)), strings=((200, 2),), detune=0.7,
         loss=(((50, 0.35), (62, 0.45), (86, 0.9)), 1.0e-3, 7e-8), bridge=((50, 0.12), (62, 0.18), (86, 0.4)),
-        bridge_fc=4000.0, pol=(0.15, 0.5),
+        bridge_fc=4000.0, bridge_h=0.15, pol=(0.15, 0.5),
         # a light wooden hammer on thin steel: hard, in contact for a fraction of a millisecond
         h_mass=0.6e-3, h_stiff=2.0e9, h_exp=1.7, h_hyst=0.03, rough=0.02, z=0.5, strike=0.1, speed=(0.5, 4.0, 1.3),
         damp=0.08, damp_top=200.0, damp_at=None, hp=130.0, flat=400.0, lp=6000.0,
         modes=((165, 25, 2.0), (240, 28, 1.8), (330, 30, 1.6), (420, 30, 1.5), (540, 30, 1.3)),
         cloud=(620.0, 9000.0, 40.0, 0.035, 35.0, 20.0, 0.5), pan=0.12, sym=0.0, knock=-16.0, knock_hz=1500.0,
-        case=(300.0, 3500.0, 24, 0.05, 0.012), release=-44.0),
+        case=(300.0, 3500.0, 24, 0.05, 0.012), release=-44.0, knock_vel=8.0, lp_order=1, diffuse=0.0),
     'banjo': dict(
         _PLUCK, seed=29, open=(146.83, 196.0, 246.94, 293.66), B=4e-5, loss=(0.8, 2.0e-3, 1.0e-7), stop_loss=0.4,
         bridge=4.5, bridge_fc=5000.0,               # the bridge stands on a membrane: the string empties fast
@@ -460,17 +492,19 @@ def _release(fc, noise, r, n=_BLOCK):
     return e
 
 
-def _radiation(sp, scale):
+def _radiation(sp, scale, key):
     """The smooth part of how a body turns bridge force into sound, as a filter (b, a). A plate driven at one
     point moves with a velocity that is, on average, flat over frequency, and sound pressure follows its
     acceleration while the body is smaller than the wavelength: pressure per force rises 6 dB per octave up to
     `flat` Hz and stays level above it; below the lowest body mode (`hp`) the body is a stiff spring and radiates
-    little; above `lp` the bridge is too heavy to follow. The filter is that curve divided by frequency, because
-    the excitation it meets is the rate of change of the force: a second-order high-pass at hp, first-order
-    low-passes at flat and lp. scale stretches the body."""
-    sos = np.vstack([signal.butter(2, sp['hp'] * scale, 'high', fs=SR, output='sos'),
-                     signal.butter(1, sp['flat'] * scale, fs=SR, output='sos'),
-                     signal.butter(1, min(sp['lp'], 0.4 * SR), fs=SR, output='sos')])
+    little; above `lp` the bridge is too heavy to follow (6 dB per octave; 12 on a piano's ribbed board, lp_order).
+    The filter is that curve divided by frequency, because the excitation it meets is the rate of change of the
+    force: a second-order high-pass at hp, a first-order low-pass at flat and the low-pass at lp. hp and flat are
+    numbers, or tables over the keys where the board answers differently along the bridge. scale stretches the
+    body."""
+    sos = np.vstack([signal.butter(2, _reg(sp['hp'], key) * scale, 'high', fs=SR, output='sos'),
+                     signal.butter(1, _reg(sp['flat'], key) * scale, fs=SR, output='sos'),
+                     signal.butter(sp['lp_order'], min(sp['lp'], 0.4 * SR), fs=SR, output='sos')])
     return signal.sos2tf(sos)
 
 
@@ -483,11 +517,13 @@ def _body(sp, key, scale, c, pan_note):
     (df Hz apart at the bottom, a fixed fraction of the frequency higher up), each with the Q of wood. A mode's
     residue puts its peak `prom` times the smooth curve, divided by the root of the modal overlap where modes
     crowd; a named mode adds in phase with the smooth path, so it is a peak of the response, the cloud's modes add
-    with either sign. Where on the bridge the string sits changes how much of each mode it drives (key). bright
+    with either sign (and, where `diffuse` is set, in any phase: the modes of a piano's board reach a close
+    microphone from all over the board). Where on the bridge the string sits changes how much of each mode it
+    drives (key). bright
     tilts the modes by 3 dB per octave around 700 Hz. The undamped strings above E6 of a piano are modes of the
     same kind: they ring on when a partial of the note passes close to them."""
     b = dsp.rng(_seed(sp, 0))
-    num, den = _radiation(sp, scale)
+    num, den = _radiation(sp, scale, key)
     res, pole, const = signal.residuez(num, den)
     up = pole.imag >= 0
     lam = np.log(pole[up].astype(complex))
@@ -509,6 +545,9 @@ def _body(sp, key, scale, c, pan_note):
     place = np.cos(b.uniform(0, 2 * np.pi, len(f)) + key * sp['bridge_k'] * np.sqrt(f / 200.0))
     named = np.arange(len(f)) < len(sp['modes'])                       # a named mode is a peak, the cloud either
     amp = amp * np.where(named, 1.0, np.sign(place)) * (0.35 + 0.65 * np.abs(place))
+    if sp['diffuse'] > 0:                           # a large board heard from a hand's breadth: every mode of the
+        turn = sp['diffuse'] * b.uniform(-0.5 * np.pi, 0.5 * np.pi, len(f))       # cloud arrives in its own phase,
+        amp = amp * np.where(named, 1.0, np.exp(1j * turn))                        # so the attack is no single spike
     lam = np.concatenate([lam, (-rate + 2j * np.pi * f) / SR])
     res = np.concatenate([res, amp])
     pan = np.concatenate([pan, b.uniform(-1, 1, len(f)) * sp['spread']])
@@ -600,7 +639,8 @@ def _string_note(sp, f0, vel, dur, r, c):
     K, N = len(k), next(count for top, count in sp['strings'] if key <= top)
     # No unison is perfect and none of a tuned piano beats fast: a tuner works by beats, so the spread is in Hz (at
     # the fundamental; partial k is k times as far off), the same pattern dealt differently to every key.
-    off = sp['detune'] / f0 * (built.permutation(_SPREAD[N]) * built.choice([-1.0, 1.0]) + 0.3 * built.normal(size=N))
+    off = _reg(sp['detune'], key) / f0 * (built.permutation(_SPREAD[N]) * built.choice([-1.0, 1.0])
+                                         + 0.3 * built.normal(size=N))
     stiff = built.normal(0, 0.012, N)
     detune = 2 * np.pi * fk[:, None] * (off - off.mean() + (0.5 * B * k * k / (1 + B * k * k))[:, None]
                                          * (stiff - stiff.mean()))
@@ -692,13 +732,13 @@ def _string_note(sp, f0, vel, dur, r, c):
     # what reaches the microphones besides the string: knock, felt, the damper landing
     peak = np.abs(y).max()
     if sp['knock'] is not None:
-        level = _reg(sp['knock'], key, log=False) - 8.0 * np.log10(vel / 0.5)
+        level = _reg(sp['knock'], key, log=False) - sp['knock_vel'] * np.log10(vel / 0.5)
         knock = _knock(sp, lam_b[:own], r_b[:own], pan_b[:own], const, min(n, int(0.6 * SR)), 1.0 + c['width'])
         _mix(y, knock, 0, peak * 10.0 ** (level / 20.0))
     if sp['felt']:
         db, lo, hi = sp['felt']
         _mix(y, _burst(r, 0.012, lo, hi, 1.0 + c['width']), 0,
-             peak * 10.0 ** ((db - 8.0 * np.log10(vel / 0.5)) / 20.0))
+             peak * 10.0 ** ((db - sp['knock_vel'] * np.log10(vel / 0.5)) / 20.0))
     if n_d is not None:
         _mix(y, _burst(r, 0.03, 120.0, 1600.0, 1.0 + c['width']), n_d, peak * 10.0 ** (sp['release'] / 20.0))
     return _finish(y, vel, fade, vary, r)
