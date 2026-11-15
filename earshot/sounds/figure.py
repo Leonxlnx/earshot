@@ -29,7 +29,7 @@ MINOR_STEP = {4: 3, 9: 8, 11: 10}    # a major third, sixth and seventh as their
 
 
 def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, last=0.6, accent=-1, room='room',
-         degrees=False, spread=0.25, voice=None, avoid=()):
+         degrees=False, spread=0.25, voice=None, avoid=(), longest=None):
     """a figure as stereo audio. steps: semitones above the root (or scale degrees of the theme's scale with
     degrees=True), one per note; gap: seconds between note starts (a number, or one per interval); vel: how hard it
     is played (0..1), vels: each note's share of it; gate: seconds an inner note sounds before it is damped (None =
@@ -38,7 +38,9 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     -1 = the last, None = none); room: the space it sits in (the theme's space wins); spread: how far the notes sit
     apart in the stereo field; voice: the figure's own default voice; avoid: materials whose voices cannot carry this
     figure (two short low notes on a metal bar are heard as an electronic beep): a theme's voice of such a material
-    gives way to the figure's own; a voice asked for by name is always played"""
+    gives way to the figure's own; a voice asked for by name is always played; longest: seconds after which the
+    figure has faded out whatever the voice (a hover or a tap on a piano must not ring for a second: the fade
+    starts at 55 % of it; `ring` scales it, a requested length replaces it)"""
     v = c.voice or voice or DEFAULT_VOICE
     if avoid and c._voice is None and voices.info(v).get('material') in avoid:     # a voice asked for by name
         v = voice or DEFAULT_VOICE                                                 # is played as asked
@@ -75,6 +77,11 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
                     spread=spread * c.lerp('width', 0.0, 2.2, 1.0), **c.axes('bright', 'hard', 'size'), ring=c.ring)
     if want and len(y) < 0.75 * want * dsp.SR:
         c.used.discard('dur')            # the voice rings shorter than the length asked for: say it was not kept
+    cut = dsp.n_of(want if want else longest * ring) if (want or longest) else None
+    if cut and len(y) > cut:
+        y = y[:cut]
+        k = max(2, int(0.45 * cut))
+        y[-k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
     return space.room(y, c.room(room), amount=c.space, r=r)
 
 

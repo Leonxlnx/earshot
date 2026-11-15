@@ -77,10 +77,10 @@ FIGURES = {
                          fig=dict(steps=(7, 0), gap=0.05, root='C6', vel=0.45, vels=(0.9, 1.0), last=0.3)),
     'toggle/up': dict(kind='chime', says=('two tiny notes stepping up a fourth, a small switch-on blip', 'a very short rising two-note tick'),
                       uses=('switch on', 'toggle', 'enable', 'check'),
-                      fig=dict(steps=(0, 5), gap=0.045, root='C6', vel=0.4, vels=(0.8, 1.0), gate=0.04, last=0.14)),
+                      fig=dict(steps=(0, 5), gap=0.045, root='C6', vel=0.4, vels=(0.8, 1.0), gate=0.04, last=0.14, longest=0.3)),
     'toggle/down': dict(kind='chime', says=('two tiny notes stepping down a fourth, a small switch-off blip', 'a very short falling two-note tick'),
                         uses=('switch off', 'toggle', 'disable', 'deselect', 'uncheck'),
-                        fig=dict(steps=(5, 0), gap=0.045, root='C6', vel=0.38, vels=(1.0, 0.8), gate=0.04, last=0.12, accent=0)),
+                        fig=dict(steps=(5, 0), gap=0.045, root='C6', vel=0.38, vels=(1.0, 0.8), gate=0.04, last=0.12, accent=0, longest=0.3)),
     'open/lift': dict(kind='chime', says=('two soft notes rising a fifth, a gentle opening gesture', 'a quiet upward two-note chime'),
                       uses=('open', 'expand', 'show', 'modal', 'menu open', 'next'),
                       fig=dict(steps=(0, 7), gap=0.09, root='G5', vel=0.42, vels=(0.85, 1.0), last=0.4)),
@@ -89,19 +89,21 @@ FIGURES = {
                        fig=dict(steps=(7, 0), gap=0.09, root='G5', vel=0.4, vels=(1.0, 0.85), last=0.32, accent=0)),
     'next/step': dict(kind='chime', says=('two tiny notes a whole step up, a small forward tick', 'a minimal rising two-note blip'),
                       uses=('next', 'forward', 'continue', 'tab', 'navigate'),
-                      fig=dict(steps=(0, 2), gap=0.055, root='A5', vel=0.36, vels=(0.85, 1.0), gate=0.05, last=0.15)),
+                      fig=dict(steps=(0, 2), gap=0.055, root='A5', vel=0.36, vels=(0.85, 1.0), gate=0.05, last=0.15, longest=0.32)),
     'back/step': dict(kind='chime', says=('two tiny notes a whole step down, a small backward tick', 'a minimal falling two-note blip'),
                       uses=('undo', 'back', 'previous', 'return'),
-                      fig=dict(steps=(2, 0), gap=0.055, root='A5', vel=0.36, vels=(1.0, 0.85), gate=0.05, last=0.15, accent=0)),
+                      fig=dict(steps=(2, 0), gap=0.055, root='A5', vel=0.36, vels=(1.0, 0.85), gate=0.05, last=0.15, accent=0, longest=0.32)),
     # ---- the smallest ones: one short note of a sustaining metal bar or a synthesizer is a bare tone burst, heard as
     # an electronic beep, so these keep to struck wood unless the theme's voice is itself short (wood, tines,
     # strings) or the theme is a synthesizer's, where a soft blip is the point
     'tap/tone': dict(kind='tap', says=('one very short muted note, a soft tonal tap', 'a tiny damped blip of a note'),
                      uses=('tap', 'button press', 'click', 'select', 'key'), prior=1.1,
-                     fig=dict(steps=(0,), root='C6', vel=0.36, last=0.07, room='booth', voice='marimba', avoid=('metal', 'glass', 'electric'))),
+                     fig=dict(steps=(0,), root='C6', vel=0.36, last=0.07, room='booth', voice='marimba',
+                              avoid=('metal', 'glass', 'electric'), longest=0.22)),
     'hover/tone': dict(kind='tick', says=('one extremely short quiet high note, a faint tonal tick', 'a tiny soft high blip'),
                        uses=('hover', 'focus', 'highlight', 'scroll tick'),
-                       fig=dict(steps=(0,), root='G6', vel=0.2, last=0.04, room='booth', voice='marimba', avoid=('metal', 'glass', 'electric'))),
+                       fig=dict(steps=(0,), root='G6', vel=0.2, last=0.04, room='booth', voice='marimba',
+                                avoid=('metal', 'glass', 'electric'), longest=0.14)),
 }
 figure.register(design, FIGURES, domains=('ui', 'game'))
 
