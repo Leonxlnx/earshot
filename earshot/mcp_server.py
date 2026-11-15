@@ -65,7 +65,10 @@ needs models takes ~20-60 s; later calls are fast (models stay loaded)."""
 
 INSTRUCTIONS += """
 Sounds for a film (no models, fast): sfx_list (the shipped bank) -> sfx_render (one take aimed at a cue: dur, apex,
-pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take)."""
+pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take).
+To get a sound, ask for it: make (a request in words -> one finished file; interface, game, motion, instrument and
+ambience sounds, all made in code), make_set (a whole product's sounds as one family, one call), sounds (the
+catalogue). No models are loaded for these."""
 
 IMG_INLINE_MAX = 1600        # px, long edge of the inline copy (sent as JPEG q88: ~1/3 of the PNG bytes)
 JSON_MAX = 7000
@@ -199,8 +202,10 @@ def _format(r, full=False, ignored=()):
         head = ''
     if len(body) > TEXT_MAX and not full:
         body = body[:TEXT_MAX] + f'\n... (text cut at {TEXT_MAX} characters; full=true gives all of it)'
-    js = json.dumps(_clean(r), ensure_ascii=False) if full else compact(r)
     note = f'(this earshot version ignored: {", ".join(ignored)})' if ignored else ''
+    if r.get('brief') and not full:      # the text is the whole answer (make, sounds): no JSON unless asked for
+        return '\n\n'.join(x for x in (head, body, note) if x)
+    js = json.dumps(_clean(r), ensure_ascii=False) if full else compact(r)
     return '\n\n'.join(x for x in (head, body, note, ('JSON: ' if full else 'JSON (compact): ') + js) if x)
 
 
@@ -605,6 +610,104 @@ def tool_kit_render(kit: Annotated[str, Field(description="absolute path of the 
 
 
 TOOLS += [(tool_sfx_list, True, False), (tool_sfx_render, False, False), (tool_kit_render, False, False)]
+
+
+# ------------------------------------------------------------------------- sounds made from words (no models)
+def _summary_only(fn):
+    def run(**kw):
+        r = fn(**{k: v for k, v in kw.items() if v is not None})
+        r.update(text=r['summary'], brief=True)
+        return r
+    return run
+
+
+def tool_make(want: Annotated[str, Field(description='the sound in words: what it is or the job it plays, how it '
+                                                     'should feel, what it is made of, e.g. "a soft wooden success '
+                                                     'chime for a finance app, 400 ms, in D" or "coin pickup, '
+                                                     'bright, 8-bit"')],
+              out: Annotated[str, Field(description='absolute path of the file to write; the extension picks the '
+                                                    'format (wav, flac, ogg, mp3, m4a, webm)')],
+              sound: Annotated[str | None, Field(description='a design id from `sounds` to use instead of ranking '
+                                                             'the words, e.g. "success/rise"')] = None,
+              n: Annotated[int, Field(description='how many takes (file_1 .. file_n): variations for a sound a '
+                                                  'game repeats', ge=1, le=12)] = 1,
+              theme: Annotated[str | None, Field(description='a theme preset so several calls sound like one '
+                                                             'product: soft, glass, wood, felt, tine, metal, '
+                                                             'electric, digital, retro')] = None,
+              pitch: Annotated[str | None, Field(description='a note ("C5") or Hz for a tonal sound')] = None,
+              dur: Annotated[float | None, Field(description='length in seconds', gt=0)] = None,
+              voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound, e.g. '
+                                                             '"kalimba", "felt_piano", "soft_pluck"')] = None,
+              seed: Annotated[int, Field(description='another take of the same sound')] = 0,
+              listen: Annotated[bool, Field(description='let the listening models choose among the best three '
+                                                        'designs and report what the result is heard as (loads the '
+                                                        'models: 20-60 s the first time)')] = False,
+              full: Full = False) -> str:
+    """Make a sound in code from a request in words and write it to a file (no models, about a second; nothing is
+    downloaded and no recorded audio is used). Covers interface sounds (taps, toggles, success, error,
+    notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit), motion-design effects (whooshes,
+    impacts, risers, braams, logos), instrument notes, pads and ambience loops. The answer names the design chosen
+    and why, what else would fit (`also`), and any words that were not understood, so one call is usually enough;
+    call again with `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to
+    steer. Everything made is free to use in any product."""
+    from . import make as M
+    return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
+                             dur=dur, voice=voice, seed=seed, listen=listen), full, _summary_only(M.make))
+
+
+def tool_make_set(out: Annotated[str, Field(description='absolute path of the folder for the files and '
+                                                        'manifest.json')],
+                  set: Annotated[str | None, Field(description='a ready-made set: "ui" (16 interface sounds), '
+                                                               '"game" (menus, rewards, jingles, actions), "arcade" '
+                                                               '(chip sound), "film" (motion-design starter)')] = None,
+                  sounds: Annotated[list[dict] | None, Field(description='your own sounds, or changes to the set: '
+                                                                         '[{"name": "tap", "want": "a soft tap"}, '
+                                                                         '{"name": "success", "sound": '
+                                                                         '"success/triad", "dur": 0.5}]; fields: '
+                                                                         'name, want, sound, pitch, dur, voice, '
+                                                                         'material, seed, n, axes, lufs')] = None,
+                  theme: Annotated[str | None, Field(description='one voice, key and room for the whole set: soft, '
+                                                                 'glass, wood, felt, tine, metal, electric, '
+                                                                 'digital, retro')] = None,
+                  format: Annotated[str, Field(description='wav, ogg, mp3, m4a, webm or flac')] = 'wav',
+                  sprite: Annotated[str | None, Field(description='also pack the set into one file with a howler-'
+                                                                  'style map, e.g. "sprite.webm"')] = None,
+                  full: Full = False) -> str:
+    """Make a whole set of sounds in one call, as one family (no models): the same voice, key and room for every
+    tonal sound, levels balanced against each other (frequent sounds quieter), a manifest.json with every file,
+    and optionally one sprite file with a map for the web. Use it for a product's interface, a game's sound
+    effects or a film's kit instead of many single `make` calls."""
+    from . import make as M
+    if not (set or sounds):
+        raise ToolFailure('give a ready-made `set` (ui, game, arcade, film) and / or your own `sounds`')
+    spec = {k: v for k, v in dict(set=set, sounds=sounds).items() if v}
+    return _run('make_set', dict(spec=spec, out=_out_path(out, 'out'), theme=theme, fmt=format, sprite=sprite),
+                full, _summary_only(M.make_set))
+
+
+def tool_sounds(search: Annotated[str | None, Field(description='words to rank the catalogue by, as `make` would, '
+                                                                'e.g. "notification" or "explosion"')] = None,
+                domain: Annotated[str | None, Field(description='ui, game, motion, ambience or music')] = None,
+                family: Annotated[str | None, Field(description='one family, e.g. "success", "whoosh_fast", '
+                                                                '"note"')] = None,
+                full: Full = False) -> str:
+    """List the sounds `make` can make (no models, instant): id, usual length and what each sounds like. Filter with
+    search, domain or family: the whole catalogue is several hundred lines."""
+    from . import make as M
+    if not (search or domain or family):
+        def fams():
+            r = M.sounds()
+            by = {}
+            for x in r['sounds']:
+                by.setdefault(x['id'].split('/')[0], []).append(x['id'].split('/')[1])
+            r['text'] = f"{len(r['sounds'])} sounds in {len(by)} families (search, domain or family lists them): " \
+                + '; '.join(f"{f}: {', '.join(m[:6])}{' ...' if len(m) > 6 else ''}" for f, m in by.items())
+            return r
+        return _run('sounds', {}, full, lambda: dict(fams(), brief=True))
+    return _run('sounds', dict(search=search, domain=domain, family=family), full, _summary_only(M.sounds))
+
+
+TOOLS += [(tool_make, False, False), (tool_make_set, False, False), (tool_sounds, True, False)]
 
 
 def _sdk():

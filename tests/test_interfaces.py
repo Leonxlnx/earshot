@@ -442,7 +442,8 @@ def test_mcp_server_registers_all_tools():
     tools = anyio.run(srv.list_tools)
     names = {t.name for t in tools}
     assert names == {'measure', 'describe', 'match', 'rank', 'find', 'compare', 'ab', 'realness', 'timeline', 'sheet',
-                     'critique', 'doctor', 'llm_critique', 'sfx_list', 'sfx_render', 'kit_render'}
+                     'critique', 'doctor', 'llm_critique', 'sfx_list', 'sfx_render', 'kit_render', 'make', 'make_set',
+                     'sounds'}
     for t in tools:
         schema = getattr(t, 'input_schema', None) or t.inputSchema
         assert len(t.description) > 120 and 'Use ' in t.description
