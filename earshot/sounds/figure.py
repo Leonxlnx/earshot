@@ -11,6 +11,9 @@ like one product: every figure of the set is played by the theme's voice, in its
 
 The shared axes mean the same for every figure: energy = how hard it is played, hard / bright / size go to the voice,
 ring scales how long notes sound, motion the speed of the figure, space the room, width the spread of the notes.
+A length in the request sets how long the figure sounds before its room dies away; a minor key in the request or
+theme turns the figure's major thirds, sixths and sevenths into minor ones; a material without a voice picks the
+voice made of it.
 """
 import numpy as np
 
@@ -19,6 +22,8 @@ from ..synth import phrase, space, voices
 DEFAULT_VOICE = 'vibraphone'
 SUSTAIN_FLOOR = 0.11              # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
 CHORD_GAP = 0.03                  # s: notes this close are one chord (or a grace note): the earlier one rings on
+MINOR = ('minor', 'minor_pentatonic')
+MINOR_STEP = {4: 3, 9: 8, 11: 10}    # a major third, sixth and seventh as their minor forms
 
 
 def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, last=0.6, accent=-1, room='room',
@@ -36,11 +41,19 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     if avoid and voices.info(v).get('material') in avoid:
         v = voice or DEFAULT_VOICE
     c.played = v
+    if not degrees and c.scale() in MINOR:       # in a minor key the thirds, sixths and sevenths are the minor ones
+        steps = [MINOR_STEP.get(s % 12, s % 12) + 12 * (s // 12) for s in steps]
     hz = c.degrees(steps, root) if degrees else c.semis(steps, root)
     k = len(hz)
     speed = c.lerp('motion', 1.4, 0.7, 1.0, log=True)
     gaps = [float(g) * speed for g in (np.broadcast_to(gap, (max(1, k - 1),)) if k > 1 else [])]
     ring = c.lerp('ring', 0.45, 2.2, 1.0, log=True)
+    want = c.length()
+    if want:                                     # a length was asked for: the notes fit into the first 60 % of it
+        run = sum(gaps)                          # (played faster if they must) and the last one rings for the rest
+        if run > 0.6 * want:
+            gaps = [g * 0.6 * want / run for g in gaps]
+        last, ring = max(0.04, want - sum(gaps)), 1.0
     # a sustaining voice (a metal bar, a bell, a pad) damped after a few tens of ms is a bare tone burst, which is
     # heard as an electronic beep: such a voice keeps each note long enough to be heard as its instrument
     floor = SUSTAIN_FLOOR if float(voices.info(v).get('ring_s') or 0.0) > 1.0 else 0.0

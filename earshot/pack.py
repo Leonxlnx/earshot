@@ -31,13 +31,25 @@ def pack(files, out, gap=GAP_S, mono=False, names=None, loops=()):
     from .synth import master
     if isinstance(files, str):
         folder = files
-        man = os.path.join(folder, 'manifest.json')
-        if os.path.isfile(man) and not loops:
+        man, rows, sprites = os.path.join(folder, 'manifest.json'), [], {os.path.basename(out)}
+        if os.path.isfile(man):
             with open(man, encoding='utf-8') as fh:
-                loops = [s['name'] for s in json.load(fh).get('sounds', []) if s.get('loop')]
-        skip = os.path.abspath(out)
-        files = sorted(os.path.join(folder, f) for f in os.listdir(folder)
-                       if f.lower().endswith(AUDIO) and os.path.abspath(os.path.join(folder, f)) != skip)
+                rows = [s for s in json.load(fh).get('sounds', []) if os.path.isfile(os.path.join(folder, s['file']))]
+        for f in os.listdir(folder):               # a sprite made earlier in this folder is not a sound of the set
+            if f.lower().endswith('.json') and f != 'manifest.json':
+                with open(os.path.join(folder, f), encoding='utf-8') as fh:
+                    try:
+                        doc = json.load(fh)
+                    except ValueError:
+                        continue
+                if isinstance(doc, dict) and 'sprite' in doc:
+                    sprites.update(doc.get('src') or [])
+        if rows:                                   # a set: exactly its sounds, in its order
+            files = [os.path.join(folder, s['file']) for s in rows if s['file'] not in sprites]
+            loops = loops or [s['name'] for s in rows if s.get('loop')]
+        else:
+            files = sorted(os.path.join(folder, f) for f in os.listdir(folder)
+                           if f.lower().endswith(AUDIO) and f not in sprites)
     if not files:
         raise ValueError('nothing to pack: no audio files')
     names = list(names) if names else [os.path.splitext(os.path.basename(f))[0] for f in files]

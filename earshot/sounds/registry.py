@@ -39,6 +39,9 @@ MODULES = ('ui', 'game', 'action', 'object', 'brand', 'synth', 'nature', 'tonal'
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
+# the voice a material names, for tonal designs asked for "in wood", "glassy", "metallic" ... without a voice
+VOICE_OF = {'wood': 'marimba', 'glass': 'glockenspiel', 'metal': 'vibraphone', 'soft': 'felt_piano',
+            'digital': 'glass_pluck', 'retro': 'square_lead'}
 # the loudest a finished sound may be at full peak (momentary-max LUFS), by kind: beds sit low by nature
 LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0}
 _designs = {}
@@ -196,9 +199,26 @@ class Controls:
 
     @property
     def voice(self):
-        """the voice that plays a tonal design: asked for, else the theme's, else the design's own"""
+        """the voice that plays a tonal design: the one asked for; else the one a requested material names (wood: a
+        marimba, glass: a glockenspiel ...: VOICE_OF); else the theme's; else the design's own"""
         self.used.add('voice')
-        return self._voice or self._theme.get('voice') or self._d.voice
+        if self._voice:
+            return self._voice
+        if VOICE_OF.get(self._material):
+            self.used.add('material')
+            return VOICE_OF[self._material]
+        return self._theme.get('voice') or self._d.voice
+
+    def length(self):
+        """the length asked for in seconds, or None when the request named none (seconds() falls back on the
+        design's own; this does not)"""
+        if self._dur is not None:
+            self.used.add('dur')
+        return self._dur
+
+    def scale(self):
+        """the scale of the request or the theme ('major' when none was given)"""
+        return self._theme.get('scale') or 'major'
 
     def room(self, default='room'):
         """the space a design sits in: the theme's, else the design's own (earshot.synth.space)"""
@@ -234,7 +254,10 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
         meta['voice'] = c.played or c.voice
     if 'material' in c.used and c.material:
         meta['material'] = c.material
-    ignored = sorted(c.asked - c.used)
+    # a voice or material that is the design's own was honoured by choosing the design ("a kalimba note", "8-bit")
+    own = {k for k, v in (('voice', d.voice), ('material', d.material))
+           if request.get(k) and (request[k] == v or request[k] in d.tags)}
+    ignored = sorted(c.asked - c.used - own)
     if ignored:
         meta['ignored'] = ignored
     if d.loop:
