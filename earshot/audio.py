@@ -85,6 +85,28 @@ def _src_channels(path):
         return 0
 
 
+def write_cache(path, write):
+    """Best-effort cache write; only filesystem errors are optional, not errors in the producer."""
+    import tempfile
+    tmp = None
+    try:
+        folder = os.path.dirname(path) or '.'
+        os.makedirs(folder, exist_ok=True)
+        with tempfile.NamedTemporaryFile(dir=folder, prefix=os.path.basename(path) + '.',
+                                         suffix=os.path.splitext(path)[1], delete=False) as fh:
+            tmp = fh.name
+        write(tmp)
+        return replace_quietly(tmp, path)
+    except OSError:
+        return False
+    finally:
+        if tmp is not None:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+
+
 def file_id(path):
     """stable id of a file's content state (path + size + mtime + sampled content); used as a cache key by the models"""
     return hashlib.sha1(_state(path).encode()).hexdigest()[:20]
@@ -129,7 +151,6 @@ def load(path, sr=SR, mono=False, start=None, end=None, cache=True):
     x = None
     npy = None
     if cache:
-        config.ensure_dirs()
         npy = os.path.join(config.DEC_CACHE, _key(path, sr, ch) + '.npy')
         if os.path.exists(npy):
             try:
@@ -139,9 +160,7 @@ def load(path, sr=SR, mono=False, start=None, end=None, cache=True):
     if x is None:
         x = _decode(path, sr, ch)
         if npy:
-            tmp = f'{npy}.{os.getpid()}.tmp.npy'
-            np.save(tmp, x)
-            replace_quietly(tmp, npy)
+            write_cache(npy, lambda tmp: np.save(tmp, x))
     bad = ~np.isfinite(x)
     if bad.any():   # one NaN / Inf sample breaks every analysis downstream (#12)
         bad = bad.any(axis=-1) if x.ndim == 2 else bad

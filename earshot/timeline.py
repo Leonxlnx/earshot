@@ -777,9 +777,7 @@ def _cached(model, fid, spans, kind, compute, reuse=True):
         res = compute([spans[i] for i in todo])
         for i, v in zip(todo, res):
             out[i] = v
-            tmp = f'{files[i]}.{os.getpid()}.tmp.npy'
-            np.save(tmp, v)
-            audio.replace_quietly(tmp, files[i])
+            audio.write_cache(files[i], lambda tmp: np.save(tmp, v))
     return np.stack(out) if out else None
 
 
@@ -1222,11 +1220,10 @@ def timeline(path, video=None, cues=None, start=None, end=None, detail='normal',
     r['summary'] = _summary(r)
     r['text'] = transcript(r)
     if cache or fresh:
-        os.makedirs(os.path.dirname(cfile), exist_ok=True)
-        tmp = f'{cfile}.{os.getpid()}.tmp'
-        with open(tmp, 'w', encoding='utf-8') as fh:
-            fh.write(to_json(r))
-        audio.replace_quietly(tmp, cfile)
+        def save(tmp):
+            with open(tmp, 'w', encoding='utf-8') as fh:
+                fh.write(to_json(r))
+        audio.write_cache(cfile, save)
     return dict(r, cached=False)
 
 
