@@ -29,8 +29,9 @@ The representation (the `model`, a plain dict of small integer and float arrays)
              the noise's own envelope divided out (a band of noise has a Rayleigh envelope of its own; an envelope
              imposed on top of it is the watery sound of a noise vocoder). Because neighbouring bands overlap, the
              take's band envelopes are then measured once and corrected towards the model's.
-  stereo     per band the level difference and the signed coherence of the two channels, plus one level-difference
-             track over time (a pass moves across).
+  stereo     per band the level difference, the signed coherence and the phase between the two channels (a
+             ringing band's carrier is turned by it in the right channel), plus one level-difference track over time
+             (a pass moves across).
 
 A take is not a copy: every render draws its noise, and the model can be transformed in ways that stay physical:
 `length` (time-warp between onsets, onsets stay as sharp), `pitch` and `size` (a bigger thing is lower and slower:
@@ -391,8 +392,22 @@ def analyze(x, sr=SR):
         pan = 10 * np.log10((tl + 1e-30) / (tr + 1e-30)) - 10 * np.log10((pl.sum() + 1e-30) / (pr.sum() + 1e-30))
         pan[tl + tr < 1e-3 * (tl + tr).max()] = 0.0
         model.update(ild=np.clip(10 * np.log10((pl + 1e-30) / (pr + 1e-30)), -24, 24).astype(np.float16),
-                     icc=icc.astype(np.float16), pan=np.clip(pan, -18, 18).astype(np.float16))
+                     icc=icc.astype(np.float16), pan=np.clip(pan, -18, 18).astype(np.float16), ipd=_ipd(cross))
     return model
+
+
+def _ipd(cross):
+    """the phase of each band's cross spectrum (left against right) in 128ths of half a turn, int8: where the
+    channels of a band are coherent but shifted (a ringing mode, a low band picked up by spaced microphones), how
+    far; the coherence alone (icc) does not say"""
+    return np.round(np.angle(cross) * (128 / np.pi)).clip(-128, 127).astype(np.int8)
+
+
+def channel_phase(x, sr):
+    """the stored `ipd` of a stereo recording x (n, 2) at sample rate sr, as analyze() measures it: for a model
+    made before analyze() kept it"""
+    ws = _bands(_prep(x, sr))
+    return _ipd(np.sum(ws[0] * np.conj(ws[1]), axis=1))
 
 
 # ------------------------------------------------------------------------------------------------ the model as arrays
@@ -624,17 +639,26 @@ def render(model, r, length=1.0, pitch=0.0, size=1.0, bright=0.0, hard=0.0, ring
     heard = A.any(axis=1)
     nz = _carriers(r, bank, m, fine, heard)
     if stereo:
-        c = np.abs(model['icc'].astype(np.float64))[:, None]
+        icc = model['icc'].astype(np.float64)
+        if 'ipd' in model:
+            # the channels of a band correlate (at no lag) by the real part of their coherence: a mode shifted a
+            # quarter turn between the channels is fully coherent and not correlated at all (a model made before
+            # analyze() kept the phase has the coherence with the sign of its real part, a coarser stand-in)
+            icc = np.abs(icc) * np.cos(model['ipd'].astype(np.float64) * (np.pi / 128))
+        c = np.abs(icc)[:, None]
         ppos = np.interp(np.arange(len(model['pan'])) * float(PANHOP) - PADB, grid, gu)
         ratio = np.exp((model['ild'].astype(np.float64)[:, None]
                         + np.interp(pos, ppos, model['pan'].astype(np.float64))[None, :]) * (np.log(10.0) / 10.0))
         gl = np.sqrt(2.0 * ratio / (1.0 + ratio)).astype(np.float32)
         gr = np.sqrt(2.0 / (1.0 + ratio)).astype(np.float32)
-        sg = np.where(model['icc'] < 0, -1.0, 1.0).astype(np.float32)[:, None]
+        sg = np.where(icc < 0, -1.0, 1.0).astype(np.float32)[:, None]
         n2 = _carriers(r, bank, m, fine, heard & (c[:, 0] < 0.97)) * np.sqrt(0.5 * (1.0 - c)).astype(np.float32)
         nz = nz * np.sqrt(0.5 * (1.0 + c)).astype(np.float32)
+        # a coherent carrier is one narrow-band signal: the right channel gets it turned by the phase whose cosine is
+        # that correlation, so a ringing band correlates as the recording's did (not fully in or out of phase)
+        turn = np.exp(-1j * np.arccos(np.clip(icc, -1.0, 1.0)))[:, None]
         parts = [(gl * full_a, gl * A * (nz + n2), gl[live] * coh),
-                 (gr * full_a, sg * gr * A * (nz - n2), (sg * gr)[live] * coh)]
+                 (gr * full_a, sg * gr * A * (nz - n2), (gr * turn)[live].astype(np.complex64) * coh)]
     else:
         parts = [(full_a, A * nz, coh)]
     Y = np.zeros((len(parts), DEC * m // 2 + 1), np.complex128)

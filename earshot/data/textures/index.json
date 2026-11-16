@@ -1,0 +1,539 @@
+{
+ "about": "learned ambience textures (earshot.synth.quilt, earshot.sounds.nature): resyn models of public-domain recordings, numbers only; see CREDITS.md",
+ "textures": {
+  "beach": {
+   "ids": [
+    "waves/sand"
+   ],
+   "title": "Small waves and beach #1",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/small-waves-and-beach-1-s1446.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    2.1,
+    28.7
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 29.3,
+   "bytes": 470580,
+   "chunks": [
+    {
+     "file": "beach-0.npz",
+     "seconds": 4.1,
+     "period": 3.3
+    },
+    {
+     "file": "beach-1.npz",
+     "seconds": 7.2,
+     "period": 6.4
+    },
+    {
+     "file": "beach-2.npz",
+     "seconds": 8.0,
+     "period": 7.2
+    },
+    {
+     "file": "beach-3.npz",
+     "seconds": 4.7,
+     "period": 3.9
+    },
+    {
+     "file": "beach-4.npz",
+     "seconds": 5.3,
+     "period": 4.5
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.37,
+    "shape_db": 0.72,
+    "mod_db": 1.29
+   },
+   "take_vs_take": {
+    "env_db": 2.51,
+    "shape_db": 0.76,
+    "mod_db": 0.94
+   }
+  },
+  "brook": {
+   "ids": [
+    "stream/brook"
+   ],
+   "title": "Small Stream",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/small-stream-s0823.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    18.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 269234,
+   "chunks": [
+    {
+     "file": "brook-0.npz",
+     "seconds": 6.34,
+     "period": null
+    },
+    {
+     "file": "brook-1.npz",
+     "seconds": 5.96,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.14,
+    "shape_db": 0.92,
+    "mod_db": 1.01
+   },
+   "take_vs_take": {
+    "env_db": 3.37,
+    "shape_db": 0.97,
+    "mod_db": 0.68
+   }
+  },
+  "campfire": {
+   "ids": [
+    "fire/camp"
+   ],
+   "title": "Big Branching Fire #1",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/big-branching-fire-1-s0987.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    5.0,
+    24.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 24.9,
+   "bytes": 501154,
+   "chunks": [
+    {
+     "file": "campfire-0.npz",
+     "seconds": 6.54,
+     "period": null
+    },
+    {
+     "file": "campfire-1.npz",
+     "seconds": 5.79,
+     "period": null
+    },
+    {
+     "file": "campfire-2.npz",
+     "seconds": 6.78,
+     "period": null
+    },
+    {
+     "file": "campfire-3.npz",
+     "seconds": 5.79,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.12,
+    "shape_db": 1.2,
+    "mod_db": 1.04
+   },
+   "take_vs_take": {
+    "env_db": 3.17,
+    "shape_db": 1.11,
+    "mod_db": 0.63
+   }
+  },
+  "crickets": {
+   "ids": [
+    "night/crickets"
+   ],
+   "title": "Campaign at Night #4",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/campaign-at-night-4-s1880.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    1.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 187488,
+   "chunks": [
+    {
+     "file": "crickets-0.npz",
+     "seconds": 5.94,
+     "period": null
+    },
+    {
+     "file": "crickets-1.npz",
+     "seconds": 6.36,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 4.43,
+    "shape_db": 1.79,
+    "mod_db": 1.4
+   },
+   "take_vs_take": {
+    "env_db": 2.22,
+    "shape_db": 0.46,
+    "mod_db": 0.49
+   }
+  },
+  "pebbles": {
+   "ids": [
+    "waves/pebbles"
+   ],
+   "title": "Sea of the beach of Dellec #3",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/sea-of-the-beach-of-dellec-3-s2566.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    13.4,
+    30.0
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 33.0,
+   "bytes": 590053,
+   "chunks": [
+    {
+     "file": "pebbles-0.npz",
+     "seconds": 7.3,
+     "period": 6.5
+    },
+    {
+     "file": "pebbles-1.npz",
+     "seconds": 7.3,
+     "period": 6.5
+    },
+    {
+     "file": "pebbles-2.npz",
+     "seconds": 6.0,
+     "period": 5.2
+    },
+    {
+     "file": "pebbles-3.npz",
+     "seconds": 7.1,
+     "period": 6.3
+    },
+    {
+     "file": "pebbles-4.npz",
+     "seconds": 5.3,
+     "period": 4.5
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.61,
+    "shape_db": 0.79,
+    "mod_db": 1.28
+   },
+   "take_vs_take": {
+    "env_db": 2.73,
+    "shape_db": 0.82,
+    "mod_db": 0.76
+   }
+  },
+  "restaurant": {
+   "ids": [
+    "cafe/busy"
+   ],
+   "title": "Restaurant",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/restaurant-s0624.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    2.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 264039,
+   "chunks": [
+    {
+     "file": "restaurant-0.npz",
+     "seconds": 5.4,
+     "period": null
+    },
+    {
+     "file": "restaurant-1.npz",
+     "seconds": 5.23,
+     "period": null
+    },
+    {
+     "file": "restaurant-2.npz",
+     "seconds": 5.97,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.11,
+    "shape_db": 0.98,
+    "mod_db": 1.11
+   },
+   "take_vs_take": {
+    "env_db": 3.41,
+    "shape_db": 1.06,
+    "mod_db": 0.94
+   }
+  },
+  "rocks": {
+   "ids": [
+    "waves/rocks"
+   ],
+   "title": "Sea of the beach of Dellec #4",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/sea-of-the-beach-of-dellec-4-s2567.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    4.6,
+    26.5
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 29.5,
+   "bytes": 601647,
+   "chunks": [
+    {
+     "file": "rocks-0.npz",
+     "seconds": 4.7,
+     "period": 3.9
+    },
+    {
+     "file": "rocks-1.npz",
+     "seconds": 6.0,
+     "period": 5.2
+    },
+    {
+     "file": "rocks-2.npz",
+     "seconds": 6.9,
+     "period": 6.1
+    },
+    {
+     "file": "rocks-3.npz",
+     "seconds": 6.8,
+     "period": 6.0
+    },
+    {
+     "file": "rocks-4.npz",
+     "seconds": 5.1,
+     "period": 4.3
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.47,
+    "shape_db": 0.77,
+    "mod_db": 1.18
+   },
+   "take_vs_take": {
+    "env_db": 2.48,
+    "shape_db": 0.74,
+    "mod_db": 0.76
+   }
+  },
+  "room": {
+   "ids": [
+    "room_tone/quiet"
+   ],
+   "title": "Apartment Closed Window",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/apartment-closed-window-s2387.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    8.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 196971,
+   "chunks": [
+    {
+     "file": "room-0.npz",
+     "seconds": 5.99,
+     "period": null
+    },
+    {
+     "file": "room-1.npz",
+     "seconds": 6.31,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.22,
+    "shape_db": 0.69,
+    "mod_db": 1.41
+   },
+   "take_vs_take": {
+    "env_db": 2.37,
+    "shape_db": 0.71,
+    "mod_db": 0.83
+   }
+  },
+  "street": {
+   "ids": [
+    "city/street",
+    "city/distant"
+   ],
+   "title": "London Street",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/london-street-s0641.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    12.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 304760,
+   "chunks": [
+    {
+     "file": "street-0.npz",
+     "seconds": 5.41,
+     "period": null
+    },
+    {
+     "file": "street-1.npz",
+     "seconds": 5.45,
+     "period": null
+    },
+    {
+     "file": "street-2.npz",
+     "seconds": 5.74,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.79,
+    "shape_db": 0.84,
+    "mod_db": 1.09
+   },
+   "take_vs_take": {
+    "env_db": 3.05,
+    "shape_db": 0.92,
+    "mod_db": 0.81
+   }
+  },
+  "terrace": {
+   "ids": [
+    "rain/street"
+   ],
+   "title": "Summer Rain on Terrace",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/summer-rain-on-terrace-s1019.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    6.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 250623,
+   "chunks": [
+    {
+     "file": "terrace-0.npz",
+     "seconds": 5.76,
+     "period": null
+    },
+    {
+     "file": "terrace-1.npz",
+     "seconds": 6.54,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.57,
+    "shape_db": 0.76,
+    "mod_db": 0.98
+   },
+   "take_vs_take": {
+    "env_db": 2.73,
+    "shape_db": 0.78,
+    "mod_db": 0.69
+   }
+  },
+  "trees": {
+   "ids": [
+    "wind/trees"
+   ],
+   "title": "Wind in the Trees",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/forest-wind-in-the-trees-s0904.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    16.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 208897,
+   "chunks": [
+    {
+     "file": "trees-0.npz",
+     "seconds": 5.71,
+     "period": null
+    },
+    {
+     "file": "trees-1.npz",
+     "seconds": 6.59,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.65,
+    "shape_db": 0.77,
+    "mod_db": 1.08
+   },
+   "take_vs_take": {
+    "env_db": 2.88,
+    "shape_db": 0.84,
+    "mod_db": 0.82
+   }
+  },
+  "underwater": {
+   "ids": [
+    "underwater/deep"
+   ],
+   "title": "Underwater",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/underwater-s3430.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    1.0,
+    12.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 229024,
+   "chunks": [
+    {
+     "file": "underwater-0.npz",
+     "seconds": 6.15,
+     "period": null
+    },
+    {
+     "file": "underwater-1.npz",
+     "seconds": 6.15,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.59,
+    "shape_db": 1.08,
+    "mod_db": 1.01
+   },
+   "take_vs_take": {
+    "env_db": 3.76,
+    "shape_db": 1.06,
+    "mod_db": 0.87
+   }
+  }
+ }
+}

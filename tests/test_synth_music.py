@@ -175,8 +175,8 @@ def test_a_loop_is_whole_bars_at_its_tempo_in_its_key_and_closes():
 
 
 def test_the_room_goes_round_the_loop_point_and_a_bed_played_once_rings_out():
-    loop = music.render(music.compose('cozy', dsp.rng(2), bars=2), dsp.rng(2))
-    plan = music.compose('cozy', dsp.rng(2), bars=2, loop=False)
+    loop = music.render(music.compose('warm', dsp.rng(2), bars=2), dsp.rng(2))
+    plan = music.compose('warm', dsp.rng(2), bars=2, loop=False)
     once = music.render(plan, dsp.rng(2))
     head = dsp.n_of(0.02)
     assert np.sqrt(np.mean(loop[:head] ** 2)) > 30 * np.sqrt(np.mean(once[:head] ** 2))    # tails on the start
@@ -192,7 +192,7 @@ def test_the_room_goes_round_the_loop_point_and_a_bed_played_once_rings_out():
 
 def test_the_beds_of_the_catalogue():
     rows = {r['id']: r for r in registry.rows(kind='music')}
-    assert set(rows) == set(beds.BEDS) and len(rows) == 12
+    assert set(rows) == set(beds.BEDS) == {'bed/warm', 'bed/playful', 'bed/8bit'}
     for sid, r in rows.items():
         assert r['loop'] and 'music' in r['domains'] and len(r['says']) >= 2 and r['axes'] == list(beds.AXES)
         assert ('retro' in r['tags']) == (sid == 'bed/8bit') == (r['material'] == 'retro')

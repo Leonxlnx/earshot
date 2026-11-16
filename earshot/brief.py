@@ -30,7 +30,9 @@ job gets a bonus, and the result is scaled by the design's prior, the domain, ma
 the request (earshot.sounds.atlas, CLAP; `blend`): a named job keeps its lexical winner, a request that only
 describes a sound is decided by the sound, and the hard filters (chip sound, loop, a job ruled out) still hold.
 """
+import json
 import math
+import os
 import re
 
 from .sounds import lexicon as L
@@ -84,6 +86,12 @@ LENGTH_SLOPE = 0.15                # how much a length mismatch costs per octave
 LEX_FLOOR, LEX_POWER, SEM_WEIGHT, Z_FLOOR, Z_SAYS = 1.0, 0.25, 0.4, -1.0, 2.5
 MEMBER_SHARE = 0.8                 # how close a member named in the request must score to the family's best
 UNNAMED_LEX = 0.25                # the most a lexical score counts in the blend when no job or sound word matched
+# the tonal interface figures a plain request no longer gets (lexicon.BY_NAME_ONLY): their score is multiplied by
+# this unless the request asks for a tone ("a tonal tap", "a tap with a note in it")
+BY_NAME = 0.5
+# a learned design whose interface job (its `roles`) is the request's head: a plain "tap", "hover", "toggle on",
+# "next", "type" gets the recorded tap, tick, switch or key chosen for that job (earshot.sounds.sets 'ui')
+ROLE = 2.0
 _rev = None
 _cache = {}
 
@@ -108,6 +116,10 @@ def stem(w):
     if len(w) > 3 and w[-1] == w[-2] and w[-1] not in 'slz' and w[-1].isalpha():
         w = w[:-1]
     return w
+
+
+# a request that says one of these asks for a tone: the tonal interface figures answer it (BY_NAME)
+TONE_STEMS = frozenset(stem(w) for w in ('tone', 'tonal', 'note', 'musical', 'melodic', 'pitched', 'chime', 'marimba'))
 
 
 def _key(words_):
@@ -730,29 +742,36 @@ def _terms(row):
     d += sum(L.CONCEPT_DIR.get(c, 0) for c in t['family'] or t['first'])
     t['feel'] = feel
     t['dir'] = (d > 0) - (d < 0)
+    t['learned'] = row['id'] in _roles()     # a design of earshot.sounds.learned (recordings of one thing):
+    #                                          `learned_ok`
     return t
 
 
 def index(rows):
     """the search index of a catalogue: (rows, terms, {word: [(row index, field score)]}, {word: weight}); a word's
-    weight is 1 + log(N / designs that have it): rarer = heavier"""
+    weight is 1 + log(N / designs that have it): rarer = heavier. N and the counts leave out the designs of
+    earshot.sounds.learned (a word only they have counts among them): a hundred recordings of footsteps and switches
+    do not make "step" or "switch" a common word, and the other designs score as they did before any were learned"""
     rows = list(rows)
     terms = [_terms(r) for r in rows]
-    inv, df = {}, {}
+    inv, df, dfr = {}, {}, {}
     for k, t in enumerate(terms):
+        count = dfr if t['learned'] else df
         for w in set().union(*(t[f] for f in FIELD_WEIGHT)):
-            df[w] = df.get(w, 0) + 1
+            count[w] = count.get(w, 0) + 1
             fs = sorted((FIELD_WEIGHT[f] for f in FIELD_WEIGHT if w in t[f]), reverse=True)
             bonus = FAMILY_BONUS if w in t['family'] else FIRST_USE_BONUS if w in t['first'] else 0.0
             bonus += EXACT_BONUS if w == t['exact'] else 0.0
             inv.setdefault(w, []).append((k, fs[0] + 0.25 * sum(fs[1:]) + bonus))
         for w in t['feel']:
             inv.setdefault('feel:' + w, []).append((k, FIELD_WEIGHT['says']))
-            df['feel:' + w] = df.get('feel:' + w, 0) + 1
+            count['feel:' + w] = count.get('feel:' + w, 0) + 1
         for w in t['alias']:
             inv.setdefault(w, []).append((k, FIRST_USE_BONUS))     # the job called by the request's word
-            df[w] = df.get(w, 0) + 1
-    n = max(1, len(rows))
+            count[w] = count.get(w, 0) + 1
+    for w, c in dfr.items():
+        df.setdefault(w, c)
+    n = max(1, sum(not t['learned'] for t in terms))
     # a job the request names is not less telling for being common in the catalogue: canonical words get a flatter
     # weight than plain words
     return rows, terms, inv, {w: 1.0 + (CONCEPT_IDF if w in L.CONCEPTS or w.startswith(('voice:', 'fam:')) else 1.0)
@@ -947,8 +966,18 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             if not w.startswith(('feel:', 'sw:', 'fam:')):
                 why.setdefault(k, []).append(w.replace('voice:', ''))
     mat, dom, loop = b.get('material'), b.get('domain'), b.get('loop')
-    pool = ([k for k in score if k in why] or [k for k in score if dom in rows[k].get('domains', ())]
-            or list(score))                            # nothing named: the closest in feel, in the request's domain
+    said = set(_said_words(b.get('text')))
+    head = next((c for c in b['concepts'] if c not in L.GENERIC), None)
+    named_ = [k for k in score if k in why
+              and (not terms[k]['learned'] or learned_ok(b, rows[k]['id'], terms[k], said))]
+    invented = [k for k in score if not terms[k]['learned']]
+    # the interface job alone ("tap", "hover", "toggle on", "type"), no thing named ("next page": a page): ROLE
+    own = set().union(*(_family_words(i) for i, r in _roles().items() if head in r))
+    alone = _interface_only(b)                                           # as learned_ok lets a role answer
+    plain = alone and not said & TONE_STEMS and not any(
+        terms[k]['learned'] and (_family_words(rows[k]['id']) & said) - own for k in named_)
+    pool = (named_ or [k for k in invented if dom in rows[k].get('domains', ())]
+            or invented or list(score))                # nothing named: the closest in feel, in the request's domain
     if mat == 'retro' and not any(chip(rows[k]) for k in pool):
         # chip sound asked for and no chip design shares a word: every chip design, by feel and direction
         pool = [k for k in range(len(rows)) if chip(rows[k])]
@@ -964,6 +993,10 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             if c in t['uses'] or c in t['name']:
                 s *= 0.5                                       # "not an error", "smooth, not clicky"
         s *= row.get('prior', 1.0)
+        if row['id'] in L.BY_NAME_ONLY and alone and not said & TONE_STEMS:
+            s *= BY_NAME
+        elif plain and t['learned'] and head in _roles().get(row['id'], ()):
+            s *= ROLE                                          # "a tap", "hover", "toggle on": the recorded one
         if dom and row.get('domains'):
             s *= 1.15 if dom in row['domains'] else 0.85
         if mat == 'retro':
@@ -983,6 +1016,41 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
     return _learned_first(b, _named_member(b, out, idx), idx)[:top]
+
+
+def _roles():
+    """{id: the interface jobs a learned design plays} (earshot.sounds.learned index `roles`), read once"""
+    if 'roles' not in _cache:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'resyn', 'index.json')
+        with open(path, encoding='utf-8') as fh:
+            _cache['roles'] = {e['id']: frozenset(e.get('roles', ())) for e in json.load(fh)}
+    return _cache['roles']
+
+
+def _interface_only(b):
+    """True when a request names interface jobs a learned design plays (its roles) and nothing else: "a tap",
+    "button click sound", "toggle on"; not "a click like an old SLR" (a shutter is a part of it)"""
+    if 'any_role' not in _cache:
+        _cache['any_role'] = frozenset().union(*_roles().values())
+    return bool(b['concepts']) and not b.get('parts') and set(b['concepts']) <= _cache['any_role']
+
+
+def learned_ok(b, sid, t, said):
+    """True when a learned design (earshot.sounds.learned: recordings of one thing) may answer the request: the
+    request names its thing, as a job or a word it says (`said`: _said_words stems): the job its family is by name
+    ("a footstep on gravel": step/, a footstep by lexicon.FAMILY_SENSE; "toggle dark mode": switch/), the
+    interface job it plays (its `roles`: "hover" is a tick of a dial) or its family's own word ("a wooden drawer",
+    "a pot clanging"). A recording never answers by feel alone nor by a job its thing merely has: "sword on armour"
+    is a clang, but no recorded pot or anvil; "a heavy impact" reaches no recorded dumbbell"""
+    asked = set(b['concepts'])                           # "... muffled and bubbly": a part, not a recorded splash
+    if _roles().get(sid, frozenset()) & asked and _interface_only(b):
+        return True                     # the interface job alone ("a click like an old SLR" is a shutter's click)
+    own = said - set(b.get('context_words', ()))         # "passes a save point flag": the flag is where, not what
+    fam = _family_words(sid)                             # "a drum hit" names no brake drum: every word of it
+    by_family = t['exact'] in asked or (fam <= own if len(fam) > 1 else bool(fam & own))
+    if sid.split('/')[0] in L.SOUND_FAMILIES:            # "a whoosh" names no recorded rope: "a rope whoosh" does
+        return by_family and bool(_name_words(sid) & said)
+    return by_family
 
 
 def _name_words(sid):

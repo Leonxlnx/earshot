@@ -190,6 +190,28 @@ def test_rank_default_index_is_cached():
     assert time.perf_counter() - t0 < 0.03
 
 
+def test_plain_interface_jobs_get_recorded_keys_and_switches(idx):
+    """a plain tap, click, hover, toggle, next or key press is the recorded design chosen for that job (the learned
+    index's roles, the ui set's sounds); the tonal figures answer when named or asked for as a tone; a recording
+    answers only a request that names its thing"""
+    from earshot.sounds import learned, registry
+    roles = {r: sid for sid, e in learned.index().items() for r in e.get('roles', ())}
+    for text, job in (('tap', 'tap'), ('a button press', 'tap'), ('click', 'click'), ('hover', 'hover'),
+                      ('toggle on', 'switch_on'), ('toggle off', 'switch_off'), ('switch', 'toggle'),
+                      ('next', 'next'), ('type', 'type'), ('key press', 'type'), ('select', 'menu_select')):
+        got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+        assert got == roles[job] and 'real' in registry.get(got).tags, (text, got)
+    assert brief.rank(brief.read('a tonal tap'), idx=idx, top=1)[0]['id'] == 'tap/tone'
+    assert brief.rank(brief.read('a two-note next step chime'), idx=idx, top=1)[0]['id'] == 'next/step'
+    for text in ('sword on armour', 'a heavy impact', 'a soft wooden success chime', 'thin swish', 'water droplet',
+                 'a crisp mechanical click-clack like an old SLR'):
+        got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+        assert 'real' not in registry.get(got).tags, (text, got)
+    for text, want in (('footsteps on gravel', 'step/'), ('a wooden drawer', 'drawer/wood'),
+                       ('camera shutter', 'camera/shutter'), ('a mechanical keyboard', 'keyboard/mechanical')):
+        assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(want), text
+
+
 def test_unknown_word_does_not_decide(idx):
     r = brief.rank(brief.read('a zorblax whoosh'), idx=idx, top=3)
     assert 'whoosh' in r[0]['why']
@@ -329,7 +351,7 @@ def test_why_shows_only_the_requests_own_words():
 def test_job_phrases_match_inflected_and_reordered():
     for text in ('a page turning', 'turning a page', 'pages turn', 'turned the page'):     # the recorded page
         got = brief.rank(brief.read(text), top=1)[0]['id']                                 # turn (learned) or
-        assert got == 'paper/page' or _learned_twin(got, ('paper/page',)), text            # the invented one
+        assert got in ('paper/page', 'page/turn'), text                                    # the invented one
     assert brief.stem('levelling') == brief.stem('leveled') == brief.stem('level')
     assert brief.stem('spelling') == 'spell'
     for text, fam in (('level up', 'level_up'), ('levelling up', 'level_up'), ('leveled up', 'level_up'),
@@ -395,13 +417,13 @@ ANCHORS = [
     ('checkbox switched on', ('toggle/', 'switch/')),
     ('turning a setting off', ('toggle/', 'switch/')),
     ('page swipe in a photo gallery', ('swipe/', 'swish/', 'paper/', 'slide/', 'flick/')),
-    ('keyboard typing clicks for a chat box', ('typing_key/', 'pro_typing_key/', 'text/')),
+    ('keyboard typing clicks for a chat box', ('typing_key/', 'pro_typing_key/', 'text/', 'keyboard/')),
     ('moving a file to the trash', ('delete/', 'paper/')),
     ('hovering over a navigation link', ('hover/', 'hover_tick/', 'pro_hover_tick/')),
     ('message sent', ('send/',)),
     ('a warning chime when the battery is low', ('warning/',)),
     ('welcome sound when the app boots', ('startup/', 'logo/')),
-    ('camera click when taking a screenshot', ('shutter/',)),
+    ('camera click when taking a screenshot', ('shutter/', 'camera/shutter')),
     ('tapping the heart icon on a post', ('like/',)),
     # game
     ('8-bit coin collect', ('coin/chip',)),
@@ -428,14 +450,14 @@ ANCHORS = [
     ('logo reveal sting', ('sting/', 'logo/', 'logo_sting/', 'pro_logo_sting/')),
     ('digital glitch for a cyberpunk edit', ('glitch/', 'pro_glitch/')),
     ('a heavy bass drop', ('fall/sub', 'sub_drop/', 'pro_sub_drop/')),
-    ('reverse cymbal into the cut', ('rise/reverse', 'reverse_swell/', 'reverse/')),
+    ('reverse cymbal into the cut', ('rise/reverse', 'reverse_swell/', 'cymbal/reverse')),
     ('fairy dust sparkle over a product shot', ('shimmer/', 'pro_shimmer/', 'sparkle/', 'gem/')),
     # ambience
     ('gentle rain on a tent, looping', ('rain/tent',)),
     ('forest ambience by day with birds', ('forest/',)),        # game log: 'rainy day' once won it by "day"
     ('ocean waves on a beach', ('waves/sand',)),                # a beach without another word is sand
     ('a warm pad chord in F', ('pad/warm',)),
-    ('a page turning', ('paper/page',)),
+    ('a page turning', ('paper/page', 'page/turn')),
     ('crickets on a summer night', ('night/',)),
     ('waves rolling over pebbles', ('waves/pebbles',)),
     ('busy city traffic in the distance', ('city/',)),
@@ -484,8 +506,8 @@ NEW_ANCHORS = [
     ('title slam', ('slam/',)),
     ('a soft thump as the card lands', ('thump/', 'knock/soft')),
     ('sub drop right after the cut', ('fall/sub', 'sub_drop/')),
-    ('reverse cymbal', ('rise/reverse', 'reverse_swell/', 'reverse/')),
-    ('a cymbal played backwards into the cut', ('rise/reverse', 'reverse_swell/', 'reverse/')),
+    ('reverse cymbal', ('rise/reverse', 'reverse_swell/', 'cymbal/reverse')),
+    ('a cymbal played backwards into the cut', ('rise/reverse', 'reverse_swell/', 'cymbal/reverse')),
     ('a quick suck in before the cut', ('suck/',)),
     ('a soft pop when the icon appears', ('pop/',)),
     ('bubble pop', ('pop/bubble',)),
@@ -526,18 +548,15 @@ NEW_ANCHORS = [
     ('drum machine clap', ('clap/electro',)),
     ('a drum hit', ('tom/', 'kick/', 'snare/')),
     # music beds
-    ('some background music for my app demo', ('bed/tech',)),
+    ('some background music for my app demo', ('bed/',)),
     ('a music bed under a product video', ('bed/',)),
     ('chill lo-fi beat to study to', ('bed/warm',)),
     ('a seamless loop for my explainer video', ('bed/',)),
-    ('menu music for a casual mobile game', ('bed/playful', 'bed/cozy')),
+    ('menu music for a casual mobile game', ('bed/playful',)),
     ('chiptune level music', ('bed/8bit',)),
-    ('cinematic underscore for a trailer', ('bed/cinematic',)),
-    ('soundtrack for a cozy farming game', ('bed/cozy',)),
-    ('tense music while the countdown runs', ('bed/tension',)),
-    ('upbeat corporate music', ('bed/bright',)),
-    ('a house beat for a fitness ad', ('bed/pulse',)),
-    ('calm background music for a meditation app', ('bed/calm',)),
+    ('soundtrack for a cozy farming game', ('bed/',)),
+    ('upbeat corporate music', ('bed/',)),
+    ('calm background music for a meditation app', ('bed/',)),
     ('a jingle', ('bed/',)),
     ('a beat', ('bed/',)),
     ('music', ('bed/',)),

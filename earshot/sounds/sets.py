@@ -9,9 +9,13 @@ interface and game audio teams work from; a product rarely needs more than a doz
 better than every event making noise.
 """
 SETS = {
+    # the touches are recorded keys and switches (earshot.sounds.learned: the owner heard the tonal touches as
+    # unrecognisable twice, real keys as satisfying); toggle_on and toggle_off are two takes of one lamp switch, the
+    # off the darker at the default seed (members walk with the seed, and a set's sounds take consecutive seeds)
     'ui': dict(says='a product interface: app, website, dashboard', theme='soft', sounds=(
-        ('tap', 'tap/tone'), ('hover', 'hover/tone'), ('toggle_on', 'toggle/up'), ('toggle_off', 'toggle/down'),
-        ('open', 'open/lift'), ('close', 'close/drop'), ('next', 'next/step'), ('back', 'back/step'),
+        ('tap', 'keyboard/desktop'), ('hover', 'dial/click'), ('toggle_on', 'switch/lamp'),
+        ('toggle_off', 'switch/lamp'), ('type', 'keyboard/mechanical'),
+        ('open', 'open/lift'), ('close', 'close/drop'), ('next', 'keyboard/laptop'), ('back', 'back/step'),
         ('send', 'send/lift'), ('receive', 'receive/drop'), ('notify', 'notify/pair'), ('success', 'success/rise'),
         ('complete', 'success/triad'), ('warning', 'warning/pulse'), ('error', 'error/fall'),
         ('delete', 'delete/drop'))),

@@ -1,5 +1,8 @@
-"""Nature and ambience textures computed from physics and statistics: rain, wind, fire, a stream, surf, a forest, a
-night, room tone, hums (48 kHz stereo beds, no recorded audio).
+"""Nature and ambience textures computed from physics and statistics: rain, wind, fire, a stream, a forest, a
+night, hums (48 kHz stereo beds, no recorded audio). The sea, the underwater rush, room tone and the city are
+learned from real recordings instead (earshot.synth.quilt, earshot.sounds.nature), as are the campfire, the
+crickets, the brook, wind in trees and rain on a street of the catalogue; the scenes here still make those for
+code that asks for them (texture.render('night', ...): the crickets the owner rated 3, kept as the fallback).
 
 Procedural ambience usually sounds fake for two reasons: the spectrum is static (noise through one filter and an LFO)
 and the events have no statistics (rain as hiss, fire without crackle clusters). Every scene here is built from two
@@ -18,7 +21,7 @@ engines instead:
     bed = texture.render('rain', 12.0, dsp.rng(3), intensity=0.4, surface='window')   # (n, 2) float64, quiet
     fire = texture.loop('fire', 10.0, dsp.rng(1), size=0.2)                           # repeats without a seam
     texture.seam_db(fire)                                                             # {'level', 'spectral', 'click'}
-    texture.SCENES['waves']                                                           # says, loop, min_loop, controls
+    texture.SCENES['stream']                                                          # says, loop, min_loop, controls
 
 A bed is rendered around a circle: controls are periodic over its length, events wrap past the end onto the start and
 filters and rooms are applied circularly, so loop() returns a buffer with no seam to hide and no event cut, and
@@ -724,107 +727,6 @@ def _stream(n, r, c):
     return _filt(y, _lp(16000.0 * 10 ** (-0.9 * far), 1)) if far > 0 else y
 
 
-def _waves(n, r, c):
-    """Surf: breakers arrive at irregular intervals (log-normal, never a fixed period) in groups of varying height,
-    with smaller waves in between, each at its own pace.
-    Each one swells as a low rumble, breaks with a crash whose spectrum opens upwards and whose break point runs
-    along the beach (the left and right side break up to a few seconds apart), leaves foam that fizzes as thousands
-    of tiny bubbles and draws back as a falling hiss, over sand or over pebbles that clack in the backwash; far
-    breakers keep a low bed under it all. The periods are those of swell on a beach, 6-12 s (never a fixed one),
-    the swell rises over seconds before the break, and the wash is long: a hiss of thousands of foam and sand
-    grains (events, like the rain) that rises after the break and drains away over 4-6 s, getting darker as it
-    goes."""
-    dur, size = n / SR, c['size']
-    m = int(round(dur * CR))
-    tt = np.arange(m) / CR
-    waves = max(1, int(round(dur / (9.0 * 1.25 ** size))))    # a breaker every 7 .. 9 .. 11 s on average
-    gaps = np.clip(np.exp(0.3 * r.standard_normal(waves)), 0.67, 1.33)                    # 6 .. 12 s apart
-    breaks = (np.cumsum(gaps) / gaps.sum() + r.uniform()) % 1.0 * dur
-    z = r.standard_normal(waves)
-    for i in range(1, waves):                                 # wave groups: neighbours are alike
-        z[i] = 0.5 * z[i - 1] + 0.87 * z[i]
-    minor = r.poisson(0.4 * waves)                            # smaller waves in between, at any time
-    breaks = np.concatenate([breaks, r.uniform(0, dur, minor)])
-    heights = np.concatenate([np.exp(0.3 * z), r.uniform(0.25, 0.5, minor)])
-    pace = 1.25 ** size * np.concatenate([r.uniform(0.75, 1.4, waves), r.uniform(0.5, 0.9, minor)])
-    centres = _bands(40.0, 14000.0, 11)
-    f = centres[:, None]
-    power = np.zeros((11, m, 2))
-    fizz, drag = np.zeros((m, 2)), np.zeros((m, 2))
-    rumble = _levels(centres, 110.0 * 1.4 ** -size, 3.0, 6.0)[:, None] * 0.6 * 1.5 ** size
-    foam = _levels(centres, 2500.0, 4.0, 6.0)[:, None]
-    for tb, h, slow in zip(breaks, heights, pace):            # big waves take their time
-        sweep = r.uniform(0.8, 2.6) * r.choice([-1.0, 1.0])   # seconds the break takes from one side to the other
-        open_to = 700.0 * r.uniform(0.7, 1.3)
-        for ch in (0, 1):
-            for turn in (-1, 0, 1):
-                tau = ((tt - tb - (ch - 0.5) * sweep + dur / 2) % dur - dur / 2 + turn * dur) / slow
-                if tau.min() > 12.0 or tau.max() < -8.0:
-                    continue
-                after = np.maximum(tau, 0.0)
-                swell = np.where(tau < 0, np.exp(np.minimum(tau, 0.0) / 2.5), np.exp(-after / 1.2))
-                crash = np.where(tau < 0, 0.2 * np.exp(np.minimum(tau, 0.0) / 0.9),
-                                 0.2 + 0.8 * (1 - np.exp(-after / 0.08))) * np.exp(-after / 0.8)
-                centre = 300.0 + open_to * (1 - np.exp(-after / 0.25)) * np.exp(-after / 2.5)
-                fz = (1 - np.exp(-after / 0.6)) * np.exp(-after / 3.5)
-                back = 0.3 * np.exp(-0.5 * ((tau - 4.5) / 1.6) ** 2)
-                power[:, :, ch] += h ** 2 * (
-                    (rumble * swell[None, :]) ** 2
-                    + (_hump(f, centre[None, :], 3.0, 5.5) * np.sqrt(f / centre[None, :]) * crash[None, :]) ** 2
-                    + (0.3 * foam * fz[None, :]) ** 2
-                    + (_hump(f, 2400.0 * np.exp(-(tau[None, :] - 3.0) / 3.0), 4.0, 6.0) * back[None, :]) ** 2)
-                fizz[:, ch] += h * fz
-                drag[:, ch] += h * back / 0.25
-    bed = _levels(centres, 400.0, 3.0, 5.0)[:, None] * 0.02 * np.exp(0.25 * drift(dur, r, 0.03, 0.5, 1.0))[None, :]
-    grain = envelopes(dur, r, 11, 0.2, 0.6, 1.0, 12.0, 1.0)   # the roar of a breaker is a little uneven
-    y = band_noise(n, r, centres, np.sqrt(power * (grain ** 2)[:, :, None] + (bed ** 2)[:, :, None]), 0.8)
-    level = np.sqrt(np.mean(power.sum(0)))
-    events = np.zeros((n, 2))
-    for ch in (0, 1):
-        side = (2 * ch - 1) * r.uniform(0.15, 1.0, 1)[0]
-        t, _ = arrivals(r, 2500.0 * fizz[:, ch], dur)
-        radius = sizes(r, len(t), 0.25, 0.9, 'power', 2.0)
-        _bubbles(events, t, 0.2 * radius * _val(fizz[:, ch], t, dur) ** 0.5,
-                 np.clip((2 * ch - 1) * r.uniform(0.1, 1.0, len(t)), -1, 1), radius, 0.1)
-        wash = fizz[:, ch] + drag[:, ch] * 0.6                # the hiss of the wash: foam and sand grains
-        t, _ = arrivals(r, np.minimum(4500.0 * wash, 5000.0), dur)
-        g = sizes(r, len(t), 0.3, 3.0, 'lognormal', 0.5) * _val(wash, t, dur) ** 0.3
-        bursts(events, t, 0.03 * level * g, np.clip((2 * ch - 1) * r.uniform(0.0, 1.0, len(t)), -1, 1),
-               r.uniform(2500.0, 8000.0, len(t)) * _val(np.exp(-drag[:, ch] / 3.0), t, dur), 1.0, 0.0004, r)
-        if c['surface'] == 'pebbles':
-            t, _ = arrivals(r, 260.0 * drag[:, ch], dur, cluster=0.4, spread=0.02)
-            a = sizes(r, len(t), 1.0, 20.0, 'power', 2.2)
-            bursts(events, t, 0.08 * a, np.clip(side + 0.4 * r.standard_normal(len(t)), -1, 1),
-                   3800.0 * a ** -0.35 * r.uniform(0.7, 1.4, len(t)), r.uniform(2.0, 5.0, len(t)),
-                   0.0003 * a ** 0.4, r)
-    if size > -0.5:                                           # the thump of the lip landing
-        big = heights > 0.7
-        rings(events, breaks[big], 1.6 * level * heights[big] ** 2 * (0.6 + 0.4 * size),
-              r.uniform(-0.3, 0.3, big.sum()), r.uniform(46.0, 68.0, big.sum()) * 1.2 ** -size, 0.16, 0.02, -1.0)
-    y += events
-    return _filt(y, _lp(7000.0 * 10 ** (-1.1 * max(c['distance'], 0.0)), 1))      # the break is tens of metres off
-
-
-def _underwater(n, r, c):
-    """Under water: everything is muffled (no highs above about 2 kHz reach the ear), a low rumble fills the space,
-    and air escapes in bursts of large, slow bubbles (2-14 mm: 230 Hz - 1.6 kHz, ringing for tens of ms)."""
-    dur = n / SR
-    centres = _bands(25.0, 3200.0, 8)
-    env = _levels(centres, 70.0, 2.0, 5.0)[:, None] * envelopes(dur, r, 8, 0.3, 0.4, 0.05, 2.0, 1.2)
-    y = band_noise(n, r, centres, env, np.linspace(0.4, 1.0, 8))
-    water = np.zeros((n, 2))
-    for tb in arrivals(r, 0.45 * 10 ** (0.5 * c['intensity']), dur)[0]:           # a burst of escaping air
-        k = int(r.integers(6, 40))
-        radius = sizes(r, k, 1.5, 14.0, 'lognormal', 0.45) * r.uniform(0.6, 1.5)
-        _bubbles(water, tb + np.cumsum(r.exponential(r.uniform(0.01, 0.05), k)), 0.3 * radius * r.uniform(0.3, 1, k),
-                 _pans(r, k, 0.2, r.uniform(-0.8, 0.8)), radius, 0.05)
-    t, _ = arrivals(r, 2.5 * 10 ** (0.5 * c['intensity']), dur)
-    radius = sizes(r, len(t), 1.0, 12.0, 'power', 2.0)
-    _bubbles(water, t, 0.2 * radius * r.uniform(0.2, 1.0, len(t)), _pans(r, len(t)), radius, 0.05)
-    y = y * (0.8 * _rms(water) / _rms(y)) + water
-    return _filt(y, _lp(2200.0 * 10 ** (-0.3 * c['distance'])))
-
-
 # ------------------------------------------------------------------------------------------------ birds
 def _note(r, dur, f0, f1, bow=0.0, trill=0.0, trill_hz=40.0, harm=0.08):
     """one note of a syrinx: a tone gliding from f0 to f1 Hz over dur s (bow arches the glide up and back, or down
@@ -989,10 +891,8 @@ def _night(n, r, c):
     temperature: a snowy tree cricket chirps (T_F - 40) / 15 times per second (Dolbear's law), each at its own
     slightly different tempo; field crickets chirp faster and in bouts; ground crickets trill without a break. A
     few sing close by, the crowd is far and soft; now and then a tree frog (an owl only when `owl` is above 0); a
-    soft air under it all. Carriers sit where crickets heard across a garden sit, 2.3-5.4 kHz (tree crickets near
-    2.5-3 kHz, field crickets 4-5 kHz; the far crowd loses its top to the air), and every stroke is a rough, short
-    ring (bandwidth near 100-150 Hz, level and pitch varying stroke to stroke), not a pure tone: the first version
-    sat up to 7.6 kHz and the owner heard its tone as too high."""
+    soft air under it all. (A version with lower, rougher strokes was heard by the owner as random trills and
+    rated lower: these are the crickets he rated 3.)"""
     dur = n / SR
     temp = 20.0 + 8.0 * c['warmth']                           # deg C: 12 .. 20 .. 28
     beat = (temp * 1.8 - 8.0) / 15.0                          # chirps per second, Dolbear
@@ -1001,29 +901,28 @@ def _night(n, r, c):
     near, far = np.zeros((n, 2)), np.zeros((n, 2))
     seats = r.permutation([-0.85, -0.3, 0.35, 0.9])
     for i in range(int(round(14 * 10 ** (0.35 * c['intensity'])))):                # 6 .. 14 .. 31 singers
-        away = i >= 3
-        gain = 1 / (r.uniform(4.0, 30.0) if away else r.uniform(2.0, 4.0))
+        away = i >= 4
+        gain = 1 / (r.uniform(4.0, 30.0) if away else r.uniform(1.0, 3.0))
         pan = _pans(r, 1)[0] if away else seats[i] + r.uniform(-0.1, 0.1)
         awake = drift(dur, r, 0.04, 0.3, 0.0)                 # a singer rests when this dips
         if i % 3 == 0:                                        # tree cricket: slow, even chirps at Dolbear's rate
-            f, strokes, rate = r.uniform(2300.0, 2900.0) * tune, int(r.integers(5, 9)), 48.0 * quick
+            f, strokes, rate = r.uniform(2500.0, 3200.0) * tune, int(r.integers(5, 9)), 48.0 * quick
             t = _chirps(r, dur, 1 / (beat * r.uniform(0.97, 1.03)), 0.05, 0.08)
-            rise, decay = np.minimum(1.0, 0.45 + 0.3 * np.arange(strokes)), 0.0028
+            rise, decay = np.minimum(1.0, 0.45 + 0.3 * np.arange(strokes)), 0.004
         elif i % 3 == 1:                                      # field cricket: quick chirps of 3-4 strokes
-            f, strokes, rate = r.uniform(3800.0, 4600.0) * tune, int(r.integers(3, 5)), 28.0 * quick
+            f, strokes, rate = r.uniform(4300.0, 5100.0) * tune, int(r.integers(3, 5)), 28.0 * quick
             t = _chirps(r, dur, 1 / (2.6 * quick * r.uniform(0.8, 1.25)), 0.07, 0.08)
             t = t[_val(awake, t, dur) > -0.7]
-            rise, decay = np.minimum(1.0, 0.6 + 0.25 * np.arange(strokes)), 0.0032
+            rise, decay = np.minimum(1.0, 0.6 + 0.25 * np.arange(strokes)), 0.006
         else:                                                 # ground cricket: an unbroken trill
-            f, strokes, rate = r.uniform(4200.0, 5400.0) * tune, 1, 42.0 * quick * r.uniform(0.85, 1.15)
+            f, strokes, rate = r.uniform(5600.0, 7600.0) * tune, 1, 42.0 * quick * r.uniform(0.85, 1.15)
             t = _chirps(r, dur, 1 / rate, 0.02, 0.02)
             t = t[_val(awake, t, dur) > -1.0]
-            rise, decay, gain = np.ones(1), 0.0022, 0.3 * gain
+            rise, decay, gain = np.ones(1), 0.003, 0.35 * gain
         tt = (t[:, None] + np.arange(strokes)[None, :] / rate).ravel()
         swell = np.exp(0.3 * _val(drift(dur, r, 0.05, 0.5, 1.0), tt, dur))
-        rough = np.exp(0.3 * r.standard_normal(len(tt)))      # no two strokes alike
-        rings(far if away else near, tt, gain * swell * rough * np.tile(rise, len(t)), pan,
-              f * np.exp(0.012 * r.standard_normal(len(tt))), decay, 0.6 * decay, -2.0)
+        rings(far if away else near, tt, gain * swell * np.tile(rise, len(t)), pan,
+              f * np.exp(0.004 * r.standard_normal(len(tt))), decay, decay, -2.0)
     if c['intensity'] > -0.5:
         for tb in arrivals(r, 0.11, dur)[0]:                  # a tree frog: a few short rattling calls
             f, pan = r.uniform(950.0, 1300.0), r.uniform(-0.8, 0.8)
@@ -1035,8 +934,8 @@ def _night(n, r, c):
             f, pan = r.uniform(330.0, 400.0), r.uniform(-0.8, 0.8)
             for t0, d in ((0.0, 0.32), (0.85, 0.14), (1.07, 0.14), (1.5, 0.65)):
                 _put(far, _note(r, d, f * 0.97, f * 0.985, 0.04, harm=0.15), tb + t0, 0.12, pan)
-    far = _space(_filt(far, _lp(5000.0, 1)), 1.0, 0.5, 28, size=0.9)
-    y = _filt(near, _lp(8000.0, 1)) * 10 ** (-0.5 * c['distance']) + 2.5 * far
+    far = _space(_filt(far, _lp(9000.0, 1)), 1.0, 0.5, 28, size=0.9)
+    y = near * 10 ** (-0.5 * c['distance']) + 2.5 * far
     centres = _bands(60.0, 9000.0, 8)
     env = _levels(centres, 250.0, 3.0, 4.5)[:, None] * envelopes(dur, r, 8, 0.15, 0.6, 0.03, 1.0, 1.2)
     air = band_noise(n, r, centres, env, 0.9)
@@ -1045,96 +944,6 @@ def _night(n, r, c):
 
 
 # ------------------------------------------------------------------------------------------------ interiors
-def _resonances(n, r, freqs, amps, q):
-    """stationary narrow noise bands (room modes, a fan's tones): Gaussian noise under Lorentzian peaks, circular;
-    stereo with a mostly common low end"""
-    f = np.fft.rfftfreq(n, 1 / SR)
-    shape = np.zeros(len(f))
-    for f0, a in zip(freqs, amps):
-        shape += a * np.sqrt(q / f0) / np.sqrt(1 + (2 * q * (f / f0 - 1)) ** 2)
-    x = [np.fft.irfft(shape * (r.standard_normal(len(f)) + 1j * r.standard_normal(len(f))), n) for _ in range(2)]
-    return np.stack([x[0] + 0.5 * x[1], x[0] - 0.5 * x[1]], axis=1) * np.sqrt(n / SR) / 2
-
-
-def _room_tone(n, r, c):
-    """Room tone: the air of a quiet room. A rumble that falls about 4.5 dB per octave band (ventilation and the
-    building, the shape of a noise-criterion curve), the lowest axial modes of the room c / 2L as narrow bands, the
-    faint tones of a fan, a trace of hiss; every band drifts a little on its own and nothing ever happens."""
-    dur = n / SR
-    centres = _bands(28.0, 12000.0, 10)
-    lev = np.hypot(_levels(centres, 50.0, 3.0, 7.5), 10 ** (-42 / 20) * _levels(centres, 4000.0, 3.0, 3.0))
-    lev = lev * 10 ** (0.4 * c['intensity'] * np.clip(np.log2(centres / 150.0), 0.0, 3.0) / 3.0)
-    y = band_noise(n, r, centres, lev[:, None] * envelopes(dur, r, 10, 0.08, 0.2, 0.03, 1.0, 1.2),
-                   np.linspace(0.5, 1.0, 10))
-    room = np.array([5.2, 3.9, 2.6]) * 1.5 ** c['size']       # m: a small office .. a living room .. a hall
-    modes = _resonances(n, r, 343.0 / (2 * room), (1.0, 0.8, 0.6), 14.0)
-    fan = _resonances(n, r, (118.0, 236.0, 354.0), (1.0, 0.5, 0.25), 90.0)
-    level = _rms(y)
-    return y + modes * (0.6 * level / _rms(modes)) + fan * (10 ** ((-10 + 8 * c['intensity']) / 20) * level / _rms(fan))
-
-
-def _city(n, r, c):
-    """A city from a distance: under a low, smooth drone of traffic too far to tell apart (air absorption has taken
-    the highs), single vehicles pass one after another on the nearer roads, each a slow swell (level as 1 / r over
-    a pass of a few seconds, gliding across the stereo field) of its engine (a low harmonic tone at the firing
-    rate, 25-70 Hz, falling a few % by Doppler as it goes by) and its tyres (a hump at 400-1000 Hz); now and then
-    a nearer car's tyre hiss swells and fades, and rarely a far horn sounds in the reverberant street. intensity is
-    how busy it is: more vehicles, a fuller and brighter drone, more horns."""
-    dur, busy = n / SR, c['intensity']
-    m = int(round(dur * CR))
-    tt = np.arange(m) / CR
-    centres = _bands(30.0, 10000.0, 10)
-    base = _levels(centres, 70.0 * 1.6 ** busy, 2.5, 8.0 - 1.5 * busy)[:, None] * envelopes(dur, r, 10, 0.12, 0.6,
-                                                                                            0.03, 0.4, 1.2)
-    y = band_noise(n, r, centres, base, np.linspace(0.6, 1.0, 10))
-    hum = _resonances(n, r, (58.0, 87.0, 116.0, 174.0), (1.0, 0.8, 0.6, 0.3), 25.0)      # many engines, one drone
-    y += hum * (0.35 * _rms(y) / _rms(hum))
-    t = np.arange(n) / SR
-    cars = np.zeros((n, 2))
-    passes = arrivals(r, 0.35 * 2.0 ** busy, dur)[0]
-    for k, tp in enumerate(passes):
-        v, d = r.uniform(9.0, 20.0), r.uniform(15.0, 45.0)            # m/s; m from the line of the road
-        tau = (t - tp + dur / 2) % dur - dur / 2                      # around the circle: the loop has no seam
-        x = v * tau
-        rr = np.hypot(x, d)
-        gain = (d / rr) ** 1.3 * np.cos(np.pi * tau / dur) ** 2 * np.exp(0.4 * r.standard_normal())
-        f0 = r.uniform(25.0, 70.0) / (1 + v * x / rr / 343.0)         # Doppler: higher coming, lower going
-        cyc = np.sum(f0) / SR
-        ph = 2 * np.pi * np.cumsum(f0 * (round(cyc) / cyc)) / SR + r.uniform(0, 2 * np.pi)     # whole cycles: loops
-        eng = sum(h ** -0.9 * np.sin(h * ph + r.uniform(0, 2 * np.pi)) for h in range(1, 7))
-        eng = eng * (1 + 0.2 * _at(drift(dur, r, 2.0, 12.0), n))
-        tyre = _svf(r.standard_normal(n), r.uniform(400.0, 1000.0), 0.7, 'bandn') * 2.0
-        th = (np.clip(r.choice([-1.0, 1.0]) * np.clip(x / (2 * d), -1, 1) * 0.8, -1, 1) + 1) * np.pi / 4
-        s = (eng + tyre) * gain
-        cars[:, 0] += s * np.cos(th)
-        cars[:, 1] += s * np.sin(th)
-    if len(passes):
-        y += _filt(cars, _lp(1500.0, 2)) * (6.0 * _rms(y) / _rms(cars) * min(1.0, np.sqrt(len(passes) * 4.0 / dur)))
-    hiss = np.zeros((n, 2))
-    for tp in arrivals(r, 0.07 * 2.0 ** busy, dur)[0]:               # a nearer car on the main road
-        tau = (t - tp + dur / 2) % dur - dur / 2
-        g = np.exp(-0.5 * (tau / r.uniform(0.8, 1.6)) ** 2)
-        _put(hiss, _svf(r.standard_normal(n), r.uniform(900.0, 1800.0), 0.8, 'bandn') * g, 0.0, 1.0,
-             r.uniform(-0.7, 0.7))
-    if hiss.any():
-        y += hiss * (0.35 * _rms(y) / _rms(hiss) * np.sqrt(0.07 * 2.0 ** busy * dur / 3.0))
-    horns = np.zeros((n, 2))
-    for tp in arrivals(r, 0.12 * 2.5 ** busy, dur)[0]:               # a far horn, one or two blasts
-        f = r.uniform(330.0, 470.0)
-        for b in range(int(r.integers(1, 3))):
-            L = r.uniform(0.25, 0.7)
-            u = np.arange(dsp.n_of(L)) / SR
-            ph = 2 * np.pi * f * u
-            tone = sum(h ** -1.0 * (np.sin(h * ph) + 0.8 * np.sin(h * 1.26 * ph)) for h in range(1, 6))
-            _put(horns, tone * np.sin(np.pi * np.minimum(u / 0.03, 1) / 2) * np.minimum((L - u) / 0.05, 1),
-                 tp + b * (L + r.uniform(0.08, 0.2)), 1.0, r.uniform(-0.6, 0.6))
-    if horns.any():
-        horns = _space(_filt(horns, _lp(1500.0, 2)), 1.6, 1.5, 26)
-        y += horns * (0.9 * _top(y) / _top(horns))
-    far = max(c['distance'], 0.0)
-    return _filt(y, _lp(3000.0 * 10 ** (-0.8 * far), 1))
-
-
 def _space_hum(n, r, c):
     """The hum of a ship or a machine room: a stack of low harmonics, every one a pair of tones a fraction of a hertz
     apart, one towards each side, so the stack beats slowly and never settles; a second, weaker machine a fifth above;
@@ -1268,22 +1077,12 @@ SCENES = {
              'loop': True, 'min_loop': 8, 'controls': ['size', 'intensity', 'distance', 'bright', 'width']},
     'stream': {'says': ['a babbling brook', 'water flowing in a stream', 'running water'],
                'loop': True, 'min_loop': 6, 'controls': ['size', 'intensity', 'distance', 'bright', 'width']},
-    'waves': {'says': ['ocean waves breaking on a beach', 'surf washing on the shore', 'sea waves'],
-              'loop': True, 'min_loop': 20, 'controls': ['size', 'surface', 'distance', 'bright', 'width'],
-              'choices': {'surface': ['sand', 'pebbles']}},
-    'underwater': {'says': ['underwater ambience with bubbles', 'muffled sound under water',
-                            'bubbles rising under water'],
-                   'loop': True, 'min_loop': 10, 'controls': ['intensity', 'distance', 'bright', 'width']},
     'forest': {'says': ['birds singing in a forest', 'a quiet forest in the morning with birdsong',
                         'birdsong and a light breeze in the trees'],
                'loop': True, 'min_loop': 20, 'controls': ['intensity', 'distance', 'bright', 'width', 'dove']},
     'night': {'says': ['crickets chirping at night', 'night insects in a field',
                        'a summer night ambience with crickets'],
               'loop': True, 'min_loop': 10, 'controls': ['intensity', 'warmth', 'distance', 'bright', 'width', 'owl']},
-    'room_tone': {'says': ['the quiet hum of an empty room', 'room tone', 'faint ventilation in a quiet room'],
-                  'loop': True, 'min_loop': 4, 'controls': ['intensity', 'size', 'bright', 'width']},
-    'city': {'says': ['distant city traffic', 'the far hum of a city', 'a distant highway'],
-             'loop': True, 'min_loop': 15, 'controls': ['intensity', 'distance', 'bright', 'width']},
     'space_hum': {'says': ['the low hum of a spaceship engine room', 'a deep machine drone',
                            'a science fiction ship interior hum'],
                   'loop': True, 'min_loop': 8, 'controls': ['size', 'bright', 'width']},
@@ -1295,8 +1094,7 @@ SCENES = {
     'sparkle': {'says': ['a magical shimmering sparkle', 'twinkling chimes', 'fairy dust glitter sound'],
                 'loop': True, 'min_loop': 8, 'controls': ['key', 'density', 'bright', 'width']},
 }
-_BUILD = {'rain': _rain, 'wind': _wind, 'fire': _fire, 'stream': _stream, 'waves': _waves,
-          'underwater': _underwater, 'forest': _forest, 'night': _night, 'room_tone': _room_tone, 'city': _city,
+_BUILD = {'rain': _rain, 'wind': _wind, 'fire': _fire, 'stream': _stream, 'forest': _forest, 'night': _night,
           'space_hum': _space_hum, 'thunder': _thunder, 'crackle': _crackle, 'sparkle': _sparkle}
 
 

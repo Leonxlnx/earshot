@@ -152,7 +152,8 @@ def test_the_scene_table_is_complete():
         assert set(spec.get('choices', {})) <= set(spec['controls'])
     assert set(tx.SCENES['rain']['choices']['surface']) == {'leaves', 'roof', 'window', 'street', 'water', 'tent'}
     assert set(tx.SCENES['wind']['choices']['place']) == {'open', 'trees', 'window', 'mountain'}
-    assert tx.SCENES['rain']['min_loop'] == 8 and tx.SCENES['waves']['min_loop'] == 20
+    assert tx.SCENES['rain']['min_loop'] == 8 and tx.SCENES['forest']['min_loop'] == 20
+    assert not {'waves', 'underwater', 'room_tone', 'city'} & set(tx.SCENES)     # learned from recordings now
 
 
 @pytest.mark.parametrize('scene', BEDS)
@@ -272,14 +273,6 @@ def test_stick_slip_is_a_sawtooth_at_the_drive_rate_with_holds():
     assert -d.min() > 5 * d.max()                                     # slow rise, sudden drop: the bright edge
     _, held = tx.stick_slip(dsp.rng(3), rate, jitter=0.05, hold=0.05, hold_s=(0.03, 0.06))
     assert np.diff(held).max() > 0.025 > np.diff(ts).max()            # the surfaces now and then hold
-
-
-def test_city_is_vehicles_passing_and_intensity_makes_it_busier():
-    quiet, busy = _bed('city', 5.0, intensity=-1.0), _bed('city', 5.0, intensity=1.0)
-    assert not np.allclose(quiet, busy)
-    assert _centroid(busy) > _centroid(quiet)                        # more tyres, a fuller drone
-    lvl = _envelope(busy, 150, 1000, 0.25)
-    assert np.percentile(lvl, 90) / np.percentile(lvl, 10) > 1.6      # swells of single vehicles, not a steady band
 
 
 def test_water_bands_move_on_their_own_and_size_goes_from_plinks_to_a_roar():

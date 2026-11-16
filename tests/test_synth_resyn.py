@@ -163,6 +163,24 @@ def test_stereo_level_difference_and_coherence():
     assert abs(np.corrcoef(y[:, 0], y[:, 1])[0, 1] - np.corrcoef(x[:, 0], x[:, 1])[0, 1]) < 0.2
 
 
+def test_ringing_low_bands_keep_their_channel_correlation():
+    """low ringing modes whose channels are 0.3, 0.5 and 0.8 of half a turn apart (correlation about 0.6, 0, -0.8)
+    keep that correlation: the coherent carrier of a band is not copied into both channels with the sign of its
+    coherence (which put the lows of a wide recording fully in or out of phase: 1.0 and -1.0 for the first and the
+    last)"""
+    t = np.arange(int(0.6 * SR)) / SR
+    env = np.exp(-t / 0.2) * (1 - np.exp(-t / 0.002))
+
+    def corr(v):
+        lo = np.stack([dsp.butter(v[:, k], 'low', 250.0, order=4) for k in range(2)], axis=1)
+        return float(np.corrcoef(lo[:, 0], lo[:, 1])[0, 1])
+    for turn in (0.3 * np.pi, 0.5 * np.pi, 0.8 * np.pi):
+        x = 0.4 * env[:, None] * np.stack([np.sin(2 * np.pi * f * t[:, None] + np.array([0.0, turn]))
+                                           for f in (110.0, 180.0)]).sum(axis=0)
+        y = resyn.render(resyn.analyze(x, SR), dsp.rng(1))
+        assert abs(corr(y) - corr(x)) < 0.15, (turn, corr(x), corr(y))
+
+
 def test_models_are_small_numbers_and_survive_a_file(tmp_path):
     for name, most in (('tone', 6000), ('clicks', 9000), ('noise', 20000), ('sweep', 20000)):
         m = _model(name)

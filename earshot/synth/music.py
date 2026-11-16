@@ -6,7 +6,10 @@ a human feel, an arrangement over a few bars and a bed mix, as a seamless loop.
     plan = music.compose('warm', dsp.rng(3), key='D', bars=8, energy=0.2)   # the score: chords, voicings, notes
     y = music.render(plan, dsp.rng(3))                                      # (n, 2) float64: exactly 8 bars, a loop
     music.chart(plan)                                                       # 'D major, 84 bpm, 8 bars: Em9 | A11 ...'
-    y = music.bed('calm', dsp.rng(1), bars=4, loop=False)                   # once, ending on a chord that rings out
+    y = music.bed('playful', dsp.rng(1), bars=4, loop=False)                # once, ending on a chord that rings out
+
+Three styles: `warm` (lo-fi electric piano over soft acoustic drums), `playful` (pizzicato, muted guitar, claps)
+and `8bit` (chip channels). earshot makes sound effects; these are the beds its owner kept.
 
 Generated music is recognised in two seconds. What gives it away, and the rule that answers it here:
   block chords in root position   chords come from a small grammar of common progressions in scale degrees and take
@@ -26,7 +29,7 @@ Generated music is recognised in two seconds. What gives it away, and the rule t
                                   its last note on a chord tone, and silent for the rest of the phrase
   no arrangement                  parts enter after a quarter or half of the loop and leave room; a fill ends each
                                   four-bar phrase; the last bar turns round on the dominant as a suspended chord
-  instruments that fight          one register and one place per part, the low end mono, pads and bass ducked under
+  instruments that fight          one register and one place per part, the low end mono, keys and bass ducked under
                                   the kick, each part set to its level by the RMS of its own loudest 400 ms, one
                                   shared room (earshot.synth.space), a dip around 2.5 kHz in a top line (where a
                                   voice-over sits), peaks far over the bed's level limited
@@ -39,9 +42,8 @@ quoted: progressions are common practice and motifs are drawn from the seed.
 
 Cost: every distinct (voice, pitch, velocity step, length, take) is rendered once and placed as often as it is
 played, so a bar that comes back costs nothing. On one thread of the lab laptop (low priority, a machine shared
-with other jobs: times vary by half) the twelve styles at their own length of 15-23 s take 1.5 s (chip) to 15 s:
-0.1 to 0.7 s per second of bed. Sustained pads are the expensive part (0.1-0.2 s per second of every pad note),
-a piano note 0.06-0.2 s, a plucked or synthesized note 0.02-0.1 s, the room and the mix 2-3 s. A bed played once
+with other jobs: times vary by half) a style at its own length of 15-23 s takes 1.5 s (chip) to about 10 s: a
+piano note 0.06-0.2 s, a plucked or synthesized note 0.02-0.1 s, the room and the mix 2-3 s. A bed played once
 is rendered with RING s of room after its last bar and costs up to half as much again.
 """
 import itertools
@@ -61,8 +63,7 @@ REF = -26.0                    # dBFS: the RMS of the loudest 400 ms of a part w
 RING = 6.0                     # s of room after the last bar for the final chord of a bed played once
 CREST = 14.0                   # dB: peaks further than this over the RMS of the bed's loudest 400 ms are limited
 #                                (a kick or a snap alone does not set the level of the whole bed)
-MODES = {'major': (0, 2, 4, 5, 7, 9, 11), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'mixolydian': (0, 2, 4, 5, 7, 9, 10),
-         'minor': (0, 2, 3, 5, 7, 8, 10), 'dorian': (0, 2, 3, 5, 7, 9, 10)}
+MODES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'dorian': (0, 2, 3, 5, 7, 9, 10)}
 MINORS = ('minor', 'dorian')
 PENTATONIC = {False: (0, 1, 2, 4, 5), True: (0, 2, 3, 4, 6)}     # scale steps: 1 2 3 5 6 of a major mode, 1 3 4 5 7
 #                                                                  of a minor one
@@ -84,19 +85,14 @@ COLOURS = {
 # the colours a mood draws from, with weights; a colour that does not fit a degree (a ninth a semitone over the
 # root, an augmented fourth, a minor sixth, a dominant seventh's tritone) is left out there
 PALETTES = {
-    'open': (('add9', 3), ('sus2', 2), ('7', 2), ('6', 1), ('9', 1)),
     'jazz': (('9', 3), ('7', 3), ('69', 1), ('add9', 1)),
     'pop': (('add9', 3), ('triad', 2), ('sus2', 1), ('6', 1)),
-    'cool': (('sus2', 2), ('add9', 2), ('7', 2), ('triad', 1)),
-    'still': (('7', 3), ('add9', 2), ('9', 1)),
-    'dark': (('add9', 2), ('sus2', 2), ('triad', 2)),
     'plain': (('triad', 1),),
 }
 # where a role sits against the grid: ms late (+) or ahead (-), the spread of its timing in ms, the spread of its
 # velocity (a share). A style scales the timing by its `feel` (0 = a machine)
-FEEL = {'pad': (-30.0, 0.0, 0.02), 'drone': (0.0, 0.0, 0.0), 'keys': (5.0, 5.0, 0.07), 'arp': (0.0, 3.5, 0.07),
-        'lead': (8.0, 6.0, 0.08), 'bass': (3.0, 3.5, 0.05), 'kick': (0.0, 1.5, 0.04), 'snare': (9.0, 3.5, 0.07),
-        'hat': (-5.0, 2.5, 0.09), 'hit': (0.0, 2.0, 0.05)}
+FEEL = {'keys': (5.0, 5.0, 0.07), 'arp': (0.0, 3.5, 0.07), 'lead': (8.0, 6.0, 0.08), 'bass': (3.0, 3.5, 0.05),
+        'kick': (0.0, 1.5, 0.04), 'snare': (9.0, 3.5, 0.07), 'hat': (-5.0, 2.5, 0.09)}
 STRENGTH = {'X': 1.0, 'x': 0.78, 'o': 0.45, '?': 0.42}    # a rhythm grid: accent, stroke, ghost note, a ghost note
 #                                                           that is played or not from bar to bar ('.' = a rest)
 
@@ -104,31 +100,15 @@ STRENGTH = {'X': 1.0, 'x': 0.78, 'o': 0.45, '?': 0.42}    # a rhythm grid: accen
 # ------------------------------------------------------------------------------------------------------- the styles
 # A style: tempo, home key and mode, usual length in bars, how many bars a chord may last (`hold`), its colours,
 # the number of upper voices and their centre (MIDI), the lowest bass note (the bass keeps to the octave above it),
-# `feel` and `swing` (the grid unit in beats, the share of it the off-beat comes late), the room (`wet`: more of
-# it), `duck` (dB the pads and bass give way to the kick), `turn` (the last bar turns round on the dominant),
-# `invert` (how often a bass line that can move by step does), `tilt` (dB of high shelf on the mix), `tape` and
-# `top` (lo-fi: dB of tape saturation, a low-pass in Hz), progressions as (mode, scale degrees with 0 = I), and
-# the parts.
-# A part: its role (FEEL), a voice of earshot.synth.voices (`controls` go to it) or a `piece` of the kit, a pattern
-# and what the pattern reads, its level in dB (see REF), pan, width, `send` to the room, filters (`hp`, `lp` in Hz,
-# `sweep`: a low-pass that opens and closes between two frequencies every so many bars, `swell`: a rise and fall
-# on each chord from this share of the level), `echo` (beats, feedback, mix), and when it plays: `enter` (the
-# share of the loop it sits out at first, `pickup`: led in by two soft strokes; from the start when energy >=
-# `full`), `need` / `upto` (the lowest and highest energy it plays at all)
+# `feel` and `swing` (the grid unit in beats, the share of it the off-beat comes late), the room, `duck` (dB the
+# keys and bass give way to the kick), `turn` (the last bar turns round on the dominant), `invert` (how often a
+# bass line that can move by step does), `tilt` (dB of high shelf on the mix), `tape` and `top` (lo-fi: dB of tape
+# saturation, a low-pass in Hz), progressions as (mode, scale degrees with 0 = I), and the parts.
+# A part: its role (FEEL), a voice of earshot.synth.voices or a `piece` of the kit, a pattern and what the pattern
+# reads, its level in dB (see REF), pan, `send` to the room, a low-pass `lp` in Hz, `echo` (beats, feedback, mix),
+# and when it plays: `enter` (the share of the loop it sits out at first, `pickup`: led in by two soft strokes;
+# from the start when energy >= `full`), `need` / `upto` (the lowest and highest energy it plays at all)
 STYLES = {
-    'calm': dict(
-        bpm=60.0, key='D', mode='major', bars=4, hold=(1, 2), palette='open', voices=4, centre=64, bass_lo=36,
-        feel=1.0, room='hall', turn=True, invert=0.6,
-        progs=(('major', (0, 3, 5, 3)), ('major', (0, 4, 5, 3)), ('major', (3, 0, 5, 4)), ('major', (5, 3, 0, 4)),
-               ('major', (0, 3)), ('lydian', (0, 1)), ('minor', (0, 5, 2, 6)), ('minor', (0, 5))),
-        parts=(
-            dict(name='pad', role='pad', voice='warm_pad', pattern='hold', level=-8.0, vel=0.5, width=1.2, send=0.8,
-                 hp=150.0, controls=dict(bright=0.1)),
-            dict(name='bass', role='bass', voice='sub_bass', pattern='bass', level=-17.0, vel=0.5,
-                 cells=(((0.0, 3.85, 1.0, 'r'),),)),
-            dict(name='pluck', role='lead', voice='harp', main=True, pattern='motif', level=-12.0, vel=0.62, pan=0.15,
-                 send=1.0, centre=72, count=3, span=2, ring=True, echo=(1.5, 0.35, 0.3)),
-        )),
     'warm': dict(
         bpm=84.0, key='F', mode='major', bars=8, hold=(1,), palette='jazz', voices=4, centre=62, bass_lo=36,
         feel=1.5, swing=(0.25, 0.18), room='room', duck=2.5, turn=True, invert=0.0, tape=5.0, top=8500.0,
@@ -156,97 +136,6 @@ STYLES = {
             dict(name='lead', role='lead', voice='electric_piano', pattern='motif', level=-13.0, vel=0.6, pan=0.2,
                  send=0.8, enter=0.5, need=-0.2, centre=74, count=3, span=2, echo=(0.75, 0.3, 0.25), lp=6000.0),
         )),
-    'bright': dict(
-        bpm=108.0, key='G', mode='major', bars=8, hold=(2, 1), palette='pop', voices=3, centre=63, bass_lo=36,
-        feel=0.8, room='studio', duck=2.0, turn=True, invert=0.6, tilt=2.0,
-        progs=(('major', (0, 4, 5, 3)), ('major', (0, 5, 3, 4)), ('major', (3, 0, 4, 5)), ('major', (0, 3, 5, 4)),
-               ('major', (5, 3, 0, 4)), ('mixolydian', (0, 6, 3)), ('minor', (0, 5, 2, 6)), ('minor', (0, 2, 6, 3))),
-        parts=(
-            dict(name='ostinato', role='arp', voice='muted_guitar', main=True, pattern='arp', level=-9.0, vel=0.7,
-                 pan=0.2, send=0.45, grid=('X.x.x.x?X.x.x.x?',),
-                 seq=((0, 2, 1, 2, 3, 0, 2, 1, 3, 2), (0, 2, 1, 2, 3, 0, 3, 2, 3, 1))),
-            dict(name='keys', role='keys', voice='felt_piano', pattern='comp', level=-12.0, vel=0.55, pan=-0.2,
-                 send=0.5, strum=16.0, duck=True,
-                 cells=(((0.0, 3.6, 1.0, 'all'),), ((0.0, 2.4, 1.0, 'all'), (2.5, 1.2, 0.6, 'up')))),
-            dict(name='bass', role='bass', voice='round_bass', pattern='bass', level=-12.0, vel=0.65, duck=True,
-                 cells=(((0.0, 1.4, 1.0, 'r'), (2.0, 1.2, 0.85, 'r'), (3.5, 0.4, 0.6, '5')),
-                        ((0.0, 1.4, 1.0, 'r'), (1.5, 0.4, 0.6, '8'), (2.0, 1.4, 0.85, 'r')))),
-            dict(name='kick', role='kick', piece='kick', pattern='drum', level=-12.0, vel=0.75,
-                 grid=('X.......x.......', 'X......ox.......')),
-            dict(name='snap', role='snare', piece='snap', pattern='drum', level=-16.0, vel=0.7, send=0.6,
-                 enter=0.5, full=0.6, need=-0.5, pickup=True, grid=('....X.......X...',),
-                 fill='....X.......X.x.'),
-            dict(name='shaker', role='hat', piece='shaker', pattern='drum', level=-21.0, vel=0.7, pan=-0.25,
-                 send=0.3, enter=0.25, full=0.5, need=-0.5, grid=('X.xoX.xoX.xoX.xo',)),
-        )),
-    'tech': dict(
-        bpm=116.0, key='A', mode='minor', bars=8, hold=(2, 1), palette='cool', voices=3, centre=64, bass_lo=33,
-        feel=0.4, room='studio', duck=2.5, turn=False, invert=0.0,
-        progs=(('minor', (0, 5, 2, 6)), ('minor', (0, 6, 5, 6)), ('minor', (5, 6, 0, 0)), ('dorian', (0, 3)),
-               ('minor', (0, 5)), ('major', (0, 4, 5, 3)), ('major', (0, 3))),
-        parts=(
-            dict(name='arp', role='arp', voice='soft_pluck', main=True, pattern='arp', level=-9.0, vel=0.6, pan=0.1,
-                 send=0.5, accent=0.15, grid=('XoxXoxXoXoxXoxxo',), gate=0.55, oct=1, echo=(0.75, 0.3, 0.2),
-                 sweep=(1500.0, 8000.0, 4),
-                 seq=((0, 1, 2, 0, 1, 2, 0, 1, 0, 1, 2, 0, 1, 2, 3, 2), (0, 1, 2, 0, 1, 2, 0, 2, 0, 1, 2, 0, 1, 3, 2, 1))),
-            dict(name='sub', role='bass', voice='sub_bass', pattern='bass', level=-12.0, vel=0.7, duck=True,
-                 cells=(((0.0, 3.8, 1.0, 'r'),), ((0.0, 1.9, 1.0, 'r'), (2.0, 1.8, 0.85, 'r')))),
-            dict(name='pad', role='pad', voice='warm_pad', pattern='hold', sel='up', level=-14.0, vel=0.45,
-                 width=1.3, send=0.7, hp=180.0, duck=True, controls=dict(bright=-0.3)),
-            dict(name='kick', role='kick', piece='kick', pattern='drum', level=-12.0, vel=0.7, need=-0.4,
-                 grid=('X.......x.......', 'X.......x.....?.')),
-            dict(name='tick', role='hat', piece='tick', pattern='drum', level=-23.0, vel=0.7, pan=-0.2, send=0.3,
-                 grid=('..x...x...x...x.', '..x...x?..x...xo')),
-            dict(name='click', role='snare', piece='rim', pattern='drum', level=-16.0, vel=0.7, send=0.6,
-                 enter=0.5, full=0.6, need=-0.2, pickup=True, grid=('....x.......x...',)),
-        )),
-    'focus': dict(
-        bpm=60.0, key='C', mode='major', bars=4, hold=(2,), palette='still', voices=4, centre=62, bass_lo=36,
-        feel=1.0, room='studio', turn=False, invert=0.0,
-        progs=(('major', (0, 3)), ('major', (0, 5)), ('lydian', (0, 1)), ('minor', (0, 5)), ('dorian', (0, 3))),
-        parts=(
-            dict(name='keys', role='keys', voice='warm_keys', main=True, pattern='comp', level=-8.0, vel=0.55,
-                 send=0.7, strum=22.0,
-                 cells=(((0.0, 3.8, 1.0, 'all'),), ((0.0, 1.9, 0.8, 'up'), (2.0, 1.9, 0.7, 'low')))),
-            dict(name='bass', role='bass', voice='sub_bass', pattern='bass', level=-19.0, vel=0.45,
-                 cells=(((0.0, 3.85, 1.0, 'r'),),)),
-            dict(name='note', role='lead', voice='felt_piano', pattern='motif', level=-14.0, vel=0.5, pan=0.2,
-                 send=1.0, centre=74, count=2, span=2, last=3.0, echo=(1.0, 0.35, 0.3)),
-        )),
-    'cinematic': dict(
-        bpm=60.0, key='D', mode='minor', bars=4, hold=(1, 2), palette='dark', voices=3, centre=63, bass_lo=33,
-        feel=1.0, room='hall', wet=0.3, turn=False, invert=0.0,
-        progs=(('minor', (0, 5, 2, 6)), ('minor', (0, 5, 3, 4)), ('minor', (0, 2, 6, 3)), ('minor', (0, 5)),
-               ('major', (0, 4, 5, 3)), ('major', (3, 0, 5, 4))),
-        parts=(
-            dict(name='drone', role='drone', voice='drone', pattern='drone', level=-11.0, vel=0.6, low=36,
-                 send=0.3, hp=60.0),
-            dict(name='strings', role='pad', voice='string_pad', pattern='hold', level=-9.0, vel=0.5, width=1.3,
-                 send=0.9, hp=160.0, lp=2000.0, swell=0.3),
-            dict(name='hit', role='hit', piece='boom', pattern='drum', level=-9.0, vel=0.8, send=1.0, lp=900.0,
-                 grid=('X...............', '................')),
-            dict(name='piano', role='lead', voice='felt_piano', main=True, pattern='motif', level=-13.0, vel=0.45,
-                 pan=-0.1, send=1.0, centre=69, count=3, span=2, last=3.0, echo=(1.5, 0.4, 0.3)),
-        )),
-    'tension': dict(
-        bpm=100.0, key='E', mode='minor', bars=8, hold=(2, 4), palette='dark', voices=3, centre=64, bass_lo=33,
-        feel=0.6, room='hall', turn=False, invert=0.0,
-        progs=(('minor', (0, 5)), ('minor', (0, 3)), ('minor', (0, 5, 3, 4)), ('minor', (0, 6, 5, 6)),
-               ('major', (5, 3))),
-        parts=(
-            dict(name='pulse', role='arp', voice='muted_pluck', main=True, pattern='arp', level=-9.0, vel=0.6,
-                 send=0.4, low=45, cresc=True, gate=0.75, seq=((-1,),), controls=dict(bright=0.4),
-                 stages=(('X...x...x...x...',), ('X.x.x.x.X.x.x.x.',), ('X.xxx.x.X.xxx.xx',), ('XxxxXxxxXxxxXxxx',))),
-            dict(name='sub', role='bass', voice='sub_bass', pattern='bass', level=-17.0, vel=0.7,
-                 cells=(((0.0, 3.8, 1.0, 'r'),),)),
-            dict(name='strings', role='pad', voice='string_pad', pattern='hold', sel='top2', level=-14.0, vel=0.45,
-                 width=1.3, send=0.9, hp=200.0, lp=3500.0, swell=0.35),
-            dict(name='kick', role='kick', piece='kick', pattern='drum', level=-13.0, vel=0.7, need=-0.5,
-                 stages=(('X...............',), ('X..o............',), ('X..o....X..o....',), ('X..oX..oX..oX..o',))),
-            dict(name='tick', role='hat', piece='tick', pattern='drum', level=-24.0, vel=0.7, send=0.4, cresc=True,
-                 enter=0.25, full=0.7,
-                 stages=(('....x.......x...',), ('..x...x...x...x.',), ('x.x.x.x.x.x.x.x.',), ('x.xxx.xxx.xxx.xx',))),
-        )),
     'playful': dict(
         bpm=120.0, key='C', mode='major', bars=8, hold=(1, 2), palette='pop', voices=3, centre=64, bass_lo=36,
         feel=0.9, swing=(0.5, 0.2), room='room', turn=True, invert=0.3, tilt=1.5,
@@ -269,61 +158,6 @@ STYLES = {
                  fill='....X.......X.X.'),
             dict(name='shaker', role='hat', piece='shaker', pattern='drum', level=-23.0, vel=0.7, pan=0.3, send=0.3,
                  enter=0.25, full=0.5, need=-0.6, grid=('x.x.x.x.x.x.x.x.', 'x.x.x.xox.x.x.xo')),
-        )),
-    'cozy': dict(
-        bpm=92.0, key='G', mode='major', bars=8, hold=(1, 2), palette='open', voices=3, centre=59, bass_lo=36,
-        feel=1.1, room='room', wet=0.2, turn=True, invert=0.6, tilt=1.5,
-        progs=(('major', (0, 4, 5, 3)), ('major', (0, 5, 3, 4)), ('major', (0, 3, 5, 4)), ('major', (3, 0, 4, 5)),
-               ('major', (0, 2, 3, 4)), ('minor', (0, 5, 2, 6)), ('minor', (0, 2, 6, 3))),
-        parts=(
-            dict(name='guitar', role='arp', voice='nylon_guitar', main=True, pattern='arp', level=-8.0, vel=0.75,
-                 pan=-0.1, send=0.5, low=40, ring=2.0, accent=0.4, controls=dict(bright=0.15, position=-0.3),
-                 grid=('X.x.x.x.x.x.x.x.', 'X.x.x.x.x...x?x.'),
-                 seq=((-1, 1, 2, 1, 0, 1, 2, 1), (-1, 2, 1, 2, 0, 2, 1, 2))),
-            dict(name='strum', role='keys', voice='nylon_guitar', pattern='comp', level=-13.0, vel=0.6, pan=0.3,
-                 send=0.6, strum=30.0, controls=dict(bright=0.2), cells=(((0.0, 3.5, 1.0, 'all'),), ())),
-            dict(name='harp', role='lead', voice='harp', pattern='motif', level=-14.0, vel=0.5, pan=0.25, send=0.8,
-                 enter=0.5, need=-0.4, centre=71, count=3, span=2, ring=True),
-            dict(name='bass', role='bass', voice='upright_bass', pattern='bass', level=-12.0, vel=0.55,
-                 cells=(((0.0, 3.0, 1.0, 'r'),), ((0.0, 2.2, 1.0, 'r'), (2.5, 1.0, 0.7, '5')))),
-        )),
-    'night': dict(
-        bpm=60.0, key='A', mode='minor', bars=4, hold=(1, 2), palette='jazz', voices=4, centre=62, bass_lo=36,
-        feel=1.3, room='hall', wet=0.5, turn=False, invert=0.0,
-        progs=(('minor', (0, 5)), ('minor', (0, 3)), ('minor', (0, 5, 2, 6)), ('minor', (0, 5, 3, 4)),
-               ('dorian', (0, 3)), ('major', (0, 3)), ('major', (5, 3, 0, 4))),
-        parts=(
-            dict(name='keys', role='keys', voice='felt_piano', main=True, pattern='comp', level=-8.0, vel=0.45,
-                 send=1.0, strum=30.0, lp=3500.0,
-                 cells=(((0.0, 3.9, 1.0, 'all'),), ((0.0, 3.9, 0.9, 'all'), (2.5, 1.4, 0.5, 'top')))),
-            dict(name='bass', role='bass', voice='sub_bass', pattern='bass', level=-22.0, vel=0.45,
-                 cells=(((0.0, 3.85, 1.0, 'r'),),)),
-            dict(name='note', role='lead', voice='felt_piano', pattern='motif', level=-15.0, vel=0.4, pan=0.2,
-                 send=1.0, centre=67, count=2, span=2, last=3.0, echo=(1.5, 0.35, 0.35), lp=3000.0),
-        )),
-    'pulse': dict(
-        bpm=120.0, key='A', mode='minor', bars=8, hold=(2, 1), palette='jazz', voices=4, centre=63, bass_lo=36,
-        feel=0.5, room='studio', duck=5.0, turn=False, invert=0.0,
-        progs=(('minor', (0, 5, 2, 6)), ('minor', (0, 6, 5, 6)), ('minor', (5, 6, 0, 0)), ('dorian', (0, 3)),
-               ('minor', (0, 3, 5, 4)), ('major', (0, 4, 5, 3)), ('major', (3, 0, 4, 5))),
-        parts=(
-            dict(name='chords', role='keys', voice='warm_keys', main=True, pattern='comp', level=-9.0, vel=0.6,
-                 send=0.6, duck=True, sweep=(700.0, 5000.0, 8), echo=(0.75, 0.3, 0.2),
-                 cells=(((0.75, 0.4, 0.9, 'all'), (1.5, 0.4, 0.8, 'all'), (2.75, 0.4, 0.9, 'all'),
-                         (3.5, 0.4, 0.75, 'all')),
-                        ((0.75, 0.4, 0.9, 'all'), (1.5, 0.4, 0.8, 'all'), (2.75, 0.4, 0.9, 'all'),
-                         (3.25, 0.3, 0.6, 'up'), (3.5, 0.4, 0.75, 'all')))),
-            dict(name='pad', role='pad', voice='warm_pad', pattern='hold', sel='up', level=-14.0, vel=0.45,
-                 width=1.3, send=0.7, hp=200.0, duck=True),
-            dict(name='bass', role='bass', voice='round_bass', pattern='bass', level=-15.0, vel=0.65, duck=True,
-                 cells=(((0.5, 0.4, 1.0, 'r'), (1.5, 0.4, 0.9, 'r'), (2.5, 0.4, 1.0, 'r'), (3.5, 0.4, 0.85, 'r')),
-                        ((0.5, 0.4, 1.0, 'r'), (1.5, 0.4, 0.9, 'r'), (2.5, 0.4, 1.0, 'r'), (3.5, 0.4, 0.85, '8')))),
-            dict(name='kick', role='kick', piece='kick', pattern='drum', level=-13.0, vel=0.8,
-                 grid=('X...X...X...X...',)),
-            dict(name='hat', role='hat', piece='hat', pattern='drum', level=-23.0, vel=0.7, pan=0.15, send=0.3,
-                 enter=0.25, full=0.5, need=-0.6, grid=('..x...x...x...x.', '..x...x...x..ox.')),
-            dict(name='clap', role='snare', piece='clap', pattern='drum', level=-15.0, vel=0.7, send=0.6,
-                 enter=0.5, full=0.6, need=-0.3, pickup=True, grid=('....X.......X...',)),
         )),
     '8bit': dict(
         bpm=126.0, key='C', mode='major', bars=8, hold=(1, 2), palette='plain', voices=3, centre=64, bass_lo=36,
@@ -423,7 +257,7 @@ def _colour(st, spans, mode, tonic, r, loop):
         if want not in chosen:
             pal = [(c, w) for c, w in PALETTES[st['palette']] if _fits(mode, s['deg'], c)] or [('triad', 1)]
             if s['turn']:
-                pal = [(c, 1) for c in (('11', 'sus4') if st['palette'] in ('jazz', 'still') else ('sus4',))
+                pal = [(c, 1) for c in (('11', 'sus4') if st['palette'] == 'jazz' else ('sus4',))
                        if _fits(mode, s['deg'], c)][:1] or pal
             w = np.array([w for _, w in pal], float)
             chosen[want] = pal[int(r.choice(len(pal), p=w / w.sum()))][0]
@@ -530,9 +364,9 @@ def _at(ctx, beat):
 
 
 def _pick(v, what):
-    """the notes of a voicing (low to high) a hit plays: all, the top one or two, the lowest, the middle, or all
-    but the lowest"""
-    return {'all': v, 'top': v[-1:], 'top2': v[-2:], 'low': v[:1], 'mid': v[1:-1] or v[:1], 'up': v[1:]}[what]
+    """the notes of a voicing (low to high) a hit plays: all, the top one or two, the middle, or all but the
+    lowest"""
+    return {'all': v, 'top': v[-1:], 'top2': v[-2:], 'mid': v[1:-1] or v[:1], 'up': v[1:]}[what]
 
 
 def _bars_of(ctx, p):
@@ -547,16 +381,12 @@ def _bars_of(ctx, p):
 
 def _grid(ctx, p, bars):
     """the strokes of a rhythm grid over the bars: (bar, beat, strength, the stroke's number in its bar, the step in
-    beats). A part may give one grid per bar in turn, a `fill` for the bar that ends a four-bar phrase, or `stages`
-    that follow one another across the loop (a build); '?' strokes come and go with the seed and the energy"""
+    beats). A part may give one grid per bar in turn and a `fill` for the bar that ends a four-bar phrase; '?'
+    strokes come and go with the seed and the energy"""
     r, e, body = ctx['r'], ctx['energy'], ctx['body']
     out = []
     for b in bars:
-        grids = p.get('grid')
-        if p.get('stages'):
-            k = len(p['stages'])
-            grids = p['stages'][min(k - 1, int(k * b / body + 0.5 * max(e, 0.0)))]
-        g = grids[b % len(grids)]
+        g = p['grid'][b % len(p['grid'])]
         if p.get('fill') and body >= 4 and ((b + 1) % 4 == 0 or b == body - 1):
             g = p['fill']
         step, k = 4.0 / len(g), -1
@@ -566,8 +396,7 @@ def _grid(ctx, p, bars):
             k += 1
             if (ch == '?' and r.uniform() > 0.4 + 0.35 * e) or (ch == 'o' and e < -0.6):
                 continue
-            grow = 0.7 + 0.3 * b / max(1, body - 1) if p.get('cresc') else 1.0
-            out.append((b, b * 4.0 + i * step, STRENGTH[ch] * grow, k, step))
+            out.append((b, b * 4.0 + i * step, STRENGTH[ch], k, step))
     return out
 
 
@@ -582,16 +411,13 @@ def _drum(ctx, p, bars):
 
 def _arp(ctx, p, bars):
     """an arpeggio or ostinato: the grid's strokes walk `seq` through the chord's voicing from the bottom (an index
-    past the top voice is the same chord an octave up; -1 is the bass note in the part's own low octave)"""
+    past the top voice is the same chord an octave up), each note held for `gate` of its step"""
     out = []
     for b, beat, s, k, step in _grid(ctx, p, bars):
-        c = _at(ctx, beat)
-        v = sorted(c['voicing'])
+        v = sorted(_at(ctx, beat)['voicing'])
         seq = p['seq'][b % len(p['seq'])]
         i = seq[k % len(seq)]
-        m = p['low'] + (c['bass_pc'] - p['low']) % 12 if i < 0 else v[i % len(v)] + 12 * (i // len(v))
-        dur = p['gate'] * step if p.get('gate') else p.get('ring')
-        out.append([beat, m + 12 * p.get('oct', 0), s * p['vel'], dur, 0.0])
+        out.append([beat, v[i % len(v)] + 12 * (i // len(v)), s * p['vel'], p['gate'] * step, 0.0])
     return out
 
 
@@ -617,7 +443,7 @@ def _comp(ctx, p, bars):
             for j, m in enumerate(_pick(v, what)):
                 bal = 1.0 if m == v[-1] else 0.86 if m == v[0] else 0.72
                 roll = j * p.get('strum', 0.0) * ms * r.uniform(0.7, 1.3)
-                out.append([beat, m + 12 * p.get('oct', 0), strength * bal * p['vel'], dur, roll])
+                out.append([beat, m, strength * bal * p['vel'], dur, roll])
             pushed = push
     return out
 
@@ -651,45 +477,6 @@ def _bass(ctx, p, bars):
                 m = root
             out.append([beat, m, strength * p['vel'], dur, 0.0])
     return out
-
-
-def _hold(ctx, p, bars):
-    """sustained chords: every voice holds its note for as long as the chords keep it (a common tone is tied, also
-    over the loop point; a note in every chord is struck once per loop)"""
-    lo, hi = bars[0] * 4.0, (bars[-1] + 1) * 4.0
-    if not ctx['loop'] and bars[-1] == ctx['body'] - 1:
-        hi = ctx['total']
-    segs = []
-    for s in ctx['spans']:
-        a, b = max(s['beat'], lo), min(s['beat'] + s['len'], hi)
-        if b > a:
-            notes = [m + 12 * p.get('oct', 0) for m in _pick(sorted(s['voicing']), p.get('sel', 'all'))]
-            segs.append((a, b - a, notes))
-    ring = ctx['loop'] and lo == 0.0 and hi == ctx['total']
-    out = []
-    for i, (a, d, notes) in enumerate(segs):
-        for m in notes:
-            if all(m in s[2] for s in segs):
-                if i == 0:
-                    out.append([a, m, p['vel'], hi - lo, 0.0])
-                continue
-            if (i > 0 or ring) and m in segs[i - 1][2]:
-                continue
-            length, j = d, i + 1
-            while (j < len(segs) or ring) and m in segs[j % len(segs)][2]:
-                length += segs[j % len(segs)][1]
-                j += 1
-            out.append([a, m, p['vel'], length, 0.0])
-    return out
-
-
-def _drone(ctx, p, bars):
-    """the tonic held under everything: a long note every two bars that is let go two seconds before the next (and
-    before the loop point), so the low end starts each time from rest, and one render serves them all"""
-    gap = 2.0 * ctx['bpm'] / 60.0
-    m = p['low'] + (ctx['tonic'] - p['low']) % 12
-    notes = [[b * 4.0, m, p['vel'], min(8.0, ctx['total'] - b * 4.0) - gap, 0.0] for b in bars[::2]]
-    return [n for n in notes if n[3] >= 2.0]
 
 
 def _motif(ctx, p, bars):
@@ -728,25 +515,20 @@ def _motif(ctx, p, bars):
     return out
 
 
-PATTERNS = {'hold': _hold, 'comp': _comp, 'arp': _arp, 'bass': _bass, 'motif': _motif, 'drum': _drum,
-            'drone': _drone}
+PATTERNS = {'comp': _comp, 'arp': _arp, 'bass': _bass, 'motif': _motif, 'drum': _drum}
 
 
 def _final(ctx, p):
     """what a part plays on the last chord of a bed played once: the chord once, rolled, left to ring; the bass its
-    root; the kick one soft stroke; the other drums nothing (sustained parts already hold the chord)"""
+    root; the kick one soft stroke; the other drums and the top line nothing"""
     c = ctx['spans'][-1]
     role, beat, ms = p['role'], c['beat'], 1e-3 * ctx['bpm'] / 60.0
-    if p.get('pattern') in ('hold', 'drone', None):
-        return []
-    if role in ('kick', 'hit'):
+    if role == 'kick':
         return [[beat, p['piece'], 0.7 * p['vel'], None, 0.0]]
     if role == 'bass':
         return [[beat, c['bass'], 0.9 * p['vel'], 4.0, 0.0]]
     if role in ('keys', 'arp'):
-        v = sorted(c['voicing'])
-        return [[beat, m + 12 * p.get('oct', 0), 0.9 * p['vel'], None if p.get('ring') else 4.0, j * 35.0 * ms]
-                for j, m in enumerate(v)]
+        return [[beat, m, 0.9 * p['vel'], 4.0, j * 35.0 * ms] for j, m in enumerate(sorted(c['voicing']))]
     return []
 
 
@@ -761,13 +543,13 @@ def _metric(beat):
 def _humanise(ctx, p, notes):
     """notes [grid beat, pitch, velocity, length, offset] as played: (beat, pitch, velocity, length, grid beat).
     Timing: the swing of the style, the role's place against the grid, a slow drift and a little scatter (the notes
-    of one chord move together). Velocity: the strength of the position in the bar, to the depth of the part's
-    `accent`, the energy, and a few per cent of touch"""
+    of one chord move together). Velocity: the strength of the position in the bar (to a depth of 30 %), the
+    energy, and a few per cent of touch"""
     st, r = ctx['st'], ctx['r']
     late, spread, touch = FEEL[p['role']]
     k = st['feel'] * 1e-3 * ctx['bpm'] / 60.0
     unit, swing = st.get('swing', (0.5, 0.0))
-    depth, drift, dev, seen, out = p.get('accent', 0.3), 0.0, 0.0, None, []
+    depth, drift, dev, seen, out = 0.3, 0.0, 0.0, None, []
     for g, m, vel, dur, off in sorted(notes, key=lambda x: (x[0], x[4])):
         if g != seen:
             seen = g
@@ -784,7 +566,7 @@ def _humanise(ctx, p, notes):
 def compose(style, r, key=None, bpm=None, bars=None, mode=None, energy=0.0, loop=True, voice=None):
     """the score of a bed as a dict. style: a key of STYLES; r: a numpy Generator (the same arguments give the same
     score); key: the tonic as a note name, Hz or pitch class (default: the style's); bpm, bars: tempo and length
-    (default: the style's); mode: 'major', 'minor', 'dorian', 'lydian' or 'mixolydian' (default: the style's; a
+    (default: the style's); mode: 'major', 'minor' or 'dorian' (default: the style's; a
     mode the style has no progression in falls back to major or minor); energy -1..1: how much plays (parts, ghost
     notes, motif notes) and how hard; loop=False: played once, the last bar a held tonic chord; voice: another
     voice for the style's main instrument.
@@ -839,21 +621,17 @@ def _chip_drum(kind, vel):
     return chip.voice(p)
 
 
-# the built-in kit: the synthetic drum voices and the shaker, clap and snap of earshot.synth.drums, a dry tick and
-# rim, a low boom and the chip channels; each takes (velocity 0..1, generator) and returns one stroke. A caller
-# may hand `render` other pieces under the same names (earshot.sounds.beds plays the catalogue's acoustic drums)
+# the built-in kit: the synthetic drum voices and the shaker and clap of earshot.synth.drums, a dry rim and the chip
+# channels; each takes (velocity 0..1, generator) and returns one stroke. A caller may hand `render` other pieces
+# under the same names (earshot.sounds.beds plays the catalogue's acoustic drums)
 KIT = {
     'kick': lambda v, r: dsp.fade(drums.kick_synth(dsp.n_of(0.45), r, 60.0, v, sweep=1.8, drop=0.04, decay=0.13,
                                                    click=0.25, drive=1.5), 0.0, 0.15),
     'snare': lambda v, r: dsp.fade(drums.snare_synth(dsp.n_of(0.3), r, 190.0, v, tone=0.45, noise_tau=0.07), 0.0,
                                    0.08),
     'clap': lambda v, r: dsp.fade(drums.clap_synth(dsp.n_of(0.35), r, v, tail=0.09), 0.0, 0.1),
-    'snap': lambda v, r: drums.snap(dsp.n_of(0.15), r, 0.025, 2600.0, 5.0, v),
-    'hat': lambda v, r: dsp.fade(drums.hat_synth(dsp.n_of(0.12), r, v, decay=0.022), 0.0, 0.04),
     'shaker': lambda v, r: dsp.fade(drums.shaker(dsp.n_of(0.22), r, [(0.055, v)]), 0.0, 0.03),
-    'tick': lambda v, r: synth.tick(r, 0.03, 2500.0, 9000.0, 0.0025),
     'rim': lambda v, r: synth.tick(r, 0.07, 500.0, 3500.0, 0.007),
-    'boom': lambda v, r: dsp.sub_drop(1.8, r, f0=95.0, f1=38.0, drop=0.2, decay=0.5, click=0.05),
     'chip_hat': lambda v, r: _chip_drum('chip_hat', v),
     'chip_snare': lambda v, r: _chip_drum('chip_snare', v),
     'chip_kick': lambda v, r: _chip_drum('chip_kick', v),
@@ -943,16 +721,15 @@ def _note(p, m, vel, dur, kit, cache, seed, count, bright):
                                                                                          decay=0.4 * d + 0.02)
             x, anchor = _stereo(chip.voice(dict(CHIP[p['voice']], freq=hz, **env))) * vq, 0
         else:
-            ctl = dict(p.get('controls') or {})
-            ctl['bright'] = float(np.clip(ctl.get('bright', 0.0) + 0.5 * bright, -1.0, 1.0))
-            x, anchor = voices.play(p['voice'], hz, vel=vq, dur=dur, r=rr, vary=0.3, **ctl), 0
+            x, anchor = voices.play(p['voice'], hz, vel=vq, dur=dur, r=rr, vary=0.3,
+                                    bright=float(np.clip(0.5 * bright, -1.0, 1.0))), 0
         cache[key] = (x, anchor)
     x, anchor = cache[key]
     return x, anchor, vel ** 1.4 if drum else vel / vq
 
 
 def _duck(plan, n, pre, spb, depth):
-    """the gain that moves pads and bass out of the kick's way: down `depth` dB within 4 ms of each kick and back
+    """the gain that moves keys and bass out of the kick's way: down `depth` dB within 4 ms of each kick and back
     with a time constant of a third of a beat"""
     kicks = [t for p in plan['parts'] if p['role'] == 'kick' for t, *_ in p['notes']]
     if not depth or not kicks:
@@ -968,41 +745,22 @@ def _duck(plan, n, pre, spb, depth):
     return 10.0 ** (-depth * g / 20.0)
 
 
-def _treat(plan, p, y, n, pre, spb):
-    """a part's own processing: the low parts mono, its filters, a dip where a voice would sit, a filter that
-    opens and closes over a few bars, a swell on each chord, an echo in time, its place and width"""
+def _treat(plan, p, y, spb):
+    """a part's own processing: the low parts mono, its low-pass, a dip where a voice would sit, an echo in time,
+    its place"""
     loop = plan['loop']
-    if p['role'] in ('bass', 'kick', 'drone'):
+    if p['role'] in ('bass', 'kick'):
         y = np.repeat(y.mean(axis=1, keepdims=True), 2, axis=1)
-    if p.get('hp'):
-        y = _around(lambda z: dsp.butter(z, 'high', p['hp']), y, loop)
     if p.get('lp'):
         y = _around(lambda z: dsp.butter(z, 'low', p['lp']), y, loop)
     if p['role'] == 'lead':
         y = _around(lambda z: dsp.peq(z, 2500.0, -2.5, 0.8), y, loop)
-    t = (np.arange(len(y)) - pre) / SR
-    if p.get('sweep'):
-        lo, hi, over = p['sweep']
-        period = n / SR / max(1, round(plan['bars'] / over))
-        fc = lo * (hi / lo) ** (0.5 - 0.5 * np.cos(2 * np.pi * t / period))
-        k = min(SR // 4, len(y)) if loop else 0             # the filter runs over the loop's end first (see _around)
-        z, f = (np.concatenate([y[-k:], y]), np.concatenate([fc[-k:], fc])) if k else (y, fc)
-        y = np.stack([dsp.svf(np.ascontiguousarray(z[:, c]), f, 0.9, 'low') for c in (0, 1)], axis=1)[k:]
-    if p.get('swell'):
-        g = np.full(len(y), float(p['swell']))
-        for c in plan['chords']:
-            a, d = c['beat'] * spb, c['len'] * spb
-            on = (t >= a) & (t < a + d)
-            g[on] = p['swell'] + (1.0 - p['swell']) * np.sin(np.pi * ((t[on] - a) / d) ** 0.8) ** 1.5
-        y = y * g[:, None]
     if p.get('echo'):
         beats, feedback, mix = p['echo']
         z = synth.echo(y, time=beats * spb, feedback=feedback, mix=mix, damp=3500.0)
         y = np.zeros_like(y)
         _wrap_add(y, z, 0, loop)
-    if p.get('pan'):
-        y = dsp.pan_to_stereo(y, p['pan'])
-    return fx.width(y, p['width']) if p.get('width', 1.0) != 1.0 else y
+    return dsp.pan_to_stereo(y, p['pan']) if p.get('pan') else y
 
 
 def render(plan, r, kit=None, room=None, amount=0.0, bright=0.0, width=0.0, stems=False):
@@ -1013,7 +771,7 @@ def render(plan, r, kit=None, room=None, amount=0.0, bright=0.0, width=0.0, stem
     room: a space of earshot.synth.space (default: the style's) and amount -1..1 more or less of it; bright -1..1:
     darker or brighter voices and mix; width -1..1: narrower or wider. stems=True returns (y, {part: its samples in
     the mix before the room}).
-    The mix: each part is brought to its level by the RMS of its own loudest 400 ms (REF + level), pads and bass
+    The mix: each part is brought to its level by the RMS of its own loudest 400 ms (REF + level), keys and bass
     duck under the kick, the parts send to one room, everything under 120 Hz is mono"""
     st = STYLES[plan['style']]
     loop, spb = plan['loop'], 60.0 / plan['bpm']
@@ -1034,7 +792,7 @@ def render(plan, r, kit=None, room=None, amount=0.0, bright=0.0, width=0.0, stem
             _wrap_add(y, gain * x, pre + int(round(t * spb * SR)) - anchor, loop)
         if np.abs(y).max() <= 0.0:
             continue
-        y = _treat(plan, p, y, n, pre, spb)
+        y = _treat(plan, p, y, spb)
         y *= 10.0 ** ((REF + p['level'] - _loudest(y)) / 20.0)
         if p.get('duck') and duck is not None:
             y *= duck[:, None]
@@ -1044,8 +802,7 @@ def render(plan, r, kit=None, room=None, amount=0.0, bright=0.0, width=0.0, stem
     if width:
         w = 1.0 + (0.6 if width > 0 else 1.0) * width
         mix, send = fx.width(mix, w), fx.width(send, w)
-    wet = space.room(send, room or st['room'], amount=float(np.clip(amount + st.get('wet', 0.0), -1.0, 1.0)),
-                     r=dsp.rng(seed + 1))
+    wet = space.room(send, room or st['room'], amount=float(np.clip(amount, -1.0, 1.0)), r=dsp.rng(seed + 1))
     k = min(len(wet), total)
     wet[:k] -= send[:k]                      # the room's tail alone: it goes round the loop point onto the start
     _wrap_add(mix, wet, 0, loop)

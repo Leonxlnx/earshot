@@ -48,11 +48,11 @@ LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0, 'music': -16
 # the most a short, peaky one-shot is raised (dB, its spike folded over: master.finish `lift`): the owner heard many
 # short sounds as "barely there"; beds, pads and music keep their own level
 LIFT = 14.0
-# the prior of a learned design (earshot.sounds.learned: a recording in the public domain played as new takes):
+# the prior of a learned design (earshot.sounds.learned: recordings in the public domain played as new takes):
 # where an invented design of the same thing exists, the learned one wins a tie
 LEARNED = 1.1
 # the most a bed held under its cap by a few peaks is raised (dB: master.finish `sparse`): a campfire's cracks
-SPARSE = 6.0
+SPARSE = 8.0
 _designs = {}
 _loaded = False
 
@@ -149,6 +149,8 @@ class Controls:
                       if v is not None and v != 0.0}
         self.used = set()
         self.played = None           # the voice a design really played, when it is not the one asked for
+        self.seed = 0                # the take's seed (render sets it): a design of several recordings picks by it
+        self.member = None           # the recording a design of several played ({'n', 'of', ...}), for meta
         self.loop = d.loop and loop is not False      # a looping design renders once, with fades, on loop=False
 
     def __getattr__(self, name):
@@ -247,12 +249,14 @@ def seed_of(id, seed):
 def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     """one finished take of a design: (y, meta). request: pitch, dur, voice, material, theme (a dict, see theme.py),
     vary, loop (False = a looping design once, with fades) and the axes. y is float64, stereo (n, 2) or mono (n,), levelled (master.finish). meta: id, kind, seed, dur_s,
-    peak_dbfs, lufs_max, pitch / voice / material when the design used them, `ignored` (what was asked for and not
+    peak_dbfs, lufs_max, pitch / voice / material when the design used them, `member` when the design plays one of
+    several recordings (earshot.sounds.learned: which one, of how many), `ignored` (what was asked for and not
     read), and the audit (`checks`: forge.sfx.check, with the design's `allows` as notes). Level: the true peak at
     peak_db, held under the kind's loudest level (LOUDEST); or exactly `lufs` (momentary max) when given."""
     from ..synth import master
     d = get(id)
     c = Controls(d, **request)
+    c.seed = int(seed)
     y = d.fn(c, dsp.rng(seed_of(id, seed)))
     y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=c.loop, cap=LOUDEST.get(d.kind, LOUDEST['']),
                       lift=0.0 if d.kind in LOUDEST else LIFT, sparse=SPARSE if d.kind == 'bed' else 0.0)
@@ -264,6 +268,8 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
         meta['voice'] = c.played or c.voice
     if 'material' in c.used and c.material:
         meta['material'] = c.material
+    if c.member:
+        meta['member'] = dict(c.member)
     # a voice or material that is the design's own was honoured by choosing the design ("a kalimba note", "8-bit")
     own = {k for k, v in (('voice', d.voice), ('material', d.material))
            if request.get(k) and (request[k] == v or request[k] in d.tags)}

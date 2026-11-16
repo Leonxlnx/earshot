@@ -1,10 +1,11 @@
-"""Music beds: short loops in a key and a tempo that sit under a voice-over or under sound effects (`bed/calm`,
-`bed/warm`, `bed/bright`, `bed/tech`, `bed/focus`, `bed/cinematic`, `bed/tension`, `bed/playful`, `bed/cozy`,
-`bed/night`, `bed/pulse`, `bed/8bit`), written by the rules of earshot.synth.music.
+"""Music beds: short loops in a key and a tempo that sit under a voice-over or under sound effects (`bed/warm`,
+`bed/playful`, `bed/8bit`), written by the rules of earshot.synth.music. earshot makes sound effects; these three
+are the beds its owner rated well enough to keep (nine other styles were removed: long sustained synthesizer
+chords under a scene were not wanted).
 
     from earshot.sounds import registry
     y, meta = registry.render('bed/warm', seed=3, dur=20, pitch='D3', energy=0.2)    # a seamless loop, 7 bars
-    y, meta = registry.render('bed/calm', loop=False, dur=16)                         # once, ending on a held chord
+    y, meta = registry.render('bed/playful', loop=False, dur=16)                      # once, ending on a held chord
 
 The controls:
     pitch    the key's tonic ('D3', 'F#3', Hz): the octave does not matter; a theme's key moves it as everywhere
@@ -13,16 +14,15 @@ The controls:
     motion   the tempo: the style's own bpm x 1.15 ^ motion (-1 .. 1 = 15 % slower .. faster)
     energy   how much plays and how hard: parts enter earlier or stay out, ghost notes, motif notes
     voice    another instrument for the bed's main part (the electric piano of bed/warm, the muted guitar of
-             bed/bright: 'felt_piano', 'marimba', 'harp' ...)
+             bed/playful: 'felt_piano', 'marimba', 'harp' ...)
     bright, space, width   as everywhere
     loop     False: played once; the last bar is the tonic chord, held, and it rings out
 A minor or major key in the request or the theme ('in D minor') changes the mode where the style has both.
 A seed is another take of the style: another progression, voicing and motif, the same instruments.
 `bed/8bit` is chip sound (earshot.synth.chip): it answers only when that is asked for.
 
-The drums of the acoustic beds are the catalogue's own (earshot.sounds.drums: kick/soft, snare/brush, rim/click,
-shaker/tick, snap/finger, clap/hands, kick/deep), played dry into the bed's one room; the electronic beds play the
-drum-machine voices of the engine.
+The drums of bed/warm and bed/playful are the catalogue's own (earshot.sounds.drums: kick/soft, snare/brush,
+rim/click, shaker/tick, clap/hands), played dry into the bed's one room; bed/8bit plays the chip channels.
 """
 import numpy as np
 
@@ -34,69 +34,28 @@ from .registry import design
 AXES = ('energy', 'motion', 'bright', 'space', 'width')
 DOMAINS = ('music', 'motion', 'ui', 'game')
 # what the audit of a single sound finds in music and is the music: drum strokes and plucked attacks (clicks), a
-# filter that opens over bars or a build (rising_glide); a chip bed has no room, so its rests are digital silence
+# top line that climbs (rising_glide); a chip bed has no room, so its rests are digital silence
 ALLOWS = ('clicks', 'rising_glide')
 # the scale a request or theme names -> the mode the bed is written in
-MODE = {'major': 'major', 'pentatonic': 'major', 'lydian': 'lydian', 'minor': 'minor', 'minor_pentatonic': 'minor',
+MODE = {'major': 'major', 'pentatonic': 'major', 'lydian': 'major', 'minor': 'minor', 'minor_pentatonic': 'minor',
         'dorian': 'dorian'}
 # kit piece -> the drum design that plays it and its tuning (None = as designed). The soft kick is tuned up a
-# fourth to D2 and the deep one a third to A1: a bed's low drums have to be heard on small speakers
+# fourth to D2: a bed's low drums have to be heard on small speakers
 ACOUSTIC = {'kick': ('kick/soft', 'D2'), 'snare': ('snare/brush', None), 'rim': ('rim/click', None),
-            'clap': ('clap/hands', None), 'snap': ('snap/finger', None), 'shaker': ('shaker/tick', None),
-            'boom': ('kick/deep', 'A1')}
+            'clap': ('clap/hands', None), 'shaker': ('shaker/tick', None)}
 # style -> the pieces of its kit that are acoustic (the rest are the engine's own)
-KITS = {'warm': ('kick', 'snare', 'rim', 'shaker'), 'bright': ('kick', 'snap', 'shaker'),
-        'playful': ('kick', 'clap', 'shaker'), 'cinematic': ('boom',), 'tension': ('kick',), 'tech': ('rim',)}
+KITS = {'warm': ('kick', 'snare', 'rim', 'shaker'), 'playful': ('kick', 'clap', 'shaker')}
 # id -> (style, says, uses, tags)
 BEDS = {
-    'bed/calm': ('calm', ('slow warm synthesizer pad chords with a few soft plucked harp notes',
-                          'calm ambient background music', 'a gentle floating ambient music loop'),
-                 ('background music', 'music', 'music bed', 'ambient music', 'voice-over', 'product video',
-                  'explainer', 'meditation', 'calm', 'relaxing'), ('ambient',)),
     'bed/warm': ('warm', ('slow warm electric piano chords over a soft kick, a brushed snare and a shaker, with '
                           'vinyl crackle', 'laid-back lo-fi hip hop background music',
                           'a mellow lo-fi beat with jazzy electric piano chords'),
                  ('lo-fi', 'lofi', 'background music', 'music', 'chill', 'study', 'landing page', 'vlog',
                   'beat'), ('lo-fi', 'hip hop')),
-    'bed/bright': ('bright', ('a light palm-muted guitar ostinato over soft piano chords, a simple bass, finger '
-                              'snaps and a shaker', 'upbeat optimistic corporate background music',
-                              'a light happy music loop'),
-                   ('background music', 'music', 'upbeat', 'product video', 'onboarding', 'corporate', 'explainer',
-                    'optimistic', 'happy', 'promo'), ('corporate', 'pop')),
-    'bed/tech': ('tech', ('a clean pulsing synthesizer arpeggio over a sub bass with minimal ticks',
-                          'modern minimal electronic background music', 'a cool pulsing synth arpeggio loop'),
-                 ('background music', 'music', 'product demo', 'technology', 'tech', 'app demo', 'startup',
-                  'electronic', 'data'), ('electronic', 'synth')),
-    'bed/focus': ('focus', ('a slow two-chord vamp of soft synthesizer keys, almost static',
-                            'quiet minimal background music for concentration',
-                            'a calm sparse keyboard loop that barely moves'),
-                  ('background music', 'music', 'focus', 'timer', 'landing page', 'minimal', 'work', 'study',
-                   'loading'), ('ambient', 'minimal')),
-    'bed/cinematic': ('cinematic', ('a low drone under slow swelling string chords with a soft distant boom',
-                                    'slow atmospheric cinematic underscore', 'a dark emotional film score bed'),
-                      ('background music', 'music', 'cinematic', 'underscore', 'trailer', 'film', 'documentary',
-                       'intro', 'emotional', 'epic'), ('film', 'score')),
-    'bed/tension': ('tension', ('a pulsing low plucked ostinato that grows denser, with a heartbeat kick and '
-                                'ticking', 'suspenseful tension music building up',
-                                'a tense thriller underscore loop'),
-                    ('background music', 'music', 'tension', 'suspense', 'countdown', 'boss', 'chase', 'thriller',
-                     'danger', 'timer running out'), ('film', 'score')),
     'bed/playful': ('playful', ('a bouncy tune of pizzicato strings and a muted guitar with hand claps and a shaker',
                                 'cheerful playful casual game menu music', 'a light funny cartoon music loop'),
                     ('background music', 'music', 'menu music', 'casual game', 'playful', 'kids', 'cartoon',
                      'fun', 'puzzle game', 'tutorial'), ('game', 'comedy')),
-    'bed/cozy': ('cozy', ('gentle fingerpicked and strummed nylon guitar with a soft upright bass and a few harp '
-                          'notes', 'warm cozy acoustic background music', 'a relaxed acoustic guitar loop'),
-                 ('background music', 'music', 'menu music', 'cozy', 'cozy game', 'recipe', 'cooking', 'farm',
-                  'acoustic', 'home'), ('acoustic', 'folk')),
-    'bed/night': ('night', ('slow sparse dark felt piano chords in a long reverb',
-                            'quiet late night ambient music', 'a lonely soft piano in a large empty hall'),
-                  ('background music', 'music', 'night', 'dark', 'sad', 'melancholy', 'sleep', 'late night',
-                   'ambient music'), ('ambient',)),
-    'bed/pulse': ('pulse', ('a soft four-on-the-floor house beat with filtered synthesizer chords and an off-beat '
-                            'bass', 'deep house background music', 'a steady soft dance music loop'),
-                  ('background music', 'music', 'house', 'dance', 'fitness', 'fashion', 'workout', 'club',
-                   'beat', 'sport'), ('electronic', 'house')),
     'bed/8bit': ('8bit', ('a chiptune loop: a square wave melody over a fast arpeggio, a triangle bass and noise '
                           'drums', '8-bit video game music', 'retro console game background music'),
                  ('background music', 'music', 'game music', 'menu music', 'level music', 'chiptune', 'arcade'),
@@ -138,4 +97,4 @@ for _id, (_style, _says, _uses, _tags) in BEDS.items():
            voice=next((p['voice'] for p in _st['parts'] if p.get('main')), None),
            material='retro' if _style == '8bit' else None, loop=True,
            allows=ALLOWS + (('silence',) if _style == '8bit' else ()),
-           prior=1.15 if _style == 'calm' else 1.0)(_bed(_style))       # calm: the bed for plain "background music"
+           prior=1.15 if _style == 'warm' else 1.0)(_bed(_style))       # warm: the bed for plain "background music"

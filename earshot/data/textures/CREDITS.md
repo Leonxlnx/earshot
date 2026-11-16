@@ -1,0 +1,16 @@
+# Credits of the learned ambience textures
+
+Every file in this folder is numbers (earshot.synth.resyn models), analysed from a recording in the public domain (CC0); no audio is shipped. BigSoundBank states for every sound used: "CC0 (public domain): Free and royalty-free" (https://bigsoundbank.com/licenses.html); attribution is not required and is kept here.
+
+- `beach` (waves/sand): "Small waves and beach #1" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/small-waves-and-beach-1-s1446.html, CC0 1.0 (public domain); 28.7 s from 2.1 s of the corpus excerpt (bigsoundbank/1446.wav)
+- `brook` (stream/brook): "Small Stream" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/small-stream-s0823.html, CC0 1.0 (public domain); 12.0 s from 18.0 s of the corpus excerpt (cuts/bigsoundbank/0823_tex.wav)
+- `campfire` (fire/camp): "Big Branching Fire #1" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/big-branching-fire-1-s0987.html, CC0 1.0 (public domain); 24.0 s from 5.0 s of the corpus excerpt (bigsoundbank/0987.wav)
+- `crickets` (night/crickets): "Campaign at Night #4" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/campaign-at-night-4-s1880.html, CC0 1.0 (public domain); 12.0 s from 1.0 s of the corpus excerpt (cuts/bigsoundbank/1880_tex.wav)
+- `pebbles` (waves/pebbles): "Sea of the beach of Dellec #3" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/sea-of-the-beach-of-dellec-3-s2566.html, CC0 1.0 (public domain); 30.0 s from 13.4 s of the corpus excerpt (bigsoundbank/2566.wav)
+- `restaurant` (cafe/busy): "Restaurant" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/restaurant-s0624.html, CC0 1.0 (public domain); 16.0 s from 2.0 s of the corpus excerpt (cuts/bigsoundbank/0624_tex.wav)
+- `rocks` (waves/rocks): "Sea of the beach of Dellec #4" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/sea-of-the-beach-of-dellec-4-s2567.html, CC0 1.0 (public domain); 26.5 s from 4.6 s of the corpus excerpt (bigsoundbank/2567.wav)
+- `room` (room_tone/quiet): "Apartment Closed Window" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/apartment-closed-window-s2387.html, CC0 1.0 (public domain); 12.0 s from 8.0 s of the corpus excerpt (cuts/bigsoundbank/2387_tex.wav)
+- `street` (city/street, city/distant): "London Street" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/london-street-s0641.html, CC0 1.0 (public domain); 16.0 s from 12.0 s of the corpus excerpt (cuts/bigsoundbank/0641_tex.wav)
+- `terrace` (rain/street): "Summer Rain on Terrace" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/summer-rain-on-terrace-s1019.html, CC0 1.0 (public domain); 12.0 s from 6.0 s of the corpus excerpt (cuts/bigsoundbank/1019_tex.wav)
+- `trees` (wind/trees): "Wind in the Trees" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/forest-wind-in-the-trees-s0904.html, CC0 1.0 (public domain); 12.0 s from 16.0 s of the corpus excerpt (cuts/bigsoundbank/0904_tex.wav)
+- `underwater` (underwater/deep): "Underwater" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/underwater-s3430.html, CC0 1.0 (public domain); 12.0 s from 1.0 s of the corpus excerpt (cuts/bigsoundbank/3430_tex.wav)

@@ -304,7 +304,10 @@ CONCEPTS = {
              'fire crackle'),
     'stream': ('river', 'creek', 'brook', 'waterfall', 'running water', 'flowing water', 'babbling', 'trickle',
                'rapids'),
-    'waves': ('ocean', 'sea', 'beach', 'surf', 'shore', 'tide', 'seaside', 'coast', 'coastal', 'shoreline'),
+    'waves': ('ocean', 'sea', 'beach', 'surf', 'shore', 'tide', 'seaside', 'coast', 'coastal', 'shoreline',
+              'rocky shore', 'rocks', 'shingle', 'pebble beach'),
+    'cafe': ('café', 'coffee shop', 'restaurant', 'bistro', 'diner', 'bar', 'pub', 'crowd murmur', 'chatter',
+             'walla'),
     'forest': ('birds', 'bird', 'birdsong', 'woods', 'woodland', 'jungle', 'nature', 'meadow', 'garden',
                'birds chirping', 'songbirds', 'tweeting', 'park'),
     'night': ('crickets', 'cricket', 'insects', 'evening', 'summer night', 'cicadas', 'frogs croaking',
@@ -386,7 +389,17 @@ BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggl
 # are directions, a 'crash' family is the cymbal though "a crash" is a collision, the one 'drum' family the roll,
 # a 'bed' the music under a video, not an ambience)
 FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride': 'cymbal', 'kick': 'kick_drum',
-                'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music'}
+                'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music',
+                # recorded things (earshot.sounds.learned) whose family is the job by another word
+                'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter'}
+# the tonal interface figures (earshot.sounds.ui): the owner heard them twice as unrecognisable, so a plain "tap",
+# "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
+# when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
+BY_NAME_ONLY = frozenset(('tap/tone', 'hover/tone', 'toggle/up', 'toggle/down', 'next/step'))
+# families that name a kind of sound, not a thing: a recorded one (whoosh/rope, knock/hollow) answers a request that
+# also names its thing or character (brief.learned_ok), or plays the interface job it is chosen for (its roles)
+SOUND_FAMILIES = frozenset(('whoosh', 'swish', 'swipe', 'click', 'tap', 'tick', 'knock', 'pop', 'thud', 'boom', 'hit',
+                            'chime'))
 # "the opposite of X", "like X but the other way"
 OPPOSITE = {'riser': 'downlifter', 'switch_on': 'switch_off', 'open': 'close', 'next': 'back', 'send': 'receive',
             'power_up': 'power_down', 'win': 'lose', 'success': 'error', 'jump': 'land', 'unlock': 'lock',

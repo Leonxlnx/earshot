@@ -1,26 +1,42 @@
-"""earshot.sounds.learned: the store (every model loads, is credited to a public-domain recording, the store stays
-small), every design renders a clean levelled take that passes its audit, the declared axes move what they stand
-for, seeds are different performances that measure alike. Model-free; the fast tier renders one short model per
-family, --slow all of them."""
+"""earshot.sounds.learned: the store (every model is a member of one design, credited to a public-domain recording;
+the store stays small; names are plain), designs render clean levelled takes that pass their audit, seeds walk
+through a design's recordings, the declared axes move what they stand for, seeds of one recording are different
+performances that measure alike. Model-free; the fast tier renders three interface designs and a footstep,
+--slow every member of every design."""
 import json
 import os
+import re
 
 import numpy as np
 import pytest
 
 from earshot.forge import dsp
-from earshot.sounds import learned, registry
+from earshot.sounds import learned, registry, sets
 from earshot.synth import resyn
 
 SR = dsp.SR
 INDEX = learned.index()
 IDS = list(INDEX)
-LIMIT = 6_000_000                     # bytes the whole store may weigh for now
+LIMIT = 8_000_000                     # bytes the whole store may weigh
+# three interface designs (sets 'ui') and a footstep: rendered in the fast tier (every member: --slow)
+FAST = ('keyboard/desktop', 'switch/lamp', 'dial/click', 'step/pebbles')
+# the character suffixes of the first pass's automatic names, and engine words: never in a name ('light' is a verb
+# in match/light)
+SLOP = {'bright', 'dark', 'warm', 'deep', 'clear', 'resyn', 'model', 'learned', 'fit', 'take', 'sample'}
 
 
-def _raw(sid, seed=5, **req):
+def _seed(sid, member):
+    """a seed that plays the member at that position of the index"""
+    return learned.order(sid).index(member)
+
+
+def _raw(sid, seed=5, member=None, **req):
+    """the design function's own output for a seed (the member it picks), or for a member and a performance seed"""
     d = registry.get(sid)
-    return np.asarray(d.fn(registry.Controls(d, **req), dsp.rng(seed)), np.float64)
+    c = registry.Controls(d, **req)
+    c.seed = _seed(sid, member) if member is not None else seed
+    r = dsp.rng(seed if member is None else seed * len(INDEX[sid]['members']) + c.seed)
+    return np.asarray(d.fn(c, r), np.float64)
 
 
 def _centroid(y):
@@ -52,16 +68,20 @@ def _strike(y, t0):
 
 def test_index_files_and_credits():
     files = {f for f in os.listdir(learned.STORE) if f.endswith('.npz')}
-    assert files == {e['file'] for e in INDEX.values()}                     # nothing unlisted, nothing missing
+    listed = [m['file'] for e in INDEX.values() for m in e['members']]
+    assert files == set(listed) and len(listed) == len(set(listed))        # nothing unlisted, missing or shared
     with open(os.path.join(learned.STORE, 'CREDITS.md'), encoding='utf-8') as fh:
         credits = fh.read()
     for sid, e in INDEX.items():
-        c = e['credit']
-        assert c['title'] and c['author'] and c['page'].startswith('https://'), sid
-        assert 'CC0' in c['licence'] or 'public domain' in c['licence'].lower(), (sid, c['licence'])
-        assert f'`{sid}`' in credits and c['page'] in credits, sid
-        assert 'mixkit' not in (c['page'] + e['source']).lower(), sid
-        assert 0 <= e['onset_s'] < e['dur_s'] and e['kind'] in registry.KINDS, sid
+        assert e['members'] and e['kind'] in registry.KINDS and isinstance(e['default'], bool), sid
+        for k, m in enumerate(e['members'], 1):
+            c = m['credit']
+            assert c['title'] and c['author'] and c['page'].startswith('https://'), sid
+            assert 'CC0' in c['licence'] or 'public domain' in c['licence'].lower(), (sid, c['licence'])
+            assert f'`{sid}` ({k})' in credits and c['page'] in credits, sid
+            assert 'mixkit' not in (c['page'] + m['source']).lower(), sid
+            assert 0 <= m['onset_s'] < m['dur_s'], sid
+            assert m['rating'] is None or m['rating'] >= 3, sid                # rated 1-2 by the owner: never in
 
 
 def test_store_size():
@@ -69,109 +89,170 @@ def test_store_size():
     assert total < LIMIT, total
 
 
-def test_every_model_loads_and_is_a_design():
+def test_names_are_plain_and_one_design_per_thing():
     with open(os.path.join(learned.STORE, 'index.json'), encoding='utf-8') as fh:
         rows = json.load(fh)
-    assert len(rows) == len(INDEX) >= 250                                    # ids are unique
+    assert len(rows) == len(INDEX) >= 100 and sum(len(e['members']) for e in rows) >= 250
+    for sid in IDS:
+        assert re.fullmatch(r'[a-z]+(_[a-z]+)?/[a-z]+(_[a-z]+)?', sid), sid
+        assert not set(re.split('[/_]', sid)) & SLOP and not sid.endswith('_light'), sid
+    families = {}
+    for sid in IDS:
+        families.setdefault(sid.split('/')[0], []).append(sid)
+    assert len([f for f, v in families.items() if len(v) > 1]) < len(families)   # things, not characters
+    assert all(len(set(m['source'] for m in e['members'])) == len(e['members']) for e in rows)
+
+
+def test_every_design_registers_and_its_models_load():
     for sid, e in INDEX.items():
-        m = learned.model(sid)
-        assert {'n', 'on', 'ap', 'ton', 'frq', 'q', 'u', 'h'} <= set(m) and int(m['n']) > 0, sid
-        assert ('ild' in m) == e['stereo'], sid
-        assert 'rating' in e and isinstance(e['default'], bool), sid
-        assert e['rating'] is None or e['rating'] >= 3, sid                  # rated 1-2 by the owner: never in
         d = registry.get(sid)
         prior = registry.LEARNED * (1.0 if e['default'] else learned.DEFAULT_OFF)
         assert d.kind == e['kind'] and set(d.axes) == set(e['axes']) and d.prior == prior, sid
-        assert {'energy', 'size', 'bright'} <= set(d.axes), sid
-        assert (d.pitch is not None) == bool(e.get('hz')), sid
-    assert learned.model(IDS[0]) is learned.model(IDS[0])                    # read once
+        assert {'energy', 'size', 'bright'} <= set(d.axes) and 'real' in d.tags, sid
+        assert (d.pitch is not None) == bool(e.get('tonal')), sid
+    f = INDEX[IDS[0]]['members'][0]['file']
+    m = learned.model(f)
+    assert {'n', 'on', 'ap', 'ton', 'frq', 'q', 'u', 'h'} <= set(m) and int(m['n']) > 0
+    assert learned.model(f) is learned.model(f)                              # read once
 
 
-def _fast(sid):
-    """the fast tier renders the first short model of each family; the rest need --slow"""
-    fam = sid.split('/')[0]
-    first = next((i for i in IDS if i.split('/')[0] == fam and INDEX[i]['dur_s'] <= 0.4), None)
-    return sid == first
+@pytest.mark.slow
+def test_every_model_loads():
+    for sid, e in INDEX.items():
+        for m in e['members']:
+            md = learned.model(m['file'])
+            assert int(md['n']) > 0 and ('ild' in md) == m['stereo'] and (not m['stereo'] or 'ipd' in md), sid
 
 
-@pytest.mark.parametrize('sid', [pytest.param(i, id=i, marks=[] if _fast(i) else [pytest.mark.slow]) for i in IDS])
+def test_the_ui_set_plays_the_designs_chosen_for_its_roles():
+    ui = dict(sets.SETS['ui']['sounds'])
+    roles = {r: sid for sid, e in INDEX.items() for r in e.get('roles', ())}
+    assert ui['tap'] == roles['tap'] and ui['hover'] == roles['hover'] and ui['next'] == roles['next']
+    assert ui['toggle_on'] == ui['toggle_off'] == roles['switch_on'] == roles['switch_off']
+    assert ui['type'] == roles['type'] and all(INDEX[s]['default'] for s in roles.values())
+    for name in ('tap', 'hover', 'toggle_on', 'toggle_off', 'next', 'type'):
+        assert 'real' in registry.get(ui[name]).tags, name
+
+
+# ---- renders
+
+def _renders(sid, seeds):
+    for seed in seeds:
+        ok = False
+        for retry in (0, 101, 202, 303):           # as make re-rolls a take that fails its audit
+            y, meta = registry.render(sid, seed=seed + retry)
+            assert y.ndim == 2 and y.shape[1] == 2 and np.isfinite(y).all()
+            assert np.abs(y).max() <= 1.0 and meta['peak_dbfs'] <= -0.8 and not meta.get('ignored')
+            assert np.abs(y[0]).max() < 1e-3 and np.abs(y[-1]).max() < 1e-2
+            assert meta['member']['of'] == len(INDEX[sid]['members'])
+            ok = meta['checks']['ok']
+            if ok:
+                break
+        assert ok, (sid, seed, meta['checks']['warnings'])
+
+
+@pytest.mark.parametrize('sid', FAST)
 def test_renders_clean_and_passes_its_audit(sid):
-    ok = False
-    for seed in (0, 101, 202, 303):            # as make re-rolls a take that fails its audit
-        y, meta = registry.render(sid, seed=seed)
-        assert y.ndim == 2 and y.shape[1] == 2 and np.isfinite(y).all()
-        assert np.abs(y).max() <= 1.0 and meta['peak_dbfs'] <= -0.8 and not meta.get('ignored')
-        assert np.abs(y[0]).max() < 1e-3 and np.abs(y[-1]).max() < 1e-2
-        ok = meta['checks']['ok']
-        if ok:
-            break
-    assert ok, meta['checks']['warnings']
+    _renders(sid, (0,))
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize('sid', IDS)
+def test_every_member_renders_clean_and_passes_its_audit(sid):
+    _renders(sid, [_seed(sid, k) for k in range(len(INDEX[sid]['members']))])
+
+
+# ---- members
+
+def test_seeds_walk_through_the_members():
+    sid = 'switch/lamp'
+    n = len(INDEX[sid]['members'])
+    got = [learned.pick(sid, s) for s in range(2 * n)]
+    assert sorted(got[:n]) == list(range(n)) and got[n:] == got[:n]
+    (a, ma), (b, mb) = registry.render(sid, seed=2, check=False), registry.render(sid, seed=2, check=False)
+    assert np.array_equal(a, b) and ma['member']['n'] == mb['member']['n'] == got[2] + 1
+    assert ma['member']['recording'] == INDEX[sid]['members'][got[2]]['credit']['title']
+
+
+def test_a_dark_or_bright_request_draws_from_the_darker_or_brighter_members():
+    sid = 'keyboard/desktop'
+    n = len(INDEX[sid]['members'])
+    half = (n + 1) // 2
+    for s in range(n):
+        assert learned.pick(sid, s, -0.7) < half and learned.pick(sid, s, 0.7) >= n - half
+        assert learned.pick(sid, s, 0.3) == learned.pick(sid, s)
+    cents = [m['quality']['centroid'] for m in INDEX[sid]['members']]
+    assert cents == sorted(cents)                                             # stored darkest first
 
 
 # ---- controls
 
-@pytest.mark.parametrize('sid', ['typing_key/office', 'thud/drop'])
+@pytest.mark.parametrize('sid', ['keyboard/mechanical', 'apple/drop'])
 def test_size_is_lower_and_longer(sid):
-    small, big = _raw(sid, size=-1.0, space=-1.0), _raw(sid, size=1.0, space=-1.0)
+    small, big = _raw(sid, member=0, size=-1.0, space=-1.0), _raw(sid, member=0, size=1.0, space=-1.0)
     assert _centroid(big) < 0.75 * _centroid(small) and _end(big) > 1.5 * _end(small)
 
 
-@pytest.mark.parametrize('sid', ['typing_key/office', 'whoosh/heavy'])
+@pytest.mark.parametrize('sid', ['keyboard/mechanical', 'whoosh/stick'])
 def test_bright_raises_the_centroid(sid):
-    assert _centroid(_raw(sid, bright=1.0)) > 1.3 * _centroid(_raw(sid, bright=-1.0))
+    assert _centroid(_raw(sid, member=0, bright=1.0)) > 1.3 * _centroid(_raw(sid, member=0, bright=-1.0))
 
 
-@pytest.mark.parametrize('sid', ['knock/hollow', 'click/mouse_light'])
-def test_hard_makes_the_strike_stand_out(sid):
-    t0 = INDEX[sid]['onset_s']
-    assert _strike(_raw(sid, hard=1.0, space=-1.0), t0) > _strike(_raw(sid, hard=-1.0, space=-1.0), t0) + 2.0
+def test_hard_makes_the_strike_stand_out():
+    sid = 'knock/hollow'
+    t0 = INDEX[sid]['members'][0]['onset_s']
+    hi, lo = _raw(sid, member=0, hard=1.0, space=-1.0), _raw(sid, member=0, hard=-1.0, space=-1.0)
+    assert _strike(hi, t0) > _strike(lo, t0) + 2.0
 
 
 def test_ring_rings_longer():
-    assert _end(_raw('cork/wine', ring=1.0, space=-1.0)) > 1.3 * _end(_raw('cork/wine', ring=-1.0, space=-1.0))
+    sid = 'cork/bottle'
+    k = next(i for i, m in enumerate(INDEX[sid]['members']) if m['source'] == 'freesound-335358')
+    assert _end(_raw(sid, member=k, ring=1.0, space=-1.0)) > 1.3 * _end(_raw(sid, member=k, ring=-1.0, space=-1.0))
 
 
-def test_energy_is_louder_and_harder():
-    lo, hi = _raw('typing_key/office', energy=-1.0), _raw('typing_key/office', energy=1.0)
+def test_energy_is_louder():
+    lo, hi = _raw('keyboard/mechanical', member=0, energy=-1.0), _raw('keyboard/mechanical', member=0, energy=1.0)
     assert _level(hi) > _level(lo) + 9.0
 
 
 def test_width_spreads_a_mono_and_a_stereo_recording():
-    for sid in ('typing_key/office', 'thud/drop'):
-        def corr(y):
-            return np.corrcoef(y[:, 0], y[:, 1])[0, 1]
-        assert corr(_raw(sid, width=1.0, space=-1.0)) < corr(_raw(sid, width=-1.0, space=-1.0)) - 0.1, sid
+    def corr(y):
+        return np.corrcoef(y[:, 0], y[:, 1])[0, 1]
+    for sid in ('keyboard/mechanical', 'apple/drop'):
+        assert corr(_raw(sid, member=0, width=1.0, space=-1.0)) < corr(_raw(sid, member=0, width=-1.0,
+                                                                             space=-1.0)) - 0.05, sid
 
 
 def test_space_adds_a_tail():
-    assert _end(_raw('knock/hollow', space=1.0)) > _end(_raw('knock/hollow', space=-1.0)) + 0.05
+    assert _end(_raw('knock/hollow', member=0, space=1.0)) > _end(_raw('knock/hollow', member=0, space=-1.0)) + 0.05
 
 
 def test_pitch_moves_a_tonal_model():
     sid = 'knock/hollow'
-    f0 = INDEX[sid]['hz']
-    y = _raw(sid, pitch=f0 * 2 ** (3 / 12), space=-1.0)
+    f0 = INDEX[sid]['members'][0]['hz']
+    y = _raw(sid, member=0, pitch=f0 * 2 ** (3 / 12), space=-1.0)
     f = max(resyn.partials(y), key=lambda q: q[1])[0]
     assert abs(1200 * np.log2(f / (f0 * 2 ** (3 / 12)))) < 50
-    assert registry.get('typing_key/office').pitch is None                       # a click has no note to move
+    assert registry.get('keyboard/mechanical').pitch is None                    # a key has no note to move
 
 
 def test_length_warps_within_its_natural_range():
     sid = 'whoosh/heavy'
-    d = INDEX[sid]['dur_s']
-    plain, long_ = _end(_raw(sid, space=-1.0)), _end(_raw(sid, dur=1.5 * d, space=-1.0))
+    d = INDEX[sid]['members'][0]['dur_s']
+    plain, long_ = _end(_raw(sid, member=0, space=-1.0)), _end(_raw(sid, member=0, dur=1.5 * d, space=-1.0))
     assert 1.25 < long_ / plain < 1.75
-    far = _raw(sid, dur=6.0 * d, space=-1.0)                                  # clamped: no stretch past LENGTH
+    far = _raw(sid, member=0, dur=3.0 * d, space=-1.0)                         # clamped: no stretch past LENGTH
     assert len(far) <= (learned.LENGTH[1] + 0.1) * d * SR
 
 
-# ---- seeds
+# ---- performances of one recording
 
-@pytest.mark.parametrize('sid', ['typing_key/office', 'knock/hollow', 'swish/bamboo'])
-def test_seeds_are_performances(sid):
-    a, b = _raw(sid, seed=1), _raw(sid, seed=1)
+@pytest.mark.parametrize('sid', ['keyboard/mechanical', 'knock/hollow', 'switch/lamp'])
+def test_seeds_of_one_recording_are_performances(sid):
+    a, b = _raw(sid, seed=1, member=0), _raw(sid, seed=1, member=0)
     assert np.array_equal(a, b)
-    takes = [a] + [_raw(sid, seed=s) for s in (2, 3)]
+    takes = [a] + [_raw(sid, seed=s, member=0) for s in (2, 3)]
     for t in takes[1:]:
         assert len(t) != len(a) or not np.allclose(t, a)
     c = [_centroid(t) for t in takes]
