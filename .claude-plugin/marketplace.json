@@ -9,7 +9,7 @@
     {
       "name": "earshot",
       "source": "./",
-      "description": "Make sound effects, notes and ambience in code from a request in words, and describe, match, measure and critique sound an agent cannot hear."
+      "description": "Make sound effects, everyday foley, drums and ambience from a request in words (computed at request time; the realistic ones from models learned from public-domain recordings, no audio shipped), and describe, match, measure and critique sound an agent cannot hear."
     }
   ]
 }

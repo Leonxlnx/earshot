@@ -5,8 +5,9 @@
 earshot makes sounds. An agent asks for a sound in words and earshot renders a new take of a design from its
 catalogue, with no model and no network: interface sounds, everyday foley, ambience beds, game sounds, chip sound,
 drums, motion-design effects and three short music loops, one at a time or as a family with a sprite for the web.
-Realistic things are learned from recordings in the public domain and kept as numbers, not audio; the rest is
-written in code. The yardstick for what was kept is the owner's listening, 1 to 5 on six pages, not earshot's own
+Realistic things (everyday sounds, the interface touches, ambiences, the acoustic drums) are learned from recordings
+in the public domain and kept as numbers, not audio, and computed anew at every request; tonal figures, chip sound
+and the music loops are written in code. The yardstick for what was kept is the owner's listening, 1 to 5 on six pages, not earshot's own
 listening models, which did not predict his ratings ([docs/VALIDATION.md](docs/VALIDATION.md#the-owners-listening)).
 Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. No new required dependencies.
 
@@ -22,8 +23,10 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
   `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
 - **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 131 designs of
-  everyday, interface and game sounds learned from 282 recorded events in the public domain (BigSoundBank, Kenney,
-  VCSL, Freesound uploads marked CC0; credits in `earshot/data/resyn/CREDITS.md`). Each recording is analysed at the
+  everyday, interface and game sounds learned from 282 recorded events in the public domain (the sources of all
+  learned material, beds and drums included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on
+  Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of `earshot/data/resyn/`,
+  `textures/` and `drums/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
   stored as numbers: 5.29 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
@@ -48,9 +51,15 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   ambience bed held down by a few peaks by up to 8 dB (`registry.SPARSE`). The owner had heard many short sounds as
   barely there. Loudest levels by kind: -14 LUFS momentary max, pads and textures -18, ambience beds -22, music
   loops -16.
-- **Drums** (`earshot/synth/drums.py`, `earshot/sounds/drums.py`): 38 designs (kicks, snares, rims, toms, hi-hats,
-  cymbals, claps, a snap, shaker, tambourine, conga, bongo, cajon, clave, sticks, a roll) from a beater's contact,
-  a head's or cymbal's modes and rattles, in a room.
+- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, `earshot/synth/drums.py`): 40 designs in 21
+  families. The acoustic kit and the hand percussion (33: kicks, snares, rims, toms, hi-hats, crashes, a ride,
+  claps, shaker, tambourine, congas, bongos, cajon, darbuka, frame drum, clave, cabasa, slapstick, a snare roll and a
+  shaker roll) are takes of 130 recorded strokes in the public domain (VCSL and Karoryfer, 1.47 MB of numbers): the
+  seed walks through a design's strokes and `energy` picks softer or harder ones. Still invented: `kick/electro`,
+  `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count`. New:
+  `conga/muted`, `bongo/low`, `darbuka/hit`, `frame_drum/deep`, `cabasa/hit`, `slapstick/crack`; removed:
+  `ride/bell`, `cymbal/swell`, `conga/slap`, `cajon/slap`. The owner rated the drums invented from physics 1-2
+  ("big problems, does not sound good"); the recorded ones are not rated yet.
 - **Motion-design sounds** (`earshot/sounds/motion.py`): whooshes, hits, builds, small arrivals, light and stingers
   for product films; being rebuilt from real material.
 - **Three music loops** (`earshot/synth/music.py`, `earshot/sounds/beds.py`): `bed/warm`, `bed/playful`, `bed/8bit`,
@@ -87,8 +96,10 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   a bed 14), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
   every sound in each, the manifest's `files` and `formats`, the sprite in each format with its map's `src` in that
   order. For the web, `webm,mp3`: Ogg Vorbis does not play in Safari before 18.4. A loop in such a set is written
-  as flac in place of mp3 / m4a (their padding leaves a gap at the seam); a second name that gets the same design
-  as an earlier one is flagged, with the nearest other design. A guess's alternatives carry a few words each.
+  as flac in place of mp3 / m4a (their padding leaves a gap at the seam); a second name that gets the same sound
+  as an earlier one is flagged, with the nearest other design, and a second name that plays another recording of
+  the same learned design (toggle_off after toggle_on) is named as such, without a warning. A guess's alternatives
+  carry a few words each.
 - **`earshot pack`** (`earshot/pack.py`, `--sprite` on a set): many sounds in one file with a map in the format
   howler.js reads; loops are marked and get a longer gap. On a set's folder it packs exactly the manifest's sounds
   and leaves out an earlier sprite.

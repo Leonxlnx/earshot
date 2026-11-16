@@ -14,8 +14,11 @@ complete on its own.
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
 paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 13 ambience beds learned from
 real textures (fire, three shores, crickets, wind in trees, a brook, a cafe, a street, distant city, room tone,
-underwater, rain on a terrace). Written in code: tonal interface and game figures (success, error, notify, coin,
-level up), chip sound, drums, rain on a window and a forest, notes, pads, three music loops, and the film bank.
+underwater, rain on a terrace). The acoustic drum kit and hand percussion are learned too (130 recorded strokes;
+seeds walk through a drum's strokes, `energy` picks softer or harder ones). Only numbers ship, no audio file: every
+sound is computed when it is asked for. Written in code: tonal interface and game figures (success, error, notify,
+coin, level up), chip sound, the drum-machine voices, a brush snare, a finger snap and stick counts, rain on a
+window and a forest, notes, pads, three music loops, and the film bank.
 Realistic things that no one recorded (jumps, magic, game hits) are invented designs and were rated low by the
 owner: prefer a learned thing when one fits.
 
@@ -34,8 +37,9 @@ owner: prefer a learned thing when one fits.
    `--family step`, then `--sound ID`. Never list the whole catalogue (hundreds of lines).
 
 **The ready-made sets.** `ui` (17): tap, hover, two toggles, type, next and back are real keys and switches; open,
-close, send, receive, notify, success, complete, warning, error, delete are soft tonal figures. In `ui` the line
-`same design as toggle_on` (and `as back`) is expected: the pair are two recordings of one switch or keyboard.
+close, send, receive, notify, success, complete, warning, error, delete are soft tonal figures. Under toggle_off
+and next the line `another recording of ... than toggle_on` (`than back`) says the pair are two recordings of one
+learned switch or keyboard design, as meant.
 `game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
 learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`), `arcade` (16 chip
 sounds), `film` (motion-design starter; being rebuilt from real material).
@@ -61,8 +65,9 @@ of different recordings differ in length and level. `--json` names the recording
 - `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
 - `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified; choose an alternative
   by its words and call again with `--sound ID`, or re-ask naming the sound or the job.
-- `same design as NAME: ... (the nearest: ID)` (sets): two names got one design; in your own spec give the second
-  `"sound": ID` (in the ready-made `ui` set it is meant, above).
+- `same design as NAME: ... (the nearest: ID)` (sets): two names got one sound; give the second `"sound": ID` in
+  your spec. `another recording of ID than NAME: ...` is not a problem: the two play different recordings of one
+  learned design.
 - `not in this sound: WORDS`: part of the request is not in this file (one call, one sound); make it separately.
 - `not used by this sound: ...`: the design ignored that control or could not keep that length; fine unless it
   mattered, then pick another design.

@@ -2,8 +2,10 @@
 
 An agent asks for a sound in words; earshot reads the request, ranks its catalogue of designs, renders a new take of
 the best one, audits it without models and writes the file. No model is loaded and nothing is downloaded. A design is
-either written in code (figures, chip sound, drums, ambience from rules, notes) or learned from recordings in the
-public domain and kept as numbers ([Learned sounds](#learned-sounds)). Everything rendered belongs to whoever
+either written in code (figures, chip sound, the drum-machine voices, ambience from rules, notes, the music loops)
+or learned from recordings in the public domain and kept as numbers ([Learned sounds](#learned-sounds)): everyday
+things, the interface touches, most ambience beds, the acoustic drums and hand percussion. Either way every sound is
+computed when it is asked for; no audio file is shipped or played back. Everything rendered belongs to whoever
 rendered it: free for any use, commercial too, without credit.
 
 - [make](#make) - [learned sounds](#learned-sounds) - [make --set / --spec](#a-whole-set) - [sounds](#sounds) -
@@ -46,7 +48,8 @@ Then:
 | `not understood: ...` | words that matched nothing in the catalogue or the lexicon | rephrase if they mattered |
 | `x.mp3: a loop in mp3 has a gap at its seam ...` | a single `make` of a loop to mp3 or m4a | write loops as ogg, webm, wav or flac |
 | `  a loop: flac instead of mp3, which leaves a gap at the seam` | in a set with several formats, a loop was written as flac in place of mp3 / m4a | nothing |
-| `  same design as NAME: ask for a different one with "sound" (the nearest: ID)` | in a set, two names got the same design | in your own spec: give the second one `"sound": ID`, or reword its `want`. In the ready-made `ui` set it is meant (below) |
+| `  same design as NAME: ask for a different one with "sound" (the nearest: ID)` | in a set, two names got the same sound | in your own spec: give the second one `"sound": ID`, or reword its `want` |
+| `  another recording of ID than NAME: N of M (title)` | in a set, two names play different recordings of one learned design (toggle_on and toggle_off, back and next in `ui`) | nothing: the pair is meant |
 | `heard as: '...' (z +x.x, verdict)` | with `--listen` only (below) | |
 | `not listened: ...` | `--listen` was asked and the model or the atlas is missing | `earshot doctor` |
 
@@ -140,23 +143,27 @@ as a dict (`summary`, `sound`, `files`, `why`, `also`, `not_in_sound`, `unknown`
 
 ## Learned sounds
 
-131 designs of everyday, interface and game sounds and 13 ambience beds are learned from recordings whose authors
-put them in the public domain (CC0). They are not invented and they are not the recordings: each recording is kept
+131 designs of everyday, interface and game sounds, 13 ambience beds and 33 drum and percussion designs are learned
+from recordings whose authors put them in the public domain. They are not invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
 2 ms and every 0.25 ms around an onset, how much of each band is one tone and at which frequency, the stereo image),
 and every render draws fresh noise on those numbers. A take is a new performance of that recording; it is not a
 sound made from nothing, and it exists only because someone recorded the thing and gave the recording away.
 
-| | one-shots | ambience beds |
-|---|---|---|
-| designs | 131 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) |
-| recordings | 282 recorded events (a few are several events cut from one recording) | 12 textures of 12-30 s |
-| store | `earshot/data/resyn/`: 5.29 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 4.09 MB, `index.json`, `CREDITS.md` |
-| sources | BigSoundBank, Kenney, VCSL, Freesound uploads marked CC0 | BigSoundBank |
-| a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) |
+| | one-shots | ambience beds | drums |
+|---|---|---|---|
+| designs | 131 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) |
+| recordings | 282 recorded events (a few are several events cut from one recording) | 12 textures of 12-30 s | 130 strokes |
+| store | `earshot/data/resyn/`: 5.29 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 4.09 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.47 MB, `index.json`, `CREDITS.md` |
+| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer |
+| a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for |
+
+All the sources together: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or
+an explicit public-domain dedication; every recording is credited in the `CREDITS.md` of `earshot/data/resyn/`,
+`textures/` and `drums/`. No audio file is shipped or played back.
 
 **A design is one thing; its recordings are its variations.** `step/pebbles` holds three recordings of footsteps
-on gravel, `switch/lamp` two takes of one lamp switch, `keyboard/laptop` several keys. Seeds 0, 1, 2 ... walk
+on gravel, `switch/lamp` three recordings of lamp switches, `keyboard/laptop` several keys. Seeds 0, 1, 2 ... walk
 through the members in a fixed shuffled order, so `--n 3` gives three different real footsteps; seeds past the last
 member are new takes of the same recordings. A request at bright -0.5 or below (or 0.5 and above) walks only the
 darker (brighter) half of the members, by their measured centroid, and tilts the take as well. `--json` names the
@@ -213,8 +220,11 @@ tap.{webm,mp3}: keyboard/desktop (0.33 s, -25 LUFS, clean) [named]
 hover.{webm,mp3}: dial/click (0.44 s, -25 LUFS, clean) [named]
 toggle_on.{webm,mp3}: switch/lamp (0.36 s, -25 LUFS, clean) [named]
 toggle_off.{webm,mp3}: switch/lamp (0.39 s, -25 LUFS, clean) [named]
-  same design as toggle_on: ask for a different one with "sound" (the nearest: switch/small)
+  another recording of switch/lamp than toggle_on: 1 of 3 (Switch desk lamp)
 type.{webm,mp3}: keyboard/mechanical (0.28 s, -25 LUFS, clean) [named]
+back.{webm,mp3}: keyboard/laptop (0.56 s, -25 LUFS, clean) [named]
+next.{webm,mp3}: keyboard/laptop (0.41 s, -25 LUFS, clean) [named]
+  another recording of keyboard/laptop than back: 4 of 5 (Slow MacBook keyboard #1)
 ...
 notify.{webm,mp3}: notify/pair (1.12 s, C6, soft_pluck, -19 LUFS, clean) [named]
 success.{webm,mp3}: success/rise (0.89 s, C6, soft_pluck, -19 LUFS, clean) [named]
@@ -227,8 +237,8 @@ delete.{webm,mp3}: delete/drop (0.75 s, C5, soft_pluck, -19 LUFS, clean) [named]
 
 The touches of the `ui` set (tap, hover, the two toggles, type, next and back) are real keys and switches; the owner
 twice heard the tonal taps and toggles as unrecognisable and rated real keys 4 of 5. The two toggles are two
-recordings of one lamp switch, and back and next two keys of one laptop keyboard (a set's sounds take consecutive
-seeds, so they play different members): the `same design as` line under the second of each pair is expected here.
+recordings of `switch/lamp`, and back and next two recordings of `keyboard/laptop` (a set's sounds take consecutive
+seeds, so they play different members): the `another recording of` line under the second of each pair says which.
 The signals (open, close, send, receive, notify, success, complete, warning, error, delete) are soft tonal figures
 in the theme's voice, key and room. In a set the touches sit lower than the signals, by kind (the table below).
 
@@ -561,7 +571,7 @@ sound is or does, the name its character.
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
 | material ticks (`sounds/ui.py`) | 3 | `tick/wood`, `tick/glass`, `tick/metal` | taps and detents that should not be a note | 7 axes (not motion), pitch |
 | ambience (`sounds/nature.py`) | 31 in 15 families | learned from real textures (13): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `wind/trees`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`; from rules (18): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
-| drums (`sounds/drums.py`) | 38 in 18 families | `kick/soft`, `kick/punch`, `snare/tight`, `snare/brush`, `rim/click`, `tom/floor`, `hat/closed`, `hat/open`, `crash/bright`, `ride/bell`, `cymbal/swell`, `clap/hands`, `snap/finger`, `shaker/tick`, `tambourine/shake`, `conga/slap`, `bongo/high`, `cajon/bass`, `clave/click`, `sticks/count`, `drum/roll` | music loops, motion design, games | energy (velocity), size, bright, hard, ring, space, width; pitch on tuned drums |
+| drums (`sounds/drums.py`) | 40 in 21 families | from recorded strokes (33): `kick/soft`, `kick/punch`, `kick/deep`, `snare/tight`, `snare/fat`, `rim/click`, `rim/shot`, `tom/high`, `tom/mid`, `tom/floor`, `hat/closed`, `hat/open`, `hat/pedal`, `crash/bright`, `crash/dark`, `ride/ping`, `clap/hands`, `clap/group`, `shaker/tick`, `tambourine/hit`, `tambourine/shake`, `conga/open`, `conga/muted`, `bongo/high`, `bongo/low`, `cajon/bass`, `darbuka/hit`, `frame_drum/deep`, `clave/click`, `cabasa/hit`, `slapstick/crack`, `drum/roll`, `shaker/roll`; invented (7): `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count` | music loops, motion design, games | energy (velocity: softer or harder strokes), size, bright, hard, ring, space, width; pitch on tuned drums |
 | film and motion (`sounds/motion.py`) | see below | | product films, title sequences, interface animation | |
 | action (`sounds/action.py`) | 47 in 23 families | `jump/*`, `land/*`, `step/grass` .. `step/metal` (6 surfaces), `swing/*`, `hit/punch` ..., `explosion/*`, `shot/*`, `door/*`, `break/*`, `splash/*`, `teleport/*`, `magic/*`, `countdown/*`, `laser/beam` and `rumble/quake` (loops) | games and animation; invented from physics | energy, size, bright, hard, ring, space, width; pitch for the tonal ones; dur for loops |
 | objects (`sounds/object.py`) | 36 in 26 families | `coin/drop`, `glass/clink`, `paper/*`, `cards/*`, `dice/*`, `water/drop`, `clock/ticktock` (loop), `switch/*`, `keys/*`, `bell/desk`, `zipper/*`, `cork/*` ... | foley; invented from physics | the same 7 axes; dur for poured, pulled and looped ones |
@@ -586,14 +596,18 @@ bed.ogg: bed/warm (17.14 s, F3, electric_piano, -16 LUFS, seamless loop, clean) 
 also: bed/playful, bed/8bit, heartbeat/pulse
 ```
 
-**Drums.** Each hit is built layer by layer (`earshot/synth/drums.py`): the beater's contact (felt, plastic, a
-stick, a brush, a palm), the head's or the cymbal's modes, the rattle of snare wires, hi-hat plates or jingles, and
-a close stereo pair in a room. Seeds are takes of the same instrument: the velocity, strike point, contact noise and
-rattle timing move. They are invented from physics, and the owner rated most of them 1-2 of 5 (the tight snare 3).
+**Drums.** The acoustic kit and the hand percussion are takes of real strokes: 130 recordings in the public domain
+(VCSL and Karoryfer Big Rusty Drums), kept as numbers in `earshot/data/drums/` like the other learned sounds and
+played softest first by velocity. The seed walks through a drum's strokes (a drummer never hits twice the same) and
+`energy` picks softer or harder ones; `drum/roll` and `shaker/roll` are performances of those strokes. Invented,
+because no public-domain recording covers them or because they are synthesizers by nature: `kick/electro`,
+`snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count`
+(`earshot/synth/drums.py`: a beater's contact, modes, wires and jingles as collisions). The owner rated the earlier
+drums invented from physics 1-2 of 5 ("big problems, does not sound good"); nobody has rated the recorded ones yet.
 
 ```
 $ earshot make "a tight snare drum hit" -o snare.wav
-snare.wav: snare/tight (0.38 s, B3, -15 LUFS, clean) [snare drum, hit]
+snare.wav: snare/tight (0.38 s, -18 LUFS, clean) [snare drum, hit]
 also: snare/brush, snare/fat, snare/electro
 ```
 

@@ -476,6 +476,22 @@ def test_mcp_make_tools_describe_listen_and_take_material_loop_and_formats(tmp_p
     assert (tmp_path / 'set' / 'tap.wav').is_file() and (tmp_path / 'set' / 'tap.flac').is_file()
 
 
+def test_mcp_make_texts_say_how_sounds_are_made_and_count_the_sets():
+    """the make tool said "no recorded audio is used" after the realistic sounds became learned from recordings, and
+    make_set said "ui (16 interface sounds)" when the set had 17"""
+    import anyio
+    from earshot.sounds import sets
+    tools = {t.name: t for t in anyio.run(mcp_server.build().list_tools)}
+    make = ' '.join(tools['make'].description.split())
+    assert 'no recorded audio' not in make and 'learned from public-domain recordings' in make
+    assert 'no audio file' in make
+    desc = (getattr(tools['make_set'], 'input_schema', None) or tools['make_set'].inputSchema)['properties']['set']
+    text = desc.get('description') or desc['anyOf'][0].get('description', '')
+    for name, s in sets.SETS.items():
+        assert f'"{name}" ({len(s["sounds"])}' in text, name
+    assert 'made in code' not in ' '.join(mcp_server.INSTRUCTIONS.split())
+
+
 # one person's taste written as a rule for every agent (issue #1); conditional, generic phrasing such as "when the user
 # wants real sound" stays allowed
 PREFERENCE_AS_RULE = re.compile(

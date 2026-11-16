@@ -108,7 +108,10 @@ family and the learned beds were built after his last ratings: each learned take
 - **Film and motion sounds are in progress.** The first motion designs were invented from class statistics of film
   effects and rated mostly 1-2; they are being rebuilt from real material. Until then prefer the learned whooshes,
   `boom/heavy`, `cymbal/reverse` and the bank's film sounds.
-- **Drums** are invented from physics; the owner rated most of them 1-2 ("percussion: big problems").
+- **Drums.** The acoustic kit and the hand percussion are now takes of 130 recorded strokes (VCSL and Karoryfer);
+  nobody has rated them yet. The drums invented from physics that they replace were rated 1-2 by the owner ("big
+  problems, does not sound good"). Still invented: `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`
+  (drum-machine voices), `snare/brush`, `snap/finger` and `sticks/count`, which no public-domain recording covers.
 - **One carrier per band.** The learned model keeps one tone per band: two crickets in one band lose their beating
   against each other (the cricket bed's take differs from its recording by 4.4 dB against 2.2 for two takes).
 - **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms).
@@ -146,12 +149,14 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 5.29 MB and the textures 4.09 MB to the package. The lab's recordings, renders,
-listening pages, request sets and the tool that builds the learned store are not in the repository: the store can
-be used and credited, not rebuilt, from the repository alone, and the request numbers cannot be re-run from it.
+sound. The learned store adds 5.29 MB, the textures 4.09 MB and the drums 1.47 MB to the package. The lab's
+recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
+repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers
+cannot be re-run from it.
 
-**Licence of the learned material.** Every learned model comes from a recording marked CC0 by its source
-(BigSoundBank, Kenney, VCSL, Freesound uploads; the Freesound ones partly read from MP3 previews found through the
-Openverse catalogue). Each recording's licence was taken from its source (the sound's page, the pack's licence
-file, or Openverse's licence field for a Freesound page) and is written next to it in the credits files; earshot
-cannot prove that an uploader had the right to give a recording away.
+**Licence of the learned material.** Every learned model comes from a recording in the public domain: BigSoundBank,
+Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication
+(the Freesound ones partly read from MP3 previews found through the Openverse catalogue). Each recording's licence
+was taken from its source (the sound's page, the pack's licence file, or Openverse's licence field for a Freesound
+page) and is written next to it in the three credits files (`earshot/data/resyn/`, `textures/` and `drums/`);
+earshot cannot prove that an uploader had the right to give a recording away.

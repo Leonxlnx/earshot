@@ -16,5 +16,5 @@ Make this sound with earshot: $ARGUMENTS
 3. Report the answer as given: the file line (design, length, pitch and voice for a tonal sound, loudness, `clean`
    or `audit: ...`), `also: ...`, and any `not understood` / `not used by this sound` line. A take with `audit:` is
    not usable: make it again with another `seed`. Do not say how it sounds beyond what the answer says; if the
-   design is a learned one (a real thing such as a footstep, a switch or a door), say it is a new take of a
-   public-domain recording.
+   design is a learned one (a real thing such as a footstep, a switch, a door or a drum), say it is a new take of a
+   public-domain recording, computed from a model of it (no audio file is shipped or played back).

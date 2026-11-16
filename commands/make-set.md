@@ -18,6 +18,7 @@ Make a set of sounds with earshot: $ARGUMENTS
    set, never one `make` per sound. If `earshot` is not found, say it must be installed first:
    `uv tool install "earshot[mcp] @ git+https://github.com/Leonxlnx/earshot"`.
 3. Report the answer as given: the folder and count, one line per file, and any file whose line shows `audit:`
-   instead of `clean` (not usable: make that sound again with another `seed`). In the `ui` set the line
-   `same design as ...` under toggle_off and next is expected (two recordings of one switch or keyboard); in a set
-   of their own it means two names got one sound. The folder also holds `manifest.json`.
+   instead of `clean` (not usable: make that sound again with another `seed`). A line `another recording of ...`
+   (under toggle_off and next in the `ui` set) says two names play two recordings of one learned design, as
+   intended; a line `same design as ...` means two names got one sound: ask for another with `sound`. The folder
+   also holds `manifest.json`.

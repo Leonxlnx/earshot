@@ -151,12 +151,14 @@ between two good recordings of one kind (4).
 
 **What failed.** Sounds invented from formulas for real things: footsteps, jumps, landings, punches, explosions,
 doors, switches, taps and toggles (1-2), in every round, whether written by hand or fitted from a recording with the
-earlier engine. Most music beds (1-2; three kept). Most drums (1-2). Bells, glass and glockenspiel timbres for
-interface sounds (1). New sounds sampled from a class model of several recordings (1-2): class sampling was dropped.
+earlier engine. Most music beds (1-2; three kept). Most drums invented from physics (1-2; "big problems, does not
+sound good"). Bells, glass and glockenspiel timbres for interface sounds (1). New sounds sampled from a class model
+of several recordings (1-2): class sampling was dropped.
 
 **What followed.** Realistic sounds are learned from public-domain recordings (`earshot/sounds/learned.py`), the
 interface touches are real keys and switches, the ambience beds he rated 2-3 were replaced by learned textures,
-nine music beds were removed, the default voice of the interface figures is the soft pluck, and short sounds are
+nine music beds were removed, the acoustic drums and hand percussion are played from 130 recorded strokes (VCSL and
+Karoryfer; not rated yet), the default voice of the interface figures is the soft pluck, and short sounds are
 raised (`master.finish` lift; the loudest 50 ms of the tap, toggle and hover figures went from -19.5, -20.4 and
 -19.5 to -13.2, -9.4 and -13.5 dBFS).
 
@@ -191,6 +193,12 @@ store and to drop members it scored lowest where a design had others.
   (4.4 dB against 2.2: two crickets in one band lose their beating). The joints of a stitched bed differ by 0.9-1.5
   times the texture's own variation (the pebble and rock shores about 1.5). The sea beds are 26-30 s with five waves
   each, the fire 24 s. A bed renders in 1.0-1.7 s of CPU per second of sound.
+- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, 1.47 MB): 130 strokes from VCSL and Karoryfer
+  (Big Rusty Drums), stored softest first with their velocity within their instrument; the seed walks through a
+  design's strokes and `energy` picks softer or harder ones. Nobody has rated them yet.
+- **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit
+  public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/` and
+  `drums/`.
 
 Film sounds built from real material are not part of this section yet: they were being built when it was written.
 

@@ -66,9 +66,10 @@ needs models takes ~20-60 s; later calls are fast (models stay loaded)."""
 INSTRUCTIONS += """
 Sounds for a film (no models, fast): sfx_list (the shipped bank) -> sfx_render (one take aimed at a cue: dur, apex,
 pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take).
-To get a sound, ask for it: make (a request in words -> one finished file; interface, game, motion, instrument and
-ambience sounds, all made in code), make_set (a whole product's sounds as one family, one call), sounds (the
-catalogue). No models are loaded for these."""
+To get a sound, ask for it: make (a request in words -> one finished file; interface, game, everyday, motion, drum,
+instrument and ambience sounds, each computed at request time: the realistic ones from models learned from
+public-domain recordings, shipped as numbers, the rest invented in code), make_set (a whole product's sounds as one
+family, one call), sounds (the catalogue). No models are loaded for these."""
 
 IMG_INLINE_MAX = 1600        # px, long edge of the inline copy (sent as JPEG q88: ~1/3 of the PNG bytes)
 JSON_MAX = 7000
@@ -97,6 +98,7 @@ def _field_types():
                                                'keyboard key press" (describe the sound itself, not its use)')],
         Video=Annotated[str | None, Field(description='optional path to the film (mp4/mov) for picture cuts and '
                                                       'frames')],
+        SetName=Annotated[str | None, Field(description=set_help())],
         Cues=Annotated[list[float] | str | None, Field(description='optional picture event times: a list of seconds, '
                                                                    '"1.2,3.4", or an absolute path to a cues JSON '
                                                                    'file ({fps, events: [{f or t, kind}]})')])
@@ -655,12 +657,15 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                         "first time, then it stays warm)")] = False,
               full: Full = False) -> str:
     """Make a sound in code from a request in words and write it to a file (no models, about a second; nothing is
-    downloaded and no recorded audio is used). Covers interface sounds (taps, toggles, success, error,
-    notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit), motion-design effects (whooshes,
-    impacts, risers, braams, logos), instrument notes, pads and ambience loops. The answer names the design chosen
-    and why, what else would fit (`also`), and any words that were not understood, so one call is usually enough;
-    call again with `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to
-    steer. Use it whenever a product, a game or a film needs a sound and no recording is at hand; use make_set
+    downloaded). Every sound is computed at request time: the realistic ones (everyday things, footsteps, doors,
+    keys and switches, ambiences, drums) are rendered from models learned from public-domain recordings, shipped
+    as numbers, no audio file; figures, chip sound and the music loops are invented in code. Covers interface sounds
+    (taps, toggles, success, error, notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit),
+    everyday foley, motion-design effects (whooshes, impacts, risers, braams, logos), drums, instrument notes and
+    ambience loops. A learned design's seeds walk through its recordings, so `n` gives different real takes. The
+    answer names the design chosen and why, what else would fit (`also`), and any words that were not understood,
+    so one call is usually enough; call again with `sound`, `theme`, `pitch`, `dur` or adjectives ("softer",
+    "bigger", "longer", "drier") to steer. Use it whenever a product, a game or a film needs a sound and no recording is at hand; use make_set
     when it needs several that belong together. Everything made is free to use in any product."""
     from . import make as M
     return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
@@ -668,11 +673,18 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                 _summary_only(M.make))
 
 
+def set_help():
+    """the description of make_set's `set`, with each set's size counted from earshot.sounds.sets"""
+    from .sounds import sets
+    n = {k: len(v['sounds']) for k, v in sets.SETS.items()}
+    return (f'a ready-made set: "ui" ({n["ui"]} interface sounds: real keys and switches for the touches, soft '
+            f'tonal figures for the signals), "game" ({n["game"]}: menus, rewards, jingles, actions), "arcade" '
+            f'({n["arcade"]} chip sounds), "film" ({n["film"]}: a motion-design starter)')
+
+
 def tool_make_set(out: Annotated[str, Field(description='absolute path of the folder for the files and '
                                                         'manifest.json')],
-                  set: Annotated[str | None, Field(description='a ready-made set: "ui" (16 interface sounds), '
-                                                               '"game" (menus, rewards, jingles, actions), "arcade" '
-                                                               '(chip sound), "film" (motion-design starter)')] = None,
+                  set: SetName = None,
                   sounds: Annotated[list[dict] | None, Field(description='your own sounds, or changes to the set: '
                                                                          '[{"name": "tap", "want": "a soft tap"}, '
                                                                          '{"name": "success", "sound": '

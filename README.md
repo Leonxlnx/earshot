@@ -48,7 +48,7 @@ sound is, then its character.
 | interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (the interface ones by a soft pluck) | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 31 | 13 learned from real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
 | chip | 24 | the channels of 8-bit consoles, band-limited | `coin/chip`, `jump/chip`, `laser/chip`, `explosion/chip` |
-| drums | 38 | modes, contacts and rattles from physics | `kick/soft`, `snare/tight`, `hat/closed`, `conga/slap`, `drum/roll` |
+| drums | 40 | 33 played from 130 recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented (drum-machine voices, a brush snare, a finger snap, stick counts) | `kick/soft`, `snare/tight`, `hat/closed`, `conga/muted`, `darbuka/hit`, `drum/roll`; `kick/electro` |
 | film and motion | in progress | being rebuilt from real material | whooshes, hits, risers, drops, pops, stingers |
 | action and objects | 83 | invented from physics | `jump/soft`, `hit/punch`, `coin/drop`, `paper/tear`, `bell/desk` |
 | notes, synthesizer | 51, 14 | struck and string models, synth patches | `note/kalimba`, `pad/warm`, `braam/hit` |
@@ -84,15 +84,16 @@ one request in three or four of the held-out kind needs a second call, which is 
 
 ### Learned sounds: what they are
 
-The 131 learned designs and 13 ambience beds are not invented. Each comes from recordings whose authors put them in
-the public domain (CC0): BigSoundBank, Kenney, the Versilian Community Sample Library (VCSL) and Freesound uploads
-marked CC0. earshot keeps each recording as numbers, not audio: the level of 56 bands on a 2 ms grid (0.25 ms around
-an onset), how tonal each band is and at which frequency, and the stereo image (`earshot/synth/resyn.py`). The store
-is 5.29 MB for 282 recorded events (`earshot/data/resyn/`; a few are several events cut from one recording) and
-4.09 MB for 12 textures (`earshot/data/textures/`), with a credits file in each. A render draws fresh noise and
-applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural one, energy,
-room, width), so every take is new. But it is a new take of that recording: a compact description of a real sound
-rendered again, not a sound made from nothing.
+The 131 learned designs, 13 ambience beds and the recorded drums are not invented. Each comes from recordings in
+the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an
+explicit public-domain dedication. earshot keeps each recording as numbers, not audio: the level of 56 bands on a
+2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
+(`earshot/synth/resyn.py`). The store is 5.29 MB for 282 recorded events (`earshot/data/resyn/`; a few are several
+events cut from one recording), 4.09 MB for 12 textures (`earshot/data/textures/`) and 1.47 MB for 130 drum strokes
+(`earshot/data/drums/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
+noise and applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural
+one, energy, room, width), so every take is new. But it is a new take of that recording: a compact description of a
+real sound rendered again, not a sound made from nothing.
 
 A design is one thing and its recordings are its variations: seeds 0, 1, 2 walk through them, so three seeds of
 `step/pebbles` are three real footsteps; seeds past the last recording are new takes of the same ones. A request for
@@ -175,8 +176,10 @@ Instrument Samples; VSCO-2 Community Edition, CC0); no recording is in the repos
 **Synthesizer** (`voice.py`, `patches.py`): band-limited oscillators, unison with drift, a ladder filter, FM
 operators, chorus, echo; 28 patches, among them the soft pluck that plays the interface figures.
 
-**Drums** (`earshot/synth/drums.py`): a beater's contact, a head's or a cymbal's modes, snare wires and jingles as
-collisions, a close stereo pair in a room.
+**Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are takes of
+130 recorded strokes (VCSL and Karoryfer) through the learned-sound engine; the seed walks through a drum's strokes
+and `energy` picks softer or harder ones. The drum-machine voices, the brush snare, the finger snap and the stick
+count are invented (`earshot/synth/drums.py`: a beater's contact, modes, wires and jingles as collisions).
 
 **Chip** (`chip.py`): pulse, triangle, noise and wavetable channels with every level step band-limited.
 
@@ -553,8 +556,8 @@ judge is in [docs/LIMITS.md](docs/LIMITS.md).
   error: 3-4; level up and coin 4), rain on a window (5), the forest without its dove (5), and takes of learned
   recordings, which he rated exactly as he rated the recordings themselves (24 of 24). What failed: sounds invented from formulas for real
   things (1-2: jumps, landings, punches, explosions, doors, taps and toggles), most music beds (1-2), most drums
-  (1-2), bells and glass timbres for interface sounds (1), and new sounds sampled from a class model of several
-  recordings (1-2). earshot's two listening models did not predict his ratings; their scores are not quoted as
+  invented from physics (1-2; the drums now played from recorded strokes are not rated yet), bells and glass
+  timbres for interface sounds (1), and new sounds sampled from a class model of several recordings (1-2). earshot's two listening models did not predict his ratings; their scores are not quoted as
   quality any more.
 - **Understanding requests**: on 220 held-out requests by someone who never saw the catalogue, scored once on the
   v1 catalogue, the first pick is right for 69.5 % and one of the top three for 76.8 %; on the development sets
@@ -609,6 +612,7 @@ earshot/            the package: CLI, Python API, MCP server, CPU model wrappers
                     patches, drums, chip, texture, music; the shared rooms, phrases, voices, finishing, file formats
   data/resyn/       the learned sounds: one model per recording (numbers), index.json, CREDITS.md
   data/textures/    the learned ambience textures: models, index.json, CREDITS.md
+  data/drums/       the recorded drum and percussion strokes: models, index.json, CREDITS.md
   forge/            make sounds in code by listening: DSP building blocks, critic, model-free tone checks, search
     fit/            recording -> code: modal / sines / spectral fitters, quality metrics, recipe codegen
     bank/, kits/    the sound bank (render blocks + fingerprints, no audio) and the kit presets: earshot sfx / kit
@@ -631,11 +635,12 @@ calibrate the instruments are not redistributed; only derived numbers are commit
 ## Licence
 
 MIT for the code (see [LICENSE](LICENSE)). Everything earshot renders (`make`, `sfx`, `kit`, `forge`) belongs to
-whoever rendered it: free for any use, commercial too, without credit. The learned sounds and beds come from
-recordings in the public domain (CC0): BigSoundBank, Kenney, the Versilian Community Sample Library (VCSL) and
-Freesound uploads marked CC0, each recording credited in
-[earshot/data/resyn/CREDITS.md](earshot/data/resyn/CREDITS.md) and
-[earshot/data/textures/CREDITS.md](earshot/data/textures/CREDITS.md); CC0 asks for no credit, and the files keep it
+whoever rendered it: free for any use, commercial too, without credit. The learned sounds, beds and drums come from
+recordings in the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all
+CC0 or an explicit public-domain dedication, each recording credited in
+[earshot/data/resyn/CREDITS.md](earshot/data/resyn/CREDITS.md),
+[earshot/data/textures/CREDITS.md](earshot/data/textures/CREDITS.md) and
+[earshot/data/drums/CREDITS.md](earshot/data/drums/CREDITS.md); CC0 asks for no credit, and the files keep it
 anyway. The bank's fitted sounds come from CC0 recordings ([docs/CREDITS_FIT.md](docs/CREDITS_FIT.md)); a fit you
 make of your own recording carries that recording's licence. The models are downloaded from their authors under
 their own licences: CLAP (`laion/larger_clap_general`) Apache-2.0, AST (`MIT/ast-finetuned-audioset-10-10-0.4593`)

@@ -325,7 +325,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     A sprite holds every sound, loops included, in each of its formats: one map serves them all, and a loop inside
     a sprite repeats a region of the decoded audio, away from the file's padded ends. The result also carries
     `also` and `not_in_sound` by the name of each sound asked for in words; the summary shows them only where the
-    pick is in doubt, and says when two names got the same design."""
+    pick is in doubt, and says when two names got the same sound; two names that play different recordings of one
+    learned design (toggle_on and toggle_off of `ui`) get a plain note saying which recording each plays."""
     from .sounds import registry
     from .synth import master
     from .sounds import sets
@@ -351,7 +352,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     fmts = _formats(fmt or spec.get('format') or 'wav')
     mono = spec.get('mono', False) if mono is None else mono
     top = lufs if lufs is not None else spec.get('lufs', -16.0)
-    rows, lines, ys, alts, missed, first = [], [], [], {}, {}, {}
+    rows, lines, ys, alts, missed, first, played = [], [], [], {}, {}, {}, {}
     for it in items:
         b, cands = choose(it.get('want'), it.get('sound'), pitch=it.get('pitch'), dur=it.get('dur'),
                           voice=it.get('voice'), material=it.get('material'), axes=it.get('axes'))
@@ -360,6 +361,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
         d = registry.get(cands[0]['id'])
         level = it.get('lufs', top + WEIGHT.get(d.kind, -4.0))
         k = int(it.get('n') or b['n'] or 1)
+        mine = {}                         # the recordings this name played: {n: meta['member']}
         for p in _paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0]):
             y, meta = take(d.id, int(it.get('seed', seed)) + len(rows), _request(b, theme), lufs=level)
             stem = os.path.splitext(p)[0]
@@ -368,6 +370,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
             files = [master.write(f'{stem}.{f}', y, mono=mono and not d.loop, bits=16 if f == 'wav' else 24)
                      for f in own]
             ys.append(y)
+            if meta.get('member'):
+                mine[meta['member']['n']] = meta['member']
             rows.append({'name': os.path.basename(stem), 'file': os.path.basename(files[0]),
                          'files': [os.path.basename(f) for f in files], 'sound': d.id, 'dur_s': meta['dur_s'],
                          'lufs_max': meta['lufs_max'], 'loop': loop,
@@ -379,13 +383,20 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
                              'which leaves a gap at the seam')
         reason = None if it.get('sound') else doubt(b, cands)
         alts[it['name']] = alternatives(b, cands, d.id, others_first=reason is not None)
-        if d.id in first:                 # two names, one design: the second says so and names another
+        if d.id in first and mine and not set(mine) & played[d.id]:
+            # two names, one design of several recordings, each name its own recording (toggle_on / toggle_off): an
+            # intended pair, said as a fact
+            lines.append(f'  another recording of {d.id} than {first[d.id]}: '
+                         + ', '.join(f"{m['n']} of {m['of']}" + (f" ({m['recording']})" if m.get('recording') else '')
+                                     for m in mine.values()))
+        elif d.id in first:               # two names, one sound: the second says so and names another
             chip = brief.chip(d.row())
             free = [a for a in alts[it['name']] + alternatives(b, cands[:1], d.id, k=6) if a not in first]
             other = next((a for a in free if brief.chip(registry.get(a).row()) == chip), None)
             lines.append(f'  same design as {first[d.id]}: ask for a different one with "sound"'
                          + (f' (the nearest: {other})' if other else ''))
         first.setdefault(d.id, it['name'])
+        played.setdefault(d.id, set()).update(mine)
         if it.get('sound'):
             del alts[it['name']]
             continue

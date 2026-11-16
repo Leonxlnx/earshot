@@ -314,6 +314,17 @@ def test_a_set_says_when_two_names_get_one_design(tmp_path):
     assert sum('same design' in ln for ln in lines) == 2
 
 
+def test_a_set_names_two_recordings_of_one_design_without_a_warning(tmp_path):
+    """make --set ui printed "same design as toggle_on" under toggle_off, an intended pair of two recordings"""
+    spec = {'sounds': [{'name': 'on', 'sound': 'switch/lamp'}, {'name': 'off', 'sound': 'switch/lamp'}]}
+    res = make_set(spec, out=str(tmp_path / 's'))
+    lines = res['summary'].splitlines()
+    k = next(i for i, ln in enumerate(lines) if ln.startswith('off.wav'))
+    assert lines[k + 1].startswith('  another recording of switch/lamp than on: ')
+    assert [r['sound'] for r in res['sounds']] == ['switch/lamp', 'switch/lamp']
+    assert 'same design' not in res['summary']
+
+
 def _chip(sid):
     from earshot import brief
     return brief.chip(registry.get(sid).row())

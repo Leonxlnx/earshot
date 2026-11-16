@@ -41,8 +41,9 @@ COMMANDS = {
 
 
 def _parser():
-    ap = argparse.ArgumentParser(prog='earshot', description='Ears for coding agents: describe, match, search, compare, '
-                                 'time-align and critique sound files you cannot hear.')
+    ap = argparse.ArgumentParser(prog='earshot', description='Ears for coding agents: make sounds from a request in '
+                                 'words, and describe, match, search, compare, time-align and critique sound files '
+                                 'you cannot hear.')
     ap.add_argument('--threads', type=int, help='CPU threads for torch and BLAS (default: EARSHOT_THREADS or '
                                                 'min(4, cores/2))')
     return ap
