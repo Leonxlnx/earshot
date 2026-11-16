@@ -239,3 +239,35 @@ def test_finish_is_louder_and_limited():
     assert master.true_peak_db(z) <= -0.9
     assert np.isfinite(z).all() and np.abs(z[0]).max() < 1e-3 and np.abs(z[-1]).max() < 1e-3
     assert np.array_equal(_take('noise', full=True), resyn.finish(_take('noise')))
+
+
+def _long():
+    """a struck thing that rings for two seconds: two decaying partials over decaying band noise"""
+    n = 2 * SR
+    t = np.arange(n) / SR
+    x = np.exp(-t / 0.5) * (np.sin(2 * np.pi * 110.0 * t) + 0.4 * np.sin(2 * np.pi * 263.0 * t))
+    x += dsp.butter(dsp.rng(5).standard_normal(n), 'band', (200, 5000)) * np.exp(-t / 0.3)
+    x[:4] += 0.6
+    return 0.3 * x
+
+
+def test_late_frames_cost_little():
+    x = _long()
+    fine, late = resyn.analyze(x, SR), resyn.analyze(x, SR, late=4)
+    assert resyn.size(late) < 0.75 * resyn.size(fine), (resyn.size(late), resyn.size(fine))
+    a = resyn.fidelity(x, resyn.render(fine, dsp.rng(1)))
+    b = resyn.fidelity(x, resyn.render(late, dsp.rng(1)))
+    assert b['env_db'] < a['env_db'] + 0.8 and b['shape_db'] < a['shape_db'] + 0.4, (a, b)
+    assert abs(b['rise_ms'][1] - a['rise_ms'][1]) < 0.5                  # the onset keeps its full resolution
+    y = resyn.render(late, dsp.rng(1))
+    tail = slice(int(1.2 * SR), int(1.5 * SR))
+    assert abs(10 * np.log10(np.mean(y[tail] ** 2) / np.mean(x[tail] ** 2))) < 1.5   # the tail is where it was
+    assert np.array_equal(resyn.analyze(x, SR, late=1)['q'], fine['q'])            # late=1 is the model as before
+
+
+def test_models_of_the_store_still_load():
+    import os
+    store = os.path.join(os.path.dirname(resyn.__file__), '..', 'data', 'resyn')
+    m = resyn.load(os.path.join(store, 'whoosh-stick-1.npz'))
+    y = resyn.render(m, dsp.rng(1))
+    assert np.isfinite(y).all() and y.shape[1] == 2 and 0 < np.abs(y).max() < 1.0

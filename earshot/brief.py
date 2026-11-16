@@ -1142,8 +1142,13 @@ def _preferred(b, sid, out, idx):
     with a prior at least as high that scores at least MEMBER_SHARE of sid's on the request's own words, or None: "a
     cork pop" names the invented cork/pop word for word, but the family's learned member is the same thing (its
     descriptions say every word of the name: "a cork ... with a hollow pop") and preferred. A member named by its
-    character ("a deep impact": boom/deep) is what was asked for and stays"""
-    if not idx or any(modifier(w) for w in sid.split('/')[1].split('_')):
+    character ("a deep impact": boom/deep) is what was asked for and stays, unless its name and family together are the
+    name of a thing ("light switch": a switch for the light, not a light one; lexicon.CONCEPTS)"""
+    if not idx:
+        return None
+    fam_, name_ = sid.split('/')
+    if (any(modifier(w) for w in name_.split('_'))
+            and _key(name_.split('_') + fam_.split('_')) not in _reverse()['c']):
         return None
     rows, terms = idx[0], idx[1]
     if _cache.get('pos_key') != id(idx):

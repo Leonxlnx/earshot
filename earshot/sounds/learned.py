@@ -64,6 +64,12 @@ LENGTH = (0.6, 1.8)
 # half its EQ; a click has nothing under 150 Hz, where a boost only adds the filter's own ring. On air (whooshes,
 # swells) it moved one centroid up by two octaves, and the owner heard an airy whoosh get worse: never there.
 FINISH = dict(lufs=-40.0, weight=1.5, presence=1.5, air=1.5, drive=3.0)
+# what follows the strike of a short dry member raised against its loudest 5 ms (body()): gain (level / loudest)
+# ** -BODY_EXP, at most BODY_DB. The registry's lift raises a click until its loudest 5 ms sit 3.5 dB under the peak,
+# and no further can it go without clipping the strike: a click's energy lies in its first 10-20 ms, so its loudest
+# 50 ms stay 7-9 dB under its loudest 5 ms where an interface figure's stay 2 dB under. Measured on the six interface
+# members (three seeds): loudest 50 ms +0.5 to +0.9 dB, the loudest 5 ms within 0.2 dB, centroid -1 to -5 %
+BODY_EXP, BODY_DB = 0.5, 6.0
 CREST, CUT = 14.0, 8.0       # dB: present() (a sound of 0.5 s and more, peaks over its loudest 50 ms)
 DEFAULT_OFF = 0.6           # prior factor of a design the index marks as not a default (`default`: false)
 
@@ -132,10 +138,19 @@ def take(e, c, r):
     y = resyn.render(model(m['file']), r, length=length, pitch=pitch, size=size, bright=bright, hard=hard, ring=ring,
                      vary=VARY * c.vary)
     if dry(e, m):
-        y = resyn.finish(y, **FINISH)
+        y = body(resyn.finish(y, **FINISH))
     y = present(y)
     y = image(y * 10 ** (6.0 * energy / 20), c.lerp('width', 0.0, 2.0, 1.0) if 'width' in ax else 1.0, m)
     return space.room(y, c.room('room'), amount=c.space if 'space' in ax else 0.0, r=r)
+
+
+def body(y):
+    """a short dry take with what follows its strike raised (BODY_EXP, BODY_DB): an upward compressor keyed by the
+    level of every 5 ms against the loudest 5 ms, so the strike itself keeps its level and its brightness"""
+    k = dsp.n_of(0.005)
+    e = np.sqrt(np.convolve(np.mean(y ** 2, axis=1), np.ones(k) / k, 'same'))
+    e = fx._follow(np.ascontiguousarray(e), fx._coef(0.5), fx._coef(20.0))
+    return y * np.clip((e / (e.max() + 1e-12) + 1e-9) ** -BODY_EXP, 1.0, 10 ** (BODY_DB / 20))[:, None]
 
 
 def present(y):

@@ -1,11 +1,17 @@
 """Motion-design sounds: what a product film, a title sequence or an interface animation is cut with. Air and
-movement (whooshes, swooshes, flicks, a sliding panel), hits (booms, a title slam, soft thumps and knocks), builds and
-falls (risers, a reversed swell, a sub drop, a suck-in), small arrivals (pops, tocks, a blip), light (a glint, a
-shimmer sweep, a sparkle), a glitch, key ticks and three short stingers.
+movement (whooshes, swooshes, flicks, a fly-by, a sliding panel), hits (booms, a title slam, an impact with a
+suck-in, soft thumps and knocks), builds and falls (risers, a reversed swell, a drum roll, a sub drop, a suck-in), a
+braam, an explosion, small arrivals (pops, tocks, a blip), light (a glint, a shimmer sweep, a sparkle), a glitch, key
+ticks and two stingers.
 
-They are shaped after class statistics of licensed film effects (the film study in docs/motion-sfx-study.md and
-docs/launch-video-sound.md, and a library of effects filed by film action that the lab measured). Medians over a
-class, never one recording:
+The film sounds (air, hits, builds, falls, the braam, the explosion, the reveal) are built from real recordings in
+the public domain, as a sound designer builds them: learned things of earshot.sounds.learned (orchestral bass drums,
+timpani, tam-tams, crash cymbals, heavy drops, door slams, swells of air and metal, drum rolls, low brass, whooshes)
+reshaped with earshot.synth.design (reverse, layer, move, fade) and glued by one room ("real material" below). The
+owner heard the invented booms, slams and risers as unrealistic (1-2 of 5) and could not tell a recording from its
+take. The rest is invented, shaped after class statistics of licensed film effects (the film study in
+docs/motion-sfx-study.md and docs/launch-video-sound.md, and a library of effects filed by film action that the lab
+measured). Medians over a class, never one recording:
     air     a film whoosh is a rounded swell, not a pointed one: it stays within 20 dB of its peak for about two
             thirds of its length (0.3-0.6 s for a small move, 1.3 s for a scene pass), peaks at 40-60 % of it, and
             its energy sits low (centroid 0.2-1.8 kHz; a scene pass under 150 Hz) with the air far under the body;
@@ -14,21 +20,19 @@ class, never one recording:
             in 0.2-0.7 s; a landing in a product film is 0.25 s long and dull (centroid about 500 Hz)
     builds  grow almost linearly in amplitude over 90 % of their length, then fall 20 dB within about 100 ms
     small   0.1-0.25 s long, a 10-20 ms rise, 20 dB down in 25-60 ms, mono, little between 2 and 5 kHz
-The trailer register (boom/deep, boom/wide, rise/tension) is the rarer, larger one.
-
-How they are built: air is stereo band noise whose bands follow one moving spectral hump and gust together
-(texture.band_noise, texture.envelopes); the hump climbs with the speed of the move and sinks behind it, so nothing
-sweeps a tone, and a pitched pass gets its fall from a real propagation delay (fx.doppler). Struck parts are modes
-behind a contact pulse (modal.ring), sparkle, grit and debris are event clouds (texture.arrivals, rings, bursts),
-tonal parts are unison voices and struck instruments (voice, voices), and everything sits in one shared room.
+The invented ones are built so: a sliding panel's air is stereo band noise whose bands follow one moving spectral
+hump and gust together (texture.band_noise, texture.envelopes); struck parts are modes behind a contact pulse
+(modal.ring), sparkle and grit are event clouds (texture.arrivals, rings, bursts), tonal parts are unison voices and
+struck instruments (voice, voices), and everything sits in one shared room.
 
     from earshot.sounds import registry, motion      # motion registers its designs on import
-    y, meta = registry.render('whoosh/fast', seed=2, energy=0.4)
-    y, meta = registry.render('rise/air', dur=3.0)   # a sustained gesture keeps `dur`; its peak stays at its share
+    y, meta = registry.render('whoosh/fast', seed=2, energy=0.4)     # meta['member']: the main recording played
+    y, meta = registry.render('rise/reverse', dur=3.0)               # a build keeps `dur`; it ends on its peak
 
-Axes: energy = a faster, harder, brighter gesture; size = bigger (lower, and longer when no dur is asked); bright =
-more top; hard = a faster onset; ring = a longer tail; space, width; motion = more travel across the stereo field
-or more movement inside (the designs that list it). Texture, voice and voices are imported where they are used.
+Axes: energy = a faster, harder, brighter gesture (and more of the lower layers); size = bigger (lower and longer:
+the takes 0.8 .. 1.25 times the design's own size); bright = more top (a tilt); hard = a harder strike; ring = a
+longer ring; space, width; motion = more travel across the stereo field (the designs that list it). Texture, voice
+and voices are imported where they are used.
 """
 from types import SimpleNamespace
 
@@ -36,6 +40,7 @@ import numpy as np
 from scipy import fft as sfft
 
 from ..forge import dsp, fx
+from ..synth import design as ops
 from ..synth import modal, space
 from .registry import design
 
@@ -47,7 +52,6 @@ MOVE = BASE + ('motion',)
 DOM = ('motion', 'ui', 'game')
 FILM = ('motion', 'game')
 PENTA = (0, 2, 4, 7, 9)
-MEMBRANE = np.array([1.0, 1.59, 2.14, 2.30, 2.65, 2.92, 3.16, 3.50])     # modes of an ideal drum skin (Bessel zeros)
 PLATE = np.array([1.0, 1.73, 2.33, 3.91, 4.11, 6.30])                    # a free disc: (2,0), (0,1), (3,0) ...
 
 
@@ -196,15 +200,6 @@ def _dull(r, seconds, f, tau, attack=0.002, q=1.1):
     n = dsp.n_of(seconds)
     x = dsp.svf(r.standard_normal(n), f, q, 'bandn') * _env(n, attack, _vary(r, tau, 0.15))
     return dsp.fade(_norm(dsp.butter(x, 'low', 3 * f, order=2)), 0.0, min(0.03, 0.3 * seconds))
-
-
-def _rumble(r, seconds, lo, hi, attack, tau):
-    """a rolling low rumble: band-limited brown noise whose level wanders slowly (a big space settling). Peak 1"""
-    n = dsp.n_of(seconds)
-    x = dsp.butter(_noise(r, n, 'brown'), 'band', (lo, hi))
-    knots = max(4, int(4 * seconds))                           # its level moves a few dB about four times a second
-    x *= np.exp(0.4 * np.interp(np.arange(n), np.linspace(0, n, knots), r.standard_normal(knots)))
-    return dsp.fade(_norm(x * _env(n, attack, tau)), 0.0, 0.3 * seconds)
 
 
 def _cloud(r, lo, hi, count, t60_lo, t60_hi, tilt=-3.0):
@@ -372,163 +367,200 @@ def _grit(r, a, f, rate, length=0.0015, spread=0.5, cluster=0.0, sharp=0.6):
     return _bed(out)
 
 
-@design('whoosh/soft', kind='whoosh',
-        says=('a soft short whoosh', 'a gentle low swish of air passing by', 'a quiet puff of air moving past'),
-        uses=('whoosh', 'transition', 'element move', 'swipe', 'slide in'), domains=DOM, dur=0.52, axes=MOVE,
-        prior=1.05)
-def whoosh_soft(c, r):
-    """a small element crossing the frame: a rounded swell of dark air (the hump at 620 Hz at its peak, 1.3 octaves
-    lower at the start, 1.9 at the end, the rise a little longer than the fall) with a soft body in its centre,
-    over the low weight of the air it moves, which arrives 12 ms late"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.52), 0.56, (2.0, 1.8))
-    air = _wind(c, r, k, a, pk, 620.0, 1.3, 1.9, _across(r, len(a), pk, 0.2 * (1 + c.motion)), lo_db=6.0, hi_db=9.0,
-                gust=0.2, body=0.0)
-    low = _weight(r, a, 190.0 * k.f, 0.012)
-    return _out(c, r, _mix([(air, 0, 0), (low, 0, -6 + k.lo)]), room='room')
+# ------------------------------------------------------------------------------------------------ real material
+# The film designs below are built the way a sound designer builds them: from recordings (the learned things of
+# earshot.sounds.learned: orchestral bass drums, timpani, gongs, cymbals, heavy drops, door slams, swells of air and
+# metal, drum rolls, low brass, real whooshes and passes), reshaped by earshot.synth.design (reverse, layer, move,
+# fade) within the range where a take stays natural, and glued by one room. No oscillator and no synthetic sweep.
+# The seed is a performance: it picks the members (another drum, another cymbal) and every take draws fresh noise.
+REAL = ('energy', 'size', 'bright', 'hard', 'ring', 'space', 'width')
+REAL_AIR = ('energy', 'size', 'bright', 'hard', 'space', 'width')
+REAL_MOVE = REAL_AIR + ('motion',)
+# the pitch detector reads the noise of a real whoosh or swell as gliding up (a swing speeds up, a swell opens):
+# that is the recording, not a synthesized whip
+GLIDE = ('rising_glide',)
+
+
+def _learned():
+    from . import learned            # lazy: the store's index is read on the first film take
+    return learned
+
+
+def _real(c, r, sid, k=0, main=False, **tr):
+    """a take (stereo) of the learned thing sid (earshot.sounds.learned) through design.take: the member the seed
+    picks, or the one k further along its fixed order (a second layer of the same thing is another recording). main:
+    the take that says which recording was played (meta['member'])"""
+    L = _learned()
+    e = L.index()[sid]
+    i = L.pick(sid, c.seed + k)
+    m = e['members'][i]
+    y = ops.take(L.model(m['file']), r, **tr)
+    if m.get('polarity', 1) < 0:
+        y[:, 1] = -y[:, 1]
+    if main:
+        c.member = {'n': i + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
+                    'author': m['credit']['author']}
+    return y
+
+
+def _natural(sid, c, k=0):
+    """the natural length in s of the member the seed picks"""
+    L = _learned()
+    e = L.index()[sid]
+    return float(e['members'][L.pick(sid, c.seed + k)]['dur_s'])
+
+
+def _tr(c, size=1.0, ring=None, bright=0.0, hard=0.0):
+    """the shared axes as the transforms of a take (design.take), around a design's own size, ring, tilt (dB per
+    octave) and hardness: size 0.8 .. 1.25 times, ring 0.6 .. 1.7 times (when the design rings), bright 2 dB per
+    octave and energy 0.6 more, hard and 0.4 of energy on the strike; a little take-to-take variation (vary)"""
+    e = c.energy
+    out = dict(size=size * c.lerp('size', 0.8, 1.25, 1.0, log=True), bright=2.0 * c.bright + 0.6 * e + bright,
+               hard=float(np.clip(c.hard + 0.4 * e + hard, -1.0, 1.0)), vary=0.5 * c.vary)
+    if ring is not None:
+        out['ring'] = ring * c.lerp('ring', 0.6, 1.7, 1.0, log=True)
+    return out
+
+
+def _fit(c, natural, share=1.0, size=1.0):
+    """the length factor of a take whose natural length is `natural` s: `share` of the length asked for (dur), else
+    of the design's own (so the takes of one design, each another recording, come out about as long), within
+    design.LENGTH (size already stretches it)"""
+    return float(np.clip(share * c.seconds() / (natural * size), *ops.LENGTH))
+
+
+def _place(c, r, y, room='room', crest=None):
+    """a mix to the finished take: its stereo width (width: mid / side, 0 .. 2 times) in the shared room; crest: the
+    takes of a short design matched in loudness as a designer matches a set of variations (_even: the peaks of a
+    take that stand more than `crest` dB over its loudness rounded off), since each seed is another recording"""
+    y = space.room(fx.width(y, c.lerp('width', 0.0, 2.0, 1.0)), c.room(room), amount=c.space, r=r)
+    y = y * 10 ** (4.0 * c.energy / 20)                   # energy is also level (+-4 dB), where a take is not levelled
+    return y if crest is None else _even(y, crest)
+
+
+def _whoosh(c, r, sid, share=1.0, size=1.0, bright=0.0, hard=0.0, main=True, k=0, low=None):
+    """a take of a real whoosh (a learned thing) at a design's size, tilt and length (`share` of the design's); low:
+    the rumble under `low` Hz taken out (a small move has no weight: the wind on a field microphone is not the move)"""
+    tr = _tr(c, size=size, bright=bright, hard=hard)
+    y = _real(c, r, sid, k=k, main=main, length=_fit(c, _natural(sid, c, k), share, tr['size']), **tr)
+    return dsp.butter(y, 'high', low, order=2) if low else y
 
 
 @design('whoosh/fast', kind='whoosh',
-        says=('a fast crisp whoosh', 'a quick sharp swish of air rushing past', 'a short fast swoosh'),
-        uses=('whoosh', 'whip pan', 'fast transition', 'cut', 'fly in', 'title'), domains=DOM, dur=0.4, axes=MOVE,
-        prior=1.03)
+        says=('a fast crisp whoosh of a stick cutting the air', 'a quick sharp swish rushing past',
+              'a short fast swoosh'),
+        uses=('whoosh', 'whip pan', 'fast transition', 'cut', 'fly in', 'title'), tags=('real',), domains=DOM,
+        dur=0.45, axes=REAL_AIR, prior=1.03, allows=GLIDE)
 def whoosh_fast(c, r):
-    """a fast element or a whip pan: a shorter, more pointed pass with the hump at 1.2 kHz and a body in it, quick
-    gusts, a crisp top of fine grains around 6.5 kHz that ride the peak (above the band where a whoosh turns
-    harsh), and a little weight"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.4), 0.55, (1.7, 1.5))
-    air = _wind(c, r, k, a, pk, 1200.0, 1.6, 2.3, _across(r, len(a), pk, 0.3 * (1 + c.motion)), lo_db=6.0, hi_db=8.0,
-                gust=0.25, rate=(6.0, 60.0), body=1.0)
-    crisp = _grit(r, a, 6500.0 * k.f ** 0.5, 900.0)
-    low = _weight(r, a, 170.0 * k.f, 0.008)
-    return _out(c, r, _mix([(air, 0, 0), (crisp, 0, -14 + k.h), (low, 0, -9 + k.lo)]), room='room')
+    """a fast move: a real stick swung through the air (whoosh/stick: the owner rated one of these 5) and, lined up
+    at its loudest moment 7 dB under it (4 more with energy), a real swish (swish/fast) for the density of a
+    designed whoosh"""
+    a = _whoosh(c, r, 'whoosh/stick', 1.0)
+    b = _whoosh(c, r, 'swish/fast', 1.0, main=False)
+    y, _ = ops.layer([(a, 0.0, 0.0, ops.peak(a, 20.0)), (b, -7.0 + 4.0 * c.energy, 0.0, ops.peak(b, 20.0))])
+    return _place(c, r, y, crest=12.0)
+
+
+@design('whoosh/soft', kind='whoosh',
+        says=('a soft short whoosh', 'a gentle swish of air passing by', 'a quiet breath of air moving past'),
+        uses=('whoosh', 'transition', 'element move', 'swipe', 'slide in'), tags=('real',), domains=DOM, dur=0.6,
+        axes=REAL_AIR, prior=1.05, allows=GLIDE)
+def whoosh_soft(c, r):
+    """a small element crossing the frame: a real airy whoosh (whoosh/airy) taken a little smaller, darker by
+    1.5 dB per octave, with a softer onset and nothing under 120 Hz, trimmed around its loudest moment to the
+    length (a long designed whoosh among the members is cut to a small move, faded at both ends)"""
+    y = _whoosh(c, r, 'whoosh/airy', 1.0, size=0.9, bright=-1.5, hard=-0.4, low=120.0)
+    T, p = c.seconds(), ops.peak(y)
+    y = ops.span(y, max(0.0, p - 0.45 * T), p + 0.55 * T, fin=0.2 * T, fout=0.3 * T)
+    return _place(c, r, y, crest=12.0)
 
 
 @design('whoosh/deep', kind='whoosh',
-        says=('a deep low whoosh, a large heavy swell of air', 'a big dark rumbling whoosh passing',
-              'a slow low rush of air'),
-        uses=('whoosh', 'big transition', 'scene change', 'pass by', 'swell'), domains=FILM, dur=1.4, axes=MOVE)
+        says=('a deep low whoosh, a large heavy swell of air', 'a big dark rush of air passing',
+              'a slow low rush of air with weight under it'),
+        uses=('whoosh', 'big transition', 'scene change', 'pass by', 'swell'), tags=('real',), domains=FILM,
+        dur=1.4, axes=REAL_AIR, allows=GLIDE)
 def whoosh_deep(c, r):
-    """a scene transition: the designed film whoosh is a low swell, not air. A slow rounded pass of noise whose
-    hump sits near 105 Hz (nine tenths of the energy under 150 Hz) and is wide even down low, with the air of the
-    move 23 dB under it and sinking two octaves behind the peak"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 1.4), 0.66, (2.0, 1.9))
-    pan = _across(r, len(a), pk, 0.25 * (1 + c.motion))
-    swell = _wind(c, r, k, a, pk, 105.0, 0.7, 1.4, pan, lo_db=6.0, hi_db=10.0, gust=0.2, rate=(1.5, 14.0),
-                  span=(32.0, 6000.0), side=(0.55, 0.9))
-    air = _wind(c, r, k, a, pk, 900.0, 1.5, 2.2, pan, lo_db=3.0, hi_db=6.0, gust=0.3, rate=(2.0, 20.0),
-                span=(200.0, 12000.0), bands=8, side=(0.5, 0.9))
-    return _out(c, r, _mix([(swell, 0, k.lo / 2), (air, 0, -23 + k.h / 2)]), room='room')
+    """a scene transition: a real deep whoosh (whoosh/low, or the heavy one the owner rated 3: whoosh/heavy, by the
+    seed) taken a little bigger, with the weight a designer puts under it: a real bass drum's decay played
+    backwards 12 dB under it (more with energy), swelling into the whoosh's loudest moment"""
+    sid = ('whoosh/low', 'whoosh/low', 'whoosh/heavy')[c.seed % 3]
+    a = _whoosh(c, r, sid, 1.0, size=1.1)
+    drum = _real(c, r, 'bass_drum/orchestral', **_tr(c, size=1.3, bright=-2.0))
+    drum = ops.reverse(ops.span(drum, 0.0, 0.8, fout=0.2))
+    y, _ = ops.layer([(a, 0.0, 0.0, ops.peak(a)), (ops.fade(drum, 0.4, 0.0, 'db'), -12.0 + 4.0 * c.energy, 0.0,
+                                                    ops.end(drum))])
+    return _place(c, r, y)
 
 
-@design('whoosh/airy', kind='whoosh',
-        says=('a wide breathy whoosh of air', 'a slow soft hiss of wind sweeping past', 'a long airy swoosh'),
-        uses=('whoosh', 'slow transition', 'air movement', 'reveal', 'breath'), domains=FILM, dur=0.9, axes=MOVE)
-def whoosh_airy(c, r):
-    """a slow wide breath in two layers that leave the band between 2 and 5 kHz thin: the soft body of the moving
-    air (a hump at 800 Hz) and the hiss of the breath above it (a hump at 8 kHz, wide), both with slow deep gusts
-    that the bands do not share, so it breathes instead of pulsing; no weight under it"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.9), 0.62, (2.2, 2.6))
-    pan = _across(r, len(a), pk, 0.35 * (1 + c.motion))
-    body = _wind(c, r, k, a, pk, 800.0, 1.0, 1.5, pan, lo_db=4.0, hi_db=8.0, gust=0.4, rate=(1.0, 12.0),
-                 side=(0.2, 0.6))
-    hiss = _wind(c, r, k, a, pk, 8000.0, 0.5, 0.8, pan, lo_db=7.0, hi_db=4.0, gust=0.45, rate=(1.0, 12.0),
-                 span=(2500.0, 16000.0), bands=6, side=(0.5, 0.75))
-    return _out(c, r, _mix([(body, 0, 0), (hiss, 0, -4 + k.h / 2)]), room='room')
-
-
-@design('whoosh/tonal', kind='whoosh',
-        says=('a whoosh with a humming tone that drops in pitch as it passes', 'a pitched object rushing past',
-              'a tonal swoosh flying by'),
-        uses=('whoosh', 'pass by', 'fly by', 'transition', 'tech'), domains=FILM, dur=0.9, pitch='A3', axes=MOVE)
-def whoosh_tonal(c, r):
-    """air with a pitched body: a blown tone (noise through narrow resonances on the pitch and its next three
-    harmonics, with a faint steady partial) carried past the listener at 30 m/s, so its pitch falls by the
-    propagation delay alone (fx.doppler: about 3 semitones, fastest at the closest point; never a swept oscillator)
-    while the air of the pass crosses with it, from either side"""
-    k = _k(c)
-    T = _span(c, k, 0.9)
-    a, pk = _move(c, r, T, 0.5, (2.0, 1.9))
-    n = len(a)
-    f0 = c.hz()
-    src = sum(g * dsp.svf(r.standard_normal(n), f0 * q, 30.0, 'bandn') for q, g in ((1.0, 1.0), (2.0, 0.6),
-                                                                                  (3.0, 0.35), (4.02, 0.2)))
-    src = dsp.fade(_norm(src) + 0.25 * np.sin(2 * np.pi * f0 * _t(n) + r.uniform(0, 6.28)), 0.02 * T, 0.05 * T)
-    v, d = _vary(r, 30.0, 0.06) * (1 + 0.12 * k.e), 2.4 * T
-    tone = fx.doppler(src, speed=v, dist=d, t_close=pk * T, width=min(1.0, 0.6 * (1 + c.motion)))
-    lead = dsp.n_of((np.hypot(v * pk * T, d) - d) / 343.0)        # the output starts when the first sound arrives
-    tone = np.concatenate([np.zeros((lead, 2)), tone, np.zeros((n, 2))])[:n] * (a[:, None] ** 0.6)
-    u = (np.arange(n) + 0.5) / n
-    air = _wind(c, r, k, a, pk, 800.0, 1.2, 1.8, min(1.0, 0.3 * (1 + c.motion)) * np.tanh((u - pk) / 0.25),
-                lo_db=4.0, hi_db=7.0, gust=0.25)
-    low = _weight(r, a, 180.0 * k.f, 0.01)
-    y = _mix([(_bed(tone), 0, -1), (air, 0, -3 + k.h / 2), (low, 0, -10 + k.lo)])
-    return _out(c, r, y[:, ::-1] if r.uniform() < 0.5 else y, room='room', tilt=-3.0 * c.size)
+@design('whoosh/long', kind='whoosh',
+        says=('a long deep whoosh that builds and passes', 'a slow heavy rush of air sweeping through',
+              'a big scene-change whoosh'),
+        uses=('whoosh', 'scene change', 'big transition', 'long whoosh', 'pass by'), tags=('real',), domains=FILM,
+        dur=2.2, axes=REAL_AIR, allows=GLIDE)
+def whoosh_long(c, r):
+    """a scene pass: a real deep whoosh (whoosh/low) taken bigger and slower, led in by a swell of real air played
+    backwards (swell/air, reversed) that ends at the whoosh's loudest moment, 8 dB under it"""
+    a = _whoosh(c, r, 'whoosh/low', 0.7, size=1.15)
+    lead = ops.reverse(ops.span(_real(c, r, 'swell/air', length=1.2, **_tr(c, bright=-1.0)), 0.0, 1.6))
+    y, _ = ops.layer([(a, 0.0, 0.0, ops.peak(a)), (lead, -8.0 + 3.0 * c.energy, 0.0, ops.end(lead))])
+    return _place(c, r, y, 'studio')
 
 
 @design('swoosh/in', kind='whoosh',
-        says=('a whoosh that rises and stops, something arriving', 'a quick swell of air rushing in',
+        says=('a whoosh that rises and stops, something arriving', 'a quick rush of air swelling in',
               'a short swoosh building to an abrupt end'),
-        uses=('whoosh', 'fly in', 'arrive', 'element enters', 'appear'), domains=DOM, dur=0.55, axes=MOVE)
+        uses=('whoosh', 'fly in', 'arrive', 'element enters', 'appear'), tags=('real',), domains=DOM, dur=0.5,
+        axes=REAL_AIR, allows=GLIDE)
 def swoosh_in(c, r):
-    """an element arriving: the air climbs for five sixths of the length (the hump from 220 Hz up to 1 kHz as
-    the move speeds up), comes in from one side to the centre and stops within the last sixth"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.55), 0.84, (1.7, 1.6))
-    u = (np.arange(len(a)) + 0.5) / len(a)
-    pan = r.choice([-1.0, 1.0]) * min(1.0, 0.45 * (1 + c.motion)) * np.clip(1.0 - u / pk, 0.0, 1.0)
-    air = _wind(c, r, k, a, pk, 1000.0, 2.2, 0.8, pan, lo_db=4.0, hi_db=7.0, gust=0.22, body=-1.0)
-    low = _weight(r, a, 180.0 * k.f, 0.01)
-    return _out(c, r, _mix([(air, 0, 0), (low, 0, -9 + k.lo)]), room='room')
+    """an element arriving: a real whoosh (whoosh/airy) up to its loudest moment and stopped there within 30 ms"""
+    a = _whoosh(c, r, 'whoosh/airy', 1.6, size=0.95, low=90.0)
+    return _place(c, r, ops.span(a, 0.0, ops.peak(a, 20.0) + 0.03, fout=0.03), crest=12.0)
 
 
 @design('swoosh/out', kind='whoosh',
         says=('a whoosh that starts full and fades away, something leaving', 'air rushing away into the distance',
               'a short swoosh trailing off'),
-        uses=('whoosh', 'fly out', 'exit', 'element leaves', 'dismiss'), domains=DOM, dur=0.6, axes=MOVE)
+        uses=('whoosh', 'fly out', 'exit', 'element leaves', 'dismiss'), tags=('real',), domains=DOM, dur=0.5,
+        axes=REAL_AIR, allows=GLIDE)
 def swoosh_out(c, r):
-    """an element leaving: full within the first seventh of the length, then the air falls away, darkening 2.6
-    octaves and drifting from the centre to one side"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.6), 0.14, (1.5, 1.5))
-    u = (np.arange(len(a)) + 0.5) / len(a)
-    pan = r.choice([-1.0, 1.0]) * min(1.0, 0.5 * (1 + c.motion)) * np.clip((u - pk) / (1.0 - pk), 0.0, 1.0)
-    air = _wind(c, r, k, a, pk, 1000.0, 0.6, 2.6, pan, lo_db=4.0, hi_db=7.0, gust=0.22, body=-1.0)
-    low = _weight(r, a, 190.0 * k.f, 0.006)
-    return _out(c, r, _mix([(air, 0, 0), (low, 0, -9 + k.lo)]), room='room')
-
-
-@design('flick/paper', kind='whoosh',
-        says=('a quick flick of paper', 'a very short dry swish of a card', 'a light papery flutter'),
-        uses=('swish', 'flick', 'text slide', 'page turn', 'card flip'), domains=DOM, dur=0.16, axes=MOVE)
-def flick_paper(c, r):
-    """a sheet flicked through the air: a short bright puff, the fibres of the paper as clustered fine grains
-    around 7 kHz, and the flap of the sheet itself low under it; eased between 2 and 5 kHz"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.16, 0.05), 0.4, (1.6, 1.4))
-    air = _wind(c, r, k, a, pk, 5200.0, 1.0, 1.4, _across(r, len(a), pk, 0.15 * (1 + c.motion)), lo_db=5.0,
-                hi_db=4.0, gust=0.3, rate=(20.0, 200.0), span=(400.0, 16000.0), side=(0.2, 0.6))
-    fibres = _grit(r, a, 7000.0 * k.f ** 0.5, 2200.0, 0.0008, cluster=0.5)
-    flap = _weight(r, a, 520.0 * k.f, 0.004)
-    y = _mix([(air, 0, 0), (fibres, 0, -6 + k.h), (flap, 0, -14 + k.lo)])
-    return _out(c, r, dsp.peq(y, 3200.0, -3.0, 0.9), room='booth', crest=15.6)
+    """an element leaving: a real whoosh (whoosh/airy) from just before its loudest moment on, so it is full at once
+    and falls away as it was recorded"""
+    a = _whoosh(c, r, 'whoosh/airy', 1.4, size=0.95, low=90.0)
+    return _place(c, r, ops.span(a, max(ops.peak(a, 20.0) - 0.02, 0.0), fin=0.01), crest=12.0)
 
 
 @design('flick/thin', kind='whoosh',
-        says=('a tiny thin high swish', 'a very short light flick of air', 'a quick faint whip'),
-        uses=('swish', 'flick', 'text move', 'small move', 'cursor'), domains=DOM, dur=0.11, axes=MOVE, prior=1.02)
+        says=('a tiny thin swish', 'a very short light flick of air', 'a quick faint whip'),
+        uses=('swish', 'flick', 'text move', 'small move', 'cursor'), tags=('real',), domains=DOM, dur=0.3,
+        axes=REAL_AIR, prior=1.02, allows=GLIDE)
 def flick_thin(c, r):
-    """the smallest move: a tenth of a second of air in a narrow hump at 6.2 kHz (10 dB per octave below it, 7
-    above: thin, little under 4 kHz and nothing under 1 kHz) around one broad resonance, a little pointed"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 0.11, 0.04), 0.45, (1.8, 1.5))
-    air = _wind(c, r, k, a, pk, 6200.0, 0.8, 1.2, _across(r, len(a), pk, 0.15 * (1 + c.motion)), lo_db=10.0,
-                hi_db=7.0, gust=0.15, rate=(20.0, 200.0), span=(1200.0, 16000.0), bands=8, side=(0.2, 0.5), body=0.0,
-                q=3.0)
-    return _out(c, r, air, room='booth', crest=14.7)
+    """the smallest move: a real swish (swish/fast) taken smaller (size 0.75), brighter by 1 dB per octave and
+    without its rumble under 150 Hz"""
+    return _place(c, r, _whoosh(c, r, 'swish/fast', 1.0, size=0.75, bright=1.0, low=150.0), 'booth', crest=12.0)
+
+
+@design('flick/paper', kind='whoosh',
+        says=('a quick flick of paper', 'a short dry papery swish', 'a light page flutter'),
+        uses=('swish', 'flick', 'text slide', 'page turn', 'card flip'), tags=('real',), domains=DOM, dur=0.8,
+        axes=REAL_AIR, allows=GLIDE)
+def flick_paper(c, r):
+    """a sheet flicked: a real page turned (page/turn), fitted to the length"""
+    return _place(c, r, _whoosh(c, r, 'page/turn', 1.0), 'booth')
+
+
+@design('pass/air', kind='whoosh',
+        says=('something flying past fast, a whoosh that sweeps from one side to the other',
+              'a fly-by whoosh dropping a little in pitch as it passes', 'a rush of air passing close by'),
+        uses=('fly by', 'pass by', 'whoosh', 'transition', 'flyby'), tags=('real',), domains=FILM, dur=1.4,
+        axes=REAL_MOVE, allows=GLIDE)
+def pass_air(c, r):
+    """a fly-by: a real deep whoosh (whoosh/low) carried past the listener (design.move): from one side to the
+    other through the centre at its loudest moment, its level following the distance and its pitch falling 1.5
+    semitones as it goes by (motion: 0.5 .. 2.5 semitones and how far it travels across)"""
+    a = _whoosh(c, r, 'whoosh/low', 1.0, size=1.05)
+    y = ops.move(a, r, travel=c.lerp('motion', 0.4, 1.0, 0.8), fall=c.lerp('motion', 0.5, 2.5, 1.5))
+    return _place(c, r, y)
 
 
 @design('slide/panel', kind='whoosh',
@@ -554,102 +586,88 @@ def slide_panel(c, r):
 
 
 # ------------------------------------------------------------------------------------------------ hits
+def _drum(c, r, size=1.25, ring=1.2, k=0, main=False, bright=0.0):
+    """a real orchestral bass drum (bass_drum/orchestral) at a design's size and ring"""
+    return _real(c, r, 'bass_drum/orchestral', k=k, main=main, **_tr(c, size=size, ring=ring, bright=bright))
+
+
 @design('boom/deep', kind='boom',
-        says=('a deep cinematic boom with a long low tail', 'a huge low drum hit with sub bass ringing out',
+        says=('a deep cinematic boom with a long low tail', 'a huge orchestral drum hit with a dark gong under it',
               'a deep trailer impact'),
-        uses=('impact', 'cinematic hit', 'trailer hit', 'reveal', 'title'), domains=FILM, dur=1.7, axes=RING)
+        uses=('impact', 'cinematic hit', 'trailer hit', 'boom', 'reveal', 'title'), tags=('real',), domains=FILM,
+        dur=3.6, axes=REAL)
 def boom_deep(c, r):
-    """a big slack drum in a hall: the beater's dull contact (16 ms to the sub's peak: a rise, not a click), a
-    clean sub that falls onto 46 Hz and rings for most of a second as the skin's lowest mode, the skin's upper
-    modes over it at the Bessel ratios (starting a little sharp and settling as the stretch relaxes; they die
-    within a few tenths of a second), the air shock as a noise band that dulls while it decays, and a low rumble.
-    The hall only hears what is above 220 Hz, so the sub stays dry"""
-    k = _k(c)
-    g = _ring(c)
-    T = 1.7 * k.L * g ** 0.5
-    f0 = _vary(r, 62.0, 0.04) * k.f
-    sub = _thump(r, T, 1.5 * f0, 0.74 * f0, 0.07, 0.3 * k.L * g, attack=0.016 * k.tc, harm=0.1)
-    up = MEMBRANE[1:]
-    skin = dsp.modal(0.74 * f0 * up, 0.5 * g * k.L * up ** -1.3, up ** -1.0, 1.1 * k.L * g, r, 0.01, 0.05)
-    hit = dsp.contact(0.006 * k.tc, r, 0.3)
-    skin = dsp.fade(_norm(dsp.excite(skin, hit / np.abs(hit).sum())), 0.0, 0.1)
-    slap = _dull(r, 0.2, 170.0 * k.f, 0.03, attack=0.003 * k.tc, q=0.9)
-    ns = dsp.n_of(0.45)
-    shock = dsp.svf(r.standard_normal(ns), np.geomspace(2400.0, 300.0, ns), 0.7, 'low') * _env(ns, 0.004, 0.07)
-    shock = dsp.fade(_norm(dsp.butter(shock, 'high', 180.0)), 0.0, 0.1)
-    tick = _burst(r, 0.03, 1400.0, 5500.0, 0.004 * k.tc, attack=0.0005)
-    rumble = _rumble(r, T, 28.0, 120.0 * k.f, 0.05, 0.45 * k.L * g)
-    y = _mix([(sub, 0, -2 + k.lo / 2), (skin, 0.002, 0), (slap, 0, -5 + k.h / 2), (shock, 0.001, -7),
-              (tick, 0, -24 + k.h), (rumble, 0.02, -13)], T)
-    return _out(c, r, fx.saturate(y, 3.0 + 2.0 * k.e, 'tanh', level='peak'), room='hall', spread=0.2)
+    """a trailer boom: a real orchestral bass drum taken bigger (size 1.25, ring 1.2) for the body, a real timpani
+    7 dB under it for the attack and the pitch of the skin, and a real tam-tam 15 dB under for the dark wash that
+    outlasts both (more of them with energy), lined up at their strikes, in a hall"""
+    e = c.energy
+    drum = _drum(c, r, main=True)
+    timp = _real(c, r, 'timpani/hit', **_tr(c, size=1.15, ring=1.0))
+    gong = _real(c, r, 'gong/hit', **_tr(c, size=1.1, ring=0.8, bright=-1.0))
+    y, _ = ops.layer([(drum, 0.0, 0.0), (timp, -7.0 + 3.0 * e, 0.0), (ops.span(gong, 0.0, 4.0, fout=1.5),
+                                                                     -15.0 + 3.0 * e, 0.01)])
+    return _place(c, r, ops.span(y, 0.0, 4.0, fout=1.2, shape='db'), 'hall')
 
 
 @design('boom/short', kind='boom',
-        says=('a short deep sub hit', 'a tight low punchy thud', 'a quick bass drum boom'),
-        uses=('impact', 'hit on a cut', 'cut', 'accent'), domains=FILM, dur=0.42, axes=RING)
+        says=('a short deep drum hit', 'a tight low punchy boom', 'a quick timpani thud'),
+        uses=('impact', 'hit on a cut', 'cut', 'accent', 'boom'), tags=('real',), domains=FILM, dur=0.7,
+        axes=REAL)
 def boom_short(c, r):
-    """a hit on a cut: a sub that rises in 14 ms (the films' sub hits swell in, they do not click), falls from 106
-    to 56 Hz within 35 ms and is gone in under half a second, the dull knock of the contact and a faint tick on
-    top; nearly dry"""
-    k = _k(c)
-    g = _ring(c)
-    T = min(0.48, 0.42 * k.L * g ** 0.5)
-    f0 = _vary(r, 56.0, 0.04) * k.f
-    sub = _thump(r, T, 1.9 * f0, f0, 0.035, 0.07 * k.L * g, attack=0.014 * k.tc, harm=0.15)
-    knock = _dull(r, 0.1, 200.0 * k.f, 0.012, attack=0.004 * k.tc, q=1.0)
-    tick = _burst(r, 0.02, 1500.0, 6000.0, 0.0025 * k.tc)
-    y = _mix([(sub, 0, k.lo / 2), (knock, 0, -5 + k.h / 2), (tick, 0, -22 + k.h)], T)
-    return _out(c, r, fx.saturate(y, 4.0 + 2.0 * k.e, 'tanh', level='peak'), room='booth', spread=0.1)
+    """a hit on a cut: a real timpani (timpani/hit) with a real bass drum 4 dB under it, both damped (ring 0.6) and
+    faded out from 0.25 s as a decay fades (straight in dB), nearly dry"""
+    timp = _real(c, r, 'timpani/hit', main=True, **_tr(c, size=1.05, ring=0.6))
+    drum = _drum(c, r, size=1.1, ring=0.6)
+    y, _ = ops.layer([(timp, 0.0, 0.0), (drum, -4.0 + 3.0 * c.energy, 0.0)])
+    return _place(c, r, ops.span(y, 0.0, 0.25 + 0.45 * c.lerp('ring', 0.5, 2.0, 1.0, log=True), fout=0.4,
+                                 shape='db'), 'booth')
 
 
 @design('boom/wide', kind='boom',
-        says=('a wide low impact with a rumbling noisy body and falling debris', 'a big crash with rubble',
-              'a heavy boom spreading out'),
-        uses=('impact', 'big hit', 'trailer hit', 'crash', 'collapse'), domains=FILM, dur=1.8, axes=RING)
+        says=('a wide low impact, a struck tam-tam over a bass drum', 'a big metallic boom spreading out',
+              'a heavy boom with a shimmering wash'),
+        uses=('impact', 'big hit', 'trailer hit', 'boom', 'reveal'), tags=('real',), domains=FILM, dur=4.5,
+        axes=REAL)
 def boom_wide(c, r):
-    """something large coming down: the body is noise, not a note (a wide band whose hump falls from 320 to 70 Hz
-    in a fifth of a second and whose two channels differ even down low), over a centred sub thump; a dull crack at
-    the contact; debris landing at a rate that dies away, power-law sizes, the big pieces lower"""
-    k = _k(c)
-    g = _ring(c)
-    T = 1.8 * k.L * g ** 0.5
-    n = dsp.n_of(T)
-    t = _t(n)
-    body = _bed(_air(r, _env(n, 0.012 * k.tc, 0.3 * k.L * g), k.f * (70.0 + 250.0 * np.exp(-t / 0.2)), 4.0, 9.0,
-                     span=(30.0, 6000.0), bands=9, gust=0.3, rate=(3.0, 30.0), side=(0.7, 0.9)))
-    sub = _thump(r, 1.2 * k.L, 85.0 * k.f, 36.0 * k.f, 0.1, 0.3 * k.L * g, attack=0.01 * k.tc, harm=0.15)
-    crack = _burst(r, 0.12, 220.0, 2600.0, 0.02 * k.tc, attack=0.001)
-    tex = _tex()
-    rate = 90.0 * 2.0 ** (0.5 * k.e) * np.exp(-np.linspace(0, 0.6 * T, 400) / (0.35 * k.L))
-    td, _ = tex.arrivals(r, rate, 0.6 * T, 0.3, 0.02)
-    debris = np.zeros((n, 2))
-    if len(td):
-        s = tex.sizes(r, len(td), 0.05, 1.0, 'power', 1.8)
-        f = np.exp(r.uniform(np.log(250.0), np.log(3500.0), len(td))) * k.f * (0.5 / (s + 0.5)) ** 0.5
-        tex.bursts(debris, td + 0.06, s ** 1.2, r.uniform(-0.9, 0.9, len(td)), f, r.uniform(0.8, 2.0, len(td)),
-                   r.uniform(0.006, 0.014, len(td)), r, sharp=0.3, wrap=False)
-    debris = dsp.butter(debris, 'low', 5000.0)        # a lone piece wider than this is a click, not a piece landing
-    y = _mix([(body, 0, 6), (sub, 0, -4 + k.lo / 2), (crack, 0, -6 + k.h), (_norm(debris), 0, -10 + 3 * k.e)], T)
-    return _out(c, r, fx.saturate(y, 3.0 + 2.0 * k.e, 'tanh', level='peak'), room='hall', spread=0.4)
+    """something large coming down: a real tam-tam struck hard (gong/hit) for the wash, a real bass drum under it
+    for the weight, both wider than recorded (width 1.6 at width 0)"""
+    gong = _real(c, r, 'gong/hit', main=True, **_tr(c, size=1.0, ring=1.0))
+    drum = _drum(c, r, size=1.2, ring=1.0)
+    y, _ = ops.layer([(gong, -2.0, 0.0), (drum, 0.0 + 2.0 * c.energy, 0.0)])
+    y = ops.span(y, 0.0, 5.0, fout=1.5, shape='db')
+    return space.room(fx.width(y, c.lerp('width', 0.6, 2.0, 1.6)), c.room('hall'), amount=c.space, r=r)
 
 
 @design('slam/title', kind='hit',
-        says=('a hard dry slam', 'a heavy object slammed onto a desk', 'a short punchy wooden bang'),
-        uses=('impact', 'title slam', 'slam', 'text slam', 'stamp'), domains=DOM, dur=0.34, axes=RING)
+        says=('a hard heavy slam with a low drum under it', 'a door slammed with a boom', 'a punchy title slam'),
+        uses=('impact', 'title slam', 'slam', 'text slam', 'stamp'), tags=('real',), domains=DOM, dur=0.9,
+        axes=REAL)
 def slam_title(c, r):
-    """a title landing hard: a board struck by a 0.8 ms contact (its 30 modes between 150 Hz and 3 kHz ring
-    50-280 ms, the upper ones dying first), the dull crack of the contact, and a short low thump under them that
-    falls from 125 to 68 Hz, 12 dB down so that the hit stays a slam and not a kick drum; driven a little, and
-    almost no room"""
-    k = _k(c)
-    g = _ring(c)
-    T = 0.34 * k.L * g ** 0.5
-    board = _struck(r, _cloud(r, 150.0 * k.f, 3000.0 * k.f, 30, 0.28 * g, 0.05, -1.0), T, 0.0008 * k.tc,
-                    noise=(0.2, 0.08, 0.004), rough=0.4)
-    thump = _thump(r, 0.2 * k.L, 125.0 * k.f, 68.0 * k.f, 0.02, 0.04 * k.L * g, attack=0.0015, harm=0.3)
-    crack = _burst(r, 0.03, 400.0, 2800.0, 0.003 * k.tc, attack=0.0002)
-    y = _mix([(board, 0, 0), (thump, 0, -12 + k.lo), (crack, 0, -3 + k.h)], T)
-    return _out(c, r, fx.saturate(y, 6.0 + 2.0 * k.e, 'tanh', level='peak'), room='booth', spread=0.15, crest=13.4)
+    """a title landing hard: a real heavy door slammed (door/slam) over a real bass drum 5 dB under it whose ring
+    is cut short (0.5 s, faded as a decay), in a short room"""
+    slam = _real(c, r, 'door/slam', main=True, **_tr(c, size=1.1, ring=1.0))
+    drum = ops.span(_drum(c, r, size=1.2, ring=0.7), 0.0, 0.5, fout=0.35, shape='db')
+    y, _ = ops.layer([(slam, 0.0, 0.0), (drum, -5.0, 0.0)])
+    return _place(c, r, y, 'room', crest=11.0)
+
+
+@design('impact/suck', kind='hit',
+        says=('air sucked in backwards, then a heavy hit', 'a reverse whoosh pulling into a big impact',
+              'an inhale into a crash'),
+        uses=('impact', 'suck in', 'pre-hit', 'reverse whoosh', 'hit with a suck-in'), tags=('real',), domains=FILM,
+        dur=1.8, prior=0.9,
+        axes=REAL, allows=('pre_swell', 'stacked'))       # the suck-in before the layered hit is the design
+def impact_suck(c, r):
+    """the breath before a hit: the build of a real airy whoosh (whoosh/airy through design.rise: its tail
+    reversed, about half a second, longer with dur) ends where a real heavy drop (heavy_drop/floor) and a real bass
+    drum 3 dB under it strike"""
+    pre = ops.rise(_real(c, r, 'whoosh/airy', length=1.2, **_tr(c, size=1.1)))
+    pre = ops.span(pre, max(0.0, ops.end(pre) - (c.length() or 1.8) * 0.3))
+    hit = _real(c, r, 'heavy_drop/floor', main=True, **_tr(c, size=1.1, ring=1.0))
+    drum = _drum(c, r, size=1.2, ring=0.8)
+    y, _ = ops.layer([(pre, -4.0, 0.0, ops.end(pre)), (hit, 0.0, 0.0), (ops.span(drum, 0.0, 1.2, fout=0.6,
+                                                                                shape='db'), -3.0, 0.0)])
+    return _place(c, r, y, 'room', crest=11.0)
 
 
 def _soft_thump(r, k, g):
@@ -690,181 +708,103 @@ def knock_soft(c, r):
 
 
 # ------------------------------------------------------------------------------------------------ builds and falls
-def _build(c, T, peak=0.93):
-    """the level of a build over T s (0..1 per sample) and its progress 0..1: amplitude grows as progress ** p up
-    to the cut at the share `peak` of the length (p 1.5: the nearly linear growth measured on film builds; a
-    harder build holds back and arrives late, p up to 2.6), then falls to nothing within the rest (cos^2)"""
-    n = dsp.n_of(T)
-    u = (np.arange(n) + 0.5) / n
-    w = np.minimum(u / peak, 1.0)
-    p = c.lerp('hard', 1.0, 2.6, 1.5)
-    return np.where(u < peak, w ** p, np.cos(0.5 * np.pi * np.clip((u - peak) / (1.0 - peak), 0.0, 1.0)) ** 2), w
-
-
-def _tremor(n, w, lo, hi, depth):
-    """a tremolo that speeds up from lo to hi Hz and deepens to `depth` with the progress w of a build, then lets
-    go over its last tenth, so the cut itself is always the loudest moment"""
-    ph = np.cumsum(lo * (hi / lo) ** w) / SR
-    return 1.0 - depth * w * (1.0 - w ** 10) * (0.5 - 0.5 * np.cos(2 * np.pi * ph))
-
-
-@design('rise/air', kind='rise',
-        says=('a rising rush of air that opens up and gets brighter', 'a noise riser building up',
-              'air swelling to a peak'),
-        uses=('riser', 'build', 'noise riser', 'reveal', 'transition', 'uplifter'), domains=FILM, dur=2.0, axes=MOVE,
-        prior=1.1)
-def rise_air(c, r):
-    """a noise riser with no pitch in it, in two layers that leave the band between 2 and 5 kHz thin (as the
-    measured film builds do): a body of band noise that grows to the cut at 93 % of the length while its hump
-    climbs two octaves from 350 Hz, and a top of air around 9 kHz that enters over the second half and is wide.
-    A tremolo speeds up from 5 to 13 Hz (motion) and the stereo field opens; after the cut it falls away within
-    7 % of the length and the room rings out"""
-    k = _k(c)
-    T = _span(c, k, 2.0, 0.4)
-    a, w = _build(c, T)
-    a = a * _tremor(len(a), w, 5.0, 13.0, 0.3 * (1 + c.motion))
-    lift = 2.0 ** (0.3 * k.e + 0.4 * c.bright)
-    body = _air(r, a, 350.0 * k.f * lift * 4.3 ** (w ** 1.3), 5.0, 9.0 * 2.0 ** (-0.4 * c.bright),
-                span=(90.0, 9000.0), bands=9, gust=0.15, rate=(2.0, 25.0), side=(0.1, 0.6))
-    top = _air(r, a * w ** 1.5, 9000.0 * k.f ** 0.5 * lift ** 0.5, 12.0, 4.0, span=(3500.0, 16000.0), bands=6,
-               gust=0.25, rate=(2.0, 25.0), side=(0.7, 0.9))
-    y = _mix([(_bed(body), 0, 0), (_bed(top), 0, -2 + 4 * c.bright)])
-    return _out(c, r, fx.width(y, 0.6 + 0.5 * w), room='room')
-
-
-@design('rise/tension', kind='rise',
-        says=('a tense rising synthesizer swell', 'a dark detuned chord growing louder and brighter',
-              'a suspenseful build-up'),
-        uses=('riser', 'tension', 'build', 'suspense', 'anticipation'), domains=FILM, dur=1.8, pitch='D3', axes=MOVE,
-        prior=1.05)
-def rise_tension(c, r):
-    """a tonal build: a stack of seven saws on the root that crossfades from a tight unison (8 cents) to a wide
-    one (36 cents: the beating speeds up), a fifth entering above it, a sub an octave under; the pitch climbs two
-    to three semitones in all, a ladder filter opens from 570 Hz to 6 kHz, a tremolo speeds up, and a breath of
-    air comes in at the top. It grows to the cut at 93 % of the length and falls away"""
-    k = _k(c)
-    T = _span(c, k, 1.8, 0.5)
-    a, w = _build(c, T)
-    n = len(a)
-    vo = _voice()
-    freq = c.hz() * 2.0 ** ((2.0 + c.motion) * w ** 2 / 12)
-    tight = vo.unison(freq, 'saw', r, voices=7, detune=8.0, spread=0.5, drift=3.0)
-    wide = vo.unison(freq, 'saw', r, voices=7, detune=36.0, spread=0.9, drift=5.0)
-    fifth = vo.unison(freq * 2.0 ** (7 / 12), 'saw', r, voices=5, detune=18.0, spread=0.7, drift=4.0)
-    x = np.sqrt(1.0 - w)[:, None] * tight + np.sqrt(w)[:, None] * wide + 0.5 * (w ** 1.5)[:, None] * fifth
-    x = x + 10 ** ((-12 + k.lo) / 20) * vo.sine(freq / 2)[:, None]
-    x = vo.ladder(x, 570.0 * k.f * 2.0 ** (0.5 * c.bright + 0.3 * k.e + 3.4 * w ** 1.4), 0.18)
-    x = x * (a * (0.75 + 0.25 * w ** 6) * _tremor(n, w, 3.0, 10.0, 0.12 * (1 + c.motion)))[:, None]
-    air = _air(r, a * w, 3000.0 * 2.0 ** (1.2 * w), 4.0, 5.0, span=(1200.0, 15000.0), bands=7, side=(0.8, 0.95))
-    y = vo.chorus(_mix([(_bed(x), 0, 0), (_bed(air), 0, -16)]), mix=0.35)
-    return _out(c, r, y, room='room', tilt=-3.0 * c.size)
+def _riser(y, at):
+    """a build cut at `at` s (its peak): everything before it, then 60 ms of what follows faded out as a decay fades,
+    so it stops on its loudest moment without a step"""
+    return ops.span(y, 0.0, at + 0.06, fout=0.06, shape='db')
 
 
 @design('rise/reverse', kind='rise',
         says=('a reversed cymbal swelling up to an abrupt stop', 'a backwards shimmering swell',
               'a reverse crash building'),
-        uses=('reverse', 'reverse swell', 'riser', 'swell into a cut', 'reverse cymbal'), domains=FILM, dur=1.5,
-        axes=BASE, prior=1.05)
+        uses=('reverse', 'reverse swell', 'riser', 'swell into a cut', 'reverse cymbal'), tags=('real',),
+        domains=FILM, dur=2.0, axes=REAL_AIR, prior=1.05, allows=GLIDE)
 def rise_reverse(c, r):
-    """the tail of a struck sheet of metal played backwards: 44 inharmonic modes between 380 Hz and 11 kHz and the
-    wash around them, each decaying at its own rate (the high ones faster), so in reverse the low ones swell first
-    and the top arrives last. The loudest moment is the cut at 92 % of the length; the last 8 % are the same tail
-    running forward again under a fast fade, so it stops without a step"""
-    k = _k(c)
-    T = _span(c, k, 1.5, 0.3)
-    n = dsp.n_of(0.92 * T)
-    tex = _tex()
-    cnt = 44
-    f = np.exp(r.uniform(np.log(380.0 * k.f), np.log(11000.0), cnt))
-    tau = 0.26 * T * (f / 1000.0) ** -0.45 * c.lerp('hard', 1.5, 0.6, 1.0, log=True)
-    metal = np.zeros((n, 2))
-    tex.rings(metal, r.uniform(0.0, 0.004, cnt), r.uniform(0.3, 1.0, cnt) * (f / 1000.0) ** -0.3,
-              r.uniform(-0.8, 0.8, cnt), f, tau, 0.0005, wrap=False)
-    cen = 400.0 * k.f * (13000.0 / 400.0) ** (np.arange(8) / 7)
-    m = sfft.next_fast_len(n, real=True)
-    tw = np.arange(m // 48) * 48 / SR
-    fall = np.exp(-tw[None, :] / (0.3 * T * (cen[:, None] / 1000.0) ** -0.5)) * (tw[None, :] < n / SR)
-    wash = tex.band_noise(m, r, cen, fall * 2.0 ** (0.2 * (c.bright + k.e) * np.log2(cen[:, None] / 1000.0)), 0.8)[:n]
-    tail = _norm(metal) + 0.8 * _bed(wash)
-    j = dsp.n_of(T) - n
-    y = np.concatenate([tail[::-1], tail[1:j + 1] * (np.cos(np.linspace(0.0, np.pi / 2, j)) ** 2)[:, None]])
-    i = dsp.n_of(0.35 * T)
-    y[:i] *= (np.linspace(0.0, 1.0, i) ** 2)[:, None]
-    return _out(c, r, y, room='room')
+    """the classic riser: a real crash cymbal's decay played backwards (cymbal/orchestral, reversed), with a real
+    tam-tam's decay played backwards 9 dB under it (more with energy) for a dark floor, both ending together on what
+    was their strike; dur sets how much of the decays is heard (2 s by default)"""
+    T = c.length() or 2.0
+    tr = _tr(c, ring=None)
+    cym = ops.reverse(ops.span(_real(c, r, 'cymbal/orchestral', main=True, **tr), 0.0, T + 0.01, fout=0.2))
+    gong = ops.reverse(ops.span(_real(c, r, 'gong/hit', **_tr(c, size=1.1, bright=-1.0)), 0.0, T + 0.01,
+                                fout=0.2))
+    y, _ = ops.layer([(cym, 0.0, 0.0, ops.end(cym)), (gong, -9.0 + 4.0 * c.energy, 0.0, ops.end(gong))])
+    return _place(c, r, ops.fade(y, 0.3 * T, 0.0, 'db'), crest=11.0)
 
 
-@design('fall/air', kind='fall',
-        says=('a rush of air falling away and fading out', 'a whoosh trailing off and getting darker',
-              'air dying away'),
-        uses=('downlifter', 'fall', 'exit', 'after a hit', 'wind down'), domains=FILM, dur=1.6, axes=MOVE,
-        prior=1.1)
-def fall_air(c, r):
-    """what follows a hit: air that is full within the first 7 % of the length and then falls away, in two layers
-    that leave the band between 2 and 5 kHz thin: a body whose hump sinks three and a half octaves from 1.6 kHz
-    and a wide top around 9 kHz that is gone by the middle; the stereo field closes, and a low rumble under it
-    all outlasts the rest"""
-    k = _k(c)
-    a, pk = _move(c, r, _span(c, k, 1.6, 0.3), 0.07, (1.2, 1.25))
-    u = (np.arange(len(a)) + 0.5) / len(a)
-    w = np.clip((u - pk) / (1.0 - pk), 0.0, 1.0)
-    lift = 2.0 ** (0.3 * k.e + 0.4 * c.bright)
-    body = _air(r, a, 1600.0 * k.f * lift * 2.0 ** (-3.5 * w ** 0.6), 5.0, 9.0 * 2.0 ** (-0.4 * c.bright),
-                span=(50.0, 9000.0), bands=9, gust=0.3, rate=(1.5, 20.0), side=(0.2, 0.6))
-    top = _air(r, a * (1.0 - w) ** 3, 9000.0 * k.f ** 0.5 * lift ** 0.5, 12.0, 4.0, span=(3500.0, 16000.0), bands=6,
-               gust=0.25, rate=(2.0, 25.0), side=(0.7, 0.9))
-    y = _mix([(_bed(body), 0, 0), (_bed(top), 0, -3 + 4 * c.bright)])
-    y = fx.width(y, np.clip(1.0 + 0.5 * c.motion - 0.7 * w, 0.0, 2.0))
-    low = _weight(r, a ** 0.7, 130.0 * k.f, 0.03)
-    return _out(c, r, _mix([(y, 0, 0), (low, 0, -10 + k.lo)]), room='studio')
+@design('rise/air', kind='rise',
+        says=('a rising rush of air that swells to a peak', 'a hiss of air and steam building up',
+              'air swelling to a cut'),
+        uses=('riser', 'build', 'noise riser', 'reveal', 'transition', 'uplifter'), tags=('real',), domains=FILM,
+        dur=1.8, axes=REAL_AIR, prior=1.1, allows=GLIDE)
+def rise_air(c, r):
+    """a noise riser made of real air: the build a recorded swell of air, wind or steam holds (swell/air through
+    design.rise: up to its loudest moment, or its decay reversed), with the build of a real airy whoosh (whoosh/airy)
+    6 dB under it for the last part, ending on the same moment and sharpening the top"""
+    sw = ops.rise(_real(c, r, 'swell/air', main=True, length=_fit(c, _natural('swell/air', c), 1.8),
+                        **_tr(c, size=1.0)))
+    wh = ops.rise(_real(c, r, 'whoosh/airy', **_tr(c, size=1.05)))
+    wh = ops.span(wh, max(0.0, ops.end(wh) - 0.6 * ops.end(sw)), fin=0.1)    # it joins in for the last part
+    y, _ = ops.layer([(sw, 0.0, 0.0, ops.end(sw)), (wh, -6.0 + 3.0 * c.energy, 0.0, ops.end(wh))])
+    return _place(c, r, ops.fade(y, 0.15 * len(y) / SR, 0.0, 'db'), crest=11.0)
 
 
-@design('fall/sub', kind='boom',
-        says=('a deep sub bass drop that swells and fades', 'a very low falling bass tone',
-              'a low boom blooming and sinking'),
-        uses=('sub drop', 'bass drop', 'drop', 'low drop after a cut', 'impact'), domains=FILM, dur=1.4, axes=RING,
-        allows=('pre_swell',))        # the sub blooms a third of a second after the cut: that swell is the design
-def fall_sub(c, r):
-    """a sub drop under a cut: a soft knock and a faint bright tick mark the cut, then a sine sinking from 66 to
-    44 Hz blooms to its peak 0.3 s later and decays straight in dB at about 40 dB per second (the film study's sub
-    drop); driven gently, so odd harmonics carry it on small speakers. Centred and nearly dry"""
-    k = _k(c)
-    g = _ring(c)
-    T = _span(c, k, 1.4, 0.4)
-    n = dsp.n_of(T)
-    t = _t(n)
-    s = T / 1.4
-    f = k.f * (44.0 + _vary(r, 22.0, 0.08) * np.exp(-t / (0.35 * s)))
-    ph = 2 * np.pi * np.cumsum(f) / SR
-    bloom = 0.3 * s * k.tc ** 0.5
-    amp = np.where(t < bloom, np.sin(0.5 * np.pi * np.minimum(t / bloom, 1.0)) ** 1.6,
-                   np.exp(-np.maximum(t - bloom, 0.0) / (0.22 * s * g)))
-    sub = fx.saturate((np.sin(ph) + 0.2 * np.sin(2 * ph)) * amp, 6.0 + 3.0 * k.e, 'tanh', level='peak')
-    knock = _dull(r, 0.08, 160.0 * k.f, 0.012, attack=0.002)
-    tick = _burst(r, 0.025, 1800.0, 7000.0, 0.003 * k.tc)
-    y = _mix([(_norm(sub), 0, k.lo / 2), (knock, 0, -13 + k.h / 2), (tick, 0, -22 + k.h)], T)
-    return _out(c, r, dsp.fade(y, 0.0, 0.25 * T), room='booth', spread=0.05)
+@design('rise/tension', kind='rise',
+        says=('a drum roll growing to a peak with a cymbal swelling over it', 'a timpani roll building tension',
+              'a rumbling orchestral build-up'),
+        uses=('riser', 'tension', 'build', 'suspense', 'anticipation', 'drum roll'), tags=('real',), domains=FILM,
+        dur=4.0, axes=REAL, prior=1.05, allows=GLIDE + ('clicks',))     # the strokes of a roll
+def rise_tension(c, r):
+    """a build that grows as players grow it: a real drum roll in crescendo (roll/drum or roll/timpani, by the seed)
+    up to its loudest moment and stopped there, with a real suspended cymbal rolled in crescendo (swell/cymbal) 6 dB
+    under it culminating on the same moment"""
+    sid = ('roll/drum', 'roll/timpani')[c.seed % 2]
+    roll = _real(c, r, sid, main=True, length=_fit(c, _natural(sid, c), 1.1), **_tr(c, size=1.05, ring=1.0))
+    roll = _riser(roll, ops.peak(roll, 200.0))
+    roll = ops.fade(roll, 0.7 * len(roll) / SR, 0.0, 'power')         # the fader ridden up, as on a steady roll
+    cym = _real(c, r, 'swell/cymbal', length=_fit(c, _natural('swell/cymbal', c), 1.1), **_tr(c, ring=1.0))
+    cym = _riser(cym, ops.peak(cym, 200.0))
+    y, _ = ops.layer([(roll, 0.0, 0.0, ops.end(roll) - 0.06), (cym, -6.0 + 3.0 * c.energy, 0.0, ops.end(cym) - 0.06)])
+    return _place(c, r, y, 'hall')
 
 
 @design('suck/in', kind='rise',
         says=('a short inward suck of air', 'a quick reverse whoosh pulling in and stopping', 'air being sucked in'),
-        uses=('suck', 'pre-hit', 'inhale', 'lead in', 'reverse whoosh'), domains=FILM, dur=0.45, axes=MOVE,
-        prior=0.9)
+        uses=('suck', 'pre-hit', 'inhale', 'lead in', 'reverse whoosh'), tags=('real',), domains=FILM, dur=0.6,
+        axes=REAL_AIR, prior=0.9, allows=('ring',) + GLIDE)     # a reversed resonant tail can read as a comb
 def suck_in(c, r):
-    """the breath before a hit: air that accelerates into the cut at 93 % of the length (most of its rise in the
-    last third), its hump climbing two and a half octaves from 250 Hz while the stereo field closes from wide
-    onto the centre, then nothing"""
-    k = _k(c)
-    T = _span(c, k, 0.45, 0.15)
-    n = dsp.n_of(T)
-    u = (np.arange(n) + 0.5) / n
-    w = np.minimum(u / 0.93, 1.0)
-    a = np.where(u < 0.93, 10 ** (-50.0 * (1.0 - w) ** c.lerp('hard', 1.1, 0.55, 0.75) / 20),
-                 np.cos(0.5 * np.pi * np.clip((u - 0.93) / 0.07, 0.0, 1.0)) ** 2)
-    fc = 250.0 * k.f * 2.0 ** (0.3 * k.e + 0.4 * c.bright) * 6.0 ** (w ** 1.5)
-    y = _bed(_air(r, a, fc, 5.0, 8.0 * 2.0 ** (-0.4 * c.bright), gust=0.2, rate=(4.0, 40.0), side=(0.3, 0.9)))
-    y = fx.width(y, np.clip(1.3 + 0.4 * c.motion - 1.1 * w, 0.0, 2.0))
-    low = _weight(r, a, 170.0 * k.f)
-    return _out(c, r, _mix([(y, 0, 0), (low, 0, -9 + k.lo)]), room='booth')
+    """the breath before a hit: a real airy whoosh (whoosh/airy) through design.rise (its tail played backwards
+    becomes the in-breath) that stops where its loudest moment was"""
+    y = ops.rise(_whoosh(c, r, 'whoosh/airy', 1.4, size=1.05))
+    T = c.length() or 0.6
+    return _place(c, r, ops.span(y, max(0.0, ops.end(y) - T), fin=0.05), 'booth')
+
+
+@design('fall/air', kind='fall',
+        says=('a rush of air falling away and fading out', 'a hiss of air dying away', 'air trailing off'),
+        uses=('downlifter', 'fall', 'exit', 'after a hit', 'wind down'), tags=('real',), domains=FILM, dur=1.4,
+        axes=REAL_AIR, prior=1.1, allows=GLIDE)
+def fall_air(c, r):
+    """what follows a hit: the decay a recorded swell of air, wind or steam holds (swell/air through design.fall:
+    from its loudest moment on, or its build reversed), ending in a fade straight in dB"""
+    y = ops.fall(_real(c, r, 'swell/air', main=True, length=_fit(c, _natural('swell/air', c), 1.4),
+                       **_tr(c, size=1.05, bright=-0.5)))
+    return _place(c, r, ops.fade(y, 0.0, 0.4 * len(y) / SR, 'db'), 'studio', crest=11.0)
+
+
+@design('fall/sub', kind='boom',
+        says=('a deep drum boom sinking into a long low tail', 'a very low boom dying away',
+              'a low boom blooming and sinking'),
+        uses=('sub drop', 'bass drop', 'drop', 'low drop after a cut', 'impact'), tags=('real',), domains=FILM,
+        dur=3.6, axes=REAL, allows=('rising_glide',))    # a big drum's skin can settle upward a little
+def fall_sub(c, r):
+    """a sub drop under a cut: a real orchestral bass drum as big and dark as the engine takes it (size 1.4, 2 dB
+    per octave darker, ring 1.4), its long decay as it is, with a real timpani 10 dB under it for the moment of the
+    cut"""
+    drum = _drum(c, r, size=1.4, ring=1.4, main=True, bright=-2.0)
+    timp = _real(c, r, 'timpani/hit', **_tr(c, size=1.3, ring=0.8, bright=-1.0))
+    y, _ = ops.layer([(drum, 0.0, 0.0), (timp, -10.0 + 3.0 * c.energy, 0.0)])
+    return _place(c, r, ops.span(y, 0.0, c.length() or 4.0, fout=1.2, shape='db'), 'booth')
 
 
 # ------------------------------------------------------------------------------------------------ small arrivals
@@ -1176,63 +1116,81 @@ def type_run(c, r):
 
 # ------------------------------------------------------------------------------------------------ stingers
 @design('sting/reveal', kind='stinger',
-        says=('a soft swell into a clean low hit with a bright chime on top', 'a short reveal sting with a bell chord',
-              'a whoosh, a thump and a ringing chime'),
-        uses=('logo', 'reveal', 'sting', 'logo reveal', 'title reveal'), domains=DOM, dur=1.5, pitch='C6',
-        voice='celesta', axes=RING, prior=1.05)
+        says=('a reversed cymbal swelling into a deep drum hit with a gong ringing out',
+              'a swell that lands on a big orchestral boom', 'a cinematic reveal hit'),
+        uses=('logo', 'reveal', 'sting', 'logo reveal', 'title reveal'), tags=('real',), domains=DOM, dur=3.5,
+        axes=REAL, prior=1.05, allows=('pre_swell',))       # the swell into the hit is the design
 def sting_reveal(c, r):
-    """a reveal in three parts that share one moment: air that swells over the first 30 % of the length and stops,
-    a soft clean hit where it stops (a thump falling to 52 Hz and the puff of air around it), and on the hit a
-    chord of the voice (root, fifth and octave, rolled by 12 ms) that rings out in a hall"""
-    from ..synth import phrase
-    k = _k(c)
-    g = _ring(c)
-    T = c.seconds()
+    """a reveal in two parts that meet on one moment: a real crash cymbal's decay played backwards (cymbal/orchestral,
+    reversed, a third of the length) swells into a real bass drum (bass_drum/orchestral) and a real tam-tam 8 dB
+    under it (gong/hit), which ring out in a hall"""
+    T = c.length() or 3.5
     lead = 0.3 * T
-    ns = dsp.n_of(lead)
-    us = (np.arange(ns) + 0.5) / ns
-    a = us ** c.lerp('hard', 1.2, 2.6, 1.6) * np.cos(0.5 * np.pi * np.clip((us - 0.95) / 0.05, 0.0, 1.0)) ** 2
-    swell = _bed(_air(r, a, 500.0 * k.f * 2.0 ** (0.4 * c.bright) * 8.0 ** (us ** 1.3), 4.0, 6.0, gust=0.25,
-                      side=(0.3, 0.9)))
-    sub = _thump(r, 0.5, 105.0 * k.f, 52.0 * k.f, 0.05, 0.12 * k.L, attack=0.008 * k.tc, harm=0.2)
-    puff = _dull(r, 0.2, 180.0 * k.f, 0.035, attack=0.005)
+    cym = ops.reverse(ops.span(_real(c, r, 'cymbal/orchestral', **_tr(c)), 0.0, lead + 0.01, fout=0.15))
+    drum = _drum(c, r, size=1.2, ring=1.1, main=True)
+    gong = _real(c, r, 'gong/hit', **_tr(c, size=1.05, ring=1.0))
+    y, _ = ops.layer([(ops.fade(cym, 0.4 * lead, 0.0, 'db'), -4.0, 0.0, ops.end(cym)), (drum, 0.0, 0.0),
+                      (gong, -8.0 + 3.0 * c.energy, 0.005)])
+    return _place(c, r, ops.span(y, 0.0, T, fout=0.4 * T, shape='db'), 'hall')
+
+
+# the chord of a braam: the root and the octave in the low brass, the fifth between them (semitones over the root)
+BRAAM = (0, 7, 12)
+
+
+@design('braam/brass', kind='boom',
+        says=('a huge low brass blast in octaves and a fifth over a bass drum hit', 'a cinematic braam of real tubas '
+              'and trombones', 'a blaring orchestral brass stab that swells'),
+        uses=('braam', 'trailer hit', 'impact', 'reveal', 'title', 'brass hit'), tags=('real', 'brass'),
+        domains=FILM, dur=3.0, pitch='A#1', axes=REAL, prior=1.2, allows=('pre_swell', 'stacked'))
+def braam_brass(c, r):
+    """a braam made of real brass: held low brass notes (brass/low: tubas, trombones, horns) moved to the root, its
+    fifth and its octave (each the member nearest its note, moved at most 7 semitones), entering together over a
+    real bass drum hit and swelling for 0.12 s (0.03 .. 0.4 s with hard), led in by a real cymbal decay played
+    backwards 12 dB under them; they are held for the length asked for and fall away as the hall closes"""
+    L = _learned()
+    e = L.index()['brass/low']
     root = c.hz()
-    chord = phrase.play([(0.0, root, 1.0), (0.012, root * 2.0 ** (7 / 12), 0.75), (0.024, 2.0 * root, 0.65)],
-                        c.voice, r, vel=float(np.clip(0.55 + 0.2 * k.e, 0.1, 1.0)), dur=0.8 * (T - lead) * g,
-                        spread=0.4, bright=c.bright)
-    y = _mix([(swell, 0, -9), (sub, lead, -3 + k.lo / 2), (puff, lead, -9 + k.h / 2), (_norm(chord), lead, 0)])
-    return _out(c, r, y, room='hall', tilt=-3.0 * c.size)
+    T = c.length() or 3.0
+    hard = c.lerp('hard', 0.4, 0.03, 0.12, log=True)
+    parts, first = [], None
+    for k, st in enumerate(BRAAM):
+        f = root * 2 ** (st / 12)
+        order = sorted(range(len(e['members'])), key=lambda i: abs(np.log2(e['members'][i]['hz'] / f)))
+        i = order[(c.seed + k) % min(2, len(order))]
+        m = e['members'][i]
+        tr = _tr(c, bright=1.0)
+        tr.pop('size')
+        z = ops.take(L.model(m['file']), r, pitch=12 * np.log2(f / m['hz']),
+                     length=float(np.clip(T / m['dur_s'], *ops.LENGTH)), **tr)
+        first = first or m
+        z = ops.fade(ops.span(z, max(0.0, ops.onset(z, 20.0) - 0.01), fout=0.5), hard, 0.0)
+        parts.append((z, (0.0, -3.0, -4.0)[k] + c.lerp('size', -3.0, 3.0, 0.0) * (k == 0), 0.0, 0.0))
+    c.member = {'n': L.index()['brass/low']['members'].index(first) + 1, 'of': len(e['members']),
+                'recording': first['credit']['title'], 'author': first['credit']['author']}
+    drum = ops.span(_drum(c, r, size=1.25, ring=0.9), 0.0, 1.5, fout=0.8, shape='db')
+    cym = ops.reverse(ops.span(_real(c, r, 'cymbal/orchestral', **_tr(c)), 0.0, 1.0, fout=0.15))
+    y, _ = ops.layer(parts + [(drum, -2.0 + 3.0 * c.energy, 0.0, ops.onset(drum)),
+                              (ops.fade(cym, 0.5, 0.0, 'db'), -12.0, 0.0, ops.end(cym))])
+    return _place(c, r, ops.span(y, 0.0, T + 1.0, fout=0.6, shape='db'), 'hall')
 
 
-@design('sting/tech', kind='stinger',
-        says=('a falling electronic chirp landing on a low humming tone', 'a quick zap down into a deep synth note',
-              'a short tech logo sting'),
-        uses=('logo', 'sting', 'tech reveal', 'reveal', 'ident'), domains=DOM, dur=1.0, pitch='D2',
-        material='digital', axes=RING, prior=1.1)
-def sting_tech(c, r):
-    """the designed sting of the film study: a chirp that falls from 1.5 kHz to the octave over the pitch in 85 ms
-    (a sine with one overtone, straight on a log-frequency axis) and lands on a low hum on the pitch (three saws
-    and a sub through a ladder filter that closes again) which sinks five semitones while it rings out; a tick
-    marks the landing. Near mono"""
-    k = _k(c)
-    g = _ring(c)
-    T = c.seconds()
-    vo = _voice()
-    f0 = c.hz()
-    nc = dsp.n_of(0.085 * k.L)
-    ph = 2 * np.pi * np.cumsum(np.geomspace(1500.0, 2.0 * f0, nc)) / SR
-    chirp = (np.sin(ph) + 0.3 * np.sin(2 * ph)) * np.sin(np.pi * (np.arange(nc) + 0.5) / nc) ** 0.7
-    hum = vo.analog(f0, 0.85, max(0.2, T - 0.5), r, sub=0.7, cutoff=260.0 * 2.0 ** c.bright, keytrack=0.0, env=1.6,
-                    res=0.2,
-                    osc=(dict(shape='saw', voices=3, detune=9.0, spread=0.3),
-                         dict(shape='pulse', pw=0.35, semi=12.0, level=0.3)),
-                    fenv=(0.004, 0.25, 0.2, 0.2), amp=(0.006 * k.tc, 0.5 * g, 0.25, 0.35 * g),
-                    pitch=lambda t: -5.0 * (1.0 - np.exp(-t / 0.45)))
-    tick = _burst(r, 0.02, 2000.0, 8000.0, 0.002 * k.tc)
-    land = 0.085 * k.L
-    y = _mix([(_norm(chirp), 0, -4), (_norm(hum), land - 0.006, k.lo / 2), (tick, land, -20 + k.h)])
-    return _out(c, r, fx.saturate(y, 2.0 + 2.0 * k.e, 'tanh', level='peak'), room='room', spread=0.15,
-                tilt=-4.0 * c.size)
+@design('explosion/huge', kind='boom',
+        says=('a huge close explosion with a deep boom and a long rolling tail', 'a big cinematic blast',
+              'an explosion that shakes the ground'),
+        uses=('explosion', 'blast', 'impact', 'big explosion'), tags=('real',), domains=FILM, dur=4.0, axes=REAL,
+        prior=1.05)
+def explosion_huge(c, r):
+    """a film explosion: a real near explosion (explosion/near) for the blast, a real bass drum 3 dB under it for the
+    weight the recording lacks, and a real roll of thunder 9 dB under them (thunder/roll) for the tail that rolls
+    away, in a hall"""
+    blast = _real(c, r, 'explosion/near', main=True, **_tr(c, size=1.15, ring=1.2))
+    drum = _drum(c, r, size=1.35, ring=1.2, bright=-1.0)
+    roll = _real(c, r, 'thunder/roll', **_tr(c, size=1.05, ring=1.0, bright=-1.0))
+    roll = ops.span(roll, max(0.0, ops.peak(roll, 200.0) - 0.4), fin=0.4)
+    y, _ = ops.layer([(blast, 0.0, 0.0), (drum, -3.0 + 3.0 * c.energy, 0.0), (roll, -9.0, 0.08, 0.0)])
+    return _place(c, r, ops.span(y, 0.0, c.length() or 4.5, fout=1.5, shape='db'), 'hall', crest=11.0)
+
 
 
 @design('sting/soft', kind='stinger',

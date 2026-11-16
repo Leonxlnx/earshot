@@ -204,11 +204,14 @@ CONCEPTS = {
     'text': ('dialogue', 'dialog text', 'text box', 'text reveal', 'text appear', 'subtitle', 'letter', 'speech',
              'talk', 'npc talk', 'chat bubble'),
     # ---- gestures of film and motion design
-    'whoosh': ('swoosh', 'woosh', 'whoosh by', 'fly by', 'flyby', 'fly-by', 'pass by', 'fly past', 'air movement',
-               'transition', 'rush of air', 'air rush', 'wind rush', 'wind-rush', 'fly through', 'flying through',
-               'fly across', 'flies across', 'fly in', 'whip pan', 'passing by', 'pass', 'whooshy', 'rushing air',
-               'air sweep', 'rushing', 'blowing past', 'blow past', 'rushing past', 'zooming past', 'zoom past',
-               'zoom by', 'zoomy', 'streak past', 'fly off screen', 'slides off', 'swooshy'),
+    'whoosh': ('swoosh', 'woosh', 'air movement', 'transition', 'rush of air', 'air rush', 'wind rush', 'wind-rush',
+               'fly through', 'flying through', 'fly across', 'flies across', 'fly in', 'whip pan', 'whooshy',
+               'rushing air', 'air sweep', 'rushing', 'blowing past', 'blow past', 'rushing past', 'zoomy',
+               'fly off screen', 'slides off', 'swooshy'),
+    # something carried past the listener (a whoosh too: BROADER)
+    'flyby': ('fly by', 'fly-by', 'flyover', 'fly over', 'flies past', 'flying past', 'fly past', 'whoosh by',
+              'pass by', 'passing by', 'pass', 'zoom by', 'zoom past', 'zooming past', 'streak past', 'drive by',
+              'drive-by'),
     'swish': ('swoop', 'flick', 'whip', 'whippy', 'quick whoosh', 'fast pass', 'zing', 'swishy', 'fwip', 'fwoop',
               'vwip', 'shwip'),
     'riser': ('uplifter', 'build', 'build up', 'build-up', 'buildup', 'tension', 'tension build', 'anticipation',
@@ -285,7 +288,7 @@ CONCEPTS = {
     'water': ('drip', 'droplet', 'water drop', 'water droplet', 'drop of water', 'liquid', 'leaky tap',
               'leaky faucet', 'faucet', 'tap drip'),
     'coin_object': ('coin drop', 'coin dropping', 'dropping a coin', 'drop a coin', 'coin spin', 'coin on table',
-                    'coin flip', 'coin toss', 'penny', 'loose change', 'coin rattle'),
+                    'coin flip', 'coin toss', 'penny', 'loose change', 'coin rattle', 'small change', 'spare change'),
     'glass_object': ('clink', 'cheers', 'toast glass', 'glass tap', 'glasses clink', 'wine glass', 'glass clink',
                      'champagne flutes', 'champagne flute', 'flutes', 'tapping together', 'clinking together',
                      'raise a glass', 'propose a toast', 'wedding toast', 'toast'),
@@ -365,7 +368,7 @@ PHRASAL = {'put': {'away': 'close', 'down': 'land'}, 'tuck': {'away': 'close', '
            'mouse': {'over': 'hover', 'on': 'hover', 'onto': 'hover'},
            'pointer': {'over': 'hover', 'on': 'hover', 'onto': 'hover'},
            'cursor': {'over': 'hover', 'on': 'hover', 'onto': 'hover'},
-           'zoom': {'past': 'whoosh', 'by': 'whoosh', 'off': 'send'}, 'fly': {'past': 'whoosh', 'by': 'whoosh'},
+           'zoom': {'past': 'flyby', 'by': 'flyby', 'off': 'send'}, 'fly': {'past': 'flyby', 'by': 'flyby'},
            'brush': {'aside': 'swipe', 'away': 'swipe'}, 'push': {'aside': 'swipe', 'away': 'swipe'},
            'shrug': {'off': 'shield'}, 'knock': {'over': 'hit'}, 'wipe': {'out': 'lose', 'away': 'delete'}}
 # outcome words: named after the thing they happen to ("upload finished", "the buff runs out"), they are the job
@@ -381,7 +384,7 @@ BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggl
            'menu_back': 'back', 'coin': 'pickup', 'gem': 'pickup', 'service_bell': 'bell', 'level_up': 'power_up',
            'one_up': 'power_up', 'receive': 'notify', 'cue': 'notify', 'thud': 'impact', 'clock': 'tick',
            'sub_drop': 'impact', 'braam': 'impact',
-           'swish': 'whoosh', 'coin_object': 'coin', 'glass_object': 'bell', 'countdown': 'timer',
+           'swish': 'whoosh', 'flyby': 'whoosh', 'coin_object': 'coin', 'glass_object': 'bell', 'countdown': 'timer',
            'kick_drum': 'drum', 'snare': 'drum', 'rimshot': 'drum', 'cross_stick': 'rimshot', 'tom': 'drum',
            'hihat': 'drum', 'cymbal': 'drum',
            'drum_roll': 'drum', 'sting': 'cue'}
@@ -391,7 +394,7 @@ BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggl
 FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride': 'cymbal', 'kick': 'kick_drum',
                 'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music',
                 # recorded things (earshot.sounds.learned) whose family is the job by another word
-                'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter'}
+                'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter', 'pass': 'flyby'}
 # the tonal interface figures (earshot.sounds.ui): the owner heard them twice as unrecognisable, so a plain "tap",
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)

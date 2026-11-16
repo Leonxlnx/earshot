@@ -258,3 +258,33 @@ def test_seeds_of_one_recording_are_performances(sid):
     c = [_centroid(t) for t in takes]
     lv = [_level(t) for t in takes]
     assert max(c) / min(c) < 1.35 and max(lv) - min(lv) < 2.5, (c, lv)
+
+
+def test_back_and_next_are_two_keys_of_one_keyboard():
+    ui = sets.SETS['ui']['sounds']
+    names = [n for n, _ in ui]
+    sound = dict(ui)
+    assert sound['back'] == sound['next'] == 'keyboard/laptop'
+    back, nxt = (learned.pick('keyboard/laptop', names.index(n)) for n in ('back', 'next'))  # a set's seeds follow
+    members = INDEX['keyboard/laptop']['members']                                            # its order
+    assert members[back]['quality']['centroid'] < members[nxt]['quality']['centroid']        # back the lower one
+    assert members[back]['quality']['peak'] < members[nxt]['quality']['peak']                # and the softer
+
+
+def _loudest(y, ms):
+    k = dsp.n_of(ms / 1000.0)
+    return 10 * np.log10(np.convolve(np.mean(y ** 2, axis=1), np.ones(k) / k, 'same').max())
+
+
+def test_interface_members_sit_near_the_figures():
+    """a click lifted by the registry keeps its strike and gets some body: its loudest 50 ms within 5 dB of an
+    interface figure's (the owner heard them as too quiet; a click is mostly its first 20 ms), its strike as bright"""
+    fig = _loudest(registry.render('success/rise', seed=0)[0], 50.0)
+    for sid in ('keyboard/desktop', 'dial/click'):
+        y, _ = registry.render(sid, seed=0)
+        assert fig - _loudest(y, 50.0) < 5.0, sid
+    hit = np.concatenate([np.zeros(480), np.exp(-np.arange(4800) / 480.0)])                # a knock 10 ms in
+    raw = learned.present(np.repeat(hit[:, None], 2, axis=1) * 0.5)
+    lifted = learned.body(raw)
+    assert abs(_loudest(lifted, 5.0) - _loudest(raw, 5.0)) < 0.5                    # the strike keeps its level
+    assert _loudest(lifted, 50.0) > _loudest(raw, 50.0) + 0.3                        # what follows it comes up

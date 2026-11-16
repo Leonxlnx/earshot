@@ -11,11 +11,13 @@ better than every event making noise.
 SETS = {
     # the touches are recorded keys and switches (earshot.sounds.learned: the owner heard the tonal touches as
     # unrecognisable twice, real keys as satisfying); toggle_on and toggle_off are two takes of one lamp switch, the
-    # off the darker at the default seed (members walk with the seed, and a set's sounds take consecutive seeds)
+    # off the darker at the default seed (members walk with the seed, and a set's sounds take consecutive seeds);
+    # back and next are two keys of one laptop keyboard in the same way: back (seed 5) the darkest and softest of its
+    # members, next (seed 6) a brighter one
     'ui': dict(says='a product interface: app, website, dashboard', theme='soft', sounds=(
         ('tap', 'keyboard/desktop'), ('hover', 'dial/click'), ('toggle_on', 'switch/lamp'),
-        ('toggle_off', 'switch/lamp'), ('type', 'keyboard/mechanical'),
-        ('open', 'open/lift'), ('close', 'close/drop'), ('next', 'keyboard/laptop'), ('back', 'back/step'),
+        ('toggle_off', 'switch/lamp'), ('type', 'keyboard/mechanical'), ('back', 'keyboard/laptop'),
+        ('next', 'keyboard/laptop'), ('open', 'open/lift'), ('close', 'close/drop'),
         ('send', 'send/lift'), ('receive', 'receive/drop'), ('notify', 'notify/pair'), ('success', 'success/rise'),
         ('complete', 'success/triad'), ('warning', 'warning/pulse'), ('error', 'error/fall'),
         ('delete', 'delete/drop'))),

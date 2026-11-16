@@ -92,6 +92,7 @@ PANHOP = 64                      # baseband samples between points of the stereo
 PADB = 320                       # silence around a signal, baseband samples (80 ms: the low bands ring that long)
 FLOOR_DB = -80.0                 # under the loudest cell: silence
 CA, CD = 32, 120                 # canonical frames before and after the main event (see _canon)
+LATE = 0.4                       # s after the start from which analyze(late=) stores coarser frames and anchors
 
 
 def _erb(f):
@@ -170,9 +171,9 @@ def _bands(x):
     return out
 
 
-def _tri(p):
-    """power smoothed over one coarse frame each side (the envelope a coarse frame stores)"""
-    k = 1.0 - np.abs(np.arange(1 - COARSE, COARSE)) / COARSE
+def _tri(p, step=COARSE):
+    """power smoothed over one frame of `step` baseband samples each side (the envelope such a frame stores)"""
+    k = 1.0 - np.abs(np.arange(1 - step, step)) / step
     return ndimage.convolve1d(p, k / k.sum(), axis=-1, mode='constant')
 
 
@@ -319,8 +320,13 @@ def _pulse(w, p, half):
     return fl, fr, (sl + sr) / (el + er + 1e-30), pr if er >= el else pl
 
 
-def analyze(x, sr=SR):
-    """the model of a recording x (mono (n,) or stereo (n, 2)) at sample rate sr: see the module text"""
+def analyze(x, sr=SR, late=1):
+    """the model of a recording x (mono (n,) or stereo (n, 2)) at sample rate sr: see the module text. late: the
+    step of the envelope frames and of the carrier anchors from LATE s after the sound starts, as a multiple of the
+    steps before (1: 2 ms and 8 ms throughout; 4: 8 ms and 32 ms there, at most 8). Onset windows keep full
+    resolution wherever they are. A long tail or a slow swell costs about 20 kB per second at 1; at 4 a quarter of
+    that, its grain smoothed over 8 ms (tests: test_late_frames_cost_little)"""
+    late = int(np.clip(late, 1, 8))
     x = _prep(x, sr)
     n = len(x)
     ws = _bands(x)
@@ -344,11 +350,17 @@ def analyze(x, sr=SR):
     for p in on:
         fine[max(p - PRE, 0):p + POST] = True
     j = np.arange(m)
-    grid = np.nonzero((fine | (j % COARSE == 0)) & (j >= first) & (j <= last))[0]
-    Pg = np.where(fine[grid][None, :], P[:, grid], _tri(P)[:, grid])
+    after = j > first + int(round(LATE * FS))
+    grid = np.nonzero((fine | (j % (COARSE * np.where(after, late, 1)) == 0)) & (j >= first) & (j <= last))[0]
+    smooth = _tri(P)
+    if late > 1:
+        smooth[:, after] = _tri(P, COARSE * late)[:, after]
+    Pg = np.where(fine[grid][None, :], P[:, grid], smooth[:, grid])
     top = 10 * np.log10(Pg.max() + 1e-30)
     G = np.maximum(10 * np.log10(Pg + 1e-30), top + FLOOR_DB)
-    ap = np.unique(np.concatenate([np.arange(first - first % ANCHOR, last + ANCHOR, ANCHOR).clip(0, m - 1), on]))
+    ap = np.arange(first - first % ANCHOR, last + ANCHOR, ANCHOR).clip(0, m - 1)
+    ap = ap[(ap <= first + LATE * FS) | (ap % (ANCHOR * late) == 0)]
+    ap = np.unique(np.concatenate([ap, on]))
     at_on = np.isin(ap, on)
     quiet = _tri(P)[:, ap] < ref * 10 ** ((FLOOR_DB + 14.0) / 10)
     ton = np.zeros((NB, len(ap)))

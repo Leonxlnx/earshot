@@ -206,7 +206,7 @@ def test_plain_interface_jobs_get_recorded_keys_and_switches(idx):
     for text in ('sword on armour', 'a heavy impact', 'a soft wooden success chime', 'thin swish', 'water droplet',
                  'a crisp mechanical click-clack like an old SLR'):
         got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
-        assert 'real' not in registry.get(got).tags, (text, got)
+        assert registry.get(got).fn.__module__ != 'earshot.sounds.learned', (text, got)   # no single recording
     for text, want in (('footsteps on gravel', 'step/'), ('a wooden drawer', 'drawer/wood'),
                        ('camera shutter', 'camera/shutter'), ('a mechanical keyboard', 'keyboard/mechanical')):
         assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(want), text
@@ -518,8 +518,23 @@ NEW_ANCHORS = [
     ('a short glitch', ('glitch/',)),
     ('soft typing under kinetic text', ('type/',)),
     ('logo sting', ('sting/', 'logo/')),
-    ('a tech sting for an app reveal', ('sting/tech',)),
+    ('a tech sting for an app reveal', ('sting/', 'logo/', 'logo_sting/')),
     ('a panel sliding in', ('slide/panel',)),
+    # film sounds from real material
+    ('braam', ('braam/brass',)),
+    ('trailer braam', ('braam/brass',)),
+    ('impact with a suck-in', ('impact/suck',)),
+    ('fly-by', ('pass/',)),
+    ('a car passing by', ('pass/car',)),
+    ('thunder', ('thunder/',)),
+    ('drum roll build up', ('roll/', 'drum/roll', 'rise/tension')),
+    ('fire whoosh', ('fire/whoosh',)),
+    ('long whoosh', ('whoosh/long',)),
+    ('timpani hit', ('timpani/hit',)),
+    # a size word inside the name of a thing
+    ('light switch', ('switch/wall',)),
+    ('flip the light switch', ('switch/wall',)),
+    ('small change', ('coin/', 'coins/')),
     # drums
     ('a punchy kick drum', ('kick/',)),
     ('kick for a hip hop track', ('kick/',)),

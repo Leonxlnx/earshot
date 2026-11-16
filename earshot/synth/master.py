@@ -110,7 +110,8 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
     above folded over smoothly (_fold: unlike a limiter's dip this leaves the strike as bright as it was). `sparse`
     dB is the same for a long sound held under its cap by a few peaks (a fire's cracks over a quiet bed): raised
     as long as no more than 0.3 % of its samples reach into the fold. Or with `lufs` the
-    momentary-max loudness at that value with the peaks limited to peak_db. A loop keeps its length and both ends
+    momentary-max loudness at that value with the peaks limited to peak_db (with `lift`, a short one-shot's peaks
+    folded over instead, so a click in a levelled set keeps its strike as bright). A loop keeps its length and both ends
     (no trim, no fades)."""
     y = np.array(y, np.float64)
     if not np.isfinite(y).all():
@@ -150,11 +151,16 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
                 over = loudness(y) - cap
                 return y * 10 ** (-over / 20) if over > 0 else y
         return y
+    fold = lift and not loop and len(y) < dsp.n_of(1.0)     # a short one-shot's spike is folded over, as by `lift`
     for k in range(6):                   # a limited peak takes loudness with it: a peaky tap is raised again, with a
         y = y * 10 ** ((lufs - loudness(y)) / 20)                            # fast limiter after the first pass
         if true_peak_db(y) <= peak_db:
             return y
-        y = fx.limit(y, ceiling_db=peak_db, **({} if k == 0 else dict(lookahead=0.001, release=0.01)))
+        if fold:
+            y = _fold(y, peak_db)
+            y = y * 10 ** (min(0.0, peak_db - true_peak_db(y)) / 20)
+        else:
+            y = fx.limit(y, ceiling_db=peak_db, **({} if k == 0 else dict(lookahead=0.001, release=0.01)))
         if lufs - loudness(y) < 0.3:
             return y
     return y
