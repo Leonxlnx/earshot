@@ -373,7 +373,15 @@ from earshot import api   # everything in one namespace: api.rank, api.critique,
 
 ## Agent skills
 
-Two skills ship in `skills/`. Copy or symlink them into `~/.claude/skills/` (or a project's `.claude/skills/`).
+Two skills ship in `skills/`. In Claude Code, install them as a plugin:
+
+```bash
+/plugin marketplace add Leonxlnx/earshot
+/plugin install earshot@earshot
+```
+
+Or copy or symlink them into `~/.claude/skills/` (or a project's `.claude/skills/`). The skills call the `earshot`
+CLI, so install it first (above).
 
 - **`skills/earshot`**: how an agent should listen with earshot: which command answers which question, how to read
   the verdicts, when not to trust them.

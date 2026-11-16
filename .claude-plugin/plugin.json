@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "earshot",
+  "displayName": "earshot",
+  "version": "0.4.1",
+  "description": "Listen with earshot before judging any sound, and build realistic soundtracks for code-made films from real licensed recordings.",
+  "author": {
+    "name": "Leonxlnx",
+    "url": "https://github.com/Leonxlnx"
+  },
+  "homepage": "https://github.com/Leonxlnx/earshot",
+  "repository": "https://github.com/Leonxlnx/earshot",
+  "license": "MIT",
+  "keywords": ["audio", "sound-design", "sfx", "soundtrack", "listening", "video", "music"]
+}
