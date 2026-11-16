@@ -1124,8 +1124,8 @@ def _twin(sid, out, idx):
     None"""
     if not idx:
         return None
-    if _cache.get('pos_key') != id(idx):
-        _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(idx[0])}
+    if _cache.get('pos_idx') is not idx:
+        _cache['pos_idx'], _cache['pos'] = idx, {r['id']: k for k, r in enumerate(idx[0])}
     pos, terms = _cache['pos'], idx[1]
     fam, name, jobs = sid.split('/')[0], _name_words(sid), terms[pos[sid]]['family']
     for r in out:
@@ -1146,8 +1146,8 @@ def _preferred(b, sid, out, idx):
     if not idx or any(modifier(w) for w in sid.split('/')[1].split('_')):
         return None
     rows, terms = idx[0], idx[1]
-    if _cache.get('pos_key') != id(idx):
-        _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(rows)}
+    if _cache.get('pos_idx') is not idx:
+        _cache['pos_idx'], _cache['pos'] = idx, {r['id']: k for k, r in enumerate(rows)}
     pos = _cache['pos']
     fam, prior = sid.split('/')[0], rows[pos[sid]].get('prior', 1.0)
     if 'real' in rows[pos[sid]].get('tags', ()):
