@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **`earshot narration`: a narrated film's picture timed to its voiceover** (no models, no new dependencies). From
+  the voiceover and the script (JSON scenes with cues, or a text file), it finds the speech and its pauses, snaps
+  every scene cut to a pause within 1.2 s of where the text puts it (all cuts chosen together, scenes at least
+  1.2 s), places cues (`"at"` words or `{name}` markers) and subtitle lines on speech onsets, and returns the film
+  length, where the voiceover starts, an optional loudness envelope per frame (mouths, music ducking) and an SRT.
+  `nudge` and `--shift` adjust by hand. Python `api.narration`, MCP tool `narration`, Loop 6 in the earshot skill.
+  An estimate from pauses and text length, not recognition: the summary names the cuts it could not put on a pause.
+
 ## 0.4.1 - 2026-11-06
 
 Fixes from the community, thanks to @SmitMachhi, @yinbowen-dc, @kyexyz and @lunar-me, and a measurement of how

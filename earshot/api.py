@@ -7,6 +7,7 @@
     api.timeline('soundtrack.wav', video='film.mp4')
     api.sfx_render('whoosh_fast/crisp', 'w.wav', dur=0.8, apex=0.32)   # the sound bank (earshot.forge.bank)
     api.kit_render('audio/kit.json', 'audio/kit')                       # a film's kit: takes + kit.lock.json
+    api.narration('vo.wav', 'script.json')                              # cut the picture on the voiceover's pauses
 """
 import importlib
 
@@ -21,6 +22,7 @@ _FUNCS = {
     'sfx_check': ('forge.sfx', 'sfx_check'), 'kit_init': ('forge.kit', 'kit_init'),
     'kit_render': ('forge.kit', 'kit_render'), 'kit_check': ('forge.kit', 'kit_check'),
     'kit_audition': ('forge.kit', 'kit_audition'),
+    'narration': ('narration', 'sync'),   # scenes, cues, subtitles timed to a voiceover (no models)
 }
 
 

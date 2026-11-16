@@ -193,6 +193,29 @@ grades (up on 7 clips, down on 2), but fewer of its takes pass, the bed check ca
 onsets came out blunter (1.00 octave off against 0.53). Every number and what is still weak:
 [docs/FIT.md](docs/FIT.md#the-replication-benchmark-04).
 
+## Narrated films: earshot narration
+
+A narrated explainer or story film needs its picture on the spoken words: a cut in a breath, a card as its number is
+said, a hit on the line it punctuates. `earshot narration` times all of it from the voiceover and the script, with no
+models and no speech recognition (any language, Thai included):
+
+```
+$ earshot narration vo.wav script.json --srt subs.srt --envelope 30 --out sync.json
+film 36.00 s: speech 33.10 s from 0.40 s, 7 pauses >= 220 ms; 3/3 scene cuts on a pause; 1 cues; 8 subtitle lines. ...
+  s2: 0:08.06 - 0:20.19  cut on a 680 ms pause (-0.44 s from the text estimate)
+  cue smile (s4): 0:29.70 on a speech onset
+```
+
+It finds the speech and its pauses (20 ms loudness frames against the file's own level), spreads the script's text
+over the speech by weight (letters, spaces, commas and full stops; Thai vowel and tone marks take no time of their
+own), then snaps every scene cut to a pause within 1.2 s of where the text puts it, all cuts chosen together (in
+order, scenes at least 1.2 s). Cues (`"at"` the words they land on, or a `{name}` marker in the text) and subtitle
+lines snap to speech onsets within 0.4 s. `nudge` on a scene and `--shift` move the picture by hand; `--envelope`
+gives the voiceover's loudness per film frame, for mouths and for ducking the music. The result is an estimate from
+pauses and text length: the summary counts the cuts it could put on a pause and names the ones placed by text alone.
+Put the sound on the cue times with `earshot sfx` / `earshot kit` (below). Python `earshot.api.narration`; MCP tool
+`narration`.
+
 ## Sound for films: bank, sfx, kits
 
 The forge's delivered sounds ship as a bank of 252 that renders by id, with no models and no network: 183 forge v2

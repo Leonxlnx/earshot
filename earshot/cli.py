@@ -29,6 +29,7 @@ COMMANDS = {
     'fit': 'forge.fit',          # translate a recording into code (analysis by synthesis) and vary it
     'sfx': 'forge.sfx',          # one sound of the shipped bank by id, aimed at the picture; audit any sound effect
     'kit': 'forge.kit',          # a film's sound kit: one bank sound per role, rendered to takes with sync points
+    'narration': 'narration',    # time a film's scenes, cues and subtitles to its voiceover (no models)
     'gallery': 'gallery',        # one static HTML page of forge results: players, spectrograms, numbers
     'measure': 'features',       # objective measurements only (no models)
     'llm': 'llm',                # optional audio-LLM critique (only with your own API key + consent)
