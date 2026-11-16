@@ -10,7 +10,7 @@ When a product, game, page or film needs a sound and no recording is given, make
 catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
 complete on its own.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (131 designs:
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (152 designs:
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
 paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 13 ambience beds learned from
 real textures (fire, three shores, crickets, wind in trees, a brook, a cafe, a street, distant city, room tone,
@@ -42,7 +42,7 @@ and next the line `another recording of ... than toggle_on` (`than back`) says t
 learned switch or keyboard design, as meant.
 `game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
 learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`), `arcade` (16 chip
-sounds), `film` (motion-design starter; being rebuilt from real material).
+sounds), `film` (motion-design starter; whooshes, hits and risers layered from learned film recordings).
 
 **How to ask.** Name the thing, the sound or the job first, then feelings, material, numbers, key:
 `"a footstep on gravel"`, `"a wooden drawer closing"`, `"a camera shutter"`, `"a soft success chime for a finance
@@ -85,10 +85,10 @@ renders in about 1-2 s per second of sound: a 30 s bed takes up to a minute.
 (20-40 s). Use it only when a describe-the-sound request came back as a guess.
 
 **What not to expect.** No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for
-sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded. Film and motion sounds
-are being rebuilt; for now prefer the learned whooshes (`whoosh/stick`, `whoosh/rope`), `boom/heavy`,
-`cymbal/reverse` and the bank (`whoosh_fast/crisp`). Drums and the invented realistic sounds were rated low by the
-owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
+sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded. The film sounds
+(whooshes, booms, risers, falls, the braam) are layered from learned recordings and nobody has rated them yet; the
+invented film sounds they replace, the drums invented from physics and the invented realistic sounds were rated low
+by the owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
 models did not predict his ratings. Say plainly that a learned sound is a new take of a public-domain recording,
 not a sound invented from nothing.
 

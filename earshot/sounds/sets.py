@@ -10,7 +10,7 @@ better than every event making noise.
 """
 SETS = {
     # the touches are recorded keys and switches (earshot.sounds.learned: the owner heard the tonal touches as
-    # unrecognisable twice, real keys as satisfying); toggle_on and toggle_off are two takes of one lamp switch, the
+    # unrecognisable twice, real keys as satisfying); toggle_on and toggle_off are two recordings of switch/lamp, the
     # off the darker at the default seed (members walk with the seed, and a set's sounds take consecutive seeds);
     # back and next are two keys of one laptop keyboard in the same way: back (seed 5) the darkest and softest of its
     # members, next (seed 6) a brighter one

@@ -143,7 +143,7 @@ as a dict (`summary`, `sound`, `files`, `why`, `also`, `not_in_sound`, `unknown`
 
 ## Learned sounds
 
-131 designs of everyday, interface and game sounds, 13 ambience beds and 33 drum and percussion designs are learned
+152 designs of everyday, interface, game and film sounds, 13 ambience beds and 33 drum and percussion designs are learned
 from recordings whose authors put them in the public domain. They are not invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
 2 ms and every 0.25 ms around an onset, how much of each band is one tone and at which frequency, the stereo image),
@@ -152,9 +152,9 @@ sound made from nothing, and it exists only because someone recorded the thing a
 
 | | one-shots | ambience beds | drums |
 |---|---|---|---|
-| designs | 131 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) |
-| recordings | 282 recorded events (a few are several events cut from one recording) | 12 textures of 12-30 s | 130 strokes |
-| store | `earshot/data/resyn/`: 5.29 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 4.09 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.47 MB, `index.json`, `CREDITS.md` |
+| designs | 152 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) |
+| recordings | 348 recorded events (a few are several events cut from one recording) | 12 textures of 12-30 s | 130 strokes |
+| store | `earshot/data/resyn/`: 6.79 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 4.09 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.47 MB, `index.json`, `CREDITS.md` |
 | sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for |
 
@@ -198,7 +198,7 @@ no limiter); airy sounds never do: the owner heard a whoosh get worse with it.
 "a camera shutter", "a wooden drawer"), the interface job it plays ("hover" is a dial's click, "toggle" a lamp
 switch, "next" a laptop key), or its family's own word. A feeling alone never reaches a recording, and a request for
 "a heavy impact" does not reach a recorded dumbbell. Where a learned and an invented design answer the same request,
-the learned one wins a tie (`registry.LEARNED` = 1.1); 19 learned designs that the store marks as not a default
+the learned one wins a tie (`registry.LEARNED` = 1.1); 34 learned designs that the store marks as not a default
 choice (`"default": false` in its index) rank lower (0.6 times that prior).
 
 **Credits.** Every member is credited with its title, author, page and licence in
@@ -565,7 +565,7 @@ sound is or does, the name its character.
 
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
-| learned (`sounds/learned.py`) | 131 in 83 families | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
+| learned (`sounds/learned.py`) | 152 in 94 families | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
 | interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
@@ -617,12 +617,68 @@ The sounds a product film, a title sequence or an interface animation is cut wit
 fast and a soft whoosh, a deep pass, a sliding panel, a flick), hits (a boom under a logo or a title, a soft
 thump, a knock), builds and falls (a riser, a reversed swell, a sub drop), small arrivals (pops, a tick, a click,
 key presses), light (a glint, a shimmer), a camera shutter and short stingers. The first designs of this group were
-invented from class statistics of film effects, and the owner rated most of them 1-2 of 5; they are being replaced
-by designs built from real material (learned recordings of sticks, ropes, drums, cymbals and brass, shaped the way a
-sound designer layers them). The learned `whoosh/*`, `boom/heavy`, `cymbal/reverse` and `camera/shutter` already
-answer such requests, and the bank's film sounds (`whoosh_fast/crisp`, rated 4) stay reachable.
+invented from class statistics of film effects, and the owner rated them 1 to 3 of 5 (booms, slams and thumps 1,
+risers and falls 1-2). 23 of the 39 designs of `earshot/sounds/motion.py` are now built from real material, the way
+a sound designer builds them: takes of learned film recordings (21 things, 66 recordings in the public domain, in
+the learned store) reshaped by `earshot/synth/design.py` (reverse, layer at a moment, carry past the listener, fade)
+within the range where a take stays natural, and glued by one room. No oscillator and no synthetic sweep is in
+them. The seed is a performance: it picks the recordings (another drum, another cymbal) and every take draws fresh
+noise; `meta['member']` names the main recording. Nobody has rated these yet.
 
-<!-- film: to be completed after C3 -->
+| family | designs | made of |
+|---|---|---|
+| air | `whoosh/fast` | a real stick swung through the air, a real fast swish 7 dB under it at its loudest moment |
+| | `whoosh/soft` | a real airy whoosh, a little smaller and darker, no rumble under 120 Hz, trimmed around its peak |
+| | `whoosh/deep` | a real deep or heavy whoosh, a real bass drum's decay played backwards 12 dB under it |
+| | `whoosh/long` | a real deep whoosh, bigger and slower, led in by a swell of real air played backwards |
+| | `swoosh/in`, `swoosh/out` | a real airy whoosh up to its peak and stopped there; from just before its peak on |
+| | `flick/thin`, `flick/paper` | a real fast swish taken small and bright; a real page turned |
+| | `pass/air` | a real deep whoosh carried past the listener: across the stereo field, level by distance, pitch falling 1.5 semitones |
+| hits | `boom/deep` | a real orchestral bass drum, a real timpani 7 dB and a real tam-tam 15 dB under it, in a hall |
+| | `boom/short` | a real timpani with a real bass drum 4 dB under it, both damped, nearly dry |
+| | `boom/wide` | a real tam-tam struck hard over a real bass drum, wider than recorded |
+| | `slam/title` | a real heavy door slammed over a real bass drum cut short |
+| | `impact/suck` | the build of a real airy whoosh played backwards into a real heavy drop and a bass drum |
+| | `explosion/huge` | a real near explosion, a real bass drum 3 dB and a real roll of thunder 9 dB under it |
+| builds | `rise/reverse` | a real crash cymbal's decay played backwards, a real tam-tam's 9 dB under it |
+| | `rise/air` | the build of a recorded swell of air, the build of a real airy whoosh 6 dB under it for the last part |
+| | `rise/tension` | a real drum or timpani roll in crescendo, a real suspended cymbal rolled 6 dB under it |
+| | `suck/in` | a real airy whoosh's tail played backwards, stopped where its peak was |
+| falls | `fall/air` | the decay of a recorded swell of air, fading straight in dB |
+| | `fall/sub` | a real orchestral bass drum, as big and dark as the engine takes it, a real timpani 10 dB under it |
+| stingers | `sting/reveal` | a real cymbal decay played backwards into a real bass drum and tam-tam |
+| | `braam/brass` | real low brass (tubas, trombones, horns) on the root, fifth and octave over a real bass drum hit |
+
+Still invented, from class statistics of small film sounds (0.1-0.25 s, a 10-20 ms rise, mono): `slide/panel`,
+`thump/soft`, `knock/soft`, `pop/soft`, `pop/bubble`, `pop/pluck`, `tock/wood`, `tock/glass`, `blip/soft`,
+`shine/glint`, `shine/sweep`, `sparkle/burst`, `glitch/short`, `type/soft`, `type/run`, `sting/soft`. Removed:
+`whoosh/tonal`, `sting/tech`, and the invented `whoosh/airy` (that id is now the learned airy whoosh). The learned
+film things answer by their own names too (`timpani/hit`, `gong/hit`, `cymbal/orchestral`, `brass/low`,
+`thunder/roll`, `pass/car` ...), and the bank's film sounds (`whoosh_fast/crisp`, rated 4) stay reachable.
+
+Controls: energy (a harder, brighter strike and more of the lower layers), size (the takes
+0.8-1.25 times the design's own size: bigger is lower and longer), bright (2 dB per octave), hard (the strike), ring
+(0.6-1.7 times the ring, on the hits), space, width, and motion on `pass/air` (how far it travels, 0.5-2.5
+semitones of fall). `dur` sets a build's length (it ends on its peak) and how much of a tail is heard. A cymbal in
+a film request is the film's crash cymbal (`cymbal/orchestral`); with a word of the drum kit ("fill", "kit",
+"beat", "drums") it is the kit's `crash/*`.
+
+```
+$ earshot make "a fast whoosh as the title flies in" -o whoosh.wav
+whoosh.wav: whoosh/fast (0.51 s, -14 LUFS, clean) [whoosh]
+also: whoosh/soft, whoosh/deep, whoosh/long
+not used by this sound: motion
+not understood: flies
+$ earshot make "a deep cinematic boom for the logo" -o boom.wav
+boom.wav: boom/deep (3.42 s, -14 LUFS, clean) [boom]
+also: boom/short, kick/deep, boom/wide
+$ earshot make "a trailer braam" -o braam.wav
+braam.wav: braam/brass (4.10 s, Bb1, -14 LUFS, clean) [braam]
+also: braam/hit, braam/swell, boom/deep
+```
+
+At seed 0 the whoosh played a stick cutting the air (qubodup, the fifth of five recordings), the boom a bass drum
+of VSCO-2 CE (the second of four) and the braam a held horn note of VSCO-2 CE (`--json` names them: `member`).
 
 ## Voices
 

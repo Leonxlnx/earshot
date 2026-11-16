@@ -1192,7 +1192,6 @@ def explosion_huge(c, r):
     return _place(c, r, ops.span(y, 0.0, c.length() or 4.5, fout=1.5, shape='db'), 'hall', crest=11.0)
 
 
-
 @design('sting/soft', kind='stinger',
         says=('a soft thump with a warm piano chord ringing out', 'a mellow piano chord over a low bump',
               'a gentle closing chord on a felt piano'),

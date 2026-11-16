@@ -44,19 +44,21 @@ sound is, then its character.
 
 | group | designs | how it is made | examples |
 |---|---|---|---|
-| learned things | 131 | learned from 282 recorded events in the public domain | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
+| learned things | 152 | learned from 348 recorded events in the public domain | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
 | interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (the interface ones by a soft pluck) | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 31 | 13 learned from real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
 | chip | 24 | the channels of 8-bit consoles, band-limited | `coin/chip`, `jump/chip`, `laser/chip`, `explosion/chip` |
 | drums | 40 | 33 played from 130 recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented (drum-machine voices, a brush snare, a finger snap, stick counts) | `kick/soft`, `snare/tight`, `hat/closed`, `conga/muted`, `darbuka/hit`, `drum/roll`; `kick/electro` |
-| film and motion | in progress | being rebuilt from real material | whooshes, hits, risers, drops, pops, stingers |
+| film and motion | 39 | 23 layered from learned film recordings (orchestral drums, timpani, tam-tams, cymbals, swells, rolls, low brass, real whooshes); 16 small ones invented (pops, tocks, glints, a glitch, key ticks) | `whoosh/fast`, `boom/deep`, `rise/reverse`, `braam/brass`, `explosion/huge`; `pop/soft` |
 | action and objects | 83 | invented from physics | `jump/soft`, `hit/punch`, `coin/drop`, `paper/tear`, `bell/desk` |
 | notes, synthesizer | 51, 14 | struck and string models, synth patches | `note/kalimba`, `pad/warm`, `braam/hit` |
 | music loops | 3 | a small grammar of harmony and feel | `bed/warm`, `bed/playful`, `bed/8bit` |
 | bank | 209 | the 0.2-0.4 sound bank, stored as code | `whoosh_fast/crisp`, `riser/tension`, `typing_key/light` |
 
 Where a learned design and an invented one answer the same request, the learned one wins the tie: the owner rated
-the invented realistic sounds 1-2 of 5. Chip designs answer only requests that ask for chip sound. earshot is a
+the invented realistic sounds 1-2 of 5. Where an invented design and a learned one are the same thing (`knock/door`
+and `door/knock`, `paper/tear` and `paper/rip`: 22 invented designs in `lexicon.TWINS`), a request that names the thing gets
+the learned one; the invented one is still there by its id. Chip designs answer only requests that ask for chip sound. earshot is a
 sound-effects tool: the three music loops are short beds for a game menu or a demo, not music generation.
 
 ### How it understands requests
@@ -84,11 +86,11 @@ one request in three or four of the held-out kind needs a second call, which is 
 
 ### Learned sounds: what they are
 
-The 131 learned designs, 13 ambience beds and the recorded drums are not invented. Each comes from recordings in
+The 152 learned designs, 13 ambience beds, the recorded drums and the film sounds layered from them are not invented. Each comes from recordings in
 the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an
 explicit public-domain dedication. earshot keeps each recording as numbers, not audio: the level of 56 bands on a
 2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
-(`earshot/synth/resyn.py`). The store is 5.29 MB for 282 recorded events (`earshot/data/resyn/`; a few are several
+(`earshot/synth/resyn.py`). The store is 6.79 MB for 348 recorded events (`earshot/data/resyn/`; a few are several
 events cut from one recording), 4.09 MB for 12 textures (`earshot/data/textures/`) and 1.47 MB for 130 drum strokes
 (`earshot/data/drums/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
 noise and applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural
@@ -577,7 +579,8 @@ judge is in [docs/LIMITS.md](docs/LIMITS.md).
 
 `make` draws on a fixed catalogue: it chooses and shapes designs; it does not compose music, speak, or invent a
 sound no design covers. Realistic sounds exist only for things someone recorded and put in the public domain; the
-invented ones for other real things were rated low. Film sounds are being rebuilt from real material. A request that
+invented ones for other real things were rated low. The film sounds layered from recordings have not been rated by
+anyone yet. A request that
 describes a mood or paraphrases a sound is understood less well than one that names it. earshot hears through two
 open models and a set of measurements. Trustworthy: loudness, timing and sync to picture, "is this the kind of sound
 I asked for" on single exposed sounds, picking among candidates, obvious code-synthesized sources. Hints only: tags

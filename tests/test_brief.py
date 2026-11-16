@@ -322,10 +322,11 @@ def test_a_member_named_in_the_request_is_the_one_chosen():
     wrong = [(text, sid, [r['id'] for r in brief.rank(brief.read(text), top=1)]) for text, sid in cases]
     def learned(got, sid):
         """a learned member of the same family that says what the name says ("grass step": a recorded footstep on
-        grass, earshot.sounds.learned, preferred to the invented step/grass by brief._preferred)"""
+        grass, earshot.sounds.learned, preferred to the invented step/grass by brief._preferred), or the learned twin
+        of the named design ("door knock": door/knock for knock/door, lexicon.TWINS)"""
         name, got_name = set(sid.split('/')[1].split('_')), set(got.split('/')[1].split('_'))
         same = got.split('/')[0] == sid.split('/')[0] or name <= got_name          # "drop drip": a water drop
-        return same and 'real' in registry.get(got).tags
+        return (same or L.TWINS.get(sid) == got) and 'real' in registry.get(got).tags
     wrong = [w for w in wrong if w[2] != [w[1]] and not (w[2] and (twin(w[2][0], w[1]) or learned(w[2][0], w[1])))]
     assert not wrong, wrong
     assert brief.rank(brief.read('a deep impact'), top=1)[0]['id'] == 'boom/deep'
@@ -481,9 +482,12 @@ ANCHORS = [
 
 def _learned_twin(sid, prefixes):
     """a learned design (earshot.sounds.learned: a recording played as new takes) of the family an anchor names:
-    where it is the same thing, brief prefers it to the invented one (brief._preferred)"""
+    where it is the same thing, brief prefers it to the invented one (brief._preferred), and the learned twin of an
+    invented design an anchor names (lexicon.TWINS: knock/door is door/knock)"""
     from earshot.sounds import registry
-    return 'real' in registry.get(sid).tags and any(sid.split('/')[0] == p.split('/')[0] for p in prefixes)
+    from earshot.sounds.lexicon import TWINS
+    return 'real' in registry.get(sid).tags and (any(sid.split('/')[0] == p.split('/')[0] for p in prefixes)
+                                                 or any(i.startswith(prefixes) and t == sid for i, t in TWINS.items()))
 
 
 @pytest.mark.parametrize('text,prefixes', ANCHORS)
@@ -535,6 +539,12 @@ NEW_ANCHORS = [
     ('light switch', ('switch/wall',)),
     ('flip the light switch', ('switch/wall',)),
     ('small change', ('coin/', 'coins/')),
+    # a learned design that is the thing asked for wins over its invented twin (lexicon.TWINS)
+    ('knocking on a wooden door', ('door/knock',)),
+    ('coins dropped on a table', ('coins/floor',)),
+    ('scissors cutting paper', ('scissors/cut',)),
+    ('paper tearing', ('paper/rip',)),
+    ('a distant explosion', ('explosion/far',)),
     # drums
     ('a punchy kick drum', ('kick/',)),
     ('kick for a hip hop track', ('kick/',)),
@@ -545,6 +555,7 @@ NEW_ANCHORS = [
     ('open hihat', ('hat/open',)),
     ('a crash cymbal at the end of the fill', ('crash/',)),
     ('crash on the drums', ('crash/',)),
+    ('a cymbal crash for a film trailer', ('cymbal/orchestral',)),
     ('ride cymbal ping', ('ride/ping',)),
     ('floor tom', ('tom/floor',)),
     ('a drum fill on the toms', ('tom/',)),
@@ -553,7 +564,12 @@ NEW_ANCHORS = [
     ('snapping fingers', ('snap/finger',)),
     ('egg shaker', ('shaker/',)),
     ('tambourine', ('tambourine/',)),
-    ('conga slap', ('conga/slap',)),
+    ('conga slap', ('conga/',)),
+    ('a darbuka', ('darbuka/',)),
+    ('doumbek', ('darbuka/',)),
+    ('a bodhran', ('frame_drum/',)),
+    ('afuche', ('cabasa/',)),
+    ('slap stick', ('slapstick/',)),
     ('bongos', ('bongo/',)),
     ('cajon', ('cajon/',)),
     ('claves', ('clave/',)),

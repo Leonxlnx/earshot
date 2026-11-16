@@ -22,13 +22,13 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
   `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
   `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 131 designs of
-  everyday, interface and game sounds learned from 282 recorded events in the public domain (the sources of all
+- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 152 designs of
+  everyday, interface, game and film sounds learned from 348 recorded events in the public domain (the sources of all
   learned material, beds and drums included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on
   Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of `earshot/data/resyn/`,
   `textures/` and `drums/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 5.29 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
+  stored as numbers: 6.79 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
   variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
   the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
@@ -60,8 +60,21 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `conga/muted`, `bongo/low`, `darbuka/hit`, `frame_drum/deep`, `cabasa/hit`, `slapstick/crack`; removed:
   `ride/bell`, `cymbal/swell`, `conga/slap`, `cajon/slap`. The owner rated the drums invented from physics 1-2
   ("big problems, does not sound good"); the recorded ones are not rated yet.
-- **Motion-design sounds** (`earshot/sounds/motion.py`): whooshes, hits, builds, small arrivals, light and stingers
-  for product films; being rebuilt from real material.
+- **Film and motion sounds** (`earshot/sounds/motion.py`, `earshot/synth/design.py`): 39 designs. 23 are built
+  the way a sound designer layers them, from 21 learned film things (66 recordings in the public domain: orchestral
+  bass drums, timpani, tam-tams, crash cymbals, heavy drops, a door slam, swells of air, cymbal and gong, drum and
+  timpani rolls, low brass, deep, airy and fast whooshes, passes, thunder) reversed, moved, faded and glued by one
+  room: `whoosh/fast`, `whoosh/soft`, `whoosh/deep`, `whoosh/long`, `swoosh/in`, `swoosh/out`, `flick/thin`,
+  `flick/paper`, `pass/air`, `boom/deep`, `boom/short`, `boom/wide`, `slam/title`, `impact/suck`, `rise/reverse`,
+  `rise/air`, `rise/tension`, `suck/in`, `fall/air`, `fall/sub`, `sting/reveal`, `braam/brass`, `explosion/huge`.
+  16 small ones stay invented (pops, tocks, a blip, a glint, a shimmer sweep, a sparkle, a glitch, key ticks, a
+  sliding panel, a soft thump and knock, the soft sting). Removed: `whoosh/tonal`, `sting/tech` and the invented
+  `whoosh/airy` (the id is now the learned airy whoosh). The owner rated the invented film sounds 1-3 of 5; the
+  ones built from recordings are not rated yet. A film request for a cymbal gets the film's crash cymbal, a request
+  with a word of the drum kit the kit's.
+- **Invented and learned twins** (`lexicon.TWINS`): 22 invented designs of real things have a learned design of
+  the same thing (`knock/door` and `door/knock`, `coin/drop` and `coins/floor`, `paper/tear` and `paper/rip` ...);
+  a request that names the thing gets the learned one, the invented one answers to its id.
 - **Three music loops** (`earshot/synth/music.py`, `earshot/sounds/beds.py`): `bed/warm`, `bed/playful`, `bed/8bit`,
   a whole number of bars in a key, seamless or once. earshot is a sound-effects tool; nine other styles were
   written and removed after the owner's listening.

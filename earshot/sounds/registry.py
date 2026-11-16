@@ -270,9 +270,12 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
         meta['material'] = c.material
     if c.member:
         meta['member'] = dict(c.member)
-    # a voice or material that is the design's own was honoured by choosing the design ("a kalimba note", "8-bit")
+    # a voice or material that is the design's own was honoured by choosing the design ("a kalimba note", "8-bit"),
+    # as is a material read from a word of the thing's own name ("a cork popping out of a bottle": cork/bottle)
+    from .lexicon import MATERIALS
+    named = {MATERIALS.get(w) for w in id.replace('/', '_').split('_')}
     own = {k for k, v in (('voice', d.voice), ('material', d.material))
-           if request.get(k) and (request[k] == v or request[k] in d.tags)}
+           if request.get(k) and (request[k] == v or request[k] in d.tags or (k == 'material' and request[k] in named))}
     if c._dur and not (0.75 * c._dur <= meta['dur_s'] <= 1.5 * c._dur + 0.5):
         c.used.discard('dur')        # read but not kept: a struck sound rings as it rings, a loop has a shortest length
     ignored = sorted(c.asked - c.used - own)

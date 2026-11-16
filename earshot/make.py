@@ -31,6 +31,7 @@ import os
 
 from . import brief
 from .cli import common
+from .sounds import lexicon as L
 from .report import emit, read_json
 
 SET_FIELDS = ('name', 'want', 'sound', 'pitch', 'dur', 'voice', 'material', 'seed', 'n', 'axes', 'lufs')
@@ -105,8 +106,12 @@ def doubt(b, cands):
         return None
     top = cands[0]
     fam = top['id'].split('/')[0]
-    others = [c for c in cands[1:] if c['id'].split('/')[0] != fam]
-    named = brief.named(top['why'])
+    # an invented twin of the pick, or the kit's cymbal under the film's, is the same thing (lexicon.TWINS,
+    # FILM_CYMBAL), not another kind of sound; a learned pick
+    # whose thing the request names is no guess (brief.thing_named)
+    others = [c for c in cands[1:] if c['id'].split('/')[0] != fam and L.TWINS.get(c['id']) != top['id']
+              and L.FILM_CYMBAL.get(c['id'].split('/')[0]) != top['id']]
+    named = brief.named(top['why']) or brief.thing_named(top['id'], top['why'])
     heard = top.get('z') is not None and top['z'] >= GUESS_Z
     close = bool(others) and top['score'] - others[0]['score'] <= GUESS_HAIR * abs(top['score'])
     if (named or heard) and not close:

@@ -277,8 +277,12 @@ CONCEPTS = {
     'tambourine': ('tamb', 'timbrel'),
     'conga': ('congas', 'tumba'),
     'bongo': ('bongos',),
+    'darbuka': ('darbouka', 'doumbek', 'goblet drum'),
+    'frame_drum': ('frame drum', 'bodhran'),
     'cajon': ('box drum',),
     'clave': ('claves',),
+    'cabasa': ('afuche',),
+    'slapstick': ('slap stick',),
     'drum_roll': ('drum roll', 'drumroll', 'snare roll', 'press roll'),
     'count_in': ('count in', 'count-in', 'count off', 'drumsticks', 'stick click', 'sticks clicking'),
     'note': ('single note', 'one note', 'tone'),
@@ -296,6 +300,7 @@ CONCEPTS = {
              'bubbly bottle', 'popping the bubbly'),
     'keyring': ('key ring', 'keychain', 'jingle keys', 'keys jingle', 'jingling keys', 'bunch of keys', 'car keys',
                 'house keys'),
+    'scissors': ('snip', 'cutting paper'),
     'heartbeat': ('heart beat', 'heart pounding', 'heartbeat pulse'),
     # ---- places and weather
     'storm': ('stormy', 'storm outside', 'distant storm'),
@@ -399,6 +404,23 @@ FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride'
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
 BY_NAME_ONLY = frozenset(('tap/tone', 'hover/tone', 'toggle/up', 'toggle/down', 'next/step'))
+# an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. The owner rated the
+# invented tactile sounds 1 to 2 of 5 and the recorded ones 4 to 5, so a request that names the thing and reaches the
+# invented one gets the recording (brief._preferred); the invented one still answers to its own id
+TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop': 'coins/floor',
+         'glass/clink': 'glass/cheers',
+         'paper/tear': 'paper/rip', 'paper/crumple': 'paper/ball', 'paper/page': 'page/turn', 'book/close': 'book/shut',
+         'dice/roll': 'dice/throw', 'clock/ticktock': 'clock/mechanical', 'cork/pop': 'cork/bottle',
+         'pen/click': 'pen/ballpoint', 'zipper/pull': 'zipper/jacket', 'scissors/snip': 'scissors/cut',
+         'match/strike': 'match/light', 'stapler/press': 'stapler/desk', 'drawer/slide': 'drawer/wood',
+         'door/close': 'door/shut', 'explosion/distant': 'explosion/far', 'hit/punch': 'punch/body',
+         'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge'}
+# a cymbal of the drum kit (earshot.sounds.drums) -> the film's cymbal (a learned crash cymbal struck hard, the
+# material of earshot.sounds.motion): a film request ("a cymbal crash for the trailer") gets the film's, a request
+# with a word of the kit ("a crash cymbal at the end of the fill") the kit's
+FILM_CYMBAL = {'crash': 'cymbal/orchestral'}
+KIT_WORDS = frozenset(('fill', 'fills', 'kit', 'beat', 'beats', 'drum', 'drums', 'drummer', 'groove', 'backbeat',
+                       'band', 'song', 'track', 'loop', 'hi-hat', 'snare', 'kick'))
 # families that name a kind of sound, not a thing: a recorded one (whoosh/rope, knock/hollow) answers a request that
 # also names its thing or character (brief.learned_ok), or plays the interface job it is chosen for (its roles)
 SOUND_FAMILIES = frozenset(('whoosh', 'swish', 'swipe', 'click', 'tap', 'tick', 'knock', 'pop', 'thud', 'boom', 'hit',

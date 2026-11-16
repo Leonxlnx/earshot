@@ -954,7 +954,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     if idx is None:
         idx = index(rows) if rows is not None else _default_index()
     if semantic is not None:
-        return _learned_first(b, _named_member(b, blend(b, rank(b, top=None, idx=idx), semantic, idx), idx), idx)[:top]
+        return _named_member(b, blend(b, rank(b, top=None, idx=idx), semantic, idx), idx)[:top]
     rows, terms, inv, idf = idx
     q = _query(b)
     score, why = {}, {}
@@ -1015,7 +1015,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
         out.append({'id': row['id'], 'score': round(s, 3),
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
-    return _learned_first(b, _named_member(b, out, idx), idx)[:top]
+    return _named_member(b, out, idx)[:top]
 
 
 def _roles():
@@ -1025,6 +1025,12 @@ def _roles():
         with open(path, encoding='utf-8') as fh:
             _cache['roles'] = {e['id']: frozenset(e.get('roles', ())) for e in json.load(fh)}
     return _cache['roles']
+
+
+def thing_named(sid, why):
+    """True when sid is a design of earshot.sounds.learned (recordings of one thing) and the words that decided it
+    (rank's `why`) name its thing: "a dumbbell dropped on the floor" names dumbbell/place, which is no guess"""
+    return sid in _roles() and bool(_family_words(sid) & {stem(w) for w in why})
 
 
 def _interface_only(b):
@@ -1041,11 +1047,17 @@ def learned_ok(b, sid, t, said):
     ("a footstep on gravel": step/, a footstep by lexicon.FAMILY_SENSE; "toggle dark mode": switch/), the
     interface job it plays (its `roles`: "hover" is a tick of a dial) or its family's own word ("a wooden drawer",
     "a pot clanging"). A recording never answers by feel alone nor by a job its thing merely has: "sword on armour"
-    is a clang, but no recorded pot or anvil; "a heavy impact" reaches no recorded dumbbell"""
+    is a clang, but no recorded pot or anvil; "a heavy impact" reaches no recorded dumbbell; "a cue when the car
+    passes a checkpoint" names a cue, and the passing car is the event, not a recording asked for (`framed`, when
+    the request names something else as its sound)"""
     asked = set(b['concepts'])                           # "... muffled and bubbly": a part, not a recorded splash
     if _roles().get(sid, frozenset()) & asked and _interface_only(b):
         return True                     # the interface job alone ("a click like an old SLR" is a shutter's click)
     own = said - set(b.get('context_words', ()))         # "passes a save point flag": the flag is where, not what
+    framed = set(b.get('framed', ()))
+    if framed and asked - framed:
+        asked -= framed
+        own -= {stem(w) for c in framed for w in WORD.findall((b.get('written') or {}).get(c, '').lower())}
     fam = _family_words(sid)                             # "a drum hit" names no brake drum: every word of it
     by_family = t['exact'] in asked or (fam <= own if len(fam) > 1 else bool(fam & own))
     if sid.split('/')[0] in L.SOUND_FAMILIES:            # "a whoosh" names no recorded rope: "a rope whoosh" does
@@ -1137,7 +1149,7 @@ def _twin(sid, out, idx):
     return None
 
 
-def _preferred(b, sid, out, idx):
+def _preferred(b, sid, out, idx, twins=True):
     """a learned member of sid's family (a recording played as a new take: earshot.sounds.learned, tagged 'real')
     with a prior at least as high that scores at least MEMBER_SHARE of sid's on the request's own words, or None: "a
     cork pop" names the invented cork/pop word for word, but the family's learned member is the same thing (its
@@ -1146,6 +1158,9 @@ def _preferred(b, sid, out, idx):
     name of a thing ("light switch": a switch for the light, not a light one; lexicon.CONCEPTS)"""
     if not idx:
         return None
+    twin = _learned_twin(b, sid, out, idx) if twins else None
+    if twin:
+        return twin
     fam_, name_ = sid.split('/')
     if (any(modifier(w) for w in name_.split('_'))
             and _key(name_.split('_') + fam_.split('_')) not in _reverse()['c']):
@@ -1174,6 +1189,28 @@ def _preferred(b, sid, out, idx):
     return None
 
 
+def _learned_twin(b, sid, out, idx):
+    """the learned design of the same thing as the invented sid (lexicon.TWINS: "knocking on a wooden door" is
+    door/knock, not knock/door; and for a film request without a word of the drum kit, the film's cymbal for the
+    kit's: lexicon.FILM_CYMBAL) when it answers the request too (it is ranked: the request names its thing) and
+    nothing rules it out (the hard filters, a direction against the request's), or None"""
+    twin = L.TWINS.get(sid)
+    fam = sid.split('/')[0]
+    if (not twin and fam in L.FILM_CYMBAL and b.get('domain') == 'motion'
+            and not set(tokens(b.get('text') or '')) & L.KIT_WORDS):
+        twin = L.FILM_CYMBAL[fam]                    # "a cymbal crash for the trailer": the film's cymbal
+    if not twin or not any(r['id'] == twin for r in out) or not _family_words(sid) & set(_said_words(b.get('text'))):
+        return None                     # only where the request says the invented one's family word ("punch impact"
+        #                                 reaches hit/punch through impact/punch, but says no hit)
+    rows, terms = idx[0], idx[1]
+    if _cache.get('pos_key') != id(idx):
+        _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(rows)}
+    k = _cache['pos'][twin]
+    if excluded(b, rows[k], terms[k]) or (b.get('dir') and terms[k]['dir'] == -b['dir']):
+        return None
+    return twin
+
+
 def _learned_first(b, out, idx):
     """a ranking whose first design gives way to a learned member of its family that is the same thing
     (_preferred: "a cork pop", "a door closing")"""
@@ -1192,12 +1229,15 @@ def _named_member(b, out, idx=None):
     that won is answered by the member the request names: "a warm pad chord" is pad/warm, though "warm" is an
     adjective (it still moves its axis) and the words of another member may score a little higher (MEMBER_SHARE).
     Among the ranked members of the first design's family, the one whose name shares the most words with the
-    request goes first (then by score); the order of everything else stays"""
+    request goes first (then by score), and then a learned design of the same thing (`_learned_first`); the order
+    of everything else stays"""
     seq = _said_seq(b.get('text'))
     said = {s: t for s, t in reversed(seq) if s}
     rows, terms = (idx[0], idx[1]) if idx else ((), ())
     score = {r['id']: r['score'] for r in out}
     full = []
+    framed = set(b.get('framed', ()))
+    sound = set(b['concepts']) - framed if framed else set()   # what the request names as its sound, when it does
     for k, row in enumerate(rows):
         i = row['id']
         if not (_name_words(i) and _compound(i, seq)) or excluded(b, row, terms[k]):
@@ -1206,11 +1246,13 @@ def _named_member(b, out, idx=None):
             continue
         if terms[k]['family'] & set(b.get('parts', ())) and not terms[k]['family'] & set(b['concepts']):
             continue                  # "... with airy chimes and a warm pad": a part of the sound, not the sound
+        if sound and terms[k]['family'] & framed and not terms[k]['family'] & sound:
+            continue                  # "a cue when the car passes ...": the event, not the sound
         full.append((len(_name_words(i)) + len(_family_words(i)), score.get(i, 0.0), -k, i))
     if full:
-        sid = max(full)[3]
-        sid = _twin(sid, out, idx) or sid
-        sid = _preferred(b, sid, out, idx) or sid
+        first = max(full)[3]
+        sid = _twin(first, out, idx) or first
+        sid = _preferred(b, sid, out, idx, twins=sid == first) or sid    # "punch cut hit" is no fist on a body
         if out and out[0]['id'] == sid:
             return out
         old = next((r for r in out if r['id'] == sid), {'id': sid, 'why': []})
@@ -1227,8 +1269,8 @@ def _named_member(b, out, idx=None):
     pos = -neg
     if (n == 0 or pos == 0 or len(_name_words(out[0]['id']) & said.keys()) >= n
             or out[pos]['score'] < MEMBER_SHARE * out[0]['score']):
-        return out
+        return _learned_first(b, out, idx)
     best = dict(out[pos], score=out[0]['score'])
     named_ = [said[w] for w in sorted(_name_words(best['id']) & said.keys())]
     best['why'] = list(dict.fromkeys(list(best['why']) + named_))
-    return [best] + out[:pos] + out[pos + 1:]
+    return _learned_first(b, [best] + out[:pos] + out[pos + 1:], idx)

@@ -185,8 +185,9 @@ store and to drop members it scored lowest where a design had others.
   a click's rise within 1 ms; a model is 3.6-35 kB (median 9.1 kB); a render takes 0.26-0.33 s per second of sound.
   Weak: soft onsets smear (a bag drop's rise went from 61 to 99 ms); a fast swipe; impacts whose mid band is partly
   carried as noise (takes differ by about 3 dB there).
-- **The store**: 131 designs, 282 members, 5.29 MB; nothing the owner rated 1-2, no duplicates, at most five members
-  per thing. Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
+- **The store**: 152 designs, 348 members, 6.79 MB (21 of the designs and 66 of the members are the film's
+  material, below); nothing the owner rated 1-2, no duplicates, at most five members
+  per thing (six notes of low brass for the braam). Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
   clear onset, a single event.
 - **Ambience textures** (`earshot/synth/quilt.py`, 12 BigSoundBank textures, 4.09 MB): a take differs from its
   recording by 2.4-3.6 dB at band-envelope level, the same as two takes differ from each other, except the crickets
@@ -199,8 +200,11 @@ store and to drop members it scored lowest where a design had others.
 - **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit
   public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/` and
   `drums/`.
-
-Film sounds built from real material are not part of this section yet: they were being built when it was written.
+- **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 23 motion designs are layers of 21
+  learned film things (66 recordings) (orchestral bass drums, timpani, tam-tams, crash cymbals, heavy drops, a door slam, swells
+  of air, cymbal and gong, drum and timpani rolls, low brass, deep, airy and fast whooshes, passes, thunder),
+  reversed, moved, faded and glued by one room. The owner rated the invented film sounds they replace 1 to 3 of 5;
+  the ones built from recordings have not been rated by anyone yet.
 
 ### Understanding requests
 

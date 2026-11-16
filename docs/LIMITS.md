@@ -82,7 +82,7 @@ family and the learned beds were built after his last ratings: each learned take
   layer two designs into one, or synthesise from a free description. A request nothing answers is an error; a
   request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
-  the recording in the public domain; the store has 131 things. For other real things the catalogue has designs
+  the recording in the public domain; the store has 152 things. For other real things the catalogue has designs
   invented from physics (`action`, `object`), which the owner rated 1-2 of 5.
 - New sounds from a class of recordings. Sampling new members from a model of several recordings was tried and
   rated 1-2; it was dropped. A learned design plays its own recordings and new takes of them.
@@ -105,9 +105,13 @@ family and the learned beds were built after his last ratings: each learned take
   `also`, `--sound` and a person's ears.
 
 **What is weak or unverified.**
-- **Film and motion sounds are in progress.** The first motion designs were invented from class statistics of film
-  effects and rated mostly 1-2; they are being rebuilt from real material. Until then prefer the learned whooshes,
-  `boom/heavy`, `cymbal/reverse` and the bank's film sounds.
+- **Film sounds from recordings are not rated.** The first motion designs were invented from class statistics of
+  film effects and the owner rated them 1 to 3 of 5 (booms, slams and thumps 1, risers and falls 1-2). 23 of the 39
+  motion designs (whooshes, the pass, booms, the slam, the suck-in hit, risers, falls, the reveal sting, the braam,
+  the explosion) are now layers of learned recordings (orchestral drums, timpani, tam-tams, cymbals, heavy drops, a
+  door slam, swells, rolls, low brass, real whooshes and thunder); nobody has listened to them yet. The other 16
+  (pops, tocks, a blip, glints, a sparkle, a glitch, key ticks, a sliding panel, a soft thump and knock, the soft
+  sting) are still invented.
 - **Drums.** The acoustic kit and the hand percussion are now takes of 130 recorded strokes (VCSL and Karoryfer);
   nobody has rated them yet. The drums invented from physics that they replace were rated 1-2 by the owner ("big
   problems, does not sound good"). Still invented: `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`
@@ -149,7 +153,7 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 5.29 MB, the textures 4.09 MB and the drums 1.47 MB to the package. The lab's
+sound. The learned store adds 6.79 MB, the textures 4.09 MB and the drums 1.47 MB to the package. The lab's
 recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
 repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers
 cannot be re-run from it.
