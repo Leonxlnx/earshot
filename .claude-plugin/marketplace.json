@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "earshot",
+  "owner": {
+    "name": "Leonxlnx",
+    "url": "https://github.com/Leonxlnx"
+  },
+  "description": "Ears for coding agents: let AI hear, review and make sound. CPU-only, open source.",
+  "plugins": [
+    {
+      "name": "earshot",
+      "source": "./",
+      "description": "Listen with earshot before judging any sound, and build realistic soundtracks for code-made films from real licensed recordings."
+    }
+  ]
+}
