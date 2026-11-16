@@ -317,6 +317,10 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
          "lufs": -18, "sprite": "sprite.webm",
          "sounds": [{"name": "tap", "want": "a soft tap for buttons"},
                     {"name": "success", "want": "a happy two-note success chime", "dur": 0.5, "axes": {"bright": 0.2}}]}
+    Expanded take names must be unique ("tap" with n=2 would conflict with "tap_1"); conflicts are refused
+    before any take is rendered or written. Names also identify manifest rows, so directory prefixes do not
+    distinguish two takes with the same basename. Sprite audio and map paths must not overwrite takes or
+    manifest.json; these collisions are also refused before rendering.
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
     takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
     seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). The sounds are levelled against
@@ -357,17 +361,44 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     fmts = _formats(fmt or spec.get('format') or 'wav')
     mono = spec.get('mono', False) if mono is None else mono
     top = lufs if lufs is not None else spec.get('lufs', -16.0)
-    rows, lines, ys, alts, missed, first, played = [], [], [], {}, {}, {}, {}
+    # Expanded names identify both manifest rows and sprite entries; validate before writing any take.
+    planned, paths = [], set()
     for it in items:
         b, cands = choose(it.get('want'), it.get('sound'), pitch=it.get('pitch'), dur=it.get('dur'),
                           voice=it.get('voice'), material=it.get('material'), axes=it.get('axes'))
         if not cands:
             raise ValueError(f'{it["name"]}: no sound in the catalogue answers {it.get("want")!r}')
         d = registry.get(cands[0]['id'])
-        level = it.get('lufs', top + WEIGHT.get(d.kind, -4.0))
         k = int(it.get('n') or b['n'] or 1)
+        takes = _paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0])
+        for p in takes:
+            key = os.path.normcase(os.path.splitext(os.path.basename(p))[0])
+            if key in paths:
+                raise ValueError(f'take name {os.path.basename(p)!r} is used more than once: rename a sound of the set')
+            paths.add(key)
+        planned.append((it, b, cands, d, takes))
+    sprite = sprite or spec.get('sprite')
+    outs = []
+    if sprite:
+        stem, ext = os.path.splitext(os.path.join(out, os.path.basename(sprite)))
+        ext = ext.lower().lstrip('.')
+        outs = [f'{stem}.{f}' for f in fmts] if not ext or ext in fmts else [f'{stem}.{ext}']
+        destinations = {os.path.normcase(os.path.abspath(os.path.join(out, 'manifest.json')))}
+        for it, b, cands, d, takes in planned:
+            own = _loop_formats(fmts) if d.loop and b.get('loop') is not False else fmts
+            for p in takes:
+                stem = os.path.splitext(p)[0]
+                destinations.update(os.path.normcase(os.path.abspath(f'{stem}.{f}')) for f in own)
+        for p in outs + [os.path.splitext(outs[0])[0] + '.json']:
+            key = os.path.normcase(os.path.abspath(p))
+            if key in destinations:
+                raise ValueError(f'sprite output {p!r} would overwrite a set file: rename the sprite')
+            destinations.add(key)
+    rows, lines, ys, alts, missed, first, played = [], [], [], {}, {}, {}, {}
+    for it, b, cands, d, takes in planned:
+        level = it.get('lufs', top + WEIGHT.get(d.kind, -4.0))
         mine = {}                         # the recordings this name played: {n: meta['member']}
-        for p in _paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0]):
+        for p in takes:
             y, meta = take(d.id, int(it.get('seed', seed)) + len(rows), _request(b, theme), lufs=level)
             stem = os.path.splitext(p)[0]
             loop = bool(meta.get('loop', False))
@@ -420,12 +451,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     head = f'{len(rows)} sounds in {out} ({", ".join(fmts)}), manifest.json'
     res = {'files': [os.path.join(out, f) for r in rows for f in r['files']], 'manifest': man, 'sounds': rows,
            'also': alts, 'not_in_sound': missed}
-    sprite = sprite or spec.get('sprite')
-    if sprite:
+    if outs:
         from .pack import pack
-        stem, ext = os.path.splitext(os.path.join(out, os.path.basename(sprite)))
-        ext = ext.lower().lstrip('.')
-        outs = [f'{stem}.{f}' for f in fmts] if not ext or ext in fmts else [f'{stem}.{ext}']
         sp = pack([os.path.join(out, r['file']) for r in rows], outs, mono=mono,
                   loops=[r['name'] for r in rows if r['loop']], ys=ys)
         lines.append(sp['summary'])
