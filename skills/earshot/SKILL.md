@@ -1,58 +1,94 @@
 ---
 name: earshot
-description: Make sounds with earshot whenever a product, game, page, animation or film needs a sound and no recording is at hand - interface sounds (taps, toggles, success, error, notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit), motion-design effects (whooshes, impacts, risers, logos), instrument notes, pads and ambience loops, one at a time (earshot make) or as one themed family (earshot make --set / make_set). Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, searching a recipe by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
+description: Make sounds with earshot whenever a product, game, page, animation or film needs a sound and no recording is at hand - interface sounds (taps, toggles, hovers, typing, success, error, notifications), everyday foley for games, 3D and video (footsteps, doors, drawers, switches, keys, cloth, glass, water, metal, swings, punches, explosions), ambience beds (fire, sea, rain, wind, crickets, a cafe, a street), game sounds (coins, fanfares, 8-bit), drums, motion-design effects and a few short music loops, one at a time (earshot make) or as one family (earshot make --set / make_set). Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, searching a recipe by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
 ---
 
 # earshot: ears for an agent
 
 ## Making sounds
-When a product, game, page or film needs a sound and no recording is given, make it: earshot renders it in code
-from words (no models, about a second, nothing downloaded, no recorded audio). This part is complete on its own.
+When a product, game, page or film needs a sound and no recording is given, make it: earshot picks a design from its
+catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
+complete on its own.
+
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (131 designs:
+footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
+paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 13 ambience beds learned from
+real textures (fire, three shores, crickets, wind in trees, a brook, a cafe, a street, distant city, room tone,
+underwater, rain on a terrace). Written in code: tonal interface and game figures (success, error, notify, coin,
+level up), chip sound, drums, rain on a window and a forest, notes, pads, three music loops, and the film bank.
+Realistic things that no one recorded (jumps, magic, game hits) are invented designs and were rated low by the
+owner: prefer a learned thing when one fits.
 
 **The three calls** (CLI, or the MCP tools of the same names; MCP paths absolute):
 1. One sound: `earshot make "WORDS" -o sounds/success.ogg` (MCP `make`: `want`, `out`; optional `sound`, `n`,
    `theme`, `pitch`, `dur`, `voice`, `material`, `loop`, `seed`). One call per sound.
 2. Several that belong together (an interface, a game, a film's kit): ONE call, never a loop of `make`.
-   `earshot make --set ui|game|arcade|film --theme NAME -o FOLDER --format webm,mp3 --sprite sprite`, or MCP
-   `make_set` with `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft
-   tap"}, ...]` (fields: name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs). One voice, key and
-   room for all, levels balanced, `manifest.json` written. Themes: soft, glass, wood, felt, tine, metal, electric,
-   digital, retro. From the CLI, your own list is a JSON file: `{"set": "ui", "theme": "felt", "format":
-   "webm,mp3", "sounds": [{"name": "tap", "want": "a soft tap"}, ...]}`, then `earshot make --spec FILE -o FOLDER`
-   (a re-run rewrites the files and `manifest.json`; it does not delete files of names you removed).
-3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20),
-   then `--sound ID`. Never list the whole catalogue (457 lines).
+   `earshot make --set ui|game|arcade|film -o FOLDER --format webm,mp3 --sprite sprite`, or MCP `make_set` with
+   `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft tap"}, ...]` (fields:
+   name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs). One voice, key and room for the tonal
+   sounds, levels balanced by kind, `manifest.json` written. Themes: soft (the default), glass, wood, felt, tine,
+   metal, electric, digital, retro. From the CLI your own list is a JSON file: `{"set": "ui", "format": "webm,mp3",
+   "sounds": [{"name": "tap", "want": "a soft tap"}, ...]}`, then `earshot make --spec FILE -o FOLDER` (a re-run
+   rewrites the files and `manifest.json`; it does not delete files of names you removed).
+3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20) or
+   `--family step`, then `--sound ID`. Never list the whole catalogue (hundreds of lines).
 
-**How to ask.** Name the sound or the job first, then feelings, material, numbers, key:
-`"a soft success chime for a finance app"`, `"coin pickup, bright, 8-bit"`, `"a deep impact for a logo reveal"`,
-`"a wooden notification, 400 ms, in D minor"`, `"three variations of a footstep on gravel"`. Feelings: "softer",
-"darker", "bigger", "longer", "drier", "not harsh". A material picks the voice (wooden: marimba, glass, metal,
-soft, digital). Chip sound only with "8-bit" / "retro" / "chiptune". Naming the sound or the job is right almost
-always; a mood or a paraphrase misses about one time in four. To steer, re-ask with adjectives, not by browsing.
+**The ready-made sets.** `ui` (17): tap, hover, two toggles, type, next and back are real keys and switches; open,
+close, send, receive, notify, success, complete, warning, error, delete are soft tonal figures. In `ui` the line
+`same design as toggle_on` (and `as back`) is expected: the pair are two recordings of one switch or keyboard.
+`game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
+learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`), `arcade` (16 chip
+sounds), `film` (motion-design starter; being rebuilt from real material).
+
+**How to ask.** Name the thing, the sound or the job first, then feelings, material, numbers, key:
+`"a footstep on gravel"`, `"a wooden drawer closing"`, `"a camera shutter"`, `"a soft success chime for a finance
+app"`, `"coin pickup, 8-bit"`, `"waves on a beach, 30 seconds"`, `"a wooden notification, 400 ms, in D minor"`.
+A learned sound answers only when its thing is named: "a heavy impact" gets an invented boom, "a dumbbell dropped"
+the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". A material picks the voice of a
+tonal sound (wooden: marimba); a bell or glass timbre only when you ask for one. Chip sound only with "8-bit" /
+"retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
+written that loosely the first pick was right 69.5 % of the time (76.8 % in the top three). To steer, re-ask with
+adjectives, not by browsing.
+
+**Seeds are variations.** For a learned design, seeds 0, 1, 2 ... play its different recordings first (three seeds
+of `step/pebbles` are three real footsteps), then new takes of them. Ask for 6-12 takes of anything a game repeats
+(`--n 8`, or "eight variations"), and make them in a set (`"n": 8` in a spec) so they share one level: single takes
+of different recordings differ in length and level. `--json` names the recording of each take (`member`).
 
 **Read the answer** (no extra call; ask for `--json` / `full=true` only if you need measurements):
-- `x.ogg: design/id (0.88 s, G5, vibraphone, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
+- `x.ogg: design/id (0.88 s, G5, soft_pluck, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
   `clean` means not usable: make it again with another `seed`.
 - `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
 - `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified; choose an alternative
   by its words and call again with `--sound ID`, or re-ask naming the sound or the job.
-- `same design as NAME: ... (the nearest: ID)` (sets): two names got one design; give the second `"sound": ID`.
+- `same design as NAME: ... (the nearest: ID)` (sets): two names got one design; in your own spec give the second
+  `"sound": ID` (in the ready-made `ui` set it is meant, above).
 - `not in this sound: WORDS`: part of the request is not in this file (one call, one sound); make it separately.
 - `not used by this sound: ...`: the design ignored that control or could not keep that length; fine unless it
   mattered, then pick another design.
 - `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
 - `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
 
-**Web**: `earshot make --set ui --theme soft -o public/sounds --format webm,mp3 --sprite sprite`, then load
-`sprite.json` (howler.js format, `src` lists webm first). Ogg Vorbis does not play in Safari before 18.4.
-**Loops**: ambience loops seamlessly by default (`--dur` sets its length); say "no loop" (or `--no-loop`) for a
-film's bed. Never ship a loop as mp3 or m4a: a set with `webm,mp3` writes loops as flac instead (`a loop: flac
-instead of mp3` is expected, not an error).
+**Formats.** The extension picks it (wav, flac, ogg, webm, mp3, m4a; all but wav and flac need ffmpeg). Web:
+`earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite`, then load `sprite.json` (howler.js
+format, `src` lists webm first); Ogg Vorbis does not play in Safari before 18.4.
+**Loops**: ambience and the music loops loop seamlessly by default (`--dur` sets the length; a learned bed has no
+loop point at all); say "no loop" (or `--no-loop`) for a film's bed. Never ship a loop as mp3 or m4a: a set with
+`webm,mp3` writes loops as flac instead (`a loop: flac instead of mp3` is expected, not an error). A learned bed
+renders in about 1-2 s per second of sound: a 30 s bed takes up to a minute.
 **`--listen`** (`listen=true`): also ranks by how designs sound and adds `heard as: ... (z)`; it loads a model
 (20-40 s). Use it only when a describe-the-sound request came back as a guess.
 
-Everything earshot renders is free to use in any product, commercial too, without credit. Do not say how a made
-sound sounds beyond its descriptions and a `heard as` verdict: it was measured by models, not tested by people.
+**What not to expect.** No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for
+sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded. Film and motion sounds
+are being rebuilt; for now prefer the learned whooshes (`whoosh/stick`, `whoosh/rope`), `boom/heavy`,
+`cymbal/reverse` and the bank (`whoosh_fast/crisp`). Drums and the invented realistic sounds were rated low by the
+owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
+models did not predict his ratings. Say plainly that a learned sound is a new take of a public-domain recording,
+not a sound invented from nothing.
+
+Everything earshot renders is free to use in any product, commercial too, without credit. The learned material
+comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md` and `earshot/data/textures/CREDITS.md`.
 
 The rest of this file is about listening: judging, choosing and checking sound you cannot hear.
 

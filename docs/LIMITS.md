@@ -71,51 +71,70 @@ cannot do and where it is weak is [at the end](#making-sounds-make).
 
 ## Making sounds (`make`)
 
-**Not a listening test.** Every quality number for the 1.0 sounds comes from earshot's own models and model-free
-audits ([VALIDATION.md](VALIDATION.md#8-made-sounds-10)). Nobody has run a listening test with people on them yet;
-"premium" is a claim about measurements and construction, not about a blind test. The models can be pleased without
-a sound getting better.
+**How they were judged.** The sounds were judged by one listener, the owner, 1 to 5, on six pages that were not
+blind ([VALIDATION.md](VALIDATION.md#the-owners-listening)). earshot's own models did not predict his ratings and are
+not a measure of how good a made sound is; a `heard as` line says what a model hears, nothing more. The learned
+family and the learned beds were built after his last ratings: each learned take matched its source in his ears on
+24 recordings, but the store as a whole has not been rated.
 
 **What it cannot do.**
-- Make a sound no design covers. `make` chooses one of 457 designs and shapes it with the controls; it does not
-  compose, layer two designs into one, or synthesise from a free description. A request nothing answers is an error;
-  a request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
-- Music beyond figures: no melodies, beats, songs or scores. Notes, chords of a pad, short motifs and logos only.
-- Speech, voices, animals (other than the insects and birds inside a few ambience scenes), vehicles (other than a
-  chip engine and distant traffic), weapons beyond game shots and lasers.
+- Make a sound no design covers. `make` chooses one design and shapes it with the controls; it does not compose,
+  layer two designs into one, or synthesise from a free description. A request nothing answers is an error; a
+  request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
+- Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
+  the recording in the public domain; the store has 131 things. For other real things the catalogue has designs
+  invented from physics (`action`, `object`), which the owner rated 1-2 of 5.
+- New sounds from a class of recordings. Sampling new members from a model of several recordings was tried and
+  rated 1-2; it was dropped. A learned design plays its own recordings and new takes of them.
+- Music. earshot is a sound-effects tool: three short loops (`bed/warm`, `bed/playful`, `bed/8bit`), notes, chords
+  of a pad, short motifs and logos. No melodies, songs or scores, and no music generation.
+- Speech and voices; animals other than the insects, birds and wings in a few beds and learned sounds; vehicles
+  other than the far traffic of a city bed and a chip engine.
 - Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
   `not in this sound: ...` for the other; ask again for it, or make a set.
 - Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
   a length it cannot keep, come back as `not used by this sound`. A material picks the voice of a tonal sound only
   among six (wood, glass, metal, soft, digital, retro); other materials ("plastic", "ceramic") only steer the
-  ranking. A theme's scale changes a figure only when it is minor (thirds, sixths and sevenths); pentatonic, lydian,
-  dorian and whole-tone themes leave the intervals as designed. Bank sounds read pitch and length where their recipe
-  has those knobs, and no axes.
+  ranking. A theme's scale changes a figure only when it is minor. Bank sounds read pitch and length where their
+  recipe has those knobs, and no axes. A learned sound keeps a length only within 0.6-1.8 times its natural one and
+  a pitch only on tonal recordings (7 semitones at most).
 - Exact lengths. A length sets how long a figure sounds before its room dies away, so the file runs longer than the
-  number (and "under 300 ms" on a notification gave a 0.76 s file with its room); a struck one-shot (a tap, a hit)
-  rings as it rings, and a voice cannot ring longer than it does (a marimba chime asked for 2 s came out 0.55 s);
-  both say `not used by this sound: dur`. A loop has a shortest length per scene.
+  number; a struck one-shot rings as it rings, and a voice cannot ring longer than it does (a marimba chime asked
+  for 2 s came out 0.55 s); both say `not used by this sound: dur`. A loop has a shortest length per scene.
 - Choose by taste. The ranking reads words, not the product; two good designs for one job can differ a lot. Use
-  `also`, `--sound`, `--listen` and a person's ears.
+  `also`, `--sound` and a person's ears.
 
-**Where it is weak** (in the lab's measurement by earshot's models). Tearing paper (z 1.6-2.5 for its own
-description), distant city traffic (0.9-1.4, heard as noise) and wind in trees (about 2.0) are still not convincing
-to the models; a bottle opening sits at about 2.3. An opening door, a soft landing, a slap, a dull hurt, a ground
-rumble, a struck match, peeling tape, rain on a roof and a small fire were weak (1.0-2.4) and were rebuilt: re-heard
-on two seeds each they reach 2.1-3.3, plausible rather than strong. Steady noise beds in general sit close to
-"noise" for the models, which says as much about the models as about the
-beds; judge beds by ear. Single short notes of sustaining metal or synth voices damped early read as beeps, which is
-why figures keep them at least 110 ms long and the tap, hover and menu move play wood on such a voice.
+**What is weak or unverified.**
+- **Film and motion sounds are in progress.** The first motion designs were invented from class statistics of film
+  effects and rated mostly 1-2; they are being rebuilt from real material. Until then prefer the learned whooshes,
+  `boom/heavy`, `cymbal/reverse` and the bank's film sounds.
+- **Drums** are invented from physics; the owner rated most of them 1-2 ("percussion: big problems").
+- **One carrier per band.** The learned model keeps one tone per band: two crickets in one band lose their beating
+  against each other (the cricket bed's take differs from its recording by 4.4 dB against 2.2 for two takes).
+- **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms).
+- **Sea joints.** A stitched bed joins pieces where the texture is in a similar state; on the pebble and rock
+  shores the joints differ by about 1.5 times the texture's own variation, more than in the other beds.
+- **The interface touches are quieter than the figures.** The recorded taps, toggles and keys measured 5 dB under
+  the tonal figures at their loudest 50 ms; a set levels them lower still, by kind.
+- **Takes of a learned design differ in length and level**, because they are different recordings (three footsteps
+  on gravel: 0.74-1.33 s, -22 to -14 LUFS, one with a lead-in of a few steps). Make pick-at-random takes as a set,
+  where each gets the kind's level.
+- **Invented realistic sounds** remain in the catalogue for things no learned design covers (jumps, landings, game
+  hits, shots, magic). The owner rated their kind 1-2. A learned design wins a tie with them, but a request that
+  names only an invented one gets it.
+- **Instrument notes and bells** were rated 2-3 and 1; interface figures play the soft pluck unless asked otherwise.
+- **`--listen` and the atlas** were not re-measured on the v1 catalogue; the atlas is built from each design's
+  default render and is stale after designs change until it is rebuilt (`python -m earshot.sounds.atlas build
+  --work DIR`, repeated until done).
 
 **Requests.** The reader is a lexicon and rules, not a language model (`--listen` adds CLAP). On 220 held-out
-requests by someone who never saw the catalogue the first pick was right for 71.4 % (74.1 % with `--listen`,
-measured before the last small fixes), and
-for interface requests only 54.5 %; requests that name the job or the sound did far better than long descriptions
-of a sound and casual paraphrases ([VALIDATION.md](VALIDATION.md#8-made-sounds-10)). Unusual phrasings, typos and
-moods ("something warm and hopeful") read worse than short plain requests ("a soft success chime", "coin pickup,
-8-bit", "rain on a window, 20 s"). The guess note catches about a third of the wrong picks, so a pick without it can
-still be wrong: read the design id against the job. `make --set` and `make_set` rank by words only, even in the MCP
-server. One request is one sound; a set is a spec.
+requests by someone who never saw the catalogue the first pick was right for 69.5 % and one of the top three for
+76.8 % ([VALIDATION.md](VALIDATION.md#understanding-requests)). Requests that name the thing, the job or the sound
+did far better than long descriptions of a sound and casual paraphrases. A learned design answers only when its
+thing is named, so "a heavy impact" never reaches a recorded dumbbell, and a feeling alone reaches no recording.
+The guess note catches only part of the wrong picks, so a pick without it can still be wrong: read the design id
+against the job. `make --set` and `make_set` rank by words only, even in the MCP server. One request is one sound; a
+set is a spec.
 
 **Formats.** Ogg Vorbis does not play in Safari before 18.4: for the web write `webm,mp3` (or `webm,m4a`). An mp3 or
 m4a loop has a gap at its seam in players that ignore the encoder's padding note: a single `make` to mp3 warns, and
@@ -126,9 +145,13 @@ files decode in full, so the message is not a sign of a broken file. Re-running 
 its files and `manifest.json` but does not delete the files of names removed from the spec.
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
-transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. Long ambience loops take seconds to render (12-20 s loops
-3-10 s on one thread). The sound atlas (`earshot/data/sounds_atlas.npz`) is built from each design's default render:
-after designs are added or re-voiced it is stale until rebuilt (`python -m earshot.sounds.atlas build --work DIR`,
-repeated until done), and `--listen` then ranks by old sounds. The lab's reference recordings, renders and request
-sets are not in the repository: the calibration can be checked against the comments in `earshot/synth/struck.py`
-and `strings.py`, and the request numbers cannot be re-run from the repo alone.
+transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
+sound. The learned store adds 5.29 MB and the textures 4.09 MB to the package. The lab's recordings, renders,
+listening pages, request sets and the tool that builds the learned store are not in the repository: the store can
+be used and credited, not rebuilt, from the repository alone, and the request numbers cannot be re-run from it.
+
+**Licence of the learned material.** Every learned model comes from a recording marked CC0 by its source
+(BigSoundBank, Kenney, VCSL, Freesound uploads; the Freesound ones partly read from MP3 previews found through the
+Openverse catalogue). Each recording's licence was taken from its source (the sound's page, the pack's licence
+file, or Openverse's licence field for a Freesound page) and is written next to it in the credits files; earshot
+cannot prove that an uploader had the right to give a recording away.
