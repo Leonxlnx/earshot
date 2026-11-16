@@ -85,28 +85,6 @@ def _src_channels(path):
         return 0
 
 
-def write_cache(path, write):
-    """Best-effort cache write; only filesystem errors are optional, not errors in the producer."""
-    import tempfile
-    tmp = None
-    try:
-        folder = os.path.dirname(path) or '.'
-        os.makedirs(folder, exist_ok=True)
-        with tempfile.NamedTemporaryFile(dir=folder, prefix=os.path.basename(path) + '.',
-                                         suffix=os.path.splitext(path)[1], delete=False) as fh:
-            tmp = fh.name
-        write(tmp)
-        return replace_quietly(tmp, path)
-    except OSError:
-        return False
-    finally:
-        if tmp is not None:
-            try:
-                os.remove(tmp)
-            except OSError:
-                pass
-
-
 def file_id(path):
     """stable id of a file's content state (path + size + mtime + sampled content); used as a cache key by the models"""
     return hashlib.sha1(_state(path).encode()).hexdigest()[:20]
@@ -270,3 +248,26 @@ def check_paths(paths, what='paths'):
 
 def db(v, floor=1e-12):
     return float(20 * np.log10(max(float(v), floor)))
+
+
+def write_cache(path, write):
+    """Best-effort cache write; only filesystem errors are optional, not errors in the producer."""
+    import tempfile
+    tmp = None
+    try:
+        folder = os.path.dirname(path) or '.'
+        os.makedirs(folder, exist_ok=True)
+        with tempfile.NamedTemporaryFile(dir=folder, prefix=os.path.basename(path) + '.',
+                                         suffix=os.path.splitext(path)[1], delete=False) as fh:
+            tmp = fh.name
+        write(tmp)
+        return replace_quietly(tmp, path)
+    except OSError:
+        return False
+    finally:
+        if tmp is not None:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+
