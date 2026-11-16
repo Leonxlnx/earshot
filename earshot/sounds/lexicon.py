@@ -415,6 +415,9 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'match/strike': 'match/light', 'stapler/press': 'stapler/desk', 'drawer/slide': 'drawer/wood',
          'door/close': 'door/shut', 'explosion/distant': 'explosion/far', 'hit/punch': 'punch/body',
          'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge'}
+# a twin that is the same thing only when the request says one of these words: the learned coins/floor is a handful
+# of coins, so "a coin dropped on the table" keeps the invented single coin
+TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile')}
 # a cymbal of the drum kit (earshot.sounds.drums) -> the film's cymbal (a learned crash cymbal struck hard, the
 # material of earshot.sounds.motion): a film request ("a cymbal crash for the trailer") gets the film's, a request
 # with a word of the kit ("a crash cymbal at the end of the fill") the kit's

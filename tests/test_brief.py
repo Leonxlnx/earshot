@@ -542,6 +542,8 @@ NEW_ANCHORS = [
     # a learned design that is the thing asked for wins over its invented twin (lexicon.TWINS)
     ('knocking on a wooden door', ('door/knock',)),
     ('coins dropped on a table', ('coins/floor',)),
+    ('a handful of coins', ('coins/floor',)),
+    ('a coin dropped on the table', ('coin/drop',)),
     ('scissors cutting paper', ('scissors/cut',)),
     ('paper tearing', ('paper/rip',)),
     ('a distant explosion', ('explosion/far',)),

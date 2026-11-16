@@ -1195,6 +1195,8 @@ def _learned_twin(b, sid, out, idx):
     kit's: lexicon.FILM_CYMBAL) when it answers the request too (it is ranked: the request names its thing) and
     nothing rules it out (the hard filters, a direction against the request's), or None"""
     twin = L.TWINS.get(sid)
+    if sid in L.TWIN_WORDS and not set(tokens(b.get('text') or '')) & set(L.TWIN_WORDS[sid]):
+        twin = None                                  # "a coin dropped": one coin, not the recorded handful
     fam = sid.split('/')[0]
     if (not twin and fam in L.FILM_CYMBAL and b.get('domain') == 'motion'
             and not set(tokens(b.get('text') or '')) & L.KIT_WORDS):

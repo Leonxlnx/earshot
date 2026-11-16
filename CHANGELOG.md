@@ -73,8 +73,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   ones built from recordings are not rated yet. A film request for a cymbal gets the film's crash cymbal, a request
   with a word of the drum kit the kit's.
 - **Invented and learned twins** (`lexicon.TWINS`): 22 invented designs of real things have a learned design of
-  the same thing (`knock/door` and `door/knock`, `coin/drop` and `coins/floor`, `paper/tear` and `paper/rip` ...);
-  a request that names the thing gets the learned one, the invented one answers to its id.
+  the same thing (`knock/door` and `door/knock`, `coins/handful` and `coins/floor`, `paper/tear` and `paper/rip`
+  ...); a request that names the thing gets the learned one, the invented one answers to its id. A single coin
+  ("a coin dropped on the table") keeps the invented `coin/drop`; coins in the plural get the recorded handful.
 - **Three music loops** (`earshot/synth/music.py`, `earshot/sounds/beds.py`): `bed/warm`, `bed/playful`, `bed/8bit`,
   a whole number of bars in a key, seamless or once. earshot is a sound-effects tool; nine other styles were
   written and removed after the owner's listening.
