@@ -298,7 +298,13 @@ def test_a_member_named_in_the_request_is_the_one_chosen():
         return (got.split('/')[1] == sid.split('/')[1] and got.split('/')[0] != sid.split('/')[0]
                 and terms[sid]['family'] & (terms[got]['family'] | terms[got]['uses']))
     wrong = [(text, sid, [r['id'] for r in brief.rank(brief.read(text), top=1)]) for text, sid in cases]
-    wrong = [w for w in wrong if w[2] != [w[1]] and not (w[2] and twin(w[2][0], w[1]))]
+    def learned(got, sid):
+        """a learned member of the same family that says what the name says ("grass step": a recorded footstep on
+        grass, earshot.sounds.learned, preferred to the invented step/grass by brief._preferred)"""
+        name, got_name = set(sid.split('/')[1].split('_')), set(got.split('/')[1].split('_'))
+        same = got.split('/')[0] == sid.split('/')[0] or name <= got_name          # "drop drip": a water drop
+        return same and 'real' in registry.get(got).tags
+    wrong = [w for w in wrong if w[2] != [w[1]] and not (w[2] and (twin(w[2][0], w[1]) or learned(w[2][0], w[1])))]
     assert not wrong, wrong
     assert brief.rank(brief.read('a deep impact'), top=1)[0]['id'] == 'boom/deep'
     assert brief.rank(brief.read('a metal impact'), top=1)[0]['id'] == 'impact/metal'      # no film member 'metal'
@@ -321,8 +327,9 @@ def test_why_shows_only_the_requests_own_words():
 
 
 def test_job_phrases_match_inflected_and_reordered():
-    for text in ('a page turning', 'turning a page', 'pages turn', 'turned the page'):
-        assert brief.rank(brief.read(text), top=1)[0]['id'] == 'paper/page', text
+    for text in ('a page turning', 'turning a page', 'pages turn', 'turned the page'):     # the recorded page
+        got = brief.rank(brief.read(text), top=1)[0]['id']                                 # turn (learned) or
+        assert got == 'paper/page' or _learned_twin(got, ('paper/page',)), text            # the invented one
     assert brief.stem('levelling') == brief.stem('leveled') == brief.stem('level')
     assert brief.stem('spelling') == 'spell'
     for text, fam in (('level up', 'level_up'), ('levelling up', 'level_up'), ('leveled up', 'level_up'),
@@ -421,7 +428,7 @@ ANCHORS = [
     ('logo reveal sting', ('sting/', 'logo/', 'logo_sting/', 'pro_logo_sting/')),
     ('digital glitch for a cyberpunk edit', ('glitch/', 'pro_glitch/')),
     ('a heavy bass drop', ('fall/sub', 'sub_drop/', 'pro_sub_drop/')),
-    ('reverse cymbal into the cut', ('rise/reverse', 'reverse_swell/')),
+    ('reverse cymbal into the cut', ('rise/reverse', 'reverse_swell/', 'reverse/')),
     ('fairy dust sparkle over a product shot', ('shimmer/', 'pro_shimmer/', 'sparkle/', 'gem/')),
     # ambience
     ('gentle rain on a tent, looping', ('rain/tent',)),
@@ -450,10 +457,17 @@ ANCHORS = [
 ]
 
 
+def _learned_twin(sid, prefixes):
+    """a learned design (earshot.sounds.learned: a recording played as new takes) of the family an anchor names:
+    where it is the same thing, brief prefers it to the invented one (brief._preferred)"""
+    from earshot.sounds import registry
+    return 'real' in registry.get(sid).tags and any(sid.split('/')[0] == p.split('/')[0] for p in prefixes)
+
+
 @pytest.mark.parametrize('text,prefixes', ANCHORS)
 def test_anchor(idx, text, prefixes):
     r = brief.rank(brief.read(text), idx=idx, top=3)
-    assert r and r[0]['id'].startswith(prefixes), (text, r)
+    assert r and (r[0]['id'].startswith(prefixes) or _learned_twin(r[0]['id'], prefixes)), (text, r)
 
 
 # anchors for the families added after round two (motion, drums, music beds): own wording, plain and casual
@@ -470,8 +484,8 @@ NEW_ANCHORS = [
     ('title slam', ('slam/',)),
     ('a soft thump as the card lands', ('thump/', 'knock/soft')),
     ('sub drop right after the cut', ('fall/sub', 'sub_drop/')),
-    ('reverse cymbal', ('rise/reverse', 'reverse_swell/')),
-    ('a cymbal played backwards into the cut', ('rise/reverse', 'reverse_swell/')),
+    ('reverse cymbal', ('rise/reverse', 'reverse_swell/', 'reverse/')),
+    ('a cymbal played backwards into the cut', ('rise/reverse', 'reverse_swell/', 'reverse/')),
     ('a quick suck in before the cut', ('suck/',)),
     ('a soft pop when the icon appears', ('pop/',)),
     ('bubble pop', ('pop/bubble',)),
@@ -538,4 +552,4 @@ NEW_ANCHORS = [
 @pytest.mark.parametrize('text,prefixes', NEW_ANCHORS)
 def test_new_family_anchor(idx, text, prefixes):
     r = brief.rank(brief.read(text), idx=idx, top=3)
-    assert r and r[0]['id'].startswith(prefixes), (text, r)
+    assert r and (r[0]['id'].startswith(prefixes) or _learned_twin(r[0]['id'], prefixes)), (text, r)

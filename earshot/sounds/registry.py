@@ -36,7 +36,7 @@ KINDS = ('tap', 'click', 'tick', 'pop', 'note', 'chime', 'figure', 'hit', 'thud'
          'boom', 'noise', 'texture', 'bed', 'pad', 'stinger', 'voice', 'object', 'music')
 DOMAINS = ('ui', 'game', 'motion', 'ambience', 'music')
 MODULES = ('ui', 'game', 'action', 'object', 'motion', 'drums', 'brand', 'synth', 'nature', 'beds', 'tonal', 'retro',
-           'bank')
+           'learned', 'bank')
 SCALES = {'major': (0, 2, 4, 5, 7, 9, 11), 'minor': (0, 2, 3, 5, 7, 8, 10), 'pentatonic': (0, 2, 4, 7, 9),
           'minor_pentatonic': (0, 3, 5, 7, 10), 'lydian': (0, 2, 4, 6, 7, 9, 11), 'dorian': (0, 2, 3, 5, 7, 9, 10),
           'whole_tone': (0, 2, 4, 6, 8, 10)}
@@ -48,6 +48,9 @@ LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0, 'music': -16
 # the most a short, peaky one-shot is raised (dB, its spike folded over: master.finish `lift`): the owner heard many
 # short sounds as "barely there"; beds, pads and music keep their own level
 LIFT = 14.0
+# the prior of a learned design (earshot.sounds.learned: a recording in the public domain played as new takes):
+# where an invented design of the same thing exists, the learned one wins a tie
+LEARNED = 1.1
 # the most a bed held under its cap by a few peaks is raised (dB: master.finish `sparse`): a campfire's cracks
 SPARSE = 6.0
 _designs = {}

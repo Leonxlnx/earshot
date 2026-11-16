@@ -935,7 +935,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     if idx is None:
         idx = index(rows) if rows is not None else _default_index()
     if semantic is not None:
-        return _named_member(b, blend(b, rank(b, top=None, idx=idx), semantic, idx), idx)[:top]
+        return _learned_first(b, _named_member(b, blend(b, rank(b, top=None, idx=idx), semantic, idx), idx), idx)[:top]
     rows, terms, inv, idf = idx
     q = _query(b)
     score, why = {}, {}
@@ -982,7 +982,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
         out.append({'id': row['id'], 'score': round(s, 3),
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
-    return _named_member(b, out, idx)[:top]
+    return _learned_first(b, _named_member(b, out, idx), idx)[:top]
 
 
 def _name_words(sid):
@@ -1069,6 +1069,49 @@ def _twin(sid, out, idx):
     return None
 
 
+def _preferred(b, sid, out, idx):
+    """a learned member of sid's family (a recording played as a new take: earshot.sounds.learned, tagged 'real')
+    with a prior at least as high that scores at least MEMBER_SHARE of sid's on the request's own words, or None: "a
+    cork pop" names the invented cork/pop word for word, but the family's learned member is the same thing (its
+    descriptions say every word of the name: "a cork ... with a hollow pop") and preferred. A member named by its
+    character ("a deep impact": boom/deep) is what was asked for and stays"""
+    if not idx or any(modifier(w) for w in sid.split('/')[1].split('_')):
+        return None
+    rows, terms = idx[0], idx[1]
+    if _cache.get('pos_key') != id(idx):
+        _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(rows)}
+    pos = _cache['pos']
+    fam, prior = sid.split('/')[0], rows[pos[sid]].get('prior', 1.0)
+    if 'real' in rows[pos[sid]].get('tags', ()):
+        return None
+    own = next((r['score'] for r in out if r['id'] == sid), None)
+    name = _name_words(sid)
+    said = _cache.setdefault('said_stems', {})
+    for r in out:
+        k = pos[r['id']]
+        if r['id'].split('/')[0] != fam or 'real' not in rows[k].get('tags', ()):
+            continue
+        if r['id'] not in said:
+            said[r['id']] = {stem(w) for w in WORD.findall(' '.join(list(rows[k].get('says', ()))
+                                                                     + list(rows[k].get('tags', ()))).lower())}
+        if (rows[k].get('prior', 1.0) >= prior and name <= said[r['id']] | _name_words(r['id']) and own is not None
+                and r['score'] >= MEMBER_SHARE * own and not excluded(b, rows[k], terms[k])
+                and not (b.get('dir') and terms[k]['dir'] == -b['dir'])):
+            return r['id']
+    return None
+
+
+def _learned_first(b, out, idx):
+    """a ranking whose first design gives way to a learned member of its family that is the same thing
+    (_preferred: "a cork pop", "a door closing")"""
+    pref = _preferred(b, out[0]['id'], out, idx) if out else None
+    if not pref or pref == out[0]['id']:
+        return out
+    k = next(i for i, r in enumerate(out) if r['id'] == pref)
+    best = dict(out[k], score=out[0]['score'], why=list(dict.fromkeys(out[k]['why'] + out[0]['why'])))
+    return [best] + out[:k] + out[k + 1:]
+
+
 def _named_member(b, out, idx=None):
     """a ranking where a design the request names by its own words comes first: "tiny drip", "a metal impact" (its
     name and then its family said word for word, as the request's own sound: `_said_seq`, `_compound`) is that
@@ -1094,6 +1137,7 @@ def _named_member(b, out, idx=None):
     if full:
         sid = max(full)[3]
         sid = _twin(sid, out, idx) or sid
+        sid = _preferred(b, sid, out, idx) or sid
         if out and out[0]['id'] == sid:
             return out
         old = next((r for r in out if r['id'] == sid), {'id': sid, 'why': []})

@@ -59,7 +59,7 @@ earshot = "earshot.cli:main"
 include = ["earshot*"]
 
 [tool.setuptools.package-data]
-earshot = ["data/*.json", "data/*.npz", "forge/bank/*.json", "forge/kits/*.json", "forge/seeds/*.json"]
+earshot = ["data/*.json", "data/*.npz", "data/resyn/*.npz", "data/resyn/*.json", "data/resyn/*.md","forge/bank/*.json", "forge/kits/*.json", "forge/seeds/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
