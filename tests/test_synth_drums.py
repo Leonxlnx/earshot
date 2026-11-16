@@ -1,6 +1,7 @@
-"""earshot.synth.drums and the drums designs: shape, determinism, clean edges, and the physics they promise
-(membrane mode ratios, the pitch drop growing with velocity, wires that follow the head, a cymbal's centroid
-climbing after the strike, damping shortening the ring, a closed hi-hat shorter than an open one)."""
+"""earshot.synth.drums (what plays the drums no recording covers: the brush, the snap, the sticks, the shaker and the
+drum-machine voices): shape, determinism, and the physics it promises (membrane mode ratios, the pitch drop growing
+with velocity, wires that follow the head, damping shortening the ring). The designs of the catalogue are tested in
+test_sounds_drums.py."""
 import numpy as np
 import pytest
 
@@ -124,25 +125,9 @@ def test_wires_follow_the_head_and_ring_a_little_longer():
     assert not D.rattle(head * 0.01, dsp.rng(3), gap=0.015).any()       # a head that never reaches them: silence
 
 
-# ------------------------------------------------------------------------------------------------------ plates
-def test_cymbal_centroid_climbs_after_a_hard_strike():
-    kw = dict(vel=0.9, f_lo=380.0, f_hi=17000.0, t60=(3.0, 0.8), tick=0.0, early=0.0)
-    y = D.cymbal(dsp.n_of(0.4), dsp.rng(1), dsp.rng(2), shimmer=0.9, **kw)['y']
-    assert _centroid(y, 0.06, 0.11) > 1.3 * _centroid(y, 0.002, 0.012)
-    y0 = D.cymbal(dsp.n_of(0.4), dsp.rng(1), dsp.rng(2), shimmer=0.0, **kw)['y']
-    assert _centroid(y0, 0.06, 0.11) < _centroid(y0, 0.002, 0.012)
-
-
-def test_choked_plate_is_shorter():
-    a = D.cymbal(dsp.n_of(1.5), dsp.rng(1), dsp.rng(2), t60=(1.2, 0.4), tick=0.0, early=0.0)['y']
-    b = D.cymbal(dsp.n_of(1.5), dsp.rng(1), dsp.rng(2), t60=(1.2, 0.4), choke=6.0, tick=0.0, early=0.0)['y']
-    assert _t_down(b) < 0.4 * _t_down(a)
-
-
 # ------------------------------------------------------------------------------------------------------ voices
 @pytest.mark.parametrize('fn', [
     lambda r: D.shaker(dsp.n_of(0.3), r, [(0.05, 1.0)]),
-    lambda r: D.tambourine(dsp.n_of(0.5), r, dsp.rng(9), [(0.0, 1.0)]),
     lambda r: D.clap(dsp.n_of(0.1), r),
     lambda r: D.snap(dsp.n_of(0.1), r),
     lambda r: D.kick_synth(dsp.n_of(0.5), r),
@@ -166,47 +151,3 @@ def test_kick_synth_pitch_falls_onto_its_note():
     y = D.kick_synth(dsp.n_of(0.8), dsp.rng(1), f_end=50.0, click=0.0, drive=0.0)
     assert _freq(y, 0.25, 0.6) == pytest.approx(50.0, rel=0.03)
     assert _freq(y, 0.0, 0.03) > 1.5 * 50.0
-
-
-# ------------------------------------------------------------------------------------------------------ designs
-@pytest.fixture(scope='module')
-def reg():
-    from earshot.sounds import drums, registry  # noqa: F401
-    return registry
-
-
-@pytest.mark.parametrize('sid', ['kick/punch', 'snare/tight', 'hat/closed', 'conga/open'])
-def test_designs_are_clean_and_deterministic(reg, sid):
-    y, meta = reg.render(sid, seed=1)
-    y2, _ = reg.render(sid, seed=1)
-    y3, _ = reg.render(sid, seed=2)
-    assert y.ndim == 2 and y.shape[1] == 2 and np.isfinite(y).all()
-    assert np.array_equal(y, y2) and not np.array_equal(y, y3)
-    assert np.abs(y).max() < 1.0
-    assert np.abs(y[0]).max() < 1e-3 and np.abs(y[-1]).max() < 1e-3
-    assert meta['checks']['ok'], meta['checks']['warnings']
-    lv = [20 * np.log10(np.sqrt(np.mean(v ** 2))) for v in (y, y3)]
-    assert abs(lv[0] - lv[1]) < 4.0                  # two takes, equally good
-
-
-def test_closed_hat_is_shorter_than_open(reg):
-    a, _ = reg.render('hat/closed', seed=1, space=-1.0)
-    b, _ = reg.render('hat/open', seed=1, space=-1.0)
-    assert _t_down(a) < 0.4 * _t_down(b)
-
-
-def test_energy_makes_a_snare_brighter(reg):
-    lo, _ = reg.render('snare/tight', seed=1, energy=-1.0, space=-1.0)
-    hi, _ = reg.render('snare/tight', seed=1, energy=1.0, space=-1.0)
-    assert _centroid(hi, 0.0, 0.1) > 1.1 * _centroid(lo, 0.0, 0.1)
-
-
-def test_size_lowers_a_tom(reg):
-    def f0(y):
-        s = y.mean(1)[int(0.05 * SR):int(0.5 * SR)]
-        S = np.abs(np.fft.rfft(s * np.hanning(len(s)), 1 << 17))
-        f = np.fft.rfftfreq(1 << 17, 1 / SR)
-        return f[np.argmax(S * (f < 400))]
-    a, _ = reg.render('tom/mid', seed=1, space=-1.0)
-    b, _ = reg.render('tom/mid', seed=1, size=1.0, space=-1.0)
-    assert f0(b) < 0.85 * f0(a)

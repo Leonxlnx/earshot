@@ -1,7 +1,10 @@
-"""Drums and percussion from their physics: struck membranes, snare wires, cymbals and hi-hats, hands, shaken
-things, and the classic synthetic drum voices.
+"""Drums from their physics, for what no recording plays: struck membranes, snare wires, hands, shaken beads, and
+the classic synthetic drum voices.
 
-A drum written in code usually sounds like a sine with a noise burst on top. A real one differs in five ways, and
+The catalogue's acoustic kit and hand percussion are played from real public-domain recordings (earshot.sounds.drums
+and earshot/data/drums/); this engine makes the rest: a brush on a snare, a finger snap, sticks clicked together, the
+shaker and the drum-machine voices of the music beds' own kit (earshot.synth.music), and the drum-machine designs.
+A drum written in code usually sounds like a sine with a noise burst on top. A real one differs in these ways, and
 each is built here and can be measured on the output:
 
   membrane   a circular head rings in inharmonic modes, (0,1) 1 : (1,1) 1.59 : (2,1) 2.14 : (0,2) 2.30 : (3,1) 2.65
@@ -14,14 +17,9 @@ each is built here and can be measured on the output:
              length follows its hardness and speed (contact): a harder or faster hit is brighter, not only louder.
   wires      the snares under a snare drum are driven by the bottom head: they slap against it whenever it swings
              into them, buzz while it moves and bounce a little after it (rattle), a bright noise that follows the
-             drum's motion with a 150-250 Hz body, never white noise under an envelope. The same law makes the
-             sizzle of two hi-hat cymbals touching and the buzz of a cajon's wires.
-  plate      a cymbal is hundreds of inharmonic modes (constant modal density) whose upper ones die first; a hard
-             strike pushes energy upward in the first 50-150 ms (nonlinear coupling: the shimmer), so the
-             spectral centroid climbs after the stick's tick (cymbal); hi-hats are two such plates held together
-             (short, with contact sizzle) or apart (long), a ride bell is a few clear partials of the thick dome.
-  events     a shaker or a tambourine is many small collisions whose rate and size follow the energy of the
-             gesture (Cook's PhISM model: shaker, tambourine); a clap is the slap of two palms exciting the cavity
+             drum's motion with a 150-250 Hz body, never white noise under an envelope.
+  events     a shaker is many small collisions whose rate and size follow the energy of the gesture (Cook's PhISM
+             model: shaker); a clap is the slap of two palms exciting the cavity
              between them (Repp 1987, Peltola et al. 2007: 0.6-2.5 kHz by hand shape), a finger snap the same
              cavity struck harder and higher.
   synthetic  the classic drum-machine voices as productions use them: a kick of a sine whose pitch falls fast with a
@@ -38,7 +36,6 @@ shared room, earshot.synth.space).
     r, built = dsp.rng(1), dsp.rng(7)                       # the take, the instrument
     tom = drums.membrane(110.0, dsp.n_of(1.2), r, built, vel=0.8, strike=0.35, t60=0.9, tune=1, radius=0.2)
     y = tom['y']                                            # (n, 2); tom['motion'] is the head's displacement
-    crash = drums.cymbal(dsp.n_of(3.0), r, built, vel=0.9)['y']
     kick = drums.kick_synth(dsp.n_of(1.0), r, f_end=48.0, vel=0.9)
 """
 import functools
@@ -283,106 +280,6 @@ def bottom_head(motion, f, q=8.0, delay=0.0004):
     return y * (np.abs(motion).max() / (np.abs(y).max() + 1e-12))
 
 
-# ------------------------------------------------------------------------------------------------------ plates
-def _sines(freq, rate, coef, n, floor_db=80.0):
-    """sum over modes of Im(coef[c, m] exp((-rate + 2 pi i f) t)), (n, channels): the exact block method of
-    modal.ring (exp(s t) at sample k of block b is exp(s b B) exp(s k)), each mode only until it is floor_db down
-    and modes with a zero coefficient skipped: a cymbal's hundreds of modes in a fraction of a second"""
-    coef = np.atleast_2d(coef)
-    keep = (np.abs(coef).max(axis=0) > 0) & (freq < 0.45 * SR)
-    s = (-rate + 2j * np.pi * freq)[keep]
-    coef = coef[:, keep]
-    out = np.zeros((coef.shape[0], n))
-    if not len(s):
-        return out.T
-    block = 256
-    life = np.minimum(n, np.ceil(floor_db / 8.686 * SR / np.maximum(rate[keep], 1e-3))).astype(np.int64)
-    order = np.argsort(-life)
-    i = 0
-    while i < len(order):
-        j = i + 1
-        while j < len(order) and life[order[j]] * 1.5 > life[order[i]]:
-            j += 1
-        idx = order[i:j]
-        blocks = int(np.ceil(life[order[i]] / block))
-        within = np.exp(s[idx, None] * (np.arange(block) / SR))
-        start = np.exp(s[None, idx] * (np.arange(blocks)[:, None] * (block / SR)))
-        m = min(n, blocks * block)
-        for c in range(coef.shape[0]):
-            out[c, :m] += ((start * coef[c, idx]) @ within).imag.reshape(-1)[:m]
-        i = j
-    return out.T
-
-
-
-BELL = (1.0, 1.45, 2.05, 2.75, 3.5, 4.3)       # a cymbal's thick dome: class ratios of struck ride bells
-
-
-def cymbal(n, r, built, vel=0.8, beater='tip', hard=0.0, f_lo=320.0, f_hi=15000.0, density=0.035, t60=(4.5, 0.9),
-           tilt=0.0, shimmer=0.7, build=0.06, cross=2200.0, tick=1.0, spread=0.6, bell=0.0, bell_hz=620.0,
-           bell_t60=2.2, sizzle=0.0, gap=0.25, choke=1.0, early=0.1):
-    """A struck cymbal (or one hi-hat plate pair): a dict with 'y' (n, 2), 'freq', 'rate', 'tau'.
-
-    A thin plate has constant modal density, so the modes lie uniformly in frequency (`density` per Hz between
-    f_lo and f_hi, drawn from `built`, the instrument: about 600 for a crash; those under 3.5 kHz as split pairs,
-    whose slow beats are the restless shimmer of a real cymbal's tail). The t60 goes log-linearly from
-    t60[0] at f_lo to t60[1] at f_hi, divided by choke (two plates pressed together lose energy at their contact).
-    The strike drives every mode with the contact's spectrum (the pulse convolved), a random weight per mode for
-    where the stick landed (the take) and (f / 1 kHz)^(0.5 + tilt): below its coincidence frequency (about 12 kHz
-    for 1 mm of bronze) a plate radiates about in proportion to frequency, so its upper modes are heard best. A
-    0.2-0.3 ms contact by itself reaches only a few kHz.
-    Shimmer: the large motion of the low modes after a hard hit feeds the upper ones (nonlinear coupling), so the
-    plate's top fills in after the strike: the modes above `cross` Hz (fully from 2.8 cross) grow towards the level
-    a contact of no length would have given them, times shimmer * vel^2, over `build` s, while the modes under
-    cross (fully from cross / 2.8) start with up to 1.5 shimmer * vel^2 more and give it up at the same rate. Each
-    mode is a pair of exponentials (rate and rate + 1 / build), exact. The centroid climbs over the first 50-150 ms,
-    then falls as the highs die. bell: a few clear partials of the dome (BELL) at bell_hz. sizzle: two plates
-    touching (rattle) while they move more than `gap`."""
-    tau, p, ck, grit = contact(beater, vel, hard)
-    count = int(min(1100, max(24, density * (f_hi - f_lo))))
-    freq = np.sort(built.uniform(f_lo, f_hi, count))
-    pair = freq[freq < 3500.0]                     # no cymbal is round: its modes come as pairs split 0.05-0.3 %
-    freq = np.sort(np.concatenate([freq, pair * (1.0 + built.uniform(0.0005, 0.003, len(pair)))]))
-    count = len(freq)
-    u = np.log(freq / f_lo) / np.log(f_hi / f_lo)
-    life = np.exp(np.log(t60[0]) + u * (np.log(t60[1]) - np.log(t60[0]))) / choke
-    rate = T60 / life
-    a = built.rayleigh(1.0, count) * r.uniform(0.4, 1.4, count) * (freq / 1000.0) ** (0.5 + tilt)
-    fg = modal.force_gain(freq, tau, p)
-    S = shimmer * vel ** 2
-    b = 1.0 / build
-    up = np.clip(np.log2(freq / cross) / 1.5, 0.0, 1.0)
-    down = np.clip(np.log2(cross / freq) / 1.5, 0.0, 1.0)
-    extra = a * fg * 1.5 * S * down
-    f2, r2 = np.concatenate([freq, freq]), np.concatenate([rate, rate + b])
-    a2 = np.concatenate([a * fg + extra, -extra])
-    if bell:
-        bf = bell_hz * np.array(BELL)
-        ba = bell * np.array([1.0, 0.8, 0.6, 0.35, 0.25, 0.15]) * (a * fg).max()
-        br = T60 / (bell_t60 * np.array(BELL) ** -0.7)
-        f2, r2, a2 = np.concatenate([f2, bf]), np.concatenate([r2, br]), np.concatenate([a2, ba])
-    az = built.uniform(-1.0, 1.0, len(f2))
-    y = _strike(_sines(f2, r2, modal.mic_pair(a2, az, f2, spread), n), tau, p)
-    if S > 0:                    # the shimmer starts from nothing and is not the contact's: it is not filtered by it
-        grow = a * S * up
-        y += _sines(f2[:2 * count], r2[:2 * count], modal.mic_pair(np.concatenate([grow, -grow]), az[:2 * count],
-                                                                   f2[:2 * count], spread), n)
-    y /= np.sqrt(np.sum((a * fg) ** 2)) + 1e-12
-    lvl = speed(vel) / 7.0
-    y *= lvl
-    if tick:
-        y += (tick * lvl * 0.5 * _click(tau, r, p, ck, grit, n, low=1500.0, ring_s=0.0015))[:, None]
-    if sizzle:
-        env = np.abs(signal.hilbert(y.mean(1)))
-        env = dsp.butter(env, 'low', 60.0, 1)
-        drive = env / (env.max() + 1e-12) * vel
-        y += sizzle * lvl * rattle(drive, r, gap, 0.012, ((6500.0, 1.5, 1.0), (9500.0, 2.0, 0.8),
-                                                          (13000.0, 2.5, 0.5)), body=0.0, grain=2.5)
-    if early:
-        y = modal.early(y, built, early)
-    return {'y': y, 'freq': freq, 'rate': rate, 'tau': tau}
-
-
 # ------------------------------------------------------------------------------------------------------ bodies
 def body(freq, t60, gain, n, r, built, vel=0.7, beater='wood', hard=0.0, spread=0.3, click=1.0, early=0.1,
          low=500.0):
@@ -398,16 +295,6 @@ def body(freq, t60, gain, n, r, built, vel=0.7, beater='wood', hard=0.0, spread=
     if click:
         y += (click * lvl * _click(tau, r, p, ck, grit, n, low))[:, None]
     return modal.early(y, built, early) if early else y
-
-
-def hoop(f, n):
-    """modes of a metal hoop (in-plane bending of a ring, m (m^2 - 1) / sqrt(m^2 + 1) for m = 2, 3, 4 ...) with
-    the lowest at f Hz: (freq, gain)"""
-    m = np.arange(2, 9)
-    ratio = m * (m * m - 1) / np.sqrt(m * m + 1) / (2 * 3 / np.sqrt(5))
-    fr = f * ratio
-    keep = fr < 0.4 * SR
-    return fr[keep], (1.0 / np.sqrt(ratio))[keep]
 
 
 # ------------------------------------------------------------------------------------------------------ events
@@ -470,52 +357,6 @@ def shaker(n, r, strokes, beads=50.0, settle=0.035, pre=0.25, travel=0.05,
         for ch in range(2):
             y[:, ch] += gain * dsp.svf(x[:, ch], fc, q, 'bandn')
     return dsp.butter(y, 'low', 13000.0, 2)          # a bead's tick has little above 13 kHz (it is no impulse)
-
-
-def tambourine(n, r, built, strokes, jingles=8, f=(1150.0, 1650.0), t60=0.35, restitution=0.55, spread=0.8,
-               shake=0.0, settle=0.06):
-    """Tambourine jingles: stereo (n, 2). Each pair of small brass discs is a dished plate whose modes follow the
-    free-disc ratios (modal.plate_modes) from its own (2,0) mode in f Hz (drawn from `built`), the upper ones dying
-    first, each clash driving them with a contact of a few hundredths of a ms (metal on metal).
-    A stroke (t s, energy) throws every pair apart: it clashes again and again, the gaps shrinking by
-    `restitution` (4-12 ms at first), each clash weaker and less regular; the run ends when the gap falls under
-    2 ms (the discs then rest on each other: a run that went on would ring as a pitched buzz). shake > 0 adds what
-    a shaken frame does between strokes (Cook's PhISM tambourine): every pair also clashes at random, at
-    shake * 120 clashes per second times the frame's energy, which each stroke tops up and which settles with
-    time constant `settle` s; their size goes as the square root of the energy"""
-    pm = modal.plate_modes(strike=1.0)
-    out = np.zeros((n, 2))
-    m = min(n, dsp.n_of(1.8 * t60 + 0.05))
-    E = energy(n, strokes, settle) if shake else None
-    for j in range(jingles):
-        f0 = built.uniform(*f)
-        freq = f0 * pm['ratio'] * built.uniform(0.97, 1.03, len(pm['ratio']))
-        freq = freq[freq < 0.4 * SR]
-        g = (np.abs(pm['gain'][:len(freq)]) + 0.3) * built.uniform(0.5, 1.0, len(freq)) * (freq / f0) ** 0.5
-        rate = T60 / (t60 * (freq / f0) ** -0.25)
-        ir = modal.ring(freq, rate, g, m, 3e-5).imag[0]
-        ts, amps = [], []
-        for t0, e in strokes:
-            d = r.uniform(0.004, 0.012)
-            t, a = t0 + r.uniform(0.0005, 0.004), e * r.uniform(0.6, 1.0)
-            while a > 0.05 * e and d > 0.002 and t < n / SR:
-                ts.append(t)
-                amps.append(a)
-                t += d * r.uniform(0.7, 1.3)
-                d *= restitution ** 0.5 * r.uniform(0.85, 1.3)
-                a *= restitution * r.uniform(0.7, 1.15)
-        if shake:
-            from .texture import arrivals
-            tr, _ = arrivals(r, shake * 120.0 * E, n / SR)
-            Ei = E[np.minimum((tr * 2000).astype(np.int64), len(E) - 1)]
-            ts += list(tr)
-            amps += list(np.sqrt(Ei) * 0.5 * np.exp(0.4 * r.standard_normal(len(tr))))
-        if not ts:
-            continue
-        pan = built.uniform(-spread, spread)
-        x = _impulses(n, np.array(ts), np.array(amps), np.full(len(ts), pan))
-        out += signal.fftconvolve(x, ir[:, None], axes=0)[:n]
-    return out / (np.abs(out).max() + 1e-12)
 
 
 # ------------------------------------------------------------------------------------------------------ hands
