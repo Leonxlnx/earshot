@@ -24,7 +24,8 @@ full=true for everything). sheet also returns the picture as an image. A tool wh
 install answers with a clear message instead of failing the server.
 
 Sound bank tools (no models, pure DSP): sfx_list, sfx_render (one take aimed at the picture), kit_render (a film's
-kit.json into takes + kit.lock.json); earshot.forge.sfx / earshot.forge.kit.
+kit.json into takes + kit.lock.json); earshot.forge.sfx / earshot.forge.kit. narration (no models): scene cuts, cues
+and subtitles of a narrated film timed to its voiceover; earshot.narration.
 """
 from __future__ import annotations
 
@@ -65,7 +66,9 @@ needs models takes ~20-60 s; later calls are fast (models stay loaded)."""
 
 INSTRUCTIONS += """
 Sounds for a film (no models, fast): sfx_list (the shipped bank) -> sfx_render (one take aimed at a cue: dur, apex,
-pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take)."""
+pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take).
+A narrated film: narration first (voiceover + script -> scene cuts on its pauses, cue times on the spoken words,
+subtitle timing), then put the sounds on those cue times."""
 
 IMG_INLINE_MAX = 1600        # px, long edge of the inline copy (sent as JPEG q88: ~1/3 of the PNG bytes)
 JSON_MAX = 7000
@@ -604,7 +607,35 @@ def tool_kit_render(kit: Annotated[str, Field(description="absolute path of the 
                 _kit.kit_render)
 
 
+def tool_narration(voiceover: Path,
+                   script: Annotated[str, Field(description='absolute path of the script: script.json ({"scenes": '
+                                                            '[{"id", "text", "nudge", "cues": [{"id", "at", "kind"}]}]}) '
+                                                            'or a .txt with scenes separated by blank lines; {name} in '
+                                                            'the text marks a cue')],
+                   lead_in: Annotated[float | None, Field(description='seconds of film before the speech (default '
+                                                                      '0.4)', ge=0)] = None,
+                   tail: Annotated[float | None, Field(description='seconds of film after the speech, the end card '
+                                                                   '(default 2.5)', ge=0)] = None,
+                   shift: Annotated[float, Field(description='move every picture event by seconds against the '
+                                                             'voiceover (+ = later)')] = 0.0,
+                   envelope_fps: Annotated[int | None, Field(description='also return the voiceover loudness per '
+                                                                         'film frame, 0..1 (mouths, music ducking)',
+                                                             gt=0)] = None,
+                   full: Full = False) -> str:
+    """Time a film's picture to its voiceover (no models, about a second): scene cuts snapped to the voiceover's
+    pauses, cues ("at" the words they land on, or {name} markers) snapped to speech onsets, subtitle lines timed to
+    the speech, the film length (lead-in + speech + tail) and where the voiceover file starts. Use before rendering a
+    narrated explainer or story film, so cuts, cards and sound effects land on the spoken words; then place the
+    sound with sfx_render / kit_render on the cue times. An estimate from pauses and text length, not recognition:
+    report the cuts marked 'text'."""
+    from . import narration
+    kw = dict(vo=_file(voiceover, 'voiceover'), script=_file(script, 'script'), lead_in=lead_in, tail=tail,
+              shift=shift, envelope_fps=envelope_fps)
+    return _run('narration', kw, full, narration.sync)
+
+
 TOOLS += [(tool_sfx_list, True, False), (tool_sfx_render, False, False), (tool_kit_render, False, False)]
+TOOLS += [(tool_narration, True, False)]
 
 
 def _sdk():

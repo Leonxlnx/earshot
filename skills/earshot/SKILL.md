@@ -196,6 +196,21 @@ touches and the snap), all chosen and checked by measurement, none by a listenin
 the brief asks for recorded sound, use `skills/real-sound` instead. To add a fit of your own (`earshot fit --takes`,
 then `bank add-fit`), see `docs/SFX.md` ("Add your own fit").
 
+## Loop 6: put a narrated film's picture on its voiceover (earshot narration)
+Use this before rendering a film with a voiceover (explainer, story, tutorial) so cuts, cards, subtitles and effects
+land on the spoken words. No models; about a second.
+1. Write the script as the film's scenes: `{"scenes": [{"id": "s1", "text": "...", "cues": [{"id": "card",
+   "at": "the words it lands on", "kind": "hit"}]}]}` (or a .txt, scenes separated by blank lines, `{name}` marking a
+   cue). The text must be what is actually spoken, in order.
+2. `earshot narration vo.wav script.json --srt subs.srt --envelope 30 --out sync.json`: scene start / end, cue times
+   and subtitle lines in film time, `vo_offset_s` (where the voiceover file's sample 0 plays), the film length.
+3. Read the summary: a cut marked 'text' had no pause within 1.2 s and sits where the text length puts it; a cue
+   "not found" sits at its scene start. Fix by hand with `"nudge"` on the scene (seconds, its first cut) or
+   `--shift` (the whole picture), and say these cuts were estimated. Never claim the sync is exact: it is pauses and
+   text length, not word recognition.
+4. Render the picture on those times, put effects on the cue times (Loop 5), and check the finished film with
+   `earshot timeline film.mp4` (Loop 2).
+
 ## Optional: a second opinion in words (audio LLM)
 `earshot llm mix.wav --yes-upload [--with-timeline] [--prompt "Is the riser at 0:12 cheap?"]` asks Google Gemini for
 a rubric critique (sync, realism, mix, loudness, what sounds cheap, fixes with times). It only runs when the user has
