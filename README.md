@@ -12,18 +12,19 @@ soundtrack. It runs locally on CPU as a CLI, a Python API and an MCP server; eve
 
 ```
 $ earshot make "a soft success chime for a finance app" -o success.ogg
-success.ogg: success/rise (1.04 s, G5, soft_pluck, -14 LUFS, clean) [success, chime]
+success.ogg: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
 
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
-step_1.ogg: step/pebbles (1.33 s, -22 LUFS, clean) [gravel, footstep]
+step_1.ogg: step/pebbles (1.27 s, -19 LUFS, clean) [gravel, footstep]
 step_2.ogg: step/pebbles (0.74 s, -14 LUFS, clean)
-step_3.ogg: step/pebbles (1.27 s, -19 LUFS, clean)
+step_3.ogg: step/pebbles (1.32 s, -21 LUFS, clean)
+played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")
 also: step/gravel, step/floorboard, step/heels
 
 $ earshot make "a campfire" -o fire.ogg --dur 24
 fire.ogg: fire/camp (24.00 s, -24 LUFS, seamless loop, clean) [campfire]
-also: fire/large, fire/small, match/strike
+also: fire/large, fire/small, fire/whoosh
 ```
 
 The three footsteps are three different real recordings ("Footsteps on Gravels #3", "#1" and "#2" from
@@ -140,13 +141,13 @@ MCP `make_set`).
 ```
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
 17 sounds in public/sounds (webm, mp3), manifest.json
-tap.{webm,mp3}: keyboard/desktop (0.33 s, -25 LUFS, clean) [named]
-hover.{webm,mp3}: dial/click (0.44 s, -25 LUFS, clean) [named]
-toggle_on.{webm,mp3}: switch/lamp (0.36 s, -25 LUFS, clean) [named]
+tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
+hover.{webm,mp3}: leather/grab (0.38 s, -23 LUFS, clean) [named]
+toggle_on.{webm,mp3}: switch/lamp (0.38 s, -19 LUFS, clean) [named]
 ...
-success.{webm,mp3}: success/rise (0.89 s, C6, soft_pluck, -19 LUFS, clean) [named]
-error.{webm,mp3}: error/fall (0.86 s, C5, soft_pluck, -19 LUFS, clean) [named]
-17 sounds in public/sounds\sprite.webm + sprite.mp3 (15.6 s, 136 kB, 245 kB), map sprite.json
+success.{webm,mp3}: success/rise (1.85 s, G4, marimba, -15 LUFS, clean) [named]
+error.{webm,mp3}: error/fall (0.52 s, A3, marimba, -15 LUFS, clean) [named]
+17 sounds in public/sounds\sprite.webm + sprite.mp3 (25.5 s, 219 kB, 399 kB), map sprite.json
 ```
 
 ### Sprites, loops, formats

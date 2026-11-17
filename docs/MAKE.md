@@ -25,7 +25,7 @@ earshot make "WORDS" [-o FILE] [--n N] [--seed S] [--theme NAME] [--sound ID] [-
 
 ```
 $ earshot make "a soft success chime for a finance app" -o success.ogg
-success.ogg: success/rise (1.04 s, G5, soft_pluck, -14 LUFS, clean) [success, chime]
+success.ogg: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
 
 $ earshot make "a mouse click" -o click.wav --n 2
@@ -61,9 +61,8 @@ also (the pick is a guess: no job or sound word matched): open/lift (two soft no
 
 ```
 $ earshot make "a marimba success chime, 2 seconds" -o mar2.wav
-mar2.wav: success/rise (0.55 s, G5, marimba, -14 LUFS, clean) [success, chime]
+mar2.wav: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
 also: success/triad, success/done, success/fifth
-not used by this sound: dur
 ```
 
 | option | what it does |
@@ -241,23 +240,24 @@ earshot make --spec sounds.json [-o FOLDER] [--theme NAME] [--format ...] [--spr
 ```
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
 17 sounds in public/sounds (webm, mp3), manifest.json
-tap.{webm,mp3}: keyboard/desktop (0.33 s, -25 LUFS, clean) [named]
-hover.{webm,mp3}: dial/click (0.44 s, -25 LUFS, clean) [named]
-toggle_on.{webm,mp3}: switch/lamp (0.36 s, -25 LUFS, clean) [named]
-toggle_off.{webm,mp3}: switch/lamp (0.39 s, -25 LUFS, clean) [named]
+tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
+hover.{webm,mp3}: leather/grab (0.38 s, -23 LUFS, clean) [named]
+toggle_on.{webm,mp3}: switch/lamp (0.38 s, -19 LUFS, clean) [named]
+toggle_off.{webm,mp3}: switch/lamp (0.40 s, -19 LUFS, clean) [named]
   another recording of switch/lamp than toggle_on: 1 of 3 (Switch desk lamp)
-type.{webm,mp3}: keyboard/mechanical (0.28 s, -25 LUFS, clean) [named]
-back.{webm,mp3}: keyboard/laptop (0.56 s, -25 LUFS, clean) [named]
-next.{webm,mp3}: keyboard/laptop (0.41 s, -25 LUFS, clean) [named]
+type.{webm,mp3}: keyboard/mechanical (0.29 s, -19 LUFS, clean) [named]
+  another recording of keyboard/mechanical than tap: 1 of 2 (mechanical key medium.wav)
+back.{webm,mp3}: keyboard/laptop (0.57 s, -18 LUFS, clean) [named]
+next.{webm,mp3}: keyboard/laptop (0.41 s, -18 LUFS, clean) [named]
   another recording of keyboard/laptop than back: 4 of 5 (Slow MacBook keyboard #1)
 ...
-notify.{webm,mp3}: notify/pair (1.12 s, C6, soft_pluck, -19 LUFS, clean) [named]
-success.{webm,mp3}: success/rise (0.89 s, C6, soft_pluck, -19 LUFS, clean) [named]
-complete.{webm,mp3}: success/triad (1.34 s, C5, soft_pluck, -18 LUFS, clean) [named]
-warning.{webm,mp3}: warning/pulse (0.92 s, C5, soft_pluck, -19 LUFS, clean) [named]
-error.{webm,mp3}: error/fall (0.86 s, C5, soft_pluck, -19 LUFS, clean) [named]
-delete.{webm,mp3}: delete/drop (0.75 s, C5, soft_pluck, -19 LUFS, clean) [named]
-17 sounds in public/sounds\sprite.webm + sprite.mp3 (15.6 s, 136 kB, 245 kB), map sprite.json
+notify.{webm,mp3}: notify/pair (1.92 s, C5, marimba, -16 LUFS, clean) [named]
+success.{webm,mp3}: success/rise (1.85 s, G4, marimba, -15 LUFS, clean) [named]
+complete.{webm,mp3}: success/triad (1.71 s, C5, marimba, -16 LUFS, clean) [named]
+warning.{webm,mp3}: warning/pulse (1.63 s, F5, marimba, -15 LUFS, clean) [named]
+error.{webm,mp3}: error/fall (0.52 s, A3, marimba, -15 LUFS, clean) [named]
+delete.{webm,mp3}: delete/drop (0.77 s, E4, marimba, -14 LUFS, clean) [named]
+17 sounds in public/sounds\sprite.webm + sprite.mp3 (25.5 s, 219 kB, 399 kB), map sprite.json
 ```
 
 The touches of the `ui` set (tap, hover, the two toggles, type, next and back) are real keys and switches; the owner
@@ -330,16 +330,16 @@ result (`--json`) carries `also` and `not_in_sound` for every such sound.
 ```
 $ earshot make --spec spec.json -o myset
 20 sounds in myset (webm, mp3), manifest.json
-tap.{webm,mp3}: keyboard/desktop (0.33 s, -25 LUFS, clean) [named]
+tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
 ...
-open.{webm,mp3}: open/lift (0.49 s, D5, marimba, -19 LUFS, clean) [named]
+open.{webm,mp3}: open/lift (2.85 s, D4, marimba, -15 LUFS, clean) [named]
 ...
-success.{webm,mp3}: success/rise (0.54 s, D5, marimba, -19 LUFS, clean) [2-note, success, chime]
-coin_1.{webm,mp3}: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin pickup]
-coin_2.{webm,mp3}: coin/bright (0.34 s, D6, marimba, -19 LUFS, clean) [coin pickup]
+success.{webm,mp3}: success/rise (2.61 s, D4, marimba, -15 LUFS, clean) [success, chime]
+coin_1.{webm,mp3}: coin/bright (2.02 s, D6, marimba, -16 LUFS, clean) [coin pickup]
+coin_2.{webm,mp3}: coin/bright (1.80 s, D6, marimba, -16 LUFS, clean) [coin pickup]
 rain.{webm,flac}: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
   a loop: flac instead of mp3, which leaves a gap at the seam
-20 sounds in myset\sprite.webm + sprite.mp3 (25.5 s, 208 kB, 387 kB), map sprite.json
+20 sounds in myset\sprite.webm + sprite.mp3 (41.5 s, 350 kB, 638 kB), map sprite.json
 ```
 
 The wood theme plays the figures on a marimba in D; the recorded touches have no voice and keep their own sound. A
@@ -496,7 +496,7 @@ What is recognised:
 
 ```
 $ earshot make "a squishy success chime, longer" -o sq.wav
-sq.wav: success/rise (1.47 s, G5, soft_pluck, -14 LUFS, clean) [success, chime]
+sq.wav: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
 also: success/triad, success/done, success/fifth
 not understood: squishy
 ```
@@ -505,15 +505,16 @@ What reached the render, on real calls:
 
 ```
 $ earshot make "a soft wooden success chime for a finance app, 400 ms, in D" -o wood.wav
-wood.wav: success/rise (0.48 s, D5, marimba, -14 LUFS, clean) [success, chime]
+wood.wav: success/rise (2.62 s, D4, marimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
+not used by this sound: dur
 
 $ earshot make "a success chime on a kalimba, softer" -o kal.wav
-kal.wav: success/rise (0.69 s, G5, kalimba, -14 LUFS, clean) [success, chime]
+kal.wav: success/rise (0.79 s, G4, kalimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
 
 $ earshot make "a two-note success chime in D minor" -o minor.wav
-minor.wav: success/rise (1.02 s, D5, soft_pluck, -14 LUFS, clean) [2-note, success, chime]
+minor.wav: success/rise (2.64 s, D4, marimba, -14 LUFS, clean) [success, chime]
 also: success/fifth, success/done, success/triad
 
 $ earshot make "a kalimba note in E" -o kalimba.wav
@@ -521,8 +522,9 @@ kalimba.wav: note/kalimba (1.06 s, E5, -14 LUFS, clean) [kalimba, note]
 also: pluck/kalimba, pluck/kalimba_ring, pluck/kalimba_soft
 ```
 
-"Wooden" played a marimba, "400 ms" made the figure 0.48 s with its room, and the key D moved the root from G5 to
-D5. In D minor, `success/rise` (a major third up) rises a minor third.
+"Wooden" played a marimba and the key D moved the root from G4 to D4; "400 ms" is not kept, since the real marimba's
+notes ring as they ring (`not used by this sound: dur`). In D minor, `success/rise` (a major third up) rises a minor
+third.
 
 **How well requests are understood.** Three sets of requests were written by someone who never saw the catalogue: A
 (440 requests for 110 intents, in four styles) and B (220) were used to develop the reader; C (220: half long
@@ -830,14 +832,15 @@ mp3 (the seam).
 
 ```
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
-step_1.ogg: step/pebbles (1.33 s, -22 LUFS, clean) [gravel, footstep]
+step_1.ogg: step/pebbles (1.27 s, -19 LUFS, clean) [gravel, footstep]
 step_2.ogg: step/pebbles (0.74 s, -14 LUFS, clean)
-step_3.ogg: step/pebbles (1.27 s, -19 LUFS, clean)
+step_3.ogg: step/pebbles (1.32 s, -21 LUFS, clean)
+played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")
 also: step/gravel, step/floorboard, step/heels
 
 $ earshot make "a campfire" -o fire.ogg --dur 24
 fire.ogg: fire/camp (24.00 s, -24 LUFS, seamless loop, clean) [campfire]
-also: fire/large, fire/small, match/strike
+also: fire/large, fire/small, fire/whoosh
 ```
 
 - **Variations.** A game plays a footstep hundreds of times: ask for 6-12 takes (`--n`, or "six variations") and

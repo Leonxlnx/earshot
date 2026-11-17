@@ -15,9 +15,11 @@ How a note is played (note()):
              on the recording (its deviation from equal temperament at A = 440 Hz), so a note is in tune within
              5 cents. resyn moves pitch by resampling with its time-warp compensating: the attack is moved with the
              pitch exactly as a resampled recording would be, its length kept
-    level    every learned note was levelled against the others (its loudest 50 ms, `gain_db` in the index, and
-             its brightness, `tilt` dB per octave, where a recording stood out of its neighbours): a chromatic run
-             has no jump where the source note changes; energy then moves the level STEP dB per unit around REF
+    level    every take is set by its own loudest 50 ms to REF, measured after it was moved to its pitch (a
+             recording moved a semitone can lie 2-3 dB from its level at its own pitch), and every learned note's
+             brightness was levelled against the others (`tilt` dB per octave in the index, where a recording stood
+             out of its neighbours): a chromatic run has no jump where the source note changes; energy then moves
+             the level STEP dB per unit around REF
     length   None: the note rings out at its natural decay (the excerpt runs until it has fallen under the noise
              floor, at most about 4 s, its end faded). A length shorter than that damps it as a player's hand or a
              damper would: a fade of DAMP s (150 ms at C3 .. 60 ms at C6) that starts at `length`, never a cut
@@ -33,6 +35,7 @@ How a note is played (note()):
 As voices of earshot.synth.voices (VOICES, play()) they take the names of the models they replace: `marimba`,
 `harp`, `pizzicato`, and `felt_piano` played by the upright, so a figure, a theme or a request reaches them by name.
 """
+import copy
 import json
 import os
 from functools import lru_cache
@@ -150,10 +153,15 @@ def render(row, midi, r, energy=0.0, length=None, bright=0.0, hard=0.0, vary=0.0
     shift = float(midi) - row['midi']
     if abs(shift) > SHIFT + 1e-9:
         raise ValueError(f'a learned note is moved at most {SHIFT} semitones, not {shift:.2f}')
-    y = resyn.render(model(row['file']), r, pitch=shift - row['cents'] / 100.0, bright=row['tilt'] + bright,
-                     hard=float(np.clip(hard, -1.0, 1.0)), vary=0.3 * float(vary))
-    y = onset(y)
-    y = y * 10 ** ((REF + row['gain_db'] + STEP * float(np.clip(energy, -1.0, 1.0))) / 20)
+    hard = float(np.clip(hard, -1.0, 1.0))
+    ref = copy.deepcopy(r) if (hard or bright) else None
+    y = onset(resyn.render(model(row['file']), r, pitch=shift - row['cents'] / 100.0, bright=row['tilt'] + bright,
+                           hard=hard, vary=0.3 * float(vary)))
+    # the level of the take as moved: the same recording moved a semitone can lie 2-3 dB from its level at its own
+    # pitch, so the gain is measured on the take itself (with bright and hard at 0, so they keep their own effect)
+    z = y if ref is None else onset(resyn.render(model(row['file']), ref, pitch=shift - row['cents'] / 100.0,
+                                                 bright=row['tilt'], vary=0.3 * float(vary)))
+    y = y * 10 ** ((REF + STEP * float(np.clip(energy, -1.0, 1.0)) - loudest(z)) / 20)
     if length is not None:
         y = damp(y, float(length), float(midi))
     return y
