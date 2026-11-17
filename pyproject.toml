@@ -33,6 +33,7 @@ dependencies = [
   "scipy>=1.11",
   "soundfile>=0.12",
   "soxr>=0.3",
+  "numba>=0.58",        # the hot loops of the synthesis; without it they run in plain Python
   "librosa>=0.10",
   "pyloudnorm>=0.1",
   "scikit-learn>=1.3",

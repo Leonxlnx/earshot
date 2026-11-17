@@ -1,0 +1,6 @@
+include CHANGELOG.md
+recursive-include docs *.md
+include tests/conftest.py tests/requirements-fast.txt
+recursive-include skills *.md
+recursive-include commands *.md
+recursive-include .claude-plugin *.json
