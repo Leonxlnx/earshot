@@ -18,14 +18,17 @@ events and pace), never a branch per thing:
     shake    dense irregular impacts in two or three swings (keys on a ring, ice in a glass, a shaker)
     pair     two events, the second the answer: a clink and its reply, a switch on and off
     row      a counted thing done in a row by hand (claps, taps, clicks, beeps), 2.5 to 3.5 a second, a little
-             uneven in time and level; earshot.make plays any one-shot design this way, each event a new seed
+             uneven in time and level; earshot.make plays any one-shot design this way, each event a new seed;
+             without a count or a length ("clapping") six to nine events, about 2 to 3 s
     count    a countdown: one event a second, on the clock
 Rules for all: never the same recording twice in a row (when the thing has more than one), never on a grid, tails
 overlap and are never gated (an event rings on under the next), one position and one room for the whole.
 A length asked for is the length of the file (`fill`, `fit`): the first event at the start, the last early enough
 to ring out, the gaps even around the pattern's own spread; a length without a count takes as many events as the
 pattern's pace fits. Gaps a hand cannot keep (GAPS: closer than its fastest, or so far apart the events are no longer
-one action) are held at the limit and `said` gives the plain line; a countdown stays one a second.
+one action) are held at the limit and `said` gives the plain line; a countdown stays one a second. A scatter and a
+shake keep their own timing and are reshaped to the length instead: the heap settles over it (`settle`: more
+impacts, thickening, over a longer one; a quicker settle over a shorter one), a shake repeats its swing.
 
     from earshot.synth import perform
     p = perform.plan('walk', dsp.rng(1), members=(2, 0, 1))     # {'onsets', 'gains', 'members', 'pace', ...}
@@ -47,16 +50,19 @@ PATTERNS = {
     'scatter': dict(events=(4, 7), pace=(5.0, 8.0), level=1.5, timing=0.2),
     'shake': dict(events=(10, 18), pace=(10.0, 20.0), level=3.0, timing=0.45),
     'pair': dict(events=(2, 2), pace=(2.0, 4.0), level=0.5, timing=0.1),
-    'row': dict(events=(3, 3), pace=(2.5, 3.5), level=0.8, timing=0.05),
+    'row': dict(events=(6, 9), pace=(2.5, 3.5), level=0.8, timing=0.05),
     'count': dict(events=(3, 3), pace=(1.0, 1.0), level=0.3, timing=0.0),
 }
 MOST = 64            # events a performance has at most (a length asked for fills at the pace, up to this)
 # the gaps (s, between onsets) a length asked for may spread a pattern's events to: closer than the first a hand
 # cannot repeat the stroke (finger tapping and knocking top out at about 8 a second, running steps at about 4), and
 # further apart than the second the events no longer make one action. A countdown is on the clock: exactly 1 s.
-# scatter and shake keep their own timing (a heap settles and a shaken thing swings as physics has it)
+# scatter and shake keep their own timing (a heap settles and a shaken thing swings as physics has it): a length
+# asked of them reshapes it instead (OWN: `settle`, more swings), never evened out
 GAPS = {'walk': (0.25, 1.5), 'knock': (0.12, 1.5), 'row': (0.12, 1.5), 'type': (0.06, 1.0), 'pair': (0.1, 1.5),
         'count': (1.0, 1.0)}
+OWN = ('scatter', 'shake')
+SWING = 0.35         # s one swing of a shake takes (its usual 10-18 impacts at 10-20 a second fall in two or three)
 CHIEF = {'walk': 'step', 'knock': 'knock', 'row': 'event', 'type': 'key', 'pair': 'event', 'count': 'beat'}
 
 
@@ -100,6 +106,26 @@ def fit(y, dur, fade=0.05):
         y[n - k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
         return y
     return np.concatenate([y, np.zeros((n - len(y),) + y.shape[1:])])
+
+
+def settle(n, first, ratio, room, events=None):
+    """(n, ratio) of a scatter that settles over `room` s (its first onset to its last): the first gap stays and each
+    next one is `ratio` times the one before, the ratio set so the gaps add up to the room. A room longer than the
+    scatter's own settle takes more impacts (as many as keep the mean gap at two thirds of the first: the heap
+    thickens over the length, toward an even trickle at ratio 1); a shorter one loses its last, smallest impacts and
+    settles faster (a smaller ratio).
+    events: a number asked for, kept. The plan stretches the onsets onto the room exactly afterwards"""
+    def span(k, q):
+        return first * (k - 1 if q > 1.0 - 1e-9 else (1.0 - q ** (k - 1)) / (1.0 - q))
+    if not events and room > span(n, ratio):
+        n = int(np.clip(max(n, round(1.5 * room / first) + 1), 2, MOST))
+    while not events and n > 2 and span(n - 1, ratio) >= room:
+        n -= 1                                            # a short room loses the last, smallest bits first
+    lo, hi = 0.2, 1.0
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        lo, hi = (mid, hi) if span(n, mid) < room else (lo, mid)
+    return n, 0.5 * (lo + hi)
 
 
 def said(p, dur, real, thing=None):
@@ -155,18 +181,25 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, de
     'pace' (events per second over the whole)}. events: the number asked for; dur: the length asked for. With
     `ring` (s one event needs to sound) and a pattern of GAPS, dur is the length of the file and the events are
     spread over it (`fill`): the plan then also has 'dur' (the length to `fit` the finished sound to, None when
-    the gaps were held and the length follows from them), 'gap' and 'fits'; else dur is filled at the natural pace.
+    the gaps were held and the length follows from them), 'gap' and 'fits'; a scatter or a shake keeps its own shape
+    and is fitted to end `ring` s before dur (`settle`; a longer shake swings more often); else dur is filled at the
+    natural pace.
     usual (lo, hi) and pace (lo, hi) events a second: the thing's own, in place of the pattern's. type only:
     deep, a deeper key (a space bar) kept for the pauses between words instead of the darkest of `members`; spread,
     how much each key's size, brightness and level differ (1 = a little; more when few recordings stand for a whole
     keyboard, so the same key never comes back the same)"""
     p = PATTERNS[name]
     rate = float(r.uniform(*(pace or p['pace'])))
-    filled = None
+    filled, room = None, None
     if dur and ring is not None and name in GAPS and (events or 2) > 1:
         n, gap, fits = fill(name, events, dur, rate, ring)
         filled = {'gap': round(gap, 3), 'fits': bool(fits), 'dur': float(dur) if fits else None}
         rate = 1.0 / gap
+    elif dur and ring is not None and name in OWN and (events or 2) > 1:
+        room = max(dur - LEAD - ring, 0.0)                # from the first onset to the last
+        n = count(name, r, events, None, rate, usual)     # a scatter's own number (`settle` may add to it)
+        if name == 'shake' and not events:
+            n = int(np.clip(round(room * rate) + 1, 2, MOST))     # a shake keeps its pace over the length
     else:
         n = count(name, r, events, dur, rate, usual)
     gaps = np.full(max(n - 1, 0), 1.0 / rate)
@@ -186,15 +219,21 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, de
         gaps = np.maximum(gaps, 0.06)
     elif name == 'scatter':
         ratio = float(r.uniform(0.6, 0.78))            # the first gap is the pace's, the next ones ever shorter
-        gaps = (float(r.uniform(0.8, 1.2)) / rate * ratio ** np.arange(n - 1)
-                * np.exp(r.normal(0.0, p['timing'], n - 1)))
+        first, own = float(r.uniform(0.8, 1.2)) / rate, n
+        if room is not None:
+            n, ratio = settle(n, first, ratio, room, events)
+        gaps = first * ratio ** np.arange(n - 1) * np.exp(r.normal(0.0, p['timing'], n - 1))
         gaps = np.maximum(gaps, 0.012)
-        db = -np.arange(n) * float(r.uniform(1.5, 3.0)) + r.normal(0.0, p['level'], n)
+        # the heap falls as far over a longer settle as over its own: the step per impact shrinks with their number
+        db = (-np.arange(n) * float(r.uniform(1.5, 3.0)) * (own - 1) / max(n - 1, own - 1, 1)
+              + r.normal(0.0, p['level'], n))
         db[0] = 0.0
         size = -0.15 * np.arange(n) / max(n - 1, 1)       # the later, smaller settling bits
     elif name == 'shake':
         gaps *= np.exp(np.clip(r.normal(0.0, p['timing'], n - 1), -1.0, 1.0))
         swings = int(r.integers(2, 4))
+        if room is not None:                              # a longer shake repeats its motion
+            swings = max(swings, int(round(room / SWING)))
         phase = np.linspace(0.0, swings * np.pi, n)
         db += 6.0 * (np.abs(np.sin(phase + 0.3)) - 1.0)   # louder where each swing turns
         gaps = np.maximum(gaps, 0.015)
@@ -203,6 +242,9 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, de
         db[1:] -= float(r.uniform(1.5, 4.0))               # the answer is softer
     elif name == 'row':
         gaps *= 1.0 + np.clip(r.normal(0.0, p['timing'], n - 1), -0.12, 0.12)
+    if room is not None:                 # the shape kept, the last onset `ring` s before the end (stretched below)
+        gap = room / max(n - 1, 1)
+        filled = {'gap': round(gap, 3), 'fits': True, 'dur': float(dur)}
     onsets = LEAD + np.concatenate([[0.0], np.cumsum(gaps)])
     order = sequence(members, n, r, name)
     tone = np.zeros(n)

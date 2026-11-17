@@ -107,7 +107,9 @@ def test_renders_clean_and_levelled(sid):
     assert np.abs(y).max() <= 1.0 and meta['peak_dbfs'] <= -1.0 + 0.2
     assert meta['lufs_max'] <= registry.LOUDEST.get(d.kind, registry.LOUDEST['']) + 0.3, meta['lufs_max']
     assert meta['id'] == sid and meta['kind'] == d.kind and not meta.get('ignored')
-    assert ('loop' in meta) == d.loop and meta.get('loop', False) == d.loop
+    cut = 'not a loop' in meta.get('note', '')       # a bed asked shorter than its shortest loop is a cut of it
+    assert ('loop' in meta) == d.loop and meta.get('loop', False) == (d.loop and not cut)
+    assert not cut or meta['dur_s'] == kw['dur']
     assert np.abs(y[0]).max() < 1e-3 or d.loop                       # a one-shot starts from zero
     ok = meta['checks']['ok']
     for s in TRIES[1:]:                                               # make re-rolls a take that fails its audit

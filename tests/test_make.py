@@ -553,6 +553,36 @@ def test_a_length_asked_with_a_count_is_the_files_and_the_events_spread_over_it(
     assert '3 knocks 1.5 s apart' in far['summary'] and 'not the 10 s asked' in far['summary']
 
 
+def test_the_action_form_of_a_row_word_is_the_action(tmp_path):
+    """"clapping, 4 seconds" is claps at a clapping pace over 4.00 s (the length is the row's, so it does not steer
+    the pick to a longer single clap); "clapping" alone six to nine claps; "knocking" is the recorded door knock,
+    spread over a length asked; a comparison or the event a sound plays for stays one event; applause is no row"""
+    claps = make('clapping, 4 seconds', str(tmp_path / 'c.wav'))
+    t = claps['takes'][0]
+    assert claps['sound'] == 'clap/hands' and t['dur_s'] == pytest.approx(4.0, abs=0.001)
+    assert t['performance']['pattern'] == 'row' and 10 <= t['performance']['events'] <= 14 and t['checks']['ok']
+    t = make('clapping', str(tmp_path / 'd.wav'))['takes'][0]
+    assert 6 <= t['performance']['events'] <= 9 and 1.8 < t['dur_s'] < 3.6
+    knock = make('knocking, 4 seconds', str(tmp_path / 'k.wav'))
+    t = knock['takes'][0]
+    assert knock['sound'] == 'door/knock' and t['performance']['pattern'] == 'knock'
+    assert t['dur_s'] == pytest.approx(4.0, abs=0.001)
+    beeps = make('beeping, 3 seconds', str(tmp_path / 'b.wav'))
+    assert beeps['sound'] == 'countdown/beep' and beeps['takes'][0]['performance']['pattern'] == 'row'
+    for text in ('applause', 'a single clear ding like tapping a little bell', 'a clap'):
+        assert 'performance' not in make(text, str(tmp_path / 'o.wav'))['takes'][0]
+
+
+def test_a_length_asked_of_a_scattered_or_shaken_action_holds(tmp_path):
+    """the pattern reshaped over the length, or the stretch of a recording of the whole action, said plainly"""
+    ice = make('ice cubes dropped in a glass, 3 seconds', str(tmp_path / 'i.wav'))['takes'][0]
+    assert ice['performance']['pattern'] == 'scatter' and ice['dur_s'] == pytest.approx(3.0, abs=0.001)
+    keys = make('keys jingling, 1 second', str(tmp_path / 'k.wav'))
+    assert keys['takes'][0]['dur_s'] == pytest.approx(1.0, abs=0.001) and 'busiest stretch' in keys['summary']
+    coins = make('coins dropping, 3 seconds', str(tmp_path / 'c.wav'))
+    assert coins['takes'][0]['dur_s'] < 2.5 and 'not the 3 s asked' in coins['summary']
+
+
 def test_a_design_named_inside_its_family_wins_over_the_default():
     """"tape stop" is a downlifter, whose default is fall/air; the request names downlifter/tape"""
     from earshot.make import choose

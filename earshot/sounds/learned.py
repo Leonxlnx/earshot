@@ -240,6 +240,24 @@ def borrow(e, keys):
     return keys + [(bar[0], order(bar[0]['id'])[0])], len(keys)
 
 
+def stretch(y, dur, hop=0.01, rise=0.02, fall=0.3):
+    """the `dur` s of y (a take of a recording of a whole action, stereo) where the action is busiest (the most
+    energy, the earliest of equals, on a `hop` s grid), faded in over `rise` s unless it starts at the beginning and
+    faded out over a quarter of it (at most `fall` s): a length shorter than the recording keeps the action at its
+    own pace and never ends in a cut"""
+    n, k = dsp.n_of(dur), dsp.n_of(hop)
+    e = np.concatenate([[0.0], np.cumsum(np.mean(y ** 2, axis=1))])
+    starts = np.arange(0, len(y) - n + 1, k)
+    s = int(starts[np.argmax(e[starts + n] - e[starts])])
+    out = np.array(y[s:s + n])
+    if s > 0:
+        a = min(n, dsp.n_of(rise))
+        out[:a] *= (np.sin(np.linspace(0, np.pi / 2, a)) ** 2)[:, None]
+    b = min(n, dsp.n_of(min(fall, 0.25 * dur)))
+    out[n - b:] *= (np.cos(np.linspace(0, np.pi / 2, b)) ** 2)[:, None]
+    return out
+
+
 def performs(sid):
     """True when the learned design sid is a thing a person does several times in a row (its index entry has a
     `pattern`, or recordings of the whole action): a walk, a knock, typing, coins, keys, clinking glasses"""
@@ -255,7 +273,9 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     or played at the closest or widest gap a person keeps, with meta['note'] saying so: earshot.synth.perform.fill).
     A recording of the whole action is played when the thing has one and the request asks for neither another number
     of events nor a length more than WHOLE_FIT away from its own; else the pattern sequences the thing's single events,
-    each its own take of the engine with a small variation, all in one room and levelled as one sound"""
+    each its own take of the engine with a small variation, all in one room and levelled as one sound. A thing with no
+    pattern plays the busiest `dur` s of a recording of the whole action at least that long (`stretch`, never
+    warped), or its longest one whole, and meta['note'] says which"""
     from . import registry
     from ..synth import master
     from ..synth import perform as P
@@ -268,14 +288,26 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     pat = e.get('pattern') or {}
     whole = wholes(e)
     walk = order(sid)
-    play, p = None, {}
+    play, p, cut, long = None, {}, None, False
     if whole:
         k = whole[(int(seed) % RETAKE) % len(whole)]
         m = e['members'][k]
         fits = ((events is None or events == m['events']) and
                 (dur is None or abs(dur / m['dur_s'] - 1.0) <= WHOLE_FIT))
         if fits or not pat:
+            if dur and abs(dur / m['dur_s'] - 1.0) > WHOLE_FIT:
+                # no pattern to spread over the length: a stretch of a recording as long as asked, unwarped (a
+                # warp would slow or hurry the action), or the longest whole when none is as long
+                pool = [j for j in whole if e['members'][j]['dur_s'] >= dur] or [
+                    max(whole, key=lambda j: e['members'][j]['dur_s'])]
+                k, cut = pool[(int(seed) % RETAKE) % len(pool)], float(dur)
+                m = e['members'][k]
+                c = registry.Controls(d, **{a: v for a, v in request.items() if a != 'dur'})
+                c.seed = int(seed)
             y = take(e, c, r, k=k)
+            long = bool(cut) and len(y) > dsp.n_of(cut)
+            if long:
+                y = stretch(y, cut)
             c.member = member(k + 1, len(e['members']))
             play = {'recording': c.member['recording'], 'events': m['events'], 'recordings': [k + 1],
                     'pace': m.get('pace')}
@@ -316,11 +348,18 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     y = master.finish(y, peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
                       sparse=registry.LIFT)
     if p.get('dur'):               # a length asked for is the file's: the events were spread over it (perform.fill)
-        y = P.fit(y, p['dur'])
+        # a scatter or a shake whose events ring longer than `ring` is faded over the last one: the motion stops
+        y = P.fit(y, p['dur'], fade=ring if p['pattern'] in P.OWN else 0.05)
+    if long:                       # the stretch is the length asked (finish may have trimmed its faded end)
+        y = P.fit(y, cut)
     meta = {'id': sid, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1),
             'member': dict(c.member), 'performance': play}
     note = P.said(p, dur, meta['dur_s']) if p else None
+    if cut:
+        note = (f"{cut:g} s of a recording of the whole action ({m['dur_s']:.2f} s), its busiest stretch" if long else
+                f"{meta['dur_s']:.2f} s, not the {cut:g} s asked: the longest recording of the whole action is "
+                f"{m['dur_s']:.2f} s")
     if note:
         meta['note'] = note
     if check:                       # several attacks are the design of a performance, not layers stacked on a hit

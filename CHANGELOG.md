@@ -201,6 +201,11 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **A counted action in a row is one file for any design**: "four knocks on the table", "three claps", "a
   countdown 3 2 1" play that many events in one file, each a new seed, in the knock, walk, row or count pattern;
   "five coin pickups" and "3 variations" stay that many files.
+- **The action form of a row word is the action**: "clapping", "clicking", "beeping" play six to nine events at
+  the row's pace (about 2 to 3 s), "clapping, 4 seconds" claps over 4 s, "knocking" is the recorded door knock.
+- **A length holds for scattered and shaken actions**: "ice cubes in a glass, 3 seconds" settles over 3 s, a chain
+  rattles on; a thing played from a recording of the whole action plays its busiest stretch of the length asked,
+  unwarped, or says the recording is shorter ("coins dropping, 3 seconds").
 - **A design named inside its family wins over the family's default**: "tape stop" is `downlifter/tape`, no
   longer `fall/air`.
 

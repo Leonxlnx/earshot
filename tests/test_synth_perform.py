@@ -202,3 +202,34 @@ def test_a_length_spreads_the_events_and_holds_them_where_a_hand_must():
     y = np.ones((dsp.n_of(1.0), 2))
     assert len(perform.fit(y, 0.5)) == dsp.n_of(0.5) and perform.fit(y, 0.5)[-1, 0] < 1e-12
     assert len(perform.fit(y, 2.0)) == dsp.n_of(2.0) and perform.fit(y, 2.0)[-1, 0] == 0.0
+
+
+def test_a_length_reshapes_a_scatter_and_a_shake_without_evening_them_out():
+    """the last onset `ring` s before the end; a longer settle takes more impacts and still shortens its gaps and
+    falls in level; a shorter one loses its last bits; a longer shake swings more often at its own pace"""
+    for dur, more in ((3.0, True), (0.6, False)):
+        p = perform.plan('scatter', dsp.rng(4), members=(0, 1, 2), dur=dur, ring=0.4)
+        on, own = np.array(p['onsets']), perform.plan('scatter', dsp.rng(4), members=(0, 1, 2))
+        assert p['fits'] and p['dur'] == dur and on[-1] == pytest.approx(dur - 0.4)
+        assert (len(on) > len(own['onsets'])) == more
+        gaps = np.diff(on)
+        k = max(1, len(gaps) // 3)
+        assert np.mean(gaps[-k:]) < np.mean(gaps[:k]) and p['gains'][-1] < p['gains'][0]
+    n, ratio = perform.settle(5, 0.15, 0.7, 3.0)
+    assert n > 5 and 0.7 < ratio < 1.0
+    assert perform.settle(5, 0.15, 0.7, 3.0, events=5)[0] == 5
+    s = perform.plan('shake', dsp.rng(2), members=(0, 1), dur=3.0, ring=0.5)
+    assert s['onsets'][-1] == pytest.approx(2.5) and 10.0 <= s['pace'] <= 20.0 * 1.2
+    assert len(s['onsets']) > perform.PATTERNS['shake']['events'][1]
+
+
+def test_a_recording_of_the_whole_action_plays_the_stretch_a_length_asks_for():
+    """a thing with no pattern (a bunch of keys): the busiest stretch of a recording, unwarped and faded out; a
+    length over every recording plays the longest whole and says so"""
+    y, meta = learned.perform('keys/bunch', seed=0, dur=1.0)
+    assert meta['dur_s'] == pytest.approx(1.0, abs=0.001) and 'busiest stretch' in meta['note']
+    assert np.abs(y[:2]).max() < 0.02 and np.abs(y[-8:]).max() < 1e-3 and meta['checks']['ok']
+    y, meta = learned.perform('coins/floor', seed=0, dur=3.0)
+    assert meta['dur_s'] < 2.5 and 'not the 3 s asked' in meta['note']
+    s = learned.stretch(np.concatenate([np.zeros((SR, 2)), np.ones((SR // 2, 2)), np.zeros((SR, 2))]), 1.0)
+    assert len(s) == SR and s[SR // 2 + 10, 0] == pytest.approx(1.0) and s[SR // 2 - 1, 0] == 0.0     # the earliest

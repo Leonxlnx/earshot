@@ -1256,7 +1256,8 @@ def explosion_huge(c, r):
         axes=RING, prior=1.15)
 def sting_soft(c, r):
     """an end card: the soft thump of thump/soft and, 6 ms after it, an open chord of the voice (root, fifth and
-    the third an octave up, rolled by 15 ms, played softly) that is held for most of the length and released"""
+    the third an octave up, rolled by 15 ms, played softly) that is held for most of the length and released. The
+    voice's notes are levelled as played, so energy sets the chord's level as well as its touch (3 dB a unit)"""
     from ..synth import phrase
     k = _k(c)
     g = _ring(c)
@@ -1265,5 +1266,5 @@ def sting_soft(c, r):
     chord = phrase.play([(0.0, root, 1.0), (0.015, root * 2.0 ** (7 / 12), 0.8), (0.03, root * 2.0 ** (16 / 12), 0.75)],
                         c.voice, r, vel=float(np.clip(0.42 + 0.2 * k.e, 0.1, 1.0)), dur=0.7 * T * g, spread=0.4,
                         bright=c.bright, hard=c.hard)
-    y = _mix([(_soft_thump(r, k, g), 0, -3 + k.lo / 2), (_norm(chord), 0.006, 0)])
+    y = _mix([(_soft_thump(r, k, g), 0, -3 + k.lo / 2), (_norm(chord), 0.006, 3.0 * k.e)])
     return _out(c, r, y, room='hall', tilt=-3.0 * c.size)

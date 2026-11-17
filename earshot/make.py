@@ -250,7 +250,22 @@ def rowed(b, sound, events=None):
         return (True, int(events), b.get('row') or 'row', thing) if int(events) > 1 else None
     if b.get('row') and (b.get('events') or 0) > 1:
         return True, int(b['events']), b['row'], thing
+    act = brief.acted(b)              # "clapping", "beeping, 3 seconds": the action at its pace (`row`)
+    if act:
+        return True, None, act, L.ACTION_WORDS[b['act']]
     return None
+
+
+def twin(b, sound):
+    """the design that plays the action a request names with an action word (brief.acted): the recorded twin of the
+    invented design picked when the twin is performed and the invented one is not (lexicon.TWINS, learned.performs;
+    knock/door is three knocks of its own, so "knocking" and "knocking, 4 seconds" are door/knock, whose knocks are
+    spread over the length asked), else sound"""
+    from .sounds import learned
+    t = L.TWINS.get(sound)
+    if t and brief.acted(b) and not learned.performs(sound) and learned.performs(t):
+        return t
+    return sound
 
 
 def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0, thing=None):
@@ -426,6 +441,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     req = _request(b, theme)
     heard = None
     pick = cands[0]
+    if not sound and twin(b, pick['id']) != pick['id']:
+        pick = {**pick, 'id': twin(b, pick['id'])}
     if b.get('dur_max') and 'dur' not in req and (registry.get(pick['id']).dur or 0) > b['dur_max']:
         req['dur'] = b['dur_max']                # "under 150 ms": only shortens a design that is longer
     perf = performance(b, pick['id'], events)

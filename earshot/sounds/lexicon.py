@@ -451,6 +451,10 @@ PERFORM_PHRASES = ('on and off', 'off and on', 'a bunch of', 'a handful of', 'a 
 # thing ("five coin pickups", "3 variations", "two versions") is that many separate files
 ROW_WORDS = {'knock': 'knock', 'step': 'walk', 'footstep': 'walk', 'clap': 'row', 'tap': 'row', 'click': 'row',
              'beep': 'row', 'bleep': 'row', 'countdown': 'count'}
+# the action form of a row word -> the row word: "clapping", "knocking, 4 seconds" name the action, not one event
+# (brief.acted). Applause is not one: it is a crowd, which earshot does not make
+ACTION_WORDS = {'clapping': 'clap', 'knocking': 'knock', 'tapping': 'tap', 'clicking': 'click', 'beeping': 'beep',
+                'bleeping': 'bleep', 'stepping': 'step', 'walking': 'step'}
 # words that ask for a single event ("a single knock", "one step", "just one key press")
 SINGLE_WORDS = ('a single', 'one single', 'single', 'just one', 'only one', 'one', 'a lone', 'an isolated')
 # a twin that is the same thing only when the request says one of these words: the learned coins/floor is a handful

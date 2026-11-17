@@ -159,7 +159,8 @@ def test_renders_clean_and_passes_its_audit(sid):
 @pytest.mark.slow
 @pytest.mark.parametrize('sid', IDS)
 def test_every_member_renders_clean_and_passes_its_audit(sid):
-    _renders(sid, [_seed(sid, k) for k in range(len(INDEX[sid]['members']))])
+    # every member a take plays (learned.order: a recording of the whole action plays only as a performance)
+    _renders(sid, range(len(learned.order(sid))))
 
 
 # ---- members

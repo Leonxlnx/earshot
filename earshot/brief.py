@@ -342,6 +342,7 @@ def _action(b, text):
     """the action words of a request into the brief (`read`: events, perform, plural)"""
     low = ' ' + (text or '').lower() + ' '
     b['events'], b['perform'], b['plural'], b['counted'], b['row'] = None, False, [], [], None
+    b['act'] = next((w for w in WORD.findall(low) if w in L.ACTION_WORDS), None)   # "clapping": `acted`
     rows = {stem(w): p for w, p in L.ROW_WORDS.items()}
     for m in EVENTS.finditer(low):
         v, noun = m.group(1).lower(), stem(m.group(2))
@@ -384,7 +385,7 @@ def performance(b, sid, pattern=None):
         return False, 1
     if b.get('events'):
         return True, int(b['events'])
-    if b.get('perform'):
+    if b.get('perform') or acted(b):
         return True, None
     fam = sid.partition('/')[0]                    # the thing, not what it stands on ("a footstep on tiles": one)
     thing = {stem(fam), stem(L.FAMILY_SENSE.get(fam, fam))} | {stem(w) for w in (pattern or {}).get('nouns', ())}
@@ -394,6 +395,20 @@ def performance(b, sid, pattern=None):
     if pattern and said & set(pattern.get('singular', ())):
         return True, None
     return False, None
+
+
+def acted(b):
+    """the pattern of earshot.synth.perform (lexicon.ROW_WORDS) of the action a request without a count names as its
+    sound with the action form of a row word ("clapping", "knocking, 4 seconds": lexicon.ACTION_WORDS), else None.
+    The word must be how the request names its head concept, not a comparison or the event the sound plays for
+    ("like tapping a little bell", "a cue for tapping Continue", "the ready-set-go beeping" is a countdown)"""
+    w = b.get('act')
+    if not w or b.get('events') or not b.get('concepts'):
+        return None
+    head = b['concepts'][0]
+    if head in b.get('framed', ()) or w not in (b.get('written', {}).get(head) or '').split():
+        return None
+    return L.ROW_WORDS[L.ACTION_WORDS[w]]
 
 
 def _figure_words(text):
@@ -507,7 +522,8 @@ def read(text):
     1), `row` the pattern of earshot.synth.perform when the counted thing is one a person performs in a row
     (lexicon.ROW_WORDS: "four knocks": knock, "a countdown 3 2 1": count), `perform` True when the request asks
     for the action a person performs ("walking", "knocking", "keys
-    jingling") and `plural` the stems of the plural nouns it says ("footsteps": footstep): `performance` decides
+    jingling"), `act` the action form of a row word it says ("clapping": `acted`) and `plural` the stems of the
+    plural nouns it says ("footsteps": footstep): `performance` decides
     with them for a design that can be performed"""
     b = {'text': text, 'concepts': [], 'parts': [], 'context': [], 'refs': [], 'not': [], 'words': [], 'hints': [],
          'axes': {},
@@ -917,7 +933,8 @@ def length_fit(b, row):
     if not d or row.get('loop') or row.get('kind') in STRETCH_KINDS:
         return 1.0
     f = 1.0
-    if b.get('dur') and not (b.get('events') or 0) > 1:     # "three knocks, 2 seconds": the length of the row
+    # "three knocks, 2 seconds", "clapping, 4 seconds": the length is the row's, not one event's
+    if b.get('dur') and not (b.get('events') or 0) > 1 and not acted(b):
         r = abs(math.log2(max(b['dur'], 0.01) / d))
         f *= max(0.5, 1.0 - LENGTH_SLOPE * max(0.0, r - 1.0))
     if b.get('dur_max') and d > b['dur_max']:

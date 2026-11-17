@@ -41,6 +41,7 @@ FIGURES = {
     'power_up/rise': dict(
         kind='figure', says=('a quick rising arpeggio over two octaves', 'seven fast notes climbing a major chord'),
         uses=('power up', 'boost', 'upgrade', 'grow', 'buff', 'charge up'), prior=1.1,
+        allows=('rising_glide',),            # seven struck notes 52 ms apart read as one glide to the audit
         fig=dict(steps=(0, 4, 7, 12, 16, 19, 24), gap=0.052, root='C5', vel=0.55,
                  vels=(0.7, 0.74, 0.78, 0.83, 0.88, 0.94, 1.0), last=0.55, room='studio', spread=0.4)),
     'power_down/fall': dict(

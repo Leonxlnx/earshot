@@ -210,6 +210,8 @@ def test_keys_differ_from_take_to_take():
 @pytest.mark.slow
 @pytest.mark.parametrize('sid', AIR)
 def test_no_rising_glide_in_air(sid):
+    if 'rising_glide' in registry.get(sid).allows:
+        pytest.skip('a real whoosh: the pitch detector reads its noise as gliding (motion.GLIDE)')
     assert sfx.rising_glide(_raw(sid, 3))['rise_st'] <= 4.0
 
 

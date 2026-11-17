@@ -254,6 +254,10 @@ than a hand plays (0.12 s for knocks, claps, taps and clicks, 0.25 s for steps) 
 are held there, the file is as long as the events then need, and one line says so. The result line shows the real
 length; `played:` the count and pace.
 
+The action form of a row word as the sound ("clapping, 4 seconds", "clicking", "knocking") is the action: a row at
+the pattern's pace over the length asked, or about 2 to 3 s; a scatter or a shake settles or swings over a length, and
+a recording of the whole action plays its busiest stretch of it, or says it is shorter than asked.
+
 ```
 $ earshot make "three knocks on the table, 2 seconds" -o knocks2.wav
 knocks2.wav: knock/desk (2.00 s, -16 LUFS, clean) [table, knocks]

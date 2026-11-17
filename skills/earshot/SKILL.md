@@ -63,7 +63,10 @@ is one event. `--events N` (MCP `events`) overrides: 1 = one event, 2 or more = 
 counted action in a row is one file whatever the design ("four knocks on the table", "three claps", "a countdown
 3 2 1"); a count of separate things is that many files ("five coin pickups", "3 variations"). A length with an
 action ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's length, the events spread over it; a
-countdown stays one a second. The answer's `played: ...` line says what was played. Chip sound only with "8-bit" /
+countdown stays one a second. "clapping", "clicking", "beeping" (the action form of a row word as the sound) are a
+row at the pattern's pace, over the length asked or about 2 to 3 s; scattered and shaken actions ("ice cubes in a
+glass, 3 seconds", "keys jingling, 1 second") keep the length too. The answer's `played: ...` line says what was
+played. Chip sound only with "8-bit" /
 "retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
 written that loosely the first pick was right 69.5 % of the time (76.8 % in the top three). To steer, re-ask with
 adjectives, not by browsing.

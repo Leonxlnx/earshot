@@ -753,6 +753,18 @@ def test_a_countdown_with_a_length_keeps_its_count_and_a_rows_length_does_not_st
     assert [x['id'] for x in a] == [x['id'] for x in b], (a, b)
 
 
+@pytest.mark.parametrize('text,want', [
+    ('clapping, 4 seconds', 'row'), ('someone clapping slowly', 'row'), ('knocking', 'knock'), ('beeping', 'row'),
+    ('stepping', 'walk'), ('three claps', None), ('applause', None), ('a cue for tapping Continue', None),
+    ('a single clear ding like tapping a little bell', None), ('the ready-set-go beeping before a race begins', None)])
+def test_the_action_form_of_a_row_word_names_the_action_only_as_the_sound_itself(text, want, idx):
+    assert brief.acted(brief.read(text)) == want
+    if want == 'row':                       # the length is the row's: it ranks as the action word alone does
+        a = brief.rank(brief.read(text.split(',')[0]), idx=idx, top=3)
+        b = brief.rank(brief.read(text), idx=idx, top=3)
+        assert [x['id'] for x in a] == [x['id'] for x in b]
+
+
 @pytest.mark.parametrize('text,word', [
     ('a dog barking', 'dog'), ('dogs barking in the distance', None), ('a violin melody for the intro', 'violin'),
     ('a car horn honk', 'car horn'), ('someone saying welcome back', 'saying'),
