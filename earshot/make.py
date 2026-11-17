@@ -215,13 +215,30 @@ def _request(b, theme):
     return {**req, **b['axes'], 'theme': th}
 
 
-def take(sound, seed, req, lufs=None, peak_db=-1.0):
+def performance(b, sound, events=None):
+    """(perform, events) of a request for a design that a person performs several times in a row (a walk, a knock,
+    typing: earshot.sounds.learned.performs), else None. events: the caller's count (1 = one event, 2 or more = a
+    performance of that many), else as the request says (brief.performance)"""
+    from .sounds import learned
+    if not learned.performs(sound):
+        return None
+    if events is not None:
+        return int(events) > 1, max(1, int(events))
+    return brief.performance(b, sound, learned.index()[sound].get('pattern'))
+
+
+def take(sound, seed, req, lufs=None, peak_db=-1.0, perform=None):
     """one clean take of a design: the first of TRIES seeds (seed, seed + 101, ...) that passes the audit, else the
-    first one with its warnings: (y, meta)"""
-    from .sounds import registry
+    first one with its warnings: (y, meta). perform: (True, events) plays the design as a performance
+    (earshot.sounds.learned.perform: events None = its natural number, or as many as fill the length asked for)"""
+    from .sounds import learned, registry
     first = None
     for k in range(TRIES):
-        y, meta = registry.render(sound, seed=seed + 101 * k, lufs=lufs, peak_db=peak_db, **req)
+        if perform and perform[0]:
+            y, meta = learned.perform(sound, seed=seed + 101 * k, events=perform[1], lufs=lufs, peak_db=peak_db,
+                                      **req)
+        else:
+            y, meta = registry.render(sound, seed=seed + 101 * k, lufs=lufs, peak_db=peak_db, **req)
         if meta['checks']['ok']:
             return y, meta
         first = first or (y, meta)
@@ -235,7 +252,7 @@ def _heard(path, queries):
 
 
 def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False, fmt=None, mono=False, lufs=None,
-         sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, loop=None, **axes):
+         sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, loop=None, events=None, **axes):
     """make the sound a request asks for and write it: {'summary', 'sound', 'files', 'why', 'also', 'not_in_sound',
     'unknown', 'takes': [meta ...]} (+ 'heard' with listen); `not_in_sound`: the sounds or jobs the request named
     that the chosen design was not picked for, as written ("water drop"), `also`: up to three alternatives. want:
@@ -243,7 +260,10 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     extension picks the format: wav, flac, ogg, mp3, m4a, webm; none = `<sound>.wav` in the working folder); n
     takes get `_1 .. _n` before the extension; theme: a preset name or dict (earshot.sounds.theme); lufs: a
     momentary-max loudness instead of the -1 dBFS peak; pitch / dur / voice / material and the axes (bright, hard,
-    ring, size, space, width, energy, motion) override what the words say."""
+    ring, size, space, width, energy, motion) override what the words say. events: for a thing a person does
+    several times in a row (footsteps, a knock, typing, coins, keys, clinking glasses), 1 = one event, 2 or more =
+    the action with that many events; None = as the words say ("footsteps", "knocking", "three knocks", "5 seconds
+    of typing" ask for the action, "a footstep" for one step); a take's meta['performance'] says what was played"""
     from .sounds import registry
     from .synth import master
     if not (want or sound):
@@ -262,9 +282,10 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if b.get('dur_max') and 'dur' not in req and (registry.get(pick['id']).dur or 0) > b['dur_max']:
         req['dur'] = b['dur_max']                # "under 150 ms": only shortens a design that is longer
     paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
+    perf = performance(b, pick['id'], events)
     takes = []
     for i, p in enumerate(paths):
-        y, meta = take(pick['id'], seed + i, req, lufs)
+        y, meta = take(pick['id'], seed + i, req, lufs, perform=perf)
         master.write(p, y, sr=sr, mono=mono, bits=bits)
         takes.append({**meta, 'file': p})
     if listen and heard is None:
@@ -272,7 +293,15 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
                        ([want] if want else []) + list(registry.get(pick['id']).says))
     why = brief.shown(b, pick['why'])
     lines = [_line(t, t['file'], ', '.join(why) if i == 0 else '') for i, t in enumerate(takes)]
-    missing = [] if sound else brief.uncovered(b, pick['why'])
+    played = takes[0].get('performance')
+    if played:
+        how = (f"a recording of the whole action ({played['events']} events)" if played.get('recording') else
+               f"{played['events']} events as a {played['pattern']}"
+               + (f" at {played['pace']:.1f} a second" if played.get('pace') else ''))
+        lines.append(f'played: {how}; one event: events=1 or "a single ..."')
+    elif perf is not None:
+        lines.append('played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")')
+    missing =[] if sound else brief.uncovered(b, pick['why'])
     if missing:
         lines.append(f"not in this sound: {', '.join(missing)}")
     reason = None if sound else doubt(b, cands)
@@ -458,11 +487,11 @@ WEIGHT = {'tap': -10.0, 'tick': -12.0, 'click': -9.0, 'pop': -7.0, 'note': -5.0,
           'noise': -8.0, 'texture': -12.0, 'bed': -14.0, 'pad': -10.0, 'stinger': 0.0, 'voice': -5.0, 'object': -6.0,
           'music': -8.0}
 TOP = -16.0             # LUFS (momentary max) of a set's loudest loop or bed when the spec names no `lufs`
-# a set's one-shots, balanced by their loudest 50 ms (D1, 2026-11-17): the final page's interface set came out at
-# -21 to -25 LUFS (taps at -16 + WEIGHT = -26), 6 to 8 dB under the same takes made alone and 8 to 10 dB under every
-# other group, and the owner heard it as far, thin and technical. Now each is made as it is made alone (peak -1 dBFS)
-# and only turned down: none more than BALANCE dB over the quietest (not counting one under FLOOR, which cannot come
-# up without being folded), a `quiet` name (hover) QUIET dB under it. Gain only: nothing is folded or limited again
+# a set's one-shots, balanced by their loudest 50 ms: levelled to a common loudness (-16 LUFS + WEIGHT), an
+# interface set came out at -21 to -25 LUFS, 6 to 8 dB under the same takes made alone and 8 to 10 dB under the
+# sounds of other sets, and quiet reads as far and thin. So each is made as it is made alone (peak -1 dBFS) and only
+# turned down: none more than BALANCE dB over the quietest (not counting one under FLOOR, which cannot come up
+# without being folded), a `quiet` name (hover) QUIET dB under it. Gain only: nothing is folded or limited again
 BALANCE, FLOOR, QUIET = 2.5, -18.0, 0.5
 
 
@@ -528,6 +557,9 @@ def add_cli(sub):
                                              'says so ("not used by this sound: dur")')
     p.add_argument('--voice', help='the instrument or patch of a tonal sound')
     p.add_argument('--material', help='what a tap, click or knock is made of')
+    p.add_argument('--events', type=int, help='a thing a person does several times in a row (footsteps, a knock, '
+                                              'typing, coins, keys, clinking glasses): 1 = one event, 2 or more = '
+                                              'the action with that many; default: as the words say')
     for a in ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion'):
         p.add_argument(f'--{a}', type=float, help='-1 .. 1, 0 = as designed')
     p.add_argument('--lufs', type=float, help='momentary-max loudness instead of a -1 dBFS peak')
@@ -561,4 +593,4 @@ def _run_make(args):
     return _emit(make(args.want, args.output, sound=args.sound, n=args.n, seed=args.seed, theme=args.theme,
                       listen=args.listen, mono=args.mono, lufs=args.lufs, pitch=args.pitch, dur=args.dur,
                       voice=args.voice, material=args.material, loop=False if args.no_loop else None,
-                      **_axes(args)), args)
+                      events=args.events, **_axes(args)), args)

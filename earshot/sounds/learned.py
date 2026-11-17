@@ -5,8 +5,8 @@ do not reach.
 
 A design is one THING (`step/concrete`, `switch/lamp`, `keyboard/laptop`); the recordings of that thing are its
 members. The seed picks the member: seeds 0, 1, 2 ... walk through the members best first (the index's `walk`: a
-recording the owner rated well first, then the full, long enough ones; a game that plays a footstep with seeds 0, 1,
-2 gets three different real footsteps), and every take adds fresh noise and a small variation on top, so seeds past
+recording heard as good first, then the full, long enough ones; a game that plays a footstep with seeds 0, 1, 2
+gets three different real footsteps), and every take adds fresh noise and a small variation on top, so seeds past
 the last member are new performances of a recording, not copies. Seeds 101 apart play the same member (make re-rolls
 a take that fails its audit at seed + 101: another performance of the same recording, not the next recording). A request for a
 dark or a bright take (bright at -0.5 or below, 0.5 or above) walks the darker or the brighter half of the members
@@ -15,7 +15,7 @@ dark or a bright take (bright at -0.5 or below, 0.5 or above) walks the darker o
 The store is earshot/data/resyn/: one model per recording (`<family>-<name>-<n>.npz`, numbers only, never audio),
 `index.json` (per design: id, descriptions, jobs, kind, whether it is a default choice, the interface jobs it plays
 (`roles`), the order its seeds play its members in (`walk`) and its members, each with its file, source recording, credit, main onset, natural length, the axes that
-measurably act on it, the measured quality of the recording, the owner's rating where he gave one) and CREDITS.md.
+measurably act on it, the measured quality of the recording, a listening rating where there is one) and CREDITS.md.
 It is built in the lab (tools/learn_build.py) from recordings whose licence is CC0, each one checked for a full band,
 a natural decay, a clear onset and a single event; nothing else may enter it. A model is read from disk once, on its
 first take.
@@ -30,14 +30,22 @@ The shared axes are transforms of the model, so they stay physical:
     dur      the time between onsets warped (onsets stay as sharp), within LENGTH of the natural length
     space    the shared room (earshot.synth.space); width: mid / side (a mono recording is spread by decorrelation)
 
+A thing a person does several times in a row (footsteps, a knock, typing, coins, a bunch of keys, clinking glasses)
+can also be played as that action (`perform`): a recording of the whole action where the store has one (a member
+with `events` over 1), else its single recordings sequenced in the thing's `pattern` by earshot.synth.perform (walk,
+knock, type, scatter, shake, pair). A plain take never plays a whole-action member of a thing that also has single
+ones; the request decides between the two (earshot.brief.performance, make's `events`).
+
     from earshot.sounds import registry
     y, meta = registry.render('step/pebbles', seed=1)            # meta['member']: which recording was played
     y, meta = registry.render('switch/lamp', seed=0, bright=-0.6)
+    y, meta = learned.perform('step/pebbles', seed=0)            # a walk; meta['performance']: what was played
 """
 import json
 import os
 import zlib
 from functools import lru_cache
+from types import SimpleNamespace
 
 import numpy as np
 
@@ -64,7 +72,7 @@ LENGTH = (0.6, 1.8)
 # 6 dB of loudness and some body with the centroid within a few percent, but its limiter slowed the strike of half
 # the clicks by 2 to 5 ms, so it runs here without the limiter (lufs -40: master.finish levels afterwards) and with
 # half its EQ; a click has nothing under 150 Hz, where a boost only adds the filter's own ring. On air (whooshes,
-# swells) it moved one centroid up by two octaves, and the owner heard an airy whoosh get worse: never there.
+# swells) it moved one centroid up by two octaves, and an airy whoosh was heard to get worse: never there.
 FINISH = dict(lufs=-40.0, weight=1.5, presence=1.5, air=1.5, drive=3.0)
 # what follows the strike of a short dry member raised against its loudest 5 ms (body()): gain (level / loudest)
 # ** -BODY_EXP, at most BODY_DB. The registry's lift raises a click until its loudest 5 ms sit 3.5 dB under the peak,
@@ -75,6 +83,10 @@ BODY_EXP, BODY_DB = 0.5, 6.0
 CREST, CUT = 14.0, 8.0       # dB: present() (a sound of 0.5 s and more, peaks over its loudest 50 ms)
 DEFAULT_OFF = 0.6           # prior factor of a design the index marks as not a default (`default`: false)
 RETAKE = 101                # make.take's step between the seeds it tries: seeds this far apart play one member
+# how far (a share of its length) a length asked of a performance may lie from a whole-action recording's own for
+# that recording to be played (warped that little): further, the pattern fills the length at the natural pace, as a
+# warp would slow or hurry the walk, the knock, the typing it holds
+WHOLE_FIT = 0.15
 
 
 def dry(e, m):
@@ -102,13 +114,19 @@ def credit(sid, member=0):
 
 
 @lru_cache(maxsize=None)
-def order(sid):
-    """the members of a design in the order the seeds walk through: the index's `walk` (best first; a member the
-    owner rated 1 is left out of it), else a fixed shuffled order"""
+def order(sid, whole=False):
+    """the members of a design in the order the seeds walk through: the index's `walk` (best first; a member heard
+    as poor is left out of it), else a fixed shuffled order. A thing with recordings of single events and of the
+    whole action (a member's `events` over 1: a walk of several steps, a knock pattern) plays its single events as a
+    take and its whole actions as a performance (`perform`): whole=False gives the first, True the second (each
+    falls back on all members when the thing has none of that sort)"""
     e = index()[sid]
     if e.get('walk'):
-        return tuple(int(k) for k in e['walk'])
-    return tuple(int(k) for k in np.random.default_rng(zlib.crc32(sid.encode())).permutation(len(e['members'])))
+        walk = tuple(int(k) for k in e['walk'])
+    else:
+        walk = tuple(int(k) for k in np.random.default_rng(zlib.crc32(sid.encode())).permutation(len(e['members'])))
+    keep = tuple(k for k in walk if (e['members'][k].get('events', 1) > 1) == whole)
+    return keep or walk
 
 
 def pick(sid, seed, bright=0.0):
@@ -123,23 +141,29 @@ def pick(sid, seed, bright=0.0):
     return walk[(int(seed) % RETAKE) % len(walk)]
 
 
-def take(e, c, r):
-    """one take of the design e (an index entry) under the controls c (module doc): the member the seed picks"""
+def take(e, c, r, k=None, room=True, nudge=None):
+    """one take of the design e (an index entry) under the controls c (module doc): the member the seed picks, or
+    member k. room False leaves the take dry (a performance puts all its events in one room); nudge: offsets added
+    to the energy and size axes ({'energy': .., 'size': ..}: one event of a performance a little firmer or smaller)"""
     ax = set(e['axes'])
+    nudge = nudge or {}
     tilt = c.bright if 'bright' in ax else 0.0
-    k = pick(e['id'], c.seed, tilt)
+    if k is None:
+        k = pick(e['id'], c.seed, tilt)
+        m = e['members'][k]
+        c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
+                    'author': m['credit']['author']}
     m = e['members'][k]
-    c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
-                'author': m['credit']['author']}
-    energy = c.energy if 'energy' in ax else 0.0
-    size = c.lerp('size', *SIZE, 1.0, log=True) if 'size' in ax else 1.0
+    energy = float(np.clip((c.energy if 'energy' in ax else 0.0) + nudge.get('energy', 0.0), -1.0, 1.0))
+    s = float(np.clip((c.size if 'size' in ax else 0.0) + nudge.get('size', 0.0), -1.0, 1.0))
+    size = float(SIZE[1] ** s if s >= 0 else SIZE[0] ** -s) if 'size' in ax else 1.0
     bright = TILT * tilt + 0.5 * energy
     hard = float(np.clip((c.hard if 'hard' in ax else 0.0) + 0.35 * energy, -1.0, 1.0))
     ring = c.lerp('ring', 0.5, 2.0, 1.0, log=True) if 'ring' in ax else 1.0
     pitch = 0.0
     if m.get('hz'):
         pitch = float(np.clip(12.0 * np.log2(c.hz(m['hz']) / m['hz']), -PITCH, PITCH))
-    want = c.length()
+    want = c.length() if room else None
     length = 1.0 if want is None else float(np.clip(want / (m['dur_s'] * size), *LENGTH))
     y = resyn.render(model(m['file']), r, length=length, pitch=pitch, size=size, bright=bright, hard=hard, ring=ring,
                      vary=VARY * c.vary)
@@ -147,6 +171,8 @@ def take(e, c, r):
         y = body(resyn.finish(y, **FINISH))
     y = present(y)
     y = image(y * 10 ** (6.0 * energy / 20), c.lerp('width', 0.0, 2.0, 1.0) if 'width' in ax else 1.0, m)
+    if not room:
+        return y
     return space.room(y, c.room('room'), amount=c.space if 'space' in ax else 0.0, r=r)
 
 
@@ -185,6 +211,80 @@ def image(y, w, m):
     mid, side = 0.5 * (y[:, 0] + y[:, 1]), 0.5 * (y[:, 0] - y[:, 1])
     st = fx.decorrelate(mid, min(1.0, SPREAD * (max(w - 1.0, 0.0) if m['stereo'] else w)))
     return st + w * np.stack([side, -side], axis=1)
+
+
+def wholes(e):
+    """the members of e that are recordings of the whole action (`events` over 1), best first"""
+    return [k for k in order(e['id'], True) if e['members'][k].get('events', 1) > 1]
+
+
+def performs(sid):
+    """True when the learned design sid is a thing a person does several times in a row (its index entry has a
+    `pattern`, or recordings of the whole action): a walk, a knock, typing, coins, keys, clinking glasses"""
+    e = index().get(sid)
+    return bool(e and (e.get('pattern') or wholes(e)))
+
+
+def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **request):
+    """a performance of the thing sid (earshot.synth.perform): (y, meta) as registry.render gives a take, with
+    meta['performance'] = {'pattern' or 'recording', 'events', 'pace' (events a second), 'recordings' (the member
+    of each event, 1-based)}. events: how many (None: the pattern's usual number, or as many as fill `dur`);
+    request: the controls of registry.render (dur = the length the performance fills at its natural pace).
+    A recording of the whole action is played when the thing has one and the request asks for neither another number
+    of events nor a length more than WHOLE_FIT away from its own; else the pattern sequences the thing's single events,
+    each its own take of the engine with a small variation, all in one room and levelled as one sound"""
+    from . import registry
+    from ..synth import master
+    from ..synth import perform as P
+    e = index()[sid]
+    d = registry.get(sid)
+    dur = request.get('dur')
+    c = registry.Controls(d, **request)          # the events of a pattern leave dur unread (take, room=False)
+    c.seed = int(seed)
+    r = dsp.rng(registry.seed_of(sid, seed) ^ 0x5EED)
+    pat = e.get('pattern') or {}
+    whole = wholes(e)
+    walk = order(sid)
+    play = None
+    if whole:
+        k = whole[(int(seed) % RETAKE) % len(whole)]
+        m = e['members'][k]
+        fits = ((events is None or events == m['events']) and
+                (dur is None or abs(dur / m['dur_s'] - 1.0) <= WHOLE_FIT))
+        if fits or not pat:
+            y = take(e, c, r, k=k)
+            play = {'recording': m['credit']['title'], 'events': m['events'], 'recordings': [k + 1],
+                    'pace': m.get('pace')}
+            c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
+                        'author': m['credit']['author']}
+    if play is None:
+        p = P.plan(pat.get('name', 'pair'), r, members=walk, events=events, dur=dur, usual=pat.get('events'),
+                   pace=pat.get('pace'))
+        parts = []
+        for k, nudge in zip(p['members'], p['nudge']):
+            m = e['members'][k]
+            size = SIZE[1] ** nudge['size'] if nudge['size'] >= 0 else SIZE[0] ** -nudge['size']
+            parts.append((take(e, c, dsp.rng(int(r.integers(2 ** 32))), k=k, room=False, nudge=nudge),
+                          m.get('onset_s', 0.0) * size))
+        y = P.mix(parts, p)
+        y = space.room(y, c.room('room'), amount=c.space if 'space' in e['axes'] else 0.0, r=r)
+        play = {'pattern': p['pattern'], 'events': len(p['members']), 'pace': p['pace'],
+                'recordings': [k + 1 for k in p['members']]}
+        c.member = {'n': p['members'][0] + 1, 'of': len(e['members']),
+                    'recording': e['members'][p['members'][0]]['credit']['title'],
+                    'author': e['members'][p['members'][0]]['credit']['author']}
+    # levelled as one sound: a performance is longer than the one-shots the registry lifts, so its few loudest
+    # strikes are folded the way a long sound held down by a few peaks is (master.finish `sparse`), as far as a
+    # single event of the thing is lifted (registry.LIFT)
+    y = master.finish(y, peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
+                      sparse=registry.LIFT)
+    meta = {'id': sid, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
+            'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1),
+            'member': dict(c.member), 'performance': play}
+    if check:                       # several attacks are the design of a performance, not layers stacked on a hit
+        meta['checks'] = registry.audit(y, SimpleNamespace(kind=d.kind, pitch=d.pitch, loop=False,
+                                                            allows=d.allows + ('stacked',)))
+    return y, meta
 
 
 def _register(e):

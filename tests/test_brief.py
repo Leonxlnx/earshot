@@ -36,6 +36,45 @@ def test_counts():
     assert brief.read('a two-note chime')['notes'] == 2
 
 
+def test_events_and_the_action():
+    """a number of events, a single one, an action word or a plural (brief.performance decides with them)"""
+    assert brief.read('three knocks on a door')['events'] == 3
+    assert brief.read('a few footsteps on gravel')['events'] == 3
+    assert brief.read('a single knock')['events'] == 1 and not brief.read('a single knock')['perform']
+    assert brief.read('one footstep on wood')['events'] == 1
+    assert brief.read('three takes of a footstep on wood')['events'] is None
+    assert brief.read('a two-note chime')['events'] is None and brief.read('an 8-bit coin')['events'] is None
+    assert brief.read('2 seconds of typing')['events'] is None and brief.read('2 seconds of typing')['perform']
+    assert brief.read('knocking on a wooden door')['perform'] and brief.read('keys jingling')['perform']
+    assert not brief.read('a footstep on gravel')['perform'] and not brief.read('a knock on the door')['perform']
+    assert 'footstep' in brief.read('footsteps on gravel')['plural']
+    assert 'glass' in brief.read('glasses clinking')['plural'] and brief.read('a glass')['plural'] == []
+    # a singular that still means the action: the pattern's words ("a knock on the door": nobody knocks once)
+    knock = {'name': 'knock', 'singular': ['door']}
+    assert brief.performance(brief.read('a knock on the door'), 'door/knock', knock) == (True, None)
+    assert brief.performance(brief.read('a knock'), 'door/knock', knock) == (False, None)
+    assert brief.performance(brief.read('a single knock on the door'), 'door/knock', knock) == (False, 1)
+
+
+@pytest.mark.parametrize('text,voice', [
+    ('a success sound on a marimba', 'marimba'),
+    ('a notification with a wooden mallet', 'marimba'),
+    ('a notification played on a harp', 'harp'),
+    ('a pizzicato confirmation', 'pizzicato'),
+    ('plucked strings', 'pizzicato'),
+    ('a soft piano notification', 'felt_piano'),
+    ('upright piano', 'felt_piano'),
+])
+def test_the_real_instruments_are_reached(text, voice):
+    assert brief.read(text)['voice'] == voice
+
+
+@pytest.mark.parametrize('text', ['a warm notification', 'a wooden success sound', 'a playful tap',
+                                  'a dreamy chime', 'an elegant confirmation'])
+def test_general_words_name_no_instrument(text):
+    assert brief.read(text)['voice'] is None
+
+
 def test_pitch_hz_note_and_middle_c():
     assert brief.read('a beep at 880 Hz')['pitch'] == pytest.approx(880.0)
     assert brief.read('a marimba note, C5')['pitch'] == 'C5'
@@ -605,3 +644,32 @@ NEW_ANCHORS = [
 def test_new_family_anchor(idx, text, prefixes):
     r = brief.rank(brief.read(text), idx=idx, top=3)
     assert r and (r[0]['id'].startswith(prefixes) or _learned_twin(r[0]['id'], prefixes)), (text, r)
+
+
+# the thing a person does several times in a row: the design it finds, and whether the request asks for the action
+# (True), a number of events (an int) or one event (False: a bare singular, "a single ...")
+PERFORM_ANCHORS = [
+    ('footsteps on gravel', 'step/pebbles', True),
+    ('someone walking on a wooden floor', 'step/floorboard', True),
+    ('a footstep on gravel', 'step/pebbles', False),
+    ('a single footstep on concrete', 'step/concrete', False),
+    ('two steps on a wooden floor', 'step/floorboard', 2),
+    ('knocking on a wooden door', 'door/knock', True),
+    ('a knock on the door', 'door/knock', True),
+    ('three knocks on a door', 'door/knock', 3),
+    ('typing on a mechanical keyboard', 'keyboard/mechanical', True),
+    ('a bunch of keys jingling', 'keys/bunch', True),
+    ('coins dropped on a table', 'coins/floor', True),
+    ('glasses clinking', 'glass/cheers', True),
+    ('ice cubes dropped into a glass', 'ice/cubes', True),
+]
+
+
+@pytest.mark.parametrize('text,sid,want', PERFORM_ANCHORS)
+def test_perform_anchor(idx, text, sid, want):
+    from earshot.make import performance
+    b = brief.read(text)
+    r = brief.rank(b, idx=idx, top=3)
+    assert r and r[0]['id'] == sid, (text, r)
+    perform, events = performance(b, sid)
+    assert perform == bool(want) and (events == want if want not in (True, False) else True), (text, perform, events)

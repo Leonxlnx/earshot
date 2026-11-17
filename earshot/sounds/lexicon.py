@@ -400,11 +400,11 @@ FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride'
                 'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music',
                 # recorded things (earshot.sounds.learned) whose family is the job by another word
                 'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter', 'pass': 'flyby'}
-# the tonal interface figures (earshot.sounds.ui): the owner heard them twice as unrecognisable, so a plain "tap",
+# the tonal interface figures (earshot.sounds.ui): listeners heard them as unrecognisable, so a plain "tap",
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
 BY_NAME_ONLY = frozenset(('tap/tone', 'hover/tone', 'toggle/up', 'toggle/down', 'next/step'))
-# an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. The owner rated the
+# an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. Listeners rated the
 # invented tactile sounds 1 to 2 of 5 and the recorded ones 4 to 5, so a request that names the thing and reaches the
 # invented one gets the recording (brief._preferred); the invented one still answers to its own id
 TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop': 'coins/floor',
@@ -414,7 +414,21 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'pen/click': 'pen/ballpoint', 'zipper/pull': 'zipper/jacket', 'scissors/snip': 'scissors/cut',
          'match/strike': 'match/light', 'stapler/press': 'stapler/desk', 'drawer/slide': 'drawer/wood',
          'door/close': 'door/shut', 'explosion/distant': 'explosion/far', 'hit/punch': 'punch/body',
-         'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge'}
+         'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge', 'keys/jingle': 'keys/bunch'}
+# words that ask for the action a person performs, not its single event (earshot.synth.perform; brief.performance):
+# a walk, knocking, typing, a bunch of keys shaken, glasses clinked. A plural of the thing itself ("footsteps",
+# "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key press") give one
+# event, since a game triggers one step per step
+PERFORM_WORDS = frozenset((
+    'walk', 'walks', 'walking', 'walked', 'footsteps', 'steps', 'stepping', 'pacing', 'strolling', 'marching',
+    'running', 'treading', 'knocking', 'knocks', 'typing', 'typed', 'keystrokes', 'jingle', 'jingles', 'jingling',
+    'jangle', 'jangling', 'rattling', 'shaking', 'shaken', 'clinking', 'clinks', 'clinked', 'toasting', 'clapping',
+    'scattering', 'scattered', 'spilling', 'spilled', 'tumbling', 'clattering'))
+# phrases that ask for the action in so many words
+PERFORM_PHRASES = ('on and off', 'off and on', 'a bunch of', 'a handful of', 'a burst of', 'a run of', 'over and over',
+                   'again and again', 'in a row')
+# words that ask for a single event ("a single knock", "one step", "just one key press")
+SINGLE_WORDS = ('a single', 'one single', 'single', 'just one', 'only one', 'one', 'a lone', 'an isolated')
 # a twin that is the same thing only when the request says one of these words: the learned coins/floor is a handful
 # of coins, so "a coin dropped on the table" keeps the invented single coin
 TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile')}
@@ -579,6 +593,7 @@ VOICES = {'piano': 'felt_piano', 'grand': 'grand_piano', 'grand piano': 'grand_p
           'wind-up': 'music_box', 'wind up': 'music_box', 'plucked string': 'harp', 'string pluck': 'harp',
           'low string': 'upright_bass', 'tine': 'kalimba', 'tines': 'kalimba', 'metal tine': 'kalimba',
           'wooden mallet': 'marimba', 'steel-string': 'steel_guitar',
+          'plucked strings': 'pizzicato', 'pizz': 'pizzicato', 'strings plucked': 'pizzicato',
           'steel string': 'steel_guitar', 'strum': 'nylon_guitar',
           'keyboard tone': 'felt_piano', 'keyboard note': 'felt_piano', 'ivory': 'grand_piano',
           'xylo': 'xylophone', 'cello pluck': 'pizzicato', 'violin pluck': 'pizzicato',

@@ -24,6 +24,21 @@ def _read(p):
 
 # ---- make
 
+def test_the_request_or_the_count_decides_between_one_event_and_the_action(tmp_path):
+    """"knocking on a door" plays the knock pattern, "a single knock on a door" one knock, events=2 two knocks; the
+    summary and the take's meta say what was played"""
+    many = make('knocking on a wooden door', str(tmp_path / 'k.wav'))
+    one = make('a single knock on a wooden door', str(tmp_path / 'k1.wav'))
+    two = make('a single knock on a wooden door', str(tmp_path / 'k2.wav'), events=2)
+    assert many['sound'] == one['sound'] == 'door/knock'
+    p = many['takes'][0]['performance']
+    assert p['events'] >= 3 and 'played:' in many['summary']
+    assert 'performance' not in one['takes'][0] and 'played: one event' in one['summary']
+    assert two['takes'][0]['performance']['events'] == 2
+    assert many['takes'][0]['dur_s'] > one['takes'][0]['dur_s'] + 0.4
+    assert abs(many['takes'][0]['peak_dbfs'] + 1.0) < 0.3
+
+
 def test_make_writes_the_file_it_names_in_its_format(tmp_path):
     for ext, fmt in (('wav', 'WAV'), ('flac', 'FLAC')):
         p = str(tmp_path / f'ok.{ext}')
@@ -227,10 +242,10 @@ def _loudest50(path):
 
 
 def test_a_set_of_one_shots_is_full_and_balanced(tmp_path):
-    """D1: the final page's interface set came out 6-8 dB under the same takes made alone (taps at -26 LUFS) and was
-    heard as far and thin. Without a `lufs` a set's one-shots are made as they are alone (the quietest at full peak)
-    and only turned down to within BALANCE dB of the quietest by their loudest 50 ms; a ready-made set's quiet names
-    (hover) sit lowest; the learned roles play the recordings chosen for them"""
+    """levelled to a common loudness, an interface set came out 6-8 dB under the same takes made alone (taps at -26
+    LUFS) and was heard as far and thin. Without a `lufs` a set's one-shots are made as they are alone (the quietest
+    at full peak) and only turned down to within BALANCE dB of the quietest by their loudest 50 ms; a ready-made
+    set's quiet names (hover) sit lowest; the learned roles play the recordings chosen for them"""
     from earshot.make import BALANCE, QUIET
     out = str(tmp_path / 'ui')
     res = make_set('ui', out=out)
@@ -242,7 +257,7 @@ def test_a_set_of_one_shots_is_full_and_balanced(tmp_path):
     assert loudest_peak > -2.0                                     # full: the quietest one-shots stay at full peak
     assert all(v > -20.0 for v in lv.values()), lv                 # nothing far and thin
     rec = {r['name']: r['member']['recording'] for r in res['sounds'] if r.get('member')}
-    assert rec['tap'].startswith('Computer Keyboard - single key')   # the key he rated 4 on page 5
+    assert rec['tap'].startswith('Computer Keyboard - single key')   # the key rated 4 in a listening test
     assert {r['name']: r['sound'] for r in res['sounds']}['hover'] == 'leather/grab'
 
 

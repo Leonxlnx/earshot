@@ -2471,9 +2471,105 @@
       "quiet"
      ]
     }
+   },
+   {
+    "file": "punch-body-4.npz",
+    "source": "cuts/bigsoundbank/0806_01.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0235,
+    "dur_s": 0.635,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.48,
+     "centroid": 619,
+     "end_db": -131.9,
+     "tail_ms": 559.6,
+     "start_db": -178.8,
+     "rise_ms": 3.62,
+     "peak": -4.2
+    },
+    "measured": {
+     "hard_db": 3.37,
+     "ring_x": 1.832
+    },
+    "bytes": 7986,
+    "credit": {
+     "title": "Punch #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/punches-3-s0806.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/punch/hit",
+    "excerpt_s": [
+     0.0,
+     0.635
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "punch-body-5.npz",
+    "source": "cuts/bigsoundbank/0444_04.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0253,
+    "dur_s": 1.06,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 7.52,
+     "centroid": 1287,
+     "end_db": -128.7,
+     "tail_ms": 964.4,
+     "start_db": -175.9,
+     "rise_ms": 1.96,
+     "peak": -7.1
+    },
+    "measured": {
+     "hard_db": 4.14,
+     "ring_x": 1.563
+    },
+    "bytes": 12367,
+    "credit": {
+     "title": "Punch #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/punches-s0444.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/punch/hit",
+    "excerpt_s": [
+     0.0,
+     1.06
+    ],
+    "events": 1,
+    "pace": null
    }
   ],
   "walk": [
+   3,
+   4,
    0,
    2,
    1
@@ -4805,7 +4901,14 @@
   "walk": [
    0,
    1
-  ]
+  ],
+  "pattern": {
+   "name": "scatter",
+   "events": [
+    3,
+    5
+   ]
+  }
  },
  {
   "id": "coins/floor",
@@ -4885,9 +4988,103 @@
      ]
     },
     "rating_final": 3
+   },
+   {
+    "file": "coins-floor-2.npz",
+    "source": "cuts/bigsoundbank/0193_04.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0232,
+    "dur_s": 1.936,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.2,
+     "centroid": 11189,
+     "end_db": -127.2,
+     "tail_ms": 145.5,
+     "start_db": -204.5,
+     "rise_ms": 0.4,
+     "peak": -2.7
+    },
+    "measured": {
+     "hard_db": 11.21,
+     "ring_x": 1.04
+    },
+    "bytes": 42185,
+    "credit": {
+     "title": "Coins #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/coins-1-s0193.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/pickup/coin",
+    "excerpt_s": [
+     0.0,
+     1.936
+    ],
+    "events": 11,
+    "pace": 5.93
+   },
+   {
+    "file": "coins-floor-3.npz",
+    "source": "cuts/bigsoundbank/0193_06.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0227,
+    "dur_s": 1.756,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.17,
+     "centroid": 11525,
+     "end_db": -131.1,
+     "tail_ms": 141.1,
+     "start_db": -197.9,
+     "rise_ms": 0.44,
+     "peak": -4.5
+    },
+    "measured": {
+     "hard_db": 11.29,
+     "ring_x": 1.135
+    },
+    "bytes": 37434,
+    "credit": {
+     "title": "Coins #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/coins-1-s0193.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/pickup/coin",
+    "excerpt_s": [
+     0.0,
+     1.756
+    ],
+    "events": 7,
+    "pace": 4.4
    }
   ],
   "walk": [
+   1,
+   2,
    0
   ]
  },
@@ -5236,13 +5433,73 @@
      ]
     },
     "rating_final": 3
+   },
+   {
+    "file": "step-concrete-4.npz",
+    "source": "bigsoundbank/0514.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1013,
+    "dur_s": 1.965,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 6.23,
+     "centroid": 300,
+     "end_db": -61.0,
+     "tail_ms": 12.3,
+     "start_db": -110.8,
+     "rise_ms": 2.06,
+     "peak": -8.9
+    },
+    "measured": {
+     "hard_db": 5.1,
+     "ring_x": 1.037
+    },
+    "bytes": 56898,
+    "credit": {
+     "title": "Footsteps, Shoe on Concrete",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/concrete",
+    "excerpt_s": [
+     2.765,
+     4.73
+    ],
+    "events": 4,
+    "pace": 1.66,
+    "allows": [
+     "stacked"
+    ]
    }
   ],
   "walk": [
+   3,
    1,
    2,
    0
-  ]
+  ],
+  "allows": [
+   "stacked"
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/lawn",
@@ -5321,7 +5578,14 @@
   ],
   "walk": [
    0
-  ]
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/pebbles",
@@ -5499,6 +5763,103 @@
       "quiet"
      ]
     }
+   },
+   {
+    "file": "step-pebbles-4.npz",
+    "source": "bigsoundbank/0510.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0905,
+    "dur_s": 3.465,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.96,
+     "centroid": 1472,
+     "end_db": -86.5,
+     "tail_ms": 70.5,
+     "start_db": -137.8,
+     "rise_ms": 0.38,
+     "peak": -3.8
+    },
+    "measured": {
+     "hard_db": 0.46,
+     "ring_x": 1.072
+    },
+    "bytes": 81620,
+    "credit": {
+     "title": "Footsteps on gravels #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-on-gravels-s0510.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/gravel",
+    "excerpt_s": [
+     2.95,
+     6.415
+    ],
+    "events": 4,
+    "pace": 0.98,
+    "allows": [
+     "clicks",
+     "stacked"
+    ]
+   },
+   {
+    "file": "step-pebbles-5.npz",
+    "source": "bigsoundbank/3216.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.154,
+    "dur_s": 3.75,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.91,
+     "centroid": 1779,
+     "end_db": -71.5,
+     "tail_ms": 23.1,
+     "start_db": -123.0,
+     "rise_ms": 0.73,
+     "peak": -2.8
+    },
+    "measured": {
+     "hard_db": 0.14,
+     "ring_x": 1.01
+    },
+    "bytes": 75878,
+    "credit": {
+     "title": "Footsteps on Gravels #4",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/footsteps-on-gravels-4-s3216.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/gravel",
+    "excerpt_s": [
+     2.895,
+     6.645
+    ],
+    "events": 5,
+    "pace": 1.13,
+    "allows": [
+     "pre_swell"
+    ]
    }
   ],
   "allows": [
@@ -5507,10 +5868,19 @@
    "stacked"
   ],
   "walk": [
+   3,
+   4,
    2,
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/heels",
@@ -5637,12 +6007,66 @@
       "dull"
      ]
     }
+   },
+   {
+    "file": "step-heels-3.npz",
+    "source": "bigsoundbank/0166.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0638,
+    "dur_s": 3.802,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.75,
+     "centroid": 729,
+     "end_db": -77.2,
+     "tail_ms": 34.6,
+     "start_db": -126.2,
+     "rise_ms": 0.92,
+     "peak": -7.3
+    },
+    "measured": {
+     "hard_db": 2.95,
+     "ring_x": 1.006
+    },
+    "bytes": 60627,
+    "credit": {
+     "title": "Heels #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/heels-s0166.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/heels",
+    "excerpt_s": [
+     0.329,
+     4.131
+    ],
+    "events": 6,
+    "pace": 1.36
    }
   ],
   "walk": [
+   2,
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/powder",
@@ -5810,7 +6234,14 @@
    1,
    2,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/tile",
@@ -5933,11 +6364,64 @@
      ]
     },
     "rating_final": 1
+   },
+   {
+    "file": "step-tile-3.npz",
+    "source": "bigsoundbank/0179.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.086,
+    "dur_s": 3.502,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.54,
+     "centroid": 726,
+     "end_db": -132.4,
+     "tail_ms": 398.5,
+     "start_db": -183.4,
+     "rise_ms": 0.42,
+     "peak": -4.9
+    },
+    "measured": {
+     "hard_db": 1.5,
+     "ring_x": 1.01
+    },
+    "bytes": 54248,
+    "credit": {
+     "title": "Steps (slipper on tiling)",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-slipper-on-tiling-s0179.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/tile",
+    "excerpt_s": [
+     7.154,
+     10.656
+    ],
+    "events": 3,
+    "pace": 0.67
    }
   ],
   "walk": [
+   2,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/twigs",
@@ -6126,7 +6610,14 @@
    2,
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "step/floorboard",
@@ -6251,12 +6742,72 @@
       "dull"
      ]
     }
+   },
+   {
+    "file": "step-floorboard-3.npz",
+    "source": "bigsoundbank/0165.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1955,
+    "dur_s": 3.862,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.74,
+     "centroid": 200,
+     "end_db": -66.0,
+     "tail_ms": 384.6,
+     "start_db": -148.1,
+     "rise_ms": 7.21,
+     "peak": -11.3
+    },
+    "measured": {
+     "hard_db": 2.82,
+     "ring_x": 1.05
+    },
+    "bytes": 54402,
+    "credit": {
+     "title": "Man Footsteps on the Wooden Floor",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-footsteps-on-the-wooden-floor-s0165.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/wood",
+    "excerpt_s": [
+     0.289,
+     4.151
+    ],
+    "events": 6,
+    "pace": 1.59,
+    "allows": [
+     "pre_swell"
+    ]
    }
   ],
   "walk": [
+   2,
    1,
    0
-  ]
+  ],
+  "allows": [
+   "pre_swell"
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ]
+  }
  },
  {
   "id": "door/shut",
@@ -6903,11 +7454,79 @@
      ]
     },
     "rating_final": 2
+   },
+   {
+    "file": "door-knock-2.npz",
+    "source": "bigsoundbank/0015.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0732,
+    "dur_s": 0.812,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.94,
+     "centroid": 482,
+     "end_db": -119.5,
+     "tail_ms": 202.3,
+     "start_db": -159.0,
+     "rise_ms": 3.33,
+     "peak": -3.1
+    },
+    "measured": {
+     "hard_db": 2.98,
+     "ring_x": 1.14
+    },
+    "bytes": 15181,
+    "credit": {
+     "title": "Door",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/door-s0015.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "obj/wood/knock",
+    "excerpt_s": [
+     3.312,
+     4.124
+    ],
+    "events": 3,
+    "pace": 4.26,
+    "allows": [
+     "pre_swell",
+     "stacked"
+    ]
    }
   ],
   "walk": [
+   1,
    0
-  ]
+  ],
+  "allows": [
+   "pre_swell",
+   "stacked"
+  ],
+  "pattern": {
+   "name": "knock",
+   "events": [
+    3,
+    4
+   ],
+   "singular": [
+    "door"
+   ],
+   "nouns": [
+    "knock"
+   ]
+  }
  },
  {
   "id": "gavel/strike",
@@ -7069,7 +7688,20 @@
   ],
   "walk": [
    0
-  ]
+  ],
+  "pattern": {
+   "name": "knock",
+   "events": [
+    3,
+    4
+   ],
+   "singular": [
+    "door"
+   ],
+   "nouns": [
+    "knock"
+   ]
+  }
  },
  {
   "id": "drawer/wood",
@@ -8391,12 +9023,60 @@
       "quiet"
      ]
     }
+   },
+   {
+    "file": "book-shut-3.npz",
+    "source": "cuts/freesound_ov/389757_01.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0217,
+    "dur_s": 0.495,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.68,
+     "centroid": 1166,
+     "end_db": -125.1,
+     "tail_ms": 295.6,
+     "start_db": -181.4,
+     "rise_ms": 2.96,
+     "peak": -6.2
+    },
+    "measured": {
+     "hard_db": -0.07,
+     "ring_x": 1.33
+    },
+    "bytes": 15654,
+    "credit": {
+     "title": "book hits floor.wav (by buzbe20)",
+     "author": "buzbe20",
+     "page": "https://freesound.org/people/buzbe20/sounds/389757",
+     "licence": "CC0 1.0 (Openverse API license field \"cc0\" 1.0 for the Freesound page; preview MP3)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "obj/book/drop",
+    "excerpt_s": [
+     0.0,
+     0.495
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
    }
   ],
   "allows": [
    "pre_swell"
   ],
   "walk": [
+   2,
    1,
    0
   ]
@@ -9271,7 +9951,14 @@
   "walk": [
    0,
    1
-  ]
+  ],
+  "pattern": {
+   "name": "scatter",
+   "events": [
+    2,
+    3
+   ]
+  }
  },
  {
   "id": "clock/mechanical",
@@ -11675,7 +12362,25 @@
    0,
    1,
    2
-  ]
+  ],
+  "pattern": {
+   "name": "pair",
+   "events": [
+    2,
+    2
+   ],
+   "pace": [
+    2.0,
+    3.5
+   ],
+   "singular": [
+    "toast",
+    "cheers"
+   ],
+   "nouns": [
+    "clink"
+   ]
+  }
  },
  {
   "id": "bulb/burst",
@@ -12034,16 +12739,129 @@
       "thin"
      ]
     }
+   },
+   {
+    "file": "glass-cheers-4.npz",
+    "source": "cuts/bigsoundbank/2886_00.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0253,
+    "dur_s": 2.425,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.04,
+     "centroid": 7560,
+     "end_db": -133.5,
+     "tail_ms": 1332.2,
+     "start_db": -209.6,
+     "rise_ms": 1.85,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 5.2,
+     "ring_x": 1.313
+    },
+    "bytes": 19551,
+    "credit": {
+     "title": "Clink of glass, Toast #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/clink-of-glass-toast-1-s2886.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "obj/glass/clink",
+    "excerpt_s": [
+     0.0,
+     2.425
+    ],
+    "events": 4,
+    "pace": 4.2
+   },
+   {
+    "file": "glass-cheers-5.npz",
+    "source": "cuts/bigsoundbank/2888_00.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2293,
+    "dur_s": 2.975,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.06,
+     "centroid": 7835,
+     "end_db": -129.8,
+     "tail_ms": 1346.4,
+     "start_db": -183.0,
+     "rise_ms": 1.85,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 11.11,
+     "ring_x": 1.247
+    },
+    "bytes": 25560,
+    "credit": {
+     "title": "Clink of glass, Toast #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/clink-of-glass-toast-3-s2888.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "obj/glass/clink",
+    "excerpt_s": [
+     0.0,
+     2.975
+    ],
+    "events": 7,
+    "pace": 5.01
    }
   ],
   "allows": [
    "ring"
   ],
   "walk": [
+   3,
+   4,
    2,
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "pair",
+   "events": [
+    2,
+    2
+   ],
+   "pace": [
+    2.0,
+    3.5
+   ],
+   "singular": [
+    "toast",
+    "cheers"
+   ],
+   "nouns": [
+    "clink"
+   ]
+  }
  },
  {
   "id": "glass/knock",
@@ -12172,7 +12990,21 @@
   "walk": [
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "knock",
+   "events": [
+    3,
+    4
+   ],
+   "singular": [
+    "door",
+    "window"
+   ],
+   "nouns": [
+    "knock"
+   ]
+  }
  },
  {
   "id": "glass/tap",
@@ -12578,7 +13410,21 @@
    1,
    0,
    2
-  ]
+  ],
+  "pattern": {
+   "name": "scatter",
+   "events": [
+    3,
+    5
+   ],
+   "pace": [
+    2.5,
+    4.0
+   ],
+   "nouns": [
+    "cube"
+   ]
+  }
  },
  {
   "id": "straw/bubbles",
@@ -13727,7 +14573,14 @@
    2,
    0,
    1
-  ]
+  ],
+  "pattern": {
+   "name": "shake",
+   "events": [
+    8,
+    14
+   ]
+  }
  },
  {
   "id": "gate/metal",
@@ -15627,7 +16480,18 @@
   "walk": [
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "pair",
+   "events": [
+    2,
+    2
+   ],
+   "pace": [
+    1.2,
+    2.2
+   ]
+  }
  },
  {
   "id": "switch/lamp",
@@ -15819,7 +16683,18 @@
    "toggle",
    "switch_on",
    "switch_off"
-  ]
+  ],
+  "pattern": {
+   "name": "pair",
+   "events": [
+    2,
+    2
+   ],
+   "pace": [
+    1.2,
+    2.2
+   ]
+  }
  },
  {
   "id": "switch/heater",
@@ -16667,7 +17542,18 @@
    2,
    1,
    0
-  ]
+  ],
+  "pattern": {
+   "name": "pair",
+   "events": [
+    2,
+    2
+   ],
+   "pace": [
+    1.2,
+    2.2
+   ]
+  }
  },
  {
   "id": "keyboard/laptop",
@@ -16949,7 +17835,19 @@
   ],
   "roles": [
    "next"
-  ]
+  ],
+  "pattern": {
+   "name": "type",
+   "events": [
+    10,
+    16
+   ],
+   "nouns": [
+    "key",
+    "keystroke",
+    "press"
+   ]
+  }
  },
  {
   "id": "keyboard/desktop",
@@ -17228,7 +18126,19 @@
    2,
    1,
    3
-  ]
+  ],
+  "pattern": {
+   "name": "type",
+   "events": [
+    10,
+    16
+   ],
+   "nouns": [
+    "key",
+    "keystroke",
+    "press"
+   ]
+  }
  },
  {
   "id": "keyboard/mechanical",
@@ -17358,7 +18268,19 @@
   "roles": [
    "tap",
    "type"
-  ]
+  ],
+  "pattern": {
+   "name": "type",
+   "events": [
+    10,
+    16
+   ],
+   "nouns": [
+    "key",
+    "keystroke",
+    "press"
+   ]
+  }
  },
  {
   "id": "keyboard/space",
@@ -17566,7 +18488,23 @@
   ],
   "walk": [
    0
-  ]
+  ],
+  "pattern": {
+   "name": "type",
+   "events": [
+    8,
+    12
+   ],
+   "pace": [
+    4.0,
+    6.0
+   ],
+   "nouns": [
+    "key",
+    "keystroke",
+    "press"
+   ]
+  }
  },
  {
   "id": "camera/shutter",
@@ -22553,6 +23491,136 @@
    2,
    1,
    0
+  ]
+ },
+ {
+  "id": "keys/bunch",
+  "says": [
+   "a bunch of keys jingled in the hand",
+   "a bright metal jangle of keys on a ring"
+  ],
+  "uses": [
+   "keyring",
+   "keys"
+  ],
+  "tags": [
+   "metal",
+   "keys",
+   "foley"
+  ],
+  "domains": [
+   "game",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.17,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "keys-bunch-1.npz",
+    "source": "cuts/bigsoundbank/2414_00.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.3013,
+    "dur_s": 4.21,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.54,
+     "centroid": 9963,
+     "end_db": -127.1,
+     "tail_ms": 354.3,
+     "start_db": -191.7,
+     "rise_ms": 3.08,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 8.38,
+     "ring_x": 1.001
+    },
+    "bytes": 83057,
+    "credit": {
+     "title": "Keys and lock #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/keys-and-lock-1-s2414.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/pickup/keys",
+    "excerpt_s": [
+     0.0,
+     4.21
+    ],
+    "events": 18,
+    "pace": 4.47
+   },
+   {
+    "file": "keys-bunch-2.npz",
+    "source": "cuts/bigsoundbank/2415_00.wav",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.359,
+    "dur_s": 4.13,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.58,
+     "centroid": 9331,
+     "end_db": -113.5,
+     "tail_ms": 285.7,
+     "start_db": -166.1,
+     "rise_ms": 3.35,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 7.25,
+     "ring_x": 1.028
+    },
+    "bytes": 83250,
+    "credit": {
+     "title": "Keys and lock #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/keys-and-lock-2-s2415.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/pickup/keys",
+    "excerpt_s": [
+     0.0,
+     4.13
+    ],
+    "events": 16,
+    "pace": 4.34
+   }
+  ],
+  "walk": [
+   0,
+   1
   ]
  }
 ]

@@ -318,6 +318,65 @@ def _numbers(b, text):
     return text
 
 
+# "three knocks", "a few steps", "two quick clinks": a number of events (not of takes, notes, seconds: COUNT, FIGURE,
+# DUR take those)
+EVENTS = re.compile(r'\b(\d+|' + '|'.join(sorted(NUMBER_WORDS, key=len, reverse=True)) + r')\s+(?:[a-z]+\s+){0,2}?'
+                    r'([a-z]+)\b', re.I)
+NOT_EVENTS = frozenset(stem(w) for w in (
+    'variation', 'variant', 'version', 'take', 'option', 'alternative', 'note', 'tone', 'beat', 'pulse', 'second', 's',
+    'sec', 'ms', 'msec', 'millisecond', 'minute', 'min', 'hz', 'khz', 'time', 'octave', 'semitone', 'bar', 'of',
+    'different', 'unique', 'shot', 'player', 'people', 'bit', 'sound', 'file', 'level', 'more', 'another', 'after'))
+PLURAL_NOT = frozenset(('glass', 'bass', 'grass', 'brass', 'chaos', 'canvas', 'gas', 'news', 'lens', 'bus', 'its',
+                        'this', 'is', 'was', 'has', 'does', 'goes', 'plus', 'less', 'across', 'always', 'perhaps',
+                        'sounds', 'sfx', 'fx', 'effects', 'vibes', 'its', 'us', 'yes', 'as', 'thus', 'kiss', 'boss',
+                        'mess', 'press', 'dress', 'loss', 'moss', 'toss'))
+
+
+def _action(b, text):
+    """the action words of a request into the brief (`read`: events, perform, plural)"""
+    low = ' ' + (text or '').lower() + ' '
+    b['events'], b['perform'], b['plural'] = None, False, []
+    for m in EVENTS.finditer(low):
+        v, noun = m.group(1).lower(), stem(m.group(2))
+        if noun in NOT_EVENTS or re.match(r'\s*-', low[m.end(1):]) or low[max(0, m.start(1) - 1)] in '.,:/':
+            continue
+        b['events'] = int(v) if v.isdigit() else NUMBER_WORDS[v]
+        break
+    if any(re.search(r'(?<![\w-])' + re.escape(w) + r'(?![\w-])', low) for w in L.SINGLE_WORDS):
+        if not (b['events'] and b['events'] > 1):
+            b['events'] = 1
+    words = WORD.findall(low)
+    b['perform'] = (b['events'] or 0) > 1 or any(w in L.PERFORM_WORDS for w in words) or any(
+        f' {p} ' in low for p in L.PERFORM_PHRASES)
+    if b['events'] == 1:
+        b['perform'] = False
+    b['plural'] = sorted({stem(w) for w in words if w.endswith('s') and not w.endswith(("'s", 'ss', 'us', 'is'))
+                          and w not in PLURAL_NOT and len(w) > 3 and stem(w) != w})
+
+
+def performance(b, sid, pattern=None):
+    """(perform, events) for the design sid, which can be performed (earshot.sounds.learned.performs; pattern: its
+    index `pattern`): (False, 1) for a single event ("a single knock", "a footstep", "a key press"); (True, n) for n
+    events ("three knocks"); (True, None) for the action at its natural number or filling the length asked for
+    ("footsteps on gravel", "knocking on a door", "5 seconds of typing"): an action word, a plural of the thing
+    itself (its family word, or one of the pattern's `nouns`: "ice cubes"), or a singular that still means the
+    action (the pattern's `singular` words: "a knock on the door")"""
+    if b.get('events') == 1:
+        return False, 1
+    if b.get('events'):
+        return True, int(b['events'])
+    if b.get('perform'):
+        return True, None
+    fam = sid.partition('/')[0]                    # the thing, not what it stands on ("a footstep on tiles": one)
+    thing = {stem(fam), stem(L.FAMILY_SENSE.get(fam, fam))} | {stem(w) for w in (pattern or {}).get('nouns', ())}
+    if set(b.get('plural', ())) & thing:
+        return True, None
+    said = set(WORD.findall((b.get('text') or '').lower()))
+    if pattern and said & set(pattern.get('singular', ())):
+        return True, None
+    return False, None
+
+
 def _figure_words(text):
     """{'<n>-note'} for the figures a text describes ("a two-tone beep", "three rising notes", "twice")"""
     out = set()
@@ -425,12 +484,16 @@ def read(text):
     figure ("a two-note chime"), `written` the words as the request wrote them ({canonical word or stemmed word:
     'water drop'}; `shown`), `framed` the jobs named only in a comparison or in the event before the sound is named
     ("sound when the player grabs a boost"), `phrases` the runs of content words a design's multi-word job is
-    matched against (`_phrases`)"""
+    matched against (`_phrases`); `events` the number of events of an action ("three knocks": 3, "a single step":
+    1), `perform` True when the request asks for the action a person performs ("walking", "knocking", "keys
+    jingling") and `plural` the stems of the plural nouns it says ("footsteps": footstep): `performance` decides
+    with them for a design that can be performed"""
     b = {'text': text, 'concepts': [], 'parts': [], 'context': [], 'refs': [], 'not': [], 'words': [], 'hints': [],
          'axes': {},
          'dir': 0, 'material': None, 'voice': None, 'domain': None, 'dur': None, 'dur_max': None, 'pitch': None,
          'key': None, 'scale': None, 'n': None, 'notes': None, 'loop': None, 'unknown': [], 'written': {},
          'framed': []}
+    _action(b, text)
     toks = tokens(_numbers(b, text))
     n_tok = len(toks)
     st = {'scale': 1.0, 'neg': False, 'where': 'concepts', 'than': False, 'opposite': False, 'head': False,
