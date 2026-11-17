@@ -76,10 +76,17 @@ def replace_quietly(tmp, dst, tries=5):
     return False
 
 
+def _ffmpeg_input(path):
+    """Disambiguate existing local files without rewriting URLs or other FFmpeg inputs."""
+    path = os.fsdecode(path)
+    # Do not normalize away symlink/.. components or change native drive-relative paths.
+    return os.path.join(os.curdir, path) if os.path.exists(path) else path
+
+
 def _src_channels(path):
     try:
         out = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'a:0', '-show_entries', 'stream=channels',
-                              '-of', 'csv=p=0', path], capture_output=True, text=True, timeout=60).stdout.strip()
+                              '-of', 'csv=p=0', _ffmpeg_input(path)], capture_output=True, text=True, timeout=60).stdout.strip()
         return int(out.splitlines()[0]) if out else 0
     except Exception:  # noqa: BLE001
         return 0
@@ -105,7 +112,7 @@ def _ffmpeg_reason(err):
 
 def _decode(path, sr, ch):
     up = ch == 2 and _src_channels(path) == 1  # ffmpeg would upmix mono at -3 dB; duplicate at unity instead
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-i', path, '-vn', '-f', 'f32le', '-acodec', 'pcm_f32le',
+    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-i', _ffmpeg_input(path), '-vn', '-f', 'f32le', '-acodec', 'pcm_f32le',
                         '-ac', '1' if up else str(ch), '-ar', str(sr), '-'], capture_output=True)
     err = p.stderr.decode(errors='replace')
     if p.returncode != 0 or not p.stdout:
@@ -175,7 +182,7 @@ def probe(path):
         out = subprocess.run(['ffprobe', '-v', 'error', '-show_entries',
                               'stream=codec_type,codec_name,sample_rate,channels,bit_rate,width,height,r_frame_rate:'
                               'stream_disposition=attached_pic:'
-                              'format=duration,bit_rate', '-of', 'json', path],
+                              'format=duration,bit_rate', '-of', 'json', _ffmpeg_input(path)],
                              capture_output=True, text=True, timeout=60).stdout
         j = json.loads(out or '{}')
     except Exception as e:  # noqa: BLE001

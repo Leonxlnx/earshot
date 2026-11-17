@@ -52,7 +52,7 @@ def frame_diff(path, cache=True):
         except Exception:
             pass
     fps = (audio.probe(path).get('video') or {}).get('fps') or 30.0
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-i', path, '-an', '-vf',
+    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-i', audio._ffmpeg_input(path), '-an', '-vf',
                         f'scale={FRAME_W}:{FRAME_H}:flags=area,format=gray', '-f', 'rawvideo', '-'], capture_output=True)
     if p.returncode != 0 or not p.stdout:
         raise audio.AudioError(f'cannot decode the picture of {path}: {p.stderr.decode(errors="replace")[:200]}')
@@ -109,7 +109,7 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
                 return json.load(saved)
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):
             pass  # a missing, unreadable or interrupted cache is not a failed scan
-    p = subprocess.run(['ffmpeg', '-hide_banner', '-nostdin', '-i', path, '-an', '-vf',
+    p = subprocess.run(['ffmpeg', '-hide_banner', '-nostdin', '-i', audio._ffmpeg_input(path), '-an', '-vf',
                         f"scale=320:-2,select='gt(scene,{threshold})',showinfo", '-f', 'null', '-'],
                        capture_output=True, text=True, errors='replace')
     if p.returncode != 0:
@@ -141,7 +141,7 @@ def frame(path, t, width=320):
     """one frame at time t as a PIL image"""
     from PIL import Image
     import io
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-ss', f'{max(0.0, t):.3f}', '-i', path, '-frames:v', '1',
+    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-ss', f'{max(0.0, t):.3f}', '-i', audio._ffmpeg_input(path), '-frames:v', '1',
                         '-vf', f'scale={width}:-2', '-f', 'image2pipe', '-vcodec', 'png', '-'], capture_output=True)
     if p.returncode != 0 or not p.stdout:
         return None
