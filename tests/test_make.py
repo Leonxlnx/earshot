@@ -257,7 +257,7 @@ def test_a_set_of_one_shots_is_full_and_balanced(tmp_path):
     assert loudest_peak > -2.0                                     # full: the quietest one-shots stay at full peak
     assert all(v > -20.0 for v in lv.values()), lv                 # nothing far and thin
     rec = {r['name']: r['member']['recording'] for r in res['sounds'] if r.get('member')}
-    assert rec['tap'].startswith('Computer Keyboard - single key')   # the key rated 4 in a listening test
+    assert rec['tap'].startswith('Computer Keyboard - single key')   # the fullest mechanical key
     assert {r['name']: r['sound'] for r in res['sounds']}['hover'] == 'leather/grab'
 
 

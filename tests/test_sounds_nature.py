@@ -43,7 +43,7 @@ def test_the_learned_ids_replace_the_invented_ones():
         assert sid in ids and sid not in nature.SCENES
         d = registry.get(sid)
         assert d.kind == 'bed' and d.loop and set(d.axes) == set(nature.LEARNED_AXES)
-    assert 'rain/window' in nature.SCENES and 'forest/morning' in nature.SCENES     # rated 5 of 5: kept
+    assert 'rain/window' in nature.SCENES and 'forest/morning' in nature.SCENES     # invented scenes that are kept
 
 
 @pytest.fixture(scope='module')

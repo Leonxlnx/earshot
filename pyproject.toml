@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "earshot"
 version = "1.0.0"
-description = "Make sound effects, everyday foley, drums and ambience from a request in words (computed at request time; the realistic ones from models learned from public-domain recordings, no audio shipped), and describe, match, measure and critique sound an agent cannot hear."
+description = "Make sound effects, interface figures on real instruments, everyday foley, drums and ambience from a request in words (computed at request time; the realistic ones from models learned from public-domain recordings, no audio shipped), and describe, match, measure and critique sound an agent cannot hear."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -59,7 +59,7 @@ earshot = "earshot.cli:main"
 include = ["earshot*"]
 
 [tool.setuptools.package-data]
-earshot = ["data/*.json", "data/*.npz", "data/resyn/*.npz", "data/resyn/*.json", "data/resyn/*.md", "data/textures/*.npz", "data/textures/*.json", "data/textures/*.md", "data/drums/*.npz", "data/drums/*.json", "data/drums/*.md", "data/notes/*.json", "data/notes/*.md", "data/notes/*/*.npz","forge/bank/*.json", "forge/kits/*.json", "forge/seeds/*.json"]
+earshot = ["data/*.json", "data/*.npz", "data/resyn/*.npz", "data/resyn/*.json", "data/resyn/*.md", "data/textures/*.npz", "data/textures/*.json", "data/textures/*.md", "data/drums/*.npz", "data/drums/*.json", "data/drums/*.md", "data/notes/*.json", "data/notes/*.md", "data/notes/*/*.npz", "forge/bank/*.json", "forge/kits/*.json", "forge/seeds/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

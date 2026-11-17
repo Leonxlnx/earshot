@@ -77,6 +77,7 @@ not used by this sound: dur
 | `--dur` | seconds: how long a figure of notes sounds, the hold of a pad, the length of a loop (each has a shortest one) or a whoosh; a learned sound within 0.6-1.8 times its natural length; a single struck sound (a tap, a hit) rings as it rings and says `not used by this sound: dur` |
 | `--voice` | the instrument or patch of a tonal sound ([Voices](#voices)); a voice asked for by name is always played |
 | `--material` | what a tap, click or knock is made of; on a tonal sound without a voice it picks the voice made of it (wood: marimba, glass: glockenspiel, metal: vibraphone, soft: felt_piano, digital: glass_pluck, retro: square_lead) |
+| `--events N` | for a thing a person does several times in a row (footsteps, a knock, typing, coins, keys, clinking glasses): 1 = one event, 2 or more = the action with that many events; without it the words decide ([Performances](#performances)) |
 | `--bright` ... `--motion` | the axes, -1 .. 1, added to what the words say ([The eight axes](#the-eight-axes)) |
 | `--lufs L` | a momentary-max loudness instead of the default level |
 | `--mono` | sum to one channel |
@@ -143,29 +144,31 @@ as a dict (`summary`, `sound`, `files`, `why`, `also`, `not_in_sound`, `unknown`
 
 ## Learned sounds
 
-152 designs of everyday, interface, game and film sounds, 13 ambience beds and 33 drum and percussion designs are learned
-from recordings whose authors put them in the public domain. They are not invented and they are not the recordings: each recording is kept
+153 designs of everyday, interface, game and film sounds, 12 ambience beds, 33 drum and percussion designs and the
+notes of four instruments are learned from recordings whose authors put them in the public domain. They are not
+invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
 2 ms and every 0.25 ms around an onset, how much of each band is one tone and at which frequency, the stereo image),
 and every render draws fresh noise on those numbers. A take is a new performance of that recording; it is not a
 sound made from nothing, and it exists only because someone recorded the thing and gave the recording away.
 
-| | one-shots | ambience beds | drums |
-|---|---|---|---|
-| designs | 152 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) |
-| recordings | 348 recorded events (a few are several events cut from one recording) | 12 textures of 12-30 s | 130 strokes |
-| store | `earshot/data/resyn/`: 6.79 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 4.09 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.47 MB, `index.json`, `CREDITS.md` |
-| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer |
-| a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for |
+| | one-shots | ambience beds | drums | instrument notes |
+|---|---|---|---|---|
+| designs | 153 (`earshot/sounds/learned.py`) | 12 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
+| recordings | 364 recorded events (a few are several events cut from one recording; 13 are recordings of a whole action) | 11 textures of 12-30 s | 130 strokes | 100 single notes (marimba 14, harp 24, pizzicato 48, upright piano 14) |
+| store | `earshot/data/resyn/`: 7.00 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 3.87 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.47 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.85 MB, `index.json`, `CREDITS.md` |
+| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer | VSCO-2 CE, VCSL |
+| a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
 All the sources together: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or
 an explicit public-domain dedication; every recording is credited in the `CREDITS.md` of `earshot/data/resyn/`,
-`textures/` and `drums/`. No audio file is shipped or played back.
+`textures/`, `drums/` and `notes/`. No audio file is shipped or played back.
 
 **A design is one thing; its recordings are its variations.** `step/pebbles` holds three recordings of footsteps
 on gravel, `switch/lamp` three recordings of lamp switches, `keyboard/laptop` several keys. Seeds 0, 1, 2 ... walk
-through the members in a fixed shuffled order, so `--n 3` gives three different real footsteps; seeds past the last
-member are new takes of the same recordings. A request at bright -0.5 or below (or 0.5 and above) walks only the
+through the members in a fixed order (`walk` in the index: the member with the best listening score first, a member
+scored 1 of 5 left out), so `--n 3` gives three different real footsteps; seeds past the last member are new takes
+of the same recordings, and a take that fails its audit is rendered again from the same recording. A request at bright -0.5 or below (or 0.5 and above) walks only the
 darker (brighter) half of the members, by their measured centroid, and tilts the take as well. `--json` names the
 recording of each take:
 
@@ -201,9 +204,31 @@ switch, "next" a laptop key), or its family's own word. A feeling alone never re
 the learned one wins a tie (`registry.LEARNED` = 1.1); 34 learned designs that the store marks as not a default
 choice (`"default": false` in its index) rank lower (0.6 times that prior).
 
+### Performances
+
+A footstep, one knuckle on a door or one key is heard as a fragment; what a listener recognises is the action. A
+learned thing a person does several times in a row (a walk, a knock, typing, coins, keys, clinking glasses) is
+played as that action when the request asks for it (`earshot/synth/perform.py`, `learned.perform`): a recording of
+the whole action where the store has one (13 recordings of 9 things: walks on gravel, wood, concrete, tiles and in
+heels, a knock run, toasts, keys and a lock, coin handfuls, punches, a book falling), else its single recordings in
+a pattern: `walk` (two feet in turn, 100-120 steps a minute), `knock` (three or four hits about 0.2 s apart),
+`type` (5-8 keys a second, irregular gaps, a deeper space bar between words), `scatter` (impacts that come sooner
+and softer), `shake` (dense impacts in two or three swings), `pair` (an event and its answer). Never the same
+recording twice in a row, never on a grid, every event its own take, one room for all.
+
+| the request | what is played |
+|---|---|
+| a plural, an action word, a count or a length: "footsteps on gravel", "knocking", "three knocks", "5 seconds of typing", "typing on a keyboard" | the action |
+| a bare singular or "a single": "a footstep on gravel", "a single knock on a door" | one event |
+| a singular that names the action: "a knock on the door", "a toast" | the action |
+| `--events N` (`events=` in Python and in the MCP tool) | 1: one event; 2 or more: the action with N events |
+
+The answer says what was played (`played: 7 events as a walk at 1.8 a second; one event: events=1 or "a single
+..."`) and a take's `meta['performance']` holds it.
+
 **Credits.** Every member is credited with its title, author, page and licence in
-`earshot/data/resyn/CREDITS.md` and `earshot/data/textures/CREDITS.md` (`learned.credit(id, member)` in Python). CC0
-asks for no credit; the files keep it.
+`earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`, `earshot/data/drums/CREDITS.md` and
+`earshot/data/notes/CREDITS.md` (`learned.credit(id, member)` in Python). CC0 asks for no credit; the files keep it.
 
 ## A whole set
 
@@ -236,11 +261,12 @@ delete.{webm,mp3}: delete/drop (0.75 s, C5, soft_pluck, -19 LUFS, clean) [named]
 ```
 
 The touches of the `ui` set (tap, hover, the two toggles, type, next and back) are real keys and switches; the owner
-twice heard the tonal taps and toggles as unrecognisable and rated real keys 4 of 5. The two toggles are two
-recordings of `switch/lamp`, and back and next two recordings of `keyboard/laptop` (a set's sounds take consecutive
-seeds, so they play different members): the `another recording of` line under the second of each pair says which.
-The signals (open, close, send, receive, notify, success, complete, warning, error, delete) are soft tonal figures
-in the theme's voice, key and room. In a set the touches sit lower than the signals, by kind (the table below).
+twice heard the tonal taps and toggles as unrecognisable and rated real keys 4 of 5. Each touch plays the recording
+chosen for its role (`seeds` in `earshot.sounds.sets`): tap the fullest mechanical key, type the other one, hover a
+soft leather touch (`leather/grab`), the two toggles two recordings of `switch/lamp` (off the darker), back and
+next two recordings of `keyboard/laptop`; the `another recording of` line under the second of each pair says which.
+The signals (open, close, send, receive, notify, success, complete, warning, error, delete) are tonal figures on
+the real marimba; `ui` has no theme, so they play in the key and voice they were written for.
 
 **Several formats.** `--format webm,mp3` (a list or a comma string in a spec, in the MCP tool) writes every sound
 once per format; `manifest.json` names each sound's `file` (the first format) and `files` (all), and the set's
@@ -252,18 +278,23 @@ in place of mp3 or m4a it is written once as flac (below).
 
 | set | theme | sounds |
 |---|---|---|
-| `ui` | soft | 17: tap, hover, toggle_on, toggle_off, type, back, next (real keys and switches); open, close, send, receive, notify, success, complete, warning, error, delete (soft figures) |
+| `ui` | none | 17: tap, hover, toggle_on, toggle_off, type, back, next (real keys and switches); open, close, send, receive, notify, success, complete, warning, error, delete (figures on the marimba) |
 | `game` | tine | 22: menu_move, menu_select, menu_back, coin, pickup, gem, heal, power_up, power_down, level_up, checkpoint, secret, win, lose, jump, land, step, hit, hurt, explosion, splash, door |
 | `arcade` | retro | 16 chip sounds: menu_move, menu_select, menu_back, coin, pickup, jump, laser, explosion, hurt, power_up, power_down, one_up, level_up, win, lose, text |
-| `film` | none | a product film's moves, arrivals, hits, builds and a logo ([Film and motion](#film-and-motion)) |
+| `film` | none | 17: a product film's moves, arrivals, hits, builds and a logo ([Film and motion](#film-and-motion)) |
 
 `earshot.sounds.sets.SETS` has the design of every name. The `game` set's jump, land, step, hit, hurt, explosion,
 splash and door are still invented designs (rated 1-2 by the owner); for a game that wants them realistic, name the
 learned ones in a spec (`step/floorboard`, `person/fall`, `punch/body`, `explosion/near`, `splash/plunge`,
 `door/shut`).
 
-**Levels in a set.** The sounds are levelled against each other by momentary-max loudness: the loudest allowed is
-`lufs` (default -16), and each sound sits under it by its kind, so frequent sounds are quieter:
+**Levels in a set.** Every one-shot is made as a single `make` makes it (true peak -1 dBFS, a short one raised as
+under Level above) and then only turned down: by its loudest 50 ms none lies more than 2.5 dB over the quietest
+(one quieter than -18 LUFS does not count), and a ready-made set's `quiet` names (`hover` in `ui`) sit 0.5 dB
+under the quietest (`make.balance`). Gain only: nothing is folded or limited again, so a set's sounds are as full
+as the same takes made alone. Loops, beds, pads and music, and every sound when the spec or `--lufs` gives a
+loudness, are levelled by momentary-max loudness: the loudest allowed is `lufs` (default -16), and each sound sits
+under it by its kind:
 
 | kind | LU under the top | kind | LU under the top |
 |---|---|---|---|
@@ -437,7 +468,8 @@ What is recognised:
   one to avoid; "the opposite of X" and "X but the other way" turn X into its opposite; "like a ..." is a
   comparison; what follows "than" is a reference and is skipped.
 - **Material and voice.** An instrument named as the thing itself ("a kalimba note", "marimba hit") asks for a
-  note of that voice; one named as the player ("a success chime on a kalimba") sets the voice of a figure, and a
+  note of that voice; one named as the player ("a success chime on a kalimba", "a notification on a harp", "a
+  success sound with pizzicato strings", "an error sound on a soft piano") sets the voice of a figure, and a
   voice asked for by name is always played. Material words ("wooden", "glass", "metal", "soft", "digital",
   "8-bit") steer the ranking toward designs of that material, and on a tonal design with no voice asked for they
   pick the voice made of it: wood a marimba, glass a glockenspiel, metal a vibraphone, soft a felt piano, digital a
@@ -451,6 +483,9 @@ What is recognised:
   few takes"; at most 12) and how many notes ("a two-note chime", "three rising notes", "twice"). A key moves a
   tonal design's root to the nearest note of that key; a minor key (in the request or the theme) turns a figure's
   major thirds, sixths and sevenths into minor ones.
+- **One event or the action.** For a thing a person does several times in a row, a plural, an action word, a count
+  or a length ("footsteps", "knocking", "three knocks", "5 seconds of typing") asks for the action, a bare singular
+  or "a single" for one event ([Performances](#performances)).
 - **Direction.** "rising", "falling", "going up" ... prefer designs whose gesture moves that way.
 - **Loop or not.** "loop", "seamless", "looping", "endless" ask for a loop; "no loop", "one-shot" for the scene
   once.
@@ -496,8 +531,8 @@ first pick belongs to a family accepted for its intent.
 
 | set | first pick right | right among the top three |
 |---|---|---|
-| A (development, 440) | 92.7 % | 96.1 % |
-| B (development, 220) | 97.3 % | 99.1 % |
+| A (development, 440) | 92.3 % | 96.1 % |
+| B (development, 220) | 96.4 % | 99.1 % |
 | C (held out, 220), scored once on the v1 catalogue | 69.5 % | 76.8 % |
 
 When the learned sounds arrived, 68 answers were added to the accept lists of A and B (a learned recording of the
@@ -530,10 +565,10 @@ and axes only.
 
 | preset | voice | key | space | axes | says |
 |---|---|---|---|---|---|
-| `soft` | soft_pluck | C major | room | bright -0.2, hard -0.4 | rounded, quiet, mid-register: the default of product UI |
+| `soft` | marimba (real) | C major | room | bright -0.2, hard -0.4 | a real marimba played softly: warm, rounded, mid-register: the default of product UI |
 | `glass` | glockenspiel | D major | studio | bright +0.2, ring +0.1 | clear, bright, bell-like |
-| `wood` | marimba | G pentatonic | room | bright -0.1, ring -0.2 | warm, dry, organic |
-| `felt` | felt_piano | F major | room | bright -0.3, hard -0.3 | an intimate soft piano |
+| `wood` | marimba (real) | G pentatonic | room | bright -0.1, ring -0.2 | a real marimba: warm, dry, organic |
+| `felt` | felt_piano (a real upright piano) | F major | room | bright -0.3, hard -0.3 | an intimate soft piano |
 | `tine` | kalimba | A pentatonic | room | ring -0.1 | plucked tines: friendly, playful |
 | `metal` | vibraphone | E major | studio | ring +0.2 | smooth sustained metal bars |
 | `electric` | electric_piano | Eb major | room | bright -0.1 | a mellow electric piano |
@@ -554,9 +589,11 @@ The fields of a theme dict (`{"base": "wood", "key": "D"}` changes a preset; a d
 A minor scale (`minor`, `minor_pentatonic`) turns every figure's major thirds, sixths and sevenths into minor ones;
 the other scales leave the figures' intervals as designed. The words of a request lay their key and scale over the
 theme's, and a material or voice in the request wins over the theme's voice. Without a theme or a voice in the
-request, interface figures play the soft pluck: a bell, a glockenspiel or a glass timbre only when asked for (the
-owner rated glass and glockenspiel interface sounds 1 of 5, the soft pluck 4). A few game figures keep the voice
-they were written for (`coin/bright`: a glockenspiel).
+request, figures play the real marimba: a bell, a glockenspiel or a glass timbre only when asked for (the owner
+rated glass and glockenspiel interface sounds 1 of 5 and every figure on a synthesised voice 1-2). An instrument
+named in the request plays the figure: "a notification on a harp", "a success sound with pizzicato strings", "an
+error sound on a soft piano" (`felt_piano`), or `--voice harp`. A few game figures keep the voice they were written
+for (`coin/bright`: a glockenspiel).
 
 ## The catalogue, family by family
 
@@ -565,12 +602,12 @@ sound is or does, the name its character.
 
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
-| learned (`sounds/learned.py`) | 152 in 94 families | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
+| learned (`sounds/learned.py`) | 153 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
 | interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
 | material ticks (`sounds/ui.py`) | 3 | `tick/wood`, `tick/glass`, `tick/metal` | taps and detents that should not be a note | 7 axes (not motion), pitch |
-| ambience (`sounds/nature.py`) | 31 in 15 families | learned from real textures (13): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `wind/trees`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`; from rules (18): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
+| ambience (`sounds/nature.py`) | 31 in 15 families | learned from real textures (12): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`; from rules (19): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/trees`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
 | drums (`sounds/drums.py`) | 40 in 21 families | from recorded strokes (33): `kick/soft`, `kick/punch`, `kick/deep`, `snare/tight`, `snare/fat`, `rim/click`, `rim/shot`, `tom/high`, `tom/mid`, `tom/floor`, `hat/closed`, `hat/open`, `hat/pedal`, `crash/bright`, `crash/dark`, `ride/ping`, `clap/hands`, `clap/group`, `shaker/tick`, `tambourine/hit`, `tambourine/shake`, `conga/open`, `conga/muted`, `bongo/high`, `bongo/low`, `cajon/bass`, `darbuka/hit`, `frame_drum/deep`, `clave/click`, `cabasa/hit`, `slapstick/crack`, `drum/roll`, `shaker/roll`; invented (7): `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count` | music loops, motion design, games | energy (velocity: softer or harder strokes), size, bright, hard, ring, space, width; pitch on tuned drums |
 | film and motion (`sounds/motion.py`) | see below | | product films, title sequences, interface animation | |
 | action (`sounds/action.py`) | 47 in 23 families | `jump/*`, `land/*`, `step/grass` .. `step/metal` (6 surfaces), `swing/*`, `hit/punch` ..., `explosion/*`, `shot/*`, `door/*`, `break/*`, `splash/*`, `teleport/*`, `magic/*`, `countdown/*`, `laser/beam` and `rumble/quake` (loops) | games and animation; invented from physics | energy, size, bright, hard, ring, space, width; pitch for the tonal ones; dur for loops |
@@ -627,27 +664,27 @@ noise; `meta['member']` names the main recording. Nobody has rated these yet.
 
 | family | designs | made of |
 |---|---|---|
-| air | `whoosh/fast` | a real stick swung through the air, a real fast swish 7 dB under it at its loudest moment |
+| air | `whoosh/fast` | a real stick swung through the air, as recorded: close and dry, nothing layered over it |
 | | `whoosh/soft` | a real airy whoosh, a little smaller and darker, no rumble under 120 Hz, trimmed around its peak |
 | | `whoosh/deep` | a real deep or heavy whoosh, a real bass drum's decay played backwards 12 dB under it |
 | | `whoosh/long` | a real deep whoosh, bigger and slower, led in by a swell of real air played backwards |
 | | `swoosh/in`, `swoosh/out` | a real airy whoosh up to its peak and stopped there; from just before its peak on |
 | | `flick/thin`, `flick/paper` | a real fast swish taken small and bright; a real page turned |
 | | `pass/air` | a real deep whoosh carried past the listener: across the stereo field, level by distance, pitch falling 1.5 semitones |
-| hits | `boom/deep` | a real orchestral bass drum, a real timpani 7 dB and a real tam-tam 15 dB under it, in a hall |
+| hits | `boom/deep` | the low end of a real deep kick drum (nothing over 150 Hz) with a real close explosion's low end 4 dB under it, made audible on small speakers by harmonics at 70-180 Hz, falling for 2.6 s, close and dry |
 | | `boom/short` | a real timpani with a real bass drum 4 dB under it, both damped, nearly dry |
 | | `boom/wide` | a real tam-tam struck hard over a real bass drum, wider than recorded |
-| | `slam/title` | a real heavy door slammed over a real bass drum cut short |
-| | `impact/suck` | the build of a real airy whoosh played backwards into a real heavy drop and a bass drum |
+| | `slam/title` | the first 0.22 s of a real heavy impact on the boom's low end 2 dB under it, 0.9 s in all, close and dry |
+| | `impact/suck` | the build of a real airy whoosh played backwards into a real heavy drop on the boom's low end, close and dry |
 | | `explosion/huge` | a real near explosion, a real bass drum 3 dB and a real roll of thunder 9 dB under it |
 | builds | `rise/reverse` | a real crash cymbal's decay played backwards, a real tam-tam's 9 dB under it |
-| | `rise/air` | the build of a recorded swell of air, the build of a real airy whoosh 6 dB under it for the last part |
+| | `rise/air` | the decays of two real close-miked cymbal strokes (crash/bright, crash/dark 5 dB under it) played backwards and lined up at their ends, growing in level and brightness to a clean cut |
 | | `rise/tension` | a real drum or timpani roll in crescendo, a real suspended cymbal rolled 6 dB under it |
 | | `suck/in` | a real airy whoosh's tail played backwards, stopped where its peak was |
 | falls | `fall/air` | the decay of a recorded swell of air, fading straight in dB |
 | | `fall/sub` | a real orchestral bass drum, as big and dark as the engine takes it, a real timpani 10 dB under it |
 | stingers | `sting/reveal` | a real cymbal decay played backwards into a real bass drum and tam-tam |
-| | `braam/brass` | real low brass (tubas, trombones, horns) on the root, fifth and octave over a real bass drum hit |
+| | `braam/brass` | real low brass (tubas, trombones, horns) on the root, fifth and octave over the boom's low end, led in by a reversed cymbal, no added room |
 
 Still invented, from class statistics of small film sounds (0.1-0.25 s, a 10-20 ms rise, mono): `slide/panel`,
 `thump/soft`, `knock/soft`, `pop/soft`, `pop/bubble`, `pop/pluck`, `tock/wood`, `tock/glass`, `blip/soft`,
@@ -690,7 +727,7 @@ pitch outside is moved by octaves.
 | glockenspiel | struck | metal | C5-C8 | C6 | a glockenspiel note |
 | celesta | struck | metal | C4-C8 | C5 | a celesta note |
 | vibraphone | struck | metal | F3-F6 | F4 | a vibraphone note |
-| marimba | struck | wood | C2-C7 | C4 | a marimba note |
+| marimba | played (real recordings) | wood | A2-D6 | C5 | a marimba note: a rosewood marimba struck with yarn mallets |
 | xylophone | struck | wood | F4-C8 | C6 | a xylophone note |
 | crotales | struck | metal | C6-C8 | C7 | a crotale note |
 | kalimba | struck | tine | G3-E6 | C5 | a kalimba note |
@@ -709,15 +746,15 @@ pitch outside is moved by octaves.
 | coin | struck | metal | C8-C10 | E9 | a coin ringing |
 | glass_clink | struck | glass | C5-C7 | D6 | two glasses clinking |
 | metal_ping | struck | metal | C5-C8 | C7 | a metal ping |
-| felt_piano | strings | felt | A0-C8 | C4 | a soft felt piano note |
+| felt_piano | played (real recordings) | felt | A2-D#6 | C5 | a soft felt piano note: an upright piano played softly |
 | grand_piano | strings | piano | A0-C8 | C4 | a grand piano note |
 | electric_piano | strings | electric | E1-E7 | C4 | an electric piano note |
 | reed_piano | strings | electric | A1-C7 | C4 | a reed electric piano note |
-| harp | strings | string | C1-G7 | G4 | a harp note |
+| harp | played (real recordings) | string | A2-F6 | C5 | a harp note |
 | nylon_guitar | strings | string | E2-B5 | A3 | a classical guitar note |
 | steel_guitar | strings | string | E2-E6 | A3 | an acoustic guitar note |
 | muted_guitar | strings | string | E2-E5 | E3 | a palm-muted guitar note |
-| pizzicato | strings | string | C2-E6 | D4 | a pizzicato string note |
+| pizzicato | played (real recordings) | string | G#2-C6 | C5 | a pizzicato string note: a cello section, a solo violin above B4 |
 | koto | strings | string | C3-C6 | D4 | a koto note |
 | upright_bass | strings | string | E1-G4 | D2 | an upright bass note |
 | harpsichord | strings | string | F1-F6 | C4 | a harpsichord note |

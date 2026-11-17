@@ -642,13 +642,21 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                              'one) or a whoosh; a single struck sound (a tap, a hit) '
                                                              'rings as it rings: it ignores dur and says so',
                                                  gt=0)] = None,
-              voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound, e.g. '
-                                                             '"kalimba", "felt_piano", "soft_pluck"')] = None,
+              voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound: "marimba" '
+                                                             '(the default of figures), "harp", "pizzicato" and '
+                                                             '"felt_piano" are real instruments learned note by '
+                                                             'note; "kalimba", "glockenspiel", "soft_pluck" ... '
+                                                             'are models')] = None,
               material: Annotated[str | None, Field(description='what a tap, click or knock is made of, e.g. '
                                                                 '"wood", "glass", "metal", "plastic"; on a tonal '
                                                                 'sound it picks the voice (wood: a marimba)')] = None,
               loop: Annotated[bool | None, Field(description='false: an ambience or other loop once, with a fade '
                                                              'in and out, instead of a seamless loop')] = None,
+              events: Annotated[int | None, Field(description='for a thing a person does several times in a row '
+                                                              '(footsteps, knocking, typing): 1 = one event, 2 or '
+                                                              'more = the action with that many events; by default '
+                                                              'the words decide ("footsteps", "three knocks" are '
+                                                              'the action, "a footstep" one event)', ge=1)] = None,
               seed: Annotated[int, Field(description='another take of the same sound')] = 0,
               listen: Annotated[bool, Field(description="also rank the whole catalogue by how each design sounds "
                                                         "like the request (CLAP against earshot's sound atlas), "
@@ -662,15 +670,19 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
     as numbers, no audio file; figures, chip sound and the music loops are invented in code. Covers interface sounds
     (taps, toggles, success, error, notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit),
     everyday foley, motion-design effects (whooshes, impacts, risers, braams, logos), drums, instrument notes and
-    ambience loops. A learned design's seeds walk through its recordings, so `n` gives different real takes. The
-    answer names the design chosen and why, what else would fit (`also`), and any words that were not understood,
-    so one call is usually enough; call again with `sound`, `theme`, `pitch`, `dur` or adjectives ("softer",
-    "bigger", "longer", "drier") to steer. Use it whenever a product, a game or a film needs a sound and no recording is at hand; use make_set
-    when it needs several that belong together. Everything made is free to use in any product."""
+    ambience loops. A learned design's seeds walk through its recordings, so `n` gives different real takes; the
+    best recording of a thing plays first. Tonal figures are played on real instruments learned note by note
+    (marimba by default; harp, pizzicato strings and felt_piano, an upright piano, by `voice`). A thing a person
+    does in a row is played as that action when the words ask for it ("footsteps on gravel", "knocking", "typing")
+    and as one event otherwise ("a footstep"); `events` sets it. The answer names the design chosen and why, what
+    else would fit (`also`), and any words that were not understood, so one call is usually enough; call again with
+    `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. Use it
+    whenever a product, a game or a film needs a sound and no recording is at hand; use make_set when it needs
+    several that belong together. Everything made is free to use in any product."""
     from . import make as M
     return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
-                             dur=dur, voice=voice, material=material, loop=loop, seed=seed, listen=listen), full,
-                _summary_only(M.make))
+                             dur=dur, voice=voice, material=material, loop=loop, events=events, seed=seed,
+                             listen=listen), full, _summary_only(M.make))
 
 
 def set_help():

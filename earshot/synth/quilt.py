@@ -16,7 +16,7 @@ periods: each stored chunk is one wave from trough to trough, and the joints sit
 
 A loop closes the same way: the last piece fades into the first one, the joint chosen like any other.
 
-What it measures (the tests and the lab report use these): seams(), the level and spectrum jump across each joint
+What it measures (the tests use these): seams(), the level and spectrum jump across each joint
 against the same measure inside the takes (the texture's own variation), and whether an event lies under a fade;
 repeats(), how alike the closest two two-second stretches 2-20 s apart are (band envelopes at 50 ms).
 

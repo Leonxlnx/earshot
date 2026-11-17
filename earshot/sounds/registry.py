@@ -45,8 +45,8 @@ VOICE_OF = {'wood': 'marimba', 'glass': 'glockenspiel', 'metal': 'vibraphone', '
             'digital': 'glass_pluck', 'retro': 'square_lead'}
 # the loudest a finished sound may be at full peak (momentary-max LUFS), by kind: beds sit low by nature
 LOUDEST = {'': -14.0, 'pad': -18.0, 'texture': -18.0, 'bed': -22.0, 'music': -16.0}
-# the most a short, peaky one-shot is raised (dB, its spike folded over: master.finish `lift`): the owner heard many
-# short sounds as "barely there"; beds, pads and music keep their own level
+# the most a short, peaky one-shot is raised (dB, its spike folded over: master.finish `lift`): at the same loudness a
+# short click sounds barely there next to a longer sound; beds, pads and music keep their own level
 LIFT = 14.0
 # the prior of a learned design (earshot.sounds.learned: recordings in the public domain played as new takes):
 # where an invented design of the same thing exists, the learned one wins a tie

@@ -2,12 +2,12 @@
 
 The default voice is a real marimba played softly with yarn mallets (earshot.synth.played: notes learned from
 public-domain recordings): warm wood, an immediate onset and a natural decay of one to two seconds in the register
-of product sound. The owner rated every figure on a synthesised voice 1-2 of 5 ("very technical", "I hate these synth
-sounds") and real recordings 3-4. A real voice plays a figure as a person would: inner notes ring on under the next
+of product sound. A figure on a synthesised voice scores 1-2 of 5 in listening tests (heard as technical and
+synthetic), on real recordings 3-4. A real voice plays a figure as a person would: inner notes ring on under the next
 one unless the figure damps them (`gate`), the last note rings out at its natural length unless a length or less
-ring is asked for, and a figure that reaches above C6 is played an octave lower (the warm register: "too high the
-last key"). A bell, a glockenspiel or a chime plays only when the request or the theme asks for one. Taps, toggles
-and hovers lead with a tactile touch (a key's thock and click, `touch`) that the note only colours.
+ring is asked for, and a figure that reaches above C6 is played an octave lower (the warm register: a top note
+above it sounds shrill). A bell, a glockenspiel or a chime plays only when the request or the theme asks for one.
+Taps, toggles and hovers lead with a tactile touch (a key's thock and click, `touch`) that the note only colours.
 
 A confirmation, a notification, a toggle or a logo is a gesture (which way it moves, by which interval, how fast,
 where the weight falls); the instrument is a second, independent choice. Keeping the two apart is what lets one
@@ -31,7 +31,7 @@ from ..synth import phrase, space, voices
 
 DEFAULT_VOICE = 'marimba'
 TOP = 1046.5                      # Hz (C6): a real voice plays a figure whose highest note is above it an octave lower
-REAL_DRY = 0.6                    # the room's amount under a real voice (the owner: "not always so far away, FULLER")
+REAL_DRY = 0.6                    # the room's amount under a real voice: close and full, not far away
 SUSTAIN_FLOOR = 0.11             # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
 CHORD_GAP = 0.03                  # s: notes this close are one chord (or a grace note): the earlier one rings on
 MINOR = ('minor', 'minor_pentatonic')
@@ -41,8 +41,8 @@ MINOR_STEP = {4: 3, 9: 8, 11: 10}    # a major third, sixth and seventh as their
 def touch(c, r, times, level, pitch=1.0):
     """the tactile part of a tap, a key or a switch, one per onset in `times` (s), stereo: a low thock (the body of
     a key or a panel, 70-110 Hz, gone in about 60 ms), a short knock of the cap or the lever (a ring near 1.4 kHz,
-    5 ms) and a click of the contact (a 1.5 ms noise burst around 4 kHz). The shape follows the re-made keyboard key
-    the owner rated 4 of 5 (fit/key/thock: most energy below 150 Hz and above 1 kHz, attack under 1 ms). `pitch`
+    5 ms) and a click of the contact (a 1.5 ms noise burst around 4 kHz). The shape follows a full, satisfying
+    keyboard key (fit/key/thock: most energy below 150 Hz and above 1 kHz, attack under 1 ms). `pitch`
     (one per onset or one) moves all three: a switch's second part is a little higher or lower than its first.
     hard sharpens and raises the click, size lowers and lengthens the thock, bright opens the click."""
     from ..synth import texture

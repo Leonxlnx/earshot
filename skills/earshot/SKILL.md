@@ -10,26 +10,29 @@ When a product, game, page or film needs a sound and no recording is given, make
 catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
 complete on its own.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (152 designs:
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (153 designs:
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
-paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 13 ambience beds learned from
-real textures (fire, three shores, crickets, wind in trees, a brook, a cafe, a street, distant city, room tone,
-underwater, rain on a terrace). The acoustic drum kit and hand percussion are learned too (130 recorded strokes;
-seeds walk through a drum's strokes, `energy` picks softer or harder ones). Only numbers ship, no audio file: every
-sound is computed when it is asked for. Written in code: tonal interface and game figures (success, error, notify,
-coin, level up), chip sound, the drum-machine voices, a brush snare, a finger snap and stick counts, rain on a
-window and a forest, notes, pads, three music loops, and the film bank.
+paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 12 ambience beds learned from
+real textures (fire, three shores, crickets, a brook, a cafe, a street, distant city, room tone, underwater, rain on
+a terrace). The acoustic drum kit and hand percussion are learned too (130 recorded strokes; seeds walk through a
+drum's strokes, `energy` picks softer or harder ones), and so are the instruments that play the tonal figures: a
+marimba (the default), a harp, pizzicato strings and an upright piano (`felt_piano`), 100 recorded single notes.
+Only numbers ship, no audio file: every sound is computed when it is asked for. Written in code: the figures
+themselves (success, error, notify, coin, level up: the notes, their timing and the room), chip sound, the
+drum-machine voices, a brush snare, a finger snap and stick counts, rain on a window, wind in trees and a forest,
+the other instruments' notes, pads, three music loops, and the film bank.
 Realistic things that no one recorded (jumps, magic, game hits) are invented designs and were rated low by the
 owner: prefer a learned thing when one fits.
 
 **The three calls** (CLI, or the MCP tools of the same names; MCP paths absolute):
 1. One sound: `earshot make "WORDS" -o sounds/success.ogg` (MCP `make`: `want`, `out`; optional `sound`, `n`,
-   `theme`, `pitch`, `dur`, `voice`, `material`, `loop`, `seed`). One call per sound.
+   `theme`, `pitch`, `dur`, `voice`, `material`, `loop`, `events`, `seed`). One call per sound.
 2. Several that belong together (an interface, a game, a film's kit): ONE call, never a loop of `make`.
    `earshot make --set ui|game|arcade|film -o FOLDER --format webm,mp3 --sprite sprite`, or MCP `make_set` with
    `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft tap"}, ...]` (fields:
    name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs). One voice, key and room for the tonal
-   sounds, levels balanced by kind, `manifest.json` written. Themes: soft (the default), glass, wood, felt, tine,
+   sounds; every one-shot as loud as made alone, within 2.5 dB of the others; loops and beds levelled by kind;
+   `manifest.json` written. Themes: soft (the default), glass, wood, felt, tine,
    metal, electric, digital, retro. From the CLI your own list is a JSON file: `{"set": "ui", "format": "webm,mp3",
    "sounds": [{"name": "tap", "want": "a soft tap"}, ...]}`, then `earshot make --spec FILE -o FOLDER` (a re-run
    rewrites the files and `manifest.json`; it does not delete files of names you removed).
@@ -37,7 +40,7 @@ owner: prefer a learned thing when one fits.
    `--family step`, then `--sound ID`. Never list the whole catalogue (hundreds of lines).
 
 **The ready-made sets.** `ui` (17): tap, hover, two toggles, type, next and back are real keys and switches; open,
-close, send, receive, notify, success, complete, warning, error, delete are soft tonal figures. Under toggle_off
+close, send, receive, notify, success, complete, warning, error, delete are figures on the real marimba. Under toggle_off
 and next the line `another recording of ... than toggle_on` (`than back`) says the pair are two recordings of one
 learned switch or keyboard design, as meant.
 `game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
@@ -48,19 +51,28 @@ sounds), `film` (motion-design starter; whooshes, hits and risers layered from l
 `"a footstep on gravel"`, `"a wooden drawer closing"`, `"a camera shutter"`, `"a soft success chime for a finance
 app"`, `"coin pickup, 8-bit"`, `"waves on a beach, 30 seconds"`, `"a wooden notification, 400 ms, in D minor"`.
 A learned sound answers only when its thing is named: "a heavy impact" gets an invented boom, "a dumbbell dropped"
-the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". A material picks the voice of a
-tonal sound (wooden: marimba); a bell or glass timbre only when you ask for one. Chip sound only with "8-bit" /
+the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". An instrument named as the
+player sets the voice of a figure: "a notification on a harp", "a success sound with pizzicato strings", "an error
+sound on a soft piano" (or `voice`: marimba, harp, pizzicato, felt_piano, kalimba, glockenspiel ...); a theme sets
+one voice for many calls. A material picks the voice of a tonal sound (wooden: marimba); a bell or glass timbre only
+when you ask for one.
+**One event or the action.** A thing a person does several times in a row (footsteps, knocking, typing, coins,
+keys, clinking glasses) is played as the action when the words ask for it: "footsteps on gravel", "knocking",
+"three knocks", "typing on a keyboard", "5 seconds of typing". "a footstep on gravel" or "a single knock on a door"
+is one event. `--events N` (MCP `events`) overrides: 1 = one event, 2 or more = the action with N events. The
+answer's `played: ...` line says which it was. Chip sound only with "8-bit" /
 "retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
 written that loosely the first pick was right 69.5 % of the time (76.8 % in the top three). To steer, re-ask with
 adjectives, not by browsing.
 
-**Seeds are variations.** For a learned design, seeds 0, 1, 2 ... play its different recordings first (three seeds
+**Seeds are variations.** For a learned design, seeds 0, 1, 2 ... play its different recordings first, the best one
+at seed 0 (three seeds
 of `step/pebbles` are three real footsteps), then new takes of them. Ask for 6-12 takes of anything a game repeats
 (`--n 8`, or "eight variations"), and make them in a set (`"n": 8` in a spec) so they share one level: single takes
 of different recordings differ in length and level. `--json` names the recording of each take (`member`).
 
 **Read the answer** (no extra call; ask for `--json` / `full=true` only if you need measurements):
-- `x.ogg: design/id (0.88 s, G5, soft_pluck, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
+- `x.ogg: design/id (0.88 s, G5, marimba, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
   `clean` means not usable: make it again with another `seed`.
 - `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
 - `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified; choose an alternative
@@ -93,7 +105,8 @@ models did not predict his ratings. Say plainly that a learned sound is a new ta
 not a sound invented from nothing.
 
 Everything earshot renders is free to use in any product, commercial too, without credit. The learned material
-comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md` and `earshot/data/textures/CREDITS.md`.
+comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`,
+`earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
 
 The rest of this file is about listening: judging, choosing and checking sound you cannot hear.
 

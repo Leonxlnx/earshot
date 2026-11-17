@@ -54,8 +54,8 @@ def _soft_pluck(f, vel, dur, r, c):
     """a triangle pair a few cents apart with a saw under a ladder that opens 3 octaves for the first 50 ms and
     settles a little above the fundamental, so the second to fourth harmonics stay (-8 to -20 dB: a round tone
     that is not a bare sine); a sine an octave down gives it body in the low mids, a breath of noise through the
-    open filter marks the attack, and the note decays over about 1.5 s and releases over 0.6 s. The owner heard the
-    darker first version as "dull" and "technical" next to the bell timbres he dislikes; this keeps it soft (no
+    open filter marks the attack, and the note decays over about 1.5 s and releases over 0.6 s. A darker version
+    sounds dull and technical next to bell timbres; this keeps it soft (no
     inharmonic partials, nothing above 4 kHz but the breath) and makes it fuller."""
     g, h = _x(c, 'ring', 1.3) * _reg(f, 0.25), _x(c, 'hard', -2.0)
     return voice.analog(

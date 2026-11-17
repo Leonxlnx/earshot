@@ -68,8 +68,7 @@ INSTRUMENTS = {
         'a banjo note', 'a plucked banjo string', 'a bright twangy banjo pick']},
 }
 
-# Literature targets the builds are calibrated to; the lab script renders/strings/measure.py prints target against
-# measured. Sources (as recalled from them, rounded; attack times and centroids are class-level ranges, not data):
+# Literature targets the builds are calibrated to (each build was measured against them). Sources (as recalled from them, rounded; attack times and centroids are class-level ranges, not data):
 # [F] Fletcher 1964 and Conklin 1996, inharmonicity of piano strings; [C] Chaigne & Askenfelt 1994, string and
 # hammer data of C2, C4 and C7 (B = pi^2 eps: 7e-5, 3.8e-4, 8.6e-3; felt F = K x^p with p 2.3, 2.5, 3.0);
 # [A] Askenfelt & Jansson 1990-91, hammer contact about 4 ms in the bass, 2 ms at C4, under 1 ms at the top, shorter
@@ -98,7 +97,7 @@ INSTRUMENTS = {
 # the bridge takes from the polarisation that moves it; the T60 near 3 kHz of nylon strings follows from the loss
 # factors of [V]. mf is vel 0.5, ff vel 1.
 #
-# [cal] The pianos are also calibrated against recordings (lab renders/calib, 2026-11): eight single notes of a
+# [cal] The pianos are also calibrated against recordings: eight single notes of a
 # 2.1 m grand (University of Iowa MIS: C2 to C7, and pp / mf / ff at C4, microphones a hand's breadth over the
 # strings) and seven of an upright (VSCO-2 CE: C2 to C6, three dynamics at C4). What the notes of both agree on:
 #   prompt sound   the fundamental falls its first 12 dB at 12-20 dB/s at C3, 16-32 at C4, 43-48 at C5 and 60-100

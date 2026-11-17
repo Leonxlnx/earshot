@@ -457,45 +457,6 @@
     "mod_db": 0.69
    }
   },
-  "trees": {
-   "ids": [
-    "wind/trees"
-   ],
-   "title": "Wind in the Trees",
-   "author": "Joseph Sardin (BigSoundBank.com)",
-   "page": "https://bigsoundbank.com/forest-wind-in-the-trees-s0904.html",
-   "licence": "CC0 1.0 (public domain)",
-   "excerpt_s": [
-    16.0,
-    12.0
-   ],
-   "channels": 2,
-   "periodic": false,
-   "seconds": 12.3,
-   "bytes": 208897,
-   "chunks": [
-    {
-     "file": "trees-0.npz",
-     "seconds": 5.71,
-     "period": null
-    },
-    {
-     "file": "trees-1.npz",
-     "seconds": 6.59,
-     "period": null
-    }
-   ],
-   "fidelity": {
-    "env_db": 2.65,
-    "shape_db": 0.77,
-    "mod_db": 1.08
-   },
-   "take_vs_take": {
-    "env_db": 2.88,
-    "shape_db": 0.84,
-    "mod_db": 0.82
-   }
-  },
   "underwater": {
    "ids": [
     "underwater/deep"

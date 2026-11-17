@@ -16,7 +16,7 @@ The store is earshot/data/resyn/: one model per recording (`<family>-<name>-<n>.
 `index.json` (per design: id, descriptions, jobs, kind, whether it is a default choice, the interface jobs it plays
 (`roles`), the order its seeds play its members in (`walk`) and its members, each with its file, source recording, credit, main onset, natural length, the axes that
 measurably act on it, the measured quality of the recording, a listening rating where there is one) and CREDITS.md.
-It is built in the lab (tools/learn_build.py) from recordings whose licence is CC0, each one checked for a full band,
+It is built outside the package from recordings whose licence is CC0, each one checked for a full band,
 a natural decay, a clear onset and a single event; nothing else may enter it. A model is read from disk once, on its
 first take.
 

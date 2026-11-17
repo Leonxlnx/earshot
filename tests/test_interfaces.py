@@ -460,7 +460,8 @@ def test_mcp_make_tools_describe_listen_and_take_material_loop_and_formats(tmp_p
     import anyio
     tools = {t.name: t for t in anyio.run(mcp_server.build().list_tools)}
     props = (getattr(tools['make'], 'input_schema', None) or tools['make'].inputSchema)['properties']
-    assert {'material', 'loop', 'listen', 'dur'} <= set(props)
+    assert {'material', 'loop', 'listen', 'dur', 'events'} <= set(props)
+    assert 'footsteps' in props['events']['description']         # events as make takes it: one event or the action
     listen = ' '.join(props['listen']['description'].split())
     assert 'best three' not in listen and 'atlas' in listen and 'blended' in listen and 'heard as' in listen
     assert 'once' in props['loop']['description'] and 'ignores dur' in props['dur']['description']
@@ -470,6 +471,8 @@ def test_mcp_make_tools_describe_listen_and_take_material_loop_and_formats(tmp_p
     assert text.startswith('r.wav: rain/tent') and 'seamless loop' not in text
     text = mcp_server.tool_make('a knock', str(tmp_path / 'k.wav'), sound='tick/wood', material='glass')
     assert 'not used by this sound: material' in text
+    text = mcp_server.tool_make('footsteps on gravel', str(tmp_path / 's.wav'), sound='step/pebbles', events=1)
+    assert 'played: one event' in text
     text = mcp_server.tool_make_set(str(tmp_path / 'set'), sounds=[{'name': 'tap', 'sound': 'tap/tone'}],
                                     format='wav,flac')
     assert text.splitlines()[0].endswith('(wav, flac), manifest.json')

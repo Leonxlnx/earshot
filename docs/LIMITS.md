@@ -82,7 +82,7 @@ family and the learned beds were built after his last ratings: each learned take
   layer two designs into one, or synthesise from a free description. A request nothing answers is an error; a
   request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
-  the recording in the public domain; the store has 152 things. For other real things the catalogue has designs
+  the recording in the public domain; the store has 153 things. For other real things the catalogue has designs
   invented from physics (`action`, `object`), which the owner rated 1-2 of 5.
 - New sounds from a class of recordings. Sampling new members from a model of several recordings was tried and
   rated 1-2; it was dropped. A learned design plays its own recordings and new takes of them.
@@ -121,15 +121,22 @@ family and the learned beds were built after his last ratings: each learned take
 - **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms).
 - **Sea joints.** A stitched bed joins pieces where the texture is in a similar state; on the pebble and rock
   shores the joints differ by about 1.5 times the texture's own variation, more than in the other beds.
-- **The interface touches are quieter than the figures.** The recorded taps, toggles and keys measured 5 dB under
-  the tonal figures at their loudest 50 ms; a set levels them lower still, by kind.
-- **Takes of a learned design differ in length and level**, because they are different recordings (three footsteps
-  on gravel: 0.74-1.33 s, -22 to -14 LUFS, one with a lead-in of a few steps). Make pick-at-random takes as a set,
-  where each gets the kind's level.
+- **The interface touches are quieter than the figures** when each is made alone: the recorded taps, toggles and
+  keys measured 5 dB under the tonal figures at their loudest 50 ms. A set turns its one-shots down to within 2.5 dB
+  of the quietest, so in a set they sit together.
+- **Takes of a learned design differ in length and level**, because they are different recordings. Make
+  pick-at-random takes as a set, where none lies more than 2.5 dB over the quietest.
+- **Performances.** Only the learned things whose index names a pattern or holds a recording of the whole action
+  (walks, knocks, typing, coins, keys, clinking glasses ...) can be played as the action; the reader decides from
+  the words (a plural, an action word, a count or a length), and `events` overrides it. A walk or a typing run made
+  from single recordings repeats the few recordings the thing has.
+- **The real instruments** have 14 to 48 recorded notes each; a note between them is a neighbour moved by a few
+  semitones, and the takes of one instrument can differ in level by 2-3 dB from note to note.
 - **Invented realistic sounds** remain in the catalogue for things no learned design covers (jumps, landings, game
   hits, shots, magic). The owner rated their kind 1-2. A learned design wins a tie with them, but a request that
   names only an invented one gets it.
-- **Instrument notes and bells** were rated 2-3 and 1; interface figures play the soft pluck unless asked otherwise.
+- **Instrument notes and bells** were rated 2-3 and 1 as models; figures now play a real marimba unless asked
+  otherwise, and the real instruments are not rated yet.
 - **`--listen` and the atlas** were not re-measured on the v1 catalogue; the atlas is built from each design's
   default render and is stale after designs change until it is rebuilt (`python -m earshot.sounds.atlas build
   --work DIR`, repeated until done).
@@ -153,7 +160,8 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 6.79 MB, the textures 4.09 MB and the drums 1.47 MB to the package. The lab's
+sound. The learned store adds 7.00 MB, the textures 3.87 MB, the drums 1.47 MB and the instrument notes 0.85 MB
+to the package. The lab's
 recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
 repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers
 cannot be re-run from it.
@@ -162,5 +170,6 @@ cannot be re-run from it.
 Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication
 (the Freesound ones partly read from MP3 previews found through the Openverse catalogue). Each recording's licence
 was taken from its source (the sound's page, the pack's licence file, or Openverse's licence field for a Freesound
-page) and is written next to it in the three credits files (`earshot/data/resyn/`, `textures/` and `drums/`);
+page) and is written next to it in the four credits files (`earshot/data/resyn/`, `textures/`, `drums/` and
+`notes/`);
 earshot cannot prove that an uploader had the right to give a recording away.

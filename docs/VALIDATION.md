@@ -158,7 +158,8 @@ of several recordings (1-2): class sampling was dropped.
 **What followed.** Realistic sounds are learned from public-domain recordings (`earshot/sounds/learned.py`), the
 interface touches are real keys and switches, the ambience beds he rated 2-3 were replaced by learned textures,
 nine music beds were removed, the acoustic drums and hand percussion are played from 130 recorded strokes (VCSL and
-Karoryfer; not rated yet), the default voice of the interface figures is the soft pluck, and short sounds are
+Karoryfer; not rated yet), the figures are played on real instruments learned note by note (a marimba by default;
+a harp, pizzicato strings and an upright piano by name), and short sounds are
 raised (`master.finish` lift; the loudest 50 ms of the tap, toggle and hover figures went from -19.5, -20.4 and
 -19.5 to -13.2, -9.4 and -13.5 dBFS).
 
@@ -185,11 +186,13 @@ store and to drop members it scored lowest where a design had others.
   a click's rise within 1 ms; a model is 3.6-35 kB (median 9.1 kB); a render takes 0.26-0.33 s per second of sound.
   Weak: soft onsets smear (a bag drop's rise went from 61 to 99 ms); a fast swipe; impacts whose mid band is partly
   carried as noise (takes differ by about 3 dB there).
-- **The store**: 152 designs, 348 members, 6.79 MB (21 of the designs and 66 of the members are the film's
-  material, below); nothing the owner rated 1-2, no duplicates, at most five members
-  per thing (six notes of low brass for the braam). Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
+- **The store**: 153 designs, 364 members, 7.00 MB (21 of the designs and 66 of the members are the film's
+  material, below; 13 members are recordings of a whole action, played by a performance); nothing the owner rated
+  1-2, no duplicates, at most five single-event members per thing (six notes of low brass for the braam). Seed 0
+  plays the member with the best listening score. Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
   clear onset, a single event.
-- **Ambience textures** (`earshot/synth/quilt.py`, 12 BigSoundBank textures, 4.09 MB): a take differs from its
+- **Ambience textures** (`earshot/synth/quilt.py`, 11 BigSoundBank textures, 3.87 MB; the wind in trees was
+  removed: its recording's leaves do not follow its gusts, and `wind/trees` is made by the texture engine): a take differs from its
   recording by 2.4-3.6 dB at band-envelope level, the same as two takes differ from each other, except the crickets
   (4.4 dB against 2.2: two crickets in one band lose their beating). The joints of a stitched bed differ by 0.9-1.5
   times the texture's own variation (the pebble and rock shores about 1.5). The sea beds are 26-30 s with five waves
@@ -198,8 +201,11 @@ store and to drop members it scored lowest where a design had others.
   (Big Rusty Drums), stored softest first with their velocity within their instrument; the seed walks through a
   design's strokes and `energy` picks softer or harder ones. Nobody has rated them yet.
 - **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit
-  public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/` and
-  `drums/`.
+  public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/`,
+  `drums/` and `notes/`.
+- **Instrument notes** (`earshot/synth/played.py`, `earshot/data/notes/`, 0.85 MB): 100 single notes from VSCO-2 CE
+  and VCSL (marimba 14, harp 24, pizzicato 48, upright piano 14), each played as a take moved to the pitch asked for
+  with the tuning measured on the recording. Not rated by the owner yet.
 - **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 23 motion designs are layers of 21
   learned film things (66 recordings) (orchestral bass drums, timpani, tam-tams, crash cymbals, heavy drops, a door slam, swells
   of air, cymbal and gong, drum and timpani rolls, low brass, deep, airy and fast whooshes, passes, thunder),
@@ -217,15 +223,17 @@ not in the repository.
 
 | set | first pick right | right among the top three |
 |---|---|---|
-| A (development, 440) | 92.7 % | 96.1 % |
-| B (development, 220) | 97.3 % | 99.1 % |
+| A (development, 440) | 92.3 % | 96.1 % |
+| B (development, 220) | 96.4 % | 99.1 % |
 | C (held out, 220), scored once on the v1 catalogue | 69.5 % | 76.8 % |
 
 When the learned recordings arrived, 68 answers were added to the accept lists of A and B by written rules: a learned
 recording of the thing the request names is a right answer. Without those additions A is 89.1 % / 95.2 % and B
 93.6 % / 98.2 %. C was scored once with the same code; the code before the learned family scored 70.9 % / 78.2 % on
 the same catalogue, so the learned designs cost C about one and a half points. Development numbers are optimistic by
-construction; C is the number to quote. About one held-out request in three or four (long descriptions and
+construction; C is the number to quote. Four of the development misses (three taps, one hover) are requests whose
+accepted learned answer was the interface set's earlier tap or hover recording; the reader now gives them the
+touches the `ui` set plays (`keyboard/mechanical`, `leather/grab`). About one held-out request in three or four (long descriptions and
 casual paraphrases) needs a second call, which is what `also`, the guess note and `sound=<id>` are for.
 `--listen` (the sound atlas) was not re-measured on the v1 catalogue.
 

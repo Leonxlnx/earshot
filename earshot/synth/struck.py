@@ -75,7 +75,7 @@ def _add(name, low, high, default, says, ring_s, position, options=None, **spec)
 # the pair of materials (a 25 mm plastic ball on steel 6e8, on rosewood across the grain 2e8, glass on glass 7e9,
 # an iron clapper on bell bronze 4e10); the wound and felted ones are set to the contact times reported for a medium
 # stroke (cord on aluminium 0.6 ms, yarn on rosewood 1 - 3 ms, felt hammers about 0.7 ms).
-# [cal] Two mallets are set from recordings (lab renders/calib, 2026-11; anechoic single notes of the University of
+# [cal] Two mallets are set from recordings (anechoic single notes of the University of
 # Iowa MIS and far-miked ones of VSCO-2 CE). Yarn: wound over a core, it stiffens like felt (p 3.5), 1 ms on the bar at
 # a loud stroke, 1.5 ms at half the speed: the second mode of a C4 marimba bar comes 17 dB closer to its fundamental
 # from mf to ff. Hard rubber: 0.2 ms, so the third mode of a xylophone bar (5 - 6 kHz at C6) is still struck: it lies

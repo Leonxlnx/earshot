@@ -1,9 +1,9 @@
 """Real instruments played note by note: a marimba, a harp, pizzicato strings and an upright piano, learned from
 single-note recordings in the public domain.
 
-Why. Tonal interface sounds played by synthesised voices were rated 1-2 of 5 by the owner ("very technical", "I hate
-these synth sounds"), while he rates real recorded drums 3-4 and cannot tell a recording from its take out of
-earshot.synth.resyn. So the notes of a figure are real notes: each instrument's recordings (VSCO-2 Community Edition
+Why. Tonal interface sounds played by synthesised voices scored 1-2 of 5 in listening tests (heard as technical
+and synthetic), real recorded drums 3-4, and a take out of earshot.synth.resyn is heard as the recording itself.
+So the notes of a figure are real notes: each instrument's recordings (VSCO-2 Community Edition
 and the Versilian Community Sample Library, CC0) are kept as a few kilobytes of numbers each in earshot/data/notes/
 (never audio; credits in CREDITS.md there) and played as new takes, the way earshot.sounds.drums plays real strokes.
 

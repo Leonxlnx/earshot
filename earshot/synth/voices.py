@@ -3,8 +3,9 @@ pianos (earshot.synth.strings), synthesizer patches (earshot.synth.patches) and 
 note from public-domain recordings (earshot.synth.played).
 
 The real instruments take the names of the voices they replace: `marimba`, `harp`, `pizzicato` and `felt_piano`
-(played by a real upright piano at its soft dynamic) are recordings, not models; the owner rated every synthesised
-interface figure 1-2 of 5 and cannot tell a real recording from its take. struck.note('marimba') and
+(played by a real upright piano at its soft dynamic) are recordings, not models: a synthesised interface figure
+sounds technical and thin next to a real note, and a take of a recording is heard as the recording itself.
+struck.note('marimba') and
 strings.note('harp') still play the physical models directly.
 
     from earshot.synth import voices

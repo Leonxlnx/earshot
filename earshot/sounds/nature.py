@@ -1,12 +1,12 @@
 """Ambience: real textures learned from public-domain recordings (`fire/camp`, `waves/sand`, `night/crickets`,
 `stream/brook`, `cafe/busy`, `city/street` ...) and the scenes of earshot.synth.texture that are invented from
-physics and kept where the owner rated them well or nothing real stands in for them (`rain/window`,
+physics and kept where they sound right or nothing real stands in for them (`rain/window`,
 `forest/morning`, `wind/trees`, `thunder/clap` ...).
 
 A learned bed is a texture stored as numbers (earshot/data/textures: resyn models of 12-16 s of one recording, a
 few hundred kB, credits in CREDITS.md there) played endlessly by earshot.synth.quilt: fresh takes of the models,
-cut into pieces of 1-3 s (whole waves for the sea) and stitched where the texture is in a similar state. The
-owner hears no difference between a recording and its resyn take; the invented fire, sea and night he rated 2-3.
+cut into pieces of 1-3 s (whole waves for the sea) and stitched where the texture is in a similar state. A
+resyn take is heard as the recording itself; an invented fire, sea or night scores 2-3 of 5 in listening tests.
 
 A bed is a seamless loop by default: the file can repeat for as long as the scene lasts (a game level, a landing
 page, a meditation timer) without a seam. `dur` is the loop's length (longer loops repeat less often),

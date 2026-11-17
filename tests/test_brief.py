@@ -75,6 +75,30 @@ def test_general_words_name_no_instrument(text):
     assert brief.read(text)['voice'] is None
 
 
+@pytest.mark.parametrize('text,family,voice', [
+    ('a notification on a harp', 'notify/', 'harp'),
+    ('a success sound with pizzicato strings', 'success/', 'pizzicato'),
+    ('an error sound on a soft piano', 'error/', 'felt_piano'),
+    ('a notification on a soft piano', 'notify/', 'felt_piano'),
+    ('a success sound on a soft piano', 'success/', 'felt_piano'),
+    ('a success sound on an upright piano', 'success/', 'felt_piano'),
+])
+def test_an_instrument_after_a_job_plays_the_figure(idx, text, family, voice):
+    """an instrument named as the player of a job (also behind an adjective: "on a soft piano") sets the voice of
+    the job's figure, not a single note of that instrument; "pizzicato strings" is one name"""
+    b = brief.read(text)
+    r = brief.rank(b, idx=idx, top=3)
+    assert r[0]['id'].startswith(family) and b['voice'] == voice, (text, r, b['voice'])
+    assert not b['unknown'], b['unknown']
+
+
+def test_a_single_knock_is_a_plain_answer(idx):
+    """the invented twin of the pick (knock/door for door/knock) and its family are the same thing, not a doubt"""
+    from earshot.make import doubt
+    b = brief.read('a single knock on a door')
+    assert doubt(b, brief.rank(b, idx=idx, top=8)) is None
+
+
 def test_pitch_hz_note_and_middle_c():
     assert brief.read('a beep at 880 Hz')['pitch'] == pytest.approx(880.0)
     assert brief.read('a marimba note, C5')['pitch'] == 'C5'
@@ -542,6 +566,9 @@ NEW_ANCHORS = [
     ('swoosh out when the card leaves the screen', ('swoosh/out',)),
     ('quick flick for a text change', ('flick/',)),
     ('a riser before the drop', ('rise/',)),
+    ('a fast whoosh', ('whoosh/fast',)),
+    ('a cinematic boom', ('boom/',)),
+    ('a title slam', ('slam/title',)),
     ('noise riser into the reveal', ('rise/air',)),
     ('downlifter after the big hit', ('fall/',)),
     ('a cinematic boom for the title', ('boom/',)),
@@ -656,6 +683,8 @@ PERFORM_ANCHORS = [
     ('two steps on a wooden floor', 'step/floorboard', 2),
     ('knocking on a wooden door', 'door/knock', True),
     ('a knock on the door', 'door/knock', True),
+    ('a single knock on a door', 'door/knock', False),
+    ('typing on a keyboard', 'keyboard/mechanical', True),
     ('three knocks on a door', 'door/knock', 3),
     ('typing on a mechanical keyboard', 'keyboard/mechanical', True),
     ('a bunch of keys jingling', 'keys/bunch', True),

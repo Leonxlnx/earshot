@@ -2,7 +2,7 @@
 night, hums (48 kHz stereo beds, no recorded audio). The sea, the underwater rush, room tone and the city are
 learned from real recordings instead (earshot.synth.quilt, earshot.sounds.nature), as are the campfire, the
 crickets, the brook, wind in trees and rain on a street of the catalogue; the scenes here still make those for
-code that asks for them (texture.render('night', ...): the crickets the owner rated 3, kept as the fallback).
+code that asks for them (texture.render('night', ...): the invented crickets, kept as the fallback).
 
 Procedural ambience usually sounds fake for two reasons: the spectrum is static (noise through one filter and an LFO)
 and the events have no statistics (rain as hiss, fire without crackle clusters). Every scene here is built from two
@@ -848,7 +848,7 @@ def _forest(n, r, c):
     """A forest by day: a light wind in the leaves (the wind model at a breeze) under birds of several species. Every
     bird keeps its own voice, perch and distance, sings its species' phrase with fresh variations and waits a
     log-normal pause; most are far off (quieter, duller, with the long diffuse echo of a wood). The low coo of a
-    dove is heard by listeners as an owl and is left out unless `dove` is above 0 (the owner disliked it)."""
+    dove is heard by listeners as an owl and is left out unless `dove` is above 0."""
     dur = n / SR
     y = _wind(n, r, dict(intensity=-0.75 + 0.2 * c['intensity'], place='trees', howl=0.0, distance=0.0,
                          gust=0.5))                           # under the canopy the gusts are half as deep
@@ -891,8 +891,7 @@ def _night(n, r, c):
     temperature: a snowy tree cricket chirps (T_F - 40) / 15 times per second (Dolbear's law), each at its own
     slightly different tempo; field crickets chirp faster and in bouts; ground crickets trill without a break. A
     few sing close by, the crowd is far and soft; now and then a tree frog (an owl only when `owl` is above 0); a
-    soft air under it all. (A version with lower, rougher strokes was heard by the owner as random trills and
-    rated lower: these are the crickets he rated 3.)"""
+    soft air under it all. (Lower, rougher strokes are heard as random trills rather than crickets.)"""
     dur = n / SR
     temp = 20.0 + 8.0 * c['warmth']                           # deg C: 12 .. 20 .. 28
     beat = (temp * 1.8 - 8.0) / 15.0                          # chirps per second, Dolbear

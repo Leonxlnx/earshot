@@ -635,7 +635,10 @@ def read(text):
             if 'v' in hit:
                 v = hit['v']
                 b['voice'] = b['voice'] or v
-                player = prev in VOICE_PARAM_PREV or (prev in ARTICLES and i > 1 and toks[i - 2] in VOICE_PARAM_PREV)
+                k = i - 1                  # "on a soft piano": articles and adjectives stand between
+                while k >= 0 and (toks[k] in ARTICLES or modifier(toks[k])):
+                    k -= 1
+                player = k >= 0 and toks[k] in VOICE_PARAM_PREV
                 follow = None if hit.get('c') in VOICE_OK and j - i > 1 else _next_concept(toks, j)
                 if j < n_tok and toks[j] in L.SOUND_NOUNS:
                     follow = None              # "a kalimba ping": a note of the instrument

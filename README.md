@@ -44,14 +44,14 @@ sound is, then its character.
 
 | group | designs | how it is made | examples |
 |---|---|---|---|
-| learned things | 152 | learned from 348 recorded events in the public domain | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
-| interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (the interface ones by a soft pluck) | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
-| ambience | 31 | 13 learned from real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
+| learned things | 153 | learned from 364 recorded events in the public domain | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
+| interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba) | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
+| ambience | 31 | 12 learned from real textures, 19 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
 | chip | 24 | the channels of 8-bit consoles, band-limited | `coin/chip`, `jump/chip`, `laser/chip`, `explosion/chip` |
 | drums | 40 | 33 played from 130 recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented (drum-machine voices, a brush snare, a finger snap, stick counts) | `kick/soft`, `snare/tight`, `hat/closed`, `conga/muted`, `darbuka/hit`, `drum/roll`; `kick/electro` |
 | film and motion | 39 | 23 layered from learned film recordings (orchestral drums, timpani, tam-tams, cymbals, swells, rolls, low brass, real whooshes); 16 small ones invented (pops, tocks, glints, a glitch, key ticks) | `whoosh/fast`, `boom/deep`, `rise/reverse`, `braam/brass`, `explosion/huge`; `pop/soft` |
 | action and objects | 83 | invented from physics | `jump/soft`, `hit/punch`, `coin/drop`, `paper/tear`, `bell/desk` |
-| notes, synthesizer | 51, 14 | struck and string models, synth patches | `note/kalimba`, `pad/warm`, `braam/hit` |
+| notes, synthesizer | 51, 14 | real instruments learned note by note (marimba, harp, pizzicato, upright piano), struck and string models, synth patches | `note/kalimba`, `pad/warm`, `braam/hit` |
 | music loops | 3 | a small grammar of harmony and feel | `bed/warm`, `bed/playful`, `bed/8bit` |
 | bank | 209 | the 0.2-0.4 sound bank, stored as code | `whoosh_fast/crisp`, `riser/tension`, `typing_key/light` |
 
@@ -68,15 +68,16 @@ sound-effects tool: the three music loops are short beds for a game menu or a de
 | the thing, the job or the sound | choose the design: things ("a light switch", "a cork"), jobs ("success", "coin pickup", "toggle") and sounds ("chime", "whoosh", "rain") | `"a notification"` -> `notify/pair` |
 | feelings | offsets on eight shared axes: bright, hard, ring, size, space, width, energy, motion | `"a much bigger, darker whoosh"`: size +0.84, bright -0.6 |
 | negation, comparison | "not harsh", "not too loud", "the opposite of a success sound", "like a ..." | `"the opposite of a success sound"` -> `error/fall` |
-| voice | the instrument that plays a tonal sound, or a single note of it | `"a success chime on a glockenspiel"`, `"a kalimba note in E"` |
+| voice | the instrument that plays a tonal sound, or a single note of it | `"a notification on a harp"`, `"a success sound with pizzicato strings"`, `"a kalimba note in E"` |
+| one event or the action | a plural, an action word, a count or a length plays the action a person performs; a singular or "a single" one event | `"footsteps on gravel"` (a walk), `"a footstep on gravel"` (one step), `"three knocks"` |
 | material | picks the voice of a tonal sound (wooden: a marimba) and steers the ranking; "8-bit", "retro", "chiptune" allow only chip sound | `"8-bit coin pickup"` -> `coin/chip` |
 | numbers | length, pitch, key (a minor key makes a figure minor), how many takes, how many notes | `"400 ms"`, `"C6"`, `"in D minor"`, `"three variations"` |
 | loop or not | ambience loops by default; "no loop" or `--no-loop` renders it once with fades | `"rain on a tent, no loop"` |
 
 A learned design answers only a request that names its thing ("a footstep on gravel", "a camera shutter", "toggle
 dark mode" for a lamp switch); a feeling alone never reaches a recording. Options win over the words: `--pitch`,
-`--dur`, `--voice` and `--bright` ... `--motion` (each -1 .. 1) are laid over what the words say, and `--sound ID`
-takes a design by name. Re-ask with adjectives ("softer", "drier", "bigger", "longer") rather than browsing.
+`--dur`, `--voice`, `--events` (1 = one event, 2 or more = the action with that many) and `--bright` ...
+`--motion` (each -1 .. 1) are laid over what the words say, and `--sound ID` takes a design by name. Re-ask with adjectives ("softer", "drier", "bigger", "longer") rather than browsing.
 
 On 220 held-out requests written by someone who never saw the catalogue (half long descriptions that never name the
 sound, half casual), scored once on the v1 catalogue, the first pick is right for 69.5 % and one of the top three
@@ -86,19 +87,24 @@ one request in three or four of the held-out kind needs a second call, which is 
 
 ### Learned sounds: what they are
 
-The 152 learned designs, 13 ambience beds, the recorded drums and the film sounds layered from them are not invented. Each comes from recordings in
+The 153 learned designs, 12 ambience beds, the recorded drums, the instrument notes and the film sounds layered
+from them are not invented. Each comes from recordings in
 the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an
 explicit public-domain dedication. earshot keeps each recording as numbers, not audio: the level of 56 bands on a
 2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
-(`earshot/synth/resyn.py`). The store is 6.79 MB for 348 recorded events (`earshot/data/resyn/`; a few are several
-events cut from one recording), 4.09 MB for 12 textures (`earshot/data/textures/`) and 1.47 MB for 130 drum strokes
-(`earshot/data/drums/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
+(`earshot/synth/resyn.py`). The store is 7.00 MB for 364 recorded events (`earshot/data/resyn/`; a few are several
+events cut from one recording, 13 are recordings of a whole action such as a walk), 3.87 MB for 11 textures
+(`earshot/data/textures/`), 1.47 MB for 130 drum strokes (`earshot/data/drums/`) and 0.85 MB for 100 single notes
+of four instruments (`earshot/data/notes/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
 noise and applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural
 one, energy, room, width), so every take is new. But it is a new take of that recording: a compact description of a
 real sound rendered again, not a sound made from nothing.
 
-A design is one thing and its recordings are its variations: seeds 0, 1, 2 walk through them, so three seeds of
-`step/pebbles` are three real footsteps; seeds past the last recording are new takes of the same ones. A request for
+A design is one thing and its recordings are its variations: seeds 0, 1, 2 walk through them, from the one with
+the best listening score down, so three seeds of `step/pebbles` are three real footsteps; seeds past the last
+recording are new takes of the same ones. A thing a person does several times in a row (a walk, a knock, typing,
+coins, keys, clinking glasses) is played as that action when the words ask for it: a recording of the whole action
+where there is one, else its single recordings in the pattern a person plays them (`earshot/synth/perform.py`). A request for
 a darker or brighter take draws from the darker or brighter recordings.
 
 Why this way: in the owner's listening test of 24 recordings, each next to two renders of it, he gave the recording
@@ -110,17 +116,25 @@ in the public domain.
 ### Themes and sets
 
 A theme is what makes a product's sounds one family: one voice, one key, one room and offsets on the axes, shared by
-every design that honours them. Presets: `soft` (soft pluck, the default of product UI), `glass` (glockenspiel),
-`wood` (marimba), `felt` (felt piano), `tine` (kalimba), `metal` (vibraphone), `electric` (electric piano),
-`digital` (glass pluck), `retro` (square lead); a dict changes one (`{"base": "wood", "key": "D"}`). Interface
-figures play the soft pluck unless a request or a theme names another voice: a bell or a glass timbre only when
-asked. A few game figures keep the voice they were written for (`coin/bright`: a glockenspiel).
+every design that honours them. Presets: `soft` (a real marimba played softly, the default of product UI), `glass`
+(glockenspiel), `wood` (a real marimba, pentatonic in G), `felt` (a real upright piano played softly), `tine`
+(kalimba), `metal` (vibraphone), `electric` (electric piano), `digital` (glass pluck), `retro` (square lead); a dict
+changes one (`{"base": "wood", "key": "D"}`). Figures play the real marimba unless a request or a theme names
+another voice (`--voice harp`, "on a harp", "with pizzicato strings", "on a soft piano"): a bell or a glass timbre
+only when asked. A few game figures keep the voice they were written for (`coin/bright`: a glockenspiel).
 
-A ready-made set makes the sounds a kind of product needs in one call, levelled against each other (frequent sounds
-quieter) with a `manifest.json`: `ui` (17 interface sounds), `game` (22: menus, rewards, jingles, actions), `arcade`
-(16 chip sounds), `film` (motion-design sounds). In `ui` the touches (tap, hover, the two toggles, typing, next and
-back) are real keys and switches; the signals (open, close, send, receive, notify, success, complete, warning, error,
-delete) are soft tonal figures. A JSON spec adds to a set or describes your own (`earshot make --spec sounds.json`,
+The real instruments (`earshot/synth/played.py`) are a marimba with yarn mallets, a harp, pizzicato strings (a cello
+section up to B4, a solo violin above) and an upright piano played softly (the voice `felt_piano`): 100 single notes
+from VSCO-2 CE and VCSL (CC0), each played as a new take moved to the pitch asked for. Inner notes of a figure ring
+on under the next one, the last rings out, and a figure whose top note lies above C6 is played an octave lower.
+
+A ready-made set makes the sounds a kind of product needs in one call with a `manifest.json`: `ui` (17 interface
+sounds), `game` (22: menus, rewards, jingles, actions), `arcade` (16 chip sounds), `film` (17 motion-design sounds).
+Every one-shot of a set is as loud as it is made alone and only turned down so that none lies more than 2.5 dB over
+the quietest (by its loudest 50 ms; `hover` in `ui` sits just under); loops and beds are levelled by kind. In `ui`
+the touches (tap, hover, the two toggles, typing, next and back) are real keys, a leather touch and a lamp switch,
+each the recording chosen for its role; the signals (open, close, send, receive, notify, success, complete,
+warning, error, delete) are tonal figures on the real marimba. A JSON spec adds to a set or describes your own (`earshot make --spec sounds.json`,
 MCP `make_set`).
 
 ```
@@ -154,7 +168,8 @@ error.{webm,mp3}: error/fall (0.86 s, C5, soft_pluck, -19 LUFS, clean) [named]
 - **Loudness**: a single sound peaks at -1 dBFS true peak but no louder than -14 LUFS momentary max (pads and
   textures -18, ambience beds -22, music loops -16); `--lufs` sets it exactly. A short one-shot whose one spike
   would hold its body far down is raised up to 14 dB and the spike folded over, so a tap or a click is heard. In a
-  set the loudest sound sits at -16 LUFS and each kind under it (a tap 10 LU under, a bed 14).
+  set the one-shots keep that level within 2.5 dB of each other; loops and beds sit by kind under -16 LUFS (a bed
+  14 LU under).
 - **Takes**: the same arguments give the same samples; `--seed` and `--n` give other takes (for a learned design,
   other recordings of the thing first).
 
@@ -176,7 +191,14 @@ pianos. The pianos and mallets were compared note by note with freely usable rec
 Instrument Samples; VSCO-2 Community Edition, CC0); no recording is in the repository.
 
 **Synthesizer** (`voice.py`, `patches.py`): band-limited oscillators, unison with drift, a ladder filter, FM
-operators, chorus, echo; 28 patches, among them the soft pluck that plays the interface figures.
+operators, chorus, echo; 28 patches, among them the soft pluck and the square lead.
+
+**Real instruments** (`played.py`, `earshot/data/notes/`): single notes of a marimba, a harp, pizzicato strings and
+an upright piano learned through the learned-sound engine, the take nearest in pitch and dynamic moved to the note
+asked for, damped like a player damps it.
+
+**Performances** (`perform.py`): when each event of a walk, a knock, typing, a scatter, a shake or a pair starts, how
+loud it is and which recording plays it; never the same recording twice in a row, never on a grid.
 
 **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are takes of
 130 recorded strokes (VCSL and Karoryfer) through the learned-sound engine; the seed walks through a drum's strokes
@@ -563,7 +585,7 @@ judge is in [docs/LIMITS.md](docs/LIMITS.md).
   quality any more.
 - **Understanding requests**: on 220 held-out requests by someone who never saw the catalogue, scored once on the
   v1 catalogue, the first pick is right for 69.5 % and one of the top three for 76.8 %; on the development sets
-  92.7 % and 97.3 % (with 68 answers added to their accept lists when the learned sounds arrived).
+  92.3 % and 96.4 % (with 68 answers added to their accept lists when the learned sounds arrived).
 - **Matching descriptions** (a held-out library of 125 real recordings, nothing tuned on it): in a library search a
   "strong" verdict is the right kind of sound 98% of the time and the exact variant 61% of the time.
 - **Finding the moment**: on a recording of 17 single key presses the found trims land on real key presses; in a
@@ -611,11 +633,14 @@ earshot/            the package: CLI, Python API, MCP server, CPU model wrappers
   sounds/           the catalogue: registry (the @design contract), themes, sets, the lexicon, the design modules
                     (learned, nature, figure / ui / game / brand, drums, motion, action, object, retro, tonal,
                     synth, beds, bank)
-  synth/            the engines: resyn (learned sounds), quilt (learned beds), modal / struck, strings, voice /
-                    patches, drums, chip, texture, music; the shared rooms, phrases, voices, finishing, file formats
+  synth/            the engines: resyn (learned sounds), quilt (learned beds), played (real instruments), perform
+                    (performances), modal / struck, strings, voice / patches, drums, chip, texture, music; the
+                    shared rooms, phrases, voices, finishing, file formats
   data/resyn/       the learned sounds: one model per recording (numbers), index.json, CREDITS.md
   data/textures/    the learned ambience textures: models, index.json, CREDITS.md
   data/drums/       the recorded drum and percussion strokes: models, index.json, CREDITS.md
+  data/notes/       the real instruments' single notes (marimba, harp, pizzicato, upright piano): models, index.json,
+                    CREDITS.md
   forge/            make sounds in code by listening: DSP building blocks, critic, model-free tone checks, search
     fit/            recording -> code: modal / sines / spectral fitters, quality metrics, recipe codegen
     bank/, kits/    the sound bank (render blocks + fingerprints, no audio) and the kit presets: earshot sfx / kit
@@ -638,12 +663,13 @@ calibrate the instruments are not redistributed; only derived numbers are commit
 ## Licence
 
 MIT for the code (see [LICENSE](LICENSE)). Everything earshot renders (`make`, `sfx`, `kit`, `forge`) belongs to
-whoever rendered it: free for any use, commercial too, without credit. The learned sounds, beds and drums come from
-recordings in the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all
-CC0 or an explicit public-domain dedication, each recording credited in
+whoever rendered it: free for any use, commercial too, without credit. The learned sounds, beds, drums and
+instrument notes come from recordings in the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0
+uploads on Freesound, all CC0 or an explicit public-domain dedication, each recording credited in
 [earshot/data/resyn/CREDITS.md](earshot/data/resyn/CREDITS.md),
-[earshot/data/textures/CREDITS.md](earshot/data/textures/CREDITS.md) and
-[earshot/data/drums/CREDITS.md](earshot/data/drums/CREDITS.md); CC0 asks for no credit, and the files keep it
+[earshot/data/textures/CREDITS.md](earshot/data/textures/CREDITS.md),
+[earshot/data/drums/CREDITS.md](earshot/data/drums/CREDITS.md) and
+[earshot/data/notes/CREDITS.md](earshot/data/notes/CREDITS.md); CC0 asks for no credit, and the files keep it
 anyway. The bank's fitted sounds come from CC0 recordings ([docs/CREDITS_FIT.md](docs/CREDITS_FIT.md)); a fit you
 make of your own recording carries that recording's licence. The models are downloaded from their authors under
 their own licences: CLAP (`laion/larger_clap_general`) Apache-2.0, AST (`MIT/ast-finetuned-audioset-10-10-0.4593`)

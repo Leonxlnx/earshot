@@ -81,7 +81,7 @@ def test_index_files_and_credits():
             assert f'`{sid}` ({k})' in credits and c['page'] in credits, sid
             assert 'mixkit' not in (c['page'] + m['source']).lower(), sid
             assert 0 <= m['onset_s'] < m['dur_s'], sid
-            assert m['rating'] is None or m['rating'] >= 3, sid                # a recording rated 1-2: never in
+            assert m['rating'] is None or m['rating'] >= 3, sid                # listening score 1-2: never in
 
 
 def test_store_size():
@@ -270,20 +270,20 @@ def test_back_and_next_are_two_keys_of_one_keyboard():
     assert members[back]['quality']['peak'] < members[nxt]['quality']['peak']                # and the softer
 
 
-# recordings rated 3 to 5 in a listening test (the recording, its take and its variant alike), by design
-RATED = {'keyboard/mechanical': 'freesound-380142', 'camera/shutter': 'freesound-170229',
+# recordings with the best listening score (1 to 5) of their thing, which seed 0 plays first by design
+BEST = {'keyboard/mechanical': 'freesound-380142', 'camera/shutter': 'freesound-170229',
          'whoosh/stick': 'freesound-59995', 'bag/drop': 'freesound-584441'}
 
 
-@pytest.mark.parametrize('sid', sorted(RATED))
+@pytest.mark.parametrize('sid', sorted(BEST))
 def test_seed_zero_plays_the_recording_rated_best(sid):
-    """seed 0 plays the recording rated best, not another member of the thing"""
-    assert INDEX[sid]['members'][learned.pick(sid, 0)]['source'] == RATED[sid]
+    """seed 0 plays the recording with the best listening score, not another member of the thing"""
+    assert INDEX[sid]['members'][learned.pick(sid, 0)]['source'] == BEST[sid]
     assert learned.order(sid)[0] == learned.pick(sid, 0)
 
 
 def test_the_walk_holds_every_member_but_those_rated_one():
-    """a plain take walks every single-event member but one rated 1; the recordings of the whole action are walked
+    """a plain take walks every single-event member but one with a listening score of 1; the recordings of the whole action are walked
     by a performance (learned.perform) and never by a plain take"""
     for sid, e in INDEX.items():
         walk = learned.order(sid)
@@ -293,7 +293,7 @@ def test_the_walk_holds_every_member_but_those_rated_one():
         assert all(e['members'][k].get('rating_final') == 1 for k in out), sid
         assert walk or not e['members'], sid
         assert not whole & set(walk) or whole == set(range(len(e['members']))), sid
-    assert len(learned.order('step/tile')) < len(INDEX['step/tile']['members'])        # the tile step rated 1
+    assert len(learned.order('step/tile')) < len(INDEX['step/tile']['members'])        # a tile step scored 1
 
 
 def test_a_retake_plays_the_same_recording():
@@ -305,8 +305,8 @@ def test_a_retake_plays_the_same_recording():
 
 
 def test_the_ui_set_plays_the_members_chosen_for_its_roles():
-    """tap the mechanical key rated 4, type the other mechanical key, toggles two lamp switches (the off the one
-    rated 3), hover the soft leather touch"""
+    """tap the fullest mechanical key, type the other mechanical key, toggles two lamp switches (the off the
+    darker one), hover the soft leather touch"""
     ui = sets.SETS['ui']
     sound = dict(ui['sounds'])
     src = {n: INDEX[sound[n]]['members'][learned.pick(sound[n], s)]['source'] for n, s in ui['seeds'].items()}

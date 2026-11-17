@@ -109,7 +109,8 @@ def doubt(b, cands):
     # an invented twin of the pick, or the kit's cymbal under the film's, is the same thing (lexicon.TWINS,
     # FILM_CYMBAL), not another kind of sound; a learned pick
     # whose thing the request names is no guess (brief.thing_named)
-    others = [c for c in cands[1:] if c['id'].split('/')[0] != fam and L.TWINS.get(c['id']) != top['id']
+    same = {fam} | {k.split('/')[0] for k, v in L.TWINS.items() if v == top['id']}    # door/knock: knock/* too
+    others = [c for c in cands[1:] if c['id'].split('/')[0] not in same and L.TWINS.get(c['id']) != top['id']
               and L.FILM_CYMBAL.get(c['id'].split('/')[0]) != top['id']]
     named = brief.named(top['why']) or brief.thing_named(top['id'], top['why'])
     heard = top.get('z') is not None and top['z'] >= GUESS_Z
@@ -301,7 +302,7 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         lines.append(f'played: {how}; one event: events=1 or "a single ..."')
     elif perf is not None:
         lines.append('played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")')
-    missing =[] if sound else brief.uncovered(b, pick['why'])
+    missing = [] if sound else brief.uncovered(b, pick['why'])
     if missing:
         lines.append(f"not in this sound: {', '.join(missing)}")
     reason = None if sound else doubt(b, cands)
@@ -555,7 +556,9 @@ def add_cli(sub):
                                              'length of a loop (each has a shortest one) or a whoosh; a single '
                                              'struck sound (a tap, a hit) rings as it rings: it ignores --dur and '
                                              'says so ("not used by this sound: dur")')
-    p.add_argument('--voice', help='the instrument or patch of a tonal sound')
+    p.add_argument('--voice', help='the instrument or patch of a tonal sound: marimba (the default of figures), '
+                                   'harp, pizzicato and felt_piano are real instruments learned note by note; '
+                                   'kalimba, glockenspiel, vibraphone, soft_pluck ... are models')
     p.add_argument('--material', help='what a tap, click or knock is made of')
     p.add_argument('--events', type=int, help='a thing a person does several times in a row (footsteps, a knock, '
                                               'typing, coins, keys, clinking glasses): 1 = one event, 2 or more = '

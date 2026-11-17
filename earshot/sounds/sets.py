@@ -12,14 +12,12 @@ game audio teams work from; a product rarely needs more than a dozen distinct so
 event making noise.
 """
 SETS = {
-    # the touches are recorded keys and switches (earshot.sounds.learned: the owner heard the tonal touches as
-    # unrecognisable twice, real keys as satisfying). D1 (2026-11-17, renders/d1/roles.txt): tap is the key he rated 4
-    # on page 5 (keyboard/mechanical, first in its walk), type the other mechanical key; next and back the two laptop
-    # keys nearest that key (next member 4, back member 1: the darker and softer); toggle_on and toggle_off two
-    # recordings of switch/lamp, the off the darker one he rated 3 (member 1), the on member 2; hover the softest,
-    # lowest short touch that is not thin (leather/grab member 1). No theme: the figures play in their own key and
-    # voice, as on page 7, where he rated them 3 to 4 (in the soft theme they were moved to C, darker and softer, and
-    # got 1 to 2)
+    # the touches are recorded keys and switches (earshot.sounds.learned): tonal touches are hard to recognise as
+    # touches, a real key reads at once. tap is the fullest mechanical key (keyboard/mechanical, first in its walk),
+    # type the other mechanical key; next and back the two laptop keys nearest that key (next member 4, back
+    # member 1: the darker and softer); toggle_on and toggle_off two recordings of switch/lamp, the off the darker one
+    # (member 1), the on member 2; hover the softest, lowest short touch that is not thin (leather/grab member 1).
+    # No theme: the figures play in their own key and voice (moved to C, darker and softer, they sound dull)
     'ui': dict(says='a product interface: app, website, dashboard', theme=None,
                seeds={'tap': 0, 'type': 1, 'hover': 1, 'toggle_on': 1, 'toggle_off': 0, 'back': 4, 'next': 3},
                quiet=('hover',), sounds=(

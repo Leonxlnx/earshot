@@ -404,9 +404,9 @@ FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride'
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
 BY_NAME_ONLY = frozenset(('tap/tone', 'hover/tone', 'toggle/up', 'toggle/down', 'next/step'))
-# an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. Listeners rated the
-# invented tactile sounds 1 to 2 of 5 and the recorded ones 4 to 5, so a request that names the thing and reaches the
-# invented one gets the recording (brief._preferred); the invented one still answers to its own id
+# an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. An invented
+# tactile sound scores 1 to 2 of 5 in listening tests and the recorded one 4 to 5, so a request that names the thing
+# and reaches the invented one gets the recording (brief._preferred); the invented one still answers to its own id
 TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop': 'coins/floor',
          'glass/clink': 'glass/cheers',
          'paper/tear': 'paper/rip', 'paper/crumple': 'paper/ball', 'paper/page': 'page/turn', 'book/close': 'book/shut',
@@ -594,6 +594,7 @@ VOICES = {'piano': 'felt_piano', 'grand': 'grand_piano', 'grand piano': 'grand_p
           'low string': 'upright_bass', 'tine': 'kalimba', 'tines': 'kalimba', 'metal tine': 'kalimba',
           'wooden mallet': 'marimba', 'steel-string': 'steel_guitar',
           'plucked strings': 'pizzicato', 'pizz': 'pizzicato', 'strings plucked': 'pizzicato',
+          'pizzicato strings': 'pizzicato', 'pizzicato string': 'pizzicato', 'string pizzicato': 'pizzicato',
           'steel string': 'steel_guitar', 'strum': 'nylon_guitar',
           'keyboard tone': 'felt_piano', 'keyboard note': 'felt_piano', 'ivory': 'grand_piano',
           'xylo': 'xylophone', 'cello pluck': 'pizzicato', 'violin pluck': 'pizzicato',

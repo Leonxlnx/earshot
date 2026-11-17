@@ -188,7 +188,7 @@ def test_finish_at_a_loudness():
 
 
 def test_finish_does_not_bend_a_tone_to_reach_a_loudness():
-    """D1: a tonal figure asked for more loudness than its peak allows stops at its peak (no fold, no limiter: both
+    """a tonal figure asked for more loudness than its peak allows stops at its peak (no fold, no limiter: both
     leave a residual a held tone shows); quieter targets are met as before"""
     x = _tone(sec=0.6, decay=0.3)
     free = master.finish(x)

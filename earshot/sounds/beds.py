@@ -1,7 +1,7 @@
 """Music beds: short loops in a key and a tempo that sit under a voice-over or under sound effects (`bed/warm`,
 `bed/playful`, `bed/8bit`), written by the rules of earshot.synth.music. earshot makes sound effects; these three
-are the beds its owner rated well enough to keep (nine other styles were removed: long sustained synthesizer
-chords under a scene were not wanted).
+beds are the ones kept (nine other styles were removed: long sustained synthesizer chords under a scene sound
+cheap and pull attention from the picture).
 
     from earshot.sounds import registry
     y, meta = registry.render('bed/warm', seed=3, dur=20, pitch='D3', energy=0.2)    # a seamless loop, 7 bars

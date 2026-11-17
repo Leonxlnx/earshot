@@ -41,7 +41,7 @@ Every pitch is a note of the key's scale (chords are built on the scale, motifs 
 quoted: progressions are common practice and motifs are drawn from the seed.
 
 Cost: every distinct (voice, pitch, velocity step, length, take) is rendered once and placed as often as it is
-played, so a bar that comes back costs nothing. On one thread of the lab laptop (low priority, a machine shared
+played, so a bar that comes back costs nothing. On one thread of a laptop (low priority, a machine shared
 with other jobs: times vary by half) a style at its own length of 15-23 s takes 1.5 s (chip) to about 10 s: a
 piano note 0.06-0.2 s, a plucked or synthesized note 0.02-0.1 s, the room and the mix 2-3 s. A bed played once
 is rendered with RING s of room after its last bar and costs up to half as much again.

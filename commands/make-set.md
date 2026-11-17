@@ -6,8 +6,8 @@ argument-hint: "[ui|game|arcade|film or the product's sounds in words] [theme]"
 Make a set of sounds with earshot: $ARGUMENTS
 
 1. Read the words: a ready-made set (`ui` 17 interface sounds: the touches are real keys and switches, the signals
-   soft tonal figures; `game` 22; `arcade` 16 chip sounds; `film` motion-design sounds), a theme (soft, glass, wood,
-   felt, tine, metal, electric, digital, retro; it sets the voice, key and room of the tonal sounds), and any sounds
+   figures on a real marimba; `game` 22; `arcade` 16 chip sounds; `film` 17 motion-design sounds), a theme (soft,
+   glass, wood, felt, tine, metal, electric, digital, retro; it sets the voice, key and room of the tonal sounds), and any sounds
    of their own (each a `name` for the file and a `want` in words, or a `sound` id). Pick the folder this project
    keeps sounds in, else `sounds/`; format `webm,mp3` for a web project (every browser plays one of the two), `wav`
    otherwise, unless the words name one.

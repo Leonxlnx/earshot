@@ -3,8 +3,8 @@ hands (claps) and hand percussion (shaker, tambourine, congas, bongos, cajon, da
 slapstick), for music beds, motion design and games, and the drum-machine voices, which are synthetic by nature.
 
 Why recordings. A drum is its detail: the stick's exact strike, the head's pitch settling after a hard hit, the
-wires answering the bottom head, a cymbal's wash opening up. Invented from physics these were rated 1-2 of 5 by the
-owner, while he cannot tell a real recording from its take out of earshot.synth.resyn. So a drum here is one THING
+wires answering the bottom head, a cymbal's wash opening up. Invented from physics these scored 1-2 of 5 in listening
+tests, while a take out of earshot.synth.resyn is heard as the recording itself. So a drum here is one THING
 (`snare/tight`, `tom/floor`) and its recordings are its members: public-domain one-shots played by drummers in
 velocity layers (Versilian Community Sample Library, Karoryfer Big Rusty Drums; CC0), kept as a few kilobytes of
 numbers each (never audio) in earshot/data/drums/ and played as new takes.

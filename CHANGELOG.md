@@ -22,13 +22,13 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
   `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
   `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 152 designs of
-  everyday, interface, game and film sounds learned from 348 recorded events in the public domain (the sources of all
-  learned material, beds and drums included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on
-  Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of `earshot/data/resyn/`,
-  `textures/` and `drums/`). Each recording is analysed at the
+- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 153 designs of
+  everyday, interface, game and film sounds learned from 364 recorded events in the public domain (the sources of all
+  learned material, beds, drums and instrument notes included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and
+  CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of
+  `earshot/data/resyn/`, `textures/`, `drums/` and `notes/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 6.79 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
+  stored as numbers: 7.00 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
   variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
   the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
@@ -36,16 +36,42 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design answers only a request that names its thing and wins a tie with an invented one. Why: the owner gave a
   recording and its renders the same rating on all 24 rows of his test, and rated sounds invented from formulas for
   real things 1-2 of 5.
-- **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
-  beds from 12 BigSoundBank textures (4.09 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
-  `night/crickets`, `wind/trees`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
+- **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 12
+  beds from 11 BigSoundBank textures (3.87 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
+  `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
   `underwater/deep`, `rain/street`. Takes of the texture's models are cut into pieces and stitched where the texture
-  is in a similar state, so a bed plays for any length without a loop point. `rain/window` and `forest/morning`
-  (rated 5) and the other scenes stay made from rules.
+  is in a similar state, so a bed plays for any length without a loop point. `rain/window`, `forest/morning`,
+  `wind/trees` and the other scenes are made from rules.
+- **Wind in the trees** (`wind/trees`): made by the texture engine like the rain (the wind model in the trees, no
+  howl): most of its movement is in gusts under 1 Hz and the leaves follow them. The recording it was learned from
+  is a thin rustle whose leaves do not follow its gusts; its texture was removed from the store.
 - **The interface set from real keys and switches**: in `make --set ui` (17 sounds) the tap, hover, toggles,
-  typing, next and back are learned keyboards, a dial and a lamp switch; the signals stay soft tonal figures. The
-  interface figures play a soft pluck unless a request or a theme names another voice: no bell or glass timbre
-  unless asked (rated 1 for interface sounds).
+  typing, next and back are learned keyboards, a leather touch and a lamp switch; the signals are tonal figures on
+  the real marimba. No bell or glass timbre unless a request or a theme asks for one.
+- **The best recording plays first** (`earshot/sounds/learned.py`, `walk` in `earshot/data/resyn/index.json`): a
+  learned design's seeds walk its recordings from the one with the best listening score down; a recording scored 1
+  of 5 is left out of the walk; a take that fails its audit is rendered again from the same recording.
+- **A set is as full as its sounds made alone** (`earshot/make.py` `balance`): every one-shot of a set is made as a
+  single `make` makes it (true peak -1 dBFS) and only turned down, so that by its loudest 50 ms none lies more than
+  2.5 dB over the quietest; a `quiet` name (`hover` in `ui`) sits 0.5 dB under it. Loops, beds, pads and music, and
+  every sound of a spec that gives `lufs`, are levelled by kind as before (-16 LUFS and each kind's weight under it).
+- **Tonal figures on real instruments** (`earshot/synth/played.py`, `earshot/data/notes/`): a marimba played with
+  yarn mallets (14 notes), a harp (24), pizzicato strings (48: a cello section up to B4, a solo violin above) and an
+  upright piano played softly (14), 100 single notes from VSCO-2 CE and VCSL (CC0), kept as numbers (0.85 MB,
+  credits in `earshot/data/notes/CREDITS.md`) and played as new takes. The voices `marimba`, `harp`, `pizzicato` and
+  `felt_piano` play them (`struck.note` and `strings.note` still play the models). The marimba is the default voice
+  of figures and of the `soft` and `wood` themes. A real voice lets inner notes ring under the next one, rings the
+  last one out and plays a figure whose top note is above C6 an octave lower. The interface figures were written
+  for the marimba (`ui.py`: between A3 and G5).
+- **Performances** (`earshot/synth/perform.py`, `learned.perform`, `make(events=)`, `--events`, MCP `make`
+  `events`): a thing a person does several times in a row is played as the action, from its single recordings by a
+  pattern (walk, knock, type, scatter, shake, pair) or from one of 13 recordings of the whole action (walks on
+  gravel, wood, concrete, tiles and in heels, a knock run, toasts, keys and a lock, coin handfuls, punches, a book
+  falling); 9 learned things have such recordings. The words decide: a plural, an action word, a count or a length
+  asks for the action ("footsteps on gravel", "knocking", "three knocks", "5 seconds of typing"), a bare singular
+  or "a single" for one event ("a footstep on gravel", "a single knock on a door"), a singular that names the
+  action ("a knock on the door", "a toast") for the action. `events` overrides the words; the answer says what was
+  played. New thing: `keys/bunch`.
 - **Short sounds come forward** (`earshot/synth/master.py` `finish(lift=)`, `registry.LIFT`): a one-shot under 1 s
   whose one spike holds its body far down is raised by up to 14 dB and the spike folded over, not limited; an
   ambience bed held down by a few peaks by up to 8 dB (`registry.SPARSE`). The owner had heard many short sounds as
@@ -71,7 +97,11 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   sliding panel, a soft thump and knock, the soft sting). Removed: `whoosh/tonal`, `sting/tech` and the invented
   `whoosh/airy` (the id is now the learned airy whoosh). The owner rated the invented film sounds 1-3 of 5; the
   ones built from recordings are not rated yet. A film request for a cymbal gets the film's crash cymbal, a request
-  with a word of the drum kit the kit's.
+  with a word of the drum kit the kit's. Rebuilt closer and drier: `whoosh/fast` is the recorded stick swoosh as
+  it is, close and dry; `rise/air` the decays of two real cymbal strokes played backwards, growing to the cut (the
+  steam riser is gone); `boom/deep` the low end of a real deep kick with a close explosion's low end under it, close
+  and dry; `slam/title` the front of a real heavy impact on that low end, 0.9 s; `braam/brass` and `impact/suck`
+  over the same low end without the hall.
 - **Invented and learned twins** (`lexicon.TWINS`): 22 invented designs of real things have a learned design of
   the same thing (`knock/door` and `door/knock`, `coins/handful` and `coins/floor`, `paper/tear` and `paper/rip`
   ...); a request that names the thing gets the learned one, the invented one answers to its id. A single coin
@@ -81,6 +111,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   written and removed after the owner's listening.
 - **Voices, keys and lengths from the words**: a material without a voice picks the voice made of it (wood a
   marimba, glass a glockenspiel, metal a vibraphone, soft a felt piano, digital a glass pluck, retro a square lead);
+  an instrument named in the request plays the figure ("a notification on a harp", "a success sound with
+  pizzicato strings", "an error sound on a soft piano");
   a voice asked for by name is always played; a minor key in the request or theme turns a figure's major thirds,
   sixths and sevenths into minor ones; a length sets how long a figure sounds, and "under 300 ms" shortens only a
   design that is longer.
@@ -89,8 +121,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   the ranking and reports what the written sound is heard as; the MCP server's `make` blends it in without being
   asked once CLAP is loaded. Rebuilt with `python -m earshot.sounds.atlas build --work DIR`.
 - **Understanding requests, measured**: on 220 held-out requests written by someone who never saw the catalogue,
-  scored once on the v1 catalogue, the first pick is right for 69.5 % and one of the top three for 76.8 %; 92.7 %
-  and 97.3 % on the two development sets, whose accept lists gained 68 answers when the learned sounds arrived
+  scored once on the v1 catalogue, the first pick is right for 69.5 % and one of the top three for 76.8 %; 92.3 %
+  and 96.4 % on the two development sets, whose accept lists gained 68 answers when the learned sounds arrived
   ([docs/VALIDATION.md](docs/VALIDATION.md#understanding-requests)).
 - **Reading requests** (`earshot/brief.py`, `earshot/sounds/lexicon.py`): things, jobs and sounds to canonical
   words, the head of a request and its parts and context, feelings as offsets on eight shared axes (bright, hard,
@@ -100,14 +132,15 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **The catalogue** (`earshot/sounds/`: `registry.py` with the `@design` contract, `earshot sounds`, MCP `sounds`):
   the learned sounds and beds above; 45 figures for interfaces, games and brands that any voice can play (`ui.py`,
   `game.py`, `brand.py` on `figure.py`) and 3 material ticks; 51 single notes of 36 instruments and 15 patches
-  (`tonal.py`); 14 synthesizer sounds (`synth.py`); 24 chip sounds (`retro.py`); drums; motion-design sounds; 47
+  (`tonal.py`); 14 synthesizer sounds (`synth.py`); 24 chip sounds (`retro.py`; the power-up's held top note lands between F5
+  and C6); drums; motion-design sounds; 47
   invented action sounds (`action.py`) and 36 object sounds (`object.py`); 31 ambience scenes (`nature.py`); three
   music loops. The bank's 209 named members join it (`bank.py`) and rank under the newer designs.
 - **Themes and sets** (`earshot/sounds/theme.py`, `sets.py`): nine theme presets (soft, glass, wood, felt, tine,
   metal, electric, digital, retro) give a family one voice, key, room and axis offsets; four ready-made sets (`ui`
-  17, `game` 22, `arcade` 16, `film`). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a whole
-  set in one call, levelled against each other by kind (the loudest at -16 LUFS momentary max, a tap 10 LU under,
-  a bed 14), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
+  17, `game` 22, `arcade` 16, `film` 17). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a
+  whole set in one call, its one-shots as loud as made alone and within 2.5 dB of each other, its loops and beds
+  levelled by kind (the loudest at -16 LUFS momentary max, a bed 14 LU under), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
   every sound in each, the manifest's `files` and `formats`, the sprite in each format with its map's `src` in that
   order. For the web, `webm,mp3`: Ogg Vorbis does not play in Safari before 18.4. A loop in such a set is written
   as flac in place of mp3 / m4a (their padding leaves a gap at the seam); a second name that gets the same sound
@@ -117,7 +150,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **`earshot pack`** (`earshot/pack.py`, `--sprite` on a set): many sounds in one file with a map in the format
   howler.js reads; loops are marked and get a longer gap. On a set's folder it packs exactly the manifest's sounds
   and leaves out an earlier sprite.
-- **The engines** (`earshot/synth/`): learned sounds (`resyn.py`) and stitched beds (`quilt.py`); struck
+- **The engines** (`earshot/synth/`): learned sounds (`resyn.py`), stitched beds (`quilt.py`), real instruments
+  note by note (`played.py`) and performances (`perform.py`); struck
   instruments from modes, damping laws and a Hertz contact (`modal.py`, `struck.py`); strings, pianos and electric
   pianos (`strings.py`); a synthesizer with band-limited oscillators, a ladder filter, FM operators, chorus and echo,
   and 28 patches (`voice.py`, `patches.py`); drums (`drums.py`); band-limited chip sound (`chip.py`); ambience from
@@ -127,7 +161,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **Calibration**: the pianos and mallet instruments were compared note by note with freely usable recordings
   (University of Iowa Musical Instrument Samples; VSCO-2 Community Edition, CC0) and the laws of the models set from
   several notes; no recording and no per-recording data is in the repository.
-- **Docs**: [docs/MAKE.md](docs/MAKE.md) (the reference of `make`, learned sounds, sets and the spec, `sounds`,
+- **Docs**: [docs/MAKE.md](docs/MAKE.md) (the reference of `make`, learned sounds, performances, sets and the spec,
+  `sounds`,
   `pack`, the request language, axes, themes, the catalogue family by family, the voices, recipes for a web page, a
   game and a film, how to add a design); VALIDATION section 8 (the owner's listening, the learned sounds measured,
   understanding requests); LIMITS "Making sounds"; the earshot skill opens with a self-contained making part.
@@ -137,7 +172,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `/earshot:make-set`.
 - **Tests** for the catalogue contract, the learned sounds and their engine, the stitched beds, drums, music loops,
   the rooms and finishing, the voices, `make` / sets / `pack` and the atlas (`tests/test_sounds_catalogue.py`,
-  `test_sounds_learned.py`, `test_synth_resyn.py`, `test_synth_quilt.py`, `test_sounds_nature.py`,
+  `test_sounds_learned.py`, `test_synth_resyn.py`, `test_synth_quilt.py`, `test_synth_played.py`,
+  `test_synth_perform.py`, `test_sounds_nature.py`,
   `test_synth_drums.py`, `test_synth_music.py`, `test_make.py`, `test_sounds_atlas.py` ...); the long renders and the
   tests that load CLAP run with `--slow`.
 - **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
@@ -151,8 +187,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **Picture-only timelines and frame differences use far less memory** (#31; thanks, @liugedragon).
 - **Licence of rendered audio** (answers #21): the code is MIT; everything earshot renders (`make`, `sfx`, `kit`,
   `forge`) belongs to whoever rendered it: free for any use, commercial too, without credit. The README says so.
-  The learned material comes from CC0 recordings, credited in `earshot/data/resyn/CREDITS.md` and
-  `earshot/data/textures/CREDITS.md`.
+  The learned material comes from CC0 recordings, credited in `earshot/data/resyn/CREDITS.md`,
+  `earshot/data/textures/CREDITS.md`, `earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
 
 ### Fixed
 

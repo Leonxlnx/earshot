@@ -119,8 +119,8 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
     momentary-max loudness at that value with the peaks limited to peak_db (with `lift`, a short one-shot's peaks
     folded over instead, so a click in a levelled set keeps its strike as bright). A `tonal` sound (a note, a
     figure) asked for a loudness its peak does not allow stops at its peak instead: pushed 3 LU past it, the fold
-    left a residual 27 dB under a success figure and the limiter one 18 dB under (D1, renders/d1/fold.txt), a
-    distortion a held tone shows. A loop keeps its length and both ends (no trim, no fades)."""
+    left a residual 27 dB under a success figure and the limiter one 18 dB under, a distortion a held tone
+    shows. A loop keeps its length and both ends (no trim, no fades)."""
     y = np.array(y, np.float64)
     if not np.isfinite(y).all():
         raise ValueError('the render has non-finite samples')

@@ -10,7 +10,7 @@ timpani, tam-tams, crash cymbals, heavy drops, door slams, swells of air and met
 reshaped with earshot.synth.design (reverse, layer, move, fade) and glued by one room ("real material" below). The
 owner heard the invented booms, slams and risers as unrealistic (1-2 of 5) and could not tell a recording from its
 take. The rest is invented, shaped after class statistics of licensed film effects (the film study in
-docs/motion-sfx-study.md and docs/launch-video-sound.md, and a library of effects filed by film action that the lab
+docs/motion-sfx-study.md and docs/launch-video-sound.md, and a library of effects filed by film action that was
 measured). Medians over a class, never one recording:
     air     a film whoosh is a rounded swell, not a pointed one: it stays within 20 dB of its peak for about two
             thirds of its length (0.3-0.6 s for a small move, 1.3 s for a scene pass), peaks at 40-60 % of it, and
@@ -484,8 +484,7 @@ def whoosh_soft(c, r):
         uses=('whoosh', 'big transition', 'scene change', 'pass by', 'swell'), tags=('real',), domains=FILM,
         dur=1.4, axes=REAL_AIR, allows=GLIDE)
 def whoosh_deep(c, r):
-    """a scene transition: a real deep whoosh (whoosh/low, or the heavy one the owner rated 3: whoosh/heavy, by the
-    seed) taken a little bigger, with the weight a designer puts under it: a real bass drum's decay played
+    """a scene transition: a real deep whoosh (whoosh/low, or the heavy one, whoosh/heavy, by the seed) taken a little bigger, with the weight a designer puts under it: a real bass drum's decay played
     backwards 12 dB under it (more with energy), swelling into the whoosh's loudest moment"""
     sid = ('whoosh/low', 'whoosh/low', 'whoosh/heavy')[c.seed % 3]
     a = _whoosh(c, r, sid, 1.0, size=1.1)
@@ -638,8 +637,8 @@ def _small(y, drive=6.0, top=190.0):
 def boom_deep(c, r):
     """a film boom, felt more than heard: the low end of a real deep kick drum (_low: nothing over 150 Hz, so no
     drum in it, its decay drawn out 1.8 times) with the low end of a real close explosion (explosion/near under
-    110 Hz) 4 dB under it for a rumbling tail (more with energy), lined up at their onsets, made audible on small speakers (_small: harmonics
-    at 70-180 Hz, nothing above), softened at the onset (4 ms), falling for 2.6 s (ring: 1.3 .. 5 s), close and
+    110 Hz) 4 dB under it for a rumbling tail (more with energy), lined up at their onsets, made audible on small
+    speakers (_small: harmonics at 70-180 Hz, nothing above), softened at the onset (4 ms), falling for 2.6 s (ring: 1.3 .. 5 s), close and
     dry. A boom in a hall, or with a skin's tone above 150 Hz, is heard as a drum played far away"""
     T = c.length() or 2.6 * _ring(c)
     low = _low(c, r, size=1.05, ring=1.8, main=True)
@@ -771,20 +770,25 @@ def _riser(y, at):
 def rise_reverse(c, r):
     """the classic riser: a real crash cymbal's decay played backwards (cymbal/orchestral, reversed), with a real
     tam-tam's decay played backwards 9 dB under it (more with energy) for a dark floor, both ending together on what
-    was their strike; dur sets how much of the decays is heard (2 s by default)"""
+    was their strike; dur sets how much of the decays is heard (2 s by default). Each decay is taken from 2 ms
+    before its strike and its reversed end closed over 20 ms (a cut, not a step): a recording that starts right on
+    its strike would otherwise end the riser on its loudest sample"""
     T = c.length() or 2.0
     tr = _tr(c, ring=None)
-    cym = ops.reverse(ops.span(_real(c, r, 'cymbal/orchestral', main=True, **tr), 0.0, T + 0.01, fout=0.2))
-    gong = ops.reverse(ops.span(_real(c, r, 'gong/hit', **_tr(c, size=1.1, bright=-1.0)), 0.0, T + 0.01,
-                                fout=0.2))
+
+    def back(x):
+        t0 = max(0.0, ops.onset(x) - 0.002)
+        return ops.reverse(ops.span(x, t0, t0 + T + 0.01, fout=0.2), 0.02)
+    cym = back(_real(c, r, 'cymbal/orchestral', main=True, **tr))
+    gong = back(_real(c, r, 'gong/hit', **_tr(c, size=1.1, bright=-1.0)))
     y, _ = ops.layer([(cym, 0.0, 0.0, ops.end(cym)), (gong, -9.0 + 4.0 * c.energy, 0.0, ops.end(gong))])
     return _place(c, r, ops.fade(y, 0.3 * T, 0.0, 'db'), crest=11.0)
 
 
 @design('rise/air', kind='rise',
-        says=('a cymbal swell played backwards, growing to a sharp cut', 'a reverse cymbal rising to a stop',
-              'a shimmering swell building up and cut off at the top'),
-        uses=('riser', 'build', 'reveal', 'transition', 'uplifter', 'reverse cymbal'), tags=('real',), domains=FILM,
+        says=('a bright cymbal swell growing to a sharp cut', 'a shimmering riser building up to a stop',
+              'a crash swelling louder and brighter, cut off at the top'),
+        uses=('riser', 'build', 'reveal', 'transition', 'uplifter'), tags=('real',), domains=FILM,
         dur=2.5, axes=REAL_AIR, prior=1.1, allows=GLIDE)
 def rise_air(c, r):
     """the riser every editor knows: a cymbal's decay played backwards. Two real close-miked strokes of the kit's
@@ -1200,8 +1204,8 @@ def braam_brass(c, r):
     """a braam made of real brass: held low brass notes (brass/low: tubas, trombones, horns) moved to the root, its
     fifth and its octave (each the member nearest its note, moved at most 7 semitones, each at the same loudest
     50 ms before its gain), entering together over the boom's low end (_low, made audible on small speakers, 5 dB
-    over the root, more with energy and size: the three brass notes together stand about 4 dB over one) and swelling for 0.12 s (0.03 .. 0.4 s with hard), led in by a real cymbal
-    decay played backwards 14 dB under them; they are held for the length asked for and fall away within 0.6 s.
+    over the root, more with energy and size: the three brass notes together stand about 4 dB over one) and
+    swelling for 0.12 s (0.03 .. 0.4 s with hard), led in by a real cymbal decay played backwards 14 dB under them; they are held for the length asked for and fall away within 0.6 s.
     No room is added at space 0: the brass recordings carry their own, and a hall on top made the blast distant"""
     L = _learned()
     e = L.index()['brass/low']
