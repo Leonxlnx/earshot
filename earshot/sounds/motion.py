@@ -42,7 +42,7 @@ from scipy import fft as sfft
 from ..forge import dsp, fx
 from ..synth import design as ops
 from ..synth import modal, space
-from .registry import design
+from .registry import design, member
 
 SR = dsp.SR
 T60 = modal.T60
@@ -398,8 +398,7 @@ def _real(c, r, sid, k=0, main=False, **tr):
     if m.get('polarity', 1) < 0:
         y[:, 1] = -y[:, 1]
     if main:
-        c.member = {'n': i + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
-                    'author': m['credit']['author']}
+        c.member = member(i + 1, len(e['members']))
     return y
 
 
@@ -602,8 +601,7 @@ def _kit(c, r, sid, k=0, main=False, **tr):
     i = kit.pick(sid, c.seed + k, c.energy)
     m = e['members'][i]
     if main:
-        c.member = {'n': i + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
-                    'author': m['credit']['author']}
+        c.member = member(i + 1, len(e['members']))
     return ops.take(kit.model(m['file']), r, **tr)
 
 
@@ -1225,8 +1223,7 @@ def braam_brass(c, r):
         first = first or m
         z = ops.fade(ops.span(z, max(0.0, ops.onset(z, 20.0) - 0.01), fout=0.5), hard, 0.0)
         parts.append((z, (0.0, -3.0, -4.0)[k] + c.lerp('size', -3.0, 3.0, 0.0) * (k == 0), 0.0, 0.0))
-    c.member = {'n': L.index()['brass/low']['members'].index(first) + 1, 'of': len(e['members']),
-                'recording': first['credit']['title'], 'author': first['credit']['author']}
+    c.member = member(L.index()['brass/low']['members'].index(first) + 1, len(e['members']))
     drum =ops.span(_small(_low(c, r, size=1.0, ring=1.1), 5.0), 0.0, 2.0, fout=1.0, shape='db')
     cym = ops.reverse(ops.span(_real(c, r, 'cymbal/orchestral', **_tr(c)), 0.0, 1.0, fout=0.15))
     y, _ = ops.layer([(_lv(z), g, o, a) for z, g, o, a in parts] +

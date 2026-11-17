@@ -51,7 +51,7 @@ import numpy as np
 
 from ..forge import dsp, fx
 from ..synth import resyn, space
-from .registry import LEARNED, design
+from .registry import LEARNED, design, member
 
 STORE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'resyn')
 SIZE = (0.7, 1.4)            # size -1 .. 1: a smaller .. bigger thing (log)
@@ -154,9 +154,7 @@ def take(e, c, r, k=None, room=True, nudge=None):
     tilt = c.bright if 'bright' in ax else 0.0
     if k is None:
         k = pick(e['id'], c.seed, tilt)
-        m = e['members'][k]
-        c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
-                    'author': m['credit']['author']}
+        c.member = member(k + 1, len(e['members']))
     m = e['members'][k]
     energy = float(np.clip((c.energy if 'energy' in ax else 0.0) + nudge.get('energy', 0.0), -1.0, 1.0))
     s = float(np.clip((c.size if 'size' in ax else 0.0) + nudge.get('size', 0.0), -1.0, 1.0))
@@ -277,10 +275,9 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
                 (dur is None or abs(dur / m['dur_s'] - 1.0) <= WHOLE_FIT))
         if fits or not pat:
             y = take(e, c, r, k=k)
-            play = {'recording': m['credit']['title'], 'events': m['events'], 'recordings': [k + 1],
+            c.member = member(k + 1, len(e['members']))
+            play = {'recording': c.member['recording'], 'events': m['events'], 'recordings': [k + 1],
                     'pace': m.get('pace')}
-            c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
-                        'author': m['credit']['author']}
     if play is None:
         name = pat.get('name', 'pair')
         keys = [(e, k) for k in walk]
@@ -310,9 +307,7 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
                 'recordings': [keys[i][1] + 1 if keys[i][0] is e else f"{keys[i][0]['id']}#{keys[i][1] + 1}"
                                for i in p['members']]}
         p['members'] = [keys[i][1] if keys[i][0] is e else walk[0] for i in p['members']]
-        c.member = {'n': p['members'][0] + 1, 'of': len(e['members']),
-                    'recording': e['members'][p['members'][0]]['credit']['title'],
-                    'author': e['members'][p['members'][0]]['credit']['author']}
+        c.member = member(p['members'][0] + 1, len(e['members']))
     # levelled as one sound: a performance is longer than the one-shots the registry lifts, so its few loudest
     # strikes are folded the way a long sound held down by a few peaks is (master.finish `sparse`), as far as a
     # single event of the thing is lifted (registry.LIFT)

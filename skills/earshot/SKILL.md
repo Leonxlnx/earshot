@@ -59,7 +59,9 @@ when you ask for one.
 **One event or the action.** A thing a person does several times in a row (footsteps, knocking, typing, coins,
 keys, clinking glasses) is played as the action when the words ask for it: "footsteps on gravel", "knocking",
 "three knocks", "typing on a keyboard", "5 seconds of typing". "a footstep on gravel" or "a single knock on a door"
-is one event. `--events N` (MCP `events`) overrides: 1 = one event, 2 or more = the action with N events. The
+is one event. `--events N` (MCP `events`) overrides: 1 = one event, 2 or more = the action with N events. A
+counted action in a row is one file whatever the design ("four knocks on the table", "three claps", "a countdown
+3 2 1"); a count of separate things is that many files ("five coin pickups", "3 variations"). The
 answer's `played: ...` line says which it was. Chip sound only with "8-bit" /
 "retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
 written that loosely the first pick was right 69.5 % of the time (76.8 % in the top three). To steer, re-ask with
@@ -81,8 +83,11 @@ of different recordings differ in length and level. `--json` names the recording
   your spec. `another recording of ID than NAME: ...` is not a problem: the two play different recordings of one
   learned design.
 - `not in this sound: WORDS`: part of the request is not in this file (one call, one sound); make it separately.
-- `not used by this sound: ...`: the design ignored that control or could not keep that length; fine unless it
-  mattered, then pick another design.
+- `not followed: ...` or `0.43 s, not the 2 s asked: ...`: the design has no such control or could not keep that
+  length, and the line says what it does instead; fine unless it mattered, then pick another design.
+- `a cut of 4 s, not a loop: ...` / `a seamless loop of 8.00 s, ...` / `8.57 s: a music loop is whole bars ...`:
+  the length asked for an ambience or a loop, and what was made of it; ask "a seamless loop of ..." when the
+  sound must repeat without a seam.
 - `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
 - `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
 

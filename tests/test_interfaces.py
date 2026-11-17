@@ -470,7 +470,7 @@ def test_mcp_make_tools_describe_listen_and_take_material_loop_and_formats(tmp_p
     text = mcp_server.tool_make('rain on a tent', str(tmp_path / 'r.wav'), sound='rain/tent', dur=2.0, loop=False)
     assert text.startswith('r.wav: rain/tent') and 'seamless loop' not in text
     text = mcp_server.tool_make('a knock', str(tmp_path / 'k.wav'), sound='tick/wood', material='glass')
-    assert 'not used by this sound: material' in text
+    assert 'not followed: material glass; this sound has no material to set' in text
     text = mcp_server.tool_make('footsteps on gravel', str(tmp_path / 's.wav'), sound='step/pebbles', events=1)
     assert 'played: one event' in text
     text = mcp_server.tool_make_set(str(tmp_path / 'set'), sounds=[{'name': 'tap', 'sound': 'tap/tone'}],

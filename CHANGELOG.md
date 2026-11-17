@@ -190,6 +190,19 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `forge`) belongs to whoever rendered it: free for any use, commercial too, without credit. The README says so.
   The learned material comes from CC0 recordings, credited in `earshot/data/resyn/CREDITS.md`,
   `earshot/data/textures/CREDITS.md`, `earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
+- **A learned take says "recording 2 of 3"**, in the lines, `meta['member']`, a performance and the manifest, never
+  the title an uploader gave the recording; titles stay in the stores' indexes and `CREDITS.md`.
+- **An asked length holds for ambiences**: "rain on a window, 4 seconds" is 4 s, a cut with fades that says it is
+  no loop and how long the shortest seamless loop is; with "loop" or "seamless" in the request the shortest loop
+  stays and the answer says so; a music loop says it keeps whole bars.
+- **`not used by this sound: ...` is gone**: a control the request did not ask for in words is never listed (the
+  "fast" of "a fast whoosh" named the design); one that was asked and cannot be followed is said in plain words
+  (`not followed: "slow"; this sound has no control of its speed ...`, `0.43 s, not the 2 s asked ...`).
+- **A counted action in a row is one file for any design**: "four knocks on the table", "three claps", "a
+  countdown 3 2 1" play that many events in one file, each a new seed, in the knock, walk, row or count pattern;
+  "five coin pickups" and "3 variations" stay that many files.
+- **A design named inside its family wins over the family's default**: "tape stop" is `downlifter/tape`, no
+  longer `fall/air`.
 
 ### Fixed
 

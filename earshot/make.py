@@ -216,8 +216,8 @@ def _request(b, theme):
         th = dict(th or {})
         th.update({k: b[k] for k in ('key', 'scale') if b.get(k)})
     req = {k: b[k] for k in ('pitch', 'dur', 'voice', 'material') if b.get(k) is not None}
-    if b.get('loop') is False:
-        req['loop'] = False
+    if b.get('loop') is not None:            # True: the request said "loop" / "seamless"; False: "once"
+        req['loop'] = b['loop']
     return {**req, **b['axes'], 'theme': th}
 
 
@@ -227,10 +227,65 @@ def performance(b, sound, events=None):
     performance of that many), else as the request says (brief.performance)"""
     from .sounds import learned
     if not learned.performs(sound):
-        return None
+        return rowed(b, sound, events)
     if events is not None:
         return int(events) > 1, max(1, int(events))
     return brief.performance(b, sound, learned.index()[sound].get('pattern'))
+
+
+LASTING = ('bed', 'music', 'pad', 'texture', 'noise')     # kinds that last: never played as a row of events
+
+
+def rowed(b, sound, events=None):
+    """(True, events, pattern) when a one-shot design that is not performed from recordings
+    (earshot.sounds.learned.performs) is asked for as a counted thing a person does in a row ("four knocks on the
+    table", "three claps", "a countdown 3 2 1": brief's `row`) or with the caller's events over 1; else None"""
+    from .sounds import registry
+    d = registry.get(sound)
+    if d.loop or d.kind in LASTING:
+        return None
+    if events is not None:
+        return (True, int(events), b.get('row') or 'row') if int(events) > 1 else None
+    if b.get('row') and (b.get('events') or 0) > 1:
+        return True, int(b['events']), b['row']
+    return None
+
+
+def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0):
+    """a counted action of any one-shot design as one sound: (y, meta) as registry.render gives a take, with
+    meta['performance'] = {'pattern', 'events', 'pace', 'seeds'}. The pattern player (earshot.synth.perform) places
+    `events` takes of the design, each its own seed (a new variation; a learned design's next recording), each a
+    little firmer or softer and early or late as the pattern does it, then the whole is levelled as one sound. A
+    length asked for is not read: the count and the pattern's pace make the length"""
+    from types import SimpleNamespace
+    from .forge import dsp
+    from .sounds import registry
+    from .synth import master
+    from .synth import perform as P
+    d = registry.get(sound)
+    p = P.plan(name, dsp.rng(registry.seed_of(sound, seed) ^ 0x60E5), events=events)
+    one = {k: v for k, v in req.items() if k != 'dur'}
+    parts, first = [], None
+    for i, nudge in enumerate(p['nudge']):
+        ax = {**one, 'energy': max(-1.0, min(1.0, float(one.get('energy', 0.0)) + nudge['energy']))}
+        y, m = registry.render(sound, seed=seed + i, check=False, **ax)
+        first = first or m
+        parts.append((y, 0.0))
+    y = master.finish(P.mix(parts, p), peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
+                      sparse=registry.LIFT)
+    meta = {'id': sound, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
+            'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1),
+            'performance': {'pattern': p['pattern'], 'events': len(p['onsets']), 'pace': p['pace'],
+                            'seeds': [seed + i for i in range(len(p['onsets']))]}}
+    meta.update({k: first[k] for k in ('pitch', 'voice', 'material') if first.get(k)})
+    ign = [k for k in first.get('ignored', ()) if k in one and k != 'energy' or k == 'energy' and one.get('energy')]
+    if ign:
+        meta['ignored'] = ign
+    # several attacks are the design of a row, not layers stacked on one hit, and a short dry event ends before the
+    # next begins: the gap between them is silence
+    meta['checks'] = registry.audit(y, SimpleNamespace(kind=d.kind, pitch=d.pitch, loop=False,
+                                                        allows=d.allows + ('stacked', 'silence')))
+    return y, meta
 
 
 def takes_asked(b, why, perf, n=1):
@@ -260,14 +315,54 @@ def _held(sound, dur, takes):
     return None
 
 
+# an axis as a listener names what it controls
+PLAIN = {'bright': 'brightness', 'hard': 'hardness', 'ring': 'ring', 'size': 'size', 'space': 'room',
+         'width': 'width', 'energy': 'strength', 'motion': 'speed'}
+
+
+def unfollowed(b, sound, why, ignored, req, given, takes):
+    """the plain lines for what a request asked and the sound could not follow (registry.render's `ignored`), each
+    with what the sound does instead. An axis is said only when the caller set it (`given`) or a word of the request
+    moved it that neither the design was picked for nor its name or tags hold: "fast" in "a fast whoosh" named
+    whoosh/fast, nothing was ignored"""
+    from .sounds import registry
+    d = registry.get(sound)
+    own = [w for w in sound.replace('/', '_').split('_')] + list(d.tags)
+    picked = set(why) | {w.split(':')[-1] for w in why} | set(own) | {brief.stem(w) for w in own}
+    words = [w for w in brief.WORD.findall((b.get('text') or '').lower())
+             if brief.stem(w) not in picked and w not in picked]
+    out, what, axes = [], [], []
+    for k in [k for k in ignored if k in PLAIN]:
+        said = [w for w in words if brief.modifier(w) and k in L.MODIFIERS[brief.modifier(w)]]
+        if k in given or said:
+            what += [f'"{w}"' for w in said] if said else [f'{k}={req.get(k, 0):+.2g}']
+            axes.append(PLAIN[k])
+    if axes:
+        no = ', '.join(axes[:-1]) + (' or ' if len(axes) > 1 else '') + axes[-1]
+        out.append(f"not followed: {', '.join(dict.fromkeys(what))}; this sound has no control of its {no} "
+                   'and plays as designed')
+    for k in ignored:
+        if k == 'dur' and req.get('dur'):
+            got = max(t['dur_s'] for t in takes)
+            out.append(f"{got:.2f} s, not the {req['dur']:g} s asked: a single struck sound rings as long as it rings")
+        elif k in ('pitch', 'voice', 'material') and req.get(k) is not None:
+            if brief.stem(str(req[k])) in picked or str(req[k]) in picked:
+                continue
+            out.append(f'not followed: {k} {req[k]}; this sound has no {k} to set and plays as designed')
+    return out
+
+
 def take(sound, seed, req, lufs=None, peak_db=-1.0, perform=None):
     """one clean take of a design: the first of TRIES seeds (seed, seed + 101, ...) that passes the audit, else the
     first one with its warnings: (y, meta). perform: (True, events) plays the design as a performance
-    (earshot.sounds.learned.perform: events None = its natural number, or as many as fill the length asked for)"""
+    (earshot.sounds.learned.perform: events None = its natural number, or as many as fill the length asked for);
+    (True, events, pattern) plays any one-shot design as a row of that many events (`row`)"""
     from .sounds import learned, registry
     first = None
     for k in range(TRIES):
-        if perform and perform[0]:
+        if perform and perform[0] and len(perform) > 2:
+            y, meta = row(sound, seed + 101 * k, perform[1], perform[2], req, lufs=lufs, peak_db=peak_db)
+        elif perform and perform[0]:
             y, meta = learned.perform(sound, seed=seed + 101 * k, events=perform[1], lufs=lufs, peak_db=peak_db,
                                       **req)
         else:
@@ -296,7 +391,10 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     ring, size, space, width, energy, motion) override what the words say. events: for a thing a person does
     several times in a row (footsteps, a knock, typing, coins, keys, clinking glasses), 1 = one event, 2 or more =
     the action with that many events; None = as the words say ("footsteps", "knocking", "three knocks", "5 seconds
-    of typing" ask for the action, "a footstep" for one step); a take's meta['performance'] says what was played"""
+    of typing" ask for the action, "a footstep" for one step); any other one-shot design plays a counted action done
+    in a row ("four knocks on the table", "three claps", "a countdown 3 2 1") or events of 2 or more as one file of
+    that many events (`row`), while a count of separate things ("five coin pickups") is that many files; a take's
+    meta['performance'] says what was played"""
     from .sounds import registry
     from .synth import master
     if not (want or sound):
@@ -355,8 +453,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if held:
         lines.append(held)
         ign = [k for k in ign if k != 'dur']
-    if ign:
-        lines.append(f"not used by this sound: {', '.join(ign)}")
+    lines += list(dict.fromkeys(t['note'] for t in takes if t.get('note')))
+    lines += unfollowed(b, pick['id'], pick['why'], ign, req, {a for a, v in axes.items() if v}, takes)
     unknown = _unknown(b, pick['why'])
     if unknown:
         lines.append(f"not understood: {', '.join(unknown)}")
@@ -452,6 +550,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
             lines.append(None)            # the file's line, written once the set is balanced
             pending.append({'p': p, 'y': y, 'meta': meta, 'd': d, 'alone': alone, 'name': it['name'],
                             'line': len(lines) - 1, 'why': ', '.join(brief.shown(b, cands[0]['why']))})
+            if meta.get('note'):
+                lines.append(f"  {meta['note']}")
             if meta.get('loop') and _loop_formats(fmts) != fmts:
                 lines.append(f"  a loop: {SEAM_SAFE} instead of {' / '.join(f for f in fmts if f in PADDED)}, "
                              'which leaves a gap at the seam')
@@ -461,8 +561,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
             # two names, one design of several recordings, each name its own recording (toggle_on / toggle_off): an
             # intended pair, said as a fact
             lines.append(f'  another recording of {d.id} than {first[d.id]}: '
-                         + ', '.join(f"{m['n']} of {m['of']}" + (f" ({m['recording']})" if m.get('recording') else '')
-                                     for m in mine.values()))
+                         + ', '.join(m['recording'] for m in mine.values()))
         elif d.id in first:               # two names, one sound: the second says so and names another
             chip = brief.chip(d.row())
             free = [a for a in alts[it['name']] + alternatives(b, cands[:1], d.id, k=6) if a not in first]
@@ -593,16 +692,18 @@ def add_cli(sub):
     p.add_argument('--pitch', help='a note (C5) or Hz')
     p.add_argument('--dur', type=float, help='seconds: how long a figure of notes sounds (damped by the hand to end '
                                              'there; a figure rings no longer than it rings), the hold of a pad, the '
-                                             'length of a loop (each has a shortest one) or a whoosh; a single '
-                                             'struck sound (a tap, a hit) rings as it rings: it ignores --dur and '
-                                             'says so ("not used by this sound: dur")')
+                                             'length of an ambience (shorter than its shortest loop: a cut, not a '
+                                             'loop, unless the words say "loop") or a whoosh; a music loop keeps '
+                                             'whole bars; a single struck sound (a tap, a hit) rings as it rings: '
+                                             'it ignores --dur and says so')
     p.add_argument('--voice', help='the instrument or patch of a tonal sound: marimba (the default of figures), '
                                    'harp, pizzicato and felt_piano are real instruments learned note by note; '
                                    'kalimba, glockenspiel, vibraphone, soft_pluck ... are models')
     p.add_argument('--material', help='what a tap, click or knock is made of')
     p.add_argument('--events', type=int, help='a thing a person does several times in a row (footsteps, a knock, '
                                               'typing, coins, keys, clinking glasses): 1 = one event, 2 or more = '
-                                              'the action with that many; default: as the words say')
+                                              'the action with that many (any other one-shot: a row of that many '
+                                              'in one file); default: as the words say')
     for a in ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion'):
         p.add_argument(f'--{a}', type=float, help='-1 .. 1, 0 = as designed')
     p.add_argument('--lufs', type=float, help='momentary-max loudness instead of a -1 dBFS peak')

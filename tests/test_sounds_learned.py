@@ -171,7 +171,7 @@ def test_seeds_walk_through_the_members():
     assert sorted(got[:n]) == list(range(n)) and got[n:] == got[:n]
     (a, ma), (b, mb) = registry.render(sid, seed=2, check=False), registry.render(sid, seed=2, check=False)
     assert np.array_equal(a, b) and ma['member']['n'] == mb['member']['n'] == got[2] + 1
-    assert ma['member']['recording'] == INDEX[sid]['members'][got[2]]['credit']['title']
+    assert ma['member']['recording'] == f'recording {got[2] + 1} of {n}'        # never the uploader's title
 
 
 def test_a_dark_or_bright_request_draws_from_the_darker_or_brighter_members():

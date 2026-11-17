@@ -87,6 +87,9 @@ LENGTH_SLOPE = 0.15                # how much a length mismatch costs per octave
 # the blend of the lexical score with the semantic z (`blend`; chosen on eval/requests.json + requests_b.json)
 LEX_FLOOR, LEX_POWER, SEM_WEIGHT, Z_FLOOR, Z_SAYS = 1.0, 0.25, 0.4, -1.0, 2.5
 MEMBER_SHARE = 0.8                 # how close a member named in the request must score to the family's best
+# the same for a named design of another family found by the very same words, of the same kind ("tape stop":
+# downlifter/tape at 0.77 of fall/air, the downlifter concept's default)
+KIN_SHARE = 0.7
 UNNAMED_LEX = 0.25                # the most a lexical score counts in the blend when no job or sound word matched
 # the tonal interface figures a plain request no longer gets (lexicon.BY_NAME_ONLY): their score is multiplied by
 # this unless the request asks for a tone ("a tonal tap", "a tap with a note in it")
@@ -328,6 +331,7 @@ NOT_EVENTS = frozenset(stem(w) for w in (
     'variation', 'variant', 'version', 'take', 'option', 'alternative', 'note', 'tone', 'beat', 'pulse', 'second', 's',
     'sec', 'ms', 'msec', 'millisecond', 'minute', 'min', 'hz', 'khz', 'time', 'octave', 'semitone', 'bar', 'of',
     'different', 'unique', 'shot', 'player', 'people', 'bit', 'sound', 'file', 'level', 'more', 'another', 'after'))
+COUNTDOWN = re.compile(r'\b(?:10|\d)(?:[\s,.\-]+(?:10|\d))+\b')    # "3 2 1", "5, 4, 3, 2, 1" (checked: down to 1)
 PLURAL_NOT = frozenset(('glass', 'bass', 'grass', 'brass', 'chaos', 'canvas', 'gas', 'news', 'lens', 'bus', 'its',
                         'this', 'is', 'was', 'has', 'does', 'goes', 'plus', 'less', 'across', 'always', 'perhaps',
                         'sounds', 'sfx', 'fx', 'effects', 'vibes', 'its', 'us', 'yes', 'as', 'thus', 'kiss', 'boss',
@@ -337,14 +341,22 @@ PLURAL_NOT = frozenset(('glass', 'bass', 'grass', 'brass', 'chaos', 'canvas', 'g
 def _action(b, text):
     """the action words of a request into the brief (`read`: events, perform, plural)"""
     low = ' ' + (text or '').lower() + ' '
-    b['events'], b['perform'], b['plural'], b['counted'] = None, False, [], []
+    b['events'], b['perform'], b['plural'], b['counted'], b['row'] = None, False, [], [], None
+    rows = {stem(w): p for w, p in L.ROW_WORDS.items()}
     for m in EVENTS.finditer(low):
         v, noun = m.group(1).lower(), stem(m.group(2))
         if noun in NOT_EVENTS or re.match(r'\s*-', low[m.end(1):]) or low[max(0, m.start(1) - 1)] in '.,:/':
             continue
         b['events'] = int(v) if v.isdigit() else NUMBER_WORDS[v]
         b['counted'] = [stem(w) for w in WORD.findall(low[m.end(1):m.end()])]   # "five coin pickups": coin, pickup
+        # the counted thing within three words ("three mouse clicks"): a row when a person performs it in a row
+        b['row'] = next((rows[stem(w)] for w in WORD.findall(low[m.end(1):])[:3] if stem(w) in rows), None)
         break
+    for c in (COUNTDOWN.finditer(low) if 'countdown' in low and b['events'] is None else ()):
+        ds = [int(x) for x in re.findall(r'\d+', c.group(0))]
+        if ds[-1] in (0, 1) and all(x - y == 1 for x, y in zip(ds, ds[1:])):
+            b['events'], b['row'] = len(ds), 'count'   # "a countdown 3 2 1": three events a second apart
+            break
     if any(re.search(r'(?<![\w-])' + re.escape(w) + r'(?![\w-])', low) for w in L.SINGLE_WORDS):
         if not (b['events'] and b['events'] > 1):
             b['events'] = 1
@@ -488,7 +500,9 @@ def read(text):
     'water drop'}; `shown`), `framed` the jobs named only in a comparison or in the event before the sound is named
     ("sound when the player grabs a boost"), `phrases` the runs of content words a design's multi-word job is
     matched against (`_phrases`); `events` the number of events of an action ("three knocks": 3, "a single step":
-    1), `perform` True when the request asks for the action a person performs ("walking", "knocking", "keys
+    1), `row` the pattern of earshot.synth.perform when the counted thing is one a person performs in a row
+    (lexicon.ROW_WORDS: "four knocks": knock, "a countdown 3 2 1": count), `perform` True when the request asks
+    for the action a person performs ("walking", "knocking", "keys
     jingling") and `plural` the stems of the plural nouns it says ("footsteps": footstep): `performance` decides
     with them for a design that can be performed"""
     b = {'text': text, 'concepts': [], 'parts': [], 'context': [], 'refs': [], 'not': [], 'words': [], 'hints': [],
@@ -1360,12 +1374,30 @@ def _named_member(b, out, idx=None):
     fam = out[0]['id'].split('/')[0]
     hits = [(len(_name_words(r['id']) & said.keys()), r['score'], -i) for i, r in enumerate(out)
             if r['id'].split('/')[0] == fam]
+    if max(hits)[0] == 0:
+        # no member of the winning family is named: a design of another family found by the same words, of the same
+        # kind, whose own name the request says ("tape stop": downlifter/tape over fall/air, both a downlifter)
+        # a name that is an adjective ("soft", "bright", "airy"), the very word that found the concept ("swell") or a
+        # word that names a sound by itself ("hit" of darbuka/hit in "a drum hit") names no design: those stay with
+        # the family that won
+        top, kind = set(out[0]['why']), {r['id']: r['kind'] for r in rows}
+        terms_ = {(b.get('written') or {}).get(c, c) for c in top}
+
+        def kin(i):
+            return {w for w in _name_words(i) & said.keys() if not modifier(said[w]) and said[w] not in terms_
+                    and not read(said[w])['concepts']} - top
+        hits += [(len(kin(r['id'])), r['score'], -i) for i, r in enumerate(out)
+                 if i and set(r['why']) == top and kind.get(r['id']) and kind.get(r['id']) == kind.get(out[0]['id'])]
     n, _, neg = max(hits)
     pos = -neg
+    share = MEMBER_SHARE if out[pos]['id'].split('/')[0] == fam else KIN_SHARE
     if (n == 0 or pos == 0 or len(_name_words(out[0]['id']) & said.keys()) >= n
-            or out[pos]['score'] < MEMBER_SHARE * out[0]['score']):
+            or out[pos]['score'] < share * out[0]['score']):
         return _learned_first(b, out, idx)
     best = dict(out[pos], score=out[0]['score'])
     named_ = [said[w] for w in sorted(_name_words(best['id']) & said.keys())]
     best['why'] = list(dict.fromkeys(list(best['why']) + named_))
-    return _learned_first(b, [best] + out[:pos] + out[pos + 1:], idx)
+    rest = out[:pos] + out[pos + 1:]
+    if share == KIN_SHARE:              # the other family's default takes the named design's score: not a near tie
+        rest[0] = dict(rest[0], score=out[pos]['score'])
+    return _learned_first(b, [best] + rest, idx)

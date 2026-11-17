@@ -168,7 +168,7 @@ def test_also_is_filled_from_the_catalogue(tmp_path):
 
 def test_a_struck_sound_says_it_ignores_dur(tmp_path):
     res = make(out=str(tmp_path / 'h.wav'), sound='hit/metal', dur=2.5)
-    assert res['takes'][0]['dur_s'] < 1.5 and 'not used by this sound: dur' in res['summary']
+    assert res['takes'][0]['dur_s'] < 1.5 and 'not the 2.5 s asked: a single struck sound rings' in res['summary']
     res = make(out=str(tmp_path / 'f.wav'), sound='success/rise', dur=1.0)
     assert 'dur' not in res['takes'][0].get('ignored', [])
 
@@ -189,7 +189,7 @@ def test_help_names_the_codecs_and_what_dur_does(capsys):
         cli.main(['make', '--help'])
     text = ' '.join(capsys.readouterr().out.split())
     for bit in ('ogg = Vorbis', 'webm = Opus', 'm4a = AAC', 'webm,mp3', 'a figure of notes', 'hold of a pad',
-                'length of a loop', 'ignores --dur'):
+                'length of an ambience', 'whole bars', 'ignores --dur'):
         assert bit in text, bit
 
 
@@ -267,8 +267,11 @@ def test_a_set_of_one_shots_is_full_and_balanced(tmp_path):
     loudest_peak = max(20 * np.log10(np.abs(y).max()) for y in pk.values())
     assert loudest_peak > -2.0                                     # full: the quietest one-shots stay at full peak
     assert all(v > -20.0 for v in lv.values()), lv                 # nothing far and thin
-    rec = {r['name']: r['member']['recording'] for r in res['sounds'] if r.get('member')}
-    assert rec['tap'].startswith('Computer Keyboard - single key')   # the fullest mechanical key
+    from earshot.sounds import learned
+    tap = next(r for r in res['sounds'] if r['name'] == 'tap')
+    src = learned.index()[tap['sound']]['members'][tap['member']['n'] - 1]['credit']['title']
+    assert src.startswith('Computer Keyboard - single key')          # the fullest mechanical key
+    assert tap['member']['recording'] == f"recording {tap['member']['n']} of {tap['member']['of']}"
     assert {r['name']: r['sound'] for r in res['sounds']}['hover'] == 'leather/grab'
 
 
@@ -450,3 +453,81 @@ def test_cli_bad_request_is_one_line_and_exit_1(tmp_path, capsys, monkeypatch):
     lines = cap.err.strip().splitlines()
     assert len(lines) == 1 and lines[0].startswith('earshot make: error: ValueError: no sound in the catalogue')
     assert cap.out == '' and not os.path.exists(tmp_path / 'x.wav')
+
+
+TITLED = ('a laptop keyboard key', 'a light switch', 'three knocks on a door', 'footsteps on gravel', 'a cap gun shot')
+
+
+def _titles():
+    """every title an uploader gave a recording of the stores (learned things, drums, beds, instrument notes), but
+    those that are plain words of a request or of the catalogue itself ("Light switch")"""
+    from earshot.sounds import drums, learned, nature
+    from earshot.synth import played
+    out = {m['credit']['title'] for ix in (learned.index(), drums.index()) for e in ix.values() for m in e['members']}
+    out |= {t['title'] for t in nature.store().values() if t.get('title')}
+    out |= {n['credit']['title'] for e in played.index().values() for n in e['notes']}
+    ours = ' | '.join(list(TITLED) + [' '.join([r['id']] + list(r['says']) + list(r['uses']))
+                                      for r in registry.rows()]).lower()
+    return {t.lower() for t in out if len(t) >= 6 and t.lower() not in ours}
+
+
+def test_no_output_names_a_recording_by_its_title(tmp_path):
+    """the lines, meta and manifest say "recording 2 of 3", never the title its uploader gave a recording (a brand, a
+    file name): those stay in CREDITS.md and the stores' indexes"""
+    titles = _titles()
+    assert len(titles) > 50
+    out = [make_set('ui', out=str(tmp_path / 'ui'))]
+    for i, want in enumerate(TITLED):
+        out += [make(want, str(tmp_path / f'{i}.wav'), n=2)]
+    text = json.dumps(out, default=str).lower()
+    with open(tmp_path / 'ui' / 'manifest.json', encoding='utf-8') as fh:
+        text += fh.read().lower()
+    assert not [t for t in titles if t in text]
+    assert 'recording 1 of ' in text or 'recording 2 of ' in text
+
+
+def test_an_asked_length_holds_for_an_ambience_and_a_loop_says_its_bars(tmp_path):
+    """who asks for 4 seconds of rain gets 4 seconds, a cut that says it is no loop; "a seamless loop" keeps the
+    shortest loop and says so; a music loop keeps whole bars and says so; nothing says `not used by this sound`"""
+    cut = make('rain on a window, 4 seconds', str(tmp_path / 'r.wav'))
+    t = cut['takes'][0]
+    assert t['dur_s'] == pytest.approx(4.0, abs=0.001) and t['loop'] is False and t['checks']['ok']
+    y, _ = _read(cut['files'][0])
+    assert np.abs(y[0]).max() == 0.0 and np.abs(y[-1]).max() < 1e-4
+    assert 'a cut of 4 s, not a loop: the shortest seamless loop of this sound is 8.00 s' in cut['summary']
+    seam = make('a seamless loop of rain on a window, 4 seconds', str(tmp_path / 's.wav'))
+    assert seam['takes'][0]['loop'] is True and seam['takes'][0]['dur_s'] == pytest.approx(8.0, abs=0.001)
+    assert 'a seamless loop of 8.00 s, the shortest this sound has; 4 s was asked' in seam['summary']
+    bars = make('background music, 8 seconds', str(tmp_path / 'm.wav'))
+    assert 'a music loop is whole bars, and these are the nearest to the 8 s asked' in bars['summary']
+    fast = make('a fast whoosh', str(tmp_path / 'w.wav'))
+    for res in (cut, seam, bars, fast):
+        assert 'not used by this sound' not in res['summary'] and 'not followed' not in res['summary']
+
+
+def test_a_counted_action_in_a_row_is_one_file_and_a_count_of_things_is_many(tmp_path):
+    """"four knocks on the table" picks a design that is not recorded as an action (knock/desk) and still plays one
+    file of four knocks; "three claps" one file of three; "five coin pickups" stays five files; "a single" one event"""
+    knocks = make('four knocks on the table', str(tmp_path / 'k.wav'))
+    p = knocks['takes'][0]['performance']
+    assert knocks['sound'] == 'knock/desk' and len(knocks['files']) == 1
+    assert p['pattern'] == 'knock' and p['events'] == 4 and len(set(p['seeds'])) == 4
+    assert 'played: 4 events as a knock' in knocks['summary'] and knocks['takes'][0]['checks']['ok']
+    claps = make('three claps', str(tmp_path / 'c.wav'))
+    assert len(claps['files']) == 1 and claps['takes'][0]['performance']['events'] == 3
+    count = make('a countdown 3 2 1', str(tmp_path / 'n.wav'))
+    assert count['takes'][0]['performance']['pattern'] == 'count' and count['takes'][0]['dur_s'] > 2.0
+    assert len(make('five coin pickups', str(tmp_path / 'p.wav'))['files']) == 5
+    one = make('a single knock on the table', str(tmp_path / 'o.wav'))
+    assert 'performance' not in one['takes'][0]
+    two = make(out=str(tmp_path / 't.wav'), sound='tick/wood', events=2)
+    assert two['takes'][0]['performance']['events'] == 2 and two['takes'][0]['performance']['pattern'] == 'row'
+
+
+def test_a_design_named_inside_its_family_wins_over_the_default():
+    """"tape stop" is a downlifter, whose default is fall/air; the request names downlifter/tape"""
+    from earshot.make import choose
+    for want in ('tape stop', 'a tape stop effect'):
+        b, cands = choose(want, top=4)
+        assert cands[0]['id'] == 'downlifter/tape'
+        assert cands[1]['score'] < 0.9 * cands[0]['score']                 # no near tie: not a guess

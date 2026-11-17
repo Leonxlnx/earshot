@@ -155,6 +155,7 @@ class Controls:
         self.seed = 0                # the take's seed (render sets it): a design of several recordings picks by it
         self.member = None           # the recording a design of several played ({'n', 'of', ...}), for meta
         self.loop = d.loop and loop is not False      # a looping design renders once, with fades, on loop=False
+        self.seam = d.loop and loop is True           # the request said "loop" / "seamless": the seam over the length
 
     def __getattr__(self, name):
         if name in AXES:
@@ -244,9 +245,43 @@ class Controls:
         return self._material or self._theme.get('material') or self._d.material
 
 
+def member(n, of):
+    """meta['member'] of a design that played recording n (1-based) of its `of`: the number and a plain line. The
+    title a recording's uploader gave it (a brand, a file name) stays in the store's index and CREDITS.md: an agent
+    needs to see that a seed played another recording, not whose"""
+    return {'n': int(n), 'of': int(of), 'recording': f'recording {int(n)} of {int(of)}'}
+
+
 def seed_of(id, seed):
     """the generator seed of a take: the same id and seed give the same samples, different ids differ"""
     return (zlib.crc32(id.encode()) + 7919 * int(seed)) & 0xFFFFFFFF
+
+
+HELD = 0.05                  # s: a looping design's length within this of the one asked for is the length asked for
+CUT_IN, CUT_OUT, CUT_OUT_MAX = 0.03, 0.1, 0.5   # a cut from a bed: fade in (s), fade out (share of it, at most s)
+
+
+def fit(y, d, c):
+    """(y, note) of a looping design whose length differs from the one asked for (c.length()); note None when it
+    does not. A bed or a texture asked shorter than its shortest seamless loop is cut from it to the length asked
+    for (a CUT_IN fade in, a fade out of CUT_OUT of the length, at most CUT_OUT_MAX) and is no loop then (c.loop
+    False), unless the request asked for a loop (c.seam): then the shortest loop stays, and the note says so. A
+    music loop keeps whole bars: the note says the nearest length of whole bars was played"""
+    want, got = c._dur, len(y) / dsp.SR
+    if not (d.loop and want) or abs(got - want) <= HELD:
+        return y, None
+    if d.kind == 'music':
+        return y, f'{got:.2f} s: a music loop is whole bars, and these are the nearest to the {want:g} s asked'
+    if got < want:
+        return y, f'{got:.2f} s, shorter than the {want:g} s asked: the longest this sound is made'
+    if c.seam:
+        return y, (f'a seamless loop of {got:.2f} s, the shortest this sound has; {want:g} s was asked, and a loop '
+                   'was asked for: the seam was kept over the length')
+    shortest = got if c.loop else None
+    c.loop = False
+    y = dsp.fade(y[:dsp.n_of(want)], CUT_IN, min(CUT_OUT * want, CUT_OUT_MAX))
+    return y, (f'a cut of {want:g} s, not a loop' + (f': the shortest seamless loop of this sound is {shortest:.2f} s'
+                                                    if shortest else ''))
 
 
 def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
@@ -264,6 +299,7 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=c.loop, cap=LOUDEST.get(d.kind, LOUDEST['']),
                       lift=0.0 if d.kind in LOUDEST else LIFT, sparse=SPARSE if d.kind == 'bed' else 0.0,
                       tonal=bool(d.pitch) and d.kind in TONAL)
+    y, note = fit(y, d, c)
     meta = {'id': id, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1)}
     if 'pitch' in c.used and (d.pitch or c._pitch):
@@ -280,8 +316,11 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     named = {MATERIALS.get(w) for w in id.replace('/', '_').split('_')}
     own = {k for k, v in (('voice', d.voice), ('material', d.material))
            if request.get(k) and (request[k] == v or request[k] in d.tags or (k == 'material' and request[k] in named))}
-    if c._dur and not (0.75 * c._dur <= meta['dur_s'] <= 1.5 * c._dur + 0.5):
-        c.used.discard('dur')        # read but not kept: a struck sound rings as it rings, a loop has a shortest length
+    if note:
+        meta['note'] = note          # the length differs from the one asked for, and why, in plain words
+        c.used.add('dur')
+    elif c._dur and not (0.75 * c._dur <= meta['dur_s'] <= 1.5 * c._dur + 0.5):
+        c.used.discard('dur')        # read but not kept: a struck sound rings as it rings
     ignored = sorted(c.asked - c.used - own)
     if ignored:
         meta['ignored'] = ignored

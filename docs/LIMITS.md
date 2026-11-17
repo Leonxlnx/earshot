@@ -93,14 +93,15 @@ family and the learned beds were built after his last ratings: each learned take
 - Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
   `not in this sound: ...` for the other; ask again for it, or make a set.
 - Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
-  a length it cannot keep, come back as `not used by this sound`. A material picks the voice of a tonal sound only
+  a length it cannot keep, come back in plain words (`not followed: ...`, `0.43 s, not the 2 s asked ...`). A material picks the voice of a tonal sound only
   among six (wood, glass, metal, soft, digital, retro); other materials ("plastic", "ceramic") only steer the
   ranking. A theme's scale changes a figure only when it is minor. Bank sounds read pitch and length where their
   recipe has those knobs, and no axes. A learned sound keeps a length only within 0.6-1.8 times its natural one and
   a pitch only on tonal recordings (7 semitones at most).
 - Exact lengths. A length sets how long a figure sounds before its room dies away, so the file runs longer than the
   number; a struck one-shot rings as it rings, and a voice cannot ring longer than it does (a marimba chime asked
-  for 2 s came out 0.55 s); both say `not used by this sound: dur`. A loop has a shortest length per scene.
+  for 2 s came out 0.55 s); both say so. A loop has a shortest length per scene: an ambience asked shorter is a
+  cut, not a loop, and a music loop keeps whole bars ("8 seconds" is 8.57 s).
 - Choose by taste. The ranking reads words, not the product; two good designs for one job can differ a lot. Use
   `also`, `--sound` and a person's ears.
 

@@ -17,6 +17,9 @@ events and pace), never a branch per thing:
     scatter  things that land and settle: each next impact comes sooner and softer, as a bouncing, spreading heap
     shake    dense irregular impacts in two or three swings (keys on a ring, ice in a glass, a shaker)
     pair     two events, the second the answer: a clink and its reply, a switch on and off
+    row      a counted thing done in a row by hand (claps, taps, clicks, beeps), 2.5 to 3.5 a second, a little
+             uneven in time and level; earshot.make plays any one-shot design this way, each event a new seed
+    count    a countdown: one event a second, on the clock
 Rules for all: never the same recording twice in a row (when the thing has more than one), never on a grid, tails
 overlap and are never gated (an event rings on under the next), one position and one room for the whole.
 
@@ -40,6 +43,8 @@ PATTERNS = {
     'scatter': dict(events=(4, 7), pace=(5.0, 8.0), level=1.5, timing=0.2),
     'shake': dict(events=(10, 18), pace=(10.0, 20.0), level=3.0, timing=0.45),
     'pair': dict(events=(2, 2), pace=(2.0, 4.0), level=0.5, timing=0.1),
+    'row': dict(events=(3, 3), pace=(2.5, 3.5), level=0.8, timing=0.05),
+    'count': dict(events=(3, 3), pace=(1.0, 1.0), level=0.3, timing=0.0),
 }
 MOST = 64            # events a performance has at most (a length asked for fills at the pace, up to this)
 
@@ -132,6 +137,8 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, de
     elif name == 'pair':
         gaps *= float(r.uniform(0.8, 1.25))
         db[1:] -= float(r.uniform(1.5, 4.0))               # the answer is softer
+    elif name == 'row':
+        gaps *= 1.0 + np.clip(r.normal(0.0, p['timing'], n - 1), -0.12, 0.12)
     onsets = LEAD + np.concatenate([[0.0], np.cumsum(gaps)])
     order = sequence(members, n, r, name)
     tone = np.zeros(n)

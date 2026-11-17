@@ -639,10 +639,11 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
               pitch: Annotated[str | None, Field(description='a note ("C5") or Hz for a tonal sound')] = None,
               dur: Annotated[float | None, Field(description='seconds: how long a figure of notes sounds (damped '
                                                              'by the hand to end there; it rings no longer than it '
-                                                             'rings), the hold of a pad, the length of a loop (each '
-                                                             'has a shortest one) or a whoosh; a single struck sound '
-                                                             '(a tap, a hit) rings as it rings: it ignores dur and '
-                                                             'says so',
+                                                             'rings), the hold of a pad, the length of an ambience '
+                                                             '(shorter than its shortest loop: a cut, not a loop, '
+                                                             'unless the request says "loop") or a whoosh; a music '
+                                                             'loop keeps whole bars; a single struck sound (a tap, a '
+                                                             'hit) rings as it rings: it ignores dur and says so',
                                                  gt=0)] = None,
               voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound: "marimba" '
                                                              '(the default of figures), "harp", "pizzicato" and '
@@ -658,7 +659,8 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                               '(footsteps, knocking, typing): 1 = one event, 2 or '
                                                               'more = the action with that many events; by default '
                                                               'the words decide ("footsteps", "three knocks" are '
-                                                              'the action, "a footstep" one event)', ge=1)] = None,
+                                                              'the action, "a footstep" one event); any one-shot '
+                                                              'plays as a row of that many in one file', ge=1)] = None,
               seed: Annotated[int, Field(description='another take of the same sound')] = 0,
               listen: Annotated[bool, Field(description="also rank the whole catalogue by how each design sounds "
                                                         "like the request (CLAP against earshot's sound atlas), "
@@ -676,8 +678,11 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
     best recording of a thing plays first. Tonal figures are played on real instruments learned note by note
     (marimba by default; harp, pizzicato strings and felt_piano, an upright piano, by `voice`). A thing a person
     does in a row is played as that action when the words ask for it ("footsteps on gravel", "knocking", "typing")
-    and as one event otherwise ("a footstep"); `events` sets it. The answer names the design chosen and why, what
-    else would fit (`also`), and any words that were not understood, so one call is usually enough; call again with
+    and as one event otherwise ("a footstep"); `events` sets it. A counted action done in a row ("four knocks on
+    the table", "three claps", "a countdown 3 2 1") is one file of that many events, whatever the design; a count
+    of separate things ("five coin pickups", "3 variations") is that many files. The answer names the design chosen
+    and why, what else would fit (`also`), and any words that were not understood, so one call is usually enough;
+    call again with
     `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. Use it
     whenever a product, a game or a film needs a sound and no recording is at hand; use make_set when it needs
     several that belong together. Everything made is free to use in any product."""

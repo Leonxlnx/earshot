@@ -41,7 +41,7 @@ import numpy as np
 from ..forge import dsp, fx
 from ..synth import drums as D
 from ..synth import modal, resyn, space
-from .registry import design
+from .registry import design, member
 
 SR = dsp.SR
 AXES = ('energy', 'size', 'bright', 'hard', 'ring', 'space', 'width')
@@ -168,8 +168,7 @@ def take(e, c, r):
     energy = c.energy
     k = pick(e['id'], c.seed, energy)
     m = e['members'][k]
-    c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
-                'author': m['credit']['author']}
+    c.member = member(k + 1, len(e['members']))
     return place(e, c, r, present(hit(e, c, r, k, energy)), m['stereo'])
 
 

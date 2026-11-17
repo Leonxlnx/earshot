@@ -168,3 +168,12 @@ def test_the_count_argument_overrides_the_words():
     assert performance(brief.read('footsteps on gravel'), 'step/pebbles', events=1) == (False, 1)
     assert performance(brief.read('a footstep on gravel'), 'step/pebbles', events=4) == (True, 4)
     assert performance(brief.read('a whoosh'), 'whoosh/stick') is None
+
+
+def test_a_row_is_a_little_uneven_and_a_countdown_keeps_the_clock():
+    row = perform.plan('row', dsp.rng(5), events=4)
+    gaps = np.diff(row['onsets'])
+    assert len(row['onsets']) == 4 and 1 / 3.5 * 0.85 < gaps.min() and gaps.max() < 1 / 2.5 * 1.15
+    assert np.ptp(gaps) > 0.001                                              # off the grid
+    count = perform.plan('count', dsp.rng(5), events=3)
+    assert np.allclose(np.diff(count['onsets']), 1.0)                       # one a second, on the clock

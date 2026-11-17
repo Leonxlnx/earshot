@@ -44,12 +44,16 @@ Then:
 | `not in this sound: ...` | sounds or jobs the request named that the chosen design does not cover | ask for them in a second call, or pick from `also` |
 | `also: ...` | up to three alternatives, always: the next ranked designs, then the nearest of the same family, kind or domain | take one with `--sound ID` if the pick does not fit the job |
 | `also (the pick is a guess: ...): id (a few words), ... Name one with sound=<id>` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high; the alternatives then come from other families first, each with the start of its description | name one with `--sound ID`, or re-ask naming the sound or the job |
-| `not used by this sound: ...` | controls the request set that this design does not read, or a length it could not keep (a struck sound rings as it rings; a marimba cannot ring 2 s) | leave it, or ask for a design that has that control |
+| `not followed: "slow"; this sound has no control of its speed ...` | a control the request asked for (in words or as an argument) that this design does not have; the line says what it does instead. A word that named the design ("fast" in "a fast whoosh") is never listed | leave it, or ask for a design that has that control |
+| `0.43 s, not the 2 s asked: a single struck sound rings as long as it rings` | a length a one-shot cannot keep | leave it, or ask for a whoosh, a figure or a bed |
+| `a cut of 4 s, not a loop: the shortest seamless loop of this sound is 8.00 s` | an ambience asked shorter than its shortest loop: the length asked, cut from the bed with a 30 ms fade in and a fade out (10 % of it, at most 0.5 s) | say "a seamless loop of ..." if it must repeat |
+| `a seamless loop of 8.00 s, the shortest this sound has; 4 s was asked ...` | the request said "loop" or "seamless": the seam wins over the length | nothing, or drop "loop" for a cut |
+| `8.57 s: a music loop is whole bars, and these are the nearest to the 8 s asked` | a music loop keeps its bar grid | nothing |
 | `not understood: ...` | words that matched nothing in the catalogue or the lexicon | rephrase if they mattered |
 | `x.mp3: a loop in mp3 has a gap at its seam ...` | a single `make` of a loop to mp3 or m4a | write loops as ogg, webm, wav or flac |
 | `  a loop: flac instead of mp3, which leaves a gap at the seam` | in a set with several formats, a loop was written as flac in place of mp3 / m4a | nothing |
 | `  same design as NAME: ask for a different one with "sound" (the nearest: ID)` | in a set, two names got the same sound | in your own spec: give the second one `"sound": ID`, or reword its `want` |
-| `  another recording of ID than NAME: N of M (title)` | in a set, two names play different recordings of one learned design (toggle_on and toggle_off, back and next in `ui`) | nothing: the pair is meant |
+| `  another recording of ID than NAME: recording N of M` | in a set, two names play different recordings of one learned design (toggle_on and toggle_off, back and next in `ui`) | nothing: the pair is meant |
 | `heard as: '...' (z +x.x, verdict)` | with `--listen` only (below) | |
 | `not listened: ...` | `--listen` was asked and the model or the atlas is missing | `earshot doctor` |
 
@@ -73,7 +77,7 @@ also: success/triad, success/done, success/fifth
 | `--sound ID` | a design id from `earshot sounds` instead of the ranking; the words still set feel and numbers |
 | `--theme NAME` | a theme preset ([Themes](#themes)): voice, key, room and axis offsets shared by a product's sounds |
 | `--pitch` | a note (`C5`) or Hz. Overrides the words |
-| `--dur` | seconds: how long a figure of notes sounds, the hold of a pad, the length of a loop (each has a shortest one) or a whoosh; a learned sound within 0.6-1.8 times its natural length; a single struck sound (a tap, a hit) rings as it rings and says `not used by this sound: dur` |
+| `--dur` | seconds: how long a figure of notes sounds, the hold of a pad, the length of a loop (each has a shortest one) or a whoosh; a learned sound within 0.6-1.8 times its natural length; a single struck sound (a tap, a hit) rings as it rings and says so (`0.43 s, not the 2 s asked ...`); an ambience asked shorter than its shortest loop is a cut, not a loop (unless the words say "loop"), a music loop keeps whole bars |
 | `--voice` | the instrument or patch of a tonal sound ([Voices](#voices)); a voice asked for by name is always played |
 | `--material` | what a tap, click or knock is made of; on a tonal sound without a voice it picks the voice made of it (wood: marimba, glass: glockenspiel, metal: vibraphone, soft: felt_piano, digital: glass_pluck, retro: square_lead) |
 | `--events N` | for a thing a person does several times in a row (footsteps, a knock, typing, coins, keys, clinking glasses): 1 = one event, 2 or more = the action with that many events; without it the words decide ([Performances](#performances)) |
@@ -225,6 +229,21 @@ recording twice in a row, never on a grid, every event its own take, one room fo
 The answer says what was played (`played: 7 events as a walk at 1.8 a second; one event: events=1 or "a single
 ..."`) and a take's `meta['performance']` holds it.
 
+A counted action is one file for any one-shot design, recorded as an action or not (`make.row`): a count of
+knocks, steps or footsteps, claps, taps, clicks, beeps or bleeps ("four knocks on the table", "three claps", "two
+mouse clicks"), or a countdown "3 2 1", plays that many events in one file, each event a new seed of the design and
+a little firmer or softer, early or late, in the `knock`, `walk`, `row` (2.5-3.5 a second) or `count` (one a
+second, on the clock) pattern (`lexicon.ROW_WORDS`). A count of anything else is that many separate files, each its
+own take: "five coin pickups", "3 variations", "two versions", "a few takes". `--events N` plays any one-shot as a
+row of N; "a single ..." and `--events 1` stay one event. Loops, beds, pads and music are never played as a row.
+
+```
+$ earshot make "four knocks on the table" -o knocks.wav
+knocks.wav: knock/desk (0.87 s, -14 LUFS, clean) [table, knocks]
+played: 4 events as a knock at 4.7 a second; one event: events=1 or "a single ..."
+also: knock/door, knock/soft, tock/wood
+```
+
 **Credits.** Every member is credited with its title, author, page and licence in
 `earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`, `earshot/data/drums/CREDITS.md` and
 `earshot/data/notes/CREDITS.md` (`learned.credit(id, member)` in Python). CC0 asks for no credit; the files keep it.
@@ -244,12 +263,12 @@ tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
 hover.{webm,mp3}: leather/grab (0.38 s, -23 LUFS, clean) [named]
 toggle_on.{webm,mp3}: switch/lamp (0.38 s, -19 LUFS, clean) [named]
 toggle_off.{webm,mp3}: switch/lamp (0.40 s, -19 LUFS, clean) [named]
-  another recording of switch/lamp than toggle_on: 1 of 3 (Switch desk lamp)
+  another recording of switch/lamp than toggle_on: recording 1 of 3
 type.{webm,mp3}: keyboard/mechanical (0.29 s, -19 LUFS, clean) [named]
-  another recording of keyboard/mechanical than tap: 1 of 2 (mechanical key medium.wav)
+  another recording of keyboard/mechanical than tap: recording 1 of 2
 back.{webm,mp3}: keyboard/laptop (0.57 s, -18 LUFS, clean) [named]
 next.{webm,mp3}: keyboard/laptop (0.41 s, -18 LUFS, clean) [named]
-  another recording of keyboard/laptop than back: 4 of 5 (Slow MacBook keyboard #1)
+  another recording of keyboard/laptop than back: recording 4 of 5
 ...
 notify.{webm,mp3}: notify/pair (1.92 s, C5, marimba, -16 LUFS, clean) [named]
 success.{webm,mp3}: success/rise (1.85 s, G4, marimba, -15 LUFS, clean) [named]
@@ -480,7 +499,7 @@ What is recognised:
   it so that it ends at that length (a figure that does not fit is played faster, down to 70 ms between notes;
   shorter still, the result says `as short as this sound can be: 0.26 s`); a longer length changes nothing, a
   struck note rings as it rings (`rings out in 1.85 s, shorter than the 3 s asked for`). Any other length a design
-  cannot keep (a struck sound has no length) is reported as `not used by this sound: dur`. "Under 300 ms" is a
+  cannot keep (a struck sound has no length) is said in plain words (`0.43 s, not the 2 s asked: ...`). "Under 300 ms" is a
   ceiling: it prefers shorter designs and shortens only a design that is longer, as a length. A pitch ("C6", "440
   Hz", "middle C"), a key ("in D", "in the key of Bb minor"), how many takes ("three variations", "5 versions", "a
   few takes"; at most 12) and how many notes ("a two-note chime", "three rising notes", "twice"). A key moves a
@@ -706,9 +725,8 @@ a film request is the film's crash cymbal (`cymbal/orchestral`); with a word of 
 
 ```
 $ earshot make "a fast whoosh as the title flies in" -o whoosh.wav
-whoosh.wav: whoosh/fast (0.51 s, -14 LUFS, clean) [whoosh]
+whoosh.wav: whoosh/fast (0.30 s, -19 LUFS, clean) [whoosh]
 also: whoosh/soft, whoosh/deep, whoosh/long
-not used by this sound: motion
 not understood: flies
 $ earshot make "a deep cinematic boom for the logo" -o boom.wav
 boom.wav: boom/deep (3.42 s, -14 LUFS, clean) [boom]

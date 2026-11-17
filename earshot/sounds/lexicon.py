@@ -446,6 +446,11 @@ PERFORM_WORDS = frozenset((
 # phrases that ask for the action in so many words
 PERFORM_PHRASES = ('on and off', 'off and on', 'a bunch of', 'a handful of', 'a burst of', 'a run of', 'over and over',
                    'again and again', 'in a row')
+# a counted thing a person performs in a row ("four knocks on the table", "three claps", "two beeps"): one file of
+# that many events, in this pattern of earshot.synth.perform (a countdown "3 2 1" is a `count`). Any other counted
+# thing ("five coin pickups", "3 variations", "two versions") is that many separate files
+ROW_WORDS = {'knock': 'knock', 'step': 'walk', 'footstep': 'walk', 'clap': 'row', 'tap': 'row', 'click': 'row',
+             'beep': 'row', 'bleep': 'row', 'countdown': 'count'}
 # words that ask for a single event ("a single knock", "one step", "just one key press")
 SINGLE_WORDS = ('a single', 'one single', 'single', 'just one', 'only one', 'one', 'a lone', 'an isolated')
 # a twin that is the same thing only when the request says one of these words: the learned coins/floor is a handful
