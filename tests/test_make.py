@@ -101,9 +101,9 @@ def test_explicit_arguments_override_the_words(tmp_path):
 
 def test_make_applies_a_theme(tmp_path):
     t = make(out=str(tmp_path / 'g.wav'), sound='success/rise', theme='glass')['takes'][0]
-    assert t['voice'] == 'glockenspiel' and t['pitch'] == 'D5'
+    assert t['voice'] == 'glockenspiel' and t['pitch'] == 'D4'
     t = make(out=str(tmp_path / 'w.wav'), sound='success/rise', theme={'base': 'wood', 'key': 'A'})['takes'][0]
-    assert t['voice'] == 'marimba' and t['pitch'] == 'A5'
+    assert t['voice'] == 'marimba' and t['pitch'] == 'A4'
 
 
 def test_make_a_loop_once(tmp_path):

@@ -229,8 +229,10 @@ def test_booms_keep_the_low_end_of_their_drums():
     drum = _share(_take('bass_drum/orchestral', 1)[0], 0, 100)                 # the learned bass drum, as recorded
     for sid in ('boom/deep', 'fall/sub', 'boom/short'):
         assert _share(_take(sid)[0], 0, 100) > 0.35 * drum, sid
-    assert _centroid(_take('fall/sub')[0]) < _centroid(_take('boom/deep')[0])   # the drop is the darker one
-    assert _share(_take('slam/title')[0], 0, 150) < 0.6             # a slam is a door, not a kick drum
+    boom = _take('boom/deep')[0]
+    assert _share(boom, 150, 24000) < 0.03 and _share(boom, 35, 80) > 0.25     # felt: no skin tone, a low weight
+    assert _share(boom, 80, 160) > 0.03                              # and something a small speaker can play
+    assert 0.3 < _share(_take('slam/title')[0], 0, 150) < 0.8       # a hard front on a low end: no door, no kick
     wide, short = _take('boom/wide')[0], _take('boom/short')[0]
     assert np.corrcoef(wide[:, 0], wide[:, 1])[0, 1] < np.corrcoef(short[:, 0], short[:, 1])[0, 1] - 0.1
     assert _take('boom/short')[1]['dur_s'] < 1.0 < _take('boom/deep')[1]['dur_s']

@@ -649,9 +649,10 @@ def explosion(seed=1, pitch=None, dur=None):
 
 def power_up(seed=1, pitch=None, dur=None):
     """power-up: a fast legato arpeggio climbing two octaves on a major triad, fifths-and-octaves or the major
-    pentatonic, 1-3 frames a step, the top note held with a little vibrato"""
+    pentatonic, 1-3 frames a step, the top note held with a little vibrato. The run starts between F3 and C4, so
+    its held top note lands between F5 and C6: a square held above C6 is shrill"""
     r = _r(seed)
-    m = _base(r, pitch, 60, 67)
+    m = _base(r, pitch, 53, 60)
     arp, k = _pick(r, (((0, 4, 7, 12, 16, 19, 24), 2), ((0, 7, 12, 19, 24), 3),
                        ((0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24), 1)))
     step = _frames(k + int(r.integers(0, 2)) * (k < 3))

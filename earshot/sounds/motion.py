@@ -429,11 +429,12 @@ def _fit(c, natural, share=1.0, size=1.0):
     return float(np.clip(share * c.seconds() / (natural * size), *ops.LENGTH))
 
 
-def _place(c, r, y, room='room', crest=None):
+def _place(c, r, y, room='room', crest=None, dry=False):
     """a mix to the finished take: its stereo width (width: mid / side, 0 .. 2 times) in the shared room; crest: the
     takes of a short design matched in loudness as a designer matches a set of variations (_even: the peaks of a
-    take that stand more than `crest` dB over its loudness rounded off), since each seed is another recording"""
-    y = space.room(fx.width(y, c.lerp('width', 0.0, 2.0, 1.0)), c.room(room), amount=c.space, r=r)
+    take that stand more than `crest` dB over its loudness rounded off), since each seed is another recording; dry:
+    no room at space 0 (a close, dry sound: space +1 gives the room as designed)"""
+    y = space.room(fx.width(y, c.lerp('width', 0.0, 2.0, 1.0)), c.room(room), amount=c.space - 1.0 * dry, r=r)
     y = y * 10 ** (4.0 * c.energy / 20)                   # energy is also level (+-4 dB), where a take is not levelled
     return y if crest is None else _even(y, crest)
 
@@ -450,15 +451,17 @@ def _whoosh(c, r, sid, share=1.0, size=1.0, bright=0.0, hard=0.0, main=True, k=0
         says=('a fast crisp whoosh of a stick cutting the air', 'a quick sharp swish rushing past',
               'a short fast swoosh'),
         uses=('whoosh', 'whip pan', 'fast transition', 'cut', 'fly in', 'title'), tags=('real',), domains=DOM,
-        dur=0.45, axes=REAL_AIR, prior=1.03, allows=GLIDE)
+        dur=0.35, axes=REAL_AIR, prior=1.03, allows=GLIDE)
 def whoosh_fast(c, r):
-    """a fast move: a real stick swung through the air (whoosh/stick: the owner rated one of these 5) and, lined up
-    at its loudest moment 7 dB under it (4 more with energy), a real swish (swish/fast) for the density of a
-    designed whoosh"""
-    a = _whoosh(c, r, 'whoosh/stick', 1.0)
-    b = _whoosh(c, r, 'swish/fast', 1.0, main=False)
-    y, _ = ops.layer([(a, 0.0, 0.0, ops.peak(a, 20.0)), (b, -7.0 + 4.0 * c.energy, 0.0, ops.peak(b, 20.0))])
-    return _place(c, r, y, crest=12.0)
+    """a fast move as a motion designer cuts it, a short clean pass of air: a real stick swung through the air
+    (whoosh/stick), as recorded: close and dry (no room at space 0), at its own length (a length asked for
+    stretches it within design.LENGTH), nothing layered over it. A second layer or a room makes it longer and
+    farther, and that is what turns a crisp swoosh into a film effect"""
+    tr = _tr(c)
+    if c.length():
+        tr['length'] = _fit(c, _natural('whoosh/stick', c), 1.0, tr['size'])
+    y = ops.fade(_real(c, r, 'whoosh/stick', main=True, **tr), 0.0, 0.06, 'db')     # the take's end faded, not cut
+    return _place(c, r, y, 'booth', dry=True)
 
 
 @design('whoosh/soft', kind='whoosh',
@@ -591,22 +594,61 @@ def _drum(c, r, size=1.25, ring=1.2, k=0, main=False, bright=0.0):
     return _real(c, r, 'bass_drum/orchestral', k=k, main=main, **_tr(c, size=size, ring=ring, bright=bright))
 
 
+def _kit(c, r, sid, k=0, main=False, **tr):
+    """a take (stereo) of a close-miked stroke of the drum kit's store (earshot.sounds.drums: kicks, toms, crashes,
+    recorded dry and near, where the orchestral strokes of the learned store carry their hall): the member the seed
+    and energy pick, or the one k further along its walk"""
+    from . import drums as kit
+    e = kit.index()[sid]
+    i = kit.pick(sid, c.seed + k, c.energy)
+    m = e['members'][i]
+    if main:
+        c.member = {'n': i + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
+                    'author': m['credit']['author']}
+    return ops.take(kit.model(m['file']), r, **tr)
+
+
+def _lv(y):
+    """y with its loudest 50 ms at 0 dB, so that the gains of a layer are what the ear compares"""
+    k = dsp.n_of(0.05)
+    p = np.convolve(np.mean(np.atleast_2d(np.asarray(y).T).T ** 2, axis=1), np.ones(k) / k, 'valid')
+    return y / np.sqrt(p.max() + 1e-20)
+
+
+def _low(c, r, size=1.0, ring=1.0, main=False, cut=150.0):
+    """the weight of a film hit: a real deep kick drum (kick/deep: a 31 Hz head, close-miked, about 2.5 s) with
+    everything over `cut` Hz taken out (the beater and the skin's tone, which is what makes a hit a drum), so what
+    is left sits between 30 and 120 Hz and is felt more than heard"""
+    y = _kit(c, r, 'kick/deep', main=main, **_tr(c, size=size, ring=ring, bright=-2.0))
+    return _lv(dsp.butter(y, 'low', cut, order=4))
+
+
+def _small(y, drive=6.0, top=190.0):
+    """the weight made audible on small speakers, which reproduce nothing under about 80-100 Hz: a soft saturation
+    of the low end adds its second and third harmonics (35-60 Hz -> 70-180 Hz), the ear hears the fundamental from
+    them; nothing over `top` Hz is kept, so no skin tone comes back"""
+    return dsp.butter(fx.saturate(y, drive, 'tanh', level='peak'), 'low', top, order=2)
+
+
 @design('boom/deep', kind='boom',
-        says=('a deep cinematic boom with a long low tail', 'a huge orchestral drum hit with a dark gong under it',
+        says=('a deep cinematic boom with a long low tail', 'a very low dry hit felt more than heard, dying away',
               'a deep trailer impact'),
         uses=('impact', 'cinematic hit', 'trailer hit', 'boom', 'reveal', 'title'), tags=('real',), domains=FILM,
-        dur=3.6, axes=REAL)
+        dur=2.6, axes=REAL)
 def boom_deep(c, r):
-    """a trailer boom: a real orchestral bass drum taken bigger (size 1.25, ring 1.2) for the body, a real timpani
-    7 dB under it for the attack and the pitch of the skin, and a real tam-tam 15 dB under for the dark wash that
-    outlasts both (more of them with energy), lined up at their strikes, in a hall"""
-    e = c.energy
-    drum = _drum(c, r, main=True)
-    timp = _real(c, r, 'timpani/hit', **_tr(c, size=1.15, ring=1.0))
-    gong = _real(c, r, 'gong/hit', **_tr(c, size=1.1, ring=0.8, bright=-1.0))
-    y, _ = ops.layer([(drum, 0.0, 0.0), (timp, -7.0 + 3.0 * e, 0.0), (ops.span(gong, 0.0, 4.0, fout=1.5),
-                                                                     -15.0 + 3.0 * e, 0.01)])
-    return _place(c, r, ops.span(y, 0.0, 4.0, fout=1.2, shape='db'), 'hall')
+    """a film boom, felt more than heard: the low end of a real deep kick drum (_low: nothing over 150 Hz, so no
+    drum in it, its decay drawn out 1.8 times) with the low end of a real close explosion (explosion/near under
+    110 Hz) 4 dB under it for a rumbling tail (more with energy), lined up at their onsets, made audible on small speakers (_small: harmonics
+    at 70-180 Hz, nothing above), softened at the onset (4 ms), falling for 2.6 s (ring: 1.3 .. 5 s), close and
+    dry. A boom in a hall, or with a skin's tone above 150 Hz, is heard as a drum played far away"""
+    T = c.length() or 2.6 * _ring(c)
+    low = _low(c, r, size=1.05, ring=1.8, main=True)
+    blast = _real(c, r, 'explosion/near', **_tr(c, size=1.2, ring=1.4, bright=-2.0))
+    blast = _lv(dsp.butter(blast, 'low', 110.0, order=4))
+    y, _ = ops.layer([(low, 0.0, 0.0), (blast, -4.0 + 3.0 * c.energy, 0.0)])
+    y = _small(y, 6.0 + 3.0 * c.hard)
+    y = ops.span(ops.fade(y, 0.004), 0.0, T, fout=0.4 * T, shape='db')
+    return _place(c, r, y, 'booth', dry=True)
 
 
 @design('boom/short', kind='boom',
@@ -639,16 +681,21 @@ def boom_wide(c, r):
 
 
 @design('slam/title', kind='hit',
-        says=('a hard heavy slam with a low drum under it', 'a door slammed with a boom', 'a punchy title slam'),
+        says=('a hard heavy slam with a deep low thud under it', 'a tight close heavy impact',
+              'a punchy title slam'),
         uses=('impact', 'title slam', 'slam', 'text slam', 'stamp'), tags=('real',), domains=DOM, dur=0.9,
         axes=REAL)
 def slam_title(c, r):
-    """a title landing hard: a real heavy door slammed (door/slam) over a real bass drum 5 dB under it whose ring
-    is cut short (0.5 s, faded as a decay), in a short room"""
-    slam = _real(c, r, 'door/slam', main=True, **_tr(c, size=1.1, ring=1.0))
-    drum = ops.span(_drum(c, r, size=1.2, ring=0.7), 0.0, 0.5, fout=0.35, shape='db')
-    y, _ = ops.layer([(slam, 0.0, 0.0), (drum, -5.0, 0.0)])
-    return _place(c, r, y, 'room', crest=11.0)
+    """a title landing hard: the front of a real heavy impact (heavy_drop/floor: something heavy and hard hitting
+    a floor, its first 0.22 s, the rest faded as a decay) on the boom's low end (_low, damped, made audible on
+    small speakers) 2 dB under it, 0.9 s in all (ring: 0.6 .. 1.2 s), close and dry. A whole
+    door slam carries its latch, its frame and its room, which is what makes it a door"""
+    T = c.length() or 0.9 * float(np.clip(_ring(c), 0.67, 1.33))
+    hit = _real(c, r, 'heavy_drop/floor', main=True, **_tr(c, size=1.0, ring=0.7, hard=0.3))
+    hit = _lv(ops.span(hit, 0.0, ops.onset(hit) + 0.22, fout=0.14, shape='db'))
+    low = _small(_low(c, r, size=0.95, ring=0.8), 4.0)
+    y, _ = ops.layer([(hit, 0.0, 0.0), (_lv(low), -2.0, 0.0)])
+    return _place(c, r, ops.span(y, 0.0, T, fout=0.6 * T, shape='db'), 'booth', crest=11.0, dry=True)
 
 
 @design('impact/suck', kind='hit',
@@ -659,15 +706,17 @@ def slam_title(c, r):
         axes=REAL, allows=('pre_swell', 'stacked'))       # the suck-in before the layered hit is the design
 def impact_suck(c, r):
     """the breath before a hit: the build of a real airy whoosh (whoosh/airy through design.rise: its tail
-    reversed, about half a second, longer with dur) ends where a real heavy drop (heavy_drop/floor) and a real bass
-    drum 3 dB under it strike"""
+    reversed, 0.6 s, longer with dur) ends where a real heavy drop (heavy_drop/floor) strikes on the boom's low end
+    (_low, made audible on small speakers, 1.2 s, as loud as the hit, more with energy), close and dry: an
+    orchestral drum under it carried its hall and made the whole hit sound far away"""
+    T = c.length() or 1.8
     pre = ops.rise(_real(c, r, 'whoosh/airy', length=1.2, **_tr(c, size=1.1)))
-    pre = ops.span(pre, max(0.0, ops.end(pre) - (c.length() or 1.8) * 0.3))
-    hit = _real(c, r, 'heavy_drop/floor', main=True, **_tr(c, size=1.1, ring=1.0))
-    drum = _drum(c, r, size=1.2, ring=0.8)
-    y, _ = ops.layer([(pre, -4.0, 0.0, ops.end(pre)), (hit, 0.0, 0.0), (ops.span(drum, 0.0, 1.2, fout=0.6,
-                                                                                shape='db'), -3.0, 0.0)])
-    return _place(c, r, y, 'room', crest=11.0)
+    pre = _lv(ops.span(pre, max(0.0, ops.end(pre) - T * 0.33)))
+    hit = _lv(_real(c, r, 'heavy_drop/floor', main=True, **_tr(c, size=1.1, ring=1.0)))
+    low = _lv(_small(_low(c, r, size=1.0, ring=0.9), 5.0))
+    y, _ = ops.layer([(pre, -6.0, 0.0, ops.end(pre)), (hit, 0.0, 0.0),
+                      (ops.span(low, 0.0, T - 0.33 * T, fout=0.6, shape='db'), 0.0 + 2.0 * c.energy, 0.0)])
+    return _place(c, r, y, 'booth', crest=11.0, dry=True)
 
 
 def _soft_thump(r, k, g):
@@ -733,20 +782,24 @@ def rise_reverse(c, r):
 
 
 @design('rise/air', kind='rise',
-        says=('a rising rush of air that swells to a peak', 'a hiss of air and steam building up',
-              'air swelling to a cut'),
-        uses=('riser', 'build', 'noise riser', 'reveal', 'transition', 'uplifter'), tags=('real',), domains=FILM,
-        dur=1.8, axes=REAL_AIR, prior=1.1, allows=GLIDE)
+        says=('a cymbal swell played backwards, growing to a sharp cut', 'a reverse cymbal rising to a stop',
+              'a shimmering swell building up and cut off at the top'),
+        uses=('riser', 'build', 'reveal', 'transition', 'uplifter', 'reverse cymbal'), tags=('real',), domains=FILM,
+        dur=2.5, axes=REAL_AIR, prior=1.1, allows=GLIDE)
 def rise_air(c, r):
-    """a noise riser made of real air: the build a recorded swell of air, wind or steam holds (swell/air through
-    design.rise: up to its loudest moment, or its decay reversed), with the build of a real airy whoosh (whoosh/airy)
-    6 dB under it for the last part, ending on the same moment and sharpening the top"""
-    sw = ops.rise(_real(c, r, 'swell/air', main=True, length=_fit(c, _natural('swell/air', c), 1.8),
-                        **_tr(c, size=1.0)))
-    wh = ops.rise(_real(c, r, 'whoosh/airy', **_tr(c, size=1.05)))
-    wh = ops.span(wh, max(0.0, ops.end(wh) - 0.6 * ops.end(sw)), fin=0.1)    # it joins in for the last part
-    y, _ = ops.layer([(sw, 0.0, 0.0, ops.end(sw)), (wh, -6.0 + 3.0 * c.energy, 0.0, ops.end(wh))])
-    return _place(c, r, ops.fade(y, 0.15 * len(y) / SR, 0.0, 'db'), crest=11.0)
+    """the riser every editor knows: a cymbal's decay played backwards. Two real close-miked strokes of the kit's
+    cymbals (crash/bright: crashes and a suspended cymbal hit hard; crash/dark 5 dB under it, more with energy, for
+    the body) are taken from their strike to the length (2.5 s by default; their decays last about 3 s), reversed
+    and lined up at their ends: they grow the whole way, in level and in brightness (a cymbal's highs die first,
+    so backwards they arrive last), from silence (the first 40 % faded in as a decay fades) to the strike, which
+    is cut clean (10 ms). No tone, no noise generator"""
+    T = c.length() or 2.5
+    a = _kit(c, r, 'crash/bright', main=True, ring=1.2, **_tr(c))
+    b = _kit(c, r, 'crash/dark', k=1, ring=1.2, **_tr(c, bright=-1.0))
+    a, b = (ops.reverse(ops.span(_lv(x), max(0.0, ops.onset(x) - 0.002), ops.onset(x) + T, fout=0.3), 0.01)
+            for x in (a, b))
+    y, _ = ops.layer([(a, 0.0, 0.0, ops.end(a)), (b, -5.0 + 3.0 * c.energy, 0.0, ops.end(b))])
+    return _place(c, r, ops.fade(y, 0.4 * len(y) / SR, 0.0, 'db'), 'booth', dry=True)
 
 
 @design('rise/tension', kind='rise',
@@ -1145,9 +1198,11 @@ BRAAM = (0, 7, 12)
         domains=FILM, dur=3.0, pitch='A#1', axes=REAL, prior=1.2, allows=('pre_swell', 'stacked'))
 def braam_brass(c, r):
     """a braam made of real brass: held low brass notes (brass/low: tubas, trombones, horns) moved to the root, its
-    fifth and its octave (each the member nearest its note, moved at most 7 semitones), entering together over a
-    real bass drum hit and swelling for 0.12 s (0.03 .. 0.4 s with hard), led in by a real cymbal decay played
-    backwards 12 dB under them; they are held for the length asked for and fall away as the hall closes"""
+    fifth and its octave (each the member nearest its note, moved at most 7 semitones, each at the same loudest
+    50 ms before its gain), entering together over the boom's low end (_low, made audible on small speakers, 5 dB
+    over the root, more with energy and size: the three brass notes together stand about 4 dB over one) and swelling for 0.12 s (0.03 .. 0.4 s with hard), led in by a real cymbal
+    decay played backwards 14 dB under them; they are held for the length asked for and fall away within 0.6 s.
+    No room is added at space 0: the brass recordings carry their own, and a hall on top made the blast distant"""
     L = _learned()
     e = L.index()['brass/low']
     root = c.hz()
@@ -1168,11 +1223,12 @@ def braam_brass(c, r):
         parts.append((z, (0.0, -3.0, -4.0)[k] + c.lerp('size', -3.0, 3.0, 0.0) * (k == 0), 0.0, 0.0))
     c.member = {'n': L.index()['brass/low']['members'].index(first) + 1, 'of': len(e['members']),
                 'recording': first['credit']['title'], 'author': first['credit']['author']}
-    drum = ops.span(_drum(c, r, size=1.25, ring=0.9), 0.0, 1.5, fout=0.8, shape='db')
+    drum =ops.span(_small(_low(c, r, size=1.0, ring=1.1), 5.0), 0.0, 2.0, fout=1.0, shape='db')
     cym = ops.reverse(ops.span(_real(c, r, 'cymbal/orchestral', **_tr(c)), 0.0, 1.0, fout=0.15))
-    y, _ = ops.layer(parts + [(drum, -2.0 + 3.0 * c.energy, 0.0, ops.onset(drum)),
-                              (ops.fade(cym, 0.5, 0.0, 'db'), -12.0, 0.0, ops.end(cym))])
-    return _place(c, r, ops.span(y, 0.0, T + 1.0, fout=0.6, shape='db'), 'hall')
+    y, _ = ops.layer([(_lv(z), g, o, a) for z, g, o, a in parts] +
+                     [(_lv(drum), 5.0 + 3.0 * c.energy + 3.0 * c.size, 0.0, ops.onset(drum)),
+                      (ops.fade(_lv(cym), 0.5, 0.0, 'db'), -14.0, 0.0, ops.end(cym))])
+    return _place(c, r, ops.span(y, 0.0, T + 0.6, fout=0.6, shape='db'), 'studio', dry=True)
 
 
 @design('explosion/huge', kind='boom',

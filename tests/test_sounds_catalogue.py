@@ -163,15 +163,16 @@ def test_a_material_without_a_voice_picks_its_voice():
 
 
 def test_a_minor_key_turns_the_major_third_minor():
-    """success/rise is a root and a major third above it (G5, B5); in a minor scale the third is B flat"""
+    """success/rise climbs from the major third over G4 (B4) by way of D5 onto G5; in a minor scale it starts on the
+    minor third, B flat"""
     out = {}
     for sc in ('major', 'minor'):
         y, _ = registry.render('success/rise', voice='marimba', theme={'scale': sc}, space=-1.0)
-        root = _strongest(y, 700, 870, 0.0, 0.08)
-        third = _strongest(y, 880, 1050, 0.09, 0.3)
-        assert abs(_cents(root, knobs.hz('G5'))) <= 20
-        out[sc] = _cents(third, root)
-    assert out['major'] == pytest.approx(400, abs=20) and out['minor'] == pytest.approx(300, abs=20)
+        third = _strongest(y, 440, 520, 0.0, 0.08)
+        top = _strongest(y, 700, 870, 0.19, 0.3)
+        assert abs(_cents(top, knobs.hz('G5'))) <= 20
+        out[sc] = _cents(top, third)
+    assert out['major'] == pytest.approx(800, abs=20) and out['minor'] == pytest.approx(900, abs=20)
 
 
 @pytest.mark.parametrize('want', [0.3, 1.0])
@@ -186,9 +187,10 @@ def test_a_length_sets_how_long_a_figure_sounds(want):
 
 
 def test_a_length_longer_than_the_voice_rings():
-    """a marimba note at G5 dies by itself: a 2 s figure cannot be kept, and the render says so"""
-    _, meta = registry.render('success/rise', voice='marimba', dur=2.0)
-    assert meta['dur_s'] >= 2.0 or 'dur' in meta.get('ignored', [])
+    """a marimba note at G5 dies by itself (about 1.6 s with the room): a 3 s figure cannot be kept, and the render
+    says so"""
+    _, meta = registry.render('success/rise', voice='marimba', dur=3.0)
+    assert meta['dur_s'] >= 3.0 or 'dur' in meta.get('ignored', [])
 
 
 @pytest.mark.parametrize('sid', ['tap/tone', 'hover/tone', 'menu/move'])
