@@ -175,22 +175,46 @@ def test_a_minor_key_turns_the_major_third_minor():
     assert out['major'] == pytest.approx(800, abs=20) and out['minor'] == pytest.approx(900, abs=20)
 
 
-@pytest.mark.parametrize('want', [0.3, 1.0])
-def test_a_length_sets_how_long_a_figure_sounds(want):
-    """the figure sounds for the length asked; what follows is the damped note's release and the room (< 0.35 s)"""
-    y, meta = registry.render('success/rise', voice='vibraphone', dur=want)        # a voice that can ring that long
+def _figure_raw(sid, **req):
+    d = registry.get(sid)
+    return np.asarray(d.fn(registry.Controls(d, **req), dsp.rng(registry.seed_of(sid, 0))), np.float64)
+
+
+@pytest.mark.parametrize('voice', [None, 'square_lead', 'warm_pad'])
+def test_a_shorter_length_damps_the_figure(voice):
+    """success/rise rings about 1.8 s on the marimba: asked for 0.4 s it keeps its spacing and is damped by the hand,
+    a fade that ends at 0.4 s, never a cut; until the fade it is the unshortened figure sample for sample. A
+    modelled voice (a chip lead, a pad) is held to the length the same way"""
+    y, meta = registry.render('success/rise', voice=voice, dur=0.4)
+    assert 0.37 <= meta['dur_s'] <= 0.43, meta['dur_s']
     assert 'dur' not in meta.get('ignored', [])
+    pk = np.abs(y).max()
+    assert np.abs(y[-dsp.n_of(0.005):]).max() < 0.03 * pk                 # faded to (near) zero
     e = np.abs(y).max(1)
-    end = np.nonzero(e >= e.max() * 10 ** (-30 / 20))[0][-1] / SR       # where it has fallen 30 dB
-    assert want <= end <= want + 0.15, end
-    assert want <= meta['dur_s'] <= want + 0.35
+    tail = [e[-dsp.n_of(s):][:dsp.n_of(0.01)].max() for s in (0.05, 0.03, 0.01)]
+    assert tail[0] > tail[1] > tail[2]                                    # falling over its last 50 ms: a fade
+    a, b = _figure_raw('success/rise', voice=voice), _figure_raw('success/rise', voice=voice, dur=0.4)
+    assert len(a) > len(b) and np.array_equal(a[:dsp.n_of(0.1)], b[:dsp.n_of(0.1)])
 
 
-def test_a_length_longer_than_the_voice_rings():
-    """a marimba note at G5 dies by itself (about 1.6 s with the room): a 3 s figure cannot be kept, and the render
-    says so"""
-    _, meta = registry.render('success/rise', voice='marimba', dur=3.0)
-    assert meta['dur_s'] >= 3.0 or 'dur' in meta.get('ignored', [])
+def test_a_figure_hurried_to_fit_and_its_shortest_length():
+    """the last note starts at least LAST_ROOM s before the end: shorter, the notes come faster, down to HAND s
+    apart; success/rise (two gaps of 90 ms) is then 2 x 70 ms + 120 ms long at the least"""
+    assert figure.squeeze([0.09, 0.09], 0.16) == pytest.approx([0.08, 0.08], abs=1e-6)
+    assert figure.squeeze([0.09, 0.09], 0.05) == pytest.approx([figure.HAND] * 2)
+    assert figure.squeeze([0.07, 0.012], 0.0) == pytest.approx([figure.HAND, 0.012])      # a chord stays a chord
+    assert figure.squeeze([0.09, 0.09], 0.5) == [0.09, 0.09]
+    _, meta = registry.render('success/rise', dur=0.3, check=False)
+    assert 0.27 <= meta['dur_s'] <= 0.33
+    _, meta = registry.render('success/rise', dur=0.1, check=False)
+    assert meta['dur_s'] == pytest.approx(2 * figure.HAND + figure.LAST_ROOM, abs=0.03)
+
+
+def test_no_length_or_a_longer_one_plays_the_figure_as_it_rings():
+    """a struck note is not held: a length longer than the figure rings gives the same samples as none"""
+    a, _ = registry.render('success/rise', voice='marimba')
+    b, meta = registry.render('success/rise', voice='marimba', dur=5.0)
+    assert np.array_equal(a, b) and 'dur' in meta.get('ignored', [])
 
 
 @pytest.mark.parametrize('sid', ['tap/tone', 'hover/tone', 'menu/move'])

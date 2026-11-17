@@ -637,10 +637,12 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                              'product: soft, glass, wood, felt, tine, metal, '
                                                              'electric, digital, retro')] = None,
               pitch: Annotated[str | None, Field(description='a note ("C5") or Hz for a tonal sound')] = None,
-              dur: Annotated[float | None, Field(description='seconds: how long a figure of notes sounds, the hold '
-                                                             'of a pad, the length of a loop (each has a shortest '
-                                                             'one) or a whoosh; a single struck sound (a tap, a hit) '
-                                                             'rings as it rings: it ignores dur and says so',
+              dur: Annotated[float | None, Field(description='seconds: how long a figure of notes sounds (damped '
+                                                             'by the hand to end there; it rings no longer than it '
+                                                             'rings), the hold of a pad, the length of a loop (each '
+                                                             'has a shortest one) or a whoosh; a single struck sound '
+                                                             '(a tap, a hit) rings as it rings: it ignores dur and '
+                                                             'says so',
                                                  gt=0)] = None,
               voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound: "marimba" '
                                                              '(the default of figures), "harp", "pizzicato" and '

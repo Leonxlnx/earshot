@@ -90,13 +90,13 @@ def test_make_nothing_answers(tmp_path):
 
 
 def test_explicit_arguments_override_the_words(tmp_path):
-    words = 'a success chime on a vibraphone in D, 2 seconds'       # a voice that can ring for two seconds
+    words = 'a success chime on a vibraphone in D, 400 ms'
     base = make(words, str(tmp_path / 'a.wav'))['takes'][0]
-    assert base['pitch'].startswith('D') and base['dur_s'] >= 2.0
-    res = make(words, str(tmp_path / 'b.wav'), sound=base['id'], pitch='A5', voice='kalimba', dur=0.5)
+    assert base['pitch'].startswith('D') and base['voice'] == 'vibraphone' and abs(base['dur_s'] - 0.4) <= 0.03
+    res = make(words, str(tmp_path / 'b.wav'), sound=base['id'], pitch='A5', voice='kalimba', dur=0.3)
     t = res['takes'][0]
     assert t['pitch'] == 'A5' and t['voice'] == 'kalimba'
-    assert t['dur_s'] < base['dur_s'] - 0.8
+    assert abs(t['dur_s'] - 0.3) <= 0.03
 
 
 def test_make_applies_a_theme(tmp_path):
@@ -171,6 +171,17 @@ def test_a_struck_sound_says_it_ignores_dur(tmp_path):
     assert res['takes'][0]['dur_s'] < 1.5 and 'not used by this sound: dur' in res['summary']
     res = make(out=str(tmp_path / 'f.wav'), sound='success/rise', dur=1.0)
     assert 'dur' not in res['takes'][0].get('ignored', [])
+
+
+def test_a_figure_says_how_short_it_can_be_and_that_it_is_not_held(tmp_path):
+    """a figure asked shorter than its notes can be hurried says its shortest length; asked longer than it rings, it
+    says it rings out sooner, in plain words instead of `not used by this sound: dur`"""
+    s = make(out=str(tmp_path / 'a.wav'), sound='success/rise', dur=0.1)['summary']
+    assert 'as short as this sound can be: 0.26 s (asked for 0.1 s)' in s and 'not used' not in s
+    s = make(out=str(tmp_path / 'b.wav'), sound='success/rise', dur=3.0)['summary']
+    assert 'shorter than the 3 s asked for: a struck note is not held' in s and 'not used' not in s
+    res = make(out=str(tmp_path / 'c.wav'), sound='success/rise', dur=0.4)
+    assert 0.37 <= res['takes'][0]['dur_s'] <= 0.43 and 'not used' not in res['summary']
 
 
 def test_help_names_the_codecs_and_what_dur_does(capsys):

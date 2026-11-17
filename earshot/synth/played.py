@@ -120,15 +120,22 @@ def loudest(y, s=0.05):
     return float(10 * np.log10(np.max(c[k:] - c[:-k]) / k + 1e-30))
 
 
-def damp(y, length, midi):
-    """y damped at `length` s: a cos^2 fade of DAMP s (longer for a low note) from there, then the end"""
+def damp_s(midi):
+    """s a hand or a damper takes to stop a note at `midi`: DAMP[0] at C3 .. DAMP[1] at C6"""
+    u = float(np.clip((midi - 48.0) / 36.0, 0.0, 1.0))
+    return DAMP[0] + (DAMP[1] - DAMP[0]) * u
+
+
+def damp(y, length, midi, fade=None):
+    """y damped at `length` s: a cos^2 fade of `fade` s (None: damp_s(midi), longer for a low note) from there, then
+    the end"""
     a = dsp.n_of(length)
     if a >= len(y):
         return y
-    u = float(np.clip((midi - 48.0) / 36.0, 0.0, 1.0))
-    k = min(len(y) - a, dsp.n_of(DAMP[0] + (DAMP[1] - DAMP[0]) * u))
+    k = min(len(y) - a, dsp.n_of(damp_s(midi) if fade is None else fade))
     y = np.array(y[:a + k])
-    y[a:] *= (np.cos(np.linspace(0.0, np.pi / 2, k)) ** 2)[:, None]
+    g = np.cos(np.linspace(0.0, np.pi / 2, k)) ** 2
+    y[a:] *= g[:, None] if y.ndim == 2 else g
     return y
 
 

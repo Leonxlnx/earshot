@@ -16,7 +16,7 @@ paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) 
 real textures (fire, three shores, crickets, a brook, a cafe, a street, distant city, room tone, underwater, rain on
 a terrace). The acoustic drum kit and hand percussion are learned too (130 recorded strokes; seeds walk through a
 drum's strokes, `energy` picks softer or harder ones), and so are the instruments that play the tonal figures: a
-marimba (the default), a harp, pizzicato strings and an upright piano (`felt_piano`), 100 recorded single notes.
+marimba (the default), a harp, pizzicato strings and an upright piano (`felt_piano`), 97 recorded single notes.
 Only numbers ship, no audio file: every sound is computed when it is asked for. Written in code: the figures
 themselves (success, error, notify, coin, level up: the notes, their timing and the room), chip sound, the
 drum-machine voices, a brush snare, a finger snap and stick counts, rain on a window, wind in trees and a forest,

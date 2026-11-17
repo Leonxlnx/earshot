@@ -130,7 +130,7 @@ family and the learned beds were built after his last ratings: each learned take
   (walks, knocks, typing, coins, keys, clinking glasses ...) can be played as the action; the reader decides from
   the words (a plural, an action word, a count or a length), and `events` overrides it. A walk or a typing run made
   from single recordings repeats the few recordings the thing has.
-- **The real instruments** have 14 to 48 recorded notes each; a note between them is a neighbour moved by a few
+- **The real instruments** have 14 to 45 recorded notes each; a note between them is a neighbour moved by a few
   semitones, and the takes of one instrument can differ in level by 2-3 dB from note to note.
 - **Invented realistic sounds** remain in the catalogue for things no learned design covers (jumps, landings, game
   hits, shots, magic). The owner rated their kind 1-2. A learned design wins a tie with them, but a request that
@@ -160,7 +160,7 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 7.00 MB, the textures 3.87 MB, the drums 1.31 MB and the instrument notes 0.85 MB
+sound. The learned store adds 7.00 MB, the textures 3.87 MB, the drums 1.31 MB and the instrument notes 0.83 MB
 to the package. The lab's
 recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
 repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers

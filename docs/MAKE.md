@@ -154,8 +154,8 @@ sound made from nothing, and it exists only because someone recorded the thing a
 | | one-shots | ambience beds | drums | instrument notes |
 |---|---|---|---|---|
 | designs | 153 (`earshot/sounds/learned.py`) | 12 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
-| recordings | 364 recorded events (a few are several events cut from one recording; 13 are recordings of a whole action) | 11 textures of 12-30 s | 130 strokes | 100 single notes (marimba 14, harp 24, pizzicato 48, upright piano 14) |
-| store | `earshot/data/resyn/`: 7.00 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 3.87 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.85 MB, `index.json`, `CREDITS.md` |
+| recordings | 364 recorded events (a few are several events cut from one recording; 13 are recordings of a whole action) | 11 textures of 12-30 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
+| store | `earshot/data/resyn/`: 7.00 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 3.87 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
 | sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
@@ -334,12 +334,12 @@ tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
 ...
 open.{webm,mp3}: open/lift (2.85 s, D4, marimba, -15 LUFS, clean) [named]
 ...
-success.{webm,mp3}: success/rise (2.61 s, D4, marimba, -15 LUFS, clean) [success, chime]
+success.{webm,mp3}: success/rise (0.50 s, D4, marimba, -15 LUFS, clean) [success, chime]
 coin_1.{webm,mp3}: coin/bright (2.02 s, D6, marimba, -16 LUFS, clean) [coin pickup]
 coin_2.{webm,mp3}: coin/bright (1.80 s, D6, marimba, -16 LUFS, clean) [coin pickup]
 rain.{webm,flac}: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
   a loop: flac instead of mp3, which leaves a gap at the seam
-20 sounds in myset\sprite.webm + sprite.mp3 (41.5 s, 350 kB, 638 kB), map sprite.json
+20 sounds in myset\sprite.webm + sprite.mp3 (39.4 s, 334 kB, 606 kB), map sprite.json
 ```
 
 The wood theme plays the figures on a marimba in D; the recorded touches have no voice and keep their own sound. A
@@ -475,9 +475,12 @@ What is recognised:
   pick the voice made of it: wood a marimba, glass a glockenspiel, metal a vibraphone, soft a felt piano, digital a
   glass pluck, retro a square lead (`registry.VOICE_OF`; this wins over the theme's voice). A voice or material
   that chose the design is not reported as unused.
-- **Numbers.** Lengths ("400 ms", "2 seconds", "half a second") set how long a figure sounds before its room dies
-  away, how long a pad is held, how long a loop or a whoosh is; a length a design cannot keep (a marimba cannot
-  ring 2 s, a struck sound has no length) is reported as `not used by this sound: dur`. "Under 300 ms" is a
+- **Numbers.** Lengths ("400 ms", "2 seconds", "half a second") set how long a pad is held, how long a loop or a
+  whoosh is, and how long a figure of notes sounds: shorter than it rings, it keeps its spacing and the hand damps
+  it so that it ends at that length (a figure that does not fit is played faster, down to 70 ms between notes;
+  shorter still, the result says `as short as this sound can be: 0.26 s`); a longer length changes nothing, a
+  struck note rings as it rings (`rings out in 1.85 s, shorter than the 3 s asked for`). Any other length a design
+  cannot keep (a struck sound has no length) is reported as `not used by this sound: dur`. "Under 300 ms" is a
   ceiling: it prefers shorter designs and shortens only a design that is longer, as a length. A pitch ("C6", "440
   Hz", "middle C"), a key ("in D", "in the key of Bb minor"), how many takes ("three variations", "5 versions", "a
   few takes"; at most 12) and how many notes ("a two-note chime", "three rising notes", "twice"). A key moves a
@@ -505,9 +508,8 @@ What reached the render, on real calls:
 
 ```
 $ earshot make "a soft wooden success chime for a finance app, 400 ms, in D" -o wood.wav
-wood.wav: success/rise (2.62 s, D4, marimba, -14 LUFS, clean) [success, chime]
+wood.wav: success/rise (0.40 s, D4, marimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
-not used by this sound: dur
 
 $ earshot make "a success chime on a kalimba, softer" -o kal.wav
 kal.wav: success/rise (0.79 s, G4, kalimba, -14 LUFS, clean) [success, chime]
@@ -522,9 +524,9 @@ kalimba.wav: note/kalimba (1.06 s, E5, -14 LUFS, clean) [kalimba, note]
 also: pluck/kalimba, pluck/kalimba_ring, pluck/kalimba_soft
 ```
 
-"Wooden" played a marimba and the key D moved the root from G4 to D4; "400 ms" is not kept, since the real marimba's
-notes ring as they ring (`not used by this sound: dur`). In D minor, `success/rise` (a major third up) rises a minor
-third.
+"Wooden" played a marimba and the key D moved the root from G4 to D4; "400 ms" is kept the way a player keeps it:
+the three notes at their spacing, then the bars damped by the hand so the sound ends at 0.40 s (without a length,
+the last note rings out for about 2.6 s). In D minor, `success/rise` (a major third up) rises a minor third.
 
 **How well requests are understood.** Three sets of requests were written by someone who never saw the catalogue: A
 (440 requests for 110 intents, in four styles) and B (220) were used to develop the reader; C (220: half long

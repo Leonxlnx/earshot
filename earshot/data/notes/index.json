@@ -1448,66 +1448,6 @@
     }
    },
    {
-    "file": "pizzicato/pizzicato-72-v1-2.npz",
-    "midi": 72,
-    "dynamic": "v1",
-    "take": 2,
-    "len_s": 0.474,
-    "onset_s": 0.0035,
-    "cents": -11.0,
-    "gain_db": 34.08,
-    "tilt": 0.0,
-    "stereo": true,
-    "source": "LLVln_Pizz_C5_p_RR2.wav",
-    "credit": {
-     "title": "LLVln_Pizz_C5_p_RR2.wav",
-     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
-     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_C5_p_RR2.wav",
-     "licence": "CC0 1.0 (public domain dedication)",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    }
-   },
-   {
-    "file": "pizzicato/pizzicato-72-v2-1.npz",
-    "midi": 72,
-    "dynamic": "v2",
-    "take": 1,
-    "len_s": 0.775,
-    "onset_s": 0.0032,
-    "cents": -14.6,
-    "gain_db": 14.3,
-    "tilt": 0.0,
-    "stereo": true,
-    "source": "LLVln_Pizz_C5_f_RR1.wav",
-    "credit": {
-     "title": "LLVln_Pizz_C5_f_RR1.wav",
-     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
-     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_C5_f_RR1.wav",
-     "licence": "CC0 1.0 (public domain dedication)",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    }
-   },
-   {
-    "file": "pizzicato/pizzicato-72-v2-2.npz",
-    "midi": 72,
-    "dynamic": "v2",
-    "take": 2,
-    "len_s": 0.719,
-    "onset_s": 0.0032,
-    "cents": 4.6,
-    "gain_db": 14.44,
-    "tilt": 0.0,
-    "stereo": true,
-    "source": "LLVln_Pizz_C5_f_RR2.wav",
-    "credit": {
-     "title": "LLVln_Pizz_C5_f_RR2.wav",
-     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
-     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_C5_f_RR2.wav",
-     "licence": "CC0 1.0 (public domain dedication)",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    }
-   },
-   {
     "file": "pizzicato/pizzicato-76-v1-1.npz",
     "midi": 76,
     "dynamic": "v1",

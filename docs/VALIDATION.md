@@ -203,8 +203,8 @@ store and to drop members it scored lowest where a design had others.
 - **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit
   public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/`,
   `drums/` and `notes/`.
-- **Instrument notes** (`earshot/synth/played.py`, `earshot/data/notes/`, 0.85 MB): 100 single notes from VSCO-2 CE
-  and VCSL (marimba 14, harp 24, pizzicato 48, upright piano 14), each played as a take moved to the pitch asked for
+- **Instrument notes** (`earshot/synth/played.py`, `earshot/data/notes/`, 0.83 MB): 97 single notes from VSCO-2 CE
+  and VCSL (marimba 14, harp 24, pizzicato 45, upright piano 14), each played as a take moved to the pitch asked for
   with the tuning measured on the recording. Not rated by the owner yet.
 - **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 23 motion designs are layers of 21
   learned film things (66 recordings) (orchestral bass drums, timpani, tam-tams, crash cymbals, heavy drops, a door slam, swells

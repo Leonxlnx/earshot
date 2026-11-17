@@ -95,7 +95,7 @@ explicit public-domain dedication. earshot keeps each recording as numbers, not 
 2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
 (`earshot/synth/resyn.py`). The store is 7.00 MB for 364 recorded events (`earshot/data/resyn/`; a few are several
 events cut from one recording, 13 are recordings of a whole action such as a walk), 3.87 MB for 11 textures
-(`earshot/data/textures/`), 1.31 MB for 130 drum strokes (`earshot/data/drums/`) and 0.85 MB for 100 single notes
+(`earshot/data/textures/`), 1.31 MB for 130 drum strokes (`earshot/data/drums/`) and 0.83 MB for 97 single notes
 of four instruments (`earshot/data/notes/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
 noise and applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural
 one, energy, room, width), so every take is new. But it is a new take of that recording: a compact description of a
@@ -125,7 +125,7 @@ another voice (`--voice harp`, "on a harp", "with pizzicato strings", "on a soft
 only when asked. A few game figures keep the voice they were written for (`coin/bright`: a glockenspiel).
 
 The real instruments (`earshot/synth/played.py`) are a marimba with yarn mallets, a harp, pizzicato strings (a cello
-section up to B4, a solo violin above) and an upright piano played softly (the voice `felt_piano`): 100 single notes
+section up to B4, a solo violin above) and an upright piano played softly (the voice `felt_piano`): 97 single notes
 from VSCO-2 CE and VCSL (CC0), each played as a new take moved to the pitch asked for. Inner notes of a figure ring
 on under the next one, the last rings out, and a figure whose top note lies above C6 is played an octave lower.
 

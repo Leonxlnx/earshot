@@ -56,8 +56,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   2.5 dB over the quietest; a `quiet` name (`hover` in `ui`) sits 0.5 dB under it. Loops, beds, pads and music, and
   every sound of a spec that gives `lufs`, are levelled by kind as before (-16 LUFS and each kind's weight under it).
 - **Tonal figures on real instruments** (`earshot/synth/played.py`, `earshot/data/notes/`): a marimba played with
-  yarn mallets (14 notes), a harp (24), pizzicato strings (48: a cello section up to B4, a solo violin above) and an
-  upright piano played softly (14), 100 single notes from VSCO-2 CE and VCSL (CC0), kept as numbers (0.85 MB,
+  yarn mallets (14 notes), a harp (24), pizzicato strings (45: a cello section up to B4, a solo violin above) and an
+  upright piano played softly (14), 97 single notes from VSCO-2 CE and VCSL (CC0), kept as numbers (0.83 MB,
   credits in `earshot/data/notes/CREDITS.md`) and played as new takes. The voices `marimba`, `harp`, `pizzicato` and
   `felt_piano` play them (`struck.note` and `strings.note` still play the models). The marimba is the default voice
   of figures and of the `soft` and `wood` themes. A real voice lets inner notes ring under the next one, rings the
@@ -114,8 +114,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   an instrument named in the request plays the figure ("a notification on a harp", "a success sound with
   pizzicato strings", "an error sound on a soft piano");
   a voice asked for by name is always played; a minor key in the request or theme turns a figure's major thirds,
-  sixths and sevenths into minor ones; a length sets how long a figure sounds, and "under 300 ms" shortens only a
-  design that is longer.
+  sixths and sevenths into minor ones; a length shorter than a figure rings keeps its spacing and damps it by the
+  hand so it ends there (a figure that does not fit is played faster, down to 70 ms between notes, and the result
+  says the shortest it can be), a longer one changes nothing; "under 300 ms" shortens only a design that is longer.
 - **The sound atlas** (`earshot/sounds/atlas.py`, `earshot/data/sounds_atlas.npz`, numbers only): a CLAP embedding of
   every design's default render and of its descriptions. `--listen` (MCP `listen`) blends how each design sounds into
   the ranking and reports what the written sound is heard as; the MCP server's `make` blends it in without being

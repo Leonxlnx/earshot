@@ -228,6 +228,21 @@ def performance(b, sound, events=None):
     return brief.performance(b, sound, learned.index()[sound].get('pattern'))
 
 
+def _held(sound, dur, takes):
+    """the plain note for a figure of notes (earshot.sounds.figure) whose length differs from the one asked for: a
+    struck note is not held longer than it rings, and a figure cannot be shorter than its notes hurried to a hand's
+    spacing; None when the length was kept (within 30 ms) or none was asked for"""
+    from .sounds import figure, registry
+    if not dur or getattr(registry.get(sound).fn, '__module__', '') != figure.__name__:
+        return None
+    s = [t['dur_s'] for t in takes]
+    if min(s) > dur + 0.03:
+        return f'as short as this sound can be: {min(s):.2f} s (asked for {dur:g} s)'
+    if max(s) < 0.75 * dur:
+        return f'rings out in {max(s):.2f} s, shorter than the {dur:g} s asked for: a struck note is not held'
+    return None
+
+
 def take(sound, seed, req, lufs=None, peak_db=-1.0, perform=None):
     """one clean take of a design: the first of TRIES seeds (seed, seed + 101, ...) that passes the audit, else the
     first one with its warnings: (y, meta). perform: (True, events) plays the design as a performance
@@ -316,6 +331,10 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if heard:
         lines.append(f"heard as: {heard['query']!r} (z {heard['z']:+.1f}, {heard['verdict']})")
     ign = sorted(set().union(*(set(t.get('ignored') or ()) for t in takes)))
+    held = _held(pick['id'], req.get('dur'), takes)
+    if held:
+        lines.append(held)
+        ign = [k for k in ign if k != 'dur']
     if ign:
         lines.append(f"not used by this sound: {', '.join(ign)}")
     unknown = _unknown(b, pick['why'])
@@ -552,7 +571,8 @@ def add_cli(sub):
     p.add_argument('--seed', type=int, default=0)
     p.add_argument('--theme', help='a theme preset (soft, glass, wood, felt, tine, metal, electric, digital, retro)')
     p.add_argument('--pitch', help='a note (C5) or Hz')
-    p.add_argument('--dur', type=float, help='seconds: how long a figure of notes sounds, the hold of a pad, the '
+    p.add_argument('--dur', type=float, help='seconds: how long a figure of notes sounds (damped by the hand to end '
+                                             'there; a figure rings no longer than it rings), the hold of a pad, the '
                                              'length of a loop (each has a shortest one) or a whoosh; a single '
                                              'struck sound (a tap, a hit) rings as it rings: it ignores --dur and '
                                              'says so ("not used by this sound: dur")')
