@@ -2,6 +2,7 @@
 import hashlib
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -160,6 +161,29 @@ class BoundedLogTests(unittest.TestCase):
         log.finish()
         with self.assertRaises(audio.AudioError):
             log.rate('x')
+
+
+class DecoderCleanupTests(unittest.TestCase):
+    def test_thread_start_failure_kills_and_reaps_child(self):
+        # A real child makes context-manager waiting distinguishable from cleanup.
+        # Use Python rather than FFmpeg so this exceptional path is codec-independent.
+        popen = subprocess.Popen
+        children = []
+
+        def child(*args, **kwargs):
+            proc = popen([sys.executable, '-c', 'import time; time.sleep(2)'], **kwargs)
+            children.append(proc)
+            return proc
+
+        with patch.object(video.subprocess, 'Popen', side_effect=child), \
+                patch.object(video.threading.Thread, 'start', side_effect=RuntimeError('cannot start new thread')):
+            with self.assertRaisesRegex(RuntimeError, 'cannot start new thread'):
+                video._decode_picture('unused')
+        self.assertEqual(len(children), 1)
+        self.assertIsNotNone(children[0].returncode)
+        self.assertNotEqual(children[0].returncode, 0)
+        self.assertTrue(children[0].stdout.closed)
+        self.assertTrue(children[0].stderr.closed)
 
 
 if __name__ == '__main__':

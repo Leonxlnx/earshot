@@ -145,8 +145,8 @@ def _decode_picture(path):
                 proc.stderr.close()
 
         reader = threading.Thread(target=drain)
-        reader.start()
         try:
+            reader.start()
             raw = proc.stdout.read()
             returncode = proc.wait()
         finally:
@@ -154,7 +154,8 @@ def _decode_picture(path):
                 proc.kill()
                 proc.wait()
             proc.stdout.close()
-            reader.join()
+            if reader.ident is not None:
+                reader.join()
     return raw, log, returncode
 
 
