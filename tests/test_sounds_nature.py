@@ -24,7 +24,7 @@ def test_the_store_is_numbers_with_credits_and_under_budget():
         assert 'CC0' in t['licence'] and t['author'] and t['page'].startswith('https://')
         assert f'`{name}`' in credits and t['page'] in credits
         assert 10.0 <= t['seconds'] <= (34.0 if t['periodic'] or name == 'campfire' else 17.5)
-        assert set(t['ids']) <= set(nature.LEARNED)
+        assert set(t['ids']) <= set(nature.LEARNED) | set(nature.SCENES)    # or answered by an invented scene
         assert not t['periodic'] or len(t['chunks']) >= 4 or t['seconds'] < 17.5     # the sea: four waves or more
         for c in t['chunks']:
             path = os.path.join(nature.STORE, c['file'])

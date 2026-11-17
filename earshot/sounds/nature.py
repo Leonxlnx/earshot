@@ -1,7 +1,7 @@
 """Ambience: real textures learned from public-domain recordings (`fire/camp`, `waves/sand`, `night/crickets`,
-`wind/trees`, `stream/brook`, `cafe/busy`, `city/street` ...) and the scenes of earshot.synth.texture that are
-invented from physics and kept where the owner rated them well or nothing real stands in for them
-(`rain/window`, `forest/morning`, `thunder/clap` ...).
+`stream/brook`, `cafe/busy`, `city/street` ...) and the scenes of earshot.synth.texture that are invented from
+physics and kept where the owner rated them well or nothing real stands in for them (`rain/window`,
+`forest/morning`, `wind/trees`, `thunder/clap` ...).
 
 A learned bed is a texture stored as numbers (earshot/data/textures: resyn models of 12-16 s of one recording, a
 few hundred kB, credits in CREDITS.md there) played endlessly by earshot.synth.quilt: fresh takes of the models,
@@ -60,6 +60,12 @@ SCENES = {
     'wind/mountain': ('wind', dict(place='mountain'), ('high wind on a mountain', 'a cold gale over rock',
                                                        'wind roaring at altitude'),
                       ('wind', 'mountain', 'gale', 'summit', 'blizzard')),
+    # invented, as the rain is: broadband air shaped by slow gusts and a leaf rustle that swells with them, no
+    # Aeolian tones. The one public-domain recording of trees in wind holds a thin rustle around 5 kHz that does
+    # not follow the gusts and little air under it: faithfully resynthesised it reads as trickling water
+    'wind/trees': ('wind', dict(place='trees', howl=0.0), ('wind in the trees', 'leaves rustling in gusts of wind',
+                                                           'a breeze through foliage'),
+                   ('wind', 'trees', 'leaves', 'forest wind', 'breeze')),
     'fire/small': ('fire', dict(size=-0.7), ('a small fire crackling quietly', 'a little fireplace',
                                              'gentle fire crackle'),
                    ('fire', 'fireplace', 'candle', 'hearth')),
@@ -109,8 +115,6 @@ LEARNED = {
     'night/crickets': ('crickets', ('crickets chirping at night in the countryside', 'a field of crickets at night',
                                     'a summer night with crickets'),
                        ('night', 'crickets', 'insects', 'evening', 'summer night', 'camping night')),
-    'wind/trees': ('trees', ('wind in the trees', 'leaves rustling in gusts of wind', 'a breeze through foliage'),
-                   ('wind', 'trees', 'leaves', 'forest wind', 'breeze')),
     'stream/brook': ('brook', ('a small stream running over stones', 'water babbling in a brook',
                                'a gentle flowing creek'),
                      ('stream', 'brook', 'creek', 'running water', 'water')),

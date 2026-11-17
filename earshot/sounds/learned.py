@@ -87,6 +87,9 @@ RETAKE = 101                # make.take's step between the seeds it tries: seeds
 # that recording to be played (warped that little): further, the pattern fills the length at the natural pace, as a
 # warp would slow or hurry the walk, the knock, the typing it holds
 WHOLE_FIT = 0.15
+# the different keys a typing run lets be heard at least: with two, a run alternates 1, 2, 1, 2 and reads as a
+# machine; a thing with fewer single recordings borrows its neighbours' (borrow) and varies each key more
+KEYS = 4
 
 
 def dry(e, m):
@@ -144,7 +147,8 @@ def pick(sid, seed, bright=0.0):
 def take(e, c, r, k=None, room=True, nudge=None):
     """one take of the design e (an index entry) under the controls c (module doc): the member the seed picks, or
     member k. room False leaves the take dry (a performance puts all its events in one room); nudge: offsets added
-    to the energy and size axes ({'energy': .., 'size': ..}: one event of a performance a little firmer or smaller)"""
+    to the energy and size axes and to the tilt ({'energy': .., 'size': .., 'bright': ..}: one event of a
+    performance a little firmer, smaller or brighter)"""
     ax = set(e['axes'])
     nudge = nudge or {}
     tilt = c.bright if 'bright' in ax else 0.0
@@ -157,7 +161,7 @@ def take(e, c, r, k=None, room=True, nudge=None):
     energy = float(np.clip((c.energy if 'energy' in ax else 0.0) + nudge.get('energy', 0.0), -1.0, 1.0))
     s = float(np.clip((c.size if 'size' in ax else 0.0) + nudge.get('size', 0.0), -1.0, 1.0))
     size = float(SIZE[1] ** s if s >= 0 else SIZE[0] ** -s) if 'size' in ax else 1.0
-    bright = TILT * tilt + 0.5 * energy
+    bright = TILT * tilt + 0.5 * energy + nudge.get('bright', 0.0)
     hard = float(np.clip((c.hard if 'hard' in ax else 0.0) + 0.35 * energy, -1.0, 1.0))
     ring = c.lerp('ring', 0.5, 2.0, 1.0, log=True) if 'ring' in ax else 1.0
     pitch = 0.0
@@ -218,6 +222,26 @@ def wholes(e):
     return [k for k in order(e['id'], True) if e['members'][k].get('events', 1) > 1]
 
 
+def borrow(e, keys):
+    """the keys of a typing run when the thing has fewer than KEYS single recordings: its own, then those of its
+    neighbours (the other designs of its family and kind: the other keyboards), one from each in turn, until KEYS
+    different keys are heard; and the family's deeper key (a design whose description names a space bar) for the
+    pauses between words. Returns (keys [(entry, member) ...], position of the deep key or None)"""
+    family = e['id'].split('/')[0]
+    near = [x for sid, x in sorted(index().items()) if sid != e['id'] and sid.split('/')[0] == family
+            and x['kind'] == e['kind']]
+    bar = [x for x in near if any('space bar' in s for s in x['says'])]
+    others = [[(x, k) for k in order(x['id'])] for x in near if all(x is not b for b in bar)]
+    keys, i = list(keys), 0
+    while len(keys) < KEYS and any(others):
+        if others[i % len(others)]:
+            keys.append(others[i % len(others)].pop(0))
+        i += 1
+    if not bar:
+        return keys, None
+    return keys + [(bar[0], order(bar[0]['id'])[0])], len(keys)
+
+
 def performs(sid):
     """True when the learned design sid is a thing a person does several times in a row (its index entry has a
     `pattern`, or recordings of the whole action): a walk, a knock, typing, coins, keys, clinking glasses"""
@@ -258,18 +282,34 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
             c.member = {'n': k + 1, 'of': len(e['members']), 'recording': m['credit']['title'],
                         'author': m['credit']['author']}
     if play is None:
-        p = P.plan(pat.get('name', 'pair'), r, members=walk, events=events, dur=dur, usual=pat.get('events'),
-                   pace=pat.get('pace'))
-        parts = []
-        for k, nudge in zip(p['members'], p['nudge']):
-            m = e['members'][k]
+        name = pat.get('name', 'pair')
+        keys = [(e, k) for k in walk]
+        deep, spread = None, 1.0
+        if name == 'type' and len(walk) < KEYS:
+            keys, deep = borrow(e, keys)
+            spread = 2.0
+        p = P.plan(name, r, members=[i for i in range(len(keys)) if i != deep], events=events, dur=dur, usual=pat.get('events'),
+                   pace=pat.get('pace'), deep=deep, spread=spread)
+        parts, own = [], []
+        for i, nudge in zip(p['members'], p['nudge']):
+            ek, k = keys[i]
+            m = ek['members'][k]
             size = SIZE[1] ** nudge['size'] if nudge['size'] >= 0 else SIZE[0] ** -nudge['size']
-            parts.append((take(e, c, dsp.rng(int(r.integers(2 ** 32))), k=k, room=False, nudge=nudge),
-                          m.get('onset_s', 0.0) * size))
-        y = P.mix(parts, p)
+            z = take(ek, c, dsp.rng(int(r.integers(2 ** 32))), k=k, room=False, nudge=nudge)
+            if ek is e:
+                own.append(np.abs(z).max())
+            parts.append([z, m.get('onset_s', 0.0) * size, ek is e])
+        # a borrowed key is played at the level of the thing's own keys (each recording has its own gain)
+        ref = float(np.median(own)) if own else None
+        for part in parts:
+            if ref and not part[2]:
+                part[0] = part[0] * (ref / (np.abs(part[0]).max() + 1e-12))
+        y = P.mix([(z, on) for z, on, _ in parts], p)
         y = space.room(y, c.room('room'), amount=c.space if 'space' in e['axes'] else 0.0, r=r)
         play = {'pattern': p['pattern'], 'events': len(p['members']), 'pace': p['pace'],
-                'recordings': [k + 1 for k in p['members']]}
+                'recordings': [keys[i][1] + 1 if keys[i][0] is e else f"{keys[i][0]['id']}#{keys[i][1] + 1}"
+                               for i in p['members']]}
+        p['members'] = [keys[i][1] if keys[i][0] is e else walk[0] for i in p['members']]
         c.member = {'n': p['members'][0] + 1, 'of': len(e['members']),
                     'recording': e['members'][p['members'][0]]['credit']['title'],
                     'author': e['members'][p['members'][0]]['credit']['author']}

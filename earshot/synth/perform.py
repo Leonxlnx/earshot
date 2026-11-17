@@ -12,7 +12,8 @@ events and pace), never a branch per thing:
              early or late and a little louder or softer, the trailing foot slightly softer
     knock    three or four knuckle hits about 0.2 s apart, the first the firmest, the last a touch later
     type     a run of keys at 5 to 8 a second with the irregular gaps of typing (log-normal), a short pause between
-             words where a deeper key (the space bar) falls
+             words where a deeper key (the space bar) falls; every key a little different in size, brightness and
+             level, and never varied the same way twice in a row (ten fingers, not a machine)
     scatter  things that land and settle: each next impact comes sooner and softer, as a bouncing, spreading heap
     shake    dense irregular impacts in two or three swings (keys on a ring, ice in a glass, a shaker)
     pair     two events, the second the answer: a clink and its reply, a switch on and off
@@ -75,11 +76,27 @@ def sequence(members, n, r, name='walk'):
     return out
 
 
-def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None):
+def _keys(members, n, r, size, tone):
+    """the variation of each key of a typing run (size and brightness offsets, added to the plan's): a finger
+    never strikes two keys alike, and the same recording heard again is never varied the way it was last time
+    (the new offsets are mirrored when they land within a third of their spread of that key's last ones)"""
+    last = {}
+    ds, db = r.normal(0.0, size, n), r.normal(0.0, tone, n)
+    for i, m in enumerate(members):
+        if m in last and abs(ds[i] - last[m][0]) < size / 3 and abs(db[i] - last[m][1]) < tone / 3:
+            ds[i], db[i] = -ds[i] if abs(ds[i]) > size / 6 else ds[i] + size / 2, -db[i]
+        last[m] = (ds[i], db[i])
+    return ds, db
+
+
+def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, deep=None, spread=1.0):
     """the performance of a pattern: {'pattern', 'onsets' (s, the first at LEAD), 'gains' (linear), 'members' (the
-    recording of each event), 'nudge' (per event: offsets for the caller's energy and size axes, small), 'pace'
-    (events per second over the whole)}. events: the number asked for; dur: the length to fill at the natural pace;
-    usual (lo, hi) and pace (lo, hi) events a second: the thing's own, in place of the pattern's"""
+    recording of each event), 'nudge' (per event: offsets for the caller's energy, size and bright axes, small),
+    'pace' (events per second over the whole)}. events: the number asked for; dur: the length to fill at the natural
+    pace; usual (lo, hi) and pace (lo, hi) events a second: the thing's own, in place of the pattern's. type only:
+    deep, a deeper key (a space bar) kept for the pauses between words instead of the darkest of `members`; spread,
+    how much each key's size, brightness and level differ (1 = a little; more when few recordings stand for a whole
+    keyboard, so the same key never comes back the same)"""
     p = PATTERNS[name]
     rate = float(r.uniform(*(pace or p['pace'])))
     n = count(name, r, events, dur, rate, usual)
@@ -117,8 +134,14 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None):
         db[1:] -= float(r.uniform(1.5, 4.0))               # the answer is softer
     onsets = LEAD + np.concatenate([[0.0], np.cumsum(gaps)])
     order = sequence(members, n, r, name)
-    if name == 'type' and len(members) > 2:                # a word ends now and then: a pause, then the deeper key
-        dark = min(members)
+    tone = np.zeros(n)
+    if name == 'type':
+        ds, tone = _keys(order, n, r, 0.05 * spread, 0.15 * spread)
+        size += ds
+        db += r.normal(0.0, 0.5 * (spread - 1.0), n) if spread > 1.0 else 0.0
+    if name == 'type' and (len(members) > 2 or deep is not None):     # a word ends now and then: a pause, then
+        dark = min(members) if deep is None else deep                  # the deeper key
+        members = list(members) + ([deep] if deep is not None else [])
         k = int(r.integers(3, 6))
         while k < n - 1:
             onsets[k:] += float(r.uniform(0.08, 0.18))
@@ -128,10 +151,10 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None):
                     near = {order[i] for i in (j - 1, j + 1) if 0 <= i < n}
                     order[j] = next(m for m in members if m not in near | {dark})
             db[k] += 1.0
-            size[k] = 0.25
+            size[k] = 0.25 if deep is None else size[k]          # a space bar is deeper as recorded
             k += int(r.integers(4, 7))
-    nudge = [{'energy': float(np.clip(d / 12.0, -0.3, 0.3)), 'size': float(s + r.normal(0.0, 0.04))}
-             for d, s in zip(db, size)]
+    nudge = [{'energy': float(np.clip(d / 12.0, -0.3, 0.3)), 'size': float(s + r.normal(0.0, 0.04)),
+              'bright': float(t)} for d, s, t in zip(db, size, tone)]
     span = float(onsets[-1] - onsets[0])
     return {'pattern': name, 'onsets': [float(t) for t in onsets], 'gains': [float(10 ** (d / 20)) for d in db],
             'members': [int(m) for m in order], 'nudge': nudge,

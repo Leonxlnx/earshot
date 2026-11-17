@@ -63,6 +63,24 @@ def test_typing_runs_at_five_to_eight_keys_a_second_with_a_deeper_key_at_the_pau
     assert 0 in p['members']                        # the darkest key falls where a word ends
 
 
+def test_typing_varies_every_key_and_keeps_the_deep_key_for_the_pauses():
+    p = perform.plan('type', dsp.rng(5), members=(0, 1, 2, 3), events=16, deep=4, spread=2.0)
+    keys = p['members']
+    assert all(a != b for a, b in zip(keys, keys[1:]))
+    assert 4 in keys and len(set(keys)) == 5
+    for m in set(keys) - {4}:                       # the same key never comes back with the same variation
+        seen = [(round(n['size'], 3), round(n['bright'], 3)) for k, n in zip(keys, p['nudge']) if k == m]
+        assert all(a != b for a, b in zip(seen, seen[1:]))
+
+
+def test_a_keyboard_with_two_recordings_borrows_keys():
+    _, meta = learned.perform('keyboard/mechanical', seed=0, events=14)
+    rec = meta['performance']['recordings']
+    assert len(set(rec)) >= 4
+    assert all(a != b for a, b in zip(rec, rec[1:]))
+    assert any('space' in str(k) for k in rec)
+
+
 def test_a_scatter_settles():
     p = perform.plan('scatter', dsp.rng(4), members=(0, 1, 2), events=6)
     gaps = np.diff(p['onsets'])
