@@ -197,7 +197,7 @@ store and to drop members it scored lowest where a design had others.
   (4.4 dB against 2.2: two crickets in one band lose their beating). The joints of a stitched bed differ by 0.9-1.5
   times the texture's own variation (the pebble and rock shores about 1.5). The sea beds are 26-30 s with five waves
   each, the fire 24 s. A bed renders in 1.0-1.7 s of CPU per second of sound.
-- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, 1.47 MB): 130 strokes from VCSL and Karoryfer
+- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, 1.31 MB): 130 strokes from VCSL and Karoryfer
   (Big Rusty Drums), stored softest first with their velocity within their instrument; the seed walks through a
   design's strokes and `energy` picks softer or harder ones. Nobody has rated them yet.
 - **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit

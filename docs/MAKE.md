@@ -156,7 +156,7 @@ sound made from nothing, and it exists only because someone recorded the thing a
 |---|---|---|---|---|
 | designs | 153 (`earshot/sounds/learned.py`) | 12 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
 | recordings | 364 recorded events (a few are several events cut from one recording; 13 are recordings of a whole action) | 11 textures of 12-30 s | 130 strokes | 100 single notes (marimba 14, harp 24, pizzicato 48, upright piano 14) |
-| store | `earshot/data/resyn/`: 7.00 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 3.87 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.47 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.85 MB, `index.json`, `CREDITS.md` |
+| store | `earshot/data/resyn/`: 7.00 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 3.87 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.85 MB, `index.json`, `CREDITS.md` |
 | sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 

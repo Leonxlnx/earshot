@@ -160,7 +160,7 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 7.00 MB, the textures 3.87 MB, the drums 1.47 MB and the instrument notes 0.85 MB
+sound. The learned store adds 7.00 MB, the textures 3.87 MB, the drums 1.31 MB and the instrument notes 0.85 MB
 to the package. The lab's
 recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
 repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers

@@ -80,7 +80,7 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, `earshot/synth/drums.py`): 40 designs in 21
   families. The acoustic kit and the hand percussion (33: kicks, snares, rims, toms, hi-hats, crashes, a ride,
   claps, shaker, tambourine, congas, bongos, cajon, darbuka, frame drum, clave, cabasa, slapstick, a snare roll and a
-  shaker roll) are takes of 130 recorded strokes in the public domain (VCSL and Karoryfer, 1.47 MB of numbers): the
+  shaker roll) are takes of 130 recorded strokes in the public domain (VCSL and Karoryfer, 1.31 MB of numbers): the
   seed walks through a design's strokes and `energy` picks softer or harder ones. Still invented: `kick/electro`,
   `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count`. New:
   `conga/muted`, `bongo/low`, `darbuka/hit`, `frame_drum/deep`, `cabasa/hit`, `slapstick/crack`; removed:
