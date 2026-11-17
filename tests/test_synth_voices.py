@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from earshot.forge import dsp, knobs
-from earshot.synth import patches, phrase, strings, struck, voices
+from earshot.synth import patches, phrase, played, strings, struck, voices
 
 SR = dsp.SR
 TABLE = voices.table()
@@ -34,10 +34,13 @@ def _cents(f, ref):
 # ---- the table
 
 def test_table_lists_every_instrument_and_patch():
-    want = set(struck.INSTRUMENTS) | set(strings.INSTRUMENTS) | set(patches.PATCHES)
+    want = set(struck.INSTRUMENTS) | set(strings.INSTRUMENTS) | set(patches.PATCHES) | set(played.TABLE)
     assert set(TABLE) == want
     assert sorted(voices.names()) == sorted(want)
     assert set(voices.names('wood')) == {v for v, i in TABLE.items() if i['material'] == 'wood'}
+    for v in ('marimba', 'harp', 'pizzicato', 'felt_piano'):          # the real instruments replace their models
+        assert TABLE[v]['engine'] == 'played' and TABLE[v]['kind'] == 'real'
+    assert TABLE['marimba']['material'] == 'wood' and TABLE['felt_piano']['material'] == 'felt'
 
 
 @pytest.mark.parametrize('voice', sorted(TABLE))
@@ -78,9 +81,9 @@ def test_every_voice_plays_clean_and_in_tune(voice):
 def test_pitch_outside_the_range_moves_by_octaves():
     assert voices.clamp('kalimba', knobs.hz('C2')) == pytest.approx(knobs.hz('C4'))
     assert voices.clamp('glockenspiel', knobs.hz('C4')) == pytest.approx(knobs.hz('C5'))
-    assert voices.clamp('marimba', knobs.hz('C9')) == pytest.approx(knobs.hz('C7'))
+    assert voices.clamp('marimba', knobs.hz('C9')) == pytest.approx(knobs.hz('C6'))     # the real marimba: A2..D6
     assert voices.clamp('marimba', knobs.hz('E4')) == pytest.approx(knobs.hz('E4'))
-    for voice, asked, heard in (('kalimba', 'C2', 'C4'), ('marimba', 'A8', 'A6')):
+    for voice, asked, heard in (('kalimba', 'C2', 'C4'), ('marimba', 'A8', 'A5')):
         y = voices.play(voice, asked, r=dsp.rng(2))
         f0 = knobs.hz(heard)
         assert abs(_cents(_strongest(y, 0.75 * f0, 1.3 * f0), f0)) <= 30
@@ -121,7 +124,8 @@ def _onsets(y, k, min_gap=0.08):
 @pytest.mark.parametrize('vary', [0.0, 0.5])
 def test_phrase_onsets_land_on_time(vary):
     at = [0.0, 0.21, 0.5, 0.62]
-    y = phrase.play([(t, 'C6') for t in at], 'marimba', dsp.rng(5), vel=0.6, vary=vary)
+    # a modelled bar: the real marimba's yarn mallet reaches its steepest rise 6-12 ms after the note starts
+    y = phrase.play([(t, 'C6') for t in at], 'xylophone', dsp.rng(5), vel=0.6, vary=vary)
     got = _onsets(y, len(at))
     jitter = 4 * 0.004 * vary                         # phrase.play moves a note by 4 ms x vary x N(0, 1)
     for t, g in zip(at, got):

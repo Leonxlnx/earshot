@@ -1,5 +1,11 @@
 """Every pitched voice earshot can play, behind one call: struck instruments (earshot.synth.struck), strings and
-pianos (earshot.synth.strings) and synthesizer patches (earshot.synth.patches).
+pianos (earshot.synth.strings), synthesizer patches (earshot.synth.patches) and real instruments learned note by
+note from public-domain recordings (earshot.synth.played).
+
+The real instruments take the names of the voices they replace: `marimba`, `harp`, `pizzicato` and `felt_piano`
+(played by a real upright piano at its soft dynamic) are recordings, not models; the owner rated every synthesised
+interface figure 1-2 of 5 and cannot tell a real recording from its take. struck.note('marimba') and
+strings.note('harp') still play the physical models directly.
 
     from earshot.synth import voices
     y = voices.play('kalimba', 'E5', vel=0.6)                    # stereo (n, 2), rings out
@@ -20,6 +26,7 @@ ENGINES = {
     'struck': ('note', 'INSTRUMENTS', ('bright', 'hard', 'ring', 'size', 'position', 'width', 'vary')),
     'strings': ('note', 'INSTRUMENTS', ('bright', 'hard', 'ring', 'size', 'position', 'width', 'vary')),
     'patches': ('play', 'PATCHES', ('bright', 'hard', 'ring', 'size', 'motion', 'width', 'dirt', 'space', 'vary')),
+    'played': ('play', 'TABLE', ('bright', 'hard', 'vary')),       # last: its voices replace the models' of one name
 }
 # what a voice is made of: how a theme ("wood", "glass", "felt") finds its voices
 MATERIAL = {
@@ -48,7 +55,9 @@ def table():
             except ImportError:
                 continue
             for name, info in getattr(mod, tab).items():
-                t[name] = {**info, 'engine': eng, 'material': MATERIAL.get(name, 'synth' if eng == 'patches' else None)}
+                old = t.get(name, {})              # a real instrument keeps how its model was described
+                t[name] = {**info, 'says': old.get('says', info['says']), 'engine': eng,
+                           'material': MATERIAL.get(name, 'synth' if eng == 'patches' else None)}
         _table = t
     return _table
 

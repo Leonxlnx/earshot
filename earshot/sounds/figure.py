@@ -1,8 +1,13 @@
 """Tonal designs as figures: a few notes in time, played by whichever voice the request or the theme names.
 
-The default voice is a soft rounded pluck with some body under it, the register of product sound. A bell, a
-glockenspiel or a chime plays only when the request or the theme asks for one. Taps, toggles and hovers lead with a
-tactile touch (a key's thock and click, `touch`) that the note only colours.
+The default voice is a real marimba played softly with yarn mallets (earshot.synth.played: notes learned from
+public-domain recordings): warm wood, an immediate onset and a natural decay of one to two seconds in the register
+of product sound. The owner rated every figure on a synthesised voice 1-2 of 5 ("very technical", "I hate these synth
+sounds") and real recordings 3-4. A real voice plays a figure as a person would: inner notes ring on under the next
+one unless the figure damps them (`gate`), the last note rings out at its natural length unless a length or less
+ring is asked for, and a figure that reaches above C6 is played an octave lower (the warm register: "too high the
+last key"). A bell, a glockenspiel or a chime plays only when the request or the theme asks for one. Taps, toggles
+and hovers lead with a tactile touch (a key's thock and click, `touch`) that the note only colours.
 
 A confirmation, a notification, a toggle or a logo is a gesture (which way it moves, by which interval, how fast,
 where the weight falls); the instrument is a second, independent choice. Keeping the two apart is what lets one
@@ -21,11 +26,13 @@ voice made of it.
 """
 import numpy as np
 
-from ..forge import dsp
+from ..forge import dsp, knobs
 from ..synth import phrase, space, voices
 
-DEFAULT_VOICE = 'soft_pluck'
-SUSTAIN_FLOOR = 0.11              # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
+DEFAULT_VOICE = 'marimba'
+TOP = 1046.5                      # Hz (C6): a real voice plays a figure whose highest note is above it an octave lower
+REAL_DRY = 0.6                    # the room's amount under a real voice (the owner: "not always so far away, FULLER")
+SUSTAIN_FLOOR = 0.11             # s: the shortest an inner note of a sustaining voice sounds (the last: 1.6 x)
 CHORD_GAP = 0.03                  # s: notes this close are one chord (or a grace note): the earlier one rings on
 MINOR = ('minor', 'minor_pentatonic')
 MINOR_STEP = {4: 3, 9: 8, 11: 10}    # a major third, sixth and seventh as their minor forms
@@ -75,6 +82,10 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
     if not degrees and c.scale() in MINOR:       # in a minor key the thirds, sixths and sevenths are the minor ones
         steps = [MINOR_STEP.get(s % 12, s % 12) + 12 * (s // 12) for s in steps]
     hz = c.degrees(steps, root) if degrees else c.semis(steps, root)
+    info = voices.info(v)
+    real = info.get('kind') == 'real'
+    while real and max(hz) > TOP * 1.001 and min(hz) / 2 >= knobs.hz(info['range'][0]):
+        hz = [f / 2 for f in hz]
     k = len(hz)
     speed = c.lerp('motion', 1.4, 0.7, 1.0, log=True)
     gaps = [float(g) * speed for g in (np.broadcast_to(gap, (max(1, k - 1),)) if k > 1 else [])]
@@ -86,14 +97,17 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
             gaps = [g * 0.6 * want / run for g in gaps]
         last, ring = max(0.04, want - sum(gaps)), 1.0
     # a sustaining voice (a metal bar, a bell, a pad) damped after a few tens of ms is a bare tone burst, which is
-    # heard as an electronic beep: such a voice keeps each note long enough to be heard as its instrument
-    info = voices.info(v)                # an instrument that rings over a second, or a patch that sustains
-    sustains = float(info.get('ring_s') or 0.0) > 1.0 or info.get('kind') in ('bell', 'pad', 'key', 'lead')
-    floor = SUSTAIN_FLOOR if sustains else 0.0
+    # heard as an electronic beep: such a voice keeps each note long enough to be heard as its instrument; a real
+    # voice lets its notes ring at their natural length (module doc)
+    sustains = not real and (float(info.get('ring_s') or 0.0) > 1.0 or info.get('kind') in ('bell', 'pad', 'key',
+                                                                                             'lead'))
+    floor = SUSTAIN_FLOOR if sustains else 0.0     # an instrument that rings over a second, or a patch that sustains
     t, notes = 0.0, []
     for i, f in enumerate(hz):
         if i == k - 1 or gaps[i] <= CHORD_GAP:           # the last note, and a note the next one joins as a chord
-            d = max(last * ring, 1.6 * floor)
+            d = None if real and not want and ring >= 1.0 else max(last * ring, 1.6 * floor)
+        elif real and gate is None:                      # a played note rings on under the next one
+            d = None
         else:
             d = max((gate if gate is not None else gaps[i] * 1.15) * min(ring, 1.5), floor)
         notes.append((t, f, 1.0 if vels is None else vels[i], d))
@@ -114,6 +128,9 @@ def play(c, r, steps=(0,), gap=0.09, root='C6', vel=0.6, vels=None, gate=None, l
         y = y[:cut]
         k = max(2, int(0.45 * cut))
         y[-k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
+    if real:                             # a real instrument close: a hand's width away, a small room at most
+        return space.room(y, c.room('room' if room in ('studio', 'hall', 'plate') else room),
+                          amount=float(np.clip(c.space - REAL_DRY, -1.0, 1.0)), r=r)
     return space.room(y, c.room(room), amount=c.space, r=r)
 
 
