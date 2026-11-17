@@ -702,3 +702,69 @@ def test_perform_anchor(idx, text, sid, want):
     assert r and r[0]['id'] == sid, (text, r)
     perform, events = performance(b, sid)
     assert perform == bool(want) and (events == want if want not in (True, False) else True), (text, perform, events)
+
+
+# ---- requests as agents and editors write them: one anchor per cause the reader got wrong
+
+def test_accented_letters_stay_inside_a_word():
+    """a German or French word is one word ("für", not "f" and "r"); a few common German words are synonyms"""
+    assert brief.words('Klick für den Button') == ['klick', 'für', 'den', 'button']
+    assert 'click' in brief.read('ein leiser Klick')['concepts']
+    assert 'footstep' in brief.read('Schritte im Schnee')['concepts']
+    assert 'coin' in brief.read('eine Münze fällt')['concepts']
+
+
+def test_a_tape_is_not_a_tap(idx):
+    assert brief.stem('tape') == 'tape' and brief.stem('tap') == 'tap'
+    assert 'downlifter' in brief.read('tape stop')['concepts']
+    assert 'downlifter' in brief.read('a tape-stop at the end of the song')['concepts']
+    r = brief.rank(brief.read('packing tape ripped off a box'), idx=idx, top=3)
+    assert r[0]['id'] == 'tape/peel', r
+
+
+def test_a_material_named_takes_the_recorded_role_away(idx):
+    """"a tap" is the recorded key; "a wooden tap" is no plastic key"""
+    assert brief.rank(brief.read('a tap'), idx=idx, top=1)[0]['id'].startswith('keyboard/')
+    r = brief.rank(brief.read('a wooden tap, warm, no metal'), idx=idx, top=3)
+    assert not r[0]['id'].startswith('keyboard/'), r
+
+
+def test_a_number_of_events_reaches_the_twin_that_can_perform_them(idx):
+    from earshot.make import performance, takes_asked
+    b = brief.read('three knocks, slow')
+    r = brief.rank(b, idx=idx, top=3)
+    assert r[0]['id'] == 'door/knock' and performance(b, r[0]['id']) == (True, 3), r
+    b = brief.read('five coin pickups in a row')       # a coin is not performed: five takes
+    r = brief.rank(b, idx=idx, top=3)
+    assert r[0]['id'].startswith('coin/') and takes_asked(b, r[0]['why'], performance(b, r[0]['id'])) == 5
+    b = brief.read('level 2 complete jingle')           # the number counts no thing the design was picked for
+    r = brief.rank(b, idx=idx, top=3)
+    assert takes_asked(b, r[0]['why'], performance(b, r[0]['id'])) == 1
+
+
+@pytest.mark.parametrize('text,word', [
+    ('a dog barking', 'dog'), ('dogs barking in the distance', None), ('a violin melody for the intro', 'violin'),
+    ('a car horn honk', 'car horn'), ('someone saying welcome back', 'saying'),
+    ('a crowd cheering in a stadium', 'crowd cheering'), ('kids laughing on a playground', 'laughing'),
+])
+def test_a_sound_the_catalogue_has_nothing_of_is_said_so(idx, text, word):
+    """the pick of such a request is a guess, and the doubt names what is missing (or nothing is ranked at all)"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=8)
+    if word is None:
+        assert not cands or doubt(b, cands)
+        return
+    assert brief.not_made(b) == word
+    assert not cands or doubt(b, cands).startswith(f'earshot makes no {word};'), doubt(b, cands)
+
+
+@pytest.mark.parametrize('text', ['saying yes', 'a whoosh for a dog walking app', 'not a voice, a soft click',
+                                  'glass clink, cheers', 'accordion expand sound'])
+def test_nothing_missing_when_the_catalogue_has_it(text):
+    assert brief.not_made(brief.read(text)) is None
+
+
+def test_into_names_where_the_sound_lands(idx):
+    r = brief.rank(brief.read('suck back reverse whoosh into the logo'), idx=idx, top=3)
+    assert r[0]['id'].startswith(('suck/', 'reverse_swell/', 'whoosh', 'rise/reverse')), r

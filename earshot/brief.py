@@ -48,18 +48,20 @@ COUNT = re.compile(r'\b(\d+|' + '|'.join(NUMBER_WORDS) + r')\s+(?:different\s+|u
                    r'(?:variations?|variants?|versions?|takes?|options?|alternatives?)\b', re.I)
 FIGURE = re.compile(r'\b(one|two|three|four|five|\d)-(note|tone|step|pulse|beat)s?\b', re.I)
 KEY = re.compile(r'\b(?:in|key of|in the key of)\s+([A-G][#b]?)(?:[\s-]*(major|minor|maj|min))?(?![A-Za-z0-9#])')
-WORD = re.compile(r"[a-z0-9#]+(?:[-'][a-z0-9#]+)*")
-TOKEN = re.compile(r"[a-z0-9#]+(?:[-'][a-z0-9#]+)*|[,.;:!?()]")
+# a word is letters (also accented ones: "für" is one word, not "f" and "r"), digits and '#'
+WORD = re.compile(r"[a-z0-9#ßà-öø-ÿ]+(?:[-'][a-z0-9#ßà-öø-ÿ]+)*")
+TOKEN = re.compile(r"[a-z0-9#ßà-öø-ÿ]+(?:[-'][a-z0-9#ßà-öø-ÿ]+)*|[,.;:!?()]")
 PUNCT = frozenset(',.;:!?()')
 LOOP_WORDS = ('loop', 'looping', 'loopable', 'seamless', 'looped', 'endless')
 ONCE_WORDS = ('one-shot', 'oneshot')
 CONTEXT_WORDS = ('for', 'when', 'while', 'as', 'after', 'before', 'during', 'whenever', 'once', 'where', 'until',
-                 'whilst', 'if')
+                 'whilst', 'if', 'into')   # "a whoosh into the logo": where it lands
 PLACE_WORDS = ('in', 'under', 'over', 'across', 'behind', 'beneath', 'inside')
 # words whose ending is not an ending ('evening' is not 'even', 'string' is not 'str')
 STEM_KEEP = frozenset(('evening', 'morning', 'ceiling', 'string', 'strings', 'thing', 'things', 'ring', 'rings',
                        'spring', 'springs', 'swing', 'sling', 'wing', 'wings', 'king', 'bring', 'during', 'nothing',
-                       'something', 'anything', 'everything', 'bus', 'gas', 'news', 'lens', 'chaos', 'canvas'))
+                       'something', 'anything', 'everything', 'bus', 'gas', 'news', 'lens', 'chaos', 'canvas',
+                       'tape', 'tapes'))    # a tape is not a tap
 # a figure's shape in any words: "two-tone", "two-pulse", "two quick notes", "twice" -> '2-note'
 FIGURE_TEXT = re.compile(r'\b(one|two|three|four|five|six|seven|\d)(?:-(?:note|tone|step|pulse|beat)s?\b'
                          r'|(?:\s+[a-z]+){0,2}\s+notes\b)', re.I)
@@ -335,12 +337,13 @@ PLURAL_NOT = frozenset(('glass', 'bass', 'grass', 'brass', 'chaos', 'canvas', 'g
 def _action(b, text):
     """the action words of a request into the brief (`read`: events, perform, plural)"""
     low = ' ' + (text or '').lower() + ' '
-    b['events'], b['perform'], b['plural'] = None, False, []
+    b['events'], b['perform'], b['plural'], b['counted'] = None, False, [], []
     for m in EVENTS.finditer(low):
         v, noun = m.group(1).lower(), stem(m.group(2))
         if noun in NOT_EVENTS or re.match(r'\s*-', low[m.end(1):]) or low[max(0, m.start(1) - 1)] in '.,:/':
             continue
         b['events'] = int(v) if v.isdigit() else NUMBER_WORDS[v]
+        b['counted'] = [stem(w) for w in WORD.findall(low[m.end(1):m.end()])]   # "five coin pickups": coin, pickup
         break
     if any(re.search(r'(?<![\w-])' + re.escape(w) + r'(?![\w-])', low) for w in L.SINGLE_WORDS):
         if not (b['events'] and b['events'] > 1):
@@ -971,6 +974,25 @@ def uncovered(b, why):
     return out
 
 
+def not_made(b):
+    """the first sound the request asks for that the catalogue has nothing of (lexicon.NOT_MADE: a dog's bark, a
+    scream, a violin, a car horn), as written, or None. Only what the request says of its own sound counts: not a
+    negation or comparison ("not a voice", "like a dog's bark"), nor where it plays ("for a dog-walking app"); a
+    single word only when the reader did not understand it otherwise ("saying yes" is a success)"""
+    ctx = set(b.get('context_words', ()))
+    toks = [t for t in tokens(b.get('text') or '') if t not in PUNCT]
+    said = set(_said_words(b.get('text')).values())
+    text = ' '.join(toks)
+    for p in L.NOT_MADE_PHRASES:
+        if f' {p} ' in f' {text} ' and not set(p.split()) & ctx and set(p.split()) <= said:
+            return p
+    for t in toks:
+        if (t in L.NOT_MADE and t in b['unknown'] and stem(t) in b['words'] and t in said and t not in ctx
+                and stem(t) not in ctx):
+            return t
+    return None
+
+
 def blend(b, lexical, semantic, idx):
     """lexical ranking and semantic z (earshot.sounds.atlas.zmap: {id: z}) as one ranking (module doc of
     earshot.sounds.atlas; constants chosen on the development request sets, eval/requests*.json):
@@ -1061,8 +1083,10 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
         s *= row.get('prior', 1.0)
         if row['id'] in L.BY_NAME_ONLY and alone and not said & TONE_STEMS:
             s *= BY_NAME
-        elif plain and t['learned'] and head in _roles().get(row['id'], ()):
-            s *= ROLE                                          # "a tap", "hover", "toggle on": the recorded one
+        elif (plain and t['learned'] and head in _roles().get(row['id'], ())
+              and not (mat and mat not in t['mats'])):
+            s *= ROLE         # "a tap", "hover", "toggle on": the recorded one; not when it is of another material
+            #                   than the request names ("a wooden tap" is no plastic key)
         if dom and row.get('domains'):
             s *= 1.15 if dom in row['domains'] else 0.85
         if mat == 'retro':
@@ -1119,6 +1143,9 @@ def learned_ok(b, sid, t, said):
     asked = set(b['concepts'])                           # "... muffled and bubbly": a part, not a recorded splash
     if _roles().get(sid, frozenset()) & asked and _interface_only(b):
         return True                     # the interface job alone ("a click like an old SLR" is a shutter's click)
+    if (b.get('events') or 0) > 1 and any(v == sid and _family_words(k) & set(b.get('counted', ()))
+                                          for k, v in L.TWINS.items()):
+        return True                     # "four knocks": a number of events only the recorded twin can perform
     own = said - set(b.get('context_words', ()))         # "passes a save point flag": the flag is where, not what
     framed = set(b.get('framed', ()))
     if framed and asked - framed:

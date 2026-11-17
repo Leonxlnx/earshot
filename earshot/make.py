@@ -97,7 +97,9 @@ def choose(want, sound=None, top=4, listen=False, **over):
 
 
 def doubt(b, cands):
-    """why the pick rests on weak evidence, or None: no job or sound word matched and the request does not sound
+    """why the pick rests on weak evidence, or None: the request asks for a sound the catalogue has nothing of
+    (brief.not_made: a dog's bark, a violin; the pick is only the nearest), or no job or sound word matched and the
+    request does not sound
     like the pick (z under GUESS_Z, or not listened), or the best design of another family is within GUESS_HAIR (a
     share of the pick's score) of it: members of one family tie often and harmlessly. Thresholds chosen on the
     development request sets (660 requests, top 8 ranked): lexical ranking, 32 % of wrong first picks flagged and
@@ -105,6 +107,9 @@ def doubt(b, cands):
     if not cands or cands[0]['score'] is None:
         return None
     top = cands[0]
+    absent = brief.not_made(b)
+    if absent:                          # "a dog barking": no design is one; the pick is only the nearest
+        return f'earshot makes no {absent}; {top["id"]} is only the nearest sound it has'
     fam = top['id'].split('/')[0]
     # an invented twin of the pick, or the kit's cymbal under the film's, is the same thing (lexicon.TWINS,
     # FILM_CYMBAL), not another kind of sound; a learned pick
@@ -228,6 +233,18 @@ def performance(b, sound, events=None):
     return brief.performance(b, sound, learned.index()[sound].get('pattern'))
 
 
+def takes_asked(b, why, perf, n=1):
+    """how many takes a request asks for: its count of takes ("3 variations"), else the caller's n when not 1, else
+    the number of events it names for a design that is not performed ("five coin pickups": five pickups, each its
+    own take; the counted thing is one the design was picked for, so "level 2 complete" asks for one), else n"""
+    if b.get('n'):
+        return int(b['n'])
+    ev = b.get('events') or 0
+    if int(n) == 1 and ev > 1 and perf is None and set(b.get('counted', ())) & {brief.stem(w) for w in why}:
+        return min(12, int(ev))
+    return int(n)
+
+
 def _held(sound, dur, takes):
     """the plain note for a figure of notes (earshot.sounds.figure) whose length differs from the one asked for: a
     struck note is not held longer than it rings, and a figure cannot be shorter than its notes hurried to a hand's
@@ -289,16 +306,19 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if loop is False:
         b['loop'] = False
     if not cands:
-        raise ValueError(f'no sound in the catalogue answers {want!r}: `earshot sounds` lists what there is; name '
+        absent = brief.not_made(b)
+        raise ValueError(f'no sound in the catalogue answers {want!r}'
+                         + (f' (earshot makes no {absent})' if absent else '')
+                         + ': `earshot sounds` lists what there is; name '
                          'the sound itself (a chime, a click, a whoosh, rain) or the job it plays (success, coin, logo)')
-    n = int(b['n'] or n)
     req = _request(b, theme)
     heard = None
     pick = cands[0]
     if b.get('dur_max') and 'dur' not in req and (registry.get(pick['id']).dur or 0) > b['dur_max']:
         req['dur'] = b['dur_max']                # "under 150 ms": only shortens a design that is longer
-    paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
     perf = performance(b, pick['id'], events)
+    n = takes_asked(b, pick['why'], perf, n)
+    paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
     takes = []
     for i, p in enumerate(paths):
         y, meta = take(pick['id'], seed + i, req, lufs, perform=perf)

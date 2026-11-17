@@ -14,7 +14,8 @@ CONCEPTS = {
     # ---- jobs in an interface
     'tap': ('press', 'pressed', 'pressing', 'button', 'button press', 'button tap', 'touch', 'push', 'push button',
             'cta', 'finger tap', 'tap feedback'),
-    'click': ('clicky', 'mouse click', 'mouse', 'clack', 'click clack'),
+    'click': ('clicky', 'mouse click', 'mouse', 'clack', 'click clack',
+              'klick', 'klicken'),   # German, common in requests (no German lexicon: a few words)
     'hover': ('mouse over', 'mouseover', 'mousing over', 'mouse-over', 'rollover', 'roll over', 'focus', 'highlight',
               'cursor over', 'cursor move over', 'move over', 'moves over', 'hover over', 'pointer over',
               'mouse enter', 'hover state', 'hover effect', 'mouseenter'),
@@ -48,7 +49,7 @@ CONCEPTS = {
                 'check off', 'a little yes', 'saying yes', 'well done', 'good job', 'great job', 'nice work',
                 'all set', 'you are in', 'in the bag', 'nailed it', 'success state', 'thumbs up', 'got it right',
                 'payment goes through', 'booking confirmed', 'order confirmed', 'sync complete', 'upload complete',
-                'reassurance', 'sorted'),
+                'reassurance', 'sorted', 'erfolg'),
     'error': ('fail', 'failure', 'wrong', 'invalid', 'denied', 'deny', 'rejected', 'reject', 'incorrect',
               'wrong answer', 'forbidden', 'blocked', 'not allowed', 'mistake', 'oops', 'uh oh', 'uh-oh', 'nope',
               'declined', 'unauthorized', 'problem', 'failed login', 'login failed', 'saying no', 'says no',
@@ -121,7 +122,8 @@ CONCEPTS = {
     'land': ('landing', 'touch down', 'touchdown', 'drop down', 'hit the ground', 'hitting the ground',
              'hit the floor', 'hitting the floor', 'onto the floor', 'onto the ground', 'ground pound', 'fall down',
              'come down', 'came down', 'coming down', 'back on the ground', 'feet hit', 'lands on'),
-    'footstep': ('foot step', 'step', 'walk', 'run', 'ran', 'stomp', 'stroll', 'pace', 'tread', 'stride'),
+    'footstep': ('foot step', 'step', 'walk', 'run', 'ran', 'stomp', 'stroll', 'pace', 'tread', 'stride',
+                 'schritt', 'schritte'),
     'dash': ('dodge', 'dodge roll', 'dodge-roll', 'sprint', 'lunge', 'dart', 'speed burst', 'speed-burst',
              'air burst', 'burst of air'),
     'swing': ('sword swing', 'sword', 'greatsword', 'broadsword', 'longsword', 'claymore', 'slash', 'blade', 'katana', 'axe swing', 'club swing', 'sword slash'),
@@ -153,7 +155,7 @@ CONCEPTS = {
     'one_up': ('extra life', '1up', '1-up', 'one-up', 'bonus life'),
     'achievement': ('trophy', 'reward', 'badge earned'),
     'coin': ('coin pickup', 'collect coin', 'gold', 'gold coin', 'money', 'token', 'ring pickup', 'cash pickup',
-             'score', 'cash', 'rings', 'currency', 'bucks', 'coins'),
+             'score', 'cash', 'rings', 'currency', 'bucks', 'coins', 'münze', 'münzen'),
     'gem': ('jewel', 'diamond', 'crystal pickup', 'treasure', 'rare item', 'gemstone', 'ruby', 'emerald', 'sapphire',
             'crystal shard', 'precious stone', 'jewels'),
     'pickup': ('pick up', 'collect', 'collectible', 'grab', 'item', 'loot', 'get item', 'acquire', 'got it',
@@ -191,7 +193,8 @@ CONCEPTS = {
               'shotgun', 'cannon', 'bullet', 'projectile', 'arrow', 'bow shot', 'crossbow', 'musket', 'sniper',
               'fire a weapon', 'pull the trigger'),
     'laser': ('blaster', 'zap', 'pew', 'pew pew', 'pew-pew', 'ray gun', 'raygun', 'beam', 'phaser', 'plasma'),
-    'door': ('gate', 'hatch', 'door open', 'door close', 'creak', 'creaky', 'door slam', 'airlock', 'latch'),
+    'door': ('gate', 'hatch', 'door open', 'door close', 'creak', 'creaky', 'door slam', 'airlock', 'latch',
+             'tür'),
     'chest': ('treasure chest', 'chest open', 'crate open', 'box open', 'open a box', 'unbox', 'unboxing',
               'loot box', 'lootbox', 'loot crate', 'lid', 'goodies', 'box of goodies', 'treasure box'),
     'break': ('shatter', 'smash', 'destroy', 'crumble', 'glass break', 'wood break', 'splinter', 'broke',
@@ -207,7 +210,7 @@ CONCEPTS = {
     'whoosh': ('swoosh', 'woosh', 'air movement', 'transition', 'rush of air', 'air rush', 'wind rush', 'wind-rush',
                'fly through', 'flying through', 'fly across', 'flies across', 'fly in', 'whip pan', 'whooshy',
                'rushing air', 'air sweep', 'rushing', 'blowing past', 'blow past', 'rushing past', 'zoomy',
-               'fly off screen', 'slides off', 'swooshy'),
+               'fly off screen', 'slides off', 'swooshy', 'wusch', 'übergang'),
     # something carried past the listener (a whoosh too: BROADER)
     'flyby': ('fly by', 'fly-by', 'flyover', 'fly over', 'flies past', 'flying past', 'fly past', 'whoosh by',
               'pass by', 'passing by', 'pass', 'zoom by', 'zoom past', 'zooming past', 'streak past', 'drive by',
@@ -222,7 +225,7 @@ CONCEPTS = {
                    'pitch dropping', 'pitch-dropping', 'tension release', 'release of tension', 'calm down',
                    'calming down', 'drop away', 'dropping away', 'drops away', 'die down', 'dies down',
                    'come down from',
-                   'power down sweep'),
+                   'power down sweep', 'tape stop', 'tape slowdown', 'tape slow down', 'record stop'),
     'impact': ('boom hit', 'cinematic hit', 'trailer hit', 'slam', 'slam hit', 'big hit', 'bang', 'crash',
                'collision', 'hit on a cut', 'title slam', 'boom', 'wham', 'whomp'),
     'thud': ('thump', 'thunk', 'thwump', 'dull hit'),
@@ -251,7 +254,8 @@ CONCEPTS = {
              'ring', 'ringing bell'),
     'service_bell': ('service', 'service bell', 'desk bell', 'hotel bell', 'reception bell', 'counter bell',
                      'reception', 'concierge', 'order up'),
-    'knock': ('tock', 'thock', 'wood knock', 'rap', 'tok', 'door knock', 'knock knock', 'knock on the door'),
+    'knock': ('tock', 'thock', 'wood knock', 'rap', 'tok', 'door knock', 'knock knock', 'knock on the door',
+              'klopfen', 'anklopfen'),
     'beep': ('bleep', 'bleepy', 'beepy', 'pip', 'blip'),
     'buzz': ('buzzer', 'buzzy', 'vibrate', 'vibration', 'haptic', 'honk', 'raspberry', 'blat', 'grumpy honk'),
     'hum': ('humming', 'whir', 'whirr', 'drone hum'),
@@ -345,6 +349,21 @@ CONCEPTS = {
             'tune', 'melody'),
 }
 
+# sounds the catalogue has nothing of: voices (speech, singing, screams, a crowd's cheering), animals, and instruments
+# no design plays. A request that names one is answered with the nearest design and says so (make.doubt), not with
+# a confident wrong sound. Exact words, as written, and only where the reader understood them as nothing else
+# (brief.not_made: "saying yes" is a success)
+NOT_MADE = frozenset((
+    'dog', 'dogs', 'bark', 'barks', 'barking', 'woof', 'puppy', 'cat', 'cats', 'meow', 'meows', 'meowing', 'purr',
+    'purring', 'horse', 'neigh', 'cow', 'moo', 'rooster', 'chicken', 'sheep', 'goat', 'pig', 'oink', 'duck', 'quack',
+    'frog', 'croak', 'wolf', 'scream', 'screams', 'screaming', 'shriek', 'shrieking', 'yell', 'yelling', 'shout',
+    'shouting', 'baby', 'cry', 'crying', 'cries', 'sob', 'sobbing', 'laugh', 'laughs', 'laughing', 'laughter',
+    'giggle', 'cheer', 'cheering', 'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying',
+    'narrator', 'narration', 'voiceover', 'voice-over', 'cough', 'sneeze', 'burp',
+    'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
+    'trumpet', 'honk', 'honking'))
+NOT_MADE_PHRASES = ('car horn', 'air horn', 'electric guitar', 'guitar solo', 'drum solo', 'police siren',
+                    'phone ringing', 'ringtone', 'crowd cheering', 'cheering crowd', 'stadium crowd')
 # concepts that say what kind of thing is wanted without saying which: they do not end the head of a request
 GENERIC = frozenset(('ambience', 'note', 'beep', 'bell', 'open', 'achievement', 'cue', 'thud', 'sting'))
 # words of a short sound: an instrument named just before one is played ("a kalimba ping", "a marimba hit")
