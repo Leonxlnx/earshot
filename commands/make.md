@@ -17,7 +17,7 @@ Make this sound with earshot: $ARGUMENTS
    `uv tool install "earshot[mcp] @ git+https://github.com/Leonxlnx/earshot"`.
 3. Report the answer as given: the file line (design, length, pitch and voice for a tonal sound, loudness, `clean`
    or `audit: ...`), `also: ...`, a `played: ...` line (one event or the action), and any `not understood` /
-   `not followed` line, and a line about the length (a cut, the shortest loop, whole bars). A take with `audit:` is
-   not usable: make it again with another `seed`. Do not say how it sounds beyond what the answer says; if the
+   `not followed` line, and a line about the length (a cut, the shortest loop, whole bars, a counted action that
+   could not fill it). A take with `audit:` is not usable: make it again with another `seed`. Do not say how it sounds beyond what the answer says; if the
    design is a learned one (a real thing such as a footstep, a switch, a door or a drum), say it is a new take of a
    public-domain recording, computed from a model of it (no audio file is shipped or played back).

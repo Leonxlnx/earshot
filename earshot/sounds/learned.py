@@ -251,7 +251,8 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     """a performance of the thing sid (earshot.synth.perform): (y, meta) as registry.render gives a take, with
     meta['performance'] = {'pattern' or 'recording', 'events', 'pace' (events a second), 'recordings' (the member
     of each event, 1-based)}. events: how many (None: the pattern's usual number, or as many as fill `dur`);
-    request: the controls of registry.render (dur = the length the performance fills at its natural pace).
+    request: the controls of registry.render (dur = the length of the file: the pattern's events are spread over it,
+    or played at the closest or widest gap a person keeps, with meta['note'] saying so: earshot.synth.perform.fill).
     A recording of the whole action is played when the thing has one and the request asks for neither another number
     of events nor a length more than WHOLE_FIT away from its own; else the pattern sequences the thing's single events,
     each its own take of the engine with a small variation, all in one room and levelled as one sound"""
@@ -267,7 +268,7 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     pat = e.get('pattern') or {}
     whole = wholes(e)
     walk = order(sid)
-    play = None
+    play, p = None, {}
     if whole:
         k = whole[(int(seed) % RETAKE) % len(whole)]
         m = e['members'][k]
@@ -285,8 +286,9 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
         if name == 'type' and len(walk) < KEYS:
             keys, deep = borrow(e, keys)
             spread = 2.0
-        p = P.plan(name, r, members=[i for i in range(len(keys)) if i != deep], events=events, dur=dur, usual=pat.get('events'),
-                   pace=pat.get('pace'), deep=deep, spread=spread)
+        ring = float(np.clip(np.median([e['members'][k]['dur_s'] for k in walk]), 0.35, 0.6))
+        p = P.plan(name, r, members=[i for i in range(len(keys)) if i != deep], events=events, dur=dur,
+                   usual=pat.get('events'), pace=pat.get('pace'), deep=deep, spread=spread, ring=ring)
         parts, own = [], []
         for i, nudge in zip(p['members'], p['nudge']):
             ek, k = keys[i]
@@ -313,9 +315,14 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     # single event of the thing is lifted (registry.LIFT)
     y = master.finish(y, peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
                       sparse=registry.LIFT)
+    if p.get('dur'):               # a length asked for is the file's: the events were spread over it (perform.fill)
+        y = P.fit(y, p['dur'])
     meta = {'id': sid, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1),
             'member': dict(c.member), 'performance': play}
+    note = P.said(p, dur, meta['dur_s']) if p else None
+    if note:
+        meta['note'] = note
     if check:                       # several attacks are the design of a performance, not layers stacked on a hit
         meta['checks'] = registry.audit(y, SimpleNamespace(kind=d.kind, pitch=d.pitch, loop=False,
                                                             allows=d.allows + ('stacked',)))

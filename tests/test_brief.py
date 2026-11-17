@@ -742,6 +742,17 @@ def test_a_number_of_events_reaches_the_twin_that_can_perform_them(idx):
     assert takes_asked(b, r[0]['why'], performance(b, r[0]['id'])) == 1
 
 
+def test_a_countdown_with_a_length_keeps_its_count_and_a_rows_length_does_not_steer_the_pick(idx):
+    """"3 2 1, 1 second": the countdown is 3 2 1; "a countdown of three beeps" is on the clock; the length of a
+    counted action is the row's, so it ranks the designs as the count alone does"""
+    b = brief.read('a countdown 3 2 1, 1 second')
+    assert (b['events'], b['row'], b['dur']) == (3, 'count', 1.0)
+    assert brief.read('a countdown of three beeps over 3 seconds')['row'] == 'count'
+    a = brief.rank(brief.read('three claps'), idx=idx, top=3)
+    b = brief.rank(brief.read('three claps, 3 seconds'), idx=idx, top=3)
+    assert [x['id'] for x in a] == [x['id'] for x in b], (a, b)
+
+
 @pytest.mark.parametrize('text,word', [
     ('a dog barking', 'dog'), ('dogs barking in the distance', None), ('a violin melody for the intro', 'violin'),
     ('a car horn honk', 'car horn'), ('someone saying welcome back', 'saying'),

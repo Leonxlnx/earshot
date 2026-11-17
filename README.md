@@ -27,9 +27,9 @@ fire.ogg: fire/camp (24.00 s, -24 LUFS, seamless loop, clean) [campfire]
 also: fire/large, fire/small, fire/whoosh
 ```
 
-The three footsteps are three different real recordings ("Footsteps on Gravels #3", "#1" and "#2" from
-BigSoundBank), each rendered as a new take; the campfire is a recording of a real fire stitched into a 24 s loop that
-has no seam. `make` loads no model and takes about a second for a one-shot.
+The three footsteps are three different real recordings (recordings 3, 2 and 1 of the five that `step/pebbles`
+holds, from BigSoundBank), each rendered as a new take; the campfire is a recording of a real fire stitched into a
+24 s loop that has no seam. `make` loads no model and takes about a second for a one-shot.
 
 ## Make sounds
 
@@ -105,7 +105,9 @@ A design is one thing and its recordings are its variations: seeds 0, 1, 2 walk 
 the best listening score down, so three seeds of `step/pebbles` are three real footsteps; seeds past the last
 recording are new takes of the same ones. A thing a person does several times in a row (a walk, a knock, typing,
 coins, keys, clinking glasses) is played as that action when the words ask for it: a recording of the whole action
-where there is one, else its single recordings in the pattern a person plays them (`earshot/synth/perform.py`). A request for
+where there is one, else its single recordings in the pattern a person plays them (`earshot/synth/perform.py`); a
+length asked with it ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's, the events spread over it
+at gaps a person keeps. A request for
 a darker or brighter take draws from the darker or brighter recordings.
 
 Why this way: in the owner's listening test of 24 recordings, each next to two renders of it, he gave the recording

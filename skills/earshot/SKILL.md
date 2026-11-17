@@ -61,8 +61,9 @@ keys, clinking glasses) is played as the action when the words ask for it: "foot
 "three knocks", "typing on a keyboard", "5 seconds of typing". "a footstep on gravel" or "a single knock on a door"
 is one event. `--events N` (MCP `events`) overrides: 1 = one event, 2 or more = the action with N events. A
 counted action in a row is one file whatever the design ("four knocks on the table", "three claps", "a countdown
-3 2 1"); a count of separate things is that many files ("five coin pickups", "3 variations"). The
-answer's `played: ...` line says which it was. Chip sound only with "8-bit" /
+3 2 1"); a count of separate things is that many files ("five coin pickups", "3 variations"). A length with an
+action ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's length, the events spread over it; a
+countdown stays one a second. The answer's `played: ...` line says what was played. Chip sound only with "8-bit" /
 "retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
 written that loosely the first pick was right 69.5 % of the time (76.8 % in the top three). To steer, re-ask with
 adjectives, not by browsing.
@@ -71,7 +72,8 @@ adjectives, not by browsing.
 at seed 0 (three seeds
 of `step/pebbles` are three real footsteps), then new takes of them. Ask for 6-12 takes of anything a game repeats
 (`--n 8`, or "eight variations"), and make them in a set (`"n": 8` in a spec) so they share one level: single takes
-of different recordings differ in length and level. `--json` names the recording of each take (`member`).
+of different recordings differ in length and level. `--json` gives the number of the recording each take played
+(`member`).
 
 **Read the answer** (no extra call; ask for `--json` / `full=true` only if you need measurements):
 - `x.ogg: design/id (0.88 s, G5, marimba, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
@@ -88,6 +90,8 @@ of different recordings differ in length and level. `--json` names the recording
 - `a cut of 4 s, not a loop: ...` / `a seamless loop of 8.00 s, ...` / `8.57 s: a music loop is whole bars ...`:
   the length asked for an ambience or a loop, and what was made of it; ask "a seamless loop of ..." when the
   sound must repeat without a seam.
+- `3 knocks 1.5 s apart: 3.25 s, not the 10 s asked (...)`: a counted action could not fill the length at a pace a
+  person keeps (or a countdown at one a second); the file is as long as the line says.
 - `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
 - `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
 

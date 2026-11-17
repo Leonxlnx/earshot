@@ -679,8 +679,10 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
     (marimba by default; harp, pizzicato strings and felt_piano, an upright piano, by `voice`). A thing a person
     does in a row is played as that action when the words ask for it ("footsteps on gravel", "knocking", "typing")
     and as one event otherwise ("a footstep"); `events` sets it. A counted action done in a row ("four knocks on
-    the table", "three claps", "a countdown 3 2 1") is one file of that many events, whatever the design; a count
-    of separate things ("five coin pickups", "3 variations") is that many files. The answer names the design chosen
+    the table", "three claps", "a countdown 3 2 1") is one file of that many events, whatever the design; a length
+    asked with it ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's length, the events spread over
+    it at a pace a person keeps; a count of separate things ("five coin pickups", "3 variations") is that many
+    files. The answer names the design chosen
     and why, what else would fit (`also`), and any words that were not understood, so one call is usually enough;
     call again with
     `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. Use it

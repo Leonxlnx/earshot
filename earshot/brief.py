@@ -351,10 +351,14 @@ def _action(b, text):
         b['counted'] = [stem(w) for w in WORD.findall(low[m.end(1):m.end()])]   # "five coin pickups": coin, pickup
         # the counted thing within three words ("three mouse clicks"): a row when a person performs it in a row
         b['row'] = next((rows[stem(w)] for w in WORD.findall(low[m.end(1):])[:3] if stem(w) in rows), None)
+        if b['row'] and 'countdown' in low:                 # "a countdown of three beeps": one a second
+            b['row'] = 'count'
         break
     for c in (COUNTDOWN.finditer(low) if 'countdown' in low and b['events'] is None else ()):
         ds = [int(x) for x in re.findall(r'\d+', c.group(0))]
-        if ds[-1] in (0, 1) and all(x - y == 1 for x, y in zip(ds, ds[1:])):
+        k = next((i for i in range(1, len(ds)) if ds[i - 1] - ds[i] != 1), len(ds))
+        ds = ds[:k]                                         # "3 2 1, 1 second": the countdown is 3 2 1
+        if len(ds) > 1 and ds[-1] in (0, 1):
             b['events'], b['row'] = len(ds), 'count'   # "a countdown 3 2 1": three events a second apart
             break
     if any(re.search(r'(?<![\w-])' + re.escape(w) + r'(?![\w-])', low) for w in L.SINGLE_WORDS):
@@ -913,7 +917,7 @@ def length_fit(b, row):
     if not d or row.get('loop') or row.get('kind') in STRETCH_KINDS:
         return 1.0
     f = 1.0
-    if b.get('dur'):
+    if b.get('dur') and not (b.get('events') or 0) > 1:     # "three knocks, 2 seconds": the length of the row
         r = abs(math.log2(max(b['dur'], 0.01) / d))
         f *= max(0.5, 1.0 - LENGTH_SLOPE * max(0.0, r - 1.0))
     if b.get('dur_max') and d > b['dur_max']:

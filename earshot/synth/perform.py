@@ -22,6 +22,10 @@ events and pace), never a branch per thing:
     count    a countdown: one event a second, on the clock
 Rules for all: never the same recording twice in a row (when the thing has more than one), never on a grid, tails
 overlap and are never gated (an event rings on under the next), one position and one room for the whole.
+A length asked for is the length of the file (`fill`, `fit`): the first event at the start, the last early enough
+to ring out, the gaps even around the pattern's own spread; a length without a count takes as many events as the
+pattern's pace fits. Gaps a hand cannot keep (GAPS: closer than its fastest, or so far apart the events are no longer
+one action) are held at the limit and `said` gives the plain line; a countdown stays one a second.
 
     from earshot.synth import perform
     p = perform.plan('walk', dsp.rng(1), members=(2, 0, 1))     # {'onsets', 'gains', 'members', 'pace', ...}
@@ -47,6 +51,13 @@ PATTERNS = {
     'count': dict(events=(3, 3), pace=(1.0, 1.0), level=0.3, timing=0.0),
 }
 MOST = 64            # events a performance has at most (a length asked for fills at the pace, up to this)
+# the gaps (s, between onsets) a length asked for may spread a pattern's events to: closer than the first a hand
+# cannot repeat the stroke (finger tapping and knocking top out at about 8 a second, running steps at about 4), and
+# further apart than the second the events no longer make one action. A countdown is on the clock: exactly 1 s.
+# scatter and shake keep their own timing (a heap settles and a shaken thing swings as physics has it)
+GAPS = {'walk': (0.25, 1.5), 'knock': (0.12, 1.5), 'row': (0.12, 1.5), 'type': (0.06, 1.0), 'pair': (0.1, 1.5),
+        'count': (1.0, 1.0)}
+CHIEF = {'walk': 'step', 'knock': 'knock', 'row': 'event', 'type': 'key', 'pair': 'event', 'count': 'beat'}
 
 
 def count(name, r, events=None, dur=None, rate=None, usual=None):
@@ -60,6 +71,50 @@ def count(name, r, events=None, dur=None, rate=None, usual=None):
         return int(np.clip(round(dur * rate), 2, MOST))
     lo, hi = usual or p['events']
     return int(r.integers(lo, hi + 1))
+
+
+def fill(name, events, dur, rate, ring):
+    """how a pattern's events fill a length of `dur` s: (n, gap, fits). The first event at LEAD, the last `ring` s
+    before the end so it has sounded, the gaps even (the plan adds the pattern's human spread around them). events:
+    the number asked for, else the number that keeps the pattern's natural `rate` (events a second) closest (a
+    countdown: as many whole seconds as fit). fits is False when the gap had to be held inside GAPS: the events are
+    played at that gap and the length follows from it"""
+    lo, hi = GAPS[name]
+    room = max(dur - LEAD - ring, 0.0)                    # from the first onset to the last
+    whole = np.floor(room * rate + 1e-6) if name == 'count' else np.round(room * rate)
+    n = int(np.clip(events or whole + 1, 2, MOST))
+    gap = room / (n - 1)
+    held = float(np.clip(gap, lo, hi))
+    if name == 'count':                                   # one a second: a little room after the last is fine
+        return n, held, gap >= held and room - (n - 1) * held < 1.0
+    return n, held, abs(held - gap) < 1e-9
+
+
+def fit(y, dur, fade=0.05):
+    """y (stereo, finished) at exactly `dur` s: a longer one faded out over its last `fade` s (the last event has
+    sounded by then: `fill` leaves it its ring), a shorter one padded with silence"""
+    n = dsp.n_of(dur)
+    if len(y) >= n:
+        y = np.array(y[:n])
+        k = min(n, dsp.n_of(fade))
+        y[n - k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
+        return y
+    return np.concatenate([y, np.zeros((n - len(y),) + y.shape[1:])])
+
+
+def said(p, dur, real, thing=None):
+    """the plain line for a length the events could not fill as asked (p: a plan whose `fits` is False), or None.
+    thing: what one event is called ("knock", "clap"), else the pattern's word"""
+    if p.get('fits', True) or not dur:
+        return None
+    n, gap, thing = len(p['onsets']), p['gap'], thing or CHIEF.get(p['pattern'], 'event')
+    if p['pattern'] == 'count':
+        why = 'a countdown keeps one beat a second'
+    elif gap <= GAPS[p['pattern']][0]:
+        why = f'{thing}s cannot follow closer than {gap:g} s by hand'
+    else:
+        why = f'{thing}s further apart than {gap:g} s are no longer one action'
+    return f'{n} {thing}s {gap:g} s apart: {real:.2f} s, not the {dur:g} s asked ({why})'
 
 
 def sequence(members, n, r, name='walk'):
@@ -94,17 +149,26 @@ def _keys(members, n, r, size, tone):
     return ds, db
 
 
-def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, deep=None, spread=1.0):
+def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, deep=None, spread=1.0, ring=None):
     """the performance of a pattern: {'pattern', 'onsets' (s, the first at LEAD), 'gains' (linear), 'members' (the
     recording of each event), 'nudge' (per event: offsets for the caller's energy, size and bright axes, small),
-    'pace' (events per second over the whole)}. events: the number asked for; dur: the length to fill at the natural
-    pace; usual (lo, hi) and pace (lo, hi) events a second: the thing's own, in place of the pattern's. type only:
+    'pace' (events per second over the whole)}. events: the number asked for; dur: the length asked for. With
+    `ring` (s one event needs to sound) and a pattern of GAPS, dur is the length of the file and the events are
+    spread over it (`fill`): the plan then also has 'dur' (the length to `fit` the finished sound to, None when
+    the gaps were held and the length follows from them), 'gap' and 'fits'; else dur is filled at the natural pace.
+    usual (lo, hi) and pace (lo, hi) events a second: the thing's own, in place of the pattern's. type only:
     deep, a deeper key (a space bar) kept for the pauses between words instead of the darkest of `members`; spread,
     how much each key's size, brightness and level differ (1 = a little; more when few recordings stand for a whole
     keyboard, so the same key never comes back the same)"""
     p = PATTERNS[name]
     rate = float(r.uniform(*(pace or p['pace'])))
-    n = count(name, r, events, dur, rate, usual)
+    filled = None
+    if dur and ring is not None and name in GAPS and (events or 2) > 1:
+        n, gap, fits = fill(name, events, dur, rate, ring)
+        filled = {'gap': round(gap, 3), 'fits': bool(fits), 'dur': float(dur) if fits else None}
+        rate = 1.0 / gap
+    else:
+        n = count(name, r, events, dur, rate, usual)
     gaps = np.full(max(n - 1, 0), 1.0 / rate)
     db = r.normal(0.0, p['level'], n)
     size = np.zeros(n)
@@ -163,9 +227,12 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, de
     nudge = [{'energy': float(np.clip(d / 12.0, -0.3, 0.3)), 'size': float(s + r.normal(0.0, 0.04)),
               'bright': float(t)} for d, s, t in zip(db, size, tone)]
     span = float(onsets[-1] - onsets[0])
+    if filled and span > 0:              # the human spread kept, the whole stretched so the last lands where planned
+        onsets = LEAD + (onsets - LEAD) * (n - 1) * gap / span
+        span = float(onsets[-1] - onsets[0])
     return {'pattern': name, 'onsets': [float(t) for t in onsets], 'gains': [float(10 ** (d / 20)) for d in db],
             'members': [int(m) for m in order], 'nudge': nudge,
-            'pace': round((n - 1) / span, 2) if span > 0 else None}
+            'pace': round((n - 1) / span, 2) if span > 0 else None, **(filled or {})}
 
 
 def mix(events, p):

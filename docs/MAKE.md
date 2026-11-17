@@ -29,8 +29,8 @@ success.ogg: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime
 also: success/done, success/fifth, success/triad
 
 $ earshot make "a mouse click" -o click.wav --n 2
-click_1.wav: click/mouse (0.19 s, -21 LUFS, clean) [mouse click]
-click_2.wav: click/mouse (0.17 s, -20 LUFS, clean)
+click_1.wav: click/mouse (0.19 s, -20 LUFS, clean) [mouse click]
+click_2.wav: click/mouse (0.28 s, -21 LUFS, clean)
 also: click/soft, pen/click, switch/small
 ```
 
@@ -49,6 +49,8 @@ Then:
 | `a cut of 4 s, not a loop: the shortest seamless loop of this sound is 8.00 s` | an ambience asked shorter than its shortest loop: the length asked, cut from the bed with a 30 ms fade in and a fade out (10 % of it, at most 0.5 s) | say "a seamless loop of ..." if it must repeat |
 | `a seamless loop of 8.00 s, the shortest this sound has; 4 s was asked ...` | the request said "loop" or "seamless": the seam wins over the length | nothing, or drop "loop" for a cut |
 | `8.57 s: a music loop is whole bars, and these are the nearest to the 8 s asked` | a music loop keeps its bar grid | nothing |
+| `9.87 s, shorter than the 10 s asked: the longest this sound is made` | a looping design came out shorter than the length asked | nothing, or ask for a loop |
+| `3 knocks 1.5 s apart: 3.25 s, not the 10 s asked (knocks further apart than 1.5 s are no longer one action)` | a counted action whose events cannot fill the length asked: they are played at the widest (or closest) gap a person keeps, or a countdown at one a second, and the file is as long as that ([Performances](#performances)) | nothing, or ask for more or fewer events |
 | `not understood: ...` | words that matched nothing in the catalogue or the lexicon | rephrase if they mattered |
 | `x.mp3: a loop in mp3 has a gap at its seam ...` | a single `make` of a loop to mp3 or m4a | write loops as ogg, webm, wav or flac |
 | `  a loop: flac instead of mp3, which leaves a gap at the seam` | in a set with several formats, a loop was written as flac in place of mp3 / m4a | nothing |
@@ -77,7 +79,7 @@ also: success/triad, success/done, success/fifth
 | `--sound ID` | a design id from `earshot sounds` instead of the ranking; the words still set feel and numbers |
 | `--theme NAME` | a theme preset ([Themes](#themes)): voice, key, room and axis offsets shared by a product's sounds |
 | `--pitch` | a note (`C5`) or Hz. Overrides the words |
-| `--dur` | seconds: how long a figure of notes sounds, the hold of a pad, the length of a loop (each has a shortest one) or a whoosh; a learned sound within 0.6-1.8 times its natural length; a single struck sound (a tap, a hit) rings as it rings and says so (`0.43 s, not the 2 s asked ...`); an ambience asked shorter than its shortest loop is a cut, not a loop (unless the words say "loop"), a music loop keeps whole bars |
+| `--dur` | seconds: how long a figure of notes sounds, the hold of a pad, the length of a loop (each has a shortest one) or a whoosh; a learned sound within 0.6-1.8 times its natural length; a counted action ("three knocks", footsteps) is a file of that length with its events spread over it; a single struck sound (a tap, a hit) rings as it rings and says so (`0.43 s, not the 2 s asked ...`); an ambience asked shorter than its shortest loop is a cut, not a loop (unless the words say "loop"), a music loop keeps whole bars |
 | `--voice` | the instrument or patch of a tonal sound ([Voices](#voices)); a voice asked for by name is always played |
 | `--material` | what a tap, click or knock is made of; on a tonal sound without a voice it picks the voice made of it (wood: marimba, glass: glockenspiel, metal: vibraphone, soft: felt_piano, digital: glass_pluck, retro: square_lead) |
 | `--events N` | for a thing a person does several times in a row (footsteps, a knock, typing, coins, keys, clinking glasses): 1 = one event, 2 or more = the action with that many events; without it the words decide ([Performances](#performances)) |
@@ -134,7 +136,7 @@ formats writes its loops as flac in place of mp3 / m4a. Write loops as ogg, webm
 ```
 $ earshot make "campfire" -o fire.mp3 --dur 16
 fire.mp3: fire/camp (16.00 s, -24 LUFS, seamless loop, clean) [campfire]
-also: fire/large, fire/small, match/strike
+also: fire/large, fire/small, fire/whoosh
 fire.mp3: a loop in mp3 has a gap at its seam in players that ignore the encoder's padding note; for loops use ogg, webm, wav or flac
 ```
 
@@ -167,19 +169,19 @@ All the sources together: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and C
 an explicit public-domain dedication; every recording is credited in the `CREDITS.md` of `earshot/data/resyn/`,
 `textures/`, `drums/` and `notes/`. No audio file is shipped or played back.
 
-**A design is one thing; its recordings are its variations.** `step/pebbles` holds three recordings of footsteps
+**A design is one thing; its recordings are its variations.** `step/pebbles` holds five recordings of footsteps
 on gravel, `switch/lamp` three recordings of lamp switches, `keyboard/laptop` several keys. Seeds 0, 1, 2 ... walk
 through the members in a fixed order (`walk` in the index: the member with the best listening score first, a member
 scored 1 of 5 left out), so `--n 3` gives three different real footsteps; seeds past the last member are new takes
 of the same recordings, and a take that fails its audit is rendered again from the same recording. A request at bright -0.5 or below (or 0.5 and above) walks only the
-darker (brighter) half of the members, by their measured centroid, and tilts the take as well. `--json` names the
-recording of each take:
+darker (brighter) half of the members, by their measured centroid, and tilts the take as well. `--json` says which
+recording each take played, by its number (the titles stay in the credits):
 
 ```
 $ earshot make "a footstep on pebbles" -o peb.wav --n 3 --json
-... "member": {"n": 1, "of": 3, "recording": "Footsteps on Gravels #3", "author": "BigSoundBank (bigsoundbank.com)"}
-... "member": {"n": 2, "of": 3, "recording": "Footsteps on gravels #1", ...}
-... "member": {"n": 3, "of": 3, "recording": "Footsteps on gravels #2", ...}
+... "member": {"n": 3, "of": 5, "recording": "recording 3 of 5"}
+... "member": {"n": 2, "of": 5, "recording": "recording 2 of 5"}
+... "member": {"n": 1, "of": 5, "recording": "recording 1 of 5"}
 ```
 
 In Python: `y, meta = sounds.render('step/heels', seed=1)` and `meta['member']`.
@@ -221,7 +223,7 @@ recording twice in a row, never on a grid, every event its own take, one room fo
 
 | the request | what is played |
 |---|---|
-| a plural, an action word, a count or a length: "footsteps on gravel", "knocking", "three knocks", "5 seconds of typing", "typing on a keyboard" | the action |
+| a plural, an action word, a count or a length: "footsteps on gravel", "knocking", "three knocks", "5 seconds of typing", "typing on a keyboard" | the action (a length is the file's, below) |
 | a bare singular or "a single": "a footstep on gravel", "a single knock on a door" | one event |
 | a singular that names the action: "a knock on the door", "a toast" | the action |
 | `--events N` (`events=` in Python and in the MCP tool) | 1: one event; 2 or more: the action with N events |
@@ -241,6 +243,21 @@ row of N; "a single ..." and `--events 1` stay one event. Loops, beds, pads and 
 $ earshot make "four knocks on the table" -o knocks.wav
 knocks.wav: knock/desk (0.87 s, -14 LUFS, clean) [table, knocks]
 played: 4 events as a knock at 4.7 a second; one event: events=1 or "a single ..."
+also: knock/door, knock/soft, tock/wood
+```
+
+A length asked with an action is the length of the file, recorded design or not: the first event at the start,
+the last early enough to ring out (the design's usual length, 0.35 to 0.6 s, before the end), the gaps even around
+the pattern's own small spread (`perform.fill`). Without a count ("footsteps on gravel, 5 seconds") the count is
+what the pattern's natural pace fits into the length. A countdown stays one a second. Where the gaps would be closer
+than a hand plays (0.12 s for knocks, claps, taps and clicks, 0.25 s for steps) or further apart than 1.5 s, they
+are held there, the file is as long as the events then need, and one line says so. The result line shows the real
+length; `played:` the count and pace.
+
+```
+$ earshot make "three knocks on the table, 2 seconds" -o knocks2.wav
+knocks2.wav: knock/desk (2.00 s, -16 LUFS, clean) [table, knocks]
+played: 3 events as a knock at 1.2 a second; one event: events=1 or "a single ..."
 also: knock/door, knock/soft, tock/wood
 ```
 
@@ -378,14 +395,14 @@ earshot sounds [--search WORDS] [--domain ui|game|motion|ambience|music] [--kind
 
 ```
 $ earshot sounds
-669 sounds in 232 families
-success/rise                0.64 s  two quick rising notes, a short soft confirmation
+695 sounds in 244 families
+success/rise                0.73 s  three quick rising notes, a short soft confirmation
 success/fifth               0.69 s  two notes a fifth apart rising, an open clear signal
 ...
 
 $ earshot sounds --search notification
 20 sounds for 'notification'
-notify/pair                 0.90 s  two notes falling by a major third, a gentle two-note call
+notify/pair                 0.92 s  two notes falling by a major third, a gentle two-note call
 notify/motif                1.06 s  three notes: up a fifth, then settling on the third, a small melodic call
 notify/lift                 0.76 s  two notes rising by a fourth, a light upward call
 notify/single               0.90 s  one clear ringing note
@@ -426,10 +443,10 @@ earshot pack FILES... | FOLDER -o sprite.EXT [--gap 0.25] [--mono]
 $ earshot make --set arcade -o assets/arcade --format ogg --sprite sprite.ogg
 16 sounds in assets/arcade (ogg), manifest.json
 ...
-16 sounds in assets/arcade\sprite.ogg (14.2 s, 111 kB), map sprite.json
+16 sounds in assets/arcade\sprite.ogg (14.5 s, 114 kB), map sprite.json
 
 $ earshot pack assets/arcade -o assets/arcade_all.webm
-16 sounds in assets/arcade_all.webm (14.2 s, 150 kB), map arcade_all.json
+16 sounds in assets/arcade_all.webm (14.5 s, 152 kB), map arcade_all.json
 ```
 
 `pack` lays sounds end to end in one file with `gap` seconds of silence between them (lossy codecs smear a little
@@ -437,7 +454,7 @@ in time; without a gap the tail of one sound leaks into the next) and writes the
 `<name>.json` in the format howler.js reads:
 
 ```json
-{"src": ["arcade_all.webm"], "sprite": {"menu_move": [0, 192], "menu_select": [442, 280], "menu_back": [972, 234], ...}}
+{"src": ["arcade_all.webm"], "sprite": {"menu_move": [0, 192], "menu_select": [442, 264], "menu_back": [955, 243], ...}}
 ```
 
 Each entry is `[offset_ms, duration_ms]`, and `[offset_ms, duration_ms, true]` for a loop; loops get four times the
@@ -654,6 +671,7 @@ each seed is another progression and voicing with the same instruments.
 $ earshot make "a warm music bed" -o bed.ogg --dur 16
 bed.ogg: bed/warm (17.14 s, F3, electric_piano, -16 LUFS, seamless loop, clean) [music bed]
 also: bed/playful, bed/8bit, heartbeat/pulse
+17.14 s: a music loop is whole bars, and these are the nearest to the 16 s asked
 ```
 
 **Drums.** The acoustic kit and the hand percussion are takes of real strokes: 130 recordings in the public domain
@@ -729,15 +747,16 @@ whoosh.wav: whoosh/fast (0.30 s, -19 LUFS, clean) [whoosh]
 also: whoosh/soft, whoosh/deep, whoosh/long
 not understood: flies
 $ earshot make "a deep cinematic boom for the logo" -o boom.wav
-boom.wav: boom/deep (3.42 s, -14 LUFS, clean) [boom]
+boom.wav: boom/deep (2.19 s, -15 LUFS, clean) [boom]
 also: boom/short, kick/deep, boom/wide
 $ earshot make "a trailer braam" -o braam.wav
-braam.wav: braam/brass (4.10 s, Bb1, -14 LUFS, clean) [braam]
+braam.wav: braam/brass (3.17 s, Bb1, -14 LUFS, clean) [braam]
 also: braam/hit, braam/swell, boom/deep
 ```
 
-At seed 0 the whoosh played a stick cutting the air (qubodup, the fifth of five recordings), the boom a bass drum
-of VSCO-2 CE (the second of four) and the braam a held horn note of VSCO-2 CE (`--json` names them: `member`).
+At seed 0 the whoosh played the fifth of its five recordings, the boom the fourth of four and the braam the fourth
+of six. `--json` gives the number of each (`member`: `n` of `of`); `learned.credit(id, n - 1)` names the recording and
+its author.
 
 ## Voices
 
@@ -880,12 +899,13 @@ also: fire/large, fire/small, fire/whoosh
 
 ```
 $ earshot make "logo reveal" --voice felt_piano --pitch D4 -o logo.wav
-logo.wav: logo/bloom (3.79 s, D4, felt_piano, -14 LUFS, clean) [logo reveal]
+logo.wav: logo/bloom (3.97 s, D4, felt_piano, -14 LUFS, clean) [logo reveal]
 also: logo/duo, logo/motif, logo_sting/reverse_bloom
 
 $ earshot make "a forest at night" -o night.wav --no-loop --dur 10
 night.wav: night/crickets (9.87 s, -22 LUFS, clean) [forest, night]
 also: forest/morning, rain/leaves, wind/trees
+9.87 s, shorter than the 10 s asked: the longest this sound is made
 ```
 
 The night is a learned bed (a BigSoundBank recording of a field at night), rendered once with a fade in and out.

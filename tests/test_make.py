@@ -12,6 +12,7 @@ import pytest
 import soundfile as sf
 
 from earshot import cli
+from earshot.forge import dsp
 from earshot.make import WEIGHT, make, make_set, sounds
 from earshot.pack import pack
 from earshot.sounds import registry, sets
@@ -522,6 +523,34 @@ def test_a_counted_action_in_a_row_is_one_file_and_a_count_of_things_is_many(tmp
     assert 'performance' not in one['takes'][0]
     two = make(out=str(tmp_path / 't.wav'), sound='tick/wood', events=2)
     assert two['takes'][0]['performance']['events'] == 2 and two['takes'][0]['performance']['pattern'] == 'row'
+
+
+def test_a_length_asked_with_a_count_is_the_files_and_the_events_spread_over_it(tmp_path):
+    """"three claps, 3 seconds": one file of 3.00 s with three claps across it; "footsteps on gravel, 5 seconds": the
+    count from the walking pace; a countdown keeps one a second and says when the length does not fit; knocks never
+    further apart than 1.5 s (the line says what was played); the file ends faded, after the last event sounded"""
+    claps = make('three claps, 3 seconds', str(tmp_path / 'c.wav'))
+    t = claps['takes'][0]
+    assert t['dur_s'] == pytest.approx(3.0, abs=0.001) and t['performance']['events'] == 3
+    assert 0.5 < 1 / t['performance']['pace'] < 1.5 and '(3.00 s' in claps['summary']
+    y, _ = _read(claps['files'][0])
+    env = np.abs(y).max(1)
+    assert np.abs(y[-1]).max() < 1e-4 and env[-dsp.n_of(0.05):].max() < 0.1 * env.max()
+    assert env[dsp.n_of(2.0):].max() > 0.2 * env.max()                       # the third clap sounds after 2 s
+    steps = make('footsteps on gravel, 5 seconds', str(tmp_path / 's.wav'))
+    t = steps['takes'][0]
+    assert t['dur_s'] == pytest.approx(5.0, abs=0.001) and 7 <= t['performance']['events'] <= 10
+    beeps = make('a countdown of three beeps over 3 seconds', str(tmp_path / 'b.wav'))
+    t = beeps['takes'][0]
+    assert t['performance']['pattern'] == 'count' and t['dur_s'] == pytest.approx(3.0, abs=0.001)
+    assert t['performance']['pace'] == pytest.approx(1.0) and 'not the' not in beeps['summary']
+    short = make('a countdown 3 2 1, 1 second', str(tmp_path / 'n.wav'))
+    assert short['takes'][0]['performance']['events'] == 3 and short['takes'][0]['dur_s'] > 2.0
+    assert 'not the 1 s asked (a countdown keeps one beat a second)' in short['summary']
+    far = make('three knocks on the table, 10 seconds', str(tmp_path / 'k.wav'))
+    t = far['takes'][0]
+    assert t['performance']['events'] == 3 and t['dur_s'] < 4.0
+    assert '3 knocks 1.5 s apart' in far['summary'] and 'not the 10 s asked' in far['summary']
 
 
 def test_a_design_named_inside_its_family_wins_over_the_default():

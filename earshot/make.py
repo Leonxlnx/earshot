@@ -237,33 +237,40 @@ LASTING = ('bed', 'music', 'pad', 'texture', 'noise')     # kinds that last: nev
 
 
 def rowed(b, sound, events=None):
-    """(True, events, pattern) when a one-shot design that is not performed from recordings
+    """(True, events, pattern, thing) when a one-shot design that is not performed from recordings
     (earshot.sounds.learned.performs) is asked for as a counted thing a person does in a row ("four knocks on the
-    table", "three claps", "a countdown 3 2 1": brief's `row`) or with the caller's events over 1; else None"""
+    table", "three claps", "a countdown 3 2 1": brief's `row`) or with the caller's events over 1; else None. thing:
+    the counted word as one ("knock", "clap"), else None"""
     from .sounds import registry
     d = registry.get(sound)
     if d.loop or d.kind in LASTING:
         return None
+    thing = (b.get('counted') or [None])[-1] if b.get('row') else None
     if events is not None:
-        return (True, int(events), b.get('row') or 'row') if int(events) > 1 else None
+        return (True, int(events), b.get('row') or 'row', thing) if int(events) > 1 else None
     if b.get('row') and (b.get('events') or 0) > 1:
-        return True, int(b['events']), b['row']
+        return True, int(b['events']), b['row'], thing
     return None
 
 
-def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0):
+def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0, thing=None):
     """a counted action of any one-shot design as one sound: (y, meta) as registry.render gives a take, with
     meta['performance'] = {'pattern', 'events', 'pace', 'seeds'}. The pattern player (earshot.synth.perform) places
     `events` takes of the design, each its own seed (a new variation; a learned design's next recording), each a
     little firmer or softer and early or late as the pattern does it, then the whole is levelled as one sound. A
-    length asked for is not read: the count and the pattern's pace make the length"""
+    length asked for (req's dur) is the length of the file: the events are spread over it (earshot.synth.perform
+    `fill`; events None = as many as the pattern's pace fits), the last one left the design's usual length (0.35 to
+    0.6 s) to ring out before the end; where the gaps would leave what a hand can do, they are held there, the
+    length follows and meta['note'] says so"""
     from types import SimpleNamespace
     from .forge import dsp
     from .sounds import registry
     from .synth import master
     from .synth import perform as P
     d = registry.get(sound)
-    p = P.plan(name, dsp.rng(registry.seed_of(sound, seed) ^ 0x60E5), events=events)
+    dur = req.get('dur')
+    p = P.plan(name, dsp.rng(registry.seed_of(sound, seed) ^ 0x60E5), events=events, dur=dur,
+               ring=min(max(d.dur or 0.35, 0.35), 0.6))
     one = {k: v for k, v in req.items() if k != 'dur'}
     parts, first = [], None
     for i, nudge in enumerate(p['nudge']):
@@ -273,10 +280,15 @@ def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0):
         parts.append((y, 0.0))
     y = master.finish(P.mix(parts, p), peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
                       sparse=registry.LIFT)
+    if p.get('dur'):
+        y = P.fit(y, p['dur'])
     meta = {'id': sound, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1),
             'performance': {'pattern': p['pattern'], 'events': len(p['onsets']), 'pace': p['pace'],
                             'seeds': [seed + i for i in range(len(p['onsets']))]}}
+    note = P.said(p, dur, meta['dur_s'], thing)
+    if note:
+        meta['note'] = note
     meta.update({k: first[k] for k in ('pitch', 'voice', 'material') if first.get(k)})
     ign = [k for k in first.get('ignored', ()) if k in one and k != 'energy' or k == 'energy' and one.get('energy')]
     if ign:
@@ -361,7 +373,8 @@ def take(sound, seed, req, lufs=None, peak_db=-1.0, perform=None):
     first = None
     for k in range(TRIES):
         if perform and perform[0] and len(perform) > 2:
-            y, meta = row(sound, seed + 101 * k, perform[1], perform[2], req, lufs=lufs, peak_db=peak_db)
+            y, meta = row(sound, seed + 101 * k, perform[1], perform[2], req, lufs=lufs, peak_db=peak_db,
+                          thing=perform[3] if len(perform) > 3 else None)
         elif perform and perform[0]:
             y, meta = learned.perform(sound, seed=seed + 101 * k, events=perform[1], lufs=lufs, peak_db=peak_db,
                                       **req)
@@ -393,7 +406,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     the action with that many events; None = as the words say ("footsteps", "knocking", "three knocks", "5 seconds
     of typing" ask for the action, "a footstep" for one step); any other one-shot design plays a counted action done
     in a row ("four knocks on the table", "three claps", "a countdown 3 2 1") or events of 2 or more as one file of
-    that many events (`row`), while a count of separate things ("five coin pickups") is that many files; a take's
+    that many events (`row`), while a count of separate things ("five coin pickups") is that many files; a length
+    asked with an action ("three knocks, 2 seconds") is the file's and the events are spread over it; a take's
     meta['performance'] says what was played"""
     from .sounds import registry
     from .synth import master
@@ -694,7 +708,8 @@ def add_cli(sub):
                                              'there; a figure rings no longer than it rings), the hold of a pad, the '
                                              'length of an ambience (shorter than its shortest loop: a cut, not a '
                                              'loop, unless the words say "loop") or a whoosh; a music loop keeps '
-                                             'whole bars; a single struck sound (a tap, a hit) rings as it rings: '
+                                             'whole bars; a counted action ("three knocks", footsteps) is spread '
+                                             'over it; a single struck sound (a tap, a hit) rings as it rings: '
                                              'it ignores --dur and says so')
     p.add_argument('--voice', help='the instrument or patch of a tonal sound: marimba (the default of figures), '
                                    'harp, pizzicato and felt_piano are real instruments learned note by note; '

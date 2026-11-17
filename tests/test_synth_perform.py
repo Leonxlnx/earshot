@@ -130,8 +130,8 @@ def test_a_performance_is_longer_than_one_event():
 
 def test_a_length_is_filled_at_the_natural_pace():
     y, meta = learned.perform('door/knock', seed=0, dur=1.5)
-    assert meta['performance']['events'] >= 5
-    assert master.true_peak_db(y) < -0.5
+    assert meta['performance']['events'] >= 5 and meta['dur_s'] == pytest.approx(1.5, abs=0.001)
+    assert master.true_peak_db(y) < -0.5 and np.abs(y[-1]).max() < 1e-4
 
 
 def test_a_plain_take_never_plays_a_recording_of_the_whole_action():
@@ -177,3 +177,28 @@ def test_a_row_is_a_little_uneven_and_a_countdown_keeps_the_clock():
     assert np.ptp(gaps) > 0.001                                              # off the grid
     count = perform.plan('count', dsp.rng(5), events=3)
     assert np.allclose(np.diff(count['onsets']), 1.0)                       # one a second, on the clock
+
+
+def test_a_length_spreads_the_events_and_holds_them_where_a_hand_must():
+    """the first event at LEAD, the last `ring` before the end, the human spread kept; no count: the pace's;
+    gaps held at the fastest and the widest a person keeps, with the line that says so; a countdown on the clock"""
+    p = perform.plan('knock', dsp.rng(3), events=3, dur=2.0, ring=0.3)
+    on = np.array(p['onsets'])
+    assert p['fits'] and p['dur'] == 2.0 and on[0] == perform.LEAD and on[-1] == pytest.approx(1.7)
+    assert np.ptp(np.diff(on)) > 0.001 and perform.said(p, 2.0, 2.0) is None
+    walk = perform.plan('walk', dsp.rng(3), dur=5.0, ring=0.4)
+    assert 8 <= len(walk['onsets']) <= 10 and walk['onsets'][-1] == pytest.approx(4.6)
+    near = perform.plan('knock', dsp.rng(3), events=10, dur=0.5, ring=0.3)
+    assert not near['fits'] and near['dur'] is None and near['gap'] == 0.12
+    assert perform.said(near, 0.5, 1.4) == ('10 knocks 0.12 s apart: 1.40 s, not the 0.5 s asked (knocks cannot '
+                                            'follow closer than 0.12 s by hand)')
+    far = perform.plan('row', dsp.rng(3), events=3, dur=10.0, ring=0.3)
+    assert not far['fits'] and far['gap'] == 1.5 and 'claps further apart than 1.5 s' in perform.said(
+        far, 10.0, 3.3, 'clap')
+    count = perform.plan('count', dsp.rng(3), events=3, dur=3.0, ring=0.22)
+    assert count['fits'] and np.allclose(np.diff(count['onsets']), 1.0)
+    assert not perform.plan('count', dsp.rng(3), events=3, dur=6.0, ring=0.22)['fits']
+    assert len(perform.plan('count', dsp.rng(3), dur=5.0, ring=0.22)['onsets']) == 5
+    y = np.ones((dsp.n_of(1.0), 2))
+    assert len(perform.fit(y, 0.5)) == dsp.n_of(0.5) and perform.fit(y, 0.5)[-1, 0] < 1e-12
+    assert len(perform.fit(y, 2.0)) == dsp.n_of(2.0) and perform.fit(y, 2.0)[-1, 0] == 0.0
