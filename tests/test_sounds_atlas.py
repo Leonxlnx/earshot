@@ -89,7 +89,8 @@ def test_named_job_keeps_its_lexical_winner(idx, text):
 
 
 def test_described_sound_is_decided_by_the_atlas(idx):
-    b = brief.read('a thin airy streak fading into the distance')
+    # no word of it names a design ("fading" and "air" are in fall/air's descriptions since the film rebuild)
+    b = brief.read('a faint thin streak dissolving far away')
     for target in ('whoosh_fast/crisp', 'laser/beam', 'shimmer/m1'):
         ids = {r['id'] for r in idx[0]}
         if target not in ids:

@@ -1132,8 +1132,8 @@ def _compound(sid, seq):
 
 def _twin(sid, out, idx):
     """the member of the same name in a family that answers the same job and ranks above sid's ("a deep impact":
-    the bank's impact/deep is named word for word, but boom/deep, the film family's deep member, ranks above it), or
-    None"""
+    the bank's impact/deep is named word for word, but boom/deep, the film family's deep member, ranks above it; a
+    family that is that job, not one that merely lists it: kick/deep is a drum, not a deep impact), or None"""
     if not idx:
         return None
     if _cache.get('pos_key') != id(idx):
@@ -1144,7 +1144,7 @@ def _twin(sid, out, idx):
         if r['id'] == sid:
             return None
         t = terms[pos[r['id']]]
-        if r['id'].split('/')[0] != fam and _name_words(r['id']) == name and jobs & (t['family'] | t['uses']):
+        if r['id'].split('/')[0] != fam and _name_words(r['id']) == name and jobs & t['family']:
             return r['id']
     return None
 
