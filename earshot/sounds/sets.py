@@ -4,18 +4,26 @@
     earshot make --set arcade -o assets/sfx --format ogg
 
 A set is a list of (file name, design id). The theme decides the voice, key and room of the tonal ones; a spec may
-add sounds, replace one by name, or change any of them (earshot.make.make_set). The lists follow the inventories
-interface and game audio teams work from; a product rarely needs more than a dozen distinct sounds, and fewer is
-better than every event making noise.
+add sounds, replace one by name, or change any of them (earshot.make.make_set). `seeds` pins the take of a name (for
+a learned design: the member, by its place in the design's walk, earshot.sounds.learned); a name without one gets
+the next take of its design (the first name of a design its best recording). `quiet` names sit at the set's lowest
+level (make_set balances a set's one-shots by their loudest 50 ms). The lists follow the inventories interface and
+game audio teams work from; a product rarely needs more than a dozen distinct sounds, and fewer is better than every
+event making noise.
 """
 SETS = {
     # the touches are recorded keys and switches (earshot.sounds.learned: the owner heard the tonal touches as
-    # unrecognisable twice, real keys as satisfying); toggle_on and toggle_off are two recordings of switch/lamp, the
-    # off the darker at the default seed (members walk with the seed, and a set's sounds take consecutive seeds);
-    # back and next are two keys of one laptop keyboard in the same way: back (seed 5) the darkest and softest of its
-    # members, next (seed 6) a brighter one
-    'ui': dict(says='a product interface: app, website, dashboard', theme='soft', sounds=(
-        ('tap', 'keyboard/desktop'), ('hover', 'dial/click'), ('toggle_on', 'switch/lamp'),
+    # unrecognisable twice, real keys as satisfying). D1 (2026-11-17, renders/d1/roles.txt): tap is the key he rated 4
+    # on page 5 (keyboard/mechanical, first in its walk), type the other mechanical key; next and back the two laptop
+    # keys nearest that key (next member 4, back member 1: the darker and softer); toggle_on and toggle_off two
+    # recordings of switch/lamp, the off the darker one he rated 3 (member 1), the on member 2; hover the softest,
+    # lowest short touch that is not thin (leather/grab member 1). No theme: the figures play in their own key and
+    # voice, as on page 7, where he rated them 3 to 4 (in the soft theme they were moved to C, darker and softer, and
+    # got 1 to 2)
+    'ui': dict(says='a product interface: app, website, dashboard', theme=None,
+               seeds={'tap': 0, 'type': 1, 'hover': 1, 'toggle_on': 1, 'toggle_off': 0, 'back': 4, 'next': 3},
+               quiet=('hover',), sounds=(
+        ('tap', 'keyboard/mechanical'), ('hover', 'leather/grab'), ('toggle_on', 'switch/lamp'),
         ('toggle_off', 'switch/lamp'), ('type', 'keyboard/mechanical'), ('back', 'keyboard/laptop'),
         ('next', 'keyboard/laptop'), ('open', 'open/lift'), ('close', 'close/drop'),
         ('send', 'send/lift'), ('receive', 'receive/drop'), ('notify', 'notify/pair'), ('success', 'success/rise'),

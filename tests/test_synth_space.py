@@ -187,6 +187,26 @@ def test_finish_at_a_loudness():
         assert master.true_peak_db(y) <= -1.0 + 0.2
 
 
+def test_finish_does_not_bend_a_tone_to_reach_a_loudness():
+    """D1: a tonal figure asked for more loudness than its peak allows stops at its peak (no fold, no limiter: both
+    leave a residual a held tone shows); quieter targets are met as before"""
+    x = _tone(sec=0.6, decay=0.3)
+    free = master.finish(x)
+    y = master.finish(x, lufs=master.loudness(free) + 4.0, tonal=True)
+    g = float((y * free[:len(y)]).sum() / (free[:len(y)] ** 2).sum())
+    assert abs(master.true_peak_db(y) - (-1.0)) <= 0.2
+    assert np.abs(y - g * free[:len(y)]).max() < 1e-6 * np.abs(y).max() + 1e-9    # the same take, only gain
+    lo = master.finish(x, lufs=master.loudness(free) - 6.0, tonal=True)
+    assert abs(master.loudness(lo) - (master.loudness(free) - 6.0)) <= 0.3
+
+
+def test_loudest_window():
+    y = np.zeros((SR, 2))
+    y[1000:1000 + dsp.n_of(0.05)] = 0.5
+    assert abs(master.loudest(y) - 20 * np.log10(0.5)) < 0.1
+    assert abs(master.loudest(y, 0.005) - 20 * np.log10(0.5)) < 0.1
+
+
 def test_finish_keeps_a_loop_whole():
     x = 0.3 * np.sin(2 * np.pi * 200 * np.arange(SR) / SR)
     y = master.finish(x, loop=True)

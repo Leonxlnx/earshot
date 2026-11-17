@@ -19,7 +19,7 @@ INDEX = learned.index()
 IDS = list(INDEX)
 LIMIT = 8_000_000                     # bytes the whole store may weigh
 # three interface designs (sets 'ui') and a footstep: rendered in the fast tier (every member: --slow)
-FAST = ('keyboard/desktop', 'switch/lamp', 'dial/click', 'step/pebbles')
+FAST = ('keyboard/mechanical', 'switch/lamp', 'leather/grab', 'step/pebbles')
 # the character suffixes of the first pass's automatic names, and engine words: never in a name ('light' is a verb
 # in match/light)
 SLOP = {'bright', 'dark', 'warm', 'deep', 'clear', 'resyn', 'model', 'learned', 'fit', 'take', 'sample'}
@@ -261,14 +261,57 @@ def test_seeds_of_one_recording_are_performances(sid):
 
 
 def test_back_and_next_are_two_keys_of_one_keyboard():
-    ui = sets.SETS['ui']['sounds']
-    names = [n for n, _ in ui]
-    sound = dict(ui)
+    ui = sets.SETS['ui']
+    sound = dict(ui['sounds'])
     assert sound['back'] == sound['next'] == 'keyboard/laptop'
-    back, nxt = (learned.pick('keyboard/laptop', names.index(n)) for n in ('back', 'next'))  # a set's seeds follow
-    members = INDEX['keyboard/laptop']['members']                                            # its order
+    back, nxt = (learned.pick('keyboard/laptop', ui['seeds'][n]) for n in ('back', 'next'))   # the set pins them
+    members = INDEX['keyboard/laptop']['members']
     assert members[back]['quality']['centroid'] < members[nxt]['quality']['centroid']        # back the lower one
     assert members[back]['quality']['peak'] < members[nxt]['quality']['peak']                # and the softer
+
+
+# the recordings the owner rated 3 to 5 on page 5 (the recording, its take and its variant alike), by design
+RATED = {'keyboard/mechanical': 'freesound-380142', 'camera/shutter': 'freesound-170229',
+         'whoosh/stick': 'freesound-59995', 'bag/drop': 'freesound-584441'}
+
+
+@pytest.mark.parametrize('sid', sorted(RATED))
+def test_seed_zero_plays_the_recording_he_rated_best(sid):
+    """D1: tonight's catalogue played other recordings of these at seed 0 (rated 2 where the raw take got 3 to 5)"""
+    assert INDEX[sid]['members'][learned.pick(sid, 0)]['source'] == RATED[sid]
+    assert learned.order(sid)[0] == learned.pick(sid, 0)
+
+
+def test_the_walk_holds_every_member_but_those_rated_one():
+    for sid, e in INDEX.items():
+        walk = learned.order(sid)
+        assert len(set(walk)) == len(walk) and set(walk) <= set(range(len(e['members']))), sid
+        out = set(range(len(e['members']))) - set(walk)
+        assert all(e['members'][k].get('rating_final') == 1 for k in out), sid
+        assert walk or not e['members'], sid
+    assert len(learned.order('step/tile')) < len(INDEX['step/tile']['members'])        # his 1 for a tile step
+
+
+def test_a_retake_plays_the_same_recording():
+    """make re-rolls a take that fails its audit at seed + 101: another performance of that recording, not the
+    next one (whoosh/stick played its plainer first member through a re-roll)"""
+    for sid in ('whoosh/stick', 'keyboard/laptop', 'bag/drop'):
+        for s in range(4):
+            assert learned.pick(sid, s) == learned.pick(sid, s + learned.RETAKE) == learned.pick(sid, s + 303)
+
+
+def test_the_ui_set_plays_the_members_chosen_for_its_roles():
+    """D1 (renders/d1/roles.txt): tap the page-5 key, type the other mechanical key, toggles two lamp switches
+    (the off the one he rated 3), hover the soft leather touch"""
+    ui = sets.SETS['ui']
+    sound = dict(ui['sounds'])
+    src = {n: INDEX[sound[n]]['members'][learned.pick(sound[n], s)]['source'] for n, s in ui['seeds'].items()}
+    assert src['tap'] == 'freesound-380142' and src['type'] != src['tap']
+    assert src['toggle_off'] != src['toggle_on']
+    off = INDEX['switch/lamp']['members'][learned.pick('switch/lamp', ui['seeds']['toggle_off'])]
+    assert off.get('rating_final') == 3
+    hover = INDEX['leather/grab']['members'][learned.pick('leather/grab', ui['seeds']['hover'])]
+    assert hover['quality']['centroid'] == min(m['quality']['centroid'] for m in INDEX['leather/grab']['members'])
 
 
 def _loudest(y, ms):
@@ -280,7 +323,7 @@ def test_interface_members_sit_near_the_figures():
     """a click lifted by the registry keeps its strike and gets some body: its loudest 50 ms within 5 dB of an
     interface figure's (the owner heard them as too quiet; a click is mostly its first 20 ms), its strike as bright"""
     fig = _loudest(registry.render('success/rise', seed=0)[0], 50.0)
-    for sid in ('keyboard/desktop', 'dial/click'):
+    for sid in ('keyboard/mechanical', 'keyboard/desktop', 'dial/click'):
         y, _ = registry.render(sid, seed=0)
         assert fig - _loudest(y, 50.0) < 5.0, sid
     hit = np.concatenate([np.zeros(480), np.exp(-np.arange(4800) / 480.0)])                # a knock 10 ms in

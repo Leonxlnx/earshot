@@ -67,13 +67,19 @@ def loudness(y):
 BODY = 3.5                       # dB under the peak at which the loudest 5 ms of a lifted one-shot sit
 
 
-def _body_db(y):
-    """the level of the loudest 5 ms of y (RMS over both channels, dBFS)"""
-    k = max(2, dsp.n_of(0.005))
-    p = np.mean(np.atleast_2d(y.T).T ** 2, axis=1)
+def loudest(y, seconds=0.05):
+    """the level of the loudest `seconds` of y (RMS over both channels, dBFS): 50 ms is what a listener hears as a
+    short sound's level (a click's spike is not), 5 ms its strike"""
+    k = max(2, dsp.n_of(seconds))
+    p = np.mean(np.atleast_2d(np.asarray(y, np.float64).T).T ** 2, axis=1)
     c = np.concatenate([[0.0], np.cumsum(p)])
     return float(10 * np.log10(np.max(c[k:] - c[:-k]) / k + 1e-30)) if len(p) > k else float(
         10 * np.log10(p.mean() + 1e-30))
+
+
+def _body_db(y):
+    """the level of the loudest 5 ms of y (RMS over both channels, dBFS)"""
+    return loudest(y, 0.005)
 
 
 def _fold(y, peak_db, knee=0.5, loop=False):
@@ -100,7 +106,7 @@ def _fold(y, peak_db, knee=0.5, loop=False):
 
 
 def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66.0, loop=False, cap=None, lift=0.0,
-           sparse=0.0):
+           sparse=0.0, tonal=False):
     """a made sound as it ships: non-finite or silent renders refused, the low end cut under `low_cut` Hz (no DC, no
     rumble that small speakers turn into distortion), leading silence dropped, a `fade_in` s start from zero, the
     silent end trimmed and faded; then the level: the true peak at peak_db, but no louder than `cap` LUFS
@@ -111,8 +117,10 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
     dB is the same for a long sound held under its cap by a few peaks (a fire's cracks over a quiet bed): raised
     as long as no more than 0.3 % of its samples reach into the fold. Or with `lufs` the
     momentary-max loudness at that value with the peaks limited to peak_db (with `lift`, a short one-shot's peaks
-    folded over instead, so a click in a levelled set keeps its strike as bright). A loop keeps its length and both ends
-    (no trim, no fades)."""
+    folded over instead, so a click in a levelled set keeps its strike as bright). A `tonal` sound (a note, a
+    figure) asked for a loudness its peak does not allow stops at its peak instead: pushed 3 LU past it, the fold
+    left a residual 27 dB under a success figure and the limiter one 18 dB under (D1, renders/d1/fold.txt), a
+    distortion a held tone shows. A loop keeps its length and both ends (no trim, no fades)."""
     y = np.array(y, np.float64)
     if not np.isfinite(y).all():
         raise ValueError('the render has non-finite samples')
@@ -151,6 +159,9 @@ def finish(y, peak_db=-1.0, lufs=None, low_cut=25.0, fade_in=0.0004, tail_db=-66
                 over = loudness(y) - cap
                 return y * 10 ** (-over / 20) if over > 0 else y
         return y
+    if tonal:
+        y = y * 10 ** ((lufs - loudness(y)) / 20)
+        return y * 10 ** (min(0.0, peak_db - true_peak_db(y)) / 20)
     fold = lift and not loop and len(y) < dsp.n_of(1.0)     # a short one-shot's spike is folded over, as by `lift`
     for k in range(6):                   # a limited peak takes loudness with it: a peaky tap is raised again, with a
         y = y * 10 ** ((lufs - loudness(y)) / 20)                            # fast limiter after the first pass

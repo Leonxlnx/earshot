@@ -319,9 +319,13 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
                     {"name": "success", "want": "a happy two-note success chime", "dur": 0.5, "axes": {"bright": 0.2}}]}
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
     takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
-    seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). The sounds are levelled against
-    each other by loudness (`lufs`: the loudest allowed; default -16 for the set's loudest sound, each design's
-    own weight under it), `manifest.json` in the folder lists every file with its sound, length and level, and
+    seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). A name's take is its `seed` when
+    given, else the next take of its design (the first name of a learned design gets its best recording). Level:
+    every one-shot is made as it is made alone (true peak -1 dBFS) and the set is balanced by the loudest 50 ms
+    (balance()): none more than BALANCE dB over the quietest, a ready-made set's `quiet` names at the quietest,
+    turned down by gain only. Loops, beds, pads and music, and every sound when `lufs` is given (the loudest
+    allowed), are levelled by momentary loudness, each design's own weight under it (WEIGHT; -16 when not given).
+    `manifest.json` in the folder lists every file with its sound, length, level and recording, and
     "sprite" also packs them into one file with a map (earshot.pack). format (or fmt): one format or several
     ("webm,mp3" or a list): every sound is written once per format, the manifest's `file` is the first and `files`
     all of them, and a sprite named with one of them (or no extension) is written in each, its map's `src` listing
@@ -337,14 +341,16 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     from .sounds import sets
     if isinstance(spec, str):
         spec = {'set': spec} if spec in sets.SETS else read_json(spec)
-    items, skipped = list(spec.get('sounds') or []), []
+    items, skipped, quiet = list(spec.get('sounds') or []), [], ()
     if spec.get('set'):
         base = sets.get(spec['set'])
         theme = theme or spec.get('theme') or base['theme']
         named = {it.get('name') for it in items}
         have = set(registry.ids())
         skipped = [n for n, sid in base['sounds'] if sid not in have and n not in named]
-        items = [{'name': n, 'sound': sid} for n, sid in base['sounds'] if sid in have and n not in named] + items
+        pins, quiet = base.get('seeds', {}), tuple(base.get('quiet', ()))
+        items = [{'name': n, 'sound': sid, **({'seed': pins[n]} if n in pins else {})}
+                 for n, sid in base['sounds'] if sid in have and n not in named] + items
     if not items:
         raise ValueError('the spec has no "sounds" and names no "set"')
     bad = [f'{it.get("name", i)}: {k}' for i, it in enumerate(items) for k in it if k not in SET_FIELDS]
@@ -356,34 +362,28 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     theme = theme or spec.get('theme')
     fmts = _formats(fmt or spec.get('format') or 'wav')
     mono = spec.get('mono', False) if mono is None else mono
-    top = lufs if lufs is not None else spec.get('lufs', -16.0)
-    rows, lines, ys, alts, missed, first, played = [], [], [], {}, {}, {}, {}
+    top = lufs if lufs is not None else spec.get('lufs')
+    rows, lines, ys, alts, missed, first, played, pending, takes = [], [], [], {}, {}, {}, {}, [], {}
     for it in items:
         b, cands = choose(it.get('want'), it.get('sound'), pitch=it.get('pitch'), dur=it.get('dur'),
                           voice=it.get('voice'), material=it.get('material'), axes=it.get('axes'))
         if not cands:
             raise ValueError(f'{it["name"]}: no sound in the catalogue answers {it.get("want")!r}')
         d = registry.get(cands[0]['id'])
-        level = it.get('lufs', top + WEIGHT.get(d.kind, -4.0))
+        alone = it.get('lufs') is None and top is None and not d.loop and d.kind not in registry.LOUDEST
+        level = None if alone else it.get('lufs', (TOP if top is None else top) + WEIGHT.get(d.kind, -4.0))
         k = int(it.get('n') or b['n'] or 1)
         mine = {}                         # the recordings this name played: {n: meta['member']}
-        for p in _paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0]):
-            y, meta = take(d.id, int(it.get('seed', seed)) + len(rows), _request(b, theme), lufs=level)
-            stem = os.path.splitext(p)[0]
-            loop = bool(meta.get('loop', False))
-            own = _loop_formats(fmts) if loop else fmts
-            files = [master.write(f'{stem}.{f}', y, mono=mono and not d.loop, bits=16 if f == 'wav' else 24)
-                     for f in own]
-            ys.append(y)
+        for j, p in enumerate(_paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0])):
+            s = int(it['seed']) + j if it.get('seed') is not None else seed + takes.get(d.id, 0)
+            takes[d.id] = takes.get(d.id, 0) + 1
+            y, meta = take(d.id, s, _request(b, theme), lufs=level)
             if meta.get('member'):
                 mine[meta['member']['n']] = meta['member']
-            rows.append({'name': os.path.basename(stem), 'file': os.path.basename(files[0]),
-                         'files': [os.path.basename(f) for f in files], 'sound': d.id, 'dur_s': meta['dur_s'],
-                         'lufs_max': meta['lufs_max'], 'loop': loop,
-                         'ok': meta['checks']['ok'], **({'pitch': meta['pitch']} if meta.get('pitch') else {})})
-            shown = p if len(own) == 1 else f'{stem}.{{{",".join(own)}}}'
-            lines.append(_line(meta, shown, ', '.join(brief.shown(b, cands[0]['why']))))
-            if own != fmts:
+            lines.append(None)            # the file's line, written once the set is balanced
+            pending.append({'p': p, 'y': y, 'meta': meta, 'd': d, 'alone': alone, 'name': it['name'],
+                            'line': len(lines) - 1, 'why': ', '.join(brief.shown(b, cands[0]['why']))})
+            if meta.get('loop') and _loop_formats(fmts) != fmts:
                 lines.append(f"  a loop: {SEAM_SAFE} instead of {' / '.join(f for f in fmts if f in PADDED)}, "
                              'which leaves a gap at the seam')
         reason = None if it.get('sound') else doubt(b, cands)
@@ -413,6 +413,22 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
             lines.append('  ' + (guess(b, cands, alts[it['name']]) or 'also: ' + ', '.join(alts[it['name']])))
         if unknown:
             lines.append(f"  not understood: {', '.join(unknown)}")
+    balance(pending, quiet)
+    for q in pending:
+        y, meta, d, p = q['y'], q['meta'], q['d'], q['p']
+        stem = os.path.splitext(p)[0]
+        loop = bool(meta.get('loop', False))
+        own = _loop_formats(fmts) if loop else fmts
+        files = [master.write(f'{stem}.{f}', y, mono=mono and not d.loop, bits=16 if f == 'wav' else 24)
+                 for f in own]
+        ys.append(y)
+        rows.append({'name': os.path.basename(stem), 'file': os.path.basename(files[0]),
+                     'files': [os.path.basename(f) for f in files], 'sound': d.id, 'dur_s': meta['dur_s'],
+                     'lufs_max': meta['lufs_max'], 'loop': loop, 'ok': meta['checks']['ok'],
+                     **({'pitch': meta['pitch']} if meta.get('pitch') else {}),
+                     **({'member': meta['member']} if meta.get('member') else {})})
+        shown = p if len(own) == 1 else f'{stem}.{{{",".join(own)}}}'
+        lines[q['line']] = _line(meta, shown, q['why'])
     man = os.path.join(out, 'manifest.json')
     with open(man, 'w', encoding='utf-8', newline='\n') as fh:
         json.dump({'theme': theme, 'format': fmts[0], 'formats': fmts, 'sounds': rows}, fh, indent=1)
@@ -441,6 +457,31 @@ WEIGHT = {'tap': -10.0, 'tick': -12.0, 'click': -9.0, 'pop': -7.0, 'note': -5.0,
           'hit': -1.0, 'thud': -3.0, 'whoosh': -5.0, 'rise': -3.0, 'fall': -3.0, 'zap': -3.0, 'boom': 0.0,
           'noise': -8.0, 'texture': -12.0, 'bed': -14.0, 'pad': -10.0, 'stinger': 0.0, 'voice': -5.0, 'object': -6.0,
           'music': -8.0}
+TOP = -16.0             # LUFS (momentary max) of a set's loudest loop or bed when the spec names no `lufs`
+# a set's one-shots, balanced by their loudest 50 ms (D1, 2026-11-17): the final page's interface set came out at
+# -21 to -25 LUFS (taps at -16 + WEIGHT = -26), 6 to 8 dB under the same takes made alone and 8 to 10 dB under every
+# other group, and the owner heard it as far, thin and technical. Now each is made as it is made alone (peak -1 dBFS)
+# and only turned down: none more than BALANCE dB over the quietest (not counting one under FLOOR, which cannot come
+# up without being folded), a `quiet` name (hover) QUIET dB under it. Gain only: nothing is folded or limited again
+BALANCE, FLOOR, QUIET = 2.5, -18.0, 0.5
+
+
+def balance(pending, quiet=()):
+    """turn a set's one-shots (the takes made alone, `pending` rows with 'y', 'meta', 'alone', 'name') down so that
+    their loudest 50 ms lie within BALANCE dB of the quietest (module constants), in place"""
+    from .synth import master
+    lv = {i: master.loudest(q['y']) for i, q in enumerate(pending) if q['alone']}
+    ref = [v for i, v in lv.items() if pending[i]['name'] not in quiet]
+    if not ref:
+        return
+    low = max(min(ref), FLOOR)
+    for i, v in lv.items():
+        q = pending[i]
+        most = low - QUIET if q['name'] in quiet else low + BALANCE
+        if v > most:
+            q['y'] = q['y'] * 10 ** ((most - v) / 20)
+            q['meta'] = {**q['meta'], 'lufs_max': round(master.loudness(q['y']), 1),
+                         'peak_dbfs': round(master.true_peak_db(q['y']), 2)}
 
 
 def sounds(search=None, domain=None, kind=None, family=None):

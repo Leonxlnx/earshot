@@ -53,6 +53,9 @@ LIFT = 14.0
 LEARNED = 1.1
 # the most a bed held under its cap by a few peaks is raised (dB: master.finish `sparse`): a campfire's cracks
 SPARSE = 8.0
+# kinds of held tones: asked for a loudness (a set's level, `lufs`) one of these with a pitch is not folded or
+# limited to reach it but stops at its peak (master.finish `tonal`: both bend a held tone measurably)
+TONAL = ('note', 'chime', 'figure', 'stinger')
 _designs = {}
 _loaded = False
 
@@ -259,7 +262,8 @@ def render(id, seed=0, peak_db=-1.0, lufs=None, check=True, **request):
     c.seed = int(seed)
     y = d.fn(c, dsp.rng(seed_of(id, seed)))
     y = master.finish(y, peak_db=peak_db, lufs=lufs, loop=c.loop, cap=LOUDEST.get(d.kind, LOUDEST['']),
-                      lift=0.0 if d.kind in LOUDEST else LIFT, sparse=SPARSE if d.kind == 'bed' else 0.0)
+                      lift=0.0 if d.kind in LOUDEST else LIFT, sparse=SPARSE if d.kind == 'bed' else 0.0,
+                      tonal=bool(d.pitch) and d.kind in TONAL)
     meta = {'id': id, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1)}
     if 'pitch' in c.used and (d.pitch or c._pitch):

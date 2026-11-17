@@ -4,15 +4,17 @@ takes (earshot.synth.resyn). A mouse click, a cork, a footstep, a light switch: 
 do not reach.
 
 A design is one THING (`step/concrete`, `switch/lamp`, `keyboard/laptop`); the recordings of that thing are its
-members. The seed picks the member: seeds 0, 1, 2 ... walk through the members in a fixed shuffled order (a game that
-plays a footstep with seeds 0, 1, 2 gets three different real footsteps), and every take adds fresh noise and a small
-variation on top, so seeds past the last member are new performances of a recording, not copies. A request for a
+members. The seed picks the member: seeds 0, 1, 2 ... walk through the members best first (the index's `walk`: a
+recording the owner rated well first, then the full, long enough ones; a game that plays a footstep with seeds 0, 1,
+2 gets three different real footsteps), and every take adds fresh noise and a small variation on top, so seeds past
+the last member are new performances of a recording, not copies. Seeds 101 apart play the same member (make re-rolls
+a take that fails its audit at seed + 101: another performance of the same recording, not the next recording). A request for a
 dark or a bright take (bright at -0.5 or below, 0.5 or above) walks the darker or the brighter half of the members
 (by their measured centroid) and tilts it as well. `registry.render` reports the member played in meta['member'].
 
 The store is earshot/data/resyn/: one model per recording (`<family>-<name>-<n>.npz`, numbers only, never audio),
 `index.json` (per design: id, descriptions, jobs, kind, whether it is a default choice, the interface jobs it plays
-(`roles`) and its members, each with its file, source recording, credit, main onset, natural length, the axes that
+(`roles`), the order its seeds play its members in (`walk`) and its members, each with its file, source recording, credit, main onset, natural length, the axes that
 measurably act on it, the measured quality of the recording, the owner's rating where he gave one) and CREDITS.md.
 It is built in the lab (tools/learn_build.py) from recordings whose licence is CC0, each one checked for a full band,
 a natural decay, a clear onset and a single event; nothing else may enter it. A model is read from disk once, on its
@@ -72,6 +74,7 @@ FINISH = dict(lufs=-40.0, weight=1.5, presence=1.5, air=1.5, drive=3.0)
 BODY_EXP, BODY_DB = 0.5, 6.0
 CREST, CUT = 14.0, 8.0       # dB: present() (a sound of 0.5 s and more, peaks over its loudest 50 ms)
 DEFAULT_OFF = 0.6           # prior factor of a design the index marks as not a default (`default`: false)
+RETAKE = 101                # make.take's step between the seeds it tries: seeds this far apart play one member
 
 
 def dry(e, m):
@@ -100,21 +103,24 @@ def credit(sid, member=0):
 
 @lru_cache(maxsize=None)
 def order(sid):
-    """the members of a design in the fixed shuffled order the seeds walk through"""
-    n = len(index()[sid]['members'])
-    return tuple(int(k) for k in np.random.default_rng(zlib.crc32(sid.encode())).permutation(n))
+    """the members of a design in the order the seeds walk through: the index's `walk` (best first; a member the
+    owner rated 1 is left out of it), else a fixed shuffled order"""
+    e = index()[sid]
+    if e.get('walk'):
+        return tuple(int(k) for k in e['walk'])
+    return tuple(int(k) for k in np.random.default_rng(zlib.crc32(sid.encode())).permutation(len(e['members'])))
 
 
 def pick(sid, seed, bright=0.0):
-    """the member (its position in the index) played for a seed: seed k plays order(sid)[k % n]; a request at
-    |bright| >= CHARACTER walks only the darker or the brighter half (members are stored darkest first)"""
+    """the member (its position in the index) played for a seed: seed k plays order(sid)[(k % RETAKE) % n]; a
+    request at |bright| >= CHARACTER walks only the darker or the brighter half (members are stored darkest first)"""
     walk = order(sid)
-    n = len(walk)
+    n = len(index()[sid]['members'])
     if n > 1 and abs(bright) >= CHARACTER:
         half = (n + 1) // 2
         keep = set(range(half)) if bright < 0 else set(range(n - half, n))
-        walk = tuple(k for k in walk if k in keep)
-    return walk[int(seed) % len(walk)]
+        walk = tuple(k for k in walk if k in keep) or walk
+    return walk[(int(seed) % RETAKE) % len(walk)]
 
 
 def take(e, c, r):

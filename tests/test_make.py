@@ -210,8 +210,8 @@ def test_make_set_ready_made_with_sprite_and_pack_it_again(tmp_path):
     assert list(again['sprite']) == names
 
 
-def test_make_set_levels_follow_the_weights(tmp_path):
-    spec = {'sounds': [{'name': 'tap', 'sound': 'tap/tone'}, {'name': 'success', 'sound': 'success/rise'}]}
+def test_make_set_levels_follow_the_weights_when_a_loudness_is_given(tmp_path):
+    spec = {'lufs': -16, 'sounds': [{'name': 'tap', 'sound': 'tap/tone'}, {'name': 'success', 'sound': 'success/rise'}]}
     res = make_set(spec, out=str(tmp_path / 's'))
     lv = {r['name']: r['lufs_max'] for r in res['sounds']}
     k = {r['name']: registry.get(r['sound']).kind for r in res['sounds']}
@@ -219,6 +219,31 @@ def test_make_set_levels_follow_the_weights(tmp_path):
     assert lv['success'] - lv['tap'] == pytest.approx(WEIGHT['chime'] - WEIGHT['tap'], abs=1.0)
     assert lv['success'] == pytest.approx(-16.0 + WEIGHT['chime'], abs=0.6)
     _check_manifest(str(tmp_path / 's'), 2)
+
+
+def _loudest50(path):
+    from earshot.synth import master
+    return master.loudest(_read(path)[0])
+
+
+def test_a_set_of_one_shots_is_full_and_balanced(tmp_path):
+    """D1: the final page's interface set came out 6-8 dB under the same takes made alone (taps at -26 LUFS) and was
+    heard as far and thin. Without a `lufs` a set's one-shots are made as they are alone (the quietest at full peak)
+    and only turned down to within BALANCE dB of the quietest by their loudest 50 ms; a ready-made set's quiet names
+    (hover) sit lowest; the learned roles play the recordings chosen for them"""
+    from earshot.make import BALANCE, QUIET
+    out = str(tmp_path / 'ui')
+    res = make_set('ui', out=out)
+    lv = {r['name']: _loudest50(os.path.join(out, r['file'])) for r in res['sounds']}
+    pk = {r['name']: _read(os.path.join(out, r['file']))[0] for r in res['sounds']}
+    assert max(lv.values()) - min(lv.values()) <= BALANCE + QUIET + 0.2, lv
+    assert min(lv, key=lv.get) == 'hover'
+    loudest_peak = max(20 * np.log10(np.abs(y).max()) for y in pk.values())
+    assert loudest_peak > -2.0                                     # full: the quietest one-shots stay at full peak
+    assert all(v > -20.0 for v in lv.values()), lv                 # nothing far and thin
+    rec = {r['name']: r['member']['recording'] for r in res['sounds'] if r.get('member')}
+    assert rec['tap'].startswith('Computer Keyboard - single key')   # the key he rated 4 on page 5
+    assert {r['name']: r['sound'] for r in res['sounds']}['hover'] == 'leather/grab'
 
 
 def test_make_set_spec_file_with_a_byte_order_mark(tmp_path):
