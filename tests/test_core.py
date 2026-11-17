@@ -158,6 +158,40 @@ def test_profile_summary_survives_unmeasured_metrics():
     assert 'LRA n.a.' in profile.profile_summary(p)
 
 
+@pytest.mark.parametrize('argv, want', [
+    (['describe', 'x.wav'], 'describe'),
+    (['--threads', '2', 'describe', 'x.wav'], 'describe'),      # the value of the global option is not a command
+    (['--threads=2', 'describe', 'x.wav'], 'describe'),
+    (['describe', 'x.wav', '--threads', '2'], 'describe'),
+    (['--threads', '2'], None),                                 # no command: -h and a bad call read as none
+    (['-h'], None),
+])
+def test_the_command_word_skips_a_global_option_value(argv, want):
+    assert cli._command(argv) == want
+
+
+# Only a fresh process shows what the command word decided to import: the global --threads takes a value, and reading
+# that value as the command registered every command module instead of the one asked for (`measure`: 26 modules and
+# `doctor` 2.32 s to start, against 5 modules and 0.73 s in the `--threads=2` / `--threads 2` forms that read as the
+# command; Windows, Python 3.13, warm cache)
+_LAZY = '''import sys
+from earshot import cli
+cli.main(sys.argv[1:])
+print(len([m for m in sys.modules if m.startswith('earshot.')]))
+'''
+
+
+def test_global_threads_before_the_command_imports_one_command_module(wav, sine):
+    p = wav(sine)
+    counted = {}
+    for args in (['measure', p, '--light'], ['--threads', '2', 'measure', p, '--light']):
+        r = subprocess.run([sys.executable, '-c', _LAZY, *args], capture_output=True, text=True, cwd=REPO)
+        assert r.returncode == 0, r.stderr
+        counted[args[0] == '--threads'] = int(r.stdout.strip().splitlines()[-1])
+    assert counted[True] == counted[False], counted
+    assert counted[True] < len(cli.COMMANDS), counted
+
+
 def test_sheet_ticks_at_quarter_seconds_are_exact():
     assert sheet._tick_label(0.25, 0.25) == '0:00.25' and sheet._tick_label(0.75, 0.25) == '0:00.75'
     assert sheet._tick_label(0.5, 0.5) == '0:00.5' and sheet._tick_label(61.0, 1) == '1:01'
