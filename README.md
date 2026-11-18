@@ -11,24 +11,24 @@ well it fits a description, the best moment in a long recording, and a second-by
 soundtrack. It runs locally on CPU as a CLI, a Python API and an MCP server; everything it makes is yours to use.
 
 ```
-$ earshot make "a soft success chime for a finance app" -o success.ogg
-success.ogg: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
-also: success/done, success/fifth, success/triad
+$ earshot make "a soft success sound for a finance app" -o success.ogg
+success.ogg: success/click (0.30 s, -17 LUFS, clean) [success]
+also: complete/stamp, complete/latch, success/shutter
 
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
-step_1.ogg: step/pebbles (1.27 s, -19 LUFS, clean) [gravel, footstep]
-step_2.ogg: step/pebbles (0.74 s, -14 LUFS, clean)
-step_3.ogg: step/pebbles (1.32 s, -21 LUFS, clean)
+step_1.ogg: step/pebbles (0.51 s, -15 LUFS, clean) [gravel, footstep]
+step_2.ogg: step/pebbles (0.40 s, -16 LUFS, clean)
+step_3.ogg: step/pebbles (0.60 s, -16 LUFS, clean)
 played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")
 also: step/gravel, step/floorboard, step/heels
 
 $ earshot make "a campfire" -o fire.ogg --dur 24
-fire.ogg: fire/camp (24.00 s, -24 LUFS, seamless loop, clean) [campfire]
+fire.ogg: fire/camp (24.00 s, -22 LUFS, seamless loop, clean) [campfire]
 also: fire/large, fire/small, fire/whoosh
 ```
 
-The three footsteps are three different real recordings (recordings 3, 2 and 1 of the five that `step/pebbles`
-holds, from BigSoundBank), each rendered as a new take; the campfire is a recording of a real fire stitched into a
+The three footsteps are three single steps cut from one real recording (recordings 6, 7 and 8 of the nine that
+`step/pebbles` holds, from BigSoundBank), each rendered as a new take; the campfire is a recording of a real fire stitched into a
 24 s loop that has no seam. `make` loads no model and takes about a second for a one-shot.
 
 ## Make sounds
@@ -45,13 +45,13 @@ sound is, then its character.
 
 | group | designs | how it is made | examples |
 |---|---|---|---|
-| learned things | 153 | learned from 364 recorded events in the public domain | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
-| interface | 25 | things a hand does, built from learned recordings: a key, a rocker switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper; no note | `keyboard/mechanical`, `toggle/rocker_on`, `next/page`, `notify/knock`, `success/click`, `error/thud` |
+| learned things | 201 | learned from 517 recorded events in the public domain (animals, people without words, street, house and devices among them) | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
+| interface | 26 | things a hand does, built from learned recordings: a key, a rocker switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper; no note | `keyboard/mechanical`, `toggle/rocker_on`, `next/page`, `notify/knock`, `success/click`, `error/thud` |
 | interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba); for interfaces only when the words ask for music or a theme is named | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
-| ambience | 31 | 12 learned from real textures, 19 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
+| ambience | 31 | 13 learned from 12 real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
 | chip | 24 | the channels of 8-bit consoles, band-limited | `coin/chip`, `jump/chip`, `laser/chip`, `explosion/chip` |
 | drums | 40 | 33 played from 130 recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented (drum-machine voices, a brush snare, a finger snap, stick counts) | `kick/soft`, `snare/tight`, `hat/closed`, `conga/muted`, `darbuka/hit`, `drum/roll`; `kick/electro` |
-| film and motion | 39 | 23 built from learned recordings as motion films use them: short dry hits (a heavy bag dropped on a real explosion's low end), low thumps, bright ticks, whooshes and risers of real air, a tape stop, a braam of real brass; 16 small ones invented (pops, tocks, glints, key ticks) | `slam/title`, `boom/short`, `thump/appear`, `tick/soft`, `whoosh/soft`, `rise/air`, `hit/drop`; `pop/soft` |
+| film and motion | 46 | 32 built from learned recordings as motion films use them: short dry hits (a heavy bag dropped on a real explosion's low end), low thumps, bright ticks, whooshes and risers of real air, a tape stop, a braam of real brass; 14 small ones invented (pops, tocks, glints, key ticks) | `slam/title`, `boom/short`, `thump/appear`, `tick/soft`, `whoosh/soft`, `rise/air`, `hit/drop`; `pop/soft` |
 | action and objects | 83 | invented from physics | `jump/soft`, `hit/punch`, `coin/drop`, `paper/tear`, `bell/desk` |
 | notes, synthesizer | 51, 14 | real instruments learned note by note (marimba, harp, pizzicato, upright piano), struck and string models, synth patches | `note/kalimba`, `pad/warm`, `braam/hit` |
 | music loops | 3 | a small grammar of harmony and feel | `bed/warm`, `bed/playful`, `bed/8bit` |
@@ -59,7 +59,7 @@ sound is, then its character.
 
 Where a learned design and an invented one answer the same request, the learned one wins the tie: the owner rated
 the invented realistic sounds 1-2 of 5. Where an invented design and a learned one are the same thing (`knock/door`
-and `door/knock`, `paper/tear` and `paper/rip`: 22 invented designs in `lexicon.TWINS`), a request that names the thing gets
+and `door/knock`, `paper/tear` and `paper/rip`: 33 invented designs in `lexicon.TWINS`), a request that names the thing gets
 the learned one; the invented one is still there by its id. Chip designs answer only requests that ask for chip sound. earshot is a
 sound-effects tool: the three music loops are short beds for a game menu or a demo, not music generation.
 
@@ -67,35 +67,35 @@ sound-effects tool: the three music loops are short beds for a game menu or a de
 
 | the words | what they do | example |
 |---|---|---|
-| the thing, the job or the sound | choose the design: things ("a light switch", "a cork"), jobs ("success", "coin pickup", "toggle") and sounds ("chime", "whoosh", "rain") | `"a notification"` -> `notify/pair` |
+| the thing, the job or the sound | choose the design: things ("a light switch", "a cork"), jobs ("success", "coin pickup", "toggle") and sounds ("chime", "whoosh", "rain") | `"a notification"` -> `notify/knock` |
 | feelings | offsets on eight shared axes: bright, hard, ring, size, space, width, energy, motion | `"a much bigger, darker whoosh"`: size +0.84, bright -0.6 |
-| negation, comparison | "not harsh", "not too loud", "the opposite of a success sound", "like a ..." | `"the opposite of a success sound"` -> `error/fall` |
+| negation, comparison | "not harsh", "not too loud", "the opposite of a success sound", "like a ..." | `"the opposite of a success sound"` -> `error/thud` |
 | voice | the instrument that plays a tonal sound, or a single note of it | `"a notification on a harp"`, `"a success sound with pizzicato strings"`, `"a kalimba note in E"` |
 | one event or the action | a plural, an action word, a count or a length plays the action a person performs; a singular or "a single" one event | `"footsteps on gravel"` (a walk), `"a footstep on gravel"` (one step), `"three knocks"` |
 | material | picks the voice of a tonal sound (wooden: a marimba) and steers the ranking; "8-bit", "retro", "chiptune" allow only chip sound | `"8-bit coin pickup"` -> `coin/chip` |
 | numbers | length, pitch, key (a minor key makes a figure minor), how many takes, how many notes | `"400 ms"`, `"C6"`, `"in D minor"`, `"three variations"` |
 | loop or not | ambience loops by default; "no loop" or `--no-loop` renders it once with fades | `"rain on a tent, no loop"` |
 
-A learned design answers only a request that names its thing ("a footstep on gravel", "a camera shutter", "toggle
-dark mode" for a lamp switch); a feeling alone never reaches a recording. Options win over the words: `--pitch`,
+A learned design answers only a request that names its thing ("a footstep on gravel", "a camera shutter", "a light
+switch"); a feeling alone never reaches a recording. Options win over the words: `--pitch`,
 `--dur`, `--voice`, `--events` (1 = one event, 2 or more = the action with that many) and `--bright` ...
 `--motion` (each -1 .. 1) are laid over what the words say, and `--sound ID` takes a design by name. Re-ask with adjectives ("softer", "drier", "bigger", "longer") rather than browsing.
 
 On 220 held-out requests written by someone who never saw the catalogue (half long descriptions that never name the
-sound, half casual), scored once on the v1 catalogue, the first pick is right for 69.5 % and one of the top three
-for 76.8 %. Requests that name the thing or the job do far better than descriptions of a mood or paraphrases; about
+sound, half casual), scored once on the v1 catalogue, the first pick is right for 69.1 % and one of the top three
+for 76.4 %. Requests that name the thing or the job do far better than descriptions of a mood or paraphrases; about
 one request in three or four of the held-out kind needs a second call, which is what `also` and `--sound` are for
 ([docs/VALIDATION.md](docs/VALIDATION.md#understanding-requests)).
 
 ### Learned sounds: what they are
 
-The 153 learned designs, 12 ambience beds, the recorded drums, the instrument notes and the film sounds layered
+The 201 learned designs, 13 ambience beds, the recorded drums, the instrument notes and the film sounds layered
 from them are not invented. Each comes from recordings in
 the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an
 explicit public-domain dedication. earshot keeps each recording as numbers, not audio: the level of 56 bands on a
 2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
-(`earshot/synth/resyn.py`). The store is 7.00 MB for 364 recorded events (`earshot/data/resyn/`; a few are several
-events cut from one recording, 13 are recordings of a whole action such as a walk), 3.87 MB for 11 textures
+(`earshot/synth/resyn.py`). The store is 11.05 MB for 517 recorded events (`earshot/data/resyn/`; a few are several
+events cut from one recording, 23 are recordings of a whole action such as a walk), 5.40 MB for 12 textures
 (`earshot/data/textures/`), 1.31 MB for 130 drum strokes (`earshot/data/drums/`) and 0.83 MB for 97 single notes
 of four instruments (`earshot/data/notes/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
 noise and applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural
@@ -150,12 +150,12 @@ sounds.json`, MCP `make_set`).
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
 17 sounds in public/sounds (webm, mp3), manifest.json
 tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
-hover.{webm,mp3}: leather/grab (0.38 s, -23 LUFS, clean) [named]
-toggle_on.{webm,mp3}: switch/lamp (0.38 s, -19 LUFS, clean) [named]
+hover.{webm,mp3}: hover/fingertip (0.34 s, -23 LUFS, clean) [named]
+toggle_on.{webm,mp3}: toggle/rocker_on (0.22 s, -19 LUFS, clean) [named]
 ...
-success.{webm,mp3}: success/rise (1.85 s, G4, marimba, -15 LUFS, clean) [named]
-error.{webm,mp3}: error/fall (0.52 s, A3, marimba, -15 LUFS, clean) [named]
-17 sounds in public/sounds\sprite.webm + sprite.mp3 (25.5 s, 219 kB, 399 kB), map sprite.json
+success.{webm,mp3}: success/click (0.31 s, -17 LUFS, clean) [named]
+error.{webm,mp3}: error/thud (0.49 s, -18 LUFS, clean) [named]
+17 sounds in public/sounds\sprite.webm + sprite.mp3 (10.5 s, 92 kB, 165 kB), map sprite.json
 ```
 
 ### Sprites, loops, formats
@@ -593,7 +593,7 @@ judge is in [docs/LIMITS.md](docs/LIMITS.md).
   timbres for interface sounds (1), and new sounds sampled from a class model of several recordings (1-2). earshot's two listening models did not predict his ratings; their scores are not quoted as
   quality any more.
 - **Understanding requests**: on 220 held-out requests by someone who never saw the catalogue, scored once on the
-  v1 catalogue, the first pick is right for 69.5 % and one of the top three for 76.8 %; on the development sets
+  v1 catalogue, the first pick is right for 69.1 % and one of the top three for 76.4 %; on the development sets
   92.3 % and 96.4 % (with 68 answers added to their accept lists when the learned sounds arrived).
 - **Matching descriptions** (a held-out library of 125 real recordings, nothing tuned on it): in a library search a
   "strong" verdict is the right kind of sound 98% of the time and the exact variant 61% of the time.
@@ -610,7 +610,9 @@ judge is in [docs/LIMITS.md](docs/LIMITS.md).
 
 `make` draws on a fixed catalogue: it chooses and shapes designs; it does not compose music, speak, or invent a
 sound no design covers. Realistic sounds exist only for things someone recorded and put in the public domain; the
-invented ones for other real things were rated low. The film sounds layered from recordings have not been rated by
+invented ones for other real things were rated low. The sounds built last (the interface sounds without instruments,
+the film and motion hits, the relearned ambiences, the everyday sounds from other recordings, the animals, people,
+street and house sounds) were measured and checked by models but have not been rated by
 anyone yet. A request that
 describes a mood or paraphrases a sound is understood less well than one that names it. earshot hears through two
 open models and a set of measurements. Trustworthy: loudness, timing and sync to picture, "is this the kind of sound

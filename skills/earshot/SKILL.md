@@ -10,9 +10,11 @@ When a product, game, page or film needs a sound and no recording is given, make
 catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
 complete on its own.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (153 designs:
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (201 designs:
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
-paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 12 ambience beds learned from
+paper, books, glass, ice, water, metal, swings, punches, falls, explosions, animals such as a dog, a cat and birds,
+people without words such as applause, laughter and a cough, a car horn, a siren, a phone ringing or vibrating
+...) and 13 ambience beds learned from
 real textures (fire, three shores, crickets, a brook, a cafe, a street, distant city, room tone, underwater, rain on
 a terrace, wind in dry leaves). The interface sounds are things a hand does, from those recordings: a key, a rocker
 switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper. The film and motion
@@ -78,7 +80,7 @@ row at the pattern's pace, over the length asked or about 2 to 3 s; scattered an
 glass, 3 seconds", "keys jingling, 1 second") keep the length too. The answer's `played: ...` line says what was
 played. Chip sound only with "8-bit" /
 "retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
-written that loosely the first pick was right 69.5 % of the time (76.8 % in the top three). To steer, re-ask with
+written that loosely the first pick was right 69.1 % of the time (76.4 % in the top three). To steer, re-ask with
 adjectives, not by browsing.
 
 **Seeds are variations.** For a learned design, seeds 0, 1, 2 ... play its different recordings first, the best one
@@ -127,7 +129,9 @@ sound effects. No speech. No sound for a thing that is neither in the catalogue 
 error that says so (often "earshot makes no X"). The film and motion sounds (whooshes, hits, thumps, ticks,
 risers, the braam) are built from learned recordings; the owner rated the fast whoosh 4 of 5 and the deep whoosh
 and the braam 3 to 3.5; the hits, thumps, risers, the tape stop and the suck-in impact were rebuilt after his
-ratings and are not rated yet. The drums invented from physics and the invented realistic sounds were rated low by
+ratings and are not rated yet; so are the interface sounds without instruments, the relearned ambiences and the
+animals, people, street and house sounds (measured, no listener yet). The drums invented from physics and the
+invented realistic sounds were rated low by
 the owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
 models did not predict his ratings. Say plainly that a learned sound is a new take of a public-domain recording,
 not a sound invented from nothing.

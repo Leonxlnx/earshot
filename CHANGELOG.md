@@ -22,13 +22,13 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
   `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
   `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 153 designs of
-  everyday, interface, game and film sounds learned from 364 recorded events in the public domain (the sources of all
+- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 201 designs of
+  everyday, interface, game and film sounds learned from 517 recorded events in the public domain (the sources of all
   learned material, beds, drums and instrument notes included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and
   CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of
   `earshot/data/resyn/`, `textures/`, `drums/` and `notes/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 7.00 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
+  stored as numbers: 11.05 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
   variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
   the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
@@ -38,7 +38,7 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   real things 1-2 of 5.
 - Animals, people without words, street, house, desk and sport sounds are recordings now (44 designs: a dog barking).
 - **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
-  beds from 12 BigSoundBank textures (5.42 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
+  beds from 12 BigSoundBank textures (5.40 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
   `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
   `underwater/deep`, `rain/street`, `wind/trees`. Takes of the texture's models are cut into pieces and stitched
   where the texture is in a similar state, so a bed plays for any length without a loop point. `rain/window`,
@@ -48,7 +48,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   toggles a rocker switch (on smaller and brighter, off bigger and duller), type a desktop key, next and back a
   page flicked forward and dropped back, open and close a pen cap with air, send a stick through the air, receive
   a pop of the lips, notify two light knocks, success a pen click in two parts, complete a stapler, warning two
-  firm knocks, error two dull thuds of a bag, delete crumpled paper; nine more candidates by name. A request for an
+  firm knocks, error two dull thuds of a bag, delete crumpled paper; nine more candidates by name, and a like
+  (`like/pop`, a small bright pop of the lips over a fingertip) outside the set. A request for an
   interface job gets the same; the tonal figures answer only when the words ask for music or a theme is named.
 - **The best recording plays first** (`earshot/sounds/learned.py`, `walk` in `earshot/data/resyn/index.json`): a
   learned design's seeds walk its recordings from the one with the best listening score down; a recording scored 1
@@ -67,9 +68,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   for the marimba (`ui.py`: between A3 and G5).
 - **Performances** (`earshot/synth/perform.py`, `learned.perform`, `make(events=)`, `--events`, MCP `make`
   `events`): a thing a person does several times in a row is played as the action, from its single recordings by a
-  pattern (walk, knock, type, scatter, shake, pair) or from one of 13 recordings of the whole action (walks on
-  gravel, wood, concrete, tiles and in heels, a knock run, toasts, keys and a lock, coin handfuls, punches, a book
-  falling); 9 learned things have such recordings. The words decide: a plural, an action word, a count or a length
+  pattern (walk, knock, type, scatter, shake, pair) or from one of 23 recordings of the whole action (walks on
+  gravel, wood, tiles and in heels, a knock on a door and on a table, toasts, keys, coin handfuls, a dog barking, a
+  heartbeat, a car horn, a hammer on a nail); 14 learned things have such recordings. The words decide: a plural, an action word, a count or a length
   asks for the action ("footsteps on gravel", "knocking", "three knocks", "5 seconds of typing"), a bare singular
   or "a single" for one event ("a footstep on gravel", "a single knock on a door"), a singular that names the
   action ("a knock on the door", "a toast") for the action. `events` overrides the words; the answer says what was
@@ -89,20 +90,23 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `conga/muted`, `bongo/low`, `darbuka/hit`, `frame_drum/deep`, `cabasa/hit`, `slapstick/crack`; removed:
   `ride/bell`, `cymbal/swell`, `conga/slap`, `cajon/slap`. The owner rated the drums invented from physics 1-2
   ("big problems, does not sound good"); the recorded ones are not rated yet.
-- **Film and motion sounds** (`earshot/sounds/motion.py`, `earshot/synth/design.py`): 39 designs. 23 are built
-  the way a sound designer layers them, from 21 learned film things (66 recordings in the public domain: heavy
+- **Film and motion sounds** (`earshot/sounds/motion.py`, `earshot/synth/design.py`): 46 designs. 32 are built
+  the way a sound designer layers them, from 25 learned things of the store (recordings in the public domain: heavy
   drops, car doors and boots slammed, explosions, swells of air, breaths and flames, drum and timpani rolls, low
   brass, deep, airy and fast whooshes, passes, thunder, orchestral drums, tam-tams and cymbals) and the drum
   store's strokes, reversed, stretched, layered, faded and glued by one room, following measurements of
-  professional motion videos (short, dry, near mono, low or very bright). 16 small ones stay invented (pops,
+  professional motion videos (short, dry, near mono, low or very bright). 14 small ones stay invented (pops,
   tocks, a blip, a glint, a shimmer sweep, a sparkle, key ticks, a sliding panel, a soft knock, the soft sting).
   Removed: `whoosh/tonal`, `sting/tech` and the invented `whoosh/airy` (the id is now the learned airy whoosh).
   The owner rated the earlier film sounds 1-3 of 5 (the fast whoosh 4); the rebuilt ones are not rated yet. A
   film request for a cymbal gets the film's crash cymbal, a request with a word of the drum kit the kit's.
-- **Invented and learned twins** (`lexicon.TWINS`): 22 invented designs of real things have a learned design of
+- **Invented and learned twins** (`lexicon.TWINS`): 33 invented designs of real things have a learned design of
   the same thing (`knock/door` and `door/knock`, `coins/handful` and `coins/floor`, `paper/tear` and `paper/rip`
   ...); a request that names the thing gets the learned one, the invented one answers to its id. A single coin
   ("a coin dropped on the table") keeps the invented `coin/drop`; coins in the plural get the recorded handful.
+  An arrow is the recorded arrow hitting its target, not a gunshot; "a heart" is a heartbeat and a heart tapped
+  in an app a like; "vibrate" or "haptic" is the recorded phone vibrating; the click of a cursor or a mouse is
+  the recorded mouse button.
 - **Three music loops** (`earshot/synth/music.py`, `earshot/sounds/beds.py`): `bed/warm`, `bed/playful`, `bed/8bit`,
   a whole number of bars in a key, seamless or once. earshot is a sound-effects tool; nine other styles were
   written and removed after the owner's listening.
@@ -119,7 +123,7 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   the ranking and reports what the written sound is heard as; the MCP server's `make` blends it in without being
   asked once CLAP is loaded. Rebuilt with `python -m earshot.sounds.atlas build --work DIR`.
 - **Understanding requests, measured**: on 220 held-out requests written by someone who never saw the catalogue,
-  scored once on the v1 catalogue, the first pick is right for 69.5 % and one of the top three for 76.8 %; 92.3 %
+  scored once on the v1 catalogue, the first pick is right for 69.1 % and one of the top three for 76.4 %; 92.3 %
   and 96.4 % on the two development sets, whose accept lists gained 68 answers when the learned sounds arrived
   ([docs/VALIDATION.md](docs/VALIDATION.md#understanding-requests)).
 - **Reading requests** (`earshot/brief.py`, `earshot/sounds/lexicon.py`): things, jobs and sounds to canonical
@@ -136,7 +140,7 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   music loops. The bank's 209 named members join it (`bank.py`) and rank under the newer designs.
 - **Themes and sets** (`earshot/sounds/theme.py`, `sets.py`): nine theme presets (soft, glass, wood, felt, tine,
   metal, electric, digital, retro) give a family one voice, key, room and axis offsets; four ready-made sets (`ui`
-  17, `game` 22, `arcade` 16, `film` 17). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a
+  17, `game` 22, `arcade` 16, `film` 17; `ui` and `film` play real things, no note). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a
   whole set in one call, its one-shots as loud as made alone and within 2.5 dB of each other, its loops and beds
   levelled by kind (the loudest at -16 LUFS momentary max, a bed 14 LU under), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
   every sound in each, the manifest's `files` and `formats`, the sprite in each format with its map's `src` in that

@@ -75,21 +75,31 @@ cannot do and where it is weak is [at the end](#making-sounds-make).
 blind ([VALIDATION.md](VALIDATION.md#the-owners-listening)). earshot's own models did not predict his ratings and are
 not a measure of how good a made sound is; a `heard as` line says what a model hears, nothing more. The learned
 family and the learned beds were built after his last ratings: each learned take matched its source in his ears on
-24 recordings, but the store as a whole has not been rated.
+24 recordings, but the store as a whole has not been rated. The sounds added or rebuilt last (the interface
+sounds without instruments, the motion and film hits, the ambiences relearned from other recordings, the everyday
+sounds from other recordings, and the animals, people, street, house, desk and sport sounds) were measured against
+their recordings and against references, and checked by models, but no listener has rated them yet.
 
 **What it cannot do.**
 - Make a sound no design covers. `make` chooses one design and shapes it with the controls; it does not compose,
   layer two designs into one, or synthesise from a free description. A request nothing answers is an error; a
   request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
-  the recording in the public domain; the store has 153 things. For other real things the catalogue has designs
+  the recording in the public domain; the store has 201 things. For other real things the catalogue has designs
   invented from physics (`action`, `object`), which the owner rated 1-2 of 5.
 - New sounds from a class of recordings. Sampling new members from a model of several recordings was tried and
   rated 1-2; it was dropped. A learned design plays its own recordings and new takes of them.
 - Music. earshot is a sound-effects tool: three short loops (`bed/warm`, `bed/playful`, `bed/8bit`), notes, chords
   of a pad, short motifs and logos. No melodies, songs or scores, and no music generation.
-- Speech and voices; animals other than the insects, birds and wings in a few beds and learned sounds; vehicles
-  other than the far traffic of a city bed and a chip engine.
+- Speech, singing and the melodies of instruments. Animals, people without words and vehicles exist as learned
+  recordings: a dog barking (a big and a small one), a cat, a robin, a crow, a rooster, an owl, a horse neighing
+  and trotting, a cow, a wolf; applause, a crowd cheering, laughter, a gasp, a cough, a kiss, a heartbeat, a baby
+  crying; a car horn, a siren passing, an engine starting, a train's horn and a train passing, a helicopter, a
+  bicycle bell. Instruments play single notes, chords of a pad and short figures, no melody. To a request for
+  speech, a voice that says or sings words, a scream or a shout, sobbing, a sneeze or a burp, a pig, a duck, a
+  sheep, a goat, a chicken, a frog, a cat purring, a violin, a cello, a viola, a saxophone, a flute, a clarinet, an
+  oboe, bagpipes, a trumpet, an electric guitar, a guitar or drum solo, an air horn or a ringtone, `make` answers
+  "earshot makes no ...". Crying is a baby's: asked of another person it is not made.
 - Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
   `not in this sound: ...` for the other; ask again for it, or make a set.
 - Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
@@ -112,7 +122,7 @@ family and the learned beds were built after his last ratings: each learned take
   click for the tick, real whooshes, breaths and flames for the air). The owner rated the fast whoosh 4 of 5 and
   the earlier hits, booms, risers and the tape stop 1 to 2; the rebuilt ones have not been rated. The measurements
   come from 39 videos and find effects only where they stand out of the music, so quieter effects under the music
-  are not counted. 16 of the 39 motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a sliding panel,
+  are not counted. 14 of the 46 motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a sliding panel,
   a soft knock, the soft sting) are still invented.
 - **Interface sounds without instruments are not rated as a set.** The seventeen roles of `ui` are things a hand does,
   built from learned recordings; single roles were rated 1.5 to 4 as figures and keys, the new set as a whole not
@@ -146,8 +156,8 @@ family and the learned beds were built after his last ratings: each learned take
   --work DIR`, repeated until done).
 
 **Requests.** The reader is a lexicon and rules, not a language model (`--listen` adds CLAP). On 220 held-out
-requests by someone who never saw the catalogue the first pick was right for 69.5 % and one of the top three for
-76.8 % ([VALIDATION.md](VALIDATION.md#understanding-requests)). Requests that name the thing, the job or the sound
+requests by someone who never saw the catalogue the first pick was right for 69.1 % and one of the top three for
+76.4 % ([VALIDATION.md](VALIDATION.md#understanding-requests)). Requests that name the thing, the job or the sound
 did far better than long descriptions of a sound and casual paraphrases. A learned design answers only when its
 thing is named, so "a heavy impact" never reaches a recorded dumbbell, and a feeling alone reaches no recording.
 The guess note catches only part of the wrong picks, so a pick without it can still be wrong: read the design id
@@ -164,7 +174,7 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 7.00 MB, the textures 3.87 MB, the drums 1.31 MB and the instrument notes 0.83 MB
+sound. The learned store adds 11.05 MB, the textures 5.40 MB, the drums 1.31 MB and the instrument notes 0.83 MB
 to the package. The lab's
 recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
 repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers

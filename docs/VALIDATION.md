@@ -188,12 +188,12 @@ store and to drop members it scored lowest where a design had others.
   a click's rise within 1 ms; a model is 3.6-35 kB (median 9.1 kB); a render takes 0.26-0.33 s per second of sound.
   Weak: soft onsets smear (a bag drop's rise went from 61 to 99 ms); a fast swipe; impacts whose mid band is partly
   carried as noise (takes differ by about 3 dB there).
-- **The store**: 153 designs, 364 members, 7.00 MB (21 of the designs and 66 of the members are the film's
-  material, below; 13 members are recordings of a whole action, played by a performance); nothing the owner rated
+- **The store**: 201 designs, 517 members, 11.05 MB (25 of the designs are material of the film sounds,
+  below; 23 members are recordings of a whole action, played by a performance); nothing the owner rated
   1-2, no duplicates, at most five single-event members per thing (six notes of low brass for the braam). Seed 0
   plays the member with the best listening score. Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
   clear onset, a single event.
-- **Ambience textures** (`earshot/synth/quilt.py`, 11 BigSoundBank textures, 3.87 MB; `wind/trees` is learned from
+- **Ambience textures** (`earshot/synth/quilt.py`, 12 BigSoundBank textures, 5.40 MB; `wind/trees` is learned from
   wind through a field of dry leaves (maize), whose leaf band carries two thirds of the power and is dry, after no
   recording of trees passed that check; the fire is learned with an onset at every crackle and its two sides are two
   takes sharing the crackles; the waves from a recording at the water's edge, joined where they were cut; the rain
@@ -212,8 +212,8 @@ store and to drop members it scored lowest where a design had others.
 - **Instrument notes** (`earshot/synth/played.py`, `earshot/data/notes/`, 0.83 MB): 97 single notes from VSCO-2 CE
   and VCSL (marimba 14, harp 24, pizzicato 45, upright piano 14), each played as a take moved to the pitch asked for
   with the tuning measured on the recording. Not rated by the owner yet.
-- **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 23 motion designs are built from 21
-  learned film things (66 recordings) and the drum store's strokes, reversed, stretched, layered, faded and glued
+- **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 32 motion designs are built from 25
+  learned things of the store and the drum store's strokes, reversed, stretched, layered, faded and glued
   by one room, and follow measurements of 39 professional motion videos ([motion-sfx-study.md](motion-sfx-study.md)):
   the title hit about a third of a second with a 0.15 s swell of air into it and its centroid at 312-432 Hz
   (reference middle half from 388 Hz), the logo hit 0.2-0.3 s, the thump of something appearing about 50 ms, the
@@ -237,9 +237,16 @@ not in the repository.
 
 | set | first pick right | right among the top three |
 |---|---|---|
-| A (development, 440) | 92.3 % | 96.1 % |
-| B (development, 220) | 96.4 % | 99.1 % |
-| C (held out, 220), scored once on the v1 catalogue | 69.5 % | 76.8 % |
+| A (development, 440) | 92.3 % | 96.4 % |
+| B (development, 220) | 96.8 % | 99.1 % |
+| D (development, 160) | 90.0 % | 93.8 % |
+| E (development, 200, requests for the newest sounds) | 92.5 % | 98.0 % |
+| C (held out, 220), scored once on the final v1 catalogue | 69.1 % | 76.4 % |
+| C with the written accept rules of A, B and D applied to a copy | 70.9 % | 77.3 % |
+
+C's accept lists were written before the interface and motion answers became sounds of real things on purpose;
+the second C row applies the same written rules (by design and job, not by request) that A, B and D got. An
+earlier round scored C once at 69.5 % and 76.8 %.
 
 When the learned recordings arrived, 68 answers were added to the accept lists of A and B by written rules: a learned
 recording of the thing the request names is a right answer. Without those additions A is 89.1 % / 95.2 % and B
