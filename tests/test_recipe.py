@@ -72,6 +72,17 @@ def centroid(y):
     (rec({'source': 'noise', 'dur': 1, 'color': 'green'}), "layers[0].color is one of white, pink, brown"),
     (rec({'source': 'noise', 'dur': 1, 'size': 0.5}), 'layers[0].size does not belong to the source noise'),
     (rec({'source': 'noise', 'dur': 1, 'hz': 50}), 'layers[0].hz does not belong to the source noise'),
+    (rec(TAP, {**TAP, 'follow': 'loud'}), 'layers[1].follow is an object such as {"layer": 0, "amount": 0.8}'),
+    (rec(TAP, {**TAP, 'follow': True}), 'layers[1].follow is an object such as {"layer": 0, "amount": 0.8}'),
+    (rec(TAP, {**TAP, 'follow': {'amount': 1}}), 'layers[1].follow.layer is missing'),
+    (rec(TAP, {**TAP, 'follow': 1}), 'layers[1].follow.layer is 1, the layer itself'),
+    (rec(TAP, {**TAP, 'follow': 5}), 'layers[1].follow.layer is 5, but the recipe has 2 layers (0 to 1)'),
+    (rec(TAP, {**TAP, 'follow': 0.5}), 'layers[1].follow is an object such as'),
+    (rec(TAP, {**TAP, 'follow': {'layer': 0, 'amount': 2}}), 'layers[1].follow.amount is an amount from -1 to 1'),
+    (rec(TAP, {**TAP, 'follow': {'layer': 0, 'smooth': 0}}), 'layers[1].follow.smooth is a time in seconds from '
+                                                             '0.005 to 2, not 0'),
+    (rec(TAP, {**TAP, 'follow': {'layer': 0, 'speed': 2}}), "unknown field 'speed' in layers[1].follow: follow "
+                                                            "takes layer, amount, smooth"),
 ])
 def test_every_mistake_is_one_sentence_that_names_the_field(bad, says):
     with pytest.raises(R.RecipeError) as e:
@@ -93,6 +104,25 @@ def test_pitch_moves_a_take_as_a_tape_does():
     y, low, high = one(TAP), one({**TAP, 'pitch': -12}), one({**TAP, 'pitch': 12})
     assert abs(len(low) / len(y) - 2.0) < 0.02 and abs(len(high) / len(y) - 0.5) < 0.02
     assert centroid(low) < 0.75 * centroid(y) < centroid(high)
+
+
+def test_glide_moves_the_pitch_over_the_take_as_a_tape_that_slows():
+    tone = {'source': 'sine', 'dur': 1.0, 'hz': 100}
+
+    def hz(y):
+        s = np.abs(np.fft.rfft(y[:, 0] * np.hanning(len(y)), 8 * len(y)))
+        return float(np.fft.rfftfreq(8 * len(y), 1 / dsp.SR)[int(np.argmax(s))])
+    y = one({**tone, 'glide': -12})
+    q = len(y) // 8
+    assert 90 < hz(y[:q]) < 101 and 50 < hz(y[-q:]) < 58                     # 100 Hz sinking to 50 Hz
+    assert 1.42 < len(y) / dsp.SR < 1.46                      # slower as it sinks: 1 s of take lasts 1 / ln 2 s
+    up = one({**tone, 'pitch': -12, 'glide': 0})
+    assert 48 < hz(up[:len(up) // 8]) < 58 and 90 < hz(up[-len(up) // 8:]) < 101
+    flat = one({**tone, 'pitch': -5, 'glide': -5})
+    assert abs(len(flat) / len(one({**tone, 'pitch': -5})) - 1.0) < 0.01
+    assert R.render(rec({**TAP, 'glide': -7}))[1]['parts'] == ['switch/power_strip (+0 to -7 semitones)']
+    with pytest.raises(R.RecipeError, match=r'layers\[0\]\.glide is a number of semitones from -24 to 12, not 30'):
+        R.check(rec({**TAP, 'glide': 30}))
 
 
 def test_reverse_cut_filters_pan_and_fades():
@@ -166,9 +196,35 @@ def test_events_repeat_a_layer_faster_and_softer():
     assert 0.75 < meta['dur_s'] < 1.6 and meta['source'] == 'recipe'
 
 
+def test_follow_gives_a_layer_the_loudness_of_another_or_makes_it_give_way():
+    lead = np.zeros((dsp.n_of(1.0), 2))
+    lead[dsp.n_of(0.2):dsp.n_of(0.4)] = 0.5
+    full = R._following(lead, {'amount': 1.0, 'smooth': 0.05})
+    half = R._following(lead, {'amount': 0.5, 'smooth': 0.05})
+    duck = R._following(lead, {'amount': -1.0, 'smooth': 0.05})
+    on, off = dsp.n_of(0.3), dsp.n_of(0.7)
+    assert full[on] > 0.99 and full[off] < 1e-6
+    assert half[on] > 0.99 and abs(half[off] - 0.5) < 1e-6
+    assert duck[on] < 0.01 and duck[off] > 0.99
+    # in a recipe: noise that follows four taps is loud at each tap and quiet between them; the parts say so
+    taps = {**TAP, 'events': {'count': 4, 'gap': 0.5}}
+    noise = {'source': 'noise', 'dur': 2.0, 'color': 'white', 'highpass': 2000, 'gain': 0}
+
+    def between(y):
+        e = np.abs(y).max(axis=1)
+        return e[dsp.n_of(0.25):dsp.n_of(0.45)].max() / e.max()
+    plain, _ = R.render(rec(taps, noise))
+    followed, m = R.render(rec(taps, {**noise, 'follow': 0}))
+    assert between(followed) < 0.1 * between(plain)
+    assert m['parts'][1] == 'white noise (following layer 0, over 2000 Hz)'
+    gave, m = R.render(rec(taps, {**noise, 'follow': {'layer': 0, 'amount': -1}}))
+    assert m['parts'][1].startswith('white noise (giving way to layer 0') and between(gave) > 5 * between(followed)
+
+
 # ------------------------------------------------------------------------------------------------------ the whole
 def test_a_seed_gives_the_same_samples_and_another_seed_another_take():
-    r = rec(TAP, {'source': 'noise', 'dur': 0.6, 'lowpass': [200, 2000], 'gain': -10}, space='room')
+    hiss = {'source': 'noise', 'dur': 0.6, 'lowpass': [200, 2000], 'gain': -10, 'follow': {'layer': 0, 'amount': 0.5}}
+    r = rec(TAP, hiss, space='room')
     a, ma = R.render(r, seed=3)
     b, mb = R.render(r, seed=3)
     c, _ = R.render(r, seed=4)
@@ -314,15 +370,15 @@ def test_the_cookbook_is_valid_and_names_what_it_answers():
 
 def test_a_request_that_names_a_cookbook_thing_is_answered_by_its_recipe(tmp_path):
     from earshot import brief
-    assert R.answer(brief.read('a dragon roar'))['name'] == 'dragon_roar'
+    assert R.answer(brief.read('a car crash'))['name'] == 'car_crash'
     assert R.answer(brief.read('a soft click for a button')) is None
-    assert R.answer(brief.read('a dragon roar'), why=('dragon', 'roar')) is None    # the catalogue has it itself
-    assert R.answer(brief.read('a click for my dragon roar app')) is None           # where it plays, not the sound
-    r = make('a dragon roar', str(tmp_path / 'd.wav'))
-    assert r['source'] == 'recipe' and r['sound'] == 'recipe/dragon_roar' and r['takes'][0]['checks']['ok']
-    assert 'built from parts by the cookbook recipe dragon_roar' in r['summary']
-    assert make('a dragon roar', str(tmp_path / 'n.wav'), sound=r['also'][0])['sound'] == r['also'][0]
-    bright = make('a dragon roar', str(tmp_path / 'e.wav'), bright=0.5)
+    assert R.answer(brief.read('a car crash'), why=('car', 'crash')) is None        # the catalogue has it itself
+    assert R.answer(brief.read('a click for my car crash app')) is None             # where it plays, not the sound
+    r = make('a car crash', str(tmp_path / 'd.wav'))
+    assert r['source'] == 'recipe' and r['sound'] == 'recipe/car_crash' and r['takes'][0]['checks']['ok']
+    assert 'built from parts by the cookbook recipe car_crash' in r['summary']
+    assert make('a car crash', str(tmp_path / 'n.wav'), sound=r['also'][0])['sound'] == r['also'][0]
+    bright = make('a car crash', str(tmp_path / 'e.wav'), bright=0.5)
     assert 'not followed: bright; a recipe plays as it is written' in bright['summary'].splitlines()
 
 
@@ -331,10 +387,10 @@ def test_a_sketch_is_named_as_a_start_and_not_given_as_the_answer(tmp_path):
     answers the request as before, and one line names the recipe to start from"""
     from earshot import brief
     sketches = [n for n, r in R.cookbook().items() if r.get('sketch')]
-    assert 'geiger_counter' in sketches and 'dragon_roar' not in sketches
+    assert 'geiger_counter' in sketches and 'car_crash' not in sketches
     b = brief.read('a geiger counter')
     assert R.answer(b) is None and R.answer(b, sketch=True)['name'] == 'geiger_counter'
-    assert R.answer(brief.read('a dragon roar'), sketch=True) is None
+    assert R.answer(brief.read('a car crash'), sketch=True) is None
     r = make('a geiger counter', str(tmp_path / 'g.wav'))
     assert r.get('source') != 'recipe' and not r['sound'].startswith('recipe/')
     assert any(ln.startswith('a start from parts: earshot make --recipe geiger_counter (a sketch of a geiger '

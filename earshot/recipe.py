@@ -25,6 +25,8 @@ under a hit). Each layer has its controls:
     dur              the length asked of the design itself (an ambience any length, a whoosh, a recording within
                      0.6 to 1.8 times its own); of a source: its length
     pitch            semitones, -24 .. 12, as a tape does it: lower is also slower and bigger
+    glide            semitones, -24 .. 12: where the pitch has moved to at the end of the take, from `pitch` (or 0)
+                     at its start, straight in semitones, as a tape that slows or speeds up (a power-down, a sinking)
     reverse          played backwards: a decay becomes a swell that ends on its strike
     cut              [from, to] in s: the part of the take that is used
     halt             s: the take runs down to a stop over that long, as a motor does when its power is cut
@@ -40,6 +42,11 @@ under a hit). Each layer has its controls:
                      s from one to the next, each gap `faster` times the one before (under 1: faster and faster),
                      each event `softer` dB against the one before, each up to `loose` (0 .. 1) of half its gap
                      early or late (drops, crackles, clicks that come as they come)
+    follow           {"layer", "amount", "smooth"}: the layer's loudness follows another layer's (its index, from 0):
+                     its level over `smooth` s (default 0.05) as a share of its loudest moment; amount 1 (default)
+                     makes the layer exactly that loud, 0.5 half of the way; under 0 it gives way where the other is
+                     loud (-1: silent at the other's loudest moment): twigs that snap with the gusts, a rattle that
+                     comes with a motor, a bed that ducks under a hit
     noise: color     "white", "pink" or "brown"
     sine: hz, to     20 .. 150 Hz, gliding to `to`: weight, never a tone that is heard as a note
 
@@ -52,8 +59,11 @@ sentence that names the field and what it takes. `render` gives the
 sound as every sound of earshot is given: levelled like a catalogue sound of its kind and audited (clicks, a cut
 tail, silence, clipping), with where its hit is. Nothing here loads a model or a package the base install lacks.
 
-One sound as the body of another ("X on Y": the hits of X ringing through the resonance of Y) is not in the form:
-the engine has no way to take a resonance from a design that holds up for any pair of designs.
+One sound as the body of another ("X on Y": the hits of X ringing through the resonance of Y) is not in the form.
+Built from a struck design's partials and colour, rain through a wooden knock comes no nearer a real recording of rain
+on wood for the listening model than the plain rain does, and a metal body moves it no nearer rain on tin: what is
+heard of rain on a thing is the colour of the whole, and a knock's colour is not it. Where the catalogue has the real
+surface (rain on wood, on a tin roof, on a window), that design is the answer.
 """
 import difflib
 import json
@@ -70,10 +80,11 @@ KINDS = ('event', 'ambience')
 AXES = ('size', 'bright', 'hard', 'energy', 'ring', 'motion', 'width')
 TOP = ('name', 'says', 'layers', 'dur', 'space', 'kind', 'things', 'built', 'sketch')
 LAYER = ('sound', 'source', 'seed', 'dur', 'pitch', 'reverse', 'cut', 'halt', 'lowpass', 'highpass', 'pan', 'gain',
-         'at', 'fade_in', 'fade_out', 'swell', 'decay', 'events', 'color', 'hz', 'to') + AXES
+         'at', 'fade_in', 'fade_out', 'swell', 'decay', 'events', 'follow', 'glide', 'color', 'hz', 'to') + AXES
 EVENTS = ('count', 'gap', 'faster', 'softer', 'loose')
 # a number field -> (lowest, highest, what it is)
 RANGE = {'dur': (0.02, 120.0, 'a length in seconds'), 'pitch': (-24.0, 12.0, 'a number of semitones'),
+         'glide': (-24.0, 12.0, 'a number of semitones'),
          'pan': (-1.0, 1.0, 'a position'), 'gain': (-40.0, 12.0, 'a level in dB'),
          'at': (0.0, 120.0, 'a start time in seconds'), 'fade_in': (0.0, 30.0, 'a time in seconds'),
          'fade_out': (0.0, 30.0, 'a time in seconds'), 'swell': (0.0, 60.0, 'a time in seconds'),
@@ -86,6 +97,9 @@ EVENT_RANGE = {'count': (2, 64, 'a whole number'), 'gap': (0.02, 30.0, 'a time i
                'loose': (0.0, 1.0, 'an amount')}
 EXAMPLES = ('dragon_roar', 'giant_footsteps', 'campfire_wind')     # layers and pitch; events; an ambience
 FOLDER = os.path.join(config.DATA_DIR, 'recipes')
+FOLLOW = ('layer', 'amount', 'smooth')
+# a follow field -> (lowest, highest, what it is, when not said)
+FOLLOW_RANGE = {'amount': (-1.0, 1.0, 'an amount', 1.0), 'smooth': (0.005, 2.0, 'a time in seconds', 0.05)}
 
 
 class RecipeError(ValueError):
@@ -178,6 +192,27 @@ def _layer(lay, i):
                 raise RecipeError(f'{w}.events.{k} is missing: events take count (2 to 64) and gap (seconds from '
                                   'one to the next)')
         out['events'] = {k: _number(ev[k], f'{w}.events.{k}', *EVENT_RANGE[k], whole=k == 'count') for k in ev}
+    if 'follow' in lay:
+        out['follow'] = _follow_field(lay['follow'], w, i)
+    return out
+
+
+def _follow_field(fo, w, i):
+    """the `follow` of layer i checked: {"layer": another layer's index, "amount": -1 .. 1, "smooth": s}"""
+    if isinstance(fo, int) and not isinstance(fo, bool):
+        fo = {'layer': fo}
+    if not isinstance(fo, dict):
+        raise RecipeError(f'{w}.follow is an object such as {{"layer": 0, "amount": 0.8}}, not {fo!r}')
+    _fields(fo, FOLLOW, f'{w}.follow', 'follow')
+    if 'layer' not in fo:
+        raise RecipeError(f'{w}.follow.layer is missing: follow names the layer (its index, from 0) whose loudness '
+                          'this layer follows')
+    k = _number(fo['layer'], f'{w}.follow.layer', 0, LAYERS - 1, 'the index of another layer', whole=True)
+    if k == i:
+        raise RecipeError(f'{w}.follow.layer is {k}, the layer itself: a layer follows another layer')
+    out = {'layer': k}
+    for key, (lo, hi, what, default) in FOLLOW_RANGE.items():
+        out[key] = _number(fo.get(key, default), f'{w}.follow.{key}', lo, hi, what)
     return out
 
 
@@ -197,6 +232,10 @@ def check(recipe):
         raise RecipeError(f'layers is a list of 1 to {LAYERS} layers, each {{"sound": <id>, ...}} or '
                           '{"source": "noise", ...}')
     out = {**recipe, 'name': name.lower(), 'layers': [_layer(lay, i) for i, lay in enumerate(layers)]}
+    for i, lay in enumerate(out['layers']):
+        if 'follow' in lay and lay['follow']['layer'] >= len(layers):
+            raise RecipeError(f'layers[{i}].follow.layer is {lay["follow"]["layer"]}, but the recipe has '
+                              f'{len(layers)} layers (0 to {len(layers) - 1})')
     if 'says' in recipe and not (isinstance(recipe['says'], str) and recipe['says'].strip()):
         raise RecipeError(f'says is what the sound is, in words ("a dragon roaring"), not {recipe["says"]!r}')
     if 'built' in recipe and not isinstance(recipe['built'], str):
@@ -361,6 +400,30 @@ def _source(lay, r):
     return np.stack([y, y], axis=1)
 
 
+def _glide(y, start, end):
+    """y played as a tape whose speed moves from `start` to `end` semitones over the take, straight in semitones
+    along the take: the place read at time t has a closed form, read between samples (a low-pass at the higher of
+    the two speeds' band edges first keeps what is moved up from folding back)"""
+    import numpy as np
+    from .forge import dsp
+    c, n = np.log(2.0) / 12.0, len(y)
+    d = end - start
+    if max(start, end) > 0:
+        y = dsp.butter(y, 'low', 0.45 * dsp.SR * 2.0 ** (-max(start, end) / 12.0), order=4)
+    # read position p(t) solves dp/dt = 2 ** ((start + d * p / n) / 12)
+    if abs(d) < 1e-9:
+        t_end = n * np.exp(-c * start)
+    else:
+        t_end = n * (1.0 - np.exp(-c * d)) / (c * d * np.exp(c * start))
+    t = np.arange(int(t_end))
+    if abs(d) < 1e-9:
+        p = np.exp(c * start) * t
+    else:
+        p = -(n / (c * d)) * np.log(np.maximum(1.0 - c * d * np.exp(c * start) * t / n, 1e-12))
+    p = np.clip(p, 0, n - 1)
+    return np.stack([np.interp(p, np.arange(n), y[:, ch]) for ch in range(y.shape[1])], axis=1)
+
+
 def _one(lay, seed, i, notes):
     """one event of a layer, stereo, before its gain: the design's take (or the source) under the layer's
     controls, moved in pitch as a tape does, reversed, cut, filtered, panned, brought to PEAK and faded"""
@@ -385,7 +448,9 @@ def _one(lay, seed, i, notes):
         y = _stereo(y)
     else:
         y = _source(lay, dsp.rng(7919 * (i + 1) + 104729 * seed + lay.get('seed', 0)))
-    if lay.get('pitch'):
+    if 'glide' in lay:
+        y = _glide(y, lay.get('pitch', 0.0), lay['glide'])
+    elif lay.get('pitch'):
         ratio = Fraction(2.0 ** (-lay['pitch'] / 12.0)).limit_denominator(96)
         y = signal.resample_poly(y, ratio.numerator, ratio.denominator, axis=0)
     if lay.get('reverse'):
@@ -432,6 +497,20 @@ def _placed(lay, seed, i, notes):
     return out
 
 
+def _following(lead, fo):
+    """the gain a follower gets from the layer it follows: the leader's level (RMS over `smooth` s, centred, as a
+    share of its loudest moment, 0 .. 1); amount a over 0: (1 - a) + a * level, the follower as loud as the leader
+    is at a = 1; amount under 0: 1 - |a| * level, the follower giving way where the leader is loud"""
+    import numpy as np
+    from scipy import ndimage
+    from .forge import dsp
+    p = np.mean(lead ** 2, axis=1)
+    env = np.sqrt(np.maximum(ndimage.uniform_filter1d(p, dsp.n_of(fo['smooth'])), 0.0))
+    env = env / env.max() if env.max() > 0 else env
+    a = fo['amount']
+    return (1.0 - a) + a * env if a >= 0 else 1.0 - abs(a) * env
+
+
 def render(recipe, seed=0, lufs=None, peak_db=-1.0, dur=None):
     """the sound of a recipe: (y, meta). y: stereo float samples at 48 kHz, levelled like a catalogue sound of its
     kind (the true peak at peak_db under the kind's loudest level, or `lufs`). seed: another take of every layer
@@ -446,14 +525,20 @@ def render(recipe, seed=0, lufs=None, peak_db=-1.0, dur=None):
     from .sounds import registry
     from .synth import design as D, master, space
     rc = check(recipe)
-    seed, notes, rows = int(seed), [], []
-    for i, lay in enumerate(rc['layers']):
-        rows += _placed(lay, seed, i, notes)
+    seed, notes = int(seed), []
+    placed = [_placed(lay, seed, i, notes) for i, lay in enumerate(rc['layers'])]
+    rows = [row for p in placed for row in p]
     n = max(dsp.n_of(t) + len(y) for y, t, _ in rows)
+    tracks = []
+    for p in placed:
+        tr = np.zeros((n, 2))
+        for y, t, g in p:
+            a = dsp.n_of(t) if t > 0 else 0
+            tr[a:a + len(y)] += y * g
+        tracks.append(tr)
     mix = np.zeros((n, 2))
-    for y, t, g in rows:
-        a = dsp.n_of(t) if t > 0 else 0
-        mix[a:a + len(y)] += y * g
+    for lay, tr in zip(rc['layers'], tracks):
+        mix += tr * _following(tracks[lay['follow']['layer']], lay['follow'])[:, None] if 'follow' in lay else tr
     bed = rc.get('kind', 'event') == 'ambience'
     if rc.get('space', 'dry') != 'dry':
         mix = space.room(mix, rc['space'], r=dsp.rng(31337 + seed))
@@ -495,12 +580,18 @@ def parts(recipe):
     out = []
     for lay in recipe['layers']:
         bits = []
-        if lay.get('pitch'):
+        if 'glide' in lay:
+            bits.append(f'{lay.get("pitch", 0.0):+g} to {lay["glide"]:+g} semitones')
+        elif lay.get('pitch'):
             bits.append(f'{lay["pitch"]:+g} semitones')
         if lay.get('reverse'):
             bits.append('reversed')
         if lay.get('events'):
             bits.append(f'{lay["events"]["count"]} times')
+        if lay.get('follow'):
+            fo = lay['follow']
+            fo = fo if isinstance(fo, dict) else {'layer': fo}
+            bits.append(f'{"giving way to" if fo.get("amount", 1.0) < 0 else "following"} layer {fo["layer"]}')
         for k, word in (('lowpass', 'under'), ('highpass', 'over')):
             if k in lay:
                 v = lay[k]
@@ -515,10 +606,12 @@ def parts(recipe):
 HOW = """A recipe builds a sound the catalogue lacks from its own parts. Say what physically makes the sound, find
 two to four real parts (earshot sounds --search <word>), write the layers, render, read the result, change one thing.
   layer:   "sound": a design id   or   "source": "noise" | "sine" (with "dur"; a sine with "hz" 20..150)
-  on it:   seed, dur, pitch (semitones, -24..12: lower is slower and bigger), reverse, cut [from, to], halt (s: it
-           runs down to a stop), lowpass / highpass (Hz, or [from, to] to move), pan, gain (dB), at (s), fade_in,
-           fade_out, swell, decay, size / bright / hard / energy / ring / motion / width (-1..1, where the design
-           has them), events {"count", "gap", "faster", "softer", "loose"}
+  on it:   seed, dur, pitch (semitones, -24..12: lower is slower and bigger), glide (the pitch at the take's end),
+           reverse, cut [from, to], halt (s: it runs down to a stop), lowpass / highpass (Hz, or [from, to] to
+           move), pan, gain (dB), at (s), fade_in, fade_out, swell, decay, size / bright / hard / energy / ring /
+           motion / width (-1..1, where the design has them), events {"count", "gap", "faster", "softer", "loose"},
+           follow {"layer", "amount", "smooth"} (its loudness follows another layer's; amount under 0: it gives
+           way to it)
   whole:   name, says, layers, dur, space (dry, booth, room, studio, hall, plate, cathedral), kind (event, ambience)
   render:  earshot make --recipe file.json -o out.wav      (or: earshot make --recipe - -o out.wav < file.json)"""
 
