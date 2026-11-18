@@ -11,7 +11,8 @@ Everything rendered belongs to whoever rendered it: free for any use, commercial
 - [make](#make) - [learned sounds](#learned-sounds) - [make --set / --spec](#a-whole-set) - [sounds](#sounds) -
   [pack](#pack)
 - [The request language](#the-request-language) - [The eight axes](#the-eight-axes) - [Themes](#themes)
-- [The catalogue](#the-catalogue-family-by-family) - [Voices](#voices)
+- [Recipes: build what is missing](#when-earshot-has-no-such-sound-build-it)
+- [The catalogue](#the-catalogue-family-by-family) - [Voices](#voices) - [The engines](#the-engines)
 - Recipes: [a web page](#recipe-a-web-page) - [a game](#recipe-a-game) - [a film](#recipe-a-film) -
   [add a design](#add-a-design)
 
@@ -25,18 +26,19 @@ earshot make "WORDS" [-o FILE] [--n N] [--seed S] [--theme NAME] [--sound ID] [-
 
 ```
 $ earshot make "a soft success sound for a finance app" -o success.ogg
-success.ogg: success/shutter (0.36 s, -15 LUFS, clean) [success]
+success.ogg: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [success]
 also: complete/shutter, success/click, complete/chop
 not followed: "soft"; this sound has no control of its hardness and plays as designed
 
 $ earshot make "a mouse click" -o click.wav --n 2
-click_1.wav: click/mouse (0.19 s, -20 LUFS, clean) [mouse click]
-click_2.wav: click/mouse (0.28 s, -21 LUFS, clean)
+click_1.wav: click/mouse (0.19 s, peak at 0.01 s, -20 LUFS, clean) [mouse click]
+click_2.wav: click/mouse (0.36 s, peak at 0.14 s, -19 LUFS, clean)
 also: click/soft, pen/click, switch/small
 ```
 
-The answer is the whole result. Each file gets one line: the design chosen, its length, the note and voice it
-played (tonal designs), its momentary-max loudness, `seamless loop` for a loop, and `clean` or the audit's warnings;
+The answer is the whole result. Each file gets one line: the design chosen, its length, where its loudest moment
+is (`peak at`, seconds from the start of the file), the note and voice it played (tonal designs), its momentary-max
+loudness, `seamless loop` for a loop, and `clean` or the audit's warnings;
 the first line ends with the words that decided, as you wrote them (`[success, chime]`, or `[named]` for `--sound`).
 Then:
 
@@ -61,15 +63,19 @@ Then:
 | `heard as: '...' (z +x.x, verdict)` | with `--listen` only (below) | |
 | `not listened: ...` | `--listen` was asked and the model or the atlas is missing | `earshot doctor` |
 
-A guess line, as `make` writes it (the alternatives without a guess stay bare ids):
+A guess, as `make` writes it (the alternatives without a guess stay bare ids):
 
 ```
-also (the pick is a guess: no job or sound word matched): open/lift (two soft notes rising a fifth), bottle/open (a bottle cap prised off with a hiss of ...), chest/open (...). Name one with sound=<id>
+$ earshot make "a frobnicating zorp" -o x.wav
+x.wav: thump/soft (0.09 s, peak at 0.02 s, -19 LUFS, clean)
+also (the pick is a guess: earshot makes no frobnicating zorp; thump/soft is only the nearest sound it has): land/soft (a soft low thump of feet landing on the ...), hurt/thud (a dull muffled thud), bag/drop (a bag dropped on the floor). Name one with sound=<id>
+build it from parts: earshot recipe --example
+not understood: frobnicating, zorp
 ```
 
 ```
 $ earshot make "a marimba success chime, 2 seconds" -o mar2.wav
-mar2.wav: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
+mar2.wav: success/rise (1.85 s, peak at 0.20 s, G4, marimba, -14 LUFS, clean) [success, chime]
 also: success/triad, success/done, success/fifth
 ```
 
@@ -114,7 +120,7 @@ verdict)`. It loads CLAP once (20-40 s); the MCP server's `make` blends the atla
 model is loaded in that process. `make --set` and `make_set` rank by words only. The atlas must be rebuilt after
 designs are added or changed: `python -m earshot.sounds.atlas build --work DIR`, repeated until it says it is done
 (`python -m earshot.sounds.atlas status` checks it). The `heard as` line is what a model hears, not a judgement of
-quality: the owner's ratings did not follow the models' scores ([VALIDATION.md](VALIDATION.md#the-owners-listening)).
+quality: judgements by ear did not follow the models' scores ([VALIDATION.md](VALIDATION.md#listening-by-ear)).
 
 **Level.** A single sound is set to a true peak of -1 dBFS, but no louder than a momentary-max loudness by kind:
 -14 LUFS, pads and textures -18, ambience beds -22, music loops -16. A dense sound at full peak is far louder than a
@@ -134,7 +140,7 @@ formats writes its loops as flac in place of mp3 / m4a. Write loops as ogg, webm
 
 ```
 $ earshot make "campfire" -o fire.mp3 --dur 16
-fire.mp3: fire/camp (16.00 s, -23 LUFS, seamless loop, clean) [campfire]
+fire.mp3: fire/camp (16.00 s, peak at 14.33 s, -23 LUFS, seamless loop, clean) [campfire]
 also: fire/large, fire/small, fire/whoosh
 fire.mp3: a loop in mp3 has a gap at its seam in players that ignore the encoder's padding note; for loops use ogg, webm, wav or flac
 ```
@@ -154,8 +160,8 @@ at 0.24 s, ...)`: for its loudest moment on 12.000 s, start it at 11.76 s.
 
 ## Learned sounds
 
-249 designs of everyday, interface, game and film sounds, animals, people, street and house sounds, 13 ambience beds, 33 drum and percussion designs and the
-notes of four instruments are learned from recordings whose authors put them in the public domain. They are not
+249 designs of everyday, interface, game and film sounds, animals, people, street, house and kitchen sounds, 16
+ambience beds, 33 drum and percussion designs and the notes of four instruments are learned from recordings whose authors put them in the public domain. They are not
 invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
 2 ms and every 0.25 ms around an onset, how much of each band is one tone and at which frequency, the stereo image),
@@ -164,17 +170,17 @@ sound made from nothing, and it exists only because someone recorded the thing a
 
 | | one-shots | ambience beds | drums | instrument notes |
 |---|---|---|---|---|
-| designs | 249 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
-| recordings | 604 recorded events (a few are several events cut from one recording; 30 are recordings of a whole action) | 12 textures of 12-42 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
-| store | `earshot/data/resyn/`: 13.81 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 5.40 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
-| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer, Freesound (the hand claps) | VSCO-2 CE, VCSL |
+| designs | 249 (`earshot/sounds/learned.py`) | 16 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
+| recordings | 604 recorded members (30 hold several events, such as a whole walk) | 15 textures | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
+| store | `earshot/data/resyn/`: 13.85 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 6.61 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
+| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank, Freesound | VCSL, Karoryfer, Freesound (the hand claps) | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
 All the sources together: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or
 an explicit public-domain dedication; every recording is credited in the `CREDITS.md` of `earshot/data/resyn/`,
 `textures/`, `drums/` and `notes/`. No audio file is shipped or played back.
 
-**A design is one thing; its recordings are its variations.** `step/pebbles` holds five recordings of footsteps
+**A design is one thing; its recordings are its variations.** `step/pebbles` holds nine recordings of footsteps
 on gravel, `switch/lamp` three recordings of lamp switches, `keyboard/laptop` several keys. Seeds 0, 1, 2 ... walk
 through the members in a fixed order (`walk` in the index: the member with the best listening score first, a member
 scored 1 of 5 left out), so `--n 3` gives three different real footsteps; seeds past the last member are new takes
@@ -205,22 +211,22 @@ In Python: `y, meta = sounds.render('step/heels', seed=1)` and `meta['member']`.
 | `space`, `width` | the shared room; the stereo image (a mono recording is spread by decorrelation) |
 
 Short dry members (clicks, taps, ticks, pops, knocks under 0.6 s) get a gentle finish (some body, presence and air,
-no limiter); airy sounds never do: the owner heard a whoosh get worse with it.
+no limiter); airy sounds never do: an airy whoosh sounded worse with it.
 
 **Which requests reach them.** A learned design answers only a request that names its thing ("a footstep on gravel",
 "a camera shutter", "a wooden drawer"), the interface job it plays (through the interface designs: "hover" is a
 fingertip on wood, "toggle" a rocker switch, "next" a page flicked forward), or its family's own word. A feeling
 alone never reaches a recording, and a request for "a heavy impact" does not reach a recorded dumbbell. Where a
-learned and an invented design answer the same request, the learned one wins a tie (`registry.LEARNED` = 1.1); 34 learned designs that the store marks as not a default
-choice (`"default": false` in its index) rank lower (0.6 times that prior).
+learned and an invented design answer the same request, the learned one wins a tie (`registry.LEARNED` = 1.1);
+learned designs that the store marks as not a default choice (`"default": false` in its index) rank lower (0.6
+times that prior).
 
 ### Performances
 
 A footstep, one knuckle on a door or one key is heard as a fragment; what a listener recognises is the action. A
 learned thing a person does several times in a row (a walk, a knock, typing, coins, keys, clinking glasses) is
 played as that action when the request asks for it (`earshot/synth/perform.py`, `learned.perform`): a recording of
-the whole action where the store has one (23 recordings of 14 things: walks on gravel, wood, tiles and in
-heels, a knock on a door and on a table, toasts, keys, coin handfuls, a dog barking, a heartbeat, a car horn, a
+the whole action where the store has one (walks on gravel, wood, tiles and in heels, a knock on a door and on a table, toasts, keys, coin handfuls, a dog barking, a heartbeat, a car horn, a
 hammer on a nail), else its single recordings in
 a pattern: `walk` (two feet in turn, 100-120 steps a minute; the feet are the two single steps of one session most
 alike in loudness, brightness and length, so one walker does not limp, and a gravel walk recorded at the feet is
@@ -249,7 +255,7 @@ row of N; "a single ..." and `--events 1` stay one event. Loops, beds, pads and 
 
 ```
 $ earshot make "four knocks on the table" -o knocks.wav
-knocks.wav: knock/table (0.96 s, -14 LUFS, clean) [knocks table]
+knocks.wav: knock/table (0.96 s, peak at 0.02 s, -14 LUFS, clean) [knocks table]
 played: 4 events as a knock at 4.8 a second; one event: events=1 or "a single ..."
 also: knock/desk, knock/door, knock/soft
 ```
@@ -268,7 +274,7 @@ a recording of the whole action plays its busiest stretch of it, or says it is s
 
 ```
 $ earshot make "three knocks on the table, 2 seconds" -o knocks2.wav
-knocks2.wav: knock/table (2.00 s, -18 LUFS, clean) [knocks table]
+knocks2.wav: knock/table (2.00 s, peak at 0.02 s, -18 LUFS, clean) [knocks table]
 played: 3 events as a knock at 1.2 a second; one event: events=1 or "a single ..."
 also: knock/desk, knock/door, knock/soft
 ```
@@ -288,23 +294,23 @@ earshot make --spec sounds.json [-o FOLDER] [--theme NAME] [--format ...] [--spr
 ```
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
 17 sounds in public/sounds (webm, mp3), manifest.json
-tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
-hover.{webm,mp3}: hover/fingertip (0.34 s, -22 LUFS, clean) [named]
-toggle_on.{webm,mp3}: toggle/key_down (0.24 s, -19 LUFS, clean) [named]
-toggle_off.{webm,mp3}: toggle/key_up (0.21 s, -18 LUFS, clean) [named]
-type.{webm,mp3}: type/mechanical (0.30 s, -19 LUFS, clean) [named]
-back.{webm,mp3}: back/turn (0.51 s, -14 LUFS, clean) [named]
-next.{webm,mp3}: next/page (0.54 s, -15 LUFS, clean) [named]
-open.{webm,mp3}: open/drawer (0.68 s, -14 LUFS, clean) [named]
-close.{webm,mp3}: close/drawer (0.73 s, -17 LUFS, clean) [named]
-send.{webm,mp3}: send/swoosh (0.33 s, -21 LUFS, clean) [named]
-receive.{webm,mp3}: receive/cork (0.41 s, -19 LUFS, clean) [named]
-notify.{webm,mp3}: notify/knock (0.40 s, -18 LUFS, clean) [named]
-success.{webm,mp3}: success/shutter (0.36 s, -15 LUFS, clean) [named]
-complete.{webm,mp3}: complete/shutter (0.59 s, -14 LUFS, clean) [named]
-warning.{webm,mp3}: warning/knock (0.48 s, -19 LUFS, clean) [named]
-error.{webm,mp3}: error/knock (0.58 s, -18 LUFS, clean) [named]
-delete.{webm,mp3}: delete/snip (0.66 s, -14 LUFS, clean) [named]
+tap.{webm,mp3}: keyboard/mechanical (0.32 s, peak at 0.02 s, -18 LUFS, clean) [named]
+hover.{webm,mp3}: hover/fingertip (0.34 s, peak at 0.07 s, -22 LUFS, clean) [named]
+toggle_on.{webm,mp3}: toggle/key_down (0.24 s, peak at 0.03 s, -19 LUFS, clean) [named]
+toggle_off.{webm,mp3}: toggle/key_up (0.21 s, peak at 0.04 s, -18 LUFS, clean) [named]
+type.{webm,mp3}: type/mechanical (0.30 s, peak at 0.01 s, -19 LUFS, clean) [named]
+back.{webm,mp3}: back/turn (0.51 s, peak at 0.05 s, -14 LUFS, clean) [named]
+next.{webm,mp3}: next/page (0.54 s, peak at 0.33 s, -15 LUFS, clean) [named]
+open.{webm,mp3}: open/drawer (0.68 s, peak at 0.39 s, -14 LUFS, clean) [named]
+close.{webm,mp3}: close/drawer (0.73 s, peak at 0.48 s, -17 LUFS, clean) [named]
+send.{webm,mp3}: send/swoosh (0.33 s, peak at 0.03 s, -21 LUFS, clean) [named]
+receive.{webm,mp3}: receive/cork (0.41 s, peak at 0.03 s, -19 LUFS, clean) [named]
+notify.{webm,mp3}: notify/knock (0.40 s, peak at 0.01 s, -18 LUFS, clean) [named]
+success.{webm,mp3}: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [named]
+complete.{webm,mp3}: complete/shutter (0.59 s, peak at 0.08 s, -14 LUFS, clean) [named]
+warning.{webm,mp3}: warning/knock (0.48 s, peak at 0.01 s, -19 LUFS, clean) [named]
+error.{webm,mp3}: error/knock (0.58 s, peak at 0.19 s, -18 LUFS, clean) [named]
+delete.{webm,mp3}: delete/snip (0.66 s, peak at 0.39 s, -14 LUFS, clean) [named]
 17 sounds in public/sounds\sprite.webm + sprite.mp3 (11.7 s, 101 kB, 183 kB), map sprite.json
 ```
 
@@ -336,7 +342,7 @@ rebuilt role takes it by name in a spec: `toggle/shutter_open` and `toggle/shutt
 opening and closing), `type/light`, `back/leaf` (a heavier page falling back), `close/door`, `complete/chop` (one
 chop of a knife on a board), `error/chop`, `delete/sweep` (a stroke of a broom), `notify/pop`, `success/click`,
 `toggle/rocker_on` and `toggle/rocker_off`. A request for one interface
-job in words ("a success sound", "a notification", "toggle dark mode") gets the same design as the set, and a thing
+job in words ("a success sound", "a notification", "like button tapped") gets the same design as the set, and a thing
 of the world named in words ("a door closing", "a camera shutter") gets the recording of that thing, not the
 interface sound made of it (`door/shut`, `camera/shutter`, not `close/door`, `success/shutter`). A like ("like
 button tapped") gets `like/pop`, a small bright pop of the lips over a fingertip; a figure on an
@@ -360,7 +366,7 @@ in place of mp3 or m4a it is written once as flac (below).
 | `film` | none | 17: a product film's moves, arrivals, hits, builds and a logo ([Film and motion](#film-and-motion)) |
 
 `earshot.sounds.sets.SETS` has the design of every name. The `game` set's jump, land, step, hit, hurt, explosion,
-splash and door are still invented designs (rated 1-2 by the owner); for a game that wants them realistic, name the
+splash and door are still invented designs, which sound less real than the learned ones; for a game that wants them realistic, name the
 learned ones in a spec (`step/floorboard`, `person/fall`, `punch/body`, `explosion/near`, `splash/plunge`,
 `door/shut`).
 
@@ -406,17 +412,23 @@ result (`--json`) carries `also` and `not_in_sound` for every such sound.
 ```
 $ earshot make --spec spec.json -o myset
 20 sounds in myset (webm, mp3), manifest.json
-tap.{webm,mp3}: tap/tone (0.22 s, D6, marimba, -16 LUFS, clean) [named]
+tap.{webm,mp3}: tap/tone (0.22 s, peak at 0.03 s, D6, marimba, -16 LUFS, clean) [named]
 ...
-open.{webm,mp3}: open/lift (2.85 s, D4, marimba, -14 LUFS, clean) [named]
+type.{webm,mp3}: tap/tone (0.23 s, peak at 0.04 s, D6, marimba, -16 LUFS, clean) [named]
+  same design as tap: ask for a different one with "sound" (the nearest: tap/glass)
 ...
-success.{webm,mp3}: success/fifth (0.50 s, D5, marimba, -14 LUFS, clean) [2-note, success, chime]
-coin_1.{webm,mp3}: coin/bright (2.02 s, D6, marimba, -14 LUFS, clean) [coin pickup]
-coin_2.{webm,mp3}: coin/bright (1.80 s, D6, marimba, -14 LUFS, clean) [coin pickup]
-rain.{webm,flac}: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
+open.{webm,mp3}: open/lift (2.85 s, peak at 0.14 s, D4, marimba, -14 LUFS, clean) [named]
+...
+success.{webm,mp3}: success/rise (0.50 s, peak at 0.21 s, D4, marimba, -14 LUFS, clean) [success, chime]
+coin_1.{webm,mp3}: coin/bright (2.02 s, peak at 0.09 s, D6, marimba, -14 LUFS, clean) [coin pickup]
+coin_2.{webm,mp3}: coin/bright (1.80 s, peak at 0.09 s, D6, marimba, -14 LUFS, clean) [coin pickup]
+rain.{webm,flac}: rain/window (12.00 s, peak at 8.98 s, -30 LUFS, seamless loop, clean) [named]
   a loop: flac instead of mp3, which leaves a gap at the seam
-20 sounds in myset\sprite.webm + sprite.mp3 (38.6 s, 334 kB, 593 kB), map sprite.json
+20 sounds in myset\sprite.webm + sprite.mp3 (38.6 s, 333 kB, 593 kB), map sprite.json
 ```
+
+With a theme, the tonal `ui` set plays `tap/tone` for both tap and type, and the answer flags it: give `type` its own
+`"sound"` in the spec when the two must differ.
 
 With a theme named, `ui` is its tonal figures: the wood theme plays them on a marimba in D. A
 loop in a set with several formats is written as flac in place of mp3 or m4a, once, and says so under its line; its
@@ -425,11 +437,10 @@ without a seam from the sprite's webm, and may not from its mp3.
 
 Without `set`, only the listed sounds are made (a landing page's or a scene's own handful: the recipes below). An
 entry's `events` and `loop` are the single call's `--events` and `--no-loop`: `{"name": "steps", "want":
-"footsteps on wet pavement", "events": 4}` answered `steps.wav: step/concrete (2.15 s, -21 LUFS, clean) [footsteps]`
-and `played: 4 events as a walk`, and `"loop": false` makes a bed once, with a fade in and out. A count, a length
-and "no loop" said in the `want` do the same: "three knocks on a door, 2 seconds" in an entry is played as a single
-`make` plays it (`knocks.wav: door/knock (2.00 s, -18 LUFS, clean) [knocks on a door]`, `played: 3 events as a
-knock`).
+"footsteps on wet pavement", "events": 4}` is played as `make("footsteps on wet pavement", events=4)` plays it:
+`step/concrete (2.15 s, peak at 1.18 s, -21 LUFS, clean) [footsteps]`, `played: 4 events as a walk`, and `no
+footsteps on wet pavement: step/concrete is the nearest surface`. `"loop": false` makes a bed once, with a fade in
+and out. A count, a length and "no loop" said in the `want` do the same as in a single `make`.
 
 Re-running a spec into the same folder rewrites its files and `manifest.json`; it does not delete the files of names
 removed from the spec. An unknown field is an error that lists the fields. A design id of a set that this catalogue
@@ -457,7 +468,7 @@ notify/motif                1.06 s  three notes: up a fifth, then settling on th
 ...
 
 $ earshot sounds --family step
-14 sounds in 1 families
+17 sounds in 1 families
 step/concrete               0.28 s  a hard shoe stepping on concrete
 step/lawn                   0.67 s  a footstep on a grass lawn
 step/pebbles                1.20 s  footsteps on gravel
@@ -466,6 +477,9 @@ step/powder                 0.37 s  a footstep in fresh snow
 step/tile                   0.51 s  hard shoes stepping on a tiled floor
 step/twigs                  0.61 s  a footstep on dry twigs in a forest
 step/floorboard             0.46 s  a footstep on an old wooden floor
+step/mud                    0.66 s  a footstep in thick wet mud
+step/puddle                 0.78 s  a footstep splashing in shallow water
+step/leaves                 0.76 s  a footstep in dry fallen leaves
 step/grass                  0.25 s  a soft crunchy footstep in dry grass
 step/wood                   0.25 s  a footstep on a wooden floor, heel then toe
 step/stone                  0.25 s  a hard footstep on stone, a sharp heel click
@@ -474,8 +488,8 @@ step/snow                   0.25 s  a crunchy squeaky footstep in snow
 step/metal                  0.25 s  a heavy boot step on a metal floor
 ```
 
-One line per design: id, usual length, the first of its descriptions, `(loop)` for a loop. The first six steps are
-invented; the other eight are learned (`--json` shows the tag `real`). `--search` ranks exactly as `make` would (top
+One line per design: id, usual length, the first of its descriptions, `(loop)` for a loop. The first eleven steps
+are learned (`--json` shows the tag `real`); the last six are invented. `--search` ranks exactly as `make` would (top
 20). `--json` adds every field of a design: kind, all descriptions (`says`), jobs (`uses`), tags, domains, default
 pitch, the axes it reads, voice, material, loop, prior. The MCP tool without a filter answers with the families only.
 Kinds: tap, click, tick, pop, note, chime, figure, hit, thud, whoosh, rise, fall, zap, boom, noise, texture, bed,
@@ -627,9 +641,9 @@ inside and no clipping, not that the sound was judged by ear.
 | a monster's growl, `monster_growl` | a big animal's voice far down, a wet throat in it | `lion/roar` -9 under 3000 Hz, `snore/person` -10 cut to 2.8 s, `pig/oink` -15, space room | 3.37 s, peak at 0.24 s, -14 LUFS, clean |
 | a spaceship door, `spaceship_door` | air released, a motor that runs and stops, a panel, a stop | `spray_can/spray` over 800 Hz, `drill/electric` -9 with `halt` 0.7, `door/slide`, `lock/latch` -5, space studio | 1.67 s, peak at 0.46 s, -14 LUFS, clean |
 | a robot powering down, `robot_power_down` | a switch, motors that lose speed, the body settling | `switch/industrial`, `drill/electric` -5 with `halt` 1.6, `vacuum/cleaner` -7 with `halt` 1.8, `spray_can/spray`, `dumbbell/place` -3 | 2.91 s, peak at 0.25 s, -14 LUFS, clean |
-| a sword on a shield, `sword_on_shield` | the clang, the wood, the boss and the weight at one moment, the swing before | `sword/swing`, then at 0.2 s `clash/sword`, `knock/hollow` -7, `saucepan/hit` -7 under 3000 Hz, `punch/body` | 0.90 s, peak at 0.22 s, -14 LUFS, clean |
+| a sword on a shield, `sword_on_shield` | the clang, the wood, the boss and the weight at one moment, the swing before | `sword/swing`, then at 0.2 s `clash/sword`, `knock/hollow` -7, `saucepan/hit` -7 under 3000 Hz, `punch/body` | 0.90 s, peak at 0.27 s, -14 LUFS, clean |
 | a campfire in the wind, `campfire_wind` | two real beds and what happens in them | `fire/camp`, `wind/trees` with a swell, pink noise under 500 to 1400 Hz as a gust, `twigs/snap` five times with `loose` 0.9, kind ambience | 7.65 s, peak at 0.54 s, -22 LUFS, clean |
-| a bowling strike, `bowling_strike` | a ball rolling nearer, one hit, pins that scatter | brown noise under 180 to 420 Hz with a swell, `land/wood` -5, `dice/throw` -10, `knock/hollow` -3 six times, each softer and later, space studio | 3.08 s, peak at 1.25 s, -16 LUFS, clean |
+| a bowling strike, `bowling_strike` | a ball rolling nearer, one hit, pins that scatter | brown noise under 180 to 420 Hz with a swell, `land/wood` -5, `dice/throw` -10, `knock/hollow` -3 six times, each softer and later, space studio | 3.07 s, peak at 1.25 s, -16 LUFS, clean |
 | a woodpecker, `woodpecker` | a hard beak on a hollow trunk, very fast, twice, in a forest | `knock/hollow` +4 twelve times 0.045 s apart, again ten times at 1.4 s, `forest/morning` at -20 | 3.01 s, peak at 0.05 s, -14 LUFS, clean |
 | a giant's footsteps, `giant_footsteps` (a sketch) | weight, slowness, the ground answering | `step/floorboard` -12, `heavy_drop/floor` -7, brown noise under 100 Hz, each four times, 1.1 s apart, space hall | 4.75 s, peak at 2.26 s, -15 LUFS, clean |
 
@@ -669,7 +683,7 @@ What the request asks of a cookbook thing is followed where the form can do it, 
 `earshot make "a werewolf howl far away"` printed:
 
 ```
-q.wav: recipe/werewolf_howl (7.71 s, peak at 1.49 s, -20 LUFS, clean) [recipe]
+werewolf_howl.wav: recipe/werewolf_howl (7.71 s, peak at 1.49 s, -20 LUFS, clean) [recipe]
 built from: lion/roar (-4 semitones, under 3000 Hz); wolf/howl (-4 semitones, under 3000 Hz); wolf/howl (-8 semitones, under 2500 Hz)
 built from parts by the cookbook recipe werewolf_howl: no design of the catalogue is this sound; `earshot recipe werewolf_howl` prints the recipe to change; the nearest designs: wind/window, wind/mountain, wind/open (sound=<id>)
 as asked: far away (in a hall, duller and 6 dB softer)
@@ -772,7 +786,7 @@ What is recognised:
 
 ```
 $ earshot make "a squishy success chime, longer" -o sq.wav
-sq.wav: success/rise (1.85 s, G4, marimba, -14 LUFS, clean) [success, chime]
+sq.wav: success/rise (1.85 s, peak at 0.20 s, G4, marimba, -14 LUFS, clean) [success, chime]
 also: success/triad, success/done, success/fifth
 not understood: squishy
 ```
@@ -781,19 +795,19 @@ What reached the render, on real calls:
 
 ```
 $ earshot make "a soft wooden success chime for a finance app, 400 ms, in D" -o wood.wav
-wood.wav: success/rise (0.40 s, D4, marimba, -14 LUFS, clean) [success, chime]
+wood.wav: success/rise (0.40 s, peak at 0.21 s, D4, marimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
 
 $ earshot make "a success chime on a kalimba, softer" -o kal.wav
-kal.wav: success/rise (0.79 s, G4, kalimba, -14 LUFS, clean) [success, chime]
+kal.wav: success/rise (0.79 s, peak at 0.09 s, G4, kalimba, -14 LUFS, clean) [success, chime]
 also: success/done, success/fifth, success/triad
 
 $ earshot make "a two-note success chime in D minor" -o minor.wav
-minor.wav: success/rise (2.64 s, D4, marimba, -14 LUFS, clean) [success, chime]
+minor.wav: success/rise (2.64 s, peak at 0.22 s, D4, marimba, -14 LUFS, clean) [success, chime]
 also: success/fifth, success/done, success/triad
 
 $ earshot make "a kalimba note in E" -o kalimba.wav
-kalimba.wav: note/kalimba (1.06 s, E5, -14 LUFS, clean) [kalimba, note]
+kalimba.wav: note/kalimba (1.06 s, peak at 0.00 s, E5, -14 LUFS, clean) [kalimba, note]
 also: pluck/kalimba, pluck/kalimba_ring, pluck/kalimba_soft
 ```
 
@@ -801,22 +815,14 @@ also: pluck/kalimba, pluck/kalimba_ring, pluck/kalimba_soft
 the three notes at their spacing, then the bars damped by the hand so the sound ends at 0.40 s (without a length,
 the last note rings out for about 2.6 s). In D minor, `success/rise` (a major third up) rises a minor third.
 
-**How well requests are understood.** Three sets of requests were written by someone who never saw the catalogue: A
-(440 requests for 110 intents, in four styles) and B (220) were used to develop the reader; C (220: half long
-descriptions of a sound that never name it, half casual requests) was held out. A request counts as right when the
-first pick belongs to a family accepted for its intent.
-
-| set | first pick right | right among the top three |
-|---|---|---|
-| A (development, 440) | 92.3 % | 96.1 % |
-| B (development, 220) | 96.4 % | 99.1 % |
-| C (held out, 220), scored once on the v1 catalogue | 69.5 % | 76.8 % |
-
-When the learned sounds arrived, 68 answers were added to the accept lists of A and B (a learned recording of the
-thing the request names is a right answer); without them A is 89.1 % / 95.2 % and B 93.6 % / 98.2 %. Development
-numbers are optimistic by construction; C is the number to quote. Requests that name the thing or the job do far
-better than descriptions of a mood or paraphrases; about one held-out request in three or four needs a second call,
-which is what `also`, the guess note and `--sound ID` are for. Details: [VALIDATION.md](VALIDATION.md#understanding-requests).
+**How well requests are understood.** On five development sets of requests (A, B, D, E and G) the first
+pick is right for 92.3 to 96.8 % and one of the top three for 96.1 to 99.1 %. On 220 held-out requests written by
+someone who never saw the catalogue (half long descriptions of a sound that never name it, half casual requests),
+scored once on an earlier reader, the first pick was right for 69.1 % and one of the top three for 76.4 %.
+Development numbers are optimistic by construction. Requests that name the thing or the job do far better than
+descriptions of a mood or paraphrases; about one held-out request in three or four needs a second call, which is
+what `also`, the guess note and `--sound ID` are for. Every set and how it was scored:
+[VALIDATION.md](VALIDATION.md#understanding-requests).
 
 ## The eight axes
 
@@ -869,7 +875,7 @@ theme's, and a material or voice in the request wins over the theme's voice. A r
 job gets a figure only when its words ask for music (an instrument, a chime, a jingle, a melody, a motif) or for
 chip sound, or a theme is named; otherwise it gets the normal sounds of the interface set or the film group. Without
 a theme or a voice in the request, figures play the real marimba: a bell, a glockenspiel or a glass timbre only
-when asked for (the owner rated glass and glockenspiel interface sounds 1 of 5 and every figure on a synthesised voice 1-2). An instrument
+when asked for (glass, glockenspiel and synthesised voices were judged poor by ear for interface sounds). An instrument
 named in the request plays the figure: "a notification on a harp", "a success sound with pizzicato strings", "an
 error sound on a soft piano" (`felt_piano`), or `--voice harp`. A few game figures keep the voice they were written
 for (`coin/bright`: a glockenspiel).
@@ -887,7 +893,7 @@ sound is or does, the name its character.
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
 | material ticks (`sounds/ui.py`) | 3 | `tick/wood`, `tick/glass`, `tick/metal` | taps and detents that should not be a note | 7 axes (not motion), pitch |
-| ambience (`sounds/nature.py`) | 31 in 15 families | learned from real textures (12): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`, `wind/trees`; from rules (19): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
+| ambience (`sounds/nature.py`) | 34 in 15 families | learned from real textures (16): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`, `rain/wood`, `rain/tin_roof`, `rain/umbrella`, `wind/trees`; from rules (18): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
 | drums (`sounds/drums.py`) | 40 in 21 families | from recorded strokes (33): `kick/soft`, `kick/punch`, `kick/deep`, `snare/tight`, `snare/fat`, `rim/click`, `rim/shot`, `tom/high`, `tom/mid`, `tom/floor`, `hat/closed`, `hat/open`, `hat/pedal`, `crash/bright`, `crash/dark`, `ride/ping`, `clap/hands`, `clap/group`, `shaker/tick`, `tambourine/hit`, `tambourine/shake`, `conga/open`, `conga/muted`, `bongo/high`, `bongo/low`, `cajon/bass`, `darbuka/hit`, `frame_drum/deep`, `clave/click`, `cabasa/hit`, `slapstick/crack`, `drum/roll`, `shaker/roll`; invented (7): `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count` | music loops, motion design, games | energy (velocity: softer or harder strokes), size, bright, hard, ring, space, width; pitch on tuned drums |
 | film and motion (`sounds/motion.py`) | see below | | product films, title sequences, interface animation | |
 | action (`sounds/action.py`) | 47 in 23 families | `jump/*`, `land/*`, `step/grass` .. `step/metal` (6 surfaces), `swing/*`, `hit/punch` ..., `explosion/*`, `shot/*`, `door/*`, `break/*`, `splash/*`, `teleport/*`, `magic/*`, `countdown/*`, `laser/beam` and `rumble/quake` (loops) | games and animation; invented from physics | energy, size, bright, hard, ring, space, width; pitch for the tonal ones; dur for loops |
@@ -903,13 +909,13 @@ the designs written for the catalogue (prior 0.8, the `pro_` families 0.7), so a
 newer design; members that carry only a number in the bank (`pop/3`) stay reachable through `earshot sfx`. Chip
 designs answer only requests that ask for chip sound.
 
-**Music.** earshot is a sound-effects tool. Of twelve music styles that were written, the owner kept three; the
-other nine are gone, and nothing more is planned. The three loops are a whole number of bars in a key and a tempo;
+**Music.** earshot is a sound-effects tool and does not make music. Of twelve short music styles that were written,
+three were kept after listening; the other nine are gone, and nothing more is planned. The three loops are a whole number of bars in a key and a tempo;
 each seed is another progression and voicing with the same instruments.
 
 ```
 $ earshot make "a warm music bed" -o bed.ogg --dur 16
-bed.ogg: bed/warm (17.14 s, F3, electric_piano, -16 LUFS, seamless loop, clean) [music bed]
+bed.ogg: bed/warm (17.14 s, peak at 0.73 s, F3, electric_piano, -16 LUFS, seamless loop, clean) [music bed]
 also: bed/playful, bed/8bit, note/singing_bowl
 17.14 s: a music loop is whole bars, and these are the nearest to the 16 s asked
 ```
@@ -920,12 +926,12 @@ played softest first by velocity. The seed walks through a drum's strokes (a dru
 `energy` picks softer or harder ones; `drum/roll` and `shaker/roll` are performances of those strokes. Invented,
 because no public-domain recording covers them or because they are synthesizers by nature: `kick/electro`,
 `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count`
-(`earshot/synth/drums.py`: a beater's contact, modes, wires and jingles as collisions). The owner rated the earlier
-drums invented from physics 1-2 of 5 ("big problems, does not sound good"); nobody has rated the recorded ones yet.
+(`earshot/synth/drums.py`: a beater's contact, modes, wires and jingles as collisions). The earlier drums invented
+from physics were judged poor by ear; the recorded ones have not been judged by ear yet.
 
 ```
 $ earshot make "a tight snare drum hit" -o snare.wav
-snare.wav: snare/tight (0.38 s, -18 LUFS, clean) [snare drum, hit]
+snare.wav: snare/tight (0.38 s, peak at 0.00 s, -18 LUFS, clean) [snare drum, hit]
 also: snare/brush, snare/fat, snare/electro
 ```
 
@@ -1005,20 +1011,19 @@ crash cymbal (`cymbal/orchestral`); with a word of the drum kit ("fill", "kit", 
 
 ```
 $ earshot make "a fast whoosh as the title flies in" -o whoosh.wav
-whoosh.wav: whoosh/fast (0.30 s, -19 LUFS, clean) [whoosh]
+whoosh.wav: whoosh/fast (0.30 s, peak at 0.04 s, -19 LUFS, clean) [whoosh]
 also: whoosh/soft, whoosh/deep, whoosh/long
 not understood: flies
 $ earshot make "a deep cinematic boom for the logo" -o boom.wav
-boom.wav: boom/deep (0.37 s, -16 LUFS, clean) [cinematic boom]
-also: boom/short, kick/deep, boom/door
+boom.wav: boom/deep (0.37 s, peak at 0.13 s, -16 LUFS, clean) [cinematic boom]
+also: boom/short, boom/door, boom/wide
 $ earshot make "a trailer braam" -o braam.wav
-braam.wav: braam/brass (3.17 s, Bb1, -14 LUFS, clean) [braam]
+braam.wav: braam/brass (3.17 s, peak at 0.66 s, Bb1, -14 LUFS, clean) [braam]
 also: braam/hit, braam/swell, boom/wide
 ```
 
-At seed 0 the whoosh played the fifth of its five recordings, the boom the fourth of four and the braam the fourth
-of six. `--json` gives the number of each (`member`: `n` of `of`); `learned.credit(id, n - 1)` names the recording and
-its author.
+`--json` gives the number of the main recording each take played (`member`: `n` of `of`); `learned.credit(id, n -
+1)` names the recording and its author.
 
 ## Voices
 
@@ -1094,9 +1099,52 @@ pitch outside is moved by octaves.
 
 The pads, hits and effects patches are finished sounds (`pad/*`, `braam/*`, `zap/laser` ...), not `note/*` designs.
 A sustaining voice (an instrument that rings over a second, or a bell, pad, key or lead patch) keeps every note of a
-figure at least 110 ms long, the last 1.6 times that: damped earlier it is heard as an electronic beep. The owner
-rated the instrument notes 2-3 of 5 and bells and bowls 1: they are for someone making real music, which is rarely
-what an interface or a game needs.
+figure at least 110 ms long, the last 1.6 times that: damped earlier it is heard as an electronic beep. The voices
+other than the four real instruments, the bells and bowls above all, were judged weak by ear: they are for someone
+making real music, which is rarely what an interface or a game needs.
+
+## The engines
+
+**Learned sounds** (`earshot/synth/resyn.py`): analysis and resynthesis at the resolution of hearing
+([Learned sounds](#learned-sounds)). On 41 public-domain sources the band envelopes of a take sit a median 2.4 to
+3.2 dB from the recording's at 2 ms, the spectral shape within 0.7 to 1.3 dB, a click's rise within 1 ms; a render
+takes 0.26 to 0.33 s per second of sound on one thread.
+
+**Learned beds** (`earshot/synth/quilt.py`): fresh takes of a texture's models, cut into pieces of 1 to 3 s (whole
+waves for the sea) and stitched where the band levels on both sides match; a piece is not played again within 20 s
+where the material allows it.
+
+**Real instruments** (`earshot/synth/played.py`, `earshot/data/notes/`): single notes of a marimba, a harp,
+pizzicato strings and an upright piano learned through the learned-sound engine; the take nearest in pitch and
+dynamic is moved to the note asked for and damped as a player damps it. Inner notes of a figure ring on under the
+next one, the last rings out, and a figure whose top note lies above C6 is played an octave lower.
+
+**Performances** (`earshot/synth/perform.py`): when each event of a walk, a knock, typing, a scatter, a shake or a
+pair starts, how loud it is and which recording plays it; never the same recording twice in a row, never on a grid.
+
+**Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are takes of
+recorded strokes through the learned-sound engine; the drum-machine voices, the brush snare, the finger snap and the
+stick count are invented (`earshot/synth/drums.py`).
+
+**Struck instruments and strings** (`modal.py`, `struck.py`, `strings.py`): modes at the ratios their geometry
+gives, each dying at the rate its material gives it, struck by a contact pulse whose length follows the mallet's
+hardness; stiff strings, felt hammers, soundboards and electric pianos. They were compared note by note with freely
+usable recordings (University of Iowa Musical Instrument Samples; VSCO-2 Community Edition, CC0); no recording is in
+the repository.
+
+**Synthesizer** (`voice.py`, `patches.py`): band-limited oscillators, unison with drift, a ladder filter, FM
+operators, chorus and echo; 28 patches.
+
+**Chip** (`chip.py`): pulse, triangle, noise and wavetable channels with every level step band-limited.
+
+**Textures from rules** (`texture.py`): rain, wind, forests and nights from many small events per second with
+physical size statistics and band-wise noise, rendered around a circle so they loop.
+
+**The shared room** (`space.py`): seven spaces (dry, booth, room, studio, hall, plate, cathedral) that every design
+uses, so a family of sounds sits in one room.
+
+**Recipes** (`earshot/recipe.py`): layers of catalogue designs or plain sources, each a take of its own, shaped and
+mixed in one room ([When earshot has no such sound](#when-earshot-has-no-such-sound-build-it)).
 
 ## Recipe: a web page
 
@@ -1147,27 +1195,27 @@ six sounds. A spec without `set` makes only the ones it lists:
 ```
 $ earshot make --spec landing.json -o sounds
 5 sounds in sounds (wav), manifest.json
-open.wav: open/drawer (0.68 s, -14 LUFS, clean) [opening]
-toast.wav: notify/knock (0.40 s, -18 LUFS, clean) [toast notification]
-error.wav: error/knock (0.58 s, -18 LUFS, clean) [error]
+open.wav: open/drawer (0.68 s, peak at 0.39 s, -14 LUFS, clean) [opening]
+toast.wav: notify/knock (0.40 s, peak at 0.01 s, -18 LUFS, clean) [toast notification]
+error.wav: error/knock (0.58 s, peak at 0.19 s, -18 LUFS, clean) [error]
   not understood: address
-card.wav: thump/soft (0.09 s, -24 LUFS, clean) [thump, card, settles]
+card.wav: thump/soft (0.09 s, peak at 0.03 s, -24 LUFS, clean) [thump, card, settles]
   not understood: pricing
-paid.wav: success/shutter (0.36 s, -15 LUFS, clean) [payment success]
+paid.wav: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [payment success]
 ```
 
 ## Recipe: a game
 
 ```
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
-step_1.ogg: step/pebbles (0.51 s, -15 LUFS, clean) [gravel, footstep]
-step_2.ogg: step/pebbles (0.40 s, -16 LUFS, clean)
-step_3.ogg: step/pebbles (0.60 s, -16 LUFS, clean)
+step_1.ogg: step/pebbles (0.51 s, peak at 0.10 s, -15 LUFS, clean) [gravel, footstep]
+step_2.ogg: step/pebbles (0.40 s, peak at 0.07 s, -16 LUFS, clean)
+step_3.ogg: step/pebbles (0.60 s, peak at 0.02 s, -16 LUFS, clean)
 played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")
 also: step/gravel, step/floorboard, step/heels
 
 $ earshot make "a campfire" -o fire.ogg --dur 24
-fire.ogg: fire/camp (24.00 s, -22 LUFS, seamless loop, clean) [campfire]
+fire.ogg: fire/camp (24.00 s, peak at 19.96 s, -22 LUFS, seamless loop, clean) [campfire]
 also: fire/large, fire/small, fire/whoosh
 ```
 
@@ -1194,17 +1242,17 @@ also: fire/large, fire/small, fire/whoosh
 
 ```
 $ earshot make "a logo reveal" -o logo2.wav
-logo2.wav: sting/reveal (0.81 s, -14 LUFS, clean) [logo reveal]
+logo2.wav: sting/reveal (0.81 s, peak at 0.65 s, -14 LUFS, clean) [logo reveal]
 also: boom/short, kick/soft, kick/deep
 
 $ earshot make "logo reveal" --voice felt_piano --pitch D4 -o logo.wav
-logo.wav: logo/bloom (3.97 s, D4, felt_piano, -14 LUFS, clean) [logo reveal]
+logo.wav: logo/bloom (3.97 s, peak at 0.29 s, D4, felt_piano, -14 LUFS, clean) [logo reveal]
 also: logo/duo, logo/motif, logo_sting/reverse_bloom
 
 $ earshot make "a forest at night" -o night.wav --no-loop --dur 10
-night.wav: night/crickets (9.87 s, -22 LUFS, clean) [forest, night]
-also: forest/morning, rain/leaves, wind/trees
-9.87 s, shorter than the 10 s asked: the longest this sound is made
+night.wav: night/crickets (9.87 s, peak at 5.43 s, -22 LUFS, clean) [night, forest]
+also: forest/morning, rain/wood, rain/leaves
+9.87 s, shorter than the 10 s asked
 ```
 
 The night is a learned bed (a BigSoundBank recording of a field at night), rendered once with a fade in and out.
@@ -1226,13 +1274,10 @@ or a swell of air into one (`sting/reveal`, `boom/short`).
 - **Check it landed**: `earshot timeline mix.wav --video film.mp4 --cues cues.json` and `earshot sheet` (the
   listening half, README).
 
-**Where a made file's loudest moment lies.** `make` reports a take's length and loudness, not the time of its
-peak, and it does not put files on a timeline: the editor, ffmpeg or the page's code does. Place by these
-measurements (seed 0, the files of the examples here): `thump/soft` (0.09 s) is loudest 0.02 s after its start;
-`boom/short` (0.29 s) 0.15 s after it, behind its short swell of air, so that file starts about 80 ms before the
-frame the hit lands on, as hits do in the reference films; `whoosh/soft` (0.39 s) is loudest at 0.24 s, three
-fifths through, and that moment goes on the fastest frame of the move; `rise/air` ends on its loudest moment (at
-1.16 of 1.17 s when asked with `--dur 1.2`), so a riser starts its own length before the reveal.
+**Where a made file's loudest moment lies.** Every result line says it (`peak at`), and `--json` gives `peak_s`,
+`onset_s` and, for a row, `events_s`. earshot does not put files on a timeline: the editor, ffmpeg or the page's
+code does. To put a hit on the frame at t, start the file at t minus `peak_s`. A whoosh's loudest moment goes on the
+fastest frame of the move; a riser ends on its loudest moment, so it starts its own length before the reveal.
 
 **A scene of real footage** (a film scene, a cooking clip) takes one bed for the place and the real sound of each
 thing the picture shows being done, asked for as that thing. Made as one spec, the bed comes out 9 to 16 LU under
@@ -1241,15 +1286,19 @@ the things done in it, a first balance to mix from (`"lufs"` in an entry sets on
 ```
 $ earshot make --spec scene.json -o scene
 5 sounds in scene (wav), manifest.json
-rain.wav: rain/street (7.93 s, -30 LUFS, clean) [terrace, rain]
+rain.wav: rain/street (7.93 s, peak at 4.12 s, -30 LUFS, clean) [terrace, rain]
   7.93 s, shorter than the 8 s asked: the longest this sound is made
-door.wav: door/shut (2.54 s, -20 LUFS, clean) [door, shut]
+door.wav: door/shut (2.54 s, peak at 1.27 s, -20 LUFS, clean) [door, shut]
+  also (the pick is a guess: earshot makes no front door; door/shut is only the nearest sound it has): car_door/slam (a car door slammed shut), cupboard/shut (a wooden cupboard door closing), gate/metal (a large metal gate swung shut). Name one with sound=<id>
   not understood: front
-keys.wav: keys/bunch (2.38 s, -14 LUFS, clean) [keys jingling]
-  played: 9 events (a recording of the whole action)
-phone.wav: phone/vibrate (1.64 s, -15 LUFS, clean) [phone, table, vibrating]
-thunder.wav: thunder/distant (7.70 s, -21 LUFS, clean) [thunder, distant]
+keys.wav: keys/bunch (4.21 s, peak at 1.57 s, -15 LUFS, clean) [keys jingling]
+  played: 18 events (a recording of the whole action)
+phone.wav: phone/vibrate (1.64 s, peak at 0.38 s, -15 LUFS, clean) [phone, table, vibrating]
+thunder.wav: thunder/distant (7.70 s, peak at 3.22 s, -21 LUFS, clean) [thunder, distant]
 ```
+
+The door is the right recording, but "front door" is read as a thing earshot does not have, so the answer calls it
+a guess: read the design id against the picture, not only the guess line.
 
 The entries asked for "steady rain on a terrace, 8 seconds, no loop", "the heavy wooden front door falls shut",
 "keys jingling", "a phone vibrating on a table" and "distant thunder". A thing the catalogue has no recording of
@@ -1286,6 +1335,6 @@ takes. Then rebuild the sound atlas (`python -m earshot.sounds.atlas build --wor
 `--listen` knows the new design, and run the catalogue's contract tests (`tests/test_sounds_catalogue.py`).
 
 Learned designs are not written by hand: each is an entry of `earshot/data/resyn/index.json` with its member models,
-built in the project's lab from CC0 recordings that pass checks for a full band, a natural decay, a clear onset and
+built from CC0 recordings that pass checks for a full band, a natural decay, a clear onset and
 a single event; the build tool is not in the repository. A design written from formulas for a real thing should be
-listened to by a person before it ships: the owner rated such designs 1-2 of 5 while the models scored them well.
+listened to by a person before it ships: such designs were judged poor by ear while the models scored them well.

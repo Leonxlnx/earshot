@@ -71,25 +71,32 @@ cannot do and where it is weak is [at the end](#making-sounds-make).
 
 ## Making sounds (`make`)
 
-**How they were judged.** The sounds were judged by one listener, the owner, 1 to 5, on six pages that were not
-blind ([VALIDATION.md](VALIDATION.md#the-owners-listening)). earshot's own models did not predict his ratings and are
-not a measure of how good a made sound is; a `heard as` line says what a model hears, nothing more. The learned
-family and the learned beds were built after his last ratings: each learned take matched its source in his ears on
-24 recordings, but the store as a whole has not been rated. The sounds added or rebuilt last (the interface
-sounds without instruments, the motion and film hits, the ambiences relearned from other recordings, the everyday
-sounds from other recordings, the animals, people, street, house, desk and sport sounds, and rain on wood, on a tin
-roof and on an umbrella) were measured against
-their recordings and against references, and checked by models, but no listener has rated them yet.
+**What was measured and what was judged by ear.** Measured, by code: every take's audit (clicks, cut tails,
+clipping, DC), its loudness and length, how close a learned take stays to its recording, and how well requests are
+read ([VALIDATION.md](VALIDATION.md#8-made-sounds-10)). Judged by ear, by one listener (the maintainer) on pages that
+were not blind: which kinds of sound are good enough ([VALIDATION.md](VALIDATION.md#listening-by-ear)). On 24
+recordings each learned take was judged as good as its source, but the store as a whole has not been judged. The
+sounds built last (the `ui` set as it is now, the film and motion hits, the drums from recorded strokes, the figures
+on real instruments, the newer learned things and beds, and the cookbook's recipes) were measured and checked by the
+audit, and no one has judged them by ear yet. earshot's own models did not predict the judgements by ear and are not
+a measure of how good a made sound is; a `heard as` line says what a model hears, nothing more.
 
 **What it cannot do.**
-- Make a sound no design covers. `make` chooses one design and shapes it with the controls; it does not compose,
-  layer two designs into one, or synthesise from a free description. A request nothing answers is an error; a
-  request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
+- Make a sound no design covers from a free description. `make` chooses one design and shapes it with the controls,
+  or renders a recipe that layers designs. A request for a thing the catalogue lacks still gets a file: the nearest
+  design, with a line that says `earshot makes no X; Y is only the nearest sound it has`, three starting points of
+  other families, and a pointer to building it as a recipe. A cookbook recipe answers on its own only for 32 things;
+  the 42 sketches are starting points, and a recipe is judged by a model and the audit, not by ear.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
   the recording in the public domain; the store has 249 things. For other real things the catalogue has designs
-  invented from physics (`action`, `object`), which the owner rated 1-2 of 5.
+  invented from physics (`action`, `object`), which sound clearly less real.
+- Pan. A request cannot place or move a sound in the stereo field: "from left to right" is said not followed. Only a
+  layer of a recipe can be set to the left or the right.
+- One sound ringing through the body of another ("rain on a tin can"). It was tried and came no nearer the real
+  thing; where the catalogue has the real surface (`rain/wood`, `rain/tin_roof`, `step/floorboard`), that design is
+  the answer.
 - New sounds from a class of recordings. Sampling new members from a model of several recordings was tried and
-  rated 1-2; it was dropped. A learned design plays its own recordings and new takes of them.
+  judged poor by ear; it was dropped. A learned design plays its own recordings and new takes of them.
 - Music. earshot is a sound-effects tool: three short loops (`bed/warm`, `bed/playful`, `bed/8bit`), notes, chords
   of a pad, short motifs and logos. No melodies, songs or scores, and no music generation.
 - Speech, singing and the melodies of instruments. Animals, people without words and vehicles exist as learned
@@ -107,9 +114,9 @@ their recordings and against references, and checked by models, but no listener 
   that says or sings words, a shout or a yell, sobbing, a violin, a cello, a viola, a saxophone, a flute, a
   clarinet, an oboe, bagpipes, a trumpet, an electric guitar, a guitar or drum solo, an air horn or a ringtone,
   `make` answers "earshot makes no ...". Crying is a baby's: asked of another person it is not made. Other everyday
-  things have no recording yet and get the nearest design or nothing: a gulp, chewing, a mosquito, a seagull, a
-  pigeon, a monkey, a snake's hiss, a padlock, a kettle whistling, a pan set on a stove, a fridge door, a quick row
-  of chops (one chop is made), a printer, a shopping cart, a dishwasher, a bus, an airplane passing close, a tennis
+  things have no recording yet and get the nearest design (a few of them a cookbook recipe): a gulp, chewing, a
+  mosquito, a seagull, a pigeon, a monkey, a snake's hiss, a padlock, a kettle whistling, a pan set on a stove, a
+  fridge door, a quick row of chops (one chop is made), a printer, a shopping cart, a dishwasher, a bus, an airplane passing close, a tennis
   or basketball hit; steps on sand, on carpet and on metal stairs.
 - Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
   `not in this sound: ...` for the other; ask again for it, or make a set.
@@ -127,22 +134,22 @@ their recordings and against references, and checked by models, but no listener 
   `also`, `--sound` and a person's ears.
 
 **What is weak or unverified.**
-- **The rebuilt motion sounds are not rated.** The motion and film sounds follow measurements of professional
+- **The rebuilt motion sounds are not judged by ear.** The motion and film sounds follow measurements of professional
   motion videos: short, dry hits, thumps, ticks and whooshes of air, built from learned recordings (a heavy bag
   dropped on a real explosion's low end for the title and logo hits, a soft kick and conga for the thump, a mouse
-  click for the tick, real whooshes, breaths and flames for the air). The owner rated the fast whoosh 4 of 5 and
-  the earlier hits, booms, risers and the tape stop 1 to 2; the rebuilt ones have not been rated. The measurements
-  come from 39 videos and find effects only where they stand out of the music, so quieter effects under the music
-  are not counted. 14 of the 46 motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a sliding panel,
-  a soft knock, the soft sting) are still invented.
-- **Interface sounds without instruments are not rated as a set.** The seventeen roles of `ui` are things a hand does,
-  built from learned recordings; single roles were rated 1.5 to 4 as figures and keys, the new set as a whole not
-  yet. Which object a role uses is a choice of taste: the other candidates are in the catalogue by name.
-- **Drums.** The acoustic kit and the hand percussion are now takes of 130 recorded strokes (VCSL and Karoryfer; the
-  hand claps from one person clapping, Freesound); only the kick (4 of 5) and the claps (3.3, before their present
-  recordings) were rated. The drums invented from physics that they replace were rated 1-2 by the owner ("big
-  problems, does not sound good"). Still invented: `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`
-  (drum-machine voices), `snare/brush`, `snap/finger` and `sticks/count`, which no public-domain recording covers.
+  click for the tick, real whooshes, breaths and flames for the air). Of the earlier film sounds the fast whoosh was
+  judged good and the hits, booms, risers and the tape stop poor; the rebuilt ones have not been judged. The
+  measurements come from 39 videos and find effects only where they stand out of the music, so quieter effects under
+  the music are not counted. 14 of the 46 motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a
+  sliding panel, a soft knock, the soft sting) are still invented.
+- **The interface set is not judged by ear as a set.** The seventeen roles of `ui` are things a hand does, built from
+  learned recordings. Which object a role uses is a choice of taste: the other candidates are in the catalogue by
+  name.
+- **Drums.** The acoustic kit and the hand percussion are takes of 130 recorded strokes (VCSL and Karoryfer; the hand
+  claps from one person clapping, Freesound); they have not been judged by ear as a kit. The drums invented from
+  physics that they replace were judged poor. Still invented: `kick/electro`, `snare/electro`, `hat/electro`,
+  `clap/electro` (drum-machine voices), `snare/brush`, `snap/finger` and `sticks/count`, which no public-domain
+  recording covers.
 - **One carrier per band.** The learned model keeps one tone per band: two crickets in one band lose their beating
   against each other (the cricket bed's take differs from its recording by 4.4 dB against 2.2 for two takes).
 - **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms).
@@ -157,18 +164,19 @@ their recordings and against references, and checked by models, but no listener 
 - **The real instruments** have 14 to 45 recorded notes each; a note between them is a neighbour moved by a few
   semitones, and the takes of one instrument can differ in level by 2-3 dB from note to note.
 - **Invented realistic sounds** remain in the catalogue for things no learned design covers (jumps, landings, game
-  hits, shots, magic). The owner rated their kind 1-2. A learned design wins a tie with them, but a request that
+  hits, shots, magic). Their kind was judged poor by ear. A learned design wins a tie with them, but a request that
   names only an invented one gets it.
-- **Instrument notes and bells** were rated 2-3 and 1 as models; the figures on the real instruments were rated 2 to
-  3 as interface signals, which is why interface and motion requests get no notes unless the words ask for music.
-  Figures play a real marimba unless asked otherwise.
+- **Instrument notes and bells** from models were judged weak by ear, bells poor; figures on instruments were judged
+  only fair as interface signals, which is why interface and motion requests get no notes unless the words ask for
+  music. Figures play a real marimba unless asked otherwise.
 - **`--listen` and the atlas** were not re-measured on the v1 catalogue; the atlas is built from each design's
   default render and is stale after designs change until it is rebuilt (`python -m earshot.sounds.atlas build
   --work DIR`, repeated until done).
 
 **Requests.** The reader is a lexicon and rules, not a language model (`--listen` adds CLAP). On 220 held-out
-requests by someone who never saw the catalogue the first pick was right for 69.1 % and one of the top three for
-76.4 % ([VALIDATION.md](VALIDATION.md#understanding-requests)). Requests that name the thing, the job or the sound
+requests by someone who never saw the catalogue, scored once on an earlier reader, the first pick was right for
+69.1 % and one of the top three for 76.4 % ([VALIDATION.md](VALIDATION.md#understanding-requests)). It reads
+English; German only through a table of common sound words. Requests that name the thing, the job or the sound
 did far better than long descriptions of a sound and casual paraphrases. A learned design answers only when its
 thing is named, so "a heavy impact" never reaches a recorded dumbbell, and a feeling alone reaches no recording.
 The guess note catches only part of the wrong picks, so a pick without it can still be wrong: read the design id
@@ -183,13 +191,13 @@ The sprite holds every sound in every sprite format, so a loop inside an mp3 spr
 files decode in full, so the message is not a sign of a broken file. Re-running a spec into the same folder rewrites
 its files and `manifest.json` but does not delete the files of names removed from the spec.
 
-**Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
-transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 13.81 MB, the textures 5.40 MB, the drums 1.31 MB and the instrument notes 0.83 MB
-to the package. The lab's
-recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
-repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers
-cannot be re-run from it.
+**Engineering.** No models and no network at render time; the base install is numpy, scipy, soundfile, soxr and
+numba, and the listening stack (torch, transformers) comes only with the `listen` extra. ogg, mp3, m4a and webm need
+ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of sound; a recipe of many layers takes up to
+half a minute on one core. The learned store adds 13.85 MB, the textures 6.61 MB, the drums 1.31 MB and the
+instrument notes 0.83 MB to the package. The recordings, the listening pages, the request sets and the tool that
+builds the learned store are not in the repository: the store can be used and credited, not rebuilt, from the
+repository alone, and the request numbers cannot be re-run from it.
 
 **Licence of the learned material.** Every learned model comes from a recording in the public domain: BigSoundBank,
 Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication

@@ -68,8 +68,9 @@ Sounds for a film (no models, fast): sfx_list (the shipped bank) -> sfx_render (
 pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take).
 To get a sound, ask for it: make (a request in words -> one finished file; interface, game, everyday, motion, drum,
 instrument and ambience sounds, each computed at request time: the realistic ones from models learned from
-public-domain recordings, shipped as numbers, the rest invented in code), make_set (a whole product's sounds as one
-family, one call), sounds (the catalogue). No models are loaded for these."""
+public-domain recordings, shipped as numbers, the rest written as code), make_set (a whole product's sounds as one
+family, one call), sounds (the catalogue). When the answer says "earshot makes no X", build it from the catalogue's
+parts with make's `recipe`. No models are loaded for these."""
 
 IMG_INLINE_MAX = 1600        # px, long edge of the inline copy (sent as JPEG q88: ~1/3 of the PNG bytes)
 JSON_MAX = 7000
@@ -693,44 +694,44 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                                      '(a design id from `sounds`) or "source" '
                                                                      '("noise" with dur and color, "sine" with dur '
                                                                      'and hz 20-150), with seed, dur, pitch '
-                                                                     '(semitones -24..12, lower is slower), reverse, '
-                                                                     'cut [from, to], lowpass / highpass (Hz or '
-                                                                     '[from, to]), pan, gain (dB), at (s), fade_in, '
-                                                                     'fade_out, swell, decay, the design\'s axes '
-                                                                     '(-1..1) and events {"count", "gap", "faster", '
-                                                                     '"softer"}; the whole takes name, says, layers, '
+                                                                     '(semitones -24..12, lower is slower), glide, '
+                                                                     'reverse, cut [from, to], halt, lowpass / '
+                                                                     'highpass (Hz or [from, to]), pan, gain (dB), at '
+                                                                     '(s), fade_in, fade_out, swell, decay, the '
+                                                                     'design\'s axes (-1..1), events {"count", "gap", '
+                                                                     '"faster", "softer", "loose"} and follow '
+                                                                     '{"layer", "amount", "smooth"}; the whole takes '
+                                                                     'name, says, layers, '
                                                                      'dur, space (dry, booth, room, studio, hall, '
                                                                      'plate, cathedral), kind (event, ambience). '
                                                                      '`want` then says what the sound is')] = None,
               full: Full = False) -> str:
-    """Make a sound in code from a request in words and write it to a file (no models, about a second; nothing is
+    """Make a sound from a request in words and write it to a file (no models, about a second; nothing is
     downloaded). Every sound is computed at request time: the realistic ones (everyday things, footsteps, doors,
-    keys and switches, interface sounds, motion effects, ambiences, drums) are rendered from models learned from
-    public-domain recordings, shipped as numbers, no audio file; figures, chip sound and the music loops are invented
-    in code. Covers interface sounds (taps, toggles, success, error, notifications: things a hand does, no
-    instrument), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit), everyday foley, motion-design
-    effects as motion videos use them (short dry hits under a title or a logo, thumps, ticks, whooshes and risers of
-    air), drums, instrument notes and ambience loops. An interface or motion request gets no notes unless its words
-    ask for music (an instrument, a chime, a jingle, a melody) or a game sound. A learned design's seeds walk through its
-    recordings, so `n` gives different real takes ("recording 2 of 3" says which); the best recording of a thing
-    plays first. Tonal figures are played on real instruments learned note by note (marimba by default; harp,
-    pizzicato strings and felt_piano, an upright piano, by `voice`). A thing a person
-    does in a row is played as that action when the words ask for it ("footsteps on gravel", "knocking", "typing")
-    and as one event otherwise ("a footstep"); `events` sets it. A counted action done in a row ("four knocks on
-    the table", "three claps", "a countdown 3 2 1") is one file of that many events, whatever the design; a length
-    asked with it ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's length, the events spread over
-    it at a pace a person keeps; a count of separate things ("five coin pickups", "3 variations") is that many
-    files. The answer names the design chosen and why, what else would fit (`also`), and any words that were not
-    understood, so one call is usually enough; a thing in no design is an error that says "earshot makes no ...";
-    call again with
-    `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. When the
-    catalogue has no such sound (the answer says "earshot makes no ..."), build it from parts with `recipe`: say
-    what physically makes the sound, find two to four real parts with `sounds`, layer them (a recording moved in
-    pitch, reversed, filtered, repeated as events; noise only for air and rumble), render, read the result line
-    and change one thing at a time; a request that names a thing of the cookbook (a dragon roar, a rocket launch)
-    is answered by its recipe, and the answer says what it is built from. Use it
-    whenever a product, a game or a film needs a sound and no recording is at hand; use make_set when it needs
-    several that belong together. Everything made is free to use in any product."""
+    keys and switches, animals, interface sounds, motion effects, ambiences, drums) are rendered from models learned
+    from public-domain recordings, shipped as numbers, no audio file; tonal figures, chip sound and the music loops
+    are written in code. Covers interface sounds (taps, toggles, success, error, notifications: things a hand does,
+    no instrument), game sounds (coins, jumps, hits, fanfares, 8-bit), everyday foley, motion-design effects as
+    motion videos use them (short dry hits under a title or a logo, thumps, ticks, whooshes and risers of air),
+    drums, instrument notes and ambience loops. An interface or motion request gets no notes unless its words ask
+    for music (an instrument, a chime, a jingle, a melody) or a game sound. Name the thing, the job or the sound
+    first; what follows "on" or "in" is its surface or place ("rain on wood"). A learned design's seeds walk through
+    its recordings, the fullest clean one first, so `n` gives different real takes ("recording 2 of 3" says which).
+    A thing a person does in a row is played as that action when the words ask for it ("footsteps on gravel",
+    "knocking", "typing") and as one event otherwise ("a footstep"); `events` sets it. A counted action ("four
+    knocks on the table") is one file of that many events, and a length or a gap asked with it ("three knocks, 2
+    seconds", "200 ms apart") is kept; a count of separate things ("five coin pickups", "3 variations") is that
+    many files. The answer's first line gives the design, its length, where its loudest moment is ("peak at"), its
+    loudness and "clean" or what the check found; then what else would fit (`also`) and any words that were not
+    followed or not understood. Every request gets a file: when the catalogue lacks the thing, the answer says
+    "earshot makes no X; Y is only the nearest sound it has" and offers three starting points. Then build it from
+    parts with `recipe`: say what physically makes the sound, find two to four real parts with `sounds`, layer them
+    (a recording moved in pitch, reversed, filtered, repeated as events; noise only for air and rumble), render,
+    read the result line and change one thing at a time. A cookbook recipe answers some requests on its own (a car
+    crash, a werewolf howl) and says what it is built from; a recording of the thing answers first. earshot does
+    not pan and makes no speech or singing. Use it whenever a product, a game or a film needs a sound and no
+    recording is at hand; use make_set when it needs several that belong together. Everything made is free to use
+    in any product."""
     from . import make as M
     return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
                              dur=dur, voice=voice, material=material, loop=loop, events=events, seed=seed,
@@ -741,9 +742,9 @@ def set_help():
     """the description of make_set's `set`, with each set's size counted from earshot.sounds.sets"""
     from .sounds import sets
     n = {k: len(v['sounds']) for k, v in sets.SETS.items()}
-    return (f'a ready-made set: "ui" ({n["ui"]} interface sounds, each a normal thing a hand does: a key, a switch, '
-            f'a page, knocks, a pen click; with a theme: tonal figures in its voice), "game" ({n["game"]}: menus, '
-            f'rewards, jingles, actions), "arcade" ({n["arcade"]} chip sounds), "film" ({n["film"]}: a '
+    return (f'a ready-made set: "ui" ({n["ui"]} interface sounds, each a normal thing a hand does: a key, a page, '
+            f'a drawer, knocks, a camera shutter; with a theme: tonal figures in its voice), "game" ({n["game"]}: '
+            f'menus, rewards, jingles, actions), "arcade" ({n["arcade"]} chip sounds), "film" ({n["film"]}: a '
             f'motion-design starter)')
 
 
@@ -769,9 +770,11 @@ def tool_make_set(out: Annotated[str, Field(description='absolute path of the fo
                                                                   'style map, e.g. "sprite.webm"')] = None,
                   full: Full = False) -> str:
     """Make a whole set of sounds in one call, as one family (no models): the same voice, key and room for every
-    tonal sound, levels balanced against each other (frequent sounds quieter), a manifest.json with every file,
-    and optionally one sprite file with a map for the web. Use it for a product's interface, a game's sound
-    effects or a film's kit instead of many single `make` calls."""
+    tonal sound, every one-shot as loud as it is made alone and within 2.5 dB of the others, loops and beds
+    levelled by kind, a manifest.json with every file, and optionally one sprite file with a map for the web. Your
+    own `sounds` add to a ready-made set, or without `set` they are the whole list (the handful of sounds a landing
+    page or a scene needs). Use it for a product's interface, a game's sound effects or a film's kit instead of
+    many single `make` calls."""
     from . import make as M
     if not (set or sounds):
         raise ToolFailure('give a ready-made `set` (ui, game, arcade, film) and / or your own `sounds`')

@@ -1,491 +1,299 @@
 ---
 name: earshot
-description: Make sounds with earshot whenever a product, game, page, animation or film needs a sound and no recording is at hand - interface sounds (taps, toggles, hovers, typing, success, error, notifications), everyday foley for games, 3D and video (footsteps, doors, drawers, switches, keys, cloth, glass, water, metal, swings, punches, explosions), ambience beds (fire, sea, rain, wind, crickets, a cafe, a street), game sounds (coins, fanfares, 8-bit), drums, motion-design effects and a few short music loops, one at a time (earshot make) or as one family (earshot make --set / make_set). Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, searching a recipe by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
+description: Make sounds with earshot whenever a product, game, page, animation or film needs a sound and no recording is at hand - interface sounds (taps, toggles, hovers, typing, success, error, notifications), everyday foley for games, 3D and video (footsteps, doors, drawers, switches, keys, cloth, glass, water, metal, swings, punches, explosions, animals, kitchen and street sounds), ambience beds (fire, sea, rain, wind, crickets, a cafe, a street), game sounds (coins, fanfares, 8-bit), drums, motion-design effects and a few short music loops, one at a time (earshot make) or as one family (earshot make --set / make_set), and build what the catalogue lacks from its parts (earshot recipe). Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, searching a recipe by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
 ---
 
-# earshot: ears for an agent
+# earshot: making and hearing sound
 
 ## Making sounds
-When a product, game, page or film needs a sound and no recording is given, make it: earshot picks a design from its
-catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
-complete on its own. If the `earshot` command is not installed yet, see Setup at the end.
 
-**When a sound, and when none.** Most moments get none. A sound belongs where something happened that a person
-should notice without looking at it. What follows is common practice; only the motion video numbers further down
-are measured.
-- A page or an app: a sound for what the user did on purpose and for what came of it (a switch thrown, a form
-  sent, a payment gone through, an error, a message arriving). None for what happens by itself or all the time: a
-  page loading (a browser plays nothing before the first click anyway), scrolling, an animation, the pointer
-  crossing the links of a marketing page. A page that changes after a click has had its sound with the click. A
-  landing page is served by three to six of the `ui` roles, not by all 17; `hover` is for tools in which hovering
-  is a choice, and it is the set's quietest sound.
-- A game: every action the player repeats gets a short sound in several takes (steps, jumps, hits, coins), a
-  reward and the end of a level get the longer figures on an instrument, a menu gets one small sound for moving and
-  one for choosing.
-- A motion video: two to five effects in a film that music leads ("Scoring a motion video" below says which).
-- A scene of a film, or a clip of real footage: one bed for the place (rain, a room, a street), then the real sound
-  of each thing the picture shows being done (a door, steps, keys, a pour, a sizzle), asked for as that thing. A
-  designed sound (a whoosh, a pop) only on the few cuts or captions the edit wants felt. A thing the catalogue has
-  no recording of (the answer says so) is better recorded or left silent than replaced by a stand-in.
+earshot turns a request in words into a sound file: it picks a design from its catalogue and renders a new take. No
+model is loaded and nothing is downloaded; a one-shot takes about a second. This part is complete on its own. If the
+`earshot` command is missing, see Setup at the end.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (249 designs:
-footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
-paper, books, glass, ice, water, metal, swings, punches, falls, explosions, animals such as a dog, a cat and birds,
-people without words such as applause, laughter and a cough, a car horn, a siren, a phone ringing or vibrating
-...) and 13 ambience beds learned from
-real textures (fire, three shores, crickets, a brook, a cafe, a street, distant city, room tone, underwater, rain on
-a terrace, wind in dry leaves). The interface sounds are things a hand does, from those recordings: a key going
-down and coming up, a page, a drawer, a cork, knocks, a camera shutter, scissors. The film and motion
-effects are short, dry hits, thumps, ticks and whooshes of air built from recordings. The acoustic drum kit and hand
-percussion are learned too (130 recorded strokes; seeds walk through a drum's strokes, `energy` picks softer or
-harder ones), and so are the instruments that play the tonal figures when music is asked for: a marimba (the
-default voice), a harp, pizzicato strings and an upright piano (`felt_piano`), 97 recorded single notes. Only
-numbers ship, no audio file: every sound is computed when it is asked for. Written in code: the figures themselves
-(success, error, notify, coin, level up: the notes, their timing and the room), chip sound, the drum-machine voices,
-a brush snare, a finger snap and stick counts, rain on a window and a forest, the other instruments' notes, pads,
-three music loops, and the film bank.
-Realistic things that no one recorded (jumps, magic, game hits) are invented designs and were rated low by the
-owner: prefer a learned thing when one fits.
+The catalogue holds 830 designs. Realistic things are learned from recordings in the public domain (249 things:
+footsteps on many surfaces, doors, drawers, switches, keyboards, cloth, paper, glass, water, metal, punches, falls,
+explosions, animals, people without words, street, house and kitchen sounds) and so are 16 ambience beds (fire,
+shores, crickets, a brook, a cafe, a street, rain on wood, on a tin roof and on an umbrella), the acoustic drums and
+the four real instruments that play tonal figures (marimba, harp, pizzicato strings, upright piano). The interface
+sounds and the film and motion effects are built from those recordings. Written in code: the tonal figures (success,
+coin, level up), chip sound, the drum-machine voices, some beds made from rules, three short music loops and the
+film sound bank. Only numbers ship, no audio file: every sound is computed when it is asked for. Invented designs of
+real things (jumps, magic, game hits) sound clearly less real: prefer a learned thing when one fits.
 
-**The three calls** (CLI, or the MCP tools of the same names; MCP paths absolute):
-1. One sound: `earshot make "WORDS" -o sounds/success.ogg` (MCP `make`: `want`, `out`; optional `sound`, `n`,
-   `theme`, `pitch`, `dur`, `voice`, `material`, `loop`, `events`, `seed`). One call per sound.
-2. Several that belong together (an interface, a game, a film's kit): ONE call, never a loop of `make`.
-   `earshot make --set ui|game|arcade|film -o FOLDER --format webm,mp3 --sprite sprite`, or MCP `make_set` with
-   `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft tap"}, ...]` (fields:
-   name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs, events, loop). One voice, key and room for
-   the tonal sounds; every one-shot as loud as made alone, within 2.5 dB of the others; loops and beds levelled by
-   kind; `manifest.json` written. Themes: soft (the default), glass, wood, felt, tine, metal, electric, digital,
-   retro. From the CLI your own list is a JSON file: `{"set": "ui", "format": "webm,mp3",
-   "sounds": [{"name": "tap", "want": "a soft tap"}, ...]}`, then `earshot make --spec FILE -o FOLDER` (a re-run
-   rewrites the files and `manifest.json`; it does not delete files of names you removed).
-   Your own `sounds` come on top of the set named in `set` (the 17 of `ui` and yours; one with a name of the set
-   replaces that sound). Leave `set` out and only your list is made: that is the call for the handful of sounds a
-   landing page or a scene needs. An entry's `events` and `loop` are the single call's `--events` and `--no-loop`
-   (`{"name": "steps", "want": "footsteps on wet pavement", "events": 4}` answered `step/concrete (2.15 s ...)`,
-   `played: 4 events as a walk`; `"loop": false` makes a bed once); a count, a length and "no loop" said in the
-   `want` do the same. An unknown field is an error that lists the fields. A spec of five entries without a set:
-   ```
-   $ earshot make --spec landing.json -o sounds
-   5 sounds in sounds (wav), manifest.json
-   open.wav: open/drawer (0.68 s, -14 LUFS, clean) [opening]
-   toast.wav: notify/knock (0.40 s, -18 LUFS, clean) [toast notification]
-   error.wav: error/knock (0.58 s, -18 LUFS, clean) [error]
-     not understood: address
-   card.wav: thump/soft (0.09 s, -24 LUFS, clean) [thump, card, settles]
-     not understood: pricing
-   paid.wav: success/shutter (0.36 s, -15 LUFS, clean) [payment success]
-   ```
-   (the `want`s were "a modal opening", "a toast notification", "an error sound for a wrong email address", "a soft
-   low thump when the pricing card settles", "a payment success sound").
-3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20) or
-   `earshot sounds --family step` lists designs with their length and what they are; then make the one you chose
-   with `earshot make "WORDS" --sound ID` (`sounds` itself takes no `--sound`). Never list the whole catalogue
-   (hundreds of lines).
+### When a sound, and when none
 
-**The ready-made sets.** `ui` (17), every role a normal sound, no instrument: tap a mechanical key
-(keyboard/mechanical), hover a fingertip barely touching wood (hover/fingertip), toggle_on and toggle_off that key
-going down and coming up (toggle/key_down bigger and darker, toggle/key_up smaller and brighter), type the same key
-pressed softly (type/mechanical), next and back a page flicked forward and turned back darker (next/page,
-back/turn), open and close a wooden drawer pulled out and pushed shut (open/drawer, close/drawer), send a stick
-swung through the air (send/swoosh), receive a cork pulled from a bottle (receive/cork), notify two light knocks
-(notify/knock), success a camera shutter (success/shutter), complete a bigger, slower shutter (complete/shutter),
-warning two firm knocks on a door (warning/knock), error two heavier knocks that fall (error/knock), delete one cut
-of a pair of scissors (delete/snip). A request for
-one of these jobs in words gets the same design. With a theme named, `ui` plays the tonal figures in that theme's
-voice instead.
-`game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
-learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`; the others are
-`step/floorboard`, `person/fall`, `punch/body`, `explosion/near`, `splash/plunge`), `arcade` (16 chip
-sounds), `film` (motion-design starter; whooshes, hits and risers layered from learned film recordings).
-A game's rewards and results are figures on an instrument without being asked: "a coin pickup" is glockenspiel
-notes of 0.7 s (`coin/bright`), "a level complete fanfare" 2.9 s on a marimba (`win/fanfare`). One enemy defeated
-is a blow (`hit/crit`, 0.6 s), a boss defeated the fanfare.
+Most moments get none. A sound belongs where something happened that a person should notice without looking.
+What follows is common practice; only the motion-video numbers are measured.
 
-**How to ask.** Name the thing, the sound or the job first, then feelings, material, numbers, key:
-`"a footstep on gravel"`, `"a wooden drawer closing"`, `"a camera shutter"`, `"a soft success chime for a finance
-app"`, `"coin pickup, 8-bit"`, `"waves on a beach, 30 seconds"`, `"a wooden notification, 400 ms, in D minor"`.
-The moment may follow the sound: "a soft thump when the first headline lands" (thump/soft), "a tiny tick when new
-content drops into the feed after refreshing" (tick/soft); keep the sound or the job as the first thing named and
-the moment after "when", "as" or "each time", or the words of the moment are taken for the sound.
-A learned sound answers only when its thing is named: "a heavy impact" gets an invented boom, "a dumbbell dropped"
-the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". Interface and motion
-requests get normal sounds; notes on an instrument answer only when the words ask for music (an instrument, a
-chime, a jingle, a melody, a motif) or for chip sound. An instrument named as the player sets the voice of a
-figure: "a notification on a harp", "a success sound with pizzicato strings", "an error sound on a soft piano" (or
-`voice`: marimba, harp, pizzicato, felt_piano, kalimba, glockenspiel ...); a theme sets one voice for many calls. A
-material picks the voice of a tonal sound (wooden: marimba); a bell or glass timbre only when you ask for one.
+- A page or an app: a sound for what the user did on purpose and for what came of it (a switch thrown, a form sent,
+  a payment gone through, an error, a message arriving). None for what happens by itself or all the time: the page
+  loading, scrolling, an animation, the pointer crossing links. A landing page needs three to six of the `ui` roles,
+  not all 17; `hover` is for tools in which hovering is a choice.
+- A game: every action the player repeats gets a short sound in several takes (steps, jumps, hits, coins); a reward
+  and the end of a level get the longer figures on an instrument; a menu gets one small sound for moving and one for
+  choosing.
+- A motion video (a launch film, a product demo): two to five effects in a film that music leads (below).
+- A scene of real footage: one bed for the place, then the real sound of each thing the picture shows being done,
+  asked for as that thing. A thing the catalogue has no recording of is better recorded, built as a recipe or left
+  silent than replaced by a stand-in.
+
+### How to ask
+
+**One sound**: `earshot make "WORDS" -o sounds/success.ogg` (MCP `make`: `want`, `out`; optional `sound`, `n`,
+`theme`, `pitch`, `dur`, `voice`, `material`, `loop`, `events`, `seed`, `recipe`; MCP paths absolute). One call per
+sound.
+
+```
+$ earshot make "a soft success sound for a finance app" -o success.ogg
+success.ogg: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [success]
+also: complete/shutter, success/click, complete/chop
+not followed: "soft"; this sound has no control of its hardness and plays as designed
+```
+
+- Name the thing, the sound or the job first, then feelings, material, numbers: "a footstep on gravel", "a wooden
+  drawer closing", "a camera shutter", "coin pickup, 8-bit", "waves on a beach, 30 seconds".
+- The moment comes after the sound, behind "when", "as" or "each time": "a soft low thump when the pricing card
+  settles" (thump/soft). Put first, the words of the moment are taken for the sound. Words for the product or the
+  place ("in my running app, a success sound") choose nothing.
+- What follows "on" or "in" is the surface or the place: "rain on wood" is `rain/wood`. A surface the sound has no
+  design on gets the nearest and says so ("rain on a tarp": `no rain on a tarp: rain/tent is the nearest surface`).
+- A learned sound answers only when its thing is named: "a heavy impact" gets a designed film hit, "a dumbbell
+  dropped" the recording.
+- Feelings steer: "softer", "darker", "bigger", "longer", "drier", "not harsh". To steer, ask again with adjectives
+  rather than browsing.
+- Interface and motion requests get normal sounds. Notes on an instrument answer only when the words ask for music
+  (an instrument, a chime, a jingle, a melody) or a theme is named; an instrument named as the player sets the voice
+  ("a notification on a harp", `voice`: marimba, harp, pizzicato, felt_piano, kalimba ...). Chip sound only with
+  "8-bit", "retro" or "chiptune". A bell or glass timbre only when you ask for one.
+- English; German is read through a table of common sound words ("Regen auf Holz" is rain on wood). Other languages
+  get "write it in English".
+
 **One event or the action.** A thing a person does several times in a row (footsteps, knocking, typing, coins,
 keys, clinking glasses) is played as the action when the words ask for it: "footsteps on gravel", "knocking",
-"three knocks", "typing on a keyboard", "5 seconds of typing". "a footstep on gravel" or "a single knock on a door"
-is one event. `--events N` (MCP `events`) overrides: 1 = one event, 2 or more = the action with N events. A
-counted action in a row is one file whatever the design ("four knocks on the table", "three claps", "a countdown
-3 2 1"); a count of separate things is that many files ("five coin pickups", "3 variations"). A length with an
-action ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's length, the events spread over it; a
-countdown stays one a second. "clapping", "clicking", "beeping" (the action form of a row word as the sound) are a
-row at the pattern's pace, over the length asked or about 2 to 3 s; scattered and shaken actions ("ice cubes in a
-glass, 3 seconds", "keys jingling, 1 second") keep the length too. The answer's `played: ...` line says what was
-played. Chip sound only with "8-bit" /
-"retro" / "chiptune". Naming the thing or the job does far better than a mood or a paraphrase; on held-out requests
-written that loosely the first pick was right 69.1 % of the time (76.4 % in the top three). To steer, re-ask with
-adjectives, not by browsing.
+"three knocks", "5 seconds of typing". "a footstep on gravel" or "a single knock on a door" is one event. `--events N`
+(MCP `events`) overrides: 1 is one event, 2 or more the action with N events. A counted action is one file ("four
+knocks on the table", "three claps", "a countdown 3 2 1"); a count of separate things is that many files ("five coin
+pickups", "3 variations"). A length with an action ("three knocks, 2 seconds") is the file's length, the events
+spread over it; "200 ms apart" sets the gap. The `played:` line says what was played.
 
-**Seeds are variations.** For a learned design, seeds 0, 1, 2 ... play its different recordings first, the best one
-at seed 0 (three seeds
-of `step/pebbles` are three real footsteps), then new takes of them. Ask for 6-12 takes of anything a game repeats
-(`--n 8`, or "eight variations"), and make them in a set (`"n": 8` in a spec) so they share one level: single takes
-of different recordings differ in length and level. `--json` gives the number of the recording each take played
-(`member`).
+**Takes.** For a learned design, seeds 0, 1, 2 play its different recordings, the fullest clean one first, then new
+takes of them. Ask for 6 to 12 takes of anything a game repeats (`--n 8` or "eight variations"), and make them in a
+set (`"n": 8` in a spec) so they share one level.
 
-**Read the answer** (no extra call; ask for `--json` / `full=true` only if you need measurements):
-- `x.ogg: design/id (0.88 s, G5, marimba, -14 LUFS, clean) [words]`: report this line. `audit: ...` instead of
-  `clean` means not usable: make it again with another `seed`.
+**Several sounds that belong together** (an interface, a game, a film's kit): ONE call, never a loop of `make`.
+
+- A ready-made set: `earshot make --set ui|game|arcade|film -o FOLDER --format webm,mp3 --sprite sprite` (MCP
+  `make_set` with `set`, `theme`, `format`, `sprite`). `ui` (17): every role a thing a hand does, no instrument:
+  tap a mechanical key (keyboard/mechanical), hover a fingertip on wood (hover/fingertip), toggle_on and toggle_off
+  that key going down and coming up (toggle/key_down, toggle/key_up), type (type/mechanical), next and back a page
+  (next/page, back/turn), open and close a wooden drawer (open/drawer, close/drawer), send a stick swung through the
+  air (send/swoosh), receive a cork (receive/cork), notify two light knocks (notify/knock), success a camera shutter
+  (success/shutter), complete a bigger shutter (complete/shutter), warning two firm knocks (warning/knock), error two
+  heavier knocks that fall (error/knock), delete a cut of scissors (delete/snip). A plain request for one of these
+  jobs gets the same design. With a theme named (soft, glass, wood, felt, tine, metal, electric, digital, retro),
+  `ui` plays tonal figures in that theme's voice instead. `game` (22: menus, rewards, jingles, actions; its jump,
+  land, hit, explosion and door are invented, so name learned ones in a spec where a real sound matters, such as
+  `{"name": "door", "sound": "door/shut"}`), `arcade` (16 chip sounds), `film` (17 motion-design sounds).
+- A spec: your own list, on top of a set or alone. `{"sounds": [{"name": "tap", "want": "a soft tap"}, ...]}` in a
+  JSON file, then `earshot make --spec FILE -o FOLDER` (MCP `make_set` with `sounds`). Fields of an entry: name, want,
+  sound, recipe, pitch, dur, voice, material, seed, n, axes, lufs, events, loop; an unknown field is an error that
+  lists them. With `"set": "ui"` your entries add to the set (an entry with a set's name replaces it); without `set`
+  only your list is made, which is the call for the handful of sounds a landing page or a scene needs. Every one-shot
+  is as loud as it is made alone, within 2.5 dB of the others; loops and beds are levelled by kind. A re-run rewrites
+  the files and `manifest.json`; it does not delete files of names you removed.
+
+```
+$ earshot make --spec landing.json -o sounds
+5 sounds in sounds (wav), manifest.json
+open.wav: open/drawer (0.68 s, peak at 0.39 s, -14 LUFS, clean) [opening]
+toast.wav: notify/knock (0.40 s, peak at 0.01 s, -18 LUFS, clean) [toast notification]
+error.wav: error/knock (0.58 s, peak at 0.19 s, -18 LUFS, clean) [error]
+  not understood: address
+card.wav: thump/soft (0.09 s, peak at 0.03 s, -24 LUFS, clean) [thump, card, settles]
+  not understood: pricing
+paid.wav: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [payment success]
+```
+
+(the `want`s: "a modal opening", "a toast notification", "an error sound for a wrong email address", "a soft low
+thump when the pricing card settles", "a payment success sound").
+
+**The catalogue**, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20) or
+`earshot sounds --family step`, then `earshot make "WORDS" --sound ID`. Never list the whole catalogue.
+
+### Reading the answer
+
+The answer is the whole result; ask for `--json` (MCP `full=true`) only for measurements.
+
+- `x.ogg: design/id (0.88 s, peak at 0.05 s, G5, marimba, -14 LUFS, clean) [words]`: the design, its length, its
+  loudest moment, the note and voice of a tonal sound, the loudness, and `clean` or what the audit found. Report this
+  line. Anything other than `clean` means not usable: make it again with another `seed`.
 - `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
-- `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified; choose an alternative
-  by its words and call again with `--sound ID`, or re-ask naming the sound or the job.
-- `also (the pick is a guess: earshot makes no THING; ID is only the nearest sound it has): ...`: earshot does not
-  know the thing or what it does, and the file is a stand-in. Pick one of the alternatives by its id (`--sound
-  ID`), or ask again describing the sound by what it is made of instead of by its name, or tell the user that
-  this thing is missing. "a curtain being pulled" answered `cloth/rustle` with `earshot makes no curtain being
-  pulled; cloth/rustle is only the nearest sound it has`: keep `cloth/rustle` or take another id from that line,
-  ask for "a long rustle of heavy fabric" instead, or say that earshot has no curtain.
-- `same design as NAME: ... (the nearest: ID)` (sets): two names got one sound; give the second `"sound": ID` in
-  your spec. `another recording of ID than NAME: ...` is not a problem: the two play different recordings of one
-  learned design.
-- `not in this sound: WORDS`: part of the request is not in this file (one call, one sound). Read the words: a
-  second thing or job wants its own call; a verb or an adjective of the same thing is no missing sound ("a
-  checkbox being ticked" answered `toggle/key_down (0.24 s, -19 LUFS, clean) [checkbox]` with nothing else to
-  say: the key going down is the whole answer).
+- `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified. Choose an alternative by
+  its words (`--sound ID`), or ask again naming the sound or the job.
+- `earshot makes no THING; ID is only the nearest sound it has`: the catalogue lacks the thing, and the file is a
+  stand-in. Take one of the three starting points by id, describe the sound by what it is made of, build it as a
+  recipe (below), or tell the user it is missing. Never pass a stand-in off as the thing. There is no error for an
+  unknown thing: every request gets a file, and this line is the only sign.
+- `built from parts by the cookbook recipe NAME`: a recipe answered; `earshot recipe NAME` prints it to change.
+  `a start from parts: earshot make --recipe NAME`: the catalogue answered, and a cookbook sketch is a start.
+- `not in this sound: WORDS`: part of the request is not in this file. A second thing wants its own call; a verb or
+  an adjective of the same thing is no missing sound.
 - `not followed: ...` or `0.43 s, not the 2 s asked: ...`: the design has no such control or could not keep that
-  length, and the line says what it does instead; fine unless it mattered, then pick another design.
-- `a cut of 4 s, not a loop: ...` / `a seamless loop of 8.00 s, ...` / `8.57 s: a music loop is whole bars ...`:
-  the length asked for an ambience or a loop, and what was made of it; ask "a seamless loop of ..." when the
-  sound must repeat without a seam.
-- `3 knocks 1.5 s apart: 3.25 s, not the 10 s asked (...)`: a counted action could not fill the length at a pace a
-  person keeps (or a countdown at one a second); the file is as long as the line says.
+  length, and the line says what it did instead. "from left to right" is never followed: earshot does not pan.
+- `a cut of 4 s, not a loop: ...`, `a seamless loop of 8.00 s, ...`, `8.57 s: a music loop is whole bars ...`: what
+  was made of a length asked for a bed or a loop; ask "a seamless loop of ..." when it must repeat without a seam.
 - `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
-- `no THING on SURFACE: ID is the nearest surface; also: ...`: the sound exists, but not on that surface, ground or
-  place ("rain on a tarp" answered `no rain on a tarp: rain/tent is the nearest surface`); the alternatives are
-  its other surfaces.
-- There is no error for an unknown thing: every request gets a file, and the guess line is the only sign that it
-  is a stand-in. Never pass a stand-in off as the thing.
-- `recording 2 of 3` (in `--json` `member`, a performance and the manifest): which of a learned design's recordings
-  played; the recording's own title is only in the store's `CREDITS.md`.
-- `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
+- `same design as NAME: ...` (sets): two names got one sound; give the second `"sound": ID`. `another recording of
+  ID than NAME` is not a problem.
+- `... a loop in mp3 has a gap at its seam ...`: write that loop as ogg, webm, wav or flac.
 
-**How long, how loud, and where a file starts.** A timeline or a mix needs these three; the answer's line carries
-the first two.
-- Length (seed 0, read off real answers): an interface sound is 0.2 to 0.6 s (toggle 0.22, success 0.31, hover
-  0.34, notify 0.40, error 0.49, delete 0.61); in a motion video a tick is 0.04 s, a thump 0.06 to 0.09 s, a logo
-  hit 0.29 s, a whoosh 0.39 s, a riser 2.5 s; a game's figures run from 0.7 s (a coin) to 2.9 s (the win fanfare;
-  game over 2.1 s, a power-up 2.8 s); real things take their time: a door falling shut 2.5 s, a phone vibrating
-  1.6 s, keys jingling 2.4 s, distant thunder 7.7 s, six footsteps 3.5 s; a bed is 20 s unless a length is asked.
-  Seconds in the words, or `--dur`, set the length of a whoosh, a riser, a figure, a bed and an action
-  ("footsteps on concrete, 4 seconds" answered `step/concrete (4.00 s ...)`, `played: 7 events as a walk`); a
-  single struck sound rings as it rings and says so.
-- Level: a single `make` makes each file as loud as its kind allows (true peak -1 dBFS, at most -14 LUFS, a bed
-  -22), so single files are not a mix. `--lufs L` (`"lufs"` in a spec entry) sets one file's loudness:
-  `earshot make "a logo hit" -o logo.wav --lufs -24` answered `logo.wav: boom/short (0.29 s, -24 LUFS, clean)
-  [logo, hit]`, the plain call -17 LUFS. Sounds made as ONE spec are levelled against each other by kind, a first
-  balance to mix from. A scene's spec of five entries answered `rain.wav: rain/street (7.93 s, -30 LUFS, clean)`,
-  `door.wav: door/shut (2.54 s, -20 LUFS, clean)`, `thunder.wav: thunder/distant (7.70 s, -21 LUFS, clean)`,
-  `keys.wav: keys/bunch (2.38 s, -14 LUFS, clean)`, `phone.wav: phone/vibrate (1.64 s, -15 LUFS, clean)`: the bed
-  sits 9 to 16 LU under the things done in it. Against a music bed the motion section below has measured numbers.
-- Start: every file starts when its sound does (within 2 ms) and ends faded, but its loudest moment is not always
-  its start. Measured on files made for this text: `thump/soft` (0.09 s) is loudest 0.02 s in; `boom/short`
-  (0.29 s) 0.15 s in, after its short swell of air, so its file starts about 80 ms before the frame the hit lands
-  on; `whoosh/soft` (0.39 s) at 0.24 s, three fifths through; `rise/air` asked with `--dur 1.2` is loudest at 1.16
-  of its 1.17 s, so a riser starts its own length before the reveal. `--json` gives a take's length, peak level
-  and loudness, not the time of its loudest moment. earshot does not put files on a timeline: the editor, ffmpeg
-  or the page's code does, and `earshot timeline mix.wav --video film.mp4 --cues cues.json` (Loop 2) then shows
-  whether each cue has its sound.
+### Length, level and where the hit is
 
-**Formats.** The extension picks it (wav, flac, ogg, webm, mp3, m4a; all but wav and flac need ffmpeg). Web:
-`earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite`, then load `sprite.json` (howler.js
-format, `src` lists webm first); Ogg Vorbis does not play in Safari before 18.4.
-**Loops**: ambience and the music loops loop seamlessly by default (`--dur` sets the length; a learned bed has no
-loop point at all); say "no loop" (or `--no-loop`) for a film's bed. Never ship a loop as mp3 or m4a: a set with
-`webm,mp3` writes loops as flac instead (`a loop: flac instead of mp3` is expected, not an error). A learned bed
-renders in about 1-2 s per second of sound: a 30 s bed takes up to a minute.
-**`--listen`** (`listen=true`): also ranks by how designs sound and adds `heard as: ... (z)`; it loads a model
-(20-40 s). Use it only when a describe-the-sound request came back as a guess.
+- **Length.** An interface sound is 0.2 to 0.7 s; a motion tick 0.04 s, a thump 0.06 to 0.09 s, a logo hit about
+  0.3 s, a whoosh about 0.4 s, a riser 2.5 s; a game's figures 0.7 s (a coin) to 2.9 s (the win fanfare); real things
+  take their time (a door falling shut 2.5 s, distant thunder 7.7 s); a bed is 20 s unless a length is asked.
+  Seconds in the words, or `--dur`, set the length of a whoosh, a riser, a figure, a bed and an action; a single
+  struck sound rings as it rings and says so.
+- **Level.** A single file is as loud as its kind allows (true peak -1 dBFS, at most -14 LUFS, a bed -22), so single
+  files are not a mix. `--lufs L` (`"lufs"` in a spec entry) sets one file's loudness. Sounds made as ONE spec are
+  levelled against each other, a first balance to mix from: in a scene's spec the bed came out 9 to 16 LU under the
+  things done in it.
+- **Where the hit is.** Every file starts when its sound does (within 2 ms), but its loudest moment is often later:
+  the line says `peak at`, and `--json` gives `peak_s`, `onset_s` and, for a row, `events_s` (each event's start), in
+  seconds from the start of the file. To put the hit on the frame at t, start the file at t minus `peak_s`: "a
+  whoosh for a transition" answered `whoosh/soft (0.39 s, peak at 0.24 s, ...)`, so for its peak on 12.000 s start it
+  at 11.76 s. A riser ends on its peak, so it starts its own length before the reveal. earshot does not place files
+  on a timeline: the editor, ffmpeg or the page's code does.
+- **A row in one file**: `earshot make "a soft ui tick" -o count.wav --events 8 --dur 1.5` answered `tick/soft (1.50
+  s, peak at 0.17 s, -15 LUFS, clean)` and `played: 8 events as a row at 6.2 a second`: a number counting up.
 
-**What not to expect.** No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for
-sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded: the answer is the
-nearest design with a guess line that says so ("earshot makes no X; ID is only the nearest sound it has"). A
-request in German is read through a table of common sound words ("Regen auf Holz" as "rain on wood"); any other
-language, or a word the table lacks, gets "write it in English".
-The film and motion sounds (whooshes, hits, thumps, ticks,
-risers, the braam) are built from learned recordings; the owner rated the fast whoosh 4 of 5 and the deep whoosh
-and the braam 3 to 3.5; the hits, thumps, risers, the tape stop and the suck-in impact were rebuilt after his
-ratings and are not rated yet; so are the interface sounds without instruments, the relearned ambiences and the
-animals, people, street and house sounds (measured, no listener yet). The drums invented from physics and the
-invented realistic sounds were rated low by
-the owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
-models did not predict his ratings. Say plainly that a learned sound is a new take of a public-domain recording,
-not a sound invented from nothing.
+### Scoring a motion video
 
-**Scoring a motion video** (a launch film, product demo, explainer or social clip). Measured on 39 reference motion
-design videos (2026-11-18, `docs/motion-sfx-study.md`); [measured] is a number from them, [convention] is common
-practice they did not test.
-- Music carries the film. 34 of the 35 videos with sound are music-led, about 11 have a voice-over, one is scored with
-  effects alone [measured]. In 21 of the 35 no effect stands out of the music at all; where effects do stand out,
-  a music-led video has 1 to 4 of them, 0.2 to 1.3 per 10 seconds [measured]. Do not put a sound on every cut:
-  pick the two to five moments that matter (a reveal, the logo, a key UI action, a title change).
-- What gets a sound, and what to ask for (each phrase checked with the reader today):
-  - a stop: the most used move [measured: 47 in 16 videos]. Cut the music and everything for 0.15 to 0.5 s just
-    before a reveal or a title, then come back on a hit. It is an edit of the bed, not a file.
-  - the hit after the stop: ask "an impact after silence" or "a drop in the video" (hit/drop, about 0.25 s: a
-    heavy body with a puff of air).
-  - something appears or a card flips: a short low thump, about 50 ms, 130 to 320 Hz, dry [measured].
-    Ask "a pop when an element appears", "a card flip" or "an element pops in on screen" (thump/appear, 0.06 s);
-    "a soft thump" (thump/soft, 0.09 s) for something landing or settling ("a soft low thump when the pricing card
-    settles" answered thump/soft). In a run, one per element, about 200 ms apart: make the thump once (`--n 3`
-    gives three takes of it) and place it once per element, so the gaps are the picture's.
-  - a UI click, a cursor press, a word highlighted: a bright dry tick, 7 to 10 kHz, nothing under 1 kHz, mono, a
-    few tens of ms [measured]. Ask "a cursor click" or "a soft ui tick" (tick/soft, 0.04 s); "a mouse click"
-    (click/mouse) is the whole mouse button, 0.2 s.
-  - a number counting up [not in the measurements]: a row of the same tick as one file, asked with a count and a
-    length. `earshot make "a soft ui tick" -o count.wav --events 8 --dur 1.5` answered `count.wav: tick/soft
-    (1.50 s, -15 LUFS, clean) [ui tick]` and `played: 8 events as a row at 6.2 a second`. Ticks, clicks and blips
-    follow as close as their own length lets them: `--events 12` on "a counter ticking up, 1.5 seconds" answered
-    `tick/metal (1.50 s, ...)`; knocks and steps a hand or foot plays keep 0.12 s at the closest.
-  - where the hit is: every take says `peak_s` (the loudest moment; also on the plain line as "peak at"),
-    `onset_s` (where it starts to be heard) and for a row `events_s` (each event's start), in seconds from the start
-    of the file. The hit goes on the frame at t: start the file at t minus peak_s. "a whoosh for a transition"
-    answered `whoosh/soft (0.39 s, peak at 0.24 s, ...)`: for its peak on 12.000 s, start it at 11.76 s.
-  - a title card changes, a big transition: a mid-low hit of about 0.3 s that swells in over about 0.1 s, half of
-    it under 100 Hz [measured]. Ask "a title hit" or "a title slam" (slam/title: a low body in a short burst of
-    air, about a third of a second, then its air dies away).
-  - the logo end card: the logo lands on a short low hit, 0.2 to 0.3 s, body around 200 to 300 Hz, fast end
-    [measured: 9 of 11 end cards looked at; in some it may be the track's own last hit]. Ask "a logo hit", "a
-    logo reveal hit" or "a short boom" (boom/short, about 0.3 s) on the logo frame and let the music ring out under
-    it; "a logo reveal" (sting/reveal, 0.8 s) swells into the same hit; "a deep boom" (boom/deep) is darker.
-  - a move across the screen: a noise whoosh, mono, as long as the move (0.3 to 1 s), falling off fast after its
-    peak [measured, mostly one video]. Ask "a whoosh for a transition" (whoosh/soft, 0.4 s; it holds a length
-    asked: "a short whoosh, 0.3 seconds") or "a fast whoosh" (whoosh/fast, rated 4 of 5 by the owner); "a deep
-    whoosh" for a big slow move. A small fast move: "a quick swish" or "a soft swish" (flick/thin, 0.2 s).
-  - a text or image breaking apart: "a glitch transition" (glitch/short, 0.3 s) [measured: 3 in 3 videos].
-  - a reveal after a build: "a reverse swell into a cut" (rise/reverse, about 1.4 s, ends at its peak); put its
-    end on the reveal frame [measured: once]. "a riser before the drop" (rise/air, 2.5 s) is air growing to a cut.
-  - a sparkle on a product: "sparkle on the product reveal" (shine/air: bright air, no note).
-  - typing on screen: "typing on a keyboard, 2 seconds" for a real keyboard; the designed typing in the
-    references is brighter (keys around 9 kHz) than this recording [measured].
-- What does not get a sound: small motion that rides the music (text easing in word by word, icons drifting,
-  backgrounds), and most cuts in a music-led film. The editors cut the picture on the music's accents and let the
-  music carry the cut [measured: 8 of 9 hard cuts in random windows have an onset within 150 ms, 6 of them on
-  the beat grid]. So cut on the music's beats first; add an effect only where the music has no accent.
-- Never as an effect in a motion video: marimba, bells, chimes, glockenspiel, piano or synth notes, unless the video
-  is about music or is a game [measured: no instrument note used as an effect in 35 videos; the owner's rule].
-  Not used in any of the 39 either: braams, explosions, fire whooshes, tape stops, impacts with a reverse suck-in,
-  long risers [measured]. Use them only when the picture shows that thing.
-- Where the sound sits against the frame [measured, few cases]: a hit starts about 80 ms before the picture
-  changes and peaks about 60 ms after it; the hit after a stop lands about 50 ms after the change; a whoosh peaks
-  on the fastest frame of the move [convention]. Where the loudest moment of a made file lies is measured above
-  ("How long, how loud, and where a file starts"): `boom/short` 0.15 s in, `whoosh/soft` three fifths through.
-- Levels against the music bed [measured]: hits about 18 dB over the music's median level at that moment, a swish
-  about 20 dB, the hit after a stop and word ticks about 8 dB, a logo hit as loud as the music was (the music has
-  thinned or stopped). Clicks, whooshes and hits near mono; thumps slightly wide; everything dry, no reverb tail.
-  A made file's loudness is in its answer's line; set it with `--lufs`, or with a gain in the mix, after measuring
-  the music at the cue (`earshot measure`, or `kit.bed_level` in Loop 5).
-- Endings [measured]: 26 of 35 end at body level (the last 3 s within 3 LU of the whole), 7 fade out. End with the
-  logo hit and the music's last note, no long silence.
+Measured on 39 reference motion-design videos (`docs/motion-sfx-study.md`); [measured] is a number from them,
+[convention] common practice they did not test.
 
-**Scoring a scene or a clip of real footage** (a film scene, a cooking short). Nothing here is measured; the
-requests are quoted as they were answered on 2026-11-18. Ask for each thing the picture shows as that thing, with
-its place or surface, and make them as one spec for a first balance (above): "steady rain on a terrace, 8
-seconds, no loop" (rain/street), "the heavy wooden front door falls shut" (door/shut, 2.5 s), "keys jingling"
-(keys/bunch), "a phone vibrating on a table" (phone/vibrate), "distant thunder" (thunder/distant, 7.7 s),
-"footsteps on concrete, 4 seconds" (step/concrete, 7 steps), "pouring water into a glass" (drink/pour, 4.9 s). A
-bed loops unless the words say "no loop". The catalogue has no recording of many kitchen and street things. Then
-either the answer says it is a guess ("a kettle whistling": `earshot makes no kettle; whistle/referee is only the
-nearest sound it has`), or an app's sound answers for the real thing without a doubt: "a kitchen timer
-ringing" answered `timer/done (1.68 s, A5, marimba ...)`, three notes on a marimba, an app's timer and not a
-kitchen's bell. Read what the picked design is before it goes under a picture (`earshot sounds --search "kitchen
-timer"` prints each design's words), and leave a moment silent or record it rather than use a stand-in.
+- Music carries the film. 34 of the 35 videos with sound are music-led [measured]; where effects stand out of the
+  music at all, a video has 1 to 4 of them. Pick the two to five moments that matter (a reveal, the logo, a key UI
+  action, a title change); most cuts get no sound, because editors cut the picture on the music's accents.
+- What to ask for:
+  - a stop before a reveal [measured: the most used move]: cut the music for 0.15 to 0.5 s, then come back on a hit.
+    It is an edit of the bed; the hit is "an impact after silence" (hit/drop).
+  - something appears or a card flips: a short low thump, about 50 ms [measured]: "a pop when an element appears"
+    (thump/appear); "a soft thump" (thump/soft) for something landing. In a run, make it once and place it once per
+    element.
+  - a UI click or a word highlighted: a bright dry tick [measured]: "a cursor click" (tick/soft). "a mouse click"
+    (click/mouse) is the whole mouse button.
+  - a title change: "a title hit" (slam/title, about a third of a second).
+  - the logo end card: "a logo hit" (boom/short, about 0.3 s) on the logo frame; "a logo reveal" (sting/reveal)
+    swells into the same hit; "a deep boom" (boom/deep) is darker.
+  - a move across the screen: "a whoosh for a transition" (whoosh/soft; it holds a length asked, "a short whoosh,
+    0.3 seconds") or "a fast whoosh" (whoosh/fast); "a quick swish" (flick/thin) for a small fast move.
+  - text breaking apart: "a glitch transition" (glitch/short). A reveal after a build: "a reverse swell into a cut"
+    (rise/reverse, ends at its peak) or "a riser before the drop" (rise/air). A sparkle: "sparkle on the product
+    reveal" (shine/air, bright air with no note).
+- Never as an effect in a motion video: marimba, bells, chimes, piano or synth notes, unless the video is about music
+  or is a game [measured: none in 35 videos]. Braams, explosions, tape stops and long risers were not used in any
+  of them either: use them only when the picture shows that thing.
+- Where it sits [measured, few cases]: a hit starts about 80 ms before the picture changes and peaks about 60 ms
+  after it; a whoosh peaks on the fastest frame [convention]. Levels against the music [measured]: hits about 18 dB
+  over the music's median level at that moment, the hit after a stop and word ticks about 8 dB; near mono, dry.
+  Measure the music at the cue (`earshot measure`, or `kit.bed_level` in Loop 5) and set the gain.
+- Endings [measured]: most end at body level; end with the logo hit and the music's last note, no long silence.
 
-Everything earshot renders is free to use in any product, commercial too, without credit. The learned material
-comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`,
-`earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
+### Scoring a scene of real footage
 
-## When earshot has no such sound: build it
+Ask for each thing the picture shows as that thing, with its place or surface, and make them as one spec for a first
+balance: "steady rain on a terrace, 8 seconds, no loop" (rain/street), "the heavy wooden front door falls shut"
+(door/shut), "keys jingling" (keys/bunch), "a phone vibrating on a table" (phone/vibrate), "distant thunder"
+(thunder/distant), "footsteps on concrete, 4 seconds" (step/concrete, a walk). Read what the picked design is
+before it goes under a picture: "a kitchen timer ringing" answered `timer/done`, an app's timer figure on a
+marimba, with `earshot makes no kitchen timer; timer/done is only the nearest sound it has`. Leave a moment silent, record it, or build it, rather than use a stand-in.
 
-The catalogue cannot hold everything. When the answer says `earshot makes no fax machine; ... is only the nearest
-sound it has`, do not put the stand-in under the picture: build the sound from the catalogue's own parts with a
-recipe. You design it, earshot renders it and checks it like every other sound. No model is loaded and nothing is
-downloaded. A recipe takes longer than a catalogue sound, because every layer and every event is a take of its
-own: a few seconds for a hit, up to half a minute for a long ambience of many layers on one slow core.
+### Building what is missing: recipes
 
-The method, in this order:
+When the answer says `earshot makes no X`, build the sound from the catalogue's own parts with a recipe: you design
+it, earshot renders it and checks it like every other sound. No model is loaded. A recipe takes longer than a
+catalogue sound: a few seconds for a hit, up to half a minute for a long ambience of many layers.
 
-1. Say what physically makes the sound: the source, what it hits or moves through, how big it is and how far away.
-   A dragon's roar is the voice of a very large animal, low and slow, with breath and fire in it, in a big space.
-2. Find two to four real parts in the catalogue: `earshot sounds --search roar`, `--search fire`. The designs
-   learned from recordings are the best material because they are real. `earshot recipe --list` shows what the
-   cookbook built from which parts.
-3. Write the recipe as JSON (`earshot recipe --example` prints the form and three recipes to start from).
-4. Render it: `earshot make --recipe roar.json -o roar.wav`.
-5. Read the result line: the length, where the peak is, the level, and `clean` or what the audit found. With the
-   listening extra installed, add the words and `--listen`: `heard as` says how well the sound matches them.
+1. Say what physically makes the sound: the source, what it hits or moves through, how big it is, how far away.
+2. Find two to four real parts: `earshot sounds --search roar`. Learned designs are the best material because they
+   are real. `earshot recipe --list` shows the cookbook's recipes and their parts.
+3. Write the recipe as JSON; `earshot recipe --example` prints the form and three recipes to start from, and
+   `earshot recipe NAME` prints a cookbook recipe to change.
+4. Check it (`earshot recipe --check roar.json`) and render it: `earshot make --recipe roar.json -o roar.wav`.
+5. Read the result line: the length, the peak, the level, `clean` or what the audit found. With the listening extra,
+   add the words and `--listen`: `heard as` says how well the sound matches them.
 6. Change one thing and render again.
 
-What works: a recording moved down in pitch is also slower and bigger, as on a tape (`"pitch": -12` turns a horse
-into a beast and a door's creak into a ship's timber); `reverse` turns a decay into a swell that ends on its strike;
-`events` repeats a layer as new takes (steps, cracks, clicks), `loose` lets them come as they come and `faster`
-speeds them up or slows them down; `halt` lets a motor run down. Real recordings first. Noise is only for air and
-rumble, and the low sine only for weight under a hit. Never use a tone that sounds like a synthesiser unless the
-thing is one (a lightsaber, a laser), and no bell for a thing that is not a bell. Every layer is brought to the same
-peak before its gain, so `gain` says how loud it sits: the body at 0, what supports it at -4 to -10, air and rumble
-at -12 to -18. Keep the low end under the body, not in front of it.
+```
+{"name": "car_crash_far", "says": "a car crash far away", "space": "hall",
+ "layers": [
+  {"sound": "tyres/screech", "cut": [0, 1.6], "decay": 0.2, "gain": -2},
+  {"sound": "car_door/slam", "pitch": -7, "at": 1.5},
+  {"sound": "metal/drop", "pitch": -5, "at": 1.52, "gain": -3},
+  {"source": "noise", "color": "brown", "dur": 1.5, "at": 1.5, "lowpass": 150, "gain": -16, "decay": 1.2}]}
 
-A recipe:
+$ earshot make --recipe crash.json -o crash.wav
+crash.wav: recipe/car_crash_far (3.02 s, peak at 1.58 s, -14 LUFS, clean) [recipe]
+built from: tyres/screech; car_door/slam (-7 semitones); metal/drop (-5 semitones); brown noise (under 150 Hz)
+```
 
-    {"name": "dragon_roar", "says": "a dragon roaring", "space": "hall",
-     "layers": [
-      {"sound": "lion/roar", "pitch": -5},
-      {"sound": "horse/neigh", "pitch": -12, "at": 0.1, "gain": -9, "lowpass": 3500},
-      {"sound": "fire/whoosh", "pitch": -5, "at": 0.5, "gain": -10},
-      {"source": "noise", "color": "brown", "dur": 3.5, "lowpass": [70, 150], "gain": -18, "swell": 0.6,
-       "decay": 1.5}]}
+A layer is a catalogue design (`"sound"`) or a plain source (`"source": "noise"` with `dur` and `color`, or `"sine"`
+with `dur` and `hz` from 20 to 150). Fields of a layer: `seed`, `dur`, `pitch` (semitones, -24 to 12, as on a tape:
+lower is also slower and bigger), `glide` (where the pitch has moved by the end: a motor winding down), `reverse` (a
+decay becomes a swell), `cut` ([from, to] s), `halt` (the take runs down to a stop), `lowpass` / `highpass` (Hz, or
+[from, to] to move the cutoff), `pan`, `gain` (dB), `at` (start, s), `fade_in`, `fade_out`, `swell`, `decay`, the
+design's own axes, `events` (`count`, `gap`, `faster`, `softer`, `loose`: the layer repeated as new takes) and
+`follow` (`layer`, `amount`, `smooth`: its loudness follows another layer's, or gives way to it with an amount under
+0). The whole takes `name`, `says`, `layers` (1 to 8), `dur`, `space` (dry, booth, room, studio, hall, plate,
+cathedral) and `kind` (`event`, or `ambience` for a bed). A mistake is answered in one sentence that names the field.
+The same recipe goes into Python (`make(recipe={...}, out=...)`), the MCP `make` tool (`recipe`) and a spec entry
+(`{"name": "roar", "recipe": {...}}`). Every field: `docs/MAKE.md`.
 
-A layer names a design (`"sound"`) or a plain source (`"source": "noise"` with `dur` and `color`, or `"sine"` with
-`dur` and `hz` from 20 to 150). On a layer: `seed` (another take), `dur` (the length asked of the design itself),
-`pitch` (semitones, -24 to 12), `glide` (the pitch in semitones at the end of the take: the pitch moves there from
-`pitch` over the take, as a tape that slows down, so `"glide": -14` on a running motor winds it down), `reverse`,
-`cut` ([from, to] in seconds), `halt`, `lowpass` and `highpass` (Hz, or
-[from, to] to move the cutoff), `pan`, `gain` (dB), `at` (its start in seconds), `fade_in`, `fade_out`, `swell`,
-`decay`, the design's own axes (`size`, `bright`, `hard`, `energy`, `ring`, `motion`, `width`, -1 to 1, where it has
-them), `events` (`count`, `gap`, `faster`, `softer`, `loose`) and `follow` (`layer`, `amount`, `smooth`: the layer's
-loudness follows another layer's, named by its index from 0; `amount` 1 makes it exactly as loud as the other layer is
-against its own loudest moment, and an amount under 0 makes it give way where the other is loud, as a bed ducks under a
-hit). Twigs that snap with the gusts of the wind:
-`{"sound": "twigs/snap", "gain": -14, "events": {"count": 24, "gap": 0.33, "loose": 0.9},
-"follow": {"layer": 0, "amount": 0.9, "smooth": 0.4}}` under a first layer `{"sound": "wind/trees", "dur": 8.5}`.
-One sound as the body of another ("rain on a tin can": the hits of one thing ringing through another) is not in the
-form: built from a struck design's partials it did not come nearer the real recordings than the plain sound, so where
-the catalogue has the real surface (`rain/wood`, `rain/tin_roof`, `step/floorboard`), use it. The whole takes `name`,
-`says`, `layers` (1 to 8),
-`dur`, `space` (dry, booth, room, studio, hall, plate, cathedral) and `kind` (`event`, or `ambience` for a bed). A
-mistake is answered in one sentence that names the field and what it takes
-(`layers[1].pitch is a number of semitones from -24 to 12, not 40`). The same recipe goes into Python
-(`make(recipe={...}, out=...)`), into the MCP `make` tool (`recipe`), and into a set as `{"name": "roar",
-"recipe": {...}}`.
+What works: real recordings first; a recording moved down is bigger (`"pitch": -12` turns a horse into a beast);
+`events` with `loose` for things that come as they come (twigs, cracks, steps); `halt` or `glide` for motors.
+Noise only for air and rumble, the low sine only for weight under a hit; no tone that sounds like a synthesiser
+unless the thing is one, and no bell for a thing that is not a bell. Every layer is brought to the same peak before
+its gain: the body at 0, what supports it at -4 to -10, air and rumble at -12 to -18. One sound ringing through the
+body of another ("rain on a tin can") is not in the form: where the catalogue has the real surface (`rain/wood`,
+`rain/tin_roof`, `step/floorboard`), use that design.
 
-Ten worked recipes from the cookbook, each with the thought behind it, its layers and the line earshot printed
-for it (`earshot recipe <name>` prints the whole recipe):
+The cookbook (`earshot recipe --list`) holds 74 recipes. 32 answer a request that names their thing (a car crash, a
+cannon, a welding torch, a woodpecker, a werewolf howl and more). The other 42 are sketches that earshot's listening
+model does not hear clearly as their thing; the catalogue answers such a request and one line names the sketch as a
+start. When the catalogue has a recording of the thing itself, the recording answers ("a rocket launch" is
+`rocket/launch`). A cookbook sound follows a length, "far away", "up close", "soft" and a count ("three times"),
+and says what it did (`as asked: far away (in a hall, duller and 6 dB softer)`) or did not do.
 
-1. A dragon's roar (`dragon_roar`, a sketch). A huge animal's voice with fire in it. A real lion's roar a fourth down is the
-   body, a horse an octave down inside it, a burst of flame the breath, a little rumble the size, a hall the cave.
-   `lion/roar` pitch -5; `horse/neigh` pitch -12 at 0.1 gain -9 lowpass 3500; `fire/whoosh` pitch -5 at 0.5 gain
-   -10; brown noise 3.5 s lowpass [70, 150] gain -18 swell 0.6 decay 1.5; space hall.
-   `dragon_roar.wav: recipe/dragon_roar (3.69 s, peak at 0.19 s, -14 LUFS, clean) [recipe]`
-2. A car crash (`car_crash`). The skid, one impact of metal and weight, the debris after. Five real recordings,
-   the impact three of them at one moment.
-   `tyres/screech` cut [0, 1.6] decay 0.2 gain -2; at 1.5 `car_door/slam` pitch -7; at 1.52 `metal/drop` pitch -5
-   gain -3; at 1.58 `glass/break` gain -6; at 2.1 `can/drop` pitch -3 gain -12.
-   `car_crash.wav: recipe/car_crash (3.11 s, peak at 1.58 s, -14 LUFS, clean) [recipe]`
-3. A monster's growl (`monster_growl`). A big animal's voice far down with a wet throat in it.
-   `lion/roar` pitch -9 lowpass 3000; `snore/person` pitch -10 cut [0, 2.8] gain -5 decay 0.5; `pig/oink` pitch
-   -15 at 0.35 gain -6; space room.
-   `monster_growl.wav: recipe/monster_growl (3.37 s, peak at 0.24 s, -14 LUFS, clean) [recipe]`
-4. A spaceship door (`spaceship_door`). Air released, a motor that runs and stops, a panel that slides, a stop.
-   `spray_can/spray` cut [0, 0.5] highpass 800 gain -9; `drill/electric` pitch -9 cut [0.5, 1.3] at 0.15 gain -7
-   lowpass 3000 fade_in 0.1 halt 0.7; `door/slide` at 0.15 gain -2; `lock/latch` pitch -5 at 1.25 gain -3; space
-   studio.
-   `spaceship_door.wav: recipe/spaceship_door (1.67 s, peak at 0.46 s, -14 LUFS, clean) [recipe]`
-5. A robot powering down (`robot_power_down`). A switch, motors that lose speed, the body settling. `halt` is the
-   whole idea: a real motor recording read slower and slower.
-   `switch/industrial` gain -3; `drill/electric` pitch -5 cut [0.5, 1.5] at 0.08 halt 1.6 lowpass 5000;
-   `vacuum/cleaner` pitch -7 cut [2, 3] at 0.08 gain -8 halt 1.8; `spray_can/spray` cut [0, 0.4] at 1.7 gain -15
-   decay 0.3; `dumbbell/place` pitch -3 at 2.0 gain -7.
-   `robot_power_down.wav: recipe/robot_power_down (2.91 s, peak at 0.25 s, -14 LUFS, clean) [recipe]`
-6. A sword on a shield (`sword_on_shield`). Four things at one moment: the blade's clang, the wood of the shield,
-   its metal boss, the weight behind the blow; the swing before them.
-   `sword/swing` cut [0, 0.25] gain -9; then all at 0.2: `clash/sword`; `knock/hollow` pitch -7 gain -3;
-   `saucepan/hit` pitch -7 gain -10 lowpass 3000 decay 0.3; `punch/body` gain -6.
-   `sword_on_shield.wav: recipe/sword_on_shield (0.90 s, peak at 0.22 s, -14 LUFS, clean) [recipe]`
-7. A campfire in the wind (`campfire_wind`). An ambience is two real beds and what happens in them: the fire, the
-   wind coming up, a gust, twigs that snap when they snap (`loose`). `kind` ambience levels it as a bed.
-   `fire/camp` dur 8; `wind/trees` dur 8 gain -5 swell 2; pink noise 6 s at 1 lowpass [500, 1400] highpass 150
-   gain -16 swell 2.5 decay 3; `twigs/snap` cut [0, 0.5] decay 0.15 at 0.7 gain -10, events count 5 gap 1.4 loose
-   0.9; kind ambience, dur 8.
-   `campfire_wind.wav: recipe/campfire_wind (7.65 s, peak at 0.54 s, -22 LUFS, clean) [recipe]`
-8. A bowling strike (`bowling_strike`). A ball rolling nearer, one hit, pins that scatter. Noise is the roll
-   (no recording of it is in the catalogue); the pins are wood: dice far lower and hollow knocks, each softer and
-   later than the one before, loosely.
-   brown noise 1.6 s lowpass [180, 420] gain -10 swell 1.2 fade_out 0.05; `land/wood` pitch -5 at 1.5 gain -3;
-   `dice/throw` pitch -10 at 1.55; `knock/hollow` pitch -3 at 1.52 gain -6 decay 0.15, events count 6 gap 0.08
-   faster 1.3 softer -2.5 loose 0.6; space studio.
-   `bowling_strike.wav: recipe/bowling_strike (3.08 s, peak at 1.25 s, -16 LUFS, clean) [recipe]`
-9. A woodpecker (`woodpecker`). A hard beak on a hollow trunk, very fast, twice. One real knock raised a little,
-   repeated as new takes 45 ms apart, with a forest far under it.
-   `knock/hollow` pitch 4, events count 12 gap 0.045 softer -0.3; `knock/hollow` seed 2 pitch 4 at 1.4 gain -1,
-   events count 10 gap 0.045 softer -0.3; `forest/morning` dur 3.2 gain -20.
-   `woodpecker.wav: recipe/woodpecker (3.01 s, peak at 0.05 s, -14 LUFS, clean) [recipe]`
-10. A giant's footsteps (`giant_footsteps`, a sketch). Weight, slowness, the ground answering. A real step on
-    old floorboards an octave down and a heavy drop lower, four times, each with a short rumble, in a hall.
-    `step/floorboard` pitch -12; `heavy_drop/floor` pitch -7 at 0.01 gain -3; brown noise 0.8 s lowpass 100 at
-    0.02 gain -12 decay 0.7; each with events count 4 gap 1.1; space hall.
-    `giant_footsteps.wav: recipe/giant_footsteps (4.75 s, peak at 2.26 s, -15 LUFS, clean) [recipe]`
+You cannot hear the result. `clean` means no clicks, no cut tail and no clipping; it does not mean the sound is a
+car crash. Say what it is built from when you hand it over, and say that a person should listen once.
 
-The cookbook (`earshot/data/recipes`, `earshot recipe --list`) holds 74 recipes for things people ask for and no
-design is. 32 answer a request that names their thing: a car crash, a cannon, a welding torch, a warp drive, a
-woodpecker, a werewolf howl, a seagull, a monster growl and more. The answer says `built from parts by the cookbook
-recipe ...` and what the parts are; `earshot recipe car_crash` prints the recipe to change it. When the catalogue
-has a recording of the thing itself, the recording answers ("a rocket launch" is `rocket/launch`, "footsteps in
-mud" is `step/mud`). The other 42 are marked `sketch` (a dragon roar, a fax machine, a ship's horn, a washing
-machine, a wolf pack, a heartbeat getting faster, a giant's footsteps): earshot's listening model does not hear them as their thing
-yet, or not clearly better than the catalogue's nearest sound. The catalogue answers such a request as before, and
-one line names the sketch as a start: `a start from parts: earshot make --recipe heartbeat_faster`. Improve it
-before use.
+### What not to expect
 
-A cookbook sound follows what the request asks of it where a recipe can: "far away" puts it in a hall, duller and
-6 dB softer; "up close" takes the room away; "soft" or "quiet" is 6 dB softer; "three times" plays the whole three
-times; a length cuts it. Each is said in the answer (`as asked: far away (in a hall, duller and 6 dB softer)`), and
-what is not followed is said too (`not followed: louder; a cookbook sound is made at the loudest level of its
-kind`). Your own recipes are JSON files you keep in your project and render with `earshot make --recipe <file>`.
+No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for sound effects. No speech,
+singing or melodies; instruments play single notes and short figures. No panning. No realistic sound for a thing
+nobody recorded, except what a recipe builds. Every sound earshot makes is measured and audited, but the sounds
+built last (the `ui` set, the film hits, the newer learned things and beds, the recipes) have not been judged
+by a listener: do not say how a made sound sounds beyond its descriptions, because earshot's listening models did not
+predict how a person judged its sounds. Say plainly that a learned sound is a new take of a public-domain recording,
+not a sound invented from nothing. Everything earshot renders is free to use, commercial too, without credit.
 
-You cannot hear the result. `clean` says the file has no clicks, no cut tail and no clipping; it does not say the
-sound is a dragon. Say what it is built from when you hand it over, and say that a person should listen once.
+### Listening to what you made (the listen extra)
 
-The rest of this file is about listening: judging, choosing and checking sound you cannot hear.
+`--listen` (MCP `listen=true`) also ranks by how the designs sound and adds `heard as: ... (z)`; it loads a model
+(20 to 40 s). Use it when a request that describes a sound came back as a guess, or on a recipe with its words. The
+listening tools below check any file you made or found.
 
 ## Listen
+
 You cannot hear. Never say how audio sounds, or that a sound "fits", without an earshot reading behind it, and quote
 the number when you report ("strong match, z +3.9; p_real 0.96; -14.2 LUFS"). earshot runs locally on CPU (audio
 never leaves the machine, except with the optional `llm` command) and caches every embedding and result on disk.
-Cost: each CLI call is a new process that loads the models first (~20-40 s on a busy laptop, even for a cached file);
-inside the MCP server or one Python script the models load once and repeat calls take seconds. For more than a
-handful of calls, use MCP or a short script (`from earshot import api; api.find(...); api.realness(...)`).
-
-## Setup (once)
-This skill is the instructions; the tool is a Python package. If the `earshot` command is missing, install it:
-```
-pip install "earshot @ git+https://github.com/Leonxlnx/earshot"                 # makes sounds: no model, no GPU
-pip install "earshot[listen,mcp] @ git+https://github.com/Leonxlnx/earshot"     # adds listening and the MCP server
-earshot doctor                           # packages, ffmpeg, models (pinned revision, cache state); --load times them
-```
-Making sounds needs only the first line. Listening downloads two open models (~1.1 GB) on first use. In a clone of
-the repo, `pip install -e ".[all]"` does the same from the folder.
-Two ways in, same functions:
-- **CLI**: `earshot <command> ... [--json] [--out result.json]`. Text output starts with a plain summary; times are
-  m:ss.ss in text and seconds in JSON.
-- **MCP** (models stay loaded between calls): `claude mcp add earshot --scope user -e EARSHOT_THREADS=3 --
-  /path/to/earshot/.venv/bin/python -m earshot mcp`, or in any client's `.mcp.json`:
-  `{"mcpServers": {"earshot": {"command": "/path/to/earshot/.venv/bin/python", "args": ["-m", "earshot", "mcp"],
-  "env": {"EARSHOT_THREADS": "3", "GEMINI_API_KEY": "${GEMINI_API_KEY:-}"}}}}` (the key line only for the optional
-  llm tool; Claude Code fills it from the user's environment, other clients may need the key set in the environment
-  that launches them: never write a literal key into a project file).
-  Tools: make, make_set, sounds (no models; above); measure, describe, match, rank, find, compare, ab, realness,
-  timeline, sheet, critique, doctor, llm_critique; the sound bank (no models): sfx_list, sfx_render, kit_render
-  (Loop 5). Pass absolute paths; `full=true` returns all JSON. The server answers within a few seconds, longer on a
-  cold or
-  busy machine; if Claude Code shows no earshot tools, start it with `MCP_TIMEOUT=60000` (PowerShell:
-  `$env:MCP_TIMEOUT=60000; claude`). `earshot mcp --warm` preloads the models at startup.
-If the machine is shared, set `EARSHOT_THREADS=2-3` (or `--threads 2` on any command). The first model call of a
-process loads CLAP + AST (~20-60 s); later calls in the same process are fast. Any ffmpeg-readable file works,
-including the audio of an mp4 (a video with no audio track says so). Errors are one line on stderr:
-`earshot <command>: error: ...`, exit 1.
+Each CLI call is a new process that loads the models first (~20-40 s, even for a cached file); inside the MCP server
+or one Python script the models load once and repeat calls take seconds. For more than a handful of calls, use MCP
+or a short script (`from earshot import api; api.find(...); api.realness(...)`). Any ffmpeg-readable file works,
+including the audio of an mp4.
 
 ## Loop 1: choose an asset
 1. `earshot rank "a soft felt mallet hit on a wooden block" downloads/sfx/ --top 5` - shortlist from a folder.
@@ -507,12 +315,10 @@ including the audio of an mp4 (a video with no audio track says so). Errors are 
    tones, sounds made with earshot forge), realness is information, not a gate. The verdict thresholds depend on
    length (each summary names them): a sound up to 6 s uses the clip thresholds (lo 0.17 / hi 0.77), a longer file
    the mean of its 4 s windows with weakly calibrated file thresholds (lo 0.40 / hi 0.77), so compare verdicts, not
-   raw p_real, across files of different lengths. Real recordings and professionally produced music and sound design
-   usually read real, but realness hears how a sound sounds, not where it came from: clean professionally synthesized
-   tones (UI sounds, chimes, synth stabs) also read as code-synthesized. If realness is unavailable (model missing),
-   say plainly that real-vs-synthetic was not checked; describe's AudioSet classes (Sine wave, Beep, Synthesizer) are
-   weaker evidence. Exact digital zeros alone prove nothing (59% of the project's licensed real recordings have some
-   edit or fade padding).
+   raw p_real, across files of different lengths. Realness hears how a sound sounds, not where it came from: clean
+   professionally synthesized tones (UI sounds, chimes, synth stabs) also read as code-synthesized. If realness is
+   unavailable (model missing), say plainly that real-vs-synthetic was not checked. Exact digital zeros alone prove
+   nothing (most real recordings have some edit or fade padding).
 5. To choose between two candidates: `earshot ab a.ogg b.ogg --query "a crisp fast air whoosh"`, with
    `--a-start/--a-end/--b-start/--b-end` for trims from find (A and B may be the same multi-take file). Optional:
    `earshot match winner.ogg "a deep thocky key press" --alts "a clicky blue switch" "a typewriter key"` to test one
@@ -545,54 +351,36 @@ including the audio of an mp4 (a video with no audio track says so). Errors are 
   take plus the silence between them. Then `earshot timeline after.wav` and compare the event lines and sync stats
   with the old run. Change one thing at a time.
 
-## Loop 4: write a new recipe and improve it by listening (earshot forge)
-Use this when `earshot make` has no design for the sound and the user wants one written and refined against real
-reference recordings: an AI that hears can write synthesis code, listen, and improve it. It takes minutes per round;
-for an ordinary sound use `earshot make` instead. Every sample must be computed (no recorded audio inside, not even
-an impulse response); real recordings
-are only the references the critic compares with.
+## Loop 4: write a synthesis recipe and improve it by listening (earshot forge)
+Use this when the user wants a sound written as synthesis code and refined against real reference recordings. It
+takes minutes per round; for an ordinary sound use `earshot make`, and for a sound built from the catalogue's parts
+use a recipe (above). Every sample must be computed (no recorded audio inside); real recordings are only the
+references the critic compares with.
 1. Write or pick a recipe in `earshot/forge/recipes/<name>.py`: `SPACE` (parameter ranges), `DEFAULTS`, `TARGET`,
    `ALTS` (realistic confusions) and `render(params, r) -> 48 kHz array`, built from `earshot.forge.dsp` (modal
-   resonators, contact excitations, noise colours, a time-varying SVF, a computed room, a mic with a noise floor). Model
-   the physics of the real thing, measured on the references: what strikes what, what rings, how long, in what room.
+   resonators, contact excitations, noise colours, a time-varying SVF, a computed room, a mic with a noise floor).
+   Model the physics of the real thing, measured on the references.
 2. Run one round: `earshot forge <recipe> --refs <real refs> --budget 144 --reps 2 --tone 1.5 --keep 4 --robust 8
    --dir <round dir>`, or in one Python script per round that loads the models once:
-   `forge(recipe, critic=Critic(target, alts, refs, tone=1.5), reps=2, space={...})`.
-   - `--tone` puts the model-free tonal balance and tail into the objective.
-   - `--reps 2` ranks each candidate by 2 renders, against lucky renders.
-   - It takes about 3-5 minutes per 160 renders on a busy laptop CPU, including a 30-60 s model warm-up.
-3. Read what it heard. Each pick's summary says, for example, "sounds like: a cork pop, a glass ting", "decay +2.4
-   outside the refs" or "tone 11.2 dB from the refs' median: +16 dB at 500-630 Hz (above every ref)". Then check the
-   picks four ways:
-   - the model-free `tone` words: which bands fall outside every reference, the energy shares, the tail, the length
-     (the most trustworthy signal once the model scores are high)
-   - `robust`: the mean over new seeds, not the lucky best render
-   - `alt_zs`: which confusion is closest
-   - spectrograms next to the references: `ffmpeg -i x.wav -lavfi showspectrumpic=s=900x360:scale=log:legend=0 x.png`
-
-   The AudioSet tags in report.json are held out only while you do not pick or steer by them. Fix a selection rule
-   (for example, the robust mean) before you look, and report the tags afterwards.
+   `forge(recipe, critic=Critic(target, alts, refs, tone=1.5), reps=2, space={...})`. `--tone` puts the model-free
+   tonal balance and tail into the objective; `--reps 2` ranks each candidate by 2 renders. About 3-5 minutes per
+   160 renders on a laptop CPU, including a 30-60 s model warm-up.
+3. Read what it heard ("sounds like: a cork pop, a glass ting", "decay +2.4 outside the refs", "tone 11.2 dB from the
+   refs' median: +16 dB at 500-630 Hz"). Check the picks four ways: the model-free `tone` words (the most trustworthy
+   once the model scores are high), `robust` (the mean over new seeds), `alt_zs` (the closest confusion), and
+   spectrograms next to the references (`ffmpeg -i x.wav -lavfi showspectrumpic=s=900x360:scale=log:legend=0 x.png`).
+   The AudioSet tags in report.json are held out only while you do not pick or steer by them.
 4. Change the recipe's structure, not only its ranges, for what is wrong (a missing release tick, a metallic ring, a
-   tail too long). Then repeat. Keep a LOG of each round's change and numbers.
+   tail too long), and repeat. Keep a log of each round's change and numbers.
 5. Report honestly, next to the real references scored by the same critic (`report.json` ref_scores,
    leave-one-out).
 
-Goodhart, say it plainly:
-- The search optimises earshot's own models. Made sounds routinely out-score real recordings on them, which means the
-  critic is satisfied, not that the sound is better.
-- **p_real is easy to fool**: modal resonators plus a room and a mic noise floor read "real".
-- **Typicality rewards being an average** of the references.
-- **The model checks saturate**: after a search, every model check, held-out phrasings and independent real sets
-  included, puts the made sound inside the real ones. Only measurements and ears can still tell them apart.
-- Judge by measured closeness to the references: tonal balance, bands outside every reference, tails, lengths. Also
-  use robust re-renders and spectrograms.
-- Ask for a human blind test (random order, loudness-matched, hidden key) before calling a made sound "as good as
-  real".
-
-In the first test (demo/forge-test) an independent judge found the key press 8-13 dB off the real tonal balance and
-the pops band-unlimited with long hissy tails, while every model check called them real. Re-made by steering with the
-model-free check, they now sit inside the real recordings' measured spread. The whoosh was re-made as a truly fast
-one. The impact (darker, swell-led) and the click (short tails) were not re-made. No human has listened yet.
+Goodhart, say it plainly: the search optimises earshot's own models, so made sounds routinely out-score real
+recordings on them, which means the critic is satisfied, not that the sound is better. p_real is easy to fool (modal
+resonators plus a room and a noise floor read "real"); typicality rewards being an average; after a search every
+model check puts the made sound inside the real ones. Judge by measured closeness to the references (tonal balance,
+bands outside every reference, tails, lengths), robust re-renders and spectrograms, and ask for a human blind test
+(random order, loudness-matched, hidden key) before calling a made sound "as good as real".
 
 ## Loop 5: make a film's sound kit (earshot sfx / earshot kit)
 Use this when a code-made film (a cinetic film, any cue sheet) needs its effects: render them from earshot's shipped
@@ -601,7 +389,7 @@ bank instead of writing synth voices. No models load; a whole kit renders in abo
    energetic product films, minimal for designed effects-only films, launch for films cut to music). Each role's
    `note` says why its sound was chosen. calm / crisp / minimal keep riser, swell and suck off: a reveal resolves on
    one element, and the lockup is one clean hit. launch sounds one riser or reverse swell at a section change and
-   uses the 0.4 sounds made for music-led films (below).
+   uses the sounds made for music-led films (below).
 2. Fit it to the film: `earshot sfx list --kind hit` (or `--category`) shows the candidates with lengths, peak times
    and knobs. Change a role's `sound`, set `edits` (`pitch` to the film's root for the hit or drop, `dur` / `apex` for
    a fixed move), `takes` (12 or more for typing, 2-4 elsewhere), `level_db`. Audition one candidate with
@@ -617,14 +405,14 @@ bank instead of writing synth voices. No models load; a whole kit renders in abo
    warned take. Read the notes too (a sounded riser, a composite sting).
 5. Listen through the finished film with Loop 2 (`timeline --cues`, `sheet`) and check that each cue landed.
 
-**The 0.4 families** (`earshot sfx list --category ui_pop`, ...), for the soft, short, mid-register sound of
-music-led launch films: `ui_pop` (rounded mid pops for chips, bubbles and rows arriving: the most used effect in
-those films), `knock` (mid-band wood and plastic), `cut_hit` (short sub hits with a kick, a punchy cut hit),
+**The families for films cut to music** (`earshot sfx list --category ui_pop`, ...), for the soft, short,
+mid-register sound of music-led launch films: `ui_pop` (rounded mid pops for chips, bubbles and rows arriving: the
+most used effect in those films), `knock` (mid-band wood and plastic), `cut_hit` (short sub hits with a kick),
 `mallet` (gated glockenspiel / celesta / marimba notes, a soft pluck, chime runs; `--pitch` tunes them), `drip`
-(water drops whose pitch rises: the audit allows a bubble its climb), `shutter` (snap zooms, whip-cuts),
-`reverse_swell` (peaks just after a cut, one a film), plus whoosh_big thump*, riser dark / build / snatch, swish
-bright / flick, whoosh_fast whip, glitch burst / mid / chirp and notify mid_tine / mid_wood. Prefer them over the
-bright 5 ms blips and long cinematic tails of the older categories when the film is cut to music.
+(water drops whose pitch rises), `shutter` (snap zooms, whip-cuts), `reverse_swell` (peaks just after a cut, one a
+film), plus whoosh_big thump*, riser dark / build / snatch, swish bright / flick, whoosh_fast whip, glitch burst / mid
+/ chirp and notify mid_tine / mid_wood. Prefer them over the bright 5 ms blips and long cinematic tails of the older
+categories when the film is cut to music.
 
 **Levels against the music, not fixed** (launch, or any role with `bed_db`). In films cut to music effects ride 3-10
 dB over the music and read by timing and spectrum: a fixed `level_db` is either buried in loud passages or sticks
@@ -643,7 +431,7 @@ Pull the music down 6-12 dB for 0.3-0.5 s before a hit, a drop, a big whoosh or 
 `level_db` is the fallback; where the music is silent before a cue (a cold open, a gap in the score) `bed_level`
 returns `None` and `gain_db` uses `level_db`. Report the gains you set and the bed levels you measured.
 
-Say plainly what the bank is: forge sounds made in code (0.4's tuned toward the measured style of a private set of
+Say plainly what the bank is: forge sounds made in code (some tuned toward the measured style of a private set of
 licensed reference clips, and checked to stay originals: CLAP 0.84 at most against any of them), and 15 sounds fitted
 as code from CC0 recordings (`fit/<role>/<name>`, each with its source; the presets use them for clicks, ticks, keys,
 touches and the snap), all chosen and checked by measurement, none by a listening test. They are not recordings: when
@@ -670,15 +458,15 @@ its scores are one model's opinion: confirm every fix with timeline / ab.
 | typicality z (compare) | distance to the reference set vs the refs' own spread | >= -1 fits the set, < -2 outlier |
 | sync offset_ms, chance | sound minus picture per cut / cue; what random edits would score | trust when well above chance |
 | critique status | value vs the range of 7 professional launch films (loudness: web-delivery practice; true peak <= -1 dBTP for a master, <= 0 dBTP for decoded AAC / MP3, which already holds the codec overshoot) | a range, not a target: ok = inside what pros do |
+
 Prefer measurements, then verdicts / z / probabilities; never present cosine as confidence.
 
 ## Writing queries
 Describe the sound, not its use: source + material + action + character ("a heavy wooden door slamming in a small
 room", not "a sound for the logo"). Give alternatives that are realistic confusions (thock vs click vs typewriter).
-When a z is borderline, try two or three phrasings: trust a reading that holds up under all of them.
-Job words are not heard: "a soft rounded pop, something appearing" passed none of 9 real pops that their own titles
-matched. To check a sound for a job, describe the job's sound two or three ways and keep the best reading (on 195 real
-effects: 176 passed instead of 152, the jobs told apart slightly better; docs/VALIDATION.md).
+When a z is borderline, try two or three phrasings: trust a reading that holds up under all of them. Job words are
+not heard: "a soft rounded pop, something appearing" passed none of 9 real pops. To check a sound for a job, describe
+the job's sound two or three ways and keep the best reading (docs/VALIDATION.md).
 
 ## Limits (say these plainly when they matter)
 - Taste is not measured: earshot says what a sound is and how it measures, not whether it is beautiful or right for
@@ -692,3 +480,26 @@ effects: 176 passed instead of 152, the jobs told apart slightly better; docs/VA
   or found late, and motion inside a shot is not an event, so pass cue times (--cues) for animation.
 - Mixed, dense material blurs tags: describe a stem or a segment rather than the whole mix.
 - Licence, provenance and attribution are not audio questions: earshot cannot check them.
+
+## Setup (once)
+This skill is the instructions; the tool is a Python package. If the `earshot` command is missing, install it from
+GitHub (the name `earshot` on PyPI belongs to another project):
+```
+pip install "earshot @ git+https://github.com/Leonxlnx/earshot"                 # makes sounds: no model, no GPU
+pip install "earshot[listen,mcp] @ git+https://github.com/Leonxlnx/earshot"     # adds listening and the MCP server
+earshot doctor                           # packages, ffmpeg, models (pinned revision, cache state); --load times them
+```
+Making sounds needs only the first line; ffmpeg on PATH is needed for ogg, webm, mp3 and m4a. Listening downloads two
+open models (~1.1 GB) on first use. In a clone of the repo, `pip install -e ".[all]"` does the same from the folder.
+- **CLI**: `earshot <command> ... [--json] [--out result.json]`. Text output starts with a plain summary; times are
+  m:ss.ss in text and seconds in JSON. Errors are one line on stderr: `earshot <command>: error: ...`, exit 1.
+- **MCP** (models stay loaded between calls): `claude mcp add earshot --scope user -e EARSHOT_THREADS=3 --
+  /path/to/earshot/.venv/bin/python -m earshot mcp`, or in any client's `.mcp.json`:
+  `{"mcpServers": {"earshot": {"command": "/path/to/earshot/.venv/bin/python", "args": ["-m", "earshot", "mcp"],
+  "env": {"EARSHOT_THREADS": "3", "GEMINI_API_KEY": "${GEMINI_API_KEY:-}"}}}}` (the key line only for the optional
+  llm tool; never write a literal key into a project file). Tools: make, make_set, sounds (no models); measure,
+  describe, match, rank, find, compare, ab, realness, timeline, sheet, critique, doctor, llm_critique; the sound
+  bank (no models): sfx_list, sfx_render, kit_render. Pass absolute paths; `full=true` returns all JSON. If Claude
+  Code shows no earshot tools, start it with `MCP_TIMEOUT=60000` (PowerShell: `$env:MCP_TIMEOUT=60000; claude`).
+  `earshot mcp --warm` preloads the models at startup.
+- If the machine is shared, set `EARSHOT_THREADS=2-3` (or `--threads 2` on any command).

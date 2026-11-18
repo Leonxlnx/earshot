@@ -5,8 +5,9 @@ other jobs running). Full tables, data descriptions and "what was tuned on what"
 this page is the summary. Data: the Clawd film's licensed recordings (219 used + 125 rejected Freesound/Mixkit files),
 its finished 60 s soundtrack with every placement logged, the code-synthesized score that project retired, renders
 of the Cinetic synth engine, independent numpy generators, and 7 professional launch films (measured locally, never
-committed). Section 8 covers the sounds earshot makes (1.0). Their yardstick is the owner's listening: earshot's
-own listening models did not predict his ratings, so their scores are not used as a measure of quality there.
+committed). Section 8 covers the sounds earshot makes (1.0). Their yardstick is listening by ear: earshot's own
+listening models did not predict how a person judged the made sounds, so their scores are not used as a measure of
+quality there.
 
 ## 1. Matching descriptions, ranking, finding moments ([eval/semantics/RESULTS.md](../eval/semantics/RESULTS.md))
 `EARSHOT_THREADS=2 .venv/Scripts/python.exe eval/semantics/run_eval.py analyze` (tuning library) and `... heldout`.
@@ -100,7 +101,8 @@ own listening models did not predict his ratings, so their scores are not used a
 ## 5. Interfaces
 `.venv/Scripts/python.exe -m pytest tests/test_interfaces.py -q` (+ `--slow`)
 
-- All 13 MCP tools exercised over a real stdio connection on real files (silence, clicks, mono/stereo, ogg, mp3, the
+- The server lists 19 tools: the 13 listening tools, the three of the sound bank and `make`, `make_set` and
+  `sounds`. The 13 listening tools were exercised over a real stdio connection on real files (silence, clicks, mono/stereo, ogg, mp3, the
   60 s soundtrack, an mp4 film); bad input returns readable errors, never a crash; every JSON part valid.
 - Models stay loaded between MCP calls (the stdio handshake takes a few seconds; not benchmarked).
 - The Gemini critique has never been called live (no key on this machine, and a live call uploads audio): every path
@@ -117,69 +119,38 @@ decode cache, and `mix_report.json` byte-identical. (`--cache` must point to a w
 
 ## 7. Tests
 `.venv/Scripts/python.exe -m pytest -q` (fast; synthetic fixtures, no network) and `--slow` (loads the models / long
-end-to-end runs). At release: 128 passed, 14 skipped (slow) in ~65 s; the 14 slow tests also pass (~3 min).
-(Measured for 0.4; the 1.0 test files are listed in `tests/`.)
+end-to-end runs). What the tests of the made sounds check is in section 8.
 
 ## 8. Made sounds (1.0)
 
-### The owner's listening
+### Listening by ear
 
-The yardstick for the sounds earshot makes is one listener, the project's owner, rating each sound 1 (bad) to 5
-(very good) on listening pages in a browser, with a word or a sentence where he had one. Six pages were rated on
-2026-11-15 and 16 (279 rated files). It is one listener, the sounds were labelled on the page (on page 5 the
-recording and its takes stood in named columns), and nothing was loudness-matched beyond each page's own levelling:
-a strict judgement, not a blind test.
+The made sounds were judged by ear by one listener, the maintainer, on listening pages in a browser. The sounds were
+labelled on the page and were not loudness-matched beyond each page's own levelling: a strict judgement by one
+person, not a blind test. What it found, in plain words:
 
-| page | what was on it | his ratings |
-|---|---|---|
-| 1 | one success sound in six timbres; the interface set; instrument notes; game sounds; chip sounds; film sounds of the bank; ambience; objects | timbres: soft pluck 4, kalimba 3-4, felt piano 3, marimba 2.5, vibraphone 2, glass / glockenspiel 1 ("AI slop"). Interface: notify 4, error 4, tap, toggle, success and send 3 ("a bit too technical"). Instruments 2-3, hand bell and bowl 1. Game: coin and pickup 3, level up 3, lose 2, step on gravel 2, explosion 2 ("not an explosion"), jump and landing 1.5, punch 1 ("not a hit"). Chip: 4, 4, 4, 5. Bank film sounds: fast crisp whoosh 4, deep impact, riser, braam and logo 3, warm pad 2, soft pop 1. Ambience: rain on a window 5, waves 3, forest 3, night 3, campfire 2. Objects: coin drop 3, paper 2.5, glass clink, light switch and desk bell 2, door 1 |
-| 2 | motion sounds invented from film statistics; old against new; drums; the soft default voice | motion 1-3 (booms, slams and thumps 1, risers and falls 1-2; fast and deep whoosh, glass tock, glint and soft sting 3); drums 1-3 (tight snare 3; soft kick, closed hi-hat and shaker 2; the other eight 1); success, notify and error figures 3, tap 2, toggle 2 ("does not sound like a toggle"), level up and coin figures 4 |
-| 3 | 14 sounds fitted from CC0 recordings by an earlier engine (`earshot fit`) against 6 invented ones | two keyboard keys 4, a space bar and a mouth plop 3, the other fits 1-2; the invented ones 1-2 |
-| 5 | 24 CC0 recordings, each next to a take of its learned model and a varied take; 6 morphs; 6 sounds sampled from class models; 6 takes raw and finished | the recording, its take and its varied take got the same rating in all 24 rows (the sources themselves 1-5); morphs 4, 4, 4, 3, 2, 1; class samples 1-2; the finish helped short dry sounds (a wood knock 2 -> 3, a mouse click 1 -> 2) and made an airy whoosh worse (3 -> 2) |
-| 6 | twelve music beds | 8-bit 5, warm 3, playful 3 ("a bit cheap"), the other nine 1-2 |
-| 7 | before and after: louder figures, invented taps and toggles, ambience, jingles | success 3 -> 4, notify 2 -> 3, error 3 -> 4; taps, hovers and toggles 1-2 ("you cannot recognise these sounds"; two real keys beside them 4); forest 3 -> 5 (the dove taken out), campfire 2 -> 3, waves 2 -> 3, night 3 -> 2 (the changed crickets; reverted); jingles 3 |
+- **Passed.** Chip sounds. The soft tonal figures (success, notify, error, level up, coin). Rain on a window and the
+  forest bed, both made from rules. Takes of learned recordings: on 24 public-domain recordings, each played next to
+  a take of its learned model and a varied take, the take was judged exactly as good as its recording in every row,
+  so a learned design is as good as the recording it was learned from.
+- **Failed.** Sounds invented from formulas for real things (footsteps, jumps, landings, punches, explosions, doors,
+  switches, taps and toggles), whether written by hand or fitted from a recording. Nine of twelve music beds. Most
+  drums invented from physics. Bells, glass and glockenspiel timbres for interface sounds. New sounds sampled from a
+  model of several recordings. Many short sounds were too quiet to be heard well.
+- **What changed because of it.** Realistic sounds are learned from public-domain recordings; the interface sounds
+  are things a hand does with an object, and instruments answer only when music is asked for; weak ambience beds were
+  replaced by learned textures; nine music beds were removed; the acoustic drums are played from recorded strokes;
+  the figures are played on real instruments learned note by note; short sounds are raised (`master.finish`).
+- **Not yet judged by ear.** The sounds built last: the `ui` set as it is now, the rebuilt film and motion hits,
+  thumps and risers, the drums from recorded strokes, the figures on the real instruments, the newer learned things
+  and beds (animals, people, street, house and kitchen sounds; rain on wood, on a tin roof and on an umbrella), and
+  the cookbook's recipes. They were measured against their recordings and checked by the audit.
 
-Two of his notes changed the work more than any number: "much simply does not sound like what it should, not
-recognisable, not professional, some too technical", and "some should be LOUDER and FULLER: many of your sounds are
-short, you barely hear them". The learned family (page 8) and the learned ambience beds (page 9) had not been rated
-when this was written.
-
-**What passed.** Chip sounds (4-5). The soft tonal figures: notify and error 4, success 3-4, level up and coin 4.
-Rain on a window (5) and the forest without its dove (5), both made from rules. The learned recordings: he rated each
-take exactly as he rated its source, so a learned design is as good as the recording it was learned from. Morphs
-between two good recordings of one kind (4).
-
-**What failed.** Sounds invented from formulas for real things: footsteps, jumps, landings, punches, explosions,
-doors, switches, taps and toggles (1-2), in every round, whether written by hand or fitted from a recording with the
-earlier engine. Most music beds (1-2; three kept). Most drums invented from physics (1-2; "big problems, does not
-sound good"). Bells, glass and glockenspiel timbres for interface sounds (1). New sounds sampled from a class model
-of several recordings (1-2): class sampling was dropped.
-
-**What followed.** Realistic sounds are learned from public-domain recordings (`earshot/sounds/learned.py`), the
-interface sounds are things a hand does with an object (instruments answer only when music is asked for, after he
-rated the marimba signals 2 to 3 and asked for no instruments on a normal web page), the ambience beds he rated 2-3
-were replaced by learned textures,
-nine music beds were removed, the acoustic drums and hand percussion are played from 130 recorded strokes (VCSL and
-Karoryfer; not rated yet), the figures are played on real instruments learned note by note (a marimba by default;
-a harp, pizzicato strings and an upright piano by name), and short sounds are
-raised (`master.finish` lift; the loudest 50 ms of the tap, toggle and hover figures went from -19.5, -20.4 and
--19.5 to -13.2, -9.4 and -13.5 dBFS).
-
-**The listening models did not predict him.** The CLAP match scores and the realness score that earshot uses to
-listen did not predict his ratings: sounds he rated 1-2 had passed the models' checks, and the invented sounds landed
-at 1-3 for him whatever the models said. Before v1 these docs quoted those scores as the quality of the made sounds;
-they are no longer quoted for that.
-
-**A taste predictor, and what it is good for** (a report in the project's lab, not in the repository). From his
-279 rated files (231 units, 144 groups that are always held out together), a nearest-neighbour vote on CLAP
-embeddings (k = 10) predicts the order of his ratings with a Spearman of 0.60 in grouped cross-validation, 0.54
-(p 0.003) on the 24 real recordings of page 5 when trained without that page, and 0.56 (p 0.002) when trained
-without anything recorded. Its top fifth got 3 or more in 74 % of cases (40 % for all), its bottom fifth 2 or less
-in 87 % (59 % for all). It ranks; its absolute values are off; within one family it swings from -0.02 to 0.82; on
-pairs he rated differently inside one group (before and after, raw and finished) it is at chance (47-57 %). Features
-read from the signal alone did not predict him. Verdict: a listening order and a tie-breaker inside a class, never
-a judge; no design entered or left the catalogue on its word. It was used to order recordings for the learned
-store and to drop members it scored lowest where a design had others.
+**The listening models did not predict the ear.** The CLAP match scores and the realness score that earshot uses to
+listen did not predict these judgements: sounds that failed by ear had passed the models' checks. These docs no
+longer quote model scores as the quality of a made sound. A predictor trained on the judgements (nearest neighbours
+on CLAP embeddings) ranks kinds of sound apart but cannot tell a good recording from a poor one of the same kind; it
+was used only to order the recordings of a learned design, never to admit or drop a design.
 
 ### Learned sounds, measured
 
@@ -188,30 +159,29 @@ store and to drop members it scored lowest where a design had others.
   a click's rise within 1 ms; a model is 3.6-35 kB (median 9.1 kB); a render takes 0.26-0.33 s per second of sound.
   Weak: soft onsets smear (a bag drop's rise went from 61 to 99 ms); a fast swipe; impacts whose mid band is partly
   carried as noise (takes differ by about 3 dB there).
-- **The store**: 249 designs, 604 members, 13.81 MB (25 of the designs are material of the film sounds,
-  below; 23 members are recordings of a whole action, played by a performance); nothing the owner rated
-  1-2, no duplicates, at most five single-event members per thing (six notes of low brass for the braam). Seed 0
-  plays the member with the best listening score. Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
-  clear onset, a single event.
-- **Ambience textures** (`earshot/synth/quilt.py`, 12 BigSoundBank textures, 5.40 MB; `wind/trees` is learned from
+- **The store**: 249 designs, 604 recorded members, 13.85 MB (some designs are material of the film sounds, below;
+  30 members hold several events, such as a whole walk or a knock, and 21 designs have such members). No duplicates,
+  nothing judged poor by ear. Seed 0 plays the fullest clean member. Admission rules of the build: no chopped start
+  or end, a full band, a natural tail, not faint, a clear onset; the build tool is not in the repository.
+- **Ambience textures** (`earshot/synth/quilt.py`, 15 textures, 6.61 MB; `wind/trees` is learned from
   wind through a field of dry leaves (maize), whose leaf band carries two thirds of the power and is dry, after no
   recording of trees passed that check; the fire is learned with an onset at every crackle and its two sides are two
   takes sharing the crackles; the waves from a recording at the water's edge, joined where they were cut; the rain
-  on a window without its gutter's ringing drip): a take differs from its
-  recording by 2.4-3.6 dB at band-envelope level, the same as two takes differ from each other, except the crickets
-  (4.4 dB against 2.2: two crickets in one band lose their beating). The joints of a stitched bed differ by 0.9-1.5
+  on a window without its gutter's ringing drip). Measured on the first twelve (the rain on wood, on a tin roof and
+  on an umbrella came later and are checked by the audit only), a take differs from its recording by 2.4-3.6 dB at
+  band-envelope level, the same as two takes differ from each other, except the crickets (4.4 dB against 2.2: two crickets in one band lose their beating). The joints of a stitched bed differ by 0.9-1.5
   times the texture's own variation (the pebble and rock shores about 1.5). The sea beds are 26-30 s with five waves
   each, the fire 24 s. A bed renders in 1.0-1.7 s of CPU per second of sound.
 - **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, 1.31 MB): 130 strokes from VCSL, Karoryfer
   (Big Rusty Drums) and, for `clap/hands`, single claps cut from one person clapping (Freesound), stored softest
   first with their velocity within their instrument; the seed walks through a design's strokes and `energy` picks
-  softer or harder ones. Rated: the kick 4 of 5, the earlier claps 3.3.
+  softer or harder ones.
 - **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit
   public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/`,
   `drums/` and `notes/`.
 - **Instrument notes** (`earshot/synth/played.py`, `earshot/data/notes/`, 0.83 MB): 97 single notes from VSCO-2 CE
   and VCSL (marimba 14, harp 24, pizzicato 45, upright piano 14), each played as a take moved to the pitch asked for
-  with the tuning measured on the recording. Not rated by the owner yet.
+  with the tuning measured on the recording.
 - **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 32 motion designs are built from 25
   learned things of the store and the drum store's strokes, reversed, stretched, layered, faded and glued
   by one room, and follow measurements of 39 professional motion videos ([motion-sfx-study.md](motion-sfx-study.md)):
@@ -219,44 +189,48 @@ store and to drop members it scored lowest where a design had others.
   (reference middle half from 388 Hz), the logo hit 0.2-0.3 s, the thump of something appearing about 50 ms, the
   click a tick at 5-10 kHz cut 40 ms after it, a transition plain air gone within tens of ms of its peak. The hits
   are a heavy bag dropped on a real explosion's low end (no drum, no door); the car-door build stays by name
-  (`slam/door`, `boom/door`). The owner rated the earlier film sounds 1 to 3 of 5 (the fast whoosh 4); the rebuilt
-  ones are not rated yet.
+  (`slam/door`, `boom/door`).
 - **Interface sounds** (`earshot/sounds/interface.py`): the seventeen roles of `ui` and the interface jobs asked in
   words are things a hand does, built from fixed recordings of the learned store; measured, their tonality (how far a
   steady partial stands over the spectrum around it) is 6 to 18 dB, against 20 to 33 dB for the marimba figures
-  they replace. Not rated as a set yet.
+  they replace.
+- **Recipes** (`earshot/recipe.py`, `earshot/data/recipes/`): a cookbook recipe answers a request on its own only when
+  the listening model hears it as its thing (a match of z 3.0 or more), clearly better than the catalogue's nearest
+  design (by 1.0 or more), and the audit finds it clean: 32 of the 74 do. The other 42 are named only as starting
+  points. This is a model's judgement, not a listener's; no recipe has been judged by ear as a set. One sound
+  ringing through the body of another ("rain on a tin can") was built and measured: it came no nearer the real
+  recordings of rain on wood or on a tin roof than plain rain did, so it is not part of the recipe form.
 
 ### Understanding requests
 
-Three sets of requests were written by someone who never saw the catalogue: A (440 requests for 110 intents, in
-four styles) and B (220) were used to develop the reader (`earshot/brief.py`, the lexicon, the designs' `uses`) and
-the guess thresholds; C (220: half long descriptions of a sound that never name it, half casual requests) is held
-out. A request counts as right when the first pick belongs to a family accepted for its intent (several families
-can be right: a coin pickup may be `coin/*` or `pickup/*`). The request sets and the scoring script are in the lab,
-not in the repository.
+Sets of requests written by someone who never saw the catalogue measure the reader (`earshot/brief.py`, the
+lexicon, the designs' `uses`). A request counts as right when the first pick belongs to a family accepted for its
+intent (several families can be right: a coin pickup may be `coin/*` or `pickup/*`). The development sets were used
+to build the reader and are optimistic by construction; set C was held out. The request sets and the scoring script
+are not in the repository.
 
-| set | first pick right | right among the top three |
-|---|---|---|
-| A (development, 440) | 92.3 % | 96.4 % |
-| B (development, 220) | 96.8 % | 99.1 % |
-| D (development, 160) | 90.0 % | 93.8 % |
-| E (development, 200, requests for the newest sounds) | 92.5 % | 98.0 % |
-| C (held out, 220), scored once on the final v1 catalogue | 69.1 % | 76.4 % |
-| C with the written accept rules of A, B and D applied to a copy | 70.9 % | 77.3 % |
+| set | what it is | first pick right | right among the top three |
+|---|---|---|---|
+| A (development) | 440 requests for 110 intents, in four styles | 92.3 % | 96.1 % |
+| B (development) | 220 requests | 96.8 % | 99.1 % |
+| D (development) | 160 requests | 93.1 % | 96.2 % |
+| E (development) | 200 requests for the film, motion and newest sounds | 93.5 % | 98.0 % |
+| G (development) | 60 requests that also say where the sound plays ("for my running club app") | 93.3 % | 96.7 % |
+| C (held out) | 220 requests: half long descriptions of a sound that never name it, half casual requests | 69.1 % | 76.4 % |
 
-C's accept lists were written before the interface and motion answers became sounds of real things on purpose;
-the second C row applies the same written rules (by design and job, not by request) that A, B and D got. An
-earlier round scored C once at 69.5 % and 76.8 %.
+C was scored once, on an earlier reader and catalogue than the one released; it has not been scored on the
+released reader. Its accept lists were written before the interface and motion answers became sounds of real
+things. When the learned recordings arrived, 68 answers were added to the accept lists of A and B by a written rule
+(a learned recording of the thing the request names is a right answer). About one held-out request in three or four
+(long descriptions and casual paraphrases) needs a second call, which is what `also`, the guess note and
+`sound=<id>` are for. `--listen` (the sound atlas) was not re-measured on the released catalogue.
 
-When the learned recordings arrived, 68 answers were added to the accept lists of A and B by written rules: a learned
-recording of the thing the request names is a right answer. Without those additions A is 89.1 % / 95.2 % and B
-93.6 % / 98.2 %. C was scored once with the same code; the code before the learned family scored 70.9 % / 78.2 % on
-the same catalogue, so the learned designs cost C about one and a half points. Development numbers are optimistic by
-construction; C is the number to quote. Four of the development misses (three taps, one hover) are requests whose
-accepted learned answer was the interface set's earlier tap or hover recording; the reader now gives them the
-designs the `ui` set plays (`keyboard/mechanical`, `hover/fingertip`). About one held-out request in three or
-four (long descriptions and casual paraphrases) needs a second call, which is what `also`, the guess note and `sound=<id>` are for.
-`--listen` (the sound atlas) was not re-measured on the v1 catalogue.
+**The long tail.** Two lists of 100 everyday requests each, ten in each of ten fields (fantasy, science fiction,
+animals, vehicles and machines, household and kitchen, tools and workshop, sports and play, weather and surfaces,
+people, office and devices), ask for things the catalogue may not have. Each answer is counted as right, as an honest
+nearest (the pick is not the thing and the answer says so), or as wrong without saying so. The first list was used
+for development: 55 right, 33 honest nearest, 12 wrong. The second was scored once: 61 right, 30 honest nearest, 9
+wrong. Both were measured before the reader's last changes of the release.
 
 **The audit.** Every take `make` writes passes `forge.sfx.check` (clicks, cut tails, clipping, DC, comb ring, rising
 glides, stacked attacks) or is re-rolled on up to three more seeds; the line says `clean` or names the warnings.

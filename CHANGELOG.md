@@ -2,367 +2,131 @@
 
 ## 1.0.0 - unreleased
 
-earshot makes sounds. An agent asks for a sound in words and earshot renders a new take of a design from its
-catalogue, with no model and no network: interface sounds, everyday foley, ambience beds, game sounds, chip sound,
-drums, motion-design effects and three short music loops, one at a time or as a family with a sprite for the web.
-Realistic things (everyday sounds, the interface sounds, the motion effects, ambiences, the acoustic drums) are
-learned from recordings in the public domain and kept as numbers, not audio, and computed anew at every request;
-tonal figures, chip sound and the music loops are written in code. The yardstick for what was kept is the owner's listening, 1 to 5 on six pages, not earshot's own
-listening models, which did not predict his ratings ([docs/VALIDATION.md](docs/VALIDATION.md#the-owners-listening)).
-Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. No new required dependencies.
+earshot now makes sounds as well as listening to them. An agent asks for a sound in words and earshot renders a new
+take of a design from its catalogue, with no model and no network, or builds the sound from the catalogue's parts
+with a recipe. Realistic sounds are learned from recordings in the public domain and kept as numbers, not audio.
+Fixes from the community: thanks to @Bortlesboat, @anascherif and @liugedragon. The base install is lighter than
+before: numba is the one new requirement, and the listening stack moved to an extra.
 
 ### Added
 
-- The cookbook holds 74 recipes built from the catalogue's parts (a car crash, a welding torch, a woodpecker, a
-  cannon, a warp drive and more); 32 answer requests of their thing, the others are sketches named as a start; a
-  thing the catalogue has a recording of (a rocket launch, footsteps in mud) is answered by the recording; far away,
-  up close, softer, a length and "N times" asked of a cookbook thing are followed or said not to be.
-- Learned from public-domain recordings: a crowd booing, a cat hissing, a lion roaring, an elephant, a bee, a rocket
-  launch, a record scratch, a squeaky toy, an elevator ding, a toaster, a blender, an egg cracked, a whisk, and walks
-  in mud, through puddles and in dry leaves; a pan set on a stove and a fridge door are no longer made.
-- The reader reaches a recording by a whole job it is named for or a word that names nothing else ("the lift
-  arrives", "a tiger roar", "a rubber duck squeak", "muddy footsteps", "soccer ball kick"); a trumpet, a fire alarm,
-  a toy gun, a mouse's squeak, a fridge, a kettle and an airlock get their nearest and say earshot makes none; a
-  ring "that says the eggs are done" is no egg; "from left to right" is said not followed (earshot does not pan);
-  the three alternatives for a missing thing are of three other families, described most like it.
-- A recipe layer can follow another layer's loudness or give way to it (`follow`: twigs that snap with the gusts,
-  rain that ducks under a thunder clap) and glide in pitch over its take (`glide`: a motor winding down).
-- Fuller recordings first: 21 learned things play their fullest clean recording at seed 0 (a small action with
-  body after the strike, from a quiet lossless source), and 14 bare one-click recordings are learned again with their
-  press and release, their approach or a whole cocking (a mouse, a trackpad, keyboard keys, a desk lamp, a stapler).
-- Rain on wood, on a tin roof and on an umbrella are learned beds from public-domain recordings (`rain/wood`,
-  `rain/tin_roof`, `rain/umbrella`).
-- A plain request for an interface job gets the design the `ui` set plays ("a success sound": `success/shutter`,
-  "open a menu": `open/drawer`, "delete": `delete/snip`); `open/air`, `close/air`, `error/thud`, `receive/pop`,
-  `type/key`, `next/swipe`, `back/page`, `back/swipe`, `complete/stamp`, `complete/latch`, `delete/crumple`,
-  `delete/swish` and `hover/pad` are removed.
-- A thing of the world is answered by its own recording, never by the interface sound made of it: "a door closing"
-  is `door/shut`, not `close/door`; the interface designs no longer weigh on how rare a word is.
-- A head whose sound depends on its owner ("a fax machine", "a seagull cry", "an elevator ding") says it is only
-  the nearest when the design picked answers neither the owner nor the head.
-- "ten seconds" in words is a length; "twice" is no unknown thing; "in a bathroom", "in a stairwell" set the room.
+**Making sounds**
+
+- `earshot make "WORDS" -o FILE` (`earshot/make.py`, MCP `make`, `api.make`) reads the request, ranks the catalogue,
+  renders the best design with the request's controls, checks the take (clicks, cut tails, clipping, DC, comb ring,
+  rising glides, stacked attacks; a failed take is rendered again on up to three more seeds) and writes wav, flac,
+  ogg, mp3, m4a or webm. A one-shot takes about a second on one thread.
+- The answer is a few plain lines: the design, its length, where its loudest moment is (`peak at`), its loudness,
+  `clean` or what the check found, and the words that chose it; three alternatives (`also`); and what the sound does
+  not cover, does not follow or did not understand. Every take also carries `peak_s`, `onset_s` and, for a row of
+  events, `events_s`.
+- Every request gets a sound. When the catalogue lacks the thing, the answer says "earshot makes no X; Y is only the
+  nearest sound it has", offers three starting points from other families and points to building it as a recipe.
+- The options of `make`: `--n`, `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`,
+  `--events`, the eight axes, `--lufs`, `--mono`, `--no-loop`, `--listen` and `--recipe`. Out-of-range values are
+  refused with one plain sentence.
+- `earshot make --set ui|game|arcade|film` and `--spec FILE` (MCP `make_set`) make a family of sounds in one call with
+  a `manifest.json`, in several formats at once (`--format webm,mp3`) and with a sprite (`--sprite`). One-shots are
+  as loud as they are made alone and within 2.5 dB of each other; loops and beds are levelled by kind; a loop is
+  written as flac in place of mp3 or m4a, whose padding leaves a gap at the seam.
+- `earshot sounds` (MCP `sounds`) lists and searches the catalogue. `earshot pack` lays many sounds in one file with
+  a map in the format howler.js reads.
+- Recipes (`earshot/recipe.py`; `earshot make --recipe FILE`; `earshot recipe --example`, `--list`, `NAME` and
+  `--check`; MCP `make` with `recipe`; a spec entry's `recipe`) build a sound from the catalogue's parts as a small
+  JSON form: layers of designs, noise or a low sine, with pitch, glide, reverse, cut, halt, filters, pan, gain, fades,
+  swell, decay, repeated events, and one layer's loudness following another's. A recipe is rendered and checked like
+  every sound.
+- A cookbook of 74 recipes (`earshot/data/recipes`). 32 answer a request for their thing on their own (a car crash,
+  a cannon, a welding torch, a woodpecker, a werewolf howl and more); 42 are sketches that an answer names as a
+  starting point. A recording of the thing itself answers before a recipe. A length, far away, up close, soft and a
+  count asked of a cookbook sound are followed, or the answer says they are not.
+
+**The catalogue**
+
+- 830 designs in 320 families (`earshot/sounds/`; the `@design` contract in `registry.py`).
+- 249 learned designs (`earshot/sounds/learned.py`, `earshot/synth/resyn.py`, `earshot/data/resyn/`) of everyday,
+  interface, game and film sounds, animals, people without words, street, house and kitchen sounds, learned from 604
+  recordings in the public domain (BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound;
+  each credited in a `CREDITS.md`). Each recording is kept as numbers (56 bands, 2 ms envelopes, 0.25 ms around
+  onsets, tonal carriers, the stereo image; 13.85 MB in all, no audio), and every render is a new take of it. Seeds
+  walk through a design's recordings, the fullest clean one first; `meta['member']` names the recording by number.
+  A learned design answers only a request that names its thing, and wins over an invented design of the same thing.
+- Performances (`earshot/synth/perform.py`, `--events`): a thing a person does several times in a row (a walk, a
+  knock, typing, coins, keys, clinking glasses) is played as the action when the words ask for it, from a recording
+  of the whole action or from single recordings in a pattern a person plays. A length or a gap asked with it sets
+  the file's length or the time between events.
+- 16 learned ambience beds (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`),
+  stitched from pieces of 15 recordings so that they play for any length without a loop point: a campfire, three
+  shores, crickets, a brook, a cafe, a street, rain on wood, on a tin roof and on an umbrella and more. 18 more
+  ambience scenes are made from rules.
+- The interface sounds are things a hand does, built from learned recordings (`earshot/sounds/interface.py`, 29
+  designs): a mechanical key going down and coming up, a page, a drawer, a cork, knocks, a camera shutter, a cut of
+  scissors. A plain request for an interface job gets the design the `ui` set plays, and a thing of the world named
+  in words ("a door closing") gets its own recording.
+- 46 film and motion designs (`earshot/sounds/motion.py`, `earshot/synth/design.py`). 32 are built from learned
+  recordings the way motion films use them (short dry hits, a 50 ms thump, a bright tick, whooshes and risers of
+  air, a tape stop, a braam of real brass), following measurements of 39 professional motion videos; 14 small ones
+  are invented. A motion request gets no instrument note unless its words ask for music.
+- 40 drum designs (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are
+  played from 130 recorded strokes in the public domain; the drum-machine voices, a brush snare, a finger snap and a
+  stick count are invented.
+- Tonal figures for interfaces, games and brands (45, and 3 material ticks), played on real instruments learned note
+  by note (`earshot/synth/played.py`, `earshot/data/notes/`: marimba, harp, pizzicato strings and an upright piano,
+  97 notes). They answer an interface request only when its words ask for music or a theme is named.
+- 51 notes of other voices, 14 synthesizer sounds, 24 chip sounds (only when asked for), 83 sounds of actions and
+  objects invented from physics, three short music loops, and the 209 named members of the sound bank.
+- Themes and sets (`earshot/sounds/theme.py`, `sets.py`): nine theme presets give a family one voice, key, room and
+  axis offsets; four ready-made sets (`ui` 17, `game` 22, `arcade` 16, `film` 17).
+- The sound atlas (`earshot/sounds/atlas.py`, `earshot/data/sounds_atlas.npz`, numbers only): a CLAP embedding of
+  every design. `--listen` blends how the designs sound into the ranking and says what the result is heard as.
+
+**Reading requests**
+
+- The reader (`earshot/brief.py`, `earshot/sounds/lexicon.py`) needs no model. It reads the thing, the job and the
+  sound; feelings as offsets on eight axes (bright, hard, ring, size, space, width, energy, motion); negation and
+  comparison; voices and materials; lengths, gaps, counts, pitches and keys; loop or one-shot; the moment a sound
+  plays ("when the pricing card settles"); and words for the product or the place, which choose nothing.
+- What follows "on" or "in" is the sound's surface or place ("rain on wood"). A surface the sound has no design on
+  gets the nearest one and says so ("rain on a tarp": `rain/tent is the nearest surface`).
+- A request in German is read through a table of about 250 sound words ("Regen auf Holz"); a request in another
+  language gets "write it in English".
 - A request that asks for a change as the sound plays ("getting louder"), for a sound heard through something
-  ("behind a closed door", "underwater"), or for a length the design does not keep, says so in the result.
-- **`earshot make "WORDS" -o FILE`** (`earshot/make.py`, MCP `make`, `api.make`): the request is read, the catalogue
-  ranked, the best design rendered with the request's controls, audited (clicks, cut tails, clipping, DC, comb ring,
-  rising glides, stacked attacks; a failed take is re-rendered on up to three more seeds) and written as wav, flac,
-  ogg, mp3, m4a or webm. The answer is a few lines: the design and the words that chose it (as written), the sounds
-  or jobs of the request it does not cover (`not in this sound`), up to three alternatives (`also`, always, with a
-  note when the pick is a guess, to be taken with `sound=<id>`), controls `not used by this sound` (also a length a
-  design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
-  `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
-  `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
-- Every take of `make` says where things happen in the file: `peak_s` (the loudest moment, also "peak at" on the
-  plain line), `onset_s` (where it starts to be heard) and, for a row of events, `events_s` (each event's start).
-- A row of events no hand plays (ticks, clicks, blips, a counter) follows as close as its own length lets it, so
-  "a counter ticking up, 1.5 seconds" with 12 events is 1.5 s long; knocks and steps keep their 0.12 s limit.
-- A row with a count and a length too short for the usual ring ("a soft thump", 3 events, 0.6 s) keeps the length,
-  and the last event is faded out to end with the file instead of being cut.
-- A gap said with a count ("three soft thumps, 200 ms apart") is the time from one event to the next, and the row
-  is as long as that makes it.
-- A request that does not read as English is answered as a guess that says so ("write it in English"); a job word
-  it still holds ("Erfolgston für die App") keeps its pick.
-- Every request gets a sound: when no word of it finds a design ("a frobnicating zorp"), the answer is a nearest
-  one that says it is only that, with alternatives, where it was an error before.
-- A request whose thing, or what the thing does, is a word earshot does not know ("a mouse squeak", "a curtain
-  being pulled") is answered "earshot makes no X; ID is only the nearest sound it has"; the nearest is chosen by
-  the kind of sound the word names (a roar is a low rumble, a hiss a spray of air), then by the known words.
-- **Recipes** (`earshot/recipe.py`, `earshot make --recipe FILE`, `earshot recipe --example`, MCP `make` with
-  `recipe`, a set's `{"name", "recipe"}`): a sound no design is can be built from the catalogue's parts as a small
-  JSON form (layers of designs moved in pitch, reversed, cut, filtered, repeated as events, with noise for air and
-  rumble), rendered and audited like every sound; a cookbook of such recipes (`earshot/data/recipes`) answers the
-  requests that name its things ("a dragon roar"), and the answer says what it is built from.
-- What follows "on", "in", "against" or "into" after the sound is its surface, not a second sound: "rain on wood"
-  is no forest, "a ball bouncing on wood" is the ball, "water dripping on metal" no sizzling pan.
-- A surface the sound has no design on picks the nearest one and says so ("rain on a tarp": `no rain on a tarp:
-  rain/tent is the nearest surface`, with the other surfaces as alternatives).
-- A request in German is read through a table of about 250 sound words: "Regen auf Holz" as "rain on wood",
-  "Schritte auf Kies" as "footsteps on gravel"; a word the table lacks still gets "write it in English".
-- "a scratch" is no injury ("scratched" still is): "a vinyl scratch" no longer plays a hurt sound.
-- `knock/double` is two strikes by design: the audit no longer marks its two attacks as stacked layers.
-- A length within 0.1 s of the one asked prints no note; a length word that is not followed ("a short soft whoosh")
-  says to give the length in seconds.
-- `earshot.api` raises the plain missing-extra sentence (MissingExtra) instead of a bare ModuleNotFoundError.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 249 designs of
-  everyday, interface, game and film sounds learned from 604 recorded events in the public domain (the sources of all
-  learned material, beds, drums and instrument notes included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and
-  CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of
-  `earshot/data/resyn/`, `textures/`, `drums/` and `notes/`). Each recording is analysed at the
-  resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 13.81 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
-  take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
-  variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
-  the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
-  softer or harder, ring 0.5-2 times, energy, length within 0.6-1.8 times, pitch on tonal recordings. A learned
-  design answers only a request that names its thing and wins a tie with an invented one. Why: the owner gave a
-  recording and its renders the same rating on all 24 rows of his test, and rated sounds invented from formulas for
-  real things 1-2 of 5.
-- Animals, people without words, street, house, desk and sport sounds are recordings now (44 designs: a dog barking).
-- More everyday things are recordings now (26 designs: a scream, a sneeze, a sheep, a duck, a glass breaking).
-- Kitchen things are recordings now (8 designs: a knife chop, a pot boiling, a gas stove lit, a fridge door shut).
-- **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
-  beds from 12 BigSoundBank textures (5.40 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
-  `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
-  `underwater/deep`, `rain/street`, `wind/trees`. Takes of the texture's models are cut into pieces and stitched
-  where the texture is in a similar state, so a bed plays for any length without a loop point. `rain/window`,
-  `forest/morning` and the other scenes are made from rules.
-- **Interface sounds without instruments** (`earshot/sounds/interface.py`): the seventeen roles of `make --set ui`
-  are things a hand does, built from learned recordings: tap a mechanical key, hover a fingertip on wood, the
-  toggles that key going down and coming up, type the same key pressed softly, next and back a page flicked
-  forward and turned back darker, open and close a wooden drawer, send a stick through the air, receive a cork,
-  notify two light knocks, success a camera shutter, complete a bigger, slower shutter, warning two firm knocks,
-  error two heavier knocks that fall, delete a cut of scissors; one more candidate per role by name, and a like
-  (`like/pop`, a small bright pop of the lips over a fingertip) outside the set. A request for an
-  interface job gets the same; the tonal figures answer only when the words ask for music or a theme is named.
-- **The best recording plays first** (`earshot/sounds/learned.py`, `walk` in `earshot/data/resyn/index.json`): a
-  learned design's seeds walk its recordings from the one with the best listening score down; a recording scored 1
-  of 5 is left out of the walk; a take that fails its audit is rendered again from the same recording.
-- **A set is as full as its sounds made alone** (`earshot/make.py` `balance`): every one-shot of a set is made as a
-  single `make` makes it (true peak -1 dBFS) and only turned down, so that by its loudest 50 ms none lies more than
-  2.5 dB over the quietest; a `quiet` name (`hover` in `ui`) sits 0.5 dB under it. Loops, beds, pads and music, and
-  every sound of a spec that gives `lufs`, are levelled by kind as before (-16 LUFS and each kind's weight under it).
-- **Tonal figures on real instruments** (`earshot/synth/played.py`, `earshot/data/notes/`): a marimba played with
-  yarn mallets (14 notes), a harp (24), pizzicato strings (45: a cello section up to B4, a solo violin above) and an
-  upright piano played softly (14), 97 single notes from VSCO-2 CE and VCSL (CC0), kept as numbers (0.83 MB,
-  credits in `earshot/data/notes/CREDITS.md`) and played as new takes. The voices `marimba`, `harp`, `pizzicato` and
-  `felt_piano` play them (`struck.note` and `strings.note` still play the models). The marimba is the default voice
-  of figures and of the `soft` and `wood` themes. A real voice lets inner notes ring under the next one, rings the
-  last one out and plays a figure whose top note is above C6 an octave lower. The interface figures were written
-  for the marimba (`ui.py`: between A3 and G5).
-- **Performances** (`earshot/synth/perform.py`, `learned.perform`, `make(events=)`, `--events`, MCP `make`
-  `events`): a thing a person does several times in a row is played as the action, from its single recordings by a
-  pattern (walk, knock, type, scatter, shake, pair) or from one of 23 recordings of the whole action (walks on
-  gravel, wood, tiles and in heels, a knock on a door and on a table, toasts, keys, coin handfuls, a dog barking, a
-  heartbeat, a car horn, a hammer on a nail); 14 learned things have such recordings. The words decide: a plural, an action word, a count or a length
-  asks for the action ("footsteps on gravel", "knocking", "three knocks", "5 seconds of typing"), a bare singular
-  or "a single" for one event ("a footstep on gravel", "a single knock on a door"), a singular that names the
-  action ("a knock on the door", "a toast") for the action. `events` overrides the words; the answer says what was
-  played. New thing: `keys/bunch`.
-- **Short sounds come forward** (`earshot/synth/master.py` `finish(lift=)`, `registry.LIFT`): a one-shot under 1 s
-  whose one spike holds its body far down is raised by up to 14 dB and the spike folded over, not limited; an
-  ambience bed held down by a few peaks by up to 8 dB (`registry.SPARSE`). The owner had heard many short sounds as
-  barely there. Loudest levels by kind: -14 LUFS momentary max, pads and textures -18, ambience beds -22, music
-  loops -16.
-- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, `earshot/synth/drums.py`): 40 designs in 21
-  families. The acoustic kit and the hand percussion (33: kicks, snares, rims, toms, hi-hats, crashes, a ride,
-  claps, shaker, tambourine, congas, bongos, cajon, darbuka, frame drum, clave, cabasa, slapstick, a snare roll and a
-  shaker roll) are takes of 130 recorded strokes in the public domain (VCSL, Karoryfer and, for the hand claps, one
-  person clapping on Freesound; 1.31 MB of numbers): the seed walks through a design's strokes and `energy` picks
-  softer or harder ones. Still invented: `kick/electro`,
-  `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count`. New:
-  `conga/muted`, `bongo/low`, `darbuka/hit`, `frame_drum/deep`, `cabasa/hit`, `slapstick/crack`; removed:
-  `ride/bell`, `cymbal/swell`, `conga/slap`, `cajon/slap`. The owner rated the drums invented from physics 1-2
-  ("big problems, does not sound good"); the recorded ones are not rated yet.
-- **Film and motion sounds** (`earshot/sounds/motion.py`, `earshot/synth/design.py`): 46 designs. 32 are built
-  the way a sound designer layers them, from 25 learned things of the store (recordings in the public domain: heavy
-  drops, car doors and boots slammed, explosions, swells of air, breaths and flames, drum and timpani rolls, low
-  brass, deep, airy and fast whooshes, passes, thunder, orchestral drums, tam-tams and cymbals) and the drum
-  store's strokes, reversed, stretched, layered, faded and glued by one room, following measurements of
-  professional motion videos (short, dry, near mono, low or very bright). 14 small ones stay invented (pops,
-  tocks, a blip, a glint, a shimmer sweep, a sparkle, key ticks, a sliding panel, a soft knock, the soft sting).
-  Removed: `whoosh/tonal`, `sting/tech` and the invented `whoosh/airy` (the id is now the learned airy whoosh).
-  The owner rated the earlier film sounds 1-3 of 5 (the fast whoosh 4); the rebuilt ones are not rated yet. A
-  film request for a cymbal gets the film's crash cymbal, a request with a word of the drum kit the kit's.
-- **Invented and learned twins** (`lexicon.TWINS`): 33 invented designs of real things have a learned design of
-  the same thing (`knock/door` and `door/knock`, `coins/handful` and `coins/floor`, `paper/tear` and `paper/rip`
-  ...); a request that names the thing gets the learned one, the invented one answers to its id. A single coin
-  ("a coin dropped on the table") keeps the invented `coin/drop`; coins in the plural get the recorded handful.
-  An arrow is the recorded arrow hitting its target, not a gunshot; "a heart" is a heartbeat and a heart tapped
-  in an app a like; "vibrate" or "haptic" is the recorded phone vibrating; the click of a cursor or a mouse is
-  the recorded mouse button.
-- **Three music loops** (`earshot/synth/music.py`, `earshot/sounds/beds.py`): `bed/warm`, `bed/playful`, `bed/8bit`,
-  a whole number of bars in a key, seamless or once. earshot is a sound-effects tool; nine other styles were
-  written and removed after the owner's listening.
-- **Voices, keys and lengths from the words**: a material without a voice picks the voice made of it (wood a
-  marimba, glass a glockenspiel, metal a vibraphone, soft a felt piano, digital a glass pluck, retro a square lead);
-  an instrument named in the request plays the figure ("a notification on a harp", "a success sound with
-  pizzicato strings", "an error sound on a soft piano");
-  a voice asked for by name is always played; a minor key in the request or theme turns a figure's major thirds,
-  sixths and sevenths into minor ones; a length shorter than a figure rings keeps its spacing and damps it by the
-  hand so it ends there (a figure that does not fit is played faster, down to 70 ms between notes, and the result
-  says the shortest it can be), a longer one changes nothing; "under 300 ms" shortens only a design that is longer.
-- **The sound atlas** (`earshot/sounds/atlas.py`, `earshot/data/sounds_atlas.npz`, numbers only): a CLAP embedding of
-  every design's default render and of its descriptions. `--listen` (MCP `listen`) blends how each design sounds into
-  the ranking and reports what the written sound is heard as; the MCP server's `make` blends it in without being
-  asked once CLAP is loaded. Rebuilt with `python -m earshot.sounds.atlas build --work DIR`.
-- **Understanding requests, measured**: on 220 held-out requests written by someone who never saw the catalogue,
-  scored once on the v1 catalogue, the first pick is right for 69.1 % and one of the top three for 76.4 %; 92.3 %
-  and 96.4 % on the two development sets, whose accept lists gained 68 answers when the learned sounds arrived
-  ([docs/VALIDATION.md](docs/VALIDATION.md#understanding-requests)).
-- **Reading requests** (`earshot/brief.py`, `earshot/sounds/lexicon.py`): things, jobs and sounds to canonical
-  words, the head of a request and its parts and context, feelings as offsets on eight shared axes (bright, hard,
-  ring, size, space, width, energy, motion) with intensifiers, negation ("not harsh", "not an error"), "the opposite
-  of", comparisons, voices named as the instrument or as the player, materials, "8-bit" as a hard filter for chip
-  sound, lengths and ceilings, pitches, keys, counts of takes and notes, loop or one-shot, domains. No model.
-- The app, site, store or video a sound is for names no sound once the request names one: "in my running app, a
-  success sound" is a success sound, not footsteps, and "the Thunder app needs a notification sound" no thunder.
-- **The catalogue** (`earshot/sounds/`: `registry.py` with the `@design` contract, `earshot sounds`, MCP `sounds`):
-  the learned sounds and beds above; 45 figures for interfaces, games and brands that any voice can play (`ui.py`,
-  `game.py`, `brand.py` on `figure.py`) and 3 material ticks; 51 single notes of 36 instruments and 15 patches
-  (`tonal.py`); 14 synthesizer sounds (`synth.py`); 24 chip sounds (`retro.py`; the power-up's held top note lands between F5
-  and C6); drums; motion-design sounds; 47
-  invented action sounds (`action.py`) and 36 object sounds (`object.py`); 31 ambience scenes (`nature.py`); three
-  music loops. The bank's 209 named members join it (`bank.py`) and rank under the newer designs.
-- **Themes and sets** (`earshot/sounds/theme.py`, `sets.py`): nine theme presets (soft, glass, wood, felt, tine,
-  metal, electric, digital, retro) give a family one voice, key, room and axis offsets; four ready-made sets (`ui`
-  17, `game` 22, `arcade` 16, `film` 17; `ui` and `film` play real things, no note). `earshot make --set NAME` / `--spec FILE` and MCP `make_set` make a
-  whole set in one call, its one-shots as loud as made alone and within 2.5 dB of each other, its loops and beds
-  levelled by kind (the loudest at -16 LUFS momentary max, a bed 14 LU under), with `manifest.json`. Several formats at once (`--format webm,mp3`, a list in a spec or the MCP tool):
-  every sound in each, the manifest's `files` and `formats`, the sprite in each format with its map's `src` in that
-  order. For the web, `webm,mp3`: Ogg Vorbis does not play in Safari before 18.4. A loop in such a set is written
-  as flac in place of mp3 / m4a (their padding leaves a gap at the seam); a second name that gets the same sound
-  as an earlier one is flagged, with the nearest other design, and a second name that plays another recording of
-  the same learned design (toggle_off after toggle_on) is named as such, without a warning. A guess's alternatives
-  carry a few words each.
-- **`earshot pack`** (`earshot/pack.py`, `--sprite` on a set): many sounds in one file with a map in the format
-  howler.js reads; loops are marked and get a longer gap. On a set's folder it packs exactly the manifest's sounds
-  and leaves out an earlier sprite.
-- **The engines** (`earshot/synth/`): learned sounds (`resyn.py`), stitched beds (`quilt.py`), real instruments
-  note by note (`played.py`) and performances (`perform.py`); struck
-  instruments from modes, damping laws and a Hertz contact (`modal.py`, `struck.py`); strings, pianos and electric
-  pianos (`strings.py`); a synthesizer with band-limited oscillators, a ladder filter, FM operators, chorus and echo,
-  and 28 patches (`voice.py`, `patches.py`); drums (`drums.py`); band-limited chip sound (`chip.py`); ambience from
-  event statistics and band-wise noise (`texture.py`); music loops (`music.py`); every voice behind one call
-  (`voices.py`), figures played like a person (`phrase.py`), seven shared rooms (`space.py`) and the finish and
-  file formats (`master.py`).
-- **Calibration**: the pianos and mallet instruments were compared note by note with freely usable recordings
-  (University of Iowa Musical Instrument Samples; VSCO-2 Community Edition, CC0) and the laws of the models set from
-  several notes; no recording and no per-recording data is in the repository.
-- **Docs**: [docs/MAKE.md](docs/MAKE.md) (the reference of `make`, learned sounds, performances, sets and the spec,
-  `sounds`,
-  `pack`, the request language, axes, themes, the catalogue family by family, the voices, recipes for a web page, a
-  game and a film, how to add a design); VALIDATION section 8 (the owner's listening, the learned sounds measured,
-  understanding requests); LIMITS "Making sounds"; the earshot skill opens with a self-contained making part.
-- **Claude Code plugin** (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `commands/`): the
+  ("behind a closed door"), for a sound that moves from left to right, or for a length the design does not keep,
+  says so in the answer.
+
+**Around it**
+
+- The Claude Code plugin (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `commands/`): the
   repository is a plugin and its own marketplace (`/plugin marketplace add Leonxlnx/earshot`, `/plugin install
-  earshot@earshot`): the two skills, the MCP server from the installed `earshot`, `/earshot:make` and
-  `/earshot:make-set`.
-- **Tests** for the catalogue contract, the learned sounds and their engine, the stitched beds, drums, music loops,
-  the rooms and finishing, the voices, `make` / sets / `pack` and the atlas (`tests/test_sounds_catalogue.py`,
-  `test_sounds_learned.py`, `test_synth_resyn.py`, `test_synth_quilt.py`, `test_synth_played.py`,
-  `test_synth_perform.py`, `test_sounds_nature.py`,
-  `test_synth_drums.py`, `test_synth_music.py`, `test_make.py`, `test_sounds_atlas.py` ...); the long renders and the
-  tests that load CLAP run with `--slow`.
-- **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
+  earshot@earshot`) with the two skills, the MCP server of the installed `earshot`, and the commands `/earshot:make`
+  and `/earshot:make-set`.
+- The earshot skill opens with a complete part on making sounds. `docs/MAKE.md` is the reference of making;
+  `docs/VALIDATION.md` and `docs/LIMITS.md` cover the made sounds.
+- Tests for the catalogue contract, the learned sounds and their engines, the beds, drums, music loops, the reader,
+  `make`, sets, recipes and `pack`; the long renders and the tests that load CLAP run with `--slow`.
+- CI (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
-- **Motion effects as motion films use them**, all from recordings: a 50 ms low thump for something appearing
-  (`thump/appear`), short dry hits of a heavy bag dropped on a real explosion's low end with a swell of air into
-  them under a title (`slam/title`) and a logo (`boom/short`, `boom/deep`, `sting/reveal`; the car-door build by
-  name: `slam/door`, `boom/door`), the hit after a stop (`hit/drop`;
-  "a drop" in a film), a big far explosion that rolls (`explosion/far`), a bright click (`tick/soft`),
-  whooshes and risers of plain air that keep the length asked for, a glitch cut from real buzzes and clicks, a shine
-  of air (`shine/air`), a tape stop of a real roll running down (`stop/tape`); a motion job gets no instrument note
-  or synthesised tone unless its words ask for music (`brief.FILM_MUSIC`).
 
 ### Changed
 
-- **A light install**: the base install is numpy, scipy, soundfile, soxr and numba, all that making sounds needs;
-  torch, transformers and librosa moved to the `listen` extra, librosa also to `measure`, matplotlib and pillow to
-  `images`, and `all` brings every extra.
-- pyloudnorm and scikit-learn are no longer dependencies: nothing in earshot imports them.
+- A lighter install: the base install is numpy, scipy, soundfile, soxr and numba (new: it compiles the synthesis
+  loops), which is all that making sounds needs. torch, transformers and librosa moved to the `listen` extra, librosa also to `measure`, matplotlib and
+  pillow to `images`, and `all` brings every extra.
 - A command, MCP tool or Python function that needs a missing extra stops with one sentence that names the package
-  and the `pip install` command (`earshot.extras`); importing earshot and making sounds never load torch or librosa.
-- `earshot doctor` reports which extras are installed and does not count a missing extra as a problem.
-- `make` refuses a length over 120 s, a length of 0 or less, a count of takes outside 1 to 12, events outside 1 to 64,
-  a seed that is not a whole number and an unknown option, each with one plain sentence (a seed given as "3" is 3).
-- A request of only spaces is treated as an empty one.
-- `make_set` with an unknown set name names the sets that exist (it looked for a file of that name), and checks each
-  sound's length, takes and seed in the same way as `make`.
-- A sound of a set takes `events` and `loop` as `make` does, and a thing done in a row ("three knocks, 2 seconds",
-  footsteps) is played as the action in a set too, with a `played:` line.
-- `make` no longer reports a material it read from another word ("a chair": wood) as not followed, nor "short" when
-  the length asked in the same request was kept, and an interface press gets no hint about events.
-- **The README** puts making first and listening second; the 0.4 and 0.3 notes moved to a short history.
-- **Package metadata**: version 1.0.0, development status Beta, a description and keywords for both halves; the
-  learned models, textures and their credits ship as package data.
-- **Picture-only timelines and frame differences use far less memory** (#31; thanks, @liugedragon).
-- **Licence of rendered audio** (answers #21): the code is MIT; everything earshot renders (`make`, `sfx`, `kit`,
-  `forge`) belongs to whoever rendered it: free for any use, commercial too, without credit. The README says so.
-  The learned material comes from CC0 recordings, credited in `earshot/data/resyn/CREDITS.md`,
-  `earshot/data/textures/CREDITS.md`, `earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
+  and the `pip install` command (`earshot.extras`, also from `earshot.api`); importing earshot and making sounds never
+  load torch or librosa. `earshot doctor` reports which extras are installed and does not count a missing extra as a
+  problem.
+- The README puts making first and listening second; the notes of 0.4 and earlier moved to a short history.
+- Package metadata: version 1.0.0, development status Beta, a description and keywords for both halves; the learned
+  models, textures, drum strokes, instrument notes, recipes and their credits ship as package data, and the source
+  archive carries the changelog, the docs, the plugin's files and the tests' own files.
+- Picture-only timelines and frame differences use far less memory (#31; thanks, @liugedragon).
+- The licence of rendered audio is stated (answers #21): everything earshot renders (`make`, `sfx`, `kit`, `forge`)
+  belongs to whoever rendered it, free for any use, commercial too, without credit. The code stays MIT.
 
-The changes of the last two days, in the order they were built:
+### Removed
 
-- A design of the same name stands in for a request only when its family is the job asked for ("a deep impact" no
-  longer reaches `kick/deep`).
-- Seed 0 of a learned design plays its best recording; a set's one-shots are made as loud as alone and only balanced
-  by gain.
-- Tonal figures are played on real instruments learned note by note: marimba, harp, pizzicato strings, an upright
-  piano.
-- Everyday things answer with the action a person performs (a walk, knocking, typing) when the words ask for it;
-  `events` sets it.
-- The fast whoosh is the recorded stick swoosh as it is; the interface figures sit between A3 and G5; the chip
-  power-up starts a fifth lower.
-- A typing run on a keyboard with few recordings borrows the other keyboards' keys and keeps the space bar for the
-  pauses.
-- An instrument named after a job chooses the voice ("a success sound on a soft piano"); `make` over MCP takes
-  `events`.
-- A note is levelled as it is played, so a run of notes has no jump in level between neighbours.
-- A tonal figure asked shorter than it rings keeps its spacing and is damped by the hand to end at that length.
-- Three pizzicato C5 takes without a steady pitch left the notes store; every remaining note plays within 5 cents.
-- The source archive carries the changelog, the docs, the plugin's files and the tests' own files; numba is declared.
-- A request for a thing no design is answers "earshot makes no X"; "five coin pickups" is five takes.
-- An asked length holds for ambiences: shorter than the shortest seamless loop it is a cut with fades that says so.
-- `not used by this sound` is gone: only a control asked for in words that the sound cannot follow is named, in plain
-  words.
-- A counted action in a row ("four knocks on the table", "three claps", "a countdown 3 2 1") is one file for any
-  one-shot.
-- A design named inside its family wins over the family's default ("tape stop").
-- A learned take says "recording 2 of 3", never the title of its source recording; titles stay in the indexes and
-  credits.
-- A length asked with a count is the file's length, the events spread over it at a pace a hand keeps.
-- The action form of a row word is the action: "clapping", "clicking", "beeping" are a row; "clapping, 4 seconds"
-  claps for 4 s.
-- Scattered and shaken actions keep an asked length; a recording of a whole action plays its busiest stretch of that
-  length.
-- A recording that passes its audit plays first; the last event of a walk or a row rings out before the length asked.
-- The `ui` set and plain interface requests are normal sounds, things a hand does (`sounds/interface.py`); no
-  instrument.
-- Instruments answer an interface request only when its words ask for music (an instrument, a chime, a jingle, a
-  melody) or a theme is named.
-- The skill says which moments of a motion video get which sound, from measurements of 39 professional motion videos.
-- `fire/camp` keeps every crackle: learned with an onset at each, its two sides two takes that share them.
-- `waves/sand` is learned from a recording at the water's edge and keeps its foam; waves are joined where they were
-  cut.
-- `wind/trees` is learned from wind through a field of dry leaves ("Wind in a cornfield", BigSoundBank, CC0).
-- `rain/window` drops the gutter's ringing drip, the one tonal, regular sound in it.
-- Motion sounds are the short, dry, low things motion videos use: a 50 ms thump (`thump/appear`), a bright tick
-  (`tick/soft`), whooshes of air.
-- A motion request gets no design made of notes unless its words ask for music or for a game.
-- A whoosh holds an asked length, a riser is real air played backwards to a clean cut, a tape stop a real roll run
-  down to a halt (`stop/tape`).
-- A fire whoosh plays a real burst of flame first.
-- The title hit, the logo hit, the booms and the hit after a stop are heavy real things slammed, no drum stroke left.
-- "An explosion far away" plays a long rolling blast first (`explosion/far`).
-- In a film or video "a drop" is the hit after the silence (`hit/drop`); "pops in on screen" is the thump; "a soft
-  swish" is real air.
-- The default title and logo hits are a heavy bag dropped on a real explosion's low end with real air into them;
-  `slam/door` and `boom/door` keep a car door's build.
-- Knocks on a table are real knuckles on a wooden table (`knock/table`).
-- A single knock on a door is one whole knuckle knock with the door's body (`door/knock` plays it first).
-- Footsteps on tiles are hard shoes on a tiled floor, footsteps on concrete hard shoes on stone.
-- A walk alternates the two single steps of a surface that are most alike, so it does not limp.
-- A walk on gravel is heard from standing height.
-- A light switch, a punch and a book slammed shut play new close, dry recordings first.
-- A tap outside an interface is a fingertip on a table (`tap/fingertip`); "a tap" stays a key.
-- A bunch of keys plays a recording of metal keys first.
-- The second drum roll recording plays last: the engine clicks at one of its onsets.
-- A hand clap is a single clap of one person clapping (`clap/hands`, from "Solo Clap" on Freesound, CC0); "three
-  claps" and "clapping" play it.
-- The reader understands more requests that describe the moment instead of naming the job ("a title lands", "the
-  camera pushes in", "a swoosh as the message goes out", "grab a card to drag it", "the logo locks up", "the numbers
-  count up"); a thud for a film or a title is never a drum of the kit unless the words name one.
-- Requests written for a real job are read as what they name: a low thump is a thump and no sub drop, a card or a
-  panel that settles lands softly, "careful" before a thing says how it is done, one enemy defeated is a blow and no
-  fanfare, what follows "each time" is where the sound plays, toast that is bitten is no notification, and the
-  seconds asked of footsteps no longer choose the surface. The skill and `docs/MAKE.md` say when a page, a game, a
-  film or a clip needs a sound and when none, what a set does with your own list, how long and how loud sounds come
-  out and where a file's loudest moment lies.
-- The reader reaches the newest recordings by their plain requests ("a tap running", "a frog croaking", "glass
-  breaking", a shooter's reload; a bee is said to be missing, with the fly as the nearest), reads "twice" as two
-  events of one row, "200 ms apart" as the gap and hours as a length, gives a request that only asks for a cue the
-  notification's knocks and a purchase in an app the success click, and no longer answers a request in another
-  language from a look-alike word (German "die").
+- pyloudnorm and scikit-learn are no longer dependencies: nothing in earshot imports them.
 
 ### Fixed
 

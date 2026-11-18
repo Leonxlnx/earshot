@@ -17,10 +17,12 @@ Make this sound with earshot: $ARGUMENTS
    path. If no earshot MCP server is connected, run `earshot make "REQUEST" -o PATH` instead. No `full=true`,
    `--json` or `--listen`. If `earshot` is not found, say it must be installed first:
    `uv tool install "earshot[mcp] @ git+https://github.com/Leonxlnx/earshot"`.
-3. Report the answer as given: the file line (design, length, pitch and voice for a tonal sound, loudness, `clean`
-   or `audit: ...`), `also: ...`, a `played: ...` line (one event or the action), and any `not understood` /
-   `not followed` line, and a line about the length (a cut, the shortest loop, whole bars, a counted action that
-   could not fill it). A take with `audit:` is not usable: make it again with another `seed`. If the answer is an
-   error that earshot makes no such thing, say so plainly; do not put another sound in its place without saying it.
-   Do not say how it sounds beyond what the answer says; if the design is a learned one (a real thing such as a footstep, a switch, a door or a drum), say it is a new take of a
-   public-domain recording, computed from a model of it (no audio file is shipped or played back).
+3. Report the answer as given: the file line (design, length, where its loudest moment is, pitch and voice for a
+   tonal sound, loudness, `clean` or what the check found), `also: ...`, a `played: ...` line (one event or the
+   action), any `not understood` / `not followed` line, and a line about the length (a cut, the shortest loop, whole
+   bars, a counted action that could not fill it). A take that is not `clean` is not usable: make it again with
+   another `seed`. If the answer says "earshot makes no ...", the file is only the nearest sound: say so plainly,
+   name the starting points it offers, and do not present it as the thing; it can be built from parts with a recipe
+   (`earshot recipe --example`). Do not say how it sounds beyond what the answer says. If the design is a learned
+   one (a real thing such as a footstep, a switch, a door or a drum), say it is a new take of a public-domain
+   recording, computed from a model of it (no audio file is shipped or played back).
