@@ -1,0 +1,13 @@
+{
+ "name": "garage_door",
+ "says": "a garage door opening",
+ "things": ["garage door", "garage door opening", "roller door", "rolling shutter"],
+ "sketch": true,
+ "built": "A metal gate lower as the door, a chain rattled lower as its chain drive, an electric drill far lower as the motor, a latch at the stop.",
+ "layers": [
+  {"sound": "gate/metal", "pitch": -3, "gain": 0},
+  {"sound": "chain/rattle", "pitch": -5, "gain": -8, "events": {"count": 2, "gap": 1.2}},
+  {"sound": "drill/electric", "pitch": -10, "cut": [0.2, 2.6], "gain": -10, "lowpass": 2000, "fade_in": 0.2, "fade_out": 0.3},
+  {"sound": "lock/latch", "pitch": -4, "at": 2.6, "gain": -3}
+ ]
+}

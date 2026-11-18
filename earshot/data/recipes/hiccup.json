@@ -1,0 +1,11 @@
+{
+ "name": "hiccup",
+ "says": "a person hiccuping",
+ "things": ["hiccup", "hiccups", "hiccuping", "hiccupping"],
+ "sketch": true,
+ "built": "A sharp breath in, cut short, with a mouth pop lower as the catch in the throat, twice.",
+ "layers": [
+  {"sound": "gasp/breath", "cut": [0, 0.4], "decay": 0.2, "gain": 0, "events": {"count": 2, "gap": 1.1}},
+  {"sound": "pop/mouth", "pitch": -5, "cut": [0, 0.3], "decay": 0.12, "at": 0.03, "gain": -8, "events": {"count": 2, "gap": 1.1}}
+ ]
+}

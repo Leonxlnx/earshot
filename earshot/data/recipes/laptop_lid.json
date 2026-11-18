@@ -1,0 +1,10 @@
+{
+ "name": "laptop_lid",
+ "says": "a laptop lid closing",
+ "things": ["laptop lid closing", "laptop lid", "closing a laptop", "laptop closing", "laptop shut"],
+ "built": "A book shut higher and lighter as the lid, a microwave door closing higher still as its latch.",
+ "layers": [
+  {"sound": "book/shut", "pitch": 4, "gain": 0},
+  {"sound": "microwave/close", "pitch": 7, "gain": -9, "cut": [0, 0.4], "decay": 0.1}
+ ]
+}

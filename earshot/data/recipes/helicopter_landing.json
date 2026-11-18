@@ -2,10 +2,12 @@
  "name": "helicopter_landing",
  "says": "a helicopter landing",
  "things": ["helicopter landing", "helicopter lands", "helicopter touching down"],
- "built": "A helicopter's rotor that opens up as it comes near, a second take that runs down to a stop, and wind noise as the downwash.",
+ "sketch": true,
+ "built": "A helicopter's rotor that swells as it comes near, a second take that runs down to a stop, a landing on dirt far lower as the touchdown, and wind noise as the downwash.",
  "layers": [
-  {"sound": "helicopter/rotor", "gain": 0, "lowpass": [1200, 7000], "swell": 1.5},
-  {"sound": "helicopter/rotor", "seed": 1, "at": 2.5, "gain": 0, "halt": 3.0, "fade_in": 0.5},
-  {"source": "noise", "color": "pink", "dur": 5, "lowpass": [800, 2500], "highpass": 200, "gain": -13, "swell": 2.0, "decay": 2.5}
+  {"sound": "helicopter/rotor", "gain": 0, "swell": 1.0},
+  {"sound": "helicopter/rotor", "seed": 1, "at": 3.0, "gain": 0, "halt": 3.5, "fade_in": 0.4},
+  {"sound": "land/dirt", "pitch": -7, "at": 3.2, "gain": -6},
+  {"source": "noise", "color": "pink", "dur": 6, "lowpass": [700, 2200], "highpass": 150, "gain": -15, "swell": 2.5, "decay": 3.0}
  ]
 }

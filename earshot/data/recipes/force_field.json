@@ -1,0 +1,12 @@
+{
+ "name": "force_field",
+ "says": "a force field humming and crackling",
+ "things": ["force field", "force field buzzing", "force field humming", "energy shield", "energy barrier"],
+ "sketch": true,
+ "built": "A fly far lower as the field's electric hum, a phone vibrating lower as its buzz, water sizzling higher as its crackle.",
+ "layers": [
+  {"sound": "fly/buzz", "pitch": -12, "gain": 0, "lowpass": 3000, "cut": [0.3, 3.8]},
+  {"sound": "phone/vibrate", "pitch": -7, "gain": -5, "events": {"count": 2, "gap": 1.5}},
+  {"sound": "water/sizzle", "pitch": 3, "at": 0.3, "gain": -6, "highpass": 2000, "events": {"count": 3, "gap": 0.9, "loose": 0.5}}
+ ]
+}

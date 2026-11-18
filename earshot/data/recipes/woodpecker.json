@@ -1,0 +1,11 @@
+{
+ "name": "woodpecker",
+ "says": "a woodpecker pecking on a tree",
+ "things": ["woodpecker", "woodpecker pecking", "woodpecker drumming"],
+ "built": "A hollow knock higher, twelve times very fast, twice, as the beak on the trunk, a forest morning under it.",
+ "layers": [
+  {"sound": "knock/hollow", "pitch": 4, "gain": 0, "events": {"count": 12, "gap": 0.045, "softer": -0.3}},
+  {"sound": "knock/hollow", "seed": 2, "pitch": 4, "at": 1.4, "gain": -1, "events": {"count": 10, "gap": 0.045, "softer": -0.3}},
+  {"sound": "forest/morning", "dur": 3.2, "gain": -20}
+ ]
+}

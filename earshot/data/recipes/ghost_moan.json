@@ -1,0 +1,12 @@
+{
+ "name": "ghost_moan",
+ "says": "a ghost moaning",
+ "things": ["ghost moan", "ghost moaning", "ghostly moan", "ghost wailing"],
+ "sketch": true,
+ "built": "A person's yawn lower that swells in as the moan, wind howling at a window under it, in a cathedral.",
+ "space": "cathedral",
+ "layers": [
+  {"sound": "yawn/person", "pitch": -5, "gain": 0, "swell": 0.8},
+  {"sound": "wind/window", "dur": 4.5, "gain": -9, "swell": 1.0}
+ ]
+}

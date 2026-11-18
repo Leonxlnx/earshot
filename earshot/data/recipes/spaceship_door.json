@@ -1,7 +1,7 @@
 {
  "name": "spaceship_door",
  "says": "a spaceship door sliding open",
- "things": ["spaceship door", "airlock", "sci-fi door", "starship door"],
+ "things": ["spaceship door", "sci-fi door", "starship door", "spaceship door opening"],
  "built": "A spray can's hiss as the air, an electric drill far lower running down as the motor, a sliding door, and a latch lower as the stop.",
  "space": "studio",
  "layers": [

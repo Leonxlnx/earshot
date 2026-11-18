@@ -1,7 +1,7 @@
 {
  "name": "campfire_wind",
  "says": "a campfire in the wind",
- "things": ["campfire in the wind", "campfire wind", "fire in the wind"],
+ "things": ["campfire wind", "windy campfire", "campfire in the wind", "fire in the wind"],
  "built": "A campfire, wind in trees that comes up, a gust of noise that opens and closes, and twigs snapping in the fire.",
  "kind": "ambience",
  "dur": 8,

@@ -1,0 +1,11 @@
+{
+ "name": "snake_rattle",
+ "says": "a rattlesnake rattling",
+ "things": ["snake rattle", "rattlesnake", "rattle snake", "snake rattling"],
+ "sketch": true,
+ "built": "A shaker shaken steadily, higher and fast, as the rattle, a cat's hiss lower under it.",
+ "layers": [
+  {"sound": "shaker/roll", "pitch": 7, "cut": [0, 1.8], "gain": 0, "highpass": 1500, "fade_in": 0.08, "decay": 0.4},
+  {"sound": "cat/hiss", "pitch": -3, "at": 0.2, "gain": -12}
+ ]
+}

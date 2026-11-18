@@ -1,0 +1,12 @@
+{
+ "name": "ice_skating",
+ "says": "ice skates scraping on ice",
+ "things": ["ice skating", "ice skate", "ice skates", "skating on ice"],
+ "sketch": true,
+ "built": "A knife slicing lower, four strokes as they come, as the blades cutting into the ice, a crack of ice under them, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "knife/slice", "pitch": -3, "gain": 0, "events": {"count": 4, "gap": 0.6, "loose": 0.2}},
+  {"sound": "ice/crack", "pitch": 3, "at": 0.1, "gain": -14}
+ ]
+}

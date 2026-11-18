@@ -118,6 +118,26 @@ punches, explosions, switches, taps) he rated 1-2 of 5, whatever earshot's liste
 real things earshot renders real recordings anew. A realistic sound exists only for things someone recorded and put
 in the public domain.
 
+### Sounds built from parts: recipes
+
+Some things have no recording in the catalogue. For those, a recipe builds the sound from the catalogue's own
+parts: a few real recordings, moved lower or higher, cut, filtered, repeated and layered, written as a small JSON
+form. earshot renders a recipe and checks it like every other sound, and no model is loaded. The cookbook that
+ships with earshot (`earshot recipe --list`) holds 74 recipes. 32 of them answer a request for their thing
+directly; the other 42 are sketches that earshot's listening model does not hear as their thing yet, and an answer
+names them only as a start. When the catalogue has a recording of the thing itself, the recording answers.
+
+```
+earshot make "a car crash" -o crash.wav
+crash.wav: recipe/car_crash (3.11 s, peak at 1.58 s, -14 LUFS, clean) [recipe]
+built from: tyres/screech; car_door/slam (-7 semitones); metal/drop (-5 semitones); glass/break; can/drop (-3 semitones)
+```
+
+Far away, up close, softer, a length and "three times" are followed on a cookbook sound; what a recipe cannot do
+is said in the answer. An agent writes its own recipes for what the cookbook lacks (`earshot recipe --example`
+prints the form) and keeps them as JSON files in its own project: `earshot make --recipe roar.json -o roar.wav`.
+The method and the form: [docs/MAKE.md](docs/MAKE.md#when-earshot-has-no-such-sound-build-it).
+
 ### Themes and sets
 
 A theme is what makes a product's sounds one family: one voice, one key, one room and offsets on the axes, shared by

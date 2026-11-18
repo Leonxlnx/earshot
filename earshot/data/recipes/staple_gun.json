@@ -1,0 +1,11 @@
+{
+ "name": "staple_gun",
+ "says": "a staple gun firing",
+ "things": ["staple gun", "stapling gun", "staple gun firing", "stapler gun"],
+ "built": "A desk stapler lower as the spring, a cap gun far lower and dull as its shot, a hollow knock as the staple going into wood.",
+ "layers": [
+  {"sound": "stapler/desk", "pitch": -4, "gain": 0},
+  {"sound": "cap_gun/shot", "pitch": -7, "gain": -8, "lowpass": 3500},
+  {"sound": "knock/hollow", "pitch": -3, "gain": -6}
+ ]
+}

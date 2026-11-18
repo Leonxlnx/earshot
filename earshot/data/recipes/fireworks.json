@@ -1,0 +1,13 @@
+{
+ "name": "fireworks",
+ "says": "fireworks bursting in the sky",
+ "things": ["fireworks", "firework", "fireworks exploding", "fireworks display"],
+ "sketch": true,
+ "built": "A distant explosion three times as the bursts, a campfire's crackle higher after each as the sparks, a whistling pipe backwards as the rocket going up, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "explosion/far", "gain": 0, "events": {"count": 3, "gap": 1.3, "loose": 0.3}},
+  {"sound": "fire/camp", "dur": 1.2, "pitch": 5, "at": 0.25, "gain": -8, "highpass": 1500, "events": {"count": 3, "gap": 1.3, "loose": 0.3}},
+  {"sound": "whoosh/pipe", "pitch": 5, "gain": -10, "reverse": true}
+ ]
+}

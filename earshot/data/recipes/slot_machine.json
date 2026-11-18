@@ -2,6 +2,7 @@
  "name": "slot_machine",
  "says": "a slot machine: the lever, the reels and coins paying out",
  "things": ["slot machine", "one-armed bandit", "fruit machine"],
+ "sketch": true,
  "built": "A latch lower as the lever, a stopwatch's ticks running and slowing as the reels, three dial clicks lower as they stop, then coins on a floor and in a cup as the payout.",
  "layers": [
   {"sound": "lock/latch", "pitch": -4, "gain": -2},

@@ -1,7 +1,7 @@
 {
  "name": "door_slam_hall",
  "says": "a door slammed in a big hall",
- "things": ["door slammed in a big hall", "door slam hall", "door slam cathedral"],
+ "things": ["echoing door slam", "door slam echoing", "door slam hall", "door slammed in a big hall", "door slam cathedral"],
  "built": "A door slamming and its latch, a heavy boom far under it as the weight, in a cathedral.",
  "space": "cathedral",
  "layers": [

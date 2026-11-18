@@ -1,0 +1,11 @@
+{
+ "name": "skateboard",
+ "says": "a skateboard rolling on concrete",
+ "things": ["skateboard rolling", "skateboard", "skateboarding"],
+ "sketch": true,
+ "built": "A car passing far higher and dull as the wheels rolling on concrete, two hollow knocks lower as the board going over the cracks.",
+ "layers": [
+  {"sound": "pass/car", "pitch": 9, "gain": 0, "lowpass": 3000},
+  {"sound": "knock/hollow", "pitch": -5, "at": 1.2, "gain": -6, "events": {"count": 2, "gap": 1.1}}
+ ]
+}

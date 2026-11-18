@@ -2,6 +2,7 @@
  "name": "creaky_ship",
  "says": "a wooden ship creaking at sea",
  "things": ["creaky ship", "ship creaking", "creaking ship", "wooden ship creaking"],
+ "sketch": true,
  "built": "A door's creak and a floorboard's creak far lower as the timbers, leather gripped lower as the ropes, waves on rocks under it.",
  "kind": "ambience",
  "dur": 9,

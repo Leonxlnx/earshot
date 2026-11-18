@@ -1,0 +1,12 @@
+{
+ "name": "welding_torch",
+ "says": "a welding torch burning",
+ "things": ["welding torch", "welding", "welder", "arc welding"],
+ "built": "A gas burner igniting, then water sizzling and a pan sizzling as the arc's crackle, a spray can lower as the hiss of the gas.",
+ "layers": [
+  {"sound": "gas_stove/ignite", "gain": -4, "cut": [0, 1.2], "decay": 0.3},
+  {"sound": "water/sizzle", "at": 0.6, "gain": 0, "events": {"count": 3, "gap": 1.0}},
+  {"sound": "pan/sizzle", "at": 0.6, "gain": -5, "highpass": 1500, "cut": [0, 3.0]},
+  {"sound": "spray_can/spray", "pitch": -5, "at": 0.6, "gain": -10, "events": {"count": 4, "gap": 0.7}}
+ ]
+}

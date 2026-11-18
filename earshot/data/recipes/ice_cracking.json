@@ -2,6 +2,7 @@
  "name": "ice_cracking",
  "says": "ice cracking on a frozen lake",
  "things": ["ice cracking on a lake", "lake ice cracking", "frozen lake cracking", "ice cracking lake"],
+ "sketch": true,
  "built": "Ice cracking far lower, more cracks lower still that follow and slow, a twig snapping lower as the split, a crack of thunder thinned as the run across the ice, in a hall.",
  "space": "hall",
  "layers": [

@@ -2,12 +2,11 @@
  "name": "monster_growl",
  "says": "a monster growling",
  "things": ["monster growl", "monster growling", "beast growl", "beast growling"],
- "built": "A person's snore and a cat's purr an octave lower as the growl, a pig's grunt far lower as its throat, low rumble under it.",
+ "built": "A lion's roar far lower and duller as the growl, a person's snore lower as its throat, a pig's grunt far lower inside it.",
  "space": "room",
  "layers": [
-  {"sound": "snore/person", "pitch": -10, "cut": [0, 2.8], "gain": 0, "lowpass": 3000, "decay": 0.5},
-  {"sound": "cat/purr", "pitch": -12, "cut": [0, 2.8], "gain": -6, "decay": 0.6},
-  {"sound": "pig/oink", "pitch": -15, "at": 0.35, "gain": -4},
-  {"source": "noise", "color": "brown", "dur": 2.5, "lowpass": 120, "gain": -18, "swell": 0.4, "decay": 1.2}
+  {"sound": "lion/roar", "pitch": -9, "gain": 0, "lowpass": 3000},
+  {"sound": "snore/person", "pitch": -10, "cut": [0, 2.8], "gain": -5, "decay": 0.5},
+  {"sound": "pig/oink", "pitch": -15, "at": 0.35, "gain": -6}
  ]
 }

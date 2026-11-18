@@ -1,7 +1,7 @@
 {
  "name": "waterfall",
  "says": "a waterfall",
- "things": ["waterfall"],
+ "things": ["waterfall", "waterfall roaring", "falling water"],
  "built": "A brook lower and a running tap far lower as the falling water, broad noise as its roar, and plunges lower at its foot.",
  "kind": "ambience",
  "dur": 8,

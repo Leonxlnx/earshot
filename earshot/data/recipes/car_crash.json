@@ -1,0 +1,13 @@
+{
+ "name": "car_crash",
+ "says": "a car crashing",
+ "things": ["car crash", "car crashing", "car accident", "cars colliding"],
+ "built": "Tyres screeching, then a car door slammed lower and a heavy metal drop as the impact, glass breaking and a can falling as the debris.",
+ "layers": [
+  {"sound": "tyres/screech", "gain": -2, "cut": [0, 1.6], "decay": 0.2},
+  {"sound": "car_door/slam", "pitch": -7, "at": 1.5, "gain": 0},
+  {"sound": "metal/drop", "pitch": -5, "at": 1.52, "gain": -3},
+  {"sound": "glass/break", "at": 1.58, "gain": -6},
+  {"sound": "can/drop", "pitch": -3, "at": 2.1, "gain": -12}
+ ]
+}

@@ -2,13 +2,12 @@
  "name": "rocket_launch",
  "says": "a rocket launching",
  "things": ["rocket launch", "rocket launching", "rocket taking off", "rocket liftoff"],
- "built": "A gas burner igniting and a near explosion slowed down, then a jet pass and a campfire slowed into a roar that swells, with low rumble under it.",
- "dur": 6.5,
+ "sketch": true,
+ "built": "A recorded rocket launch with a gas burner igniting before it as the ignition, low rumble under it.",
+ "dur": 7.5,
  "layers": [
   {"sound": "gas_stove/ignite", "gain": -8},
-  {"sound": "explosion/near", "pitch": -5, "at": 0.25, "gain": -3, "lowpass": 3500},
-  {"sound": "pass/jet", "pitch": -7, "at": 0.3, "gain": -2, "swell": 0.8},
-  {"sound": "fire/camp", "dur": 6, "pitch": -5, "at": 0.3, "gain": -9, "swell": 0.6, "decay": 3.0},
-  {"source": "noise", "color": "brown", "dur": 6, "at": 0.3, "lowpass": [90, 240], "gain": -12, "swell": 1.0, "decay": 3.0}
+  {"sound": "rocket/launch", "seed": 2, "at": 0.3, "gain": 0},
+  {"source": "noise", "color": "brown", "dur": 6.5, "at": 0.3, "lowpass": [90, 240], "gain": -14, "swell": 1.0, "decay": 3.0}
  ]
 }

@@ -1,7 +1,7 @@
 {
  "name": "geiger_counter",
  "says": "a geiger counter clicking",
- "things": ["geiger counter", "geiger"],
+ "things": ["geiger counter", "geiger", "geiger counter clicking"],
  "sketch": true,
  "built": "A dial's click an octave higher and cut to its first 40 ms, fifty times as they come and getting denser, over a faint hiss.",
  "layers": [

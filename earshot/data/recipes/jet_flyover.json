@@ -2,6 +2,7 @@
  "name": "jet_flyover",
  "says": "a jet flying overhead",
  "things": ["jet flying over", "jet flyover", "jet overhead", "plane flying over"],
+ "sketch": true,
  "built": "A jet passing, a low whoosh lower with it, and thunder lower and dull as the roar that rolls away, with rumble that swells and falls.",
  "dur": 7.5,
  "layers": [

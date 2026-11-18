@@ -1,0 +1,16 @@
+{
+ "name": "crowd_gasp",
+ "says": "a crowd gasping in surprise",
+ "things": ["crowd gasp", "crowd gasping", "audience gasp", "audience gasping"],
+ "sketch": true,
+ "built": "A sharp breath in five times at once, each a new take, higher and lower, to both sides, a little applause under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "gasp/breath", "gain": 0, "pan": -0.5},
+  {"sound": "gasp/breath", "seed": 1, "pitch": 3, "at": 0.03, "gain": -2, "pan": 0.5},
+  {"sound": "gasp/breath", "seed": 2, "pitch": -3, "at": 0.06, "gain": -2, "pan": 0.1},
+  {"sound": "gasp/breath", "seed": 3, "pitch": 5, "at": 0.02, "gain": -4, "pan": -0.8},
+  {"sound": "gasp/breath", "seed": 4, "pitch": -5, "at": 0.08, "gain": -4, "pan": 0.8},
+  {"sound": "applause/audience", "gain": -24, "cut": [0, 1.0], "decay": 0.5}
+ ]
+}

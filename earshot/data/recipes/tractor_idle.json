@@ -1,0 +1,12 @@
+{
+ "name": "tractor_idle",
+ "says": "a tractor idling",
+ "things": ["tractor idling", "tractor", "tractor engine", "diesel engine idling"],
+ "sketch": true,
+ "built": "A car engine starting far lower as the diesel, a second take lower still as its idle, low rumble under it.",
+ "layers": [
+  {"sound": "car_engine/start", "pitch": -7, "gain": 0, "lowpass": 4000},
+  {"sound": "car_engine/start", "seed": 1, "pitch": -9, "cut": [1.5, 3.6], "at": 2.6, "gain": -3, "lowpass": 3000, "fade_in": 0.3},
+  {"source": "noise", "color": "brown", "dur": 5, "lowpass": 140, "gain": -16, "swell": 0.5, "decay": 1.0}
+ ]
+}

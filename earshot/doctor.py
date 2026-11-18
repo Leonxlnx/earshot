@@ -177,6 +177,15 @@ def check(load=False, fetch_missing=False):
         head.append(f"Sound bank {b['version']}: {b['sounds']} sounds ({ty.get('forge', 0) - b['pluck']} forge, "
                     f"{b['pluck']} plucks, {ty.get('fit', 0)} fitted from CC0 recordings"
                     + (f"; extra files from EARSHOT_BANK: {', '.join(b['extra'])}" if b['extra'] else '') + ').')
+    try:                # the cookbook: sounds built from the catalogue's parts (earshot.recipe)
+        from . import recipe
+        book = recipe.cookbook()
+        sk = sum(1 for x in book.values() if x.get('sketch'))
+        r['recipes'] = {'cookbook': len(book), 'sketches': sk}
+        head.append(f"Cookbook: {len(book)} recipes built from the catalogue's parts ({len(book) - sk} answer "
+                    f"requests, {sk} sketches; `earshot recipe --list`).")
+    except Exception as e:  # noqa: BLE001  (a broken recipe file: say so, keep checking the rest)
+        problems.append(f'cookbook: {type(e).__name__}: {e}')
     r['problems'], r['notes'] = problems, notes
     r['summary'] = ' '.join(head + ['earshot looks healthy.' if not problems else
                                     'Problems: ' + '; '.join(p.rstrip('.') for p in problems) + '.'] + notes)

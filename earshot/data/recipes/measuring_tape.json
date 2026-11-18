@@ -1,0 +1,10 @@
+{
+ "name": "measuring_tape",
+ "says": "a measuring tape snapping back",
+ "things": ["measuring tape", "tape measure", "tape measure snapping back", "measuring tape snapping back"],
+ "built": "A jacket zipper higher and fast as the tape running back, a latch as it snapping into its case.",
+ "layers": [
+  {"sound": "zipper/jacket", "pitch": 5, "cut": [0, 0.55], "gain": 0, "fade_in": 0.05},
+  {"sound": "lock/latch", "pitch": 2, "at": 0.5, "gain": 0}
+ ]
+}

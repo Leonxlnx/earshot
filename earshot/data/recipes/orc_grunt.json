@@ -1,0 +1,10 @@
+{
+ "name": "orc_grunt",
+ "says": "an orc grunting",
+ "things": ["orc grunt", "orc grunting", "troll grunt", "ogre grunt"],
+ "built": "A person's burp lower as the grunt, a pig's grunt far lower inside it, close.",
+ "layers": [
+  {"sound": "burp/person", "pitch": -5, "gain": 0},
+  {"sound": "pig/oink", "pitch": -10, "gain": -4}
+ ]
+}

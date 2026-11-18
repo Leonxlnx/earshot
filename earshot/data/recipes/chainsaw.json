@@ -1,7 +1,8 @@
 {
  "name": "chainsaw",
  "says": "a chainsaw revving",
- "things": ["chainsaw"],
+ "things": ["chainsaw", "chain saw", "chainsaw cutting"],
+ "sketch": true,
  "built": "A car engine starting higher as the small engine catching, an electric drill far lower as its rattle, a motorcycle passing higher as the rev, and a saw in wood as the cut.",
  "layers": [
   {"sound": "car_engine/start", "pitch": 5, "gain": -2},

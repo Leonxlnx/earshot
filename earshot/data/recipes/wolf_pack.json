@@ -2,6 +2,7 @@
  "name": "wolf_pack",
  "says": "a pack of wolves howling",
  "things": ["wolf pack howling", "wolf pack", "wolves howling", "pack of wolves"],
+ "sketch": true,
  "built": "Four wolf howls, each another take: one near, three that join later, lower or higher, duller and to the sides, with wind in trees far under them, in a hall.",
  "space": "hall",
  "layers": [

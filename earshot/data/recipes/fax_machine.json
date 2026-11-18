@@ -1,0 +1,13 @@
+{
+ "name": "fax_machine",
+ "says": "a fax machine printing an incoming page",
+ "things": ["fax machine", "fax", "fax coming in", "incoming fax"],
+ "sketch": true,
+ "built": "A phone dial clicking as the line picking up, an electric drill far higher and dull as the motor, ballpoint strokes as the print, a page turned as the sheet sliding out.",
+ "layers": [
+  {"sound": "dial/click", "gain": -4, "events": {"count": 3, "gap": 0.18}},
+  {"sound": "drill/electric", "pitch": 8, "cut": [0.3, 2.5], "at": 0.7, "gain": -8, "lowpass": 3500, "fade_in": 0.1, "fade_out": 0.3},
+  {"sound": "pen/ballpoint", "pitch": -5, "at": 0.8, "gain": -9, "events": {"count": 5, "gap": 0.38}},
+  {"sound": "page/turn", "at": 2.8, "gain": 0}
+ ]
+}

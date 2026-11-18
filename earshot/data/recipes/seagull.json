@@ -1,0 +1,11 @@
+{
+ "name": "seagull",
+ "says": "a seagull crying",
+ "things": ["seagull", "seagull cry", "seagull crying", "seagulls", "gull crying"],
+ "built": "A cat's meow higher and short as the gull's cry three times, a crow's caw higher inside it, waves on sand under it.",
+ "layers": [
+  {"sound": "cat/meow", "pitch": 5, "cut": [0, 0.7], "decay": 0.15, "gain": 0, "events": {"count": 3, "gap": 0.55, "loose": 0.2}},
+  {"sound": "crow/caw", "pitch": 4, "gain": -7, "events": {"count": 3, "gap": 0.55, "loose": 0.2}},
+  {"sound": "waves/sand", "dur": 3.2, "gain": -18}
+ ]
+}

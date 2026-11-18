@@ -1,0 +1,11 @@
+{
+ "name": "parrot",
+ "says": "a parrot squawking",
+ "things": ["parrot squawk", "parrot", "parrot squawking", "macaw squawk"],
+ "sketch": true,
+ "built": "A crow's caw higher and a chicken's cluck far higher inside it, twice, as the parrot's squawk.",
+ "layers": [
+  {"sound": "crow/caw", "pitch": 5, "gain": 0, "events": {"count": 2, "gap": 0.5, "loose": 0.2}},
+  {"sound": "chicken/cluck", "pitch": 7, "cut": [0, 0.35], "decay": 0.08, "gain": -6, "events": {"count": 2, "gap": 0.5, "loose": 0.2}}
+ ]
+}

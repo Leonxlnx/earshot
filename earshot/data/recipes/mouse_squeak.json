@@ -1,0 +1,10 @@
+{
+ "name": "mouse_squeak",
+ "says": "a mouse squeaking",
+ "things": ["mouse squeak", "mouse squeaking", "mice squeaking", "rat squeak", "rat squeaking"],
+ "sketch": true,
+ "built": "A squeaky toy far higher and short, three times as they come, as the mouse.",
+ "layers": [
+  {"sound": "toy/squeak", "pitch": 10, "cut": [0, 0.25], "decay": 0.06, "gain": 0, "events": {"count": 3, "gap": 0.22, "loose": 0.4, "softer": -2}}
+ ]
+}

@@ -1,0 +1,10 @@
+{
+ "name": "film_projector",
+ "says": "an old film projector running",
+ "things": ["film projector", "old film projector", "movie projector", "projector running"],
+ "built": "A mechanical clock's tick higher and fast, forty-eight times and a little uneven, as the film's claw, an electric drill far lower and dull as the motor.",
+ "layers": [
+  {"sound": "clock/mechanical", "pitch": 5, "cut": [0, 0.08], "decay": 0.03, "gain": 0, "events": {"count": 48, "gap": 0.0625, "loose": 0.15}},
+  {"sound": "drill/electric", "pitch": -12, "cut": [0.3, 3.4], "gain": -12, "lowpass": 1500, "fade_in": 0.2, "fade_out": 0.3}
+ ]
+}
