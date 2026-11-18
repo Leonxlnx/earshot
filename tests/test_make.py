@@ -584,9 +584,10 @@ def test_a_length_asked_of_a_scattered_or_shaken_action_holds(tmp_path):
 
 
 def test_a_design_named_inside_its_family_wins_over_the_default():
-    """"tape stop" is a downlifter, whose default is fall/air; the request names downlifter/tape"""
+    """"tape stop" is a downlifter, whose default is fall/air; the request names a tape stop: the recordings run
+    down (stop/tape), not the swept tone of downlifter/tape"""
     from earshot.make import choose
     for want in ('tape stop', 'a tape stop effect'):
         b, cands = choose(want, top=4)
-        assert cands[0]['id'] == 'downlifter/tape'
+        assert cands[0]['id'] == 'stop/tape'
         assert cands[1]['score'] < 0.9 * cands[0]['score']                 # no near tie: not a guess

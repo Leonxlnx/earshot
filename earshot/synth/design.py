@@ -4,6 +4,8 @@ no oscillator, no noise source, no filter sweep. Everything heard is a take of a
 
     take     a take of a model inside the range where the engine stays natural (size 0.7 .. 1.4, length 0.6 .. 1.8,
              pitch at most 7 semitones): a bigger drum, a slower whoosh, a brass note moved to a chord tone
+    stretch  a take of air (a whoosh, a breath, a flame) slowed up to 3 times: a long build from a short recording
+    opening  a take growing brighter from start to end, the top arriving last (a build)
     reverse  a decay played backwards: a reversed cymbal or gong swell IS the classic riser, a reversed whoosh the
              suck-in before a hit; it ends where the strike was, on its loudest moment
     rise     the build a take holds (up to its loudest moment, or its decay reversed); fall: the decay it holds
@@ -34,6 +36,7 @@ SIZE = (0.7, 1.4)           # resyn size and length factors inside which a take 
 LENGTH = (0.6, 1.8)         # (earshot.sounds.learned: measured on the bands' envelope modulation)
 PITCH = 7.0                 # semitones a take is moved at most
 RING = (0.5, 2.0)
+AIR = 3.0                   # how far stretch slows a take of air
 
 
 def take(model, r, size=1.0, length=1.0, pitch=0.0, bright=0.0, hard=0.0, ring=1.0, weight=0.0, vary=0.0):
@@ -60,6 +63,20 @@ def take(model, r, size=1.0, length=1.0, pitch=0.0, bright=0.0, hard=0.0, ring=1
         if peak > 0.98:
             y *= 0.98 / peak
     return y
+
+
+def stretch(model, r, factor, **kw):
+    """a take of a model of air (a whoosh, a breath, a burst of flame: noise in bands, no pitch, no strokes) slowed
+    `factor` times by resynthesis, up to AIR times: its band envelopes are drawn out and the noise in them drawn
+    fresh, so a long build stays air where a struck or tonal thing slowed that far would smear. Other arguments as
+    take, inside its ranges"""
+    kw = {k: v for k, v in kw.items() if k != 'length'}
+    if factor <= LENGTH[1]:
+        return take(model, r, length=max(factor, LENGTH[0]), **kw)
+    y = resyn.render(model, r, length=float(min(factor, AIR)), bright=kw.get('bright', 0.0),
+                     hard=float(np.clip(kw.get('hard', 0.0), -1.0, 1.0)))
+    peak = np.abs(y).max()
+    return y * (0.98 / peak) if peak > 0.98 else y
 
 
 def _env(y, ms):
@@ -162,6 +179,23 @@ def move(y, r, travel=1.0, fall=1.0, near=0.35, side=None):
     return dsp.fade(out, 0.002, min(0.02, 0.1 * m / SR))
 
 
+def halt(y, seconds, at=None, curve=1.6):
+    """y running down to a stop, as a tape or a turntable does when its motor is cut: from `at` s (default: so the
+    stop ends with y's end, else its start) the take is read at a speed falling from 1 to 0 over `seconds` s
+    (1 - u ** (1 / curve): fast at first, the last slow turns long), so pitch and tempo sink together through the
+    recording itself; what follows the stop is silence. Stereo in, stereo out"""
+    y = np.asarray(y, np.float64)
+    y = y if y.ndim == 2 else np.stack([y, y], axis=1)
+    n, k = len(y), dsp.n_of(seconds)
+    a = dsp.n_of(at) if at is not None else max(0, n - int(k / (curve + 1.0)) - 2)   # the stop reads k / (curve + 1)
+    u = np.linspace(0.0, 1.0, k)
+    speed = np.clip(1.0 - u ** (1.0 / curve), 0.0, 1.0)
+    pos = a + np.concatenate([[0.0], np.cumsum(speed[:-1])])
+    pos = pos[pos < n - 1]
+    z = np.concatenate([y[:a], fx._hermite(y, pos)])
+    return z
+
+
 def fade(y, fin=0.0, fout=0.0, shape='power'):
     """y with a fade in over `fin` s and a fade out over `fout` s: shape 'power' (equal power, a quarter sine),
     'lin', or 'db' (straight in dB, from 60 dB down: the shape of a natural decay)"""
@@ -191,6 +225,30 @@ def span(y, a=0.0, b=None, fin=0.004, fout=0.03, shape='power'):
     y = np.asarray(y, np.float64)
     i, j = dsp.n_of(max(a, 0.0)), len(y) if b is None else min(len(y), dsp.n_of(b))
     return fade(y[i:j], fin if i > 0 else 0.0, fout if j < len(y) else 0.0, shape)
+
+
+def opening(y, hz=500.0, power=1.5):
+    """y growing brighter from its start to its end, as a build does: what lies over `hz` Hz (a second-order split,
+    the two parts summing back to y) comes in along (t / T) ** power while what lies under it is heard throughout,
+    so the top arrives last and the take ends on all of itself (a reversed decay already brightens this way; this
+    makes it hold for a take that was not recorded as a decay)"""
+    y = np.asarray(y, np.float64)
+    lo = dsp.butter(y, 'low', hz, order=2)
+    u = np.linspace(0.0, 1.0, len(y)) ** power
+    return lo + (y - lo) * (u if y.ndim == 1 else u[:, None])
+
+
+def contour(y, start_db=-24.0, ms=60.0, floor_db=-50.0):
+    """y with its level redrawn as a build is drawn on a fader: its own envelope (over `ms` milliseconds) divided
+    out and a line straight in dB laid on, from `start_db` at the start to 0 dB at the end, so a reversed decay that
+    spends its first second 40 dB down is heard from its start and grows evenly; the grain inside the envelope is
+    kept. Moments more than `floor_db` under its loudest are not lifted further than that"""
+    y = np.asarray(y, np.float64)
+    e = _env(y, ms)
+    e = np.maximum(e, e.max() * 10 ** (floor_db / 20))
+    line = 10 ** (np.linspace(start_db, 0.0, len(y)) / 20) / e * e.max()
+    z = y * (line if y.ndim == 1 else line[:, None])
+    return z * (np.abs(y).max() / (np.abs(z).max() + 1e-20))
 
 
 def pad(y, seconds):

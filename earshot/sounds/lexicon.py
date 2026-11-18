@@ -434,6 +434,16 @@ INTERFACE_JOBS = {'hover': 'hover/fingertip', 'switch_on': 'toggle/rocker_on', '
                   'error': 'error/thud', 'delete': 'delete/crumple'}
 # where an interface job happens, not what it is: "open a menu" is an opening (brief.rank)
 INTERFACE_PLACES = frozenset(('menu',))
+# the jobs of a motion film (a logo, a title hit, a transition, a riser, a glitch ...). Motion films use no
+# instrument note, bell or synthesised tone as an effect: their effects are short low hits, thumps, clicks and
+# passes of air, and their tonal content is their music. A request for one of these jobs (or one whose domain is a
+# film or video) gets a sound of real things; a design with a note in it answers only when the words ask for music
+# (brief.FILM_MUSIC) or the request is for a game (brief.rank)
+MOTION_JOBS = frozenset(('logo', 'sting', 'impact', 'whoosh', 'swish', 'flyby', 'glitch', 'braam'))
+# jobs that are motion jobs when the request's domain is a film or a video (an intro, something appearing, a
+# shine on a product): in an app they keep their interface sounds
+MOTION_DOMAIN_JOBS = frozenset(('startup', 'shimmer', 'pop', 'open', 'thud', 'riser', 'reverse', 'sub_drop',
+                                'downlifter', 'text'))
 # an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. An invented
 # tactile sound scores 1 to 2 of 5 in listening tests and the recorded one 4 to 5, so a request that names the thing
 # and reaches the invented one gets the recording (brief._preferred); the invented one still answers to its own id

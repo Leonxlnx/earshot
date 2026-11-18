@@ -36,15 +36,12 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design answers only a request that names its thing and wins a tie with an invented one. Why: the owner gave a
   recording and its renders the same rating on all 24 rows of his test, and rated sounds invented from formulas for
   real things 1-2 of 5.
-- **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 12
-  beds from 11 BigSoundBank textures (3.87 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
+- **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
+  beds from 12 BigSoundBank textures (5.42 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
   `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
-  `underwater/deep`, `rain/street`. Takes of the texture's models are cut into pieces and stitched where the texture
-  is in a similar state, so a bed plays for any length without a loop point. `rain/window`, `forest/morning`,
-  `wind/trees` and the other scenes are made from rules.
-- **Wind in the trees** (`wind/trees`): made by the texture engine like the rain (the wind model in the trees, no
-  howl): most of its movement is in gusts under 1 Hz and the leaves follow them. The recording it was learned from
-  is a thin rustle whose leaves do not follow its gusts; its texture was removed from the store.
+  `underwater/deep`, `rain/street`, `wind/trees`. Takes of the texture's models are cut into pieces and stitched
+  where the texture is in a similar state, so a bed plays for any length without a loop point. `rain/window`,
+  `forest/morning` and the other scenes are made from rules.
 - **The interface set from real keys and switches**: in `make --set ui` (17 sounds) the tap, hover, toggles,
   typing, next and back are learned keyboards, a leather touch and a lamp switch; the signals are tonal figures on
   the real marimba. No bell or glass timbre unless a request or a theme asks for one.
@@ -179,6 +176,12 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   tests that load CLAP run with `--slow`.
 - **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
+- **Motion effects as motion films use them**, all from recordings: a 50 ms low thump for something appearing
+  (`thump/appear`), short dry low hits with a swell of air into them under a title (`slam/title`) and a logo
+  (`boom/short`, `boom/deep`, `sting/reveal`), the hit after a stop (`hit/drop`), a bright click (`tick/soft`),
+  whooshes and risers of plain air that keep the length asked for, a glitch cut from real buzzes and clicks, a shine
+  of air (`shine/air`), a tape stop of a real roll running down (`stop/tape`); a motion job gets no instrument note
+  or synthesised tone unless its words ask for music (`brief.FILM_MUSIC`).
 
 ### Changed
 
@@ -210,6 +213,15 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   unwarped, or says the recording is shorter ("coins dropping, 3 seconds").
 - **A design named inside its family wins over the family's default**: "tape stop" is `downlifter/tape`, no
   longer `fall/air`.
+- **`fire/camp` keeps every crackle**: its recording is learned again with a model onset at each crackle (30 per
+  second, not 24 per chunk), and its two sides are two takes that share the crackles (no all-pass decorrelator).
+- **`waves/sand` is learned from "Small Waves, Froth and Beach"** (BigSoundBank, CC0, taken at 10 cm), its takes
+  without redrawn grain, so the foam keeps its bubbles; a loop of waves starts as a wave rises, not in a trough.
+- **`wind/trees` is learned from "Wind in a cornfield"** (BigSoundBank, CC0): dry leaves rustling at 2-10 kHz that
+  swell with each gust, in place of the wind model of the texture engine.
+- **`rain/window` drops the gutter's bubble**: the one tonal, regular drip in it; the rest is the same rain.
+- **Stitched waves are played whole** (`quilt`): each joins where its chunk was cut, not at a quiet moment inside its wash,
+  so a bed of waves is not resampled (lower and slower) to fill its length.
 
 ### Fixed
 

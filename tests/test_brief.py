@@ -580,10 +580,10 @@ NEW_ANCHORS = [
     ('reverse cymbal', ('rise/reverse', 'reverse_swell/', 'cymbal/reverse')),
     ('a cymbal played backwards into the cut', ('rise/reverse', 'reverse_swell/', 'cymbal/reverse')),
     ('a quick suck in before the cut', ('suck/',)),
-    ('a soft pop when the icon appears', ('pop/',)),
+    ('a soft pop when the icon appears', ('pop/', 'thump/appear')),
     ('bubble pop', ('pop/bubble',)),
     ('a wooden tock when the tile snaps into place', ('tock/wood', 'knock/soft')),
-    ('a glint on the logo', ('shine/glint',)),
+    ('a glint on the logo', ('shine/',)),
     ('shimmer sweeping across the screen', ('shine/sweep',)),
     ('sparkle burst', ('sparkle/burst',)),
     ('a short glitch', ('glitch/',)),
@@ -672,6 +672,38 @@ NEW_ANCHORS = [
 def test_new_family_anchor(idx, text, prefixes):
     r = brief.rank(brief.read(text), idx=idx, top=3)
     assert r and (r[0]['id'].startswith(prefixes) or _learned_twin(r[0]['id'], prefixes)), (text, r)
+
+
+# motion jobs get the sounds of real things motion films use (short low hits, thumps, ticks, passes of air); a design
+# with a note in it answers only when the words ask for notes (brief.FILM_MUSIC) or the request is for a game
+MOTION_REAL = [
+    ('a logo reveal hit', ('boom/short', 'sting/reveal')),
+    ('a logo hit', ('boom/short', 'sting/reveal')),
+    ('a logo reveal', ('sting/reveal', 'boom/short')),
+    ('a title hit', ('slam/title',)),
+    ('a cinematic boom', ('boom/deep',)),
+    ('a pop when an element appears', ('thump/appear',)),
+    ('a soft ui tick', ('tick/soft',)),
+    ('a glitch transition', ('glitch/short',)),
+    ('lens flare shimmer', ('shine/air',)),
+    ('a logo reveal with a soft piano chord', ('logo/',)),
+    ('a marimba logo jingle', ('logo/',)),
+    ('a signature little tune for when the company name appears', ('logo/',)),
+]
+
+
+@pytest.mark.parametrize('text,prefixes', MOTION_REAL)
+def test_motion_jobs_get_real_sounds_unless_notes_are_asked_for(idx, text, prefixes):
+    r = brief.rank(brief.read(text), idx=idx, top=3)
+    assert r and r[0]['id'].startswith(prefixes), (text, r)
+
+
+def test_the_film_rule_steps_back_only_pitched_invented_designs():
+    b = brief.read('a logo reveal hit')
+    ids = [r['id'] for r in brief.rank(b, top=None)]
+    assert ids.index('boom/short') < ids.index('logo/bloom')
+    b = brief.read('a logo reveal hit for a platformer game')            # a game keeps its tonal stingers
+    assert b['domain'] == 'game'
 
 
 # the thing a person does several times in a row: the design it finds, and whether the request asks for the action

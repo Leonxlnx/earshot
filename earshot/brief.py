@@ -136,6 +136,11 @@ MUSIC_STEMS = TONE_STEMS | frozenset(stem(w) for w in (
     'notes', 'melody', 'jingle', 'arpeggio', 'arpeggiated', 'tune', 'tuneful', 'instrument', 'music', 'musically',
     'harmony', 'chord', 'bell', 'bells', 'ding', 'chiming', 'xylophone', 'glockenspiel', 'vibraphone', 'harp',
     'piano', 'pizzicato', 'kalimba', 'celesta', 'synth', 'synthesizer', 'ringtone'))
+# a motion request that says one of these asks for notes (a sonic logo of a few notes, a motif, a pad, a drone): only
+# then does a design with a note in it answer a motion job (lexicon.MOTION_JOBS); otherwise it steps back by FILM_TONE
+FILM_MUSIC = MUSIC_STEMS | frozenset(stem(w) for w in (
+    'motif', 'sonic', 'mnemonic', 'pad', 'drone', 'catchy', 'memorable', 'signature', 'musical', 'marimba'))
+FILM_TONE = 0.4
 
 
 def _key(words_):
@@ -1115,11 +1120,15 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     # a word too common to lead ("a modal slides in": open), the kind of sound ("a swoosh that flies away": send)
     # or the place of the job ("open a menu": open)
     music = bool(said & MUSIC_STEMS) or bool(b.get('voice')) or dom == 'music' or 'music' in b['concepts']
-    ui_job = dom != 'game' and mat != 'retro' and any(c in L.INTERFACE_JOBS for c in b['concepts'])
+    ui_job = dom not in ('game', 'motion') and mat != 'retro' and any(c in L.INTERFACE_JOBS for c in b['concepts'])
     lead = None if head in L.SOUND_FAMILIES or head in L.INTERFACE_PLACES else head
     job = L.INTERFACE_JOBS.get(lead) or (next((L.INTERFACE_JOBS[c] for c in b['concepts'] if c in L.INTERFACE_JOBS),
                                               None) if lead is None else None)
     job = job if ui_job else None
+    # a motion job (a logo, a hit, a transition ...; an intro, an appearance, a shine when a film or video is the
+    # domain), not a game, and no word that asks for notes: a design with a note in it steps back (FILM_TONE)
+    film = (dom != 'game' and not (said & FILM_MUSIC) and not b.get('voice') and 'music' not in b['concepts']
+            and any(c in L.MOTION_JOBS or (dom == 'motion' and c in L.MOTION_DOMAIN_JOBS) for c in b['concepts']))
     pool = (named_ or [k for k in invented if dom in rows[k].get('domains', ())]
             or invented or list(score))                # nothing named: the closest in feel, in the request's domain
     if mat == 'retro' and not any(chip(rows[k]) for k in pool):
@@ -1151,6 +1160,8 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
               and not (mat and mat not in t['mats'])):
             s *= ROLE         # "a tap", "hover", "toggle on": the recorded one; not when it is of another material
             #                   than the request names ("a wooden tap" is no plastic key)
+        if film and _pitched(row, t) and 'real' not in row.get('tags', ()):
+            s *= FILM_TONE    # "a logo reveal hit": a low hit, not a felt piano; "a logo motif": the notes
         if dom and row.get('domains'):
             s *= 1.15 if dom in row['domains'] else 0.85
         if mat == 'retro':

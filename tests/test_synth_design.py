@@ -88,3 +88,43 @@ def test_fades_and_spans():
     s = design.span(y, 0.25, 0.5, fin=0.01, fout=0.01)
     assert len(s) == SR // 4 and s[0, 0] == 0.0 and s[-1, 0] == 0.0 and s[len(s) // 2, 0] == 1.0
     assert len(design.pad(y, 0.1)) == SR + SR // 10
+
+
+def _noise_decay(n=1.0, tau=0.25, seed=3):
+    """a synthetic burst of air: white noise dying away with time constant tau"""
+    r = np.random.default_rng(seed)
+    t = np.arange(int(n * SR)) / SR
+    return 0.3 * r.standard_normal(len(t)) * np.exp(-t / tau)
+
+
+def _centroid(y):
+    P = np.abs(np.fft.rfft(np.atleast_2d(y.T).T.mean(axis=1))) ** 2
+    f = np.fft.rfftfreq(len(y), 1 / SR)
+    return float((P * f).sum() / P.sum())
+
+
+def test_stretch_draws_air_out_beyond_the_natural_range():
+    m = resyn.analyze(_noise_decay(), SR)
+    a = design.take(m, dsp.rng(1))
+    b = design.stretch(m, dsp.rng(1), 2.6)
+    assert 2.0 < len(b) / len(a) < 3.2 and np.isfinite(b).all() and np.abs(b).max() <= 0.98
+    assert np.array_equal(design.stretch(m, dsp.rng(1), 1.2), design.take(m, dsp.rng(1), length=1.2))
+
+
+def test_opening_and_contour_make_a_build():
+    y = design.reverse(np.stack([_noise_decay()] * 2, axis=1))
+    z = design.contour(design.opening(y, 800.0), -24.0)
+    q = np.array_split(z, 4)
+    lv = [float(np.sqrt(np.mean(p ** 2))) for p in q]
+    assert lv[0] < lv[1] < lv[2] < lv[3] and 15.0 < 20 * np.log10(lv[3] / lv[0]) < 30.0     # a straight line in dB
+    assert _centroid(q[3]) > 1.5 * _centroid(q[0])                                          # the top arrives last
+
+
+def test_halt_slows_pitch_and_time_together_to_silence():
+    t = np.arange(int(1.0 * SR)) / SR
+    y = np.stack([0.5 * np.sin(2 * np.pi * 440.0 * t)] * 2, axis=1)
+    z = design.halt(y, 0.6)
+    assert 1.25 < len(z) / SR < 1.45                              # 0.77 s as it was, then 0.6 s running down
+    a, b = z[int(0.1 * SR):int(0.3 * SR), 0], z[-int(0.35 * SR):-int(0.15 * SR), 0]
+    zc = [np.sum(np.abs(np.diff(np.sign(x))) > 0) / len(x) for x in (a, b)]
+    assert zc[1] < 0.6 * zc[0]                                   # the tone sinks as the reading slows
