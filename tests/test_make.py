@@ -160,7 +160,7 @@ def test_also_is_filled_from_the_catalogue(tmp_path):
         assert len(part.split(' (', 1)[1]) <= 44, part                 # about 40 characters each
     res = make('pause menu open', str(tmp_path / 'p.wav'))
     s = res['summary']
-    assert s.startswith('p.wav: open/air')                         # "menu open" is a job of open/air: the pick
+    assert s.startswith('p.wav: open/drawer')                      # "menu open" is a job of open/drawer: the pick
     res = make('crickets at night', str(tmp_path / 'n.wav'), dur=2, loop=False)
     assert len(res['also']) == 3 and 'also: ' + ', '.join(res['also']) in res['summary']
     assert sum(1 for ln in res['summary'].splitlines() if 'also' in ln) == 1
@@ -470,7 +470,6 @@ def test_a_request_nothing_knows_gets_the_nearest_and_says_so(tmp_path):
     ('a stomach growl', 'earshot makes no stomach growl; rumble/quake is only the nearest'),
     ('a paper shredder', 'earshot makes no paper shredder; paper/rip is only the nearest'),
     ('rain on a tarp', 'no rain on a tarp: rain/tent is the nearest surface'),
-    ('footsteps in mud', 'no footsteps in mud: step/grass is the nearest surface'),
 ])
 def test_a_missing_thing_and_a_missing_surface_are_said_with_alternatives(text, start):
     """the thing or what it does is unknown: the nearest kind of sound, said to be only that; the sound exists but

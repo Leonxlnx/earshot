@@ -145,8 +145,9 @@ def doubt(b, cands):
         return None
     top = cands[0]
     absent = brief.not_made(b, top['why'])
+    absent = absent or brief.owner_unknown(b, top['id'], top['why'])
     if absent:                          # "a dog barking", "a rocket launch": no design is one; only the nearest
-        return f'earshot makes no {absent}; {top["id"]} is only the nearest sound it has'
+        return f'earshot makes no {absent}; {top["id"]} is only the nearest sound it has'   # "a fax machine" too
     other = surface(b, top['id'])
     if other:                           # "rain on an umbrella": the rain exists, on another surface
         return other
@@ -483,6 +484,24 @@ def unfollowed(b, sound, why, ignored, req, given, takes):
             if k != 'pitch' and k not in given and str(req[k]).lower() not in words_of(b):
                 continue        # read from another word ("a chair": wood), not asked for: nothing to say
             out.append(f'not followed: {k} {req[k]}; this sound has no {k} to set and plays as designed')
+    import re
+    text = (b.get('text') or '').lower()
+    if 'dur' not in ignored and req.get('dur') and takes and not any(t.get('note') for t in takes):
+        got = max(t['dur_s'] for t in takes)        # "a whoosh, 2 seconds long" made at its own 2.9 s
+        if abs(got - req['dur']) > max(0.25, 0.2 * req['dur']):
+            out.append(f"{got:.2f} s, not the {req['dur']:g} s asked: this sound is made at its own length")
+    # a change over the length of the sound ("getting louder", "slowing down"): no design changes as it plays,
+    # only a recipe built for it ("a heartbeat getting faster")
+    m = re.search(r'\b(?:getting|growing|becoming|going|gets|grows|turning)\s+(?:louder|quieter|softer|faster|'
+                  r'slower|closer|nearer|further|farther|bigger|smaller|higher|lower|deeper|brighter|darker)\b'
+                  r'|\b(?:speeding up|slowing down|fading (?:in|out|away)|coming closer|moving away)\b', text)
+    if m and not sound.startswith('recipe/'):
+        out.append(f'not followed: "{m.group(0)}"; this sound stays the same from its start to its end')
+    # heard through something: a door, a wall, water
+    m = re.search(r'\b(?:behind|through) (?:a |the )?(?:closed |shut |thick )?(?:door|wall|window)\b'
+                  r'|\b(?:from|in) the next room\b|\bunder ?water\b|\bmuffled\b', text)
+    if m and not {'underwater', 'muffled'} & set(re.findall('[a-z]+', sound)):
+        out.append(f'not followed: "{m.group(0)}"; the sound is heard as in the same room, not through anything')
     return out
 
 

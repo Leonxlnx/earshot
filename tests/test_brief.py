@@ -403,7 +403,8 @@ def test_a_member_named_in_the_request_is_the_one_chosen():
         fams.setdefault(sid.split('/')[0], []).append(sid)
     cases = [(f"{sid.split('/')[1]} {fam.replace('_', ' ')}", sid) for fam, ids in fams.items() if len(ids) > 1
              and all(_sayable(p, registry.get(ids[0])) or p in L.CONCEPTS for p in fam.split('_'))
-             for sid in ids if _sayable(sid.split('/')[1], registry.get(sid))]
+             for sid in ids if _sayable(sid.split('/')[1], registry.get(sid))
+             and 'interface' not in registry.get(sid).tags]      # "door close" is a door: door/shut (brief._world)
     assert len(cases) > 60
     terms = {r['id']: t for r, t in zip(*brief._default_index()[:2])}
 
@@ -924,8 +925,8 @@ def test_a_voice_of_another_person_is_not_made(idx, text):
 
 
 @pytest.mark.parametrize('text,want', [
-    ('task complete', 'complete/'), ('checkout complete', 'complete/'), ('a success sound', 'success/click'),
-    ('switch', 'toggle/rocker_on'),
+    ('task complete', 'complete/'), ('checkout complete', 'complete/'), ('a success sound', 'success/shutter'),
+    ('switch', 'toggle/key_down'),
 ])
 def test_a_family_of_the_job_named_by_its_word_wins(idx, text, want):
     """the job's default (lexicon.INTERFACE_JOBS) is not raised over another interface family of the same job that
@@ -988,7 +989,7 @@ def test_a_job_keeps_its_only_sounds_and_a_word_its_company(idx, text, want):
     ('when you pick up a file to drag it', ('tick/', 'tock/')),
     ('the big title lands on screen with real weight', ('boom/', 'thump/', 'slam/', 'hit/drop')),
     ('the logo settles into the middle at the end of the film', ('boom/short', 'sting/reveal', 'thump/')),
-    ('a short papery crunch when an email is thrown away', 'delete/crumple'),
+    ('a short papery crunch when an email is thrown away', ('delete/', 'paper/ball')),
     ('the camera zooms fast into the laptop screen', 'whoosh/'),
     ('a quick light swoosh as the message goes out', 'send/swoosh'),
     ('the bars of the chart grow up one after another', 'rise/air'),
@@ -1092,8 +1093,8 @@ def test_food_is_no_notification_and_no_music(idx, text, never):
     assert not any(r['id'].startswith(never) for r in brief.rank(b, idx=idx, top=3))
 
 
-def test_a_whisk_is_not_made():
-    assert brief.not_made(brief.read('a whisk beating eggs in a bowl')) == 'whisk'
+def test_a_whisk_is_made():
+    assert brief.not_made(brief.read('a whisk beating eggs in a bowl')) is None
 
 
 @pytest.mark.parametrize('text,want', [('footsteps on concrete, 4 seconds', 'step/concrete'),
@@ -1117,10 +1118,10 @@ def test_stemmed_words_name_no_domain():
 
 
 @pytest.mark.parametrize('text,want', [
-    ('a copy to clipboard confirmation', 'success/click'),
-    ('a subtle acknowledgement sound for a form', 'success/click'),
-    ('a positive feedback sound for my app', 'success/click'),
-    ('a soft approval sound', 'success/click'),
+    ('a copy to clipboard confirmation', 'success/shutter'),
+    ('a subtle acknowledgement sound for a form', 'success/shutter'),
+    ('a positive feedback sound for my app', 'success/shutter'),
+    ('a soft approval sound', 'success/shutter'),
     ('a cue when the message is sent', 'send/swoosh'),
     ('a success chime', 'success/rise'),
     ('a success sound on a marimba', 'success/rise'),
@@ -1139,7 +1140,7 @@ def test_an_interface_moment_gets_no_figure_unless_the_words_ask_for_one(idx, te
     ('a reload sound for my shooter game', 'gun/reload'),
     ('footsteps on stone', 'step/stone'), ('room tone at night', 'room_tone/'),
     ('steps through puddles', 'splash/'), ('chopping an onion', 'knife/chop'), ('water boiling in a pot', 'pot/boil'),
-    ('opening the fridge', 'fridge/door'), ('turning on the gas burner', 'gas_stove/ignite'),
+    ('turning on the gas burner', 'gas_stove/ignite'),
     # the same words where they mean what they did
     ('a tap on the screen', 'keyboard/'), ('pull to refresh', 'slide/'), ('crickets at night', 'night/crickets'),
     ('footsteps on gravel', 'step/pebbles'), ('a camera shutter', 'camera/shutter'),
@@ -1151,11 +1152,11 @@ def test_a_recorded_thing_is_reached_by_its_plain_request(idx, text, want):
     assert got.startswith(want), (text, got)
 
 
-def test_a_bee_is_said_to_be_missing_and_gets_the_fly(idx):
+def test_a_bee_is_the_recorded_bee(idx):
     from earshot.make import doubt
     b = brief.read('a bee buzzing')
     cands = brief.rank(b, idx=idx, top=4)
-    assert cands[0]['id'] == 'fly/buzz' and doubt(b, cands).startswith('earshot makes no bee;'), cands[:2]
+    assert cands[0]['id'] == 'bee/buzz' and doubt(b, cands) is None, cands[:2]
 
 
 @pytest.mark.parametrize('text,never', [
@@ -1171,8 +1172,8 @@ def test_a_word_of_an_id_or_of_another_trade_picks_no_design(idx, text, never):
 @pytest.mark.parametrize('text,want', [
     ('a feedback sound for my app', 'notify/knock'),
     ('an alert when a delivery driver is nearby in a food ordering app', 'notify/knock'),
-    ('a cue when the payment method is verified', 'success/click'),
-    ('a purchase sound', 'success/click'), ('bike shop checkout purchase sound', 'success/click'),
+    ('a cue when the payment method is verified', 'success/shutter'),
+    ('a purchase sound', 'success/shutter'), ('bike shop checkout purchase sound', 'success/shutter'),
     # the till by its own words, notes by theirs, and a game's shop keep their sounds
     ('a cash register', 'cash_register/open'), ('a purchase chime', 'purchase/chime'),
 ])
@@ -1206,7 +1207,7 @@ def test_a_request_in_another_language_is_no_chance_match(idx):
     the lexicon knows are still read, and English keeps its words"""
     b = brief.read('Erfolgston für die App')
     assert b['foreign'] and 'lose' not in b['concepts']
-    assert brief.rank(b, idx=idx, top=1)[0]['id'] == 'success/click'
+    assert brief.rank(b, idx=idx, top=1)[0]['id'] == 'success/shutter'
     b = brief.read('le son pour le bouton')         # no word found anything: a nearest sound, said to be a guess
     cands = brief.rank(b, idx=idx, top=1)
     assert [c['id'] for c in cands] == [L.NEAREST_ANY[0]] and cands[0]['why'] == []
@@ -1257,7 +1258,7 @@ def test_a_known_thing_is_not_said_to_be_missing(idx, text, want):
 
 @pytest.mark.parametrize('text,want,material', [
     ('rain on wood', 'rain/', 'wood'), ('a ball bouncing on wood', 'ball/bounce', 'wood'),
-    ('water dripping on metal', 'water/drop', 'metal'), ('footsteps in mud', 'step/grass', None),
+    ('water dripping on metal', 'water/drop', 'metal'), ('footsteps in mud', 'step/mud', None),
     ('rain on a tarp', 'rain/tent', None), ('footsteps on snow', 'step/', None),
 ])
 def test_what_follows_on_or_in_is_the_surface_not_another_thing(idx, text, want, material):

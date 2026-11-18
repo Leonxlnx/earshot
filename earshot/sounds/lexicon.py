@@ -570,11 +570,11 @@ BY_NAME_ONLY = frozenset(('tap/tone', 'hover/tone', 'toggle/up', 'toggle/down', 
 # knocks, a pop). A plain request for the job gets it; a pitched interface design (a figure on a marimba, a tick of a
 # wood block) answers only a request that asks for music (brief.MUSIC_STEMS, an instrument named), and these then
 # step back. tap and type stay with the recorded keys (earshot.sounds.learned `roles`)
-INTERFACE_JOBS = {'hover': 'hover/fingertip', 'switch_on': 'toggle/rocker_on', 'switch_off': 'toggle/rocker_off',
-                  'toggle': 'toggle/rocker_on', 'next': 'next/page', 'back': 'back/page', 'undo': 'back/page',
-                  'open': 'open/air', 'close': 'close/air', 'send': 'send/swoosh', 'receive': 'receive/pop',
-                  'notify': 'notify/knock', 'success': 'success/click', 'warning': 'warning/knock',
-                  'error': 'error/thud', 'delete': 'delete/crumple', 'like': 'like/pop'}
+INTERFACE_JOBS = {'hover': 'hover/fingertip', 'switch_on': 'toggle/key_down', 'switch_off': 'toggle/key_up',
+                  'toggle': 'toggle/key_down', 'next': 'next/page', 'back': 'back/turn', 'undo': 'back/turn',
+                  'open': 'open/drawer', 'close': 'close/drawer', 'send': 'send/swoosh', 'receive': 'receive/cork',
+                  'notify': 'notify/knock', 'success': 'success/shutter', 'warning': 'warning/knock',
+                  'error': 'error/knock', 'delete': 'delete/snip', 'like': 'like/pop'}
 # where an interface job happens, not what it is: "open a menu" is an opening (brief.rank)
 INTERFACE_PLACES = frozenset(('menu',))
 # the jobs of a motion film (a logo, a title hit, a transition, a riser, a glitch ...). Motion films use no
@@ -720,6 +720,8 @@ MODIFIERS = {
     'booming': dict(size=0.6, energy=0.3),
     'dramatic': dict(size=0.5, energy=0.5, space=0.3), 'satisfying': dict(hard=0.1, size=0.1), 'tactile': dict(hard=0.2, space=-0.3),
     'reverb': dict(space=0.7), 'echo': dict(space=0.8), 'tail': dict(ring=0.5), 'room': dict(space=0.4),
+    # the room a sound is heard in ("a scream in a small bathroom", "a shout in a stairwell"): how much of it
+    'stairwell': dict(space=0.7), 'bathroom': dict(space=0.4),
 }
 INTENSIFIERS = {'very': 1.5, 'really': 1.4, 'super': 1.6, 'extremely': 1.8, 'ultra': 1.8, 'quite': 1.2, 'so': 1.3,
                 'slightly': 0.5, 'slight': 0.5, 'somewhat': 0.6, 'little': 0.5, 'bit': 0.5, 'touch': 0.4,

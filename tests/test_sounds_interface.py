@@ -108,12 +108,12 @@ def test_no_steady_pitched_partial(name):
 
 
 @pytest.mark.parametrize('want, sid', [
-    ('a success sound', 'success/click'), ('notification sound for my app', 'notify/knock'),
-    ('error sound for a form', 'error/thud'), ('a sound for sending a message', 'send/swoosh'),
-    ('toggle on', 'toggle/rocker_on'), ('toggle off', 'toggle/rocker_off'), ('hover', 'hover/fingertip'),
-    ('message received', 'receive/pop'), ('back button', 'back/page'), ('close the modal', 'close/air'),
-    ('sound when a modal slides in from the right', 'open/air'), ('open a menu', 'open/air'),
-    ('a quick bright upward swoosh that flies away', 'send/swoosh')])
+    ('a success sound', 'success/shutter'), ('notification sound for my app', 'notify/knock'),
+    ('error sound for a form', 'error/knock'), ('a sound for sending a message', 'send/swoosh'),
+    ('toggle on', 'toggle/key_down'), ('toggle off', 'toggle/key_up'), ('hover', 'hover/fingertip'),
+    ('message received', 'receive/cork'), ('back button', 'back/turn'), ('close the modal', 'close/drawer'),
+    ('sound when a modal slides in from the right', 'open/drawer'), ('open a menu', 'open/drawer'),
+    ('delete', 'delete/snip'), ('a quick bright upward swoosh that flies away', 'send/swoosh')])
 def test_a_plain_interface_request_gets_the_real_thing(want, sid):
     assert brief.rank(brief.read(want), top=1)[0]['id'] == sid
 

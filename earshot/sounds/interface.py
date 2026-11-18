@@ -80,16 +80,6 @@ def hover_fingertip(c, r):
     return _room(c, r, _cut(_take(c, r, 'fingers/drumming', 1, size=-0.2, energy=-0.6), 0.01, 0.12, 0.05))
 
 
-def hover_pad(c, r):
-    """a trackpad pressed lightly, taken bigger and darker: a soft muted press"""
-    return _room(c, r, _cut(_take(c, r, 'click/trackpad', 0, size=0.5, bright=-1.0, energy=-0.6), 0.01, 0.12, 0.05))
-
-
-def type_key(c, r):
-    """a full key of a desktop keyboard: its strike and the plastic of its case"""
-    return _room(c, r, _cut(_take(c, r, 'keyboard/desktop', 0), 0.01, 0.22, 0.08))
-
-
 # ---- switches: one rocker, on smaller and brighter, off bigger, duller and softer
 def rocker_on(c, r):
     """a rocker switch flipped on: the switch taken smaller and brighter, a crisp upward click"""
@@ -101,42 +91,10 @@ def rocker_off(c, r):
     return _room(c, r, _cut(_take(c, r, 'switch/power_strip', 1, size=0.7, bright=-1.2, energy=-0.3), 0.01, 0.2))
 
 
-# ---- pages: forward a full flick of the sheet, back the same sheet darker and shorter
+# ---- pages and a drawer
 def page_next(c, r):
     """a page of a paperback flicked forward: the rustle of the sheet lifting and its snap as it lands"""
     return _room(c, r, _cut(_take(c, r, 'page/turn', 0, size=-0.3), 0.18, 0.28, 0.1))
-
-
-def page_back(c, r):
-    """the same page flicked back: bigger, darker and shorter, the snap without the long lift"""
-    return _room(c, r, _cut(_take(c, r, 'page/turn', 0, size=0.5, bright=-1.5, energy=-0.2), 0.08, 0.2, 0.08))
-
-
-def swipe_next(c, r):
-    """a hand swept quickly through the air: a soft swipe"""
-    return _room(c, r, _cut(_take(c, r, 'swipe/hand', 0, size=-0.3, bright=0.5), 0.03, 0.25, 0.1))
-
-
-def swipe_back(c, r):
-    """the same swipe played backwards and darker: the air drawn back in"""
-    y = D.reverse(_cut(_take(c, r, 'swipe/hand', 0, size=0.3, bright=-0.8, energy=-0.2), 0.03, 0.2, 0.08))
-    return _room(c, r, D.fade(y, 0.02, 0.0))
-
-
-# ---- open and close: a small click and air going out; air drawn in and the cap snapped on
-def air_open(c, r):
-    """a small click with a soft breath of air leaving after it: a lid lifted"""
-    click = _cut(_take(c, r, 'pen/cap', 0, size=0.4, bright=-1.0, energy=-0.3), 0.005, 0.08, 0.04)
-    air = _cut(_take(c, r, 'whoosh/airy', 2, size=-0.2, energy=-0.2), 0.03, 0.3, 0.12)
-    return _room(c, r, D.layer([(click, 0.0, 0.0), (air, -8.0, 0.025)])[0])
-
-
-def air_close(c, r):
-    """a soft breath of air drawn in that ends on a small snap: a pen cap snapped on, a lid set down"""
-    air = D.reverse(_cut(_take(c, r, 'whoosh/airy', 2, size=0.2, bright=-0.8, energy=-0.2), 0.03, 0.28, 0.12))
-    air = D.fade(air, 0.04, 0.0)
-    snap = _cut(_take(c, r, 'pen/cap', 0, size=0.6, bright=-1.2, energy=-0.3), 0.005, 0.1, 0.05)
-    return _room(c, r, D.layer([(air, -8.0, 0.0, D.end(air)), (snap, 0.0, -0.012)])[0])
 
 
 def drawer_open(c, r):
@@ -148,11 +106,6 @@ def drawer_open(c, r):
 def stick_send(c, r):
     """a thin stick swung fast through the air, small: a short swoosh going away"""
     return _room(c, r, _cut(_take(c, r, 'whoosh/stick', 4, size=-0.4, bright=0.4), 0.06, 0.26, 0.1))
-
-
-def lips_receive(c, r):
-    """a soft pop of the lips, round and short: something arriving"""
-    return _room(c, r, _cut(_take(c, r, 'pop/mouth', 1, size=-0.2), 0.008, 0.26, 0.1))
 
 
 def cork_receive(c, r):
@@ -182,13 +135,6 @@ def knock_warning(c, r):
     return _room(c, r, _cut(_two(a, b, _gap(c, 0.16), -0.5), 0.01, 0.45, 0.12))
 
 
-def thud_error(c, r):
-    """two low dull thuds, the second bigger and lower: a soft bag dropped twice, a firm no without a buzzer"""
-    a = _cut(_take(c, r, 'bag/drop', 2, size=0.3, bright=-0.6, energy=0.2), 0.01, 0.12, 0.05)
-    b = _cut(_take(c, r, 'bag/drop', 2, size=1.0, bright=-2.5), 0.01, 0.3, 0.12)
-    return _room(c, r, _cut(_two(a, b, _gap(c, 0.15), -2.0), 0.01, 0.42, 0.12))
-
-
 def click_success(c, r):
     """a small click and a brighter one right after it: a pen clicked, going up"""
     a = _take(c, r, 'pen/ballpoint', 1, size=0.6, bright=-0.8, energy=-0.2)
@@ -201,37 +147,11 @@ def shutter_success(c, r):
     return _room(c, r, _cut(_take(c, r, 'camera/shutter', 2), 0.06, 0.24, 0.08))
 
 
-def stamp_complete(c, r):
-    """an office stapler pressed down hard on a desk with a book set down under it: a full, round stamp"""
-    a = _cut(_take(c, r, 'stapler/desk', 0, size=0.2), 0.01, 0.22, 0.08)
-    b = _cut(_take(c, r, 'book/place', 0, size=0.4, bright=-1.0, energy=-0.3), 0.01, 0.25, 0.1)
-    return _room(c, r, D.layer([(a, 0.0, 0.0), (b, -5.0, 0.004)])[0])
-
-
-def latch_complete(c, r):
-    """a latch snapped shut and a soft pop after it: something closed and done"""
-    a = _cut(_take(c, r, 'lock/latch', 0, size=0.3, bright=-0.6), 0.005, 0.12, 0.05)
-    b = _cut(_take(c, r, 'pop/mouth', 1, size=-0.2), 0.008, 0.26, 0.1)
-    return _room(c, r, _two(a, b, _gap(c, 0.11), -1.0))
-
-
 def pop_like(c, r):
     """a small bright pop of the lips over a fingertip on wood: a light, quick pop with a soft body under it"""
     a = _take(c, r, 'pop/mouth', 1, size=-0.6, bright=1.5)
     b = _take(c, r, 'fingers/drumming', 1, size=0.3, bright=-1.0, energy=-0.4)
     return _room(c, r, _cut(D.layer([(a, 0.0, 0.0), (b, -6.0, 0.002)])[0], 0.008, 0.15, 0.06))
-
-
-def crumple_delete(c, r):
-    """a sheet of paper crumpled quickly in the hand"""
-    return _room(c, r, _cut(_take(c, r, 'paper/ball', 0, size=-0.2), 0.04, 0.45, 0.15))
-
-
-def swish_delete(c, r):
-    """a quick swish into a soft thud: something thrown into a bin"""
-    a = _cut(_take(c, r, 'swish/fast', 0, size=-0.2, energy=-0.2), 0.04, 0.16, 0.06)
-    b = _cut(_take(c, r, 'bag/drop', 2, size=-0.3, bright=-0.5, energy=-0.2), 0.01, 0.25, 0.1)
-    return _room(c, r, D.layer([(a, -7.0, 0.0, D.end(a)), (b, 0.0, -0.01)])[0])
 
 
 # ---- the same jobs from a key, a shutter, a page, a drawer, a door, knocks, a knife on a board, a broom, scissors
@@ -328,11 +248,6 @@ ROLES = {
     'hover/fingertip': (hover_fingertip, 'tap', ('a single soft fingertip tap on a wooden table',
                                                  'a very light muted touch'),
                         ('hover', 'focus', 'highlight', 'mouse over'), 0.15),
-    'hover/pad': (hover_pad, 'tap', ('a trackpad pressed lightly, soft and muted', 'a very soft short press'),
-                  ('hover', 'focus', 'highlight'), 0.15),
-    'type/key': (type_key, 'click', ('a key of a desktop keyboard pressed, a full plastic clack',
-                                     'one keystroke on a computer keyboard'),
-                 ('type', 'typing', 'keystroke', 'key press', 'input'), 0.25),
     'toggle/rocker_on': (rocker_on, 'click', ('a small rocker switch flipped on, a crisp bright click',
                                               'a light switch clicked on'),
                          ('switch on', 'toggle on', 'toggle', 'enable', 'check'), 0.2),
@@ -342,31 +257,15 @@ ROLES = {
     'next/page': (page_next, 'whoosh', ('a page of a book flicked forward, a short paper rustle and snap',
                                         'a sheet of paper turned quickly'),
                   ('next', 'forward', 'next page', 'continue', 'swipe', 'page turn'), 0.48),
-    'back/page': (page_back, 'whoosh', ('a page flicked back, a short darker paper flick',
-                                        'a sheet of paper turned back'),
-                  ('back', 'previous', 'go back', 'return', 'undo'), 0.3),
-    'next/swipe': (swipe_next, 'whoosh', ('a hand swept quickly through the air, a soft swipe',
-                                          'a short soft swish of air'),
-                   ('next', 'swipe', 'forward', 'slide'), 0.3),
-    'back/swipe': (swipe_back, 'whoosh', ('a soft swish of air drawn back in, darker', 'a short reversed swish'),
-                   ('back', 'previous', 'swipe back'), 0.25),
-    'open/air': (air_open, 'whoosh', ('a small click and a soft breath of air after it, a lid lifted',
-                                      'a light click that opens into air'),
-                 ('open', 'expand', 'show', 'menu open', 'modal'), 0.35),
-    'close/air': (air_close, 'whoosh', ('a soft breath of air drawn in that ends on a small plastic snap',
-                                        'air sucked in and a lid clicked shut'),
-                  ('close', 'collapse', 'dismiss', 'hide'), 0.32),
     'open/drawer': (drawer_open, 'noise', ('a wooden drawer slid open, its runners and a soft knock',
                                            'a drawer pulled out'),
-                    ('open', 'expand', 'drawer open'), 0.55),
+                    ('open', 'expand', 'show', 'menu open', 'modal', 'drawer open'), 0.55),
     'send/swoosh': (stick_send, 'whoosh', ('a thin stick swung fast through the air, a short swoosh',
                                            'a quick swoosh going away'),
                     ('send', 'message sent', 'submit', 'post', 'share', 'upload'), 0.32),
-    'receive/pop': (lips_receive, 'pop', ('a soft round pop of the lips', 'a short soft plop'),
-                    ('receive', 'message received', 'incoming', 'new message'), 0.27),
     'receive/cork': (cork_receive, 'pop', ('a small cork popped out of a bottle, a short hollow plop',
                                            'a soft hollow pop'),
-                     ('receive', 'message received', 'incoming'), 0.31),
+                     ('receive', 'message received', 'incoming', 'new message'), 0.31),
     'notify/knock': (knock_notify, 'hit', ('two light knuckle knocks on hollow wood', 'a soft double knock'),
                      ('notify', 'notification', 'reminder', 'message received', 'ping'), 0.55),
     'notify/pop': (pop_notify, 'pop', ('two soft pops of the lips, the second a little higher',
@@ -374,29 +273,15 @@ ROLES = {
                    ('notify', 'notification', 'ping', 'mention'), 0.55),
     'warning/knock': (knock_warning, 'hit', ('two firm dull knocks on a door, close', 'a firm double knock'),
                       ('warning', 'caution', 'attention', 'alert'), 0.6),
-    'error/thud': (thud_error, 'thud', ('two low dull thuds, the second lower', 'a soft bag dropped twice'),
-                   ('error', 'failed', 'invalid', 'denied', 'wrong'), 0.57),
     'success/click': (click_success, 'click', ('a small click and a brighter click right after it, a pen clicked',
                                                'a quick two-part click going up'),
                       ('success', 'confirm', 'saved', 'done', 'check mark'), 0.4),
     'success/shutter': (shutter_success, 'click', ('a camera shutter fired, a quick two-part mechanical click',
                                                    'a crisp mechanical snap'),
-                        ('success', 'confirm', 'saved'), 0.3),
-    'complete/stamp': (stamp_complete, 'hit', ('a stapler pressed down hard on a desk, a full round stamp',
-                                               'a firm mechanical press with a soft thump under it'),
-                       ('complete', 'success', 'done', 'finished', 'approved', 'task done'), 0.3),
-    'complete/latch': (latch_complete, 'click', ('a latch snapped shut and a soft pop after it',
-                                                 'a metal click followed by a round pop'),
-                       ('complete', 'success', 'done', 'closed'), 0.45),
+                        ('success', 'confirm', 'saved', 'done', 'check mark'), 0.3),
     'like/pop': (pop_like, 'pop', ('a small bright pop of the lips with a soft tap under it',
                                    'a light quick pop with a soft body'),
                  ('like', 'favorite', 'heart icon', 'upvote'), 0.24),
-    'delete/crumple': (crumple_delete, 'noise', ('a sheet of paper crumpled quickly in the hand',
-                                                 'a short paper crunch'),
-                       ('delete', 'remove', 'trash', 'discard', 'clear'), 0.5),
-    'delete/swish': (swish_delete, 'thud', ('a quick swish ending in a soft thud, something thrown in a bin',
-                                            'a short swish and a dull drop'),
-                     ('delete', 'remove', 'trash', 'discard'), 0.42),
     'type/mechanical': (key_type, 'click', ('a key of a mechanical keyboard pressed softly, a full plastic clack',
                                             'one soft keystroke on a mechanical keyboard'),
                         ('type', 'typing', 'keystroke', 'key press', 'input'), 0.25),
@@ -450,33 +335,24 @@ DEFAULTS = ('hover/fingertip', 'type/mechanical', 'toggle/key_down', 'toggle/key
             'warning/knock', 'error/knock', 'success/shutter', 'complete/shutter', 'delete/snip')
 # the design a plain request for a job is answered with first (prior 1.25; the others, at 0.9, answer when their own
 # words are asked for: "a camera shutter for success", "two pops")
-PLAIN = ('hover/fingertip', 'type/key', 'toggle/rocker_on', 'toggle/rocker_off', 'next/page', 'back/page',
-         'open/air', 'close/air', 'send/swoosh', 'receive/pop', 'notify/knock', 'warning/knock', 'error/thud',
-         'success/click', 'complete/stamp', 'delete/crumple', 'like/pop')
+PLAIN = DEFAULTS + ('like/pop',)
 
 # audit findings that are the design: two strikes are two attacks (and two copies of one strike a short comb in the
 # tail), a swish or breath before a click or thud is its lead-in
 ALLOWS = {'notify/knock': ('stacked', 'ring'), 'notify/pop': ('stacked', 'ring'), 'warning/knock': ('stacked', 'ring'),
-          'error/thud': ('stacked', 'ring'), 'success/click': ('stacked', 'ring'), 'complete/latch': ('stacked',),
-          'complete/stamp': ('stacked',), 'open/air': ('stacked',), 'close/air': ('pre_swell', 'stacked'),
-          'delete/swish': ('pre_swell', 'stacked'), 'back/swipe': ('pre_swell',), 'next/page': ('pre_swell',),
+          'success/click': ('stacked', 'ring'), 'next/page': ('pre_swell',),
           'error/knock': ('stacked', 'ring'), 'error/chop': ('stacked', 'ring'), 'close/drawer': ('pre_swell',),
           'close/door': ('pre_swell', 'stacked'), 'back/turn': ('pre_swell',), 'delete/snip': ('pre_swell',)}
 
 # the learned designs each one is made of: its axes are theirs (a take reads what its recording answers to), the room's
 # and, for two strikes, hard (a harder request brings them closer together)
-PARTS = {'hover/fingertip': ('fingers/drumming',), 'hover/pad': ('click/trackpad',), 'type/key': ('keyboard/desktop',),
+PARTS = {'hover/fingertip': ('fingers/drumming',),
          'toggle/rocker_on': ('switch/power_strip',), 'toggle/rocker_off': ('switch/power_strip',),
-         'next/page': ('page/turn',), 'back/page': ('page/turn',), 'next/swipe': ('swipe/hand',),
-         'back/swipe': ('swipe/hand',), 'open/air': ('pen/cap', 'whoosh/airy'),
-         'close/air': ('whoosh/airy', 'pen/cap'),
-         'open/drawer': ('drawer/wood',), 'send/swoosh': ('whoosh/stick',), 'receive/pop': ('pop/mouth',),
+         'next/page': ('page/turn',),
+         'open/drawer': ('drawer/wood',), 'send/swoosh': ('whoosh/stick',),
          'receive/cork': ('cork/bottle',), 'notify/knock': ('knock/hollow',), 'notify/pop': ('pop/mouth',),
-         'warning/knock': ('door/knock',), 'error/thud': ('bag/drop',), 'success/click': ('pen/ballpoint',),
-         'success/shutter': ('camera/shutter',), 'complete/stamp': ('stapler/desk', 'book/place'),
-         'complete/latch': ('lock/latch', 'pop/mouth'), 'like/pop': ('pop/mouth', 'fingers/drumming'),
-         'delete/crumple': ('paper/ball',),
-         'delete/swish': ('swish/fast', 'bag/drop'),
+         'warning/knock': ('door/knock',), 'success/click': ('pen/ballpoint',),
+         'success/shutter': ('camera/shutter',), 'like/pop': ('pop/mouth', 'fingers/drumming'),
          'type/mechanical': ('keyboard/mechanical',), 'type/light': ('keyboard/mechanical',),
          'toggle/key_down': ('keyboard/mechanical',), 'toggle/key_up': ('keyboard/mechanical',),
          'toggle/shutter_open': ('camera/shutter',), 'toggle/shutter_shut': ('camera/shutter',),
@@ -484,8 +360,7 @@ PARTS = {'hover/fingertip': ('fingers/drumming',), 'hover/pad': ('click/trackpad
          'close/door': ('door/shut',), 'complete/shutter': ('camera/shutter',),
          'complete/chop': ('knife/chop',), 'error/knock': ('door/knock',), 'error/chop': ('knife/chop',),
          'delete/sweep': ('broom/sweep',), 'delete/snip': ('scissors/cut',)}
-TWO = ('notify/knock', 'notify/pop', 'warning/knock', 'error/thud', 'success/click', 'complete/latch', 'error/knock',
-       'error/chop')
+TWO = ('notify/knock', 'notify/pop', 'warning/knock', 'success/click', 'error/knock', 'error/chop')
 
 
 def _axes(sid):

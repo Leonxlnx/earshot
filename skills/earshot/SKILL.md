@@ -28,7 +28,7 @@ are measured.
   designed sound (a whoosh, a pop) only on the few cuts or captions the edit wants felt. A thing the catalogue has
   no recording of (the answer says so) is better recorded or left silent than replaced by a stand-in.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (235 designs:
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (249 designs:
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
 paper, books, glass, ice, water, metal, swings, punches, falls, explosions, animals such as a dog, a cat and birds,
 people without words such as applause, laughter and a cough, a car horn, a siren, a phone ringing or vibrating
@@ -62,19 +62,19 @@ owner: prefer a learned thing when one fits.
    Your own `sounds` come on top of the set named in `set` (the 17 of `ui` and yours; one with a name of the set
    replaces that sound). Leave `set` out and only your list is made: that is the call for the handful of sounds a
    landing page or a scene needs. An entry's `events` and `loop` are the single call's `--events` and `--no-loop`
-   (`{"name": "steps", "want": "footsteps on wet pavement", "events": 4}` answered `step/tile (2.28 s ...)`,
+   (`{"name": "steps", "want": "footsteps on wet pavement", "events": 4}` answered `step/concrete (2.15 s ...)`,
    `played: 4 events as a walk`; `"loop": false` makes a bed once); a count, a length and "no loop" said in the
    `want` do the same. An unknown field is an error that lists the fields. A spec of five entries without a set:
    ```
    $ earshot make --spec landing.json -o sounds
    5 sounds in sounds (wav), manifest.json
-   open.wav: open/air (0.36 s, -18 LUFS, clean) [opening]
-   toast.wav: notify/knock (0.40 s, -19 LUFS, clean) [toast notification]
-   error.wav: error/thud (0.49 s, -18 LUFS, clean) [error]
+   open.wav: open/drawer (0.68 s, -14 LUFS, clean) [opening]
+   toast.wav: notify/knock (0.40 s, -18 LUFS, clean) [toast notification]
+   error.wav: error/knock (0.58 s, -18 LUFS, clean) [error]
      not understood: address
    card.wav: thump/soft (0.09 s, -24 LUFS, clean) [thump, card, settles]
      not understood: pricing
-   paid.wav: success/click (0.31 s, -17 LUFS, clean) [payment success]
+   paid.wav: success/shutter (0.36 s, -15 LUFS, clean) [payment success]
    ```
    (the `want`s were "a modal opening", "a toast notification", "an error sound for a wrong email address", "a soft
    low thump when the pricing card settles", "a payment success sound").
@@ -154,8 +154,8 @@ of different recordings differ in length and level. `--json` gives the number of
   learned design.
 - `not in this sound: WORDS`: part of the request is not in this file (one call, one sound). Read the words: a
   second thing or job wants its own call; a verb or an adjective of the same thing is no missing sound ("a
-  checkbox being ticked" answered `toggle/rocker_on (0.22 s, -19 LUFS, clean) [checkbox]` and `not in this sound:
-  ticked`: the switch is the whole answer).
+  checkbox being ticked" answered `toggle/key_down (0.24 s, -19 LUFS, clean) [checkbox]` with nothing else to
+  say: the key going down is the whole answer).
 - `not followed: ...` or `0.43 s, not the 2 s asked: ...`: the design has no such control or could not keep that
   length, and the line says what it does instead; fine unless it mattered, then pick another design.
 - `a cut of 4 s, not a loop: ...` / `a seamless loop of 8.00 s, ...` / `8.57 s: a music loop is whole bars ...`:

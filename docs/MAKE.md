@@ -25,8 +25,9 @@ earshot make "WORDS" [-o FILE] [--n N] [--seed S] [--theme NAME] [--sound ID] [-
 
 ```
 $ earshot make "a soft success sound for a finance app" -o success.ogg
-success.ogg: success/click (0.30 s, -17 LUFS, clean) [success]
-also: complete/stamp, complete/latch, success/shutter
+success.ogg: success/shutter (0.36 s, -15 LUFS, clean) [success]
+also: complete/shutter, success/click, complete/chop
+not followed: "soft"; this sound has no control of its hardness and plays as designed
 
 $ earshot make "a mouse click" -o click.wav --n 2
 click_1.wav: click/mouse (0.19 s, -20 LUFS, clean) [mouse click]
@@ -153,7 +154,7 @@ at 0.24 s, ...)`: for its loudest moment on 12.000 s, start it at 11.76 s.
 
 ## Learned sounds
 
-235 designs of everyday, interface, game and film sounds, animals, people, street and house sounds, 13 ambience beds, 33 drum and percussion designs and the
+249 designs of everyday, interface, game and film sounds, animals, people, street and house sounds, 13 ambience beds, 33 drum and percussion designs and the
 notes of four instruments are learned from recordings whose authors put them in the public domain. They are not
 invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
@@ -163,9 +164,9 @@ sound made from nothing, and it exists only because someone recorded the thing a
 
 | | one-shots | ambience beds | drums | instrument notes |
 |---|---|---|---|---|
-| designs | 235 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
-| recordings | 571 recorded events (a few are several events cut from one recording; 26 are recordings of a whole action) | 12 textures of 12-42 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
-| store | `earshot/data/resyn/`: 12.50 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 5.40 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
+| designs | 249 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
+| recordings | 604 recorded events (a few are several events cut from one recording; 30 are recordings of a whole action) | 12 textures of 12-42 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
+| store | `earshot/data/resyn/`: 13.81 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 5.40 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
 | sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer, Freesound (the hand claps) | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
@@ -334,10 +335,10 @@ fixed recordings of the learned store, so a set always sounds like the same obje
 rebuilt role takes it by name in a spec: `toggle/shutter_open` and `toggle/shutter_shut` (a film camera's shutter
 opening and closing), `type/light`, `back/leaf` (a heavier page falling back), `close/door`, `complete/chop` (one
 chop of a knife on a board), `error/chop`, `delete/sweep` (a stroke of a broom), `notify/pop`, `success/click`,
-`toggle/rocker_on` and `toggle/rocker_off`; the first designs of these jobs (`open/air`, `close/air`, `type/key`,
-`back/page`, `receive/pop`, `complete/stamp`, `error/thud`, `delete/crumple` and five more) are still in the
-catalogue under their names. A request for one interface
-job in words ("a success sound", "a notification", "toggle dark mode") gets the same design, and a like ("like
+`toggle/rocker_on` and `toggle/rocker_off`. A request for one interface
+job in words ("a success sound", "a notification", "toggle dark mode") gets the same design as the set, and a thing
+of the world named in words ("a door closing", "a camera shutter") gets the recording of that thing, not the
+interface sound made of it (`door/shut`, `camera/shutter`, not `close/door`, `success/shutter`). A like ("like
 button tapped") gets `like/pop`, a small bright pop of the lips over a fingertip; a figure on an
 instrument answers only when the words ask for music (an instrument, a chime, a jingle, a melody) or for chip sound,
 or when a theme is named: a set with a theme plays the tonal figures (`success/rise`, `notify/pair` ...) in that
@@ -424,7 +425,7 @@ without a seam from the sprite's webm, and may not from its mp3.
 
 Without `set`, only the listed sounds are made (a landing page's or a scene's own handful: the recipes below). An
 entry's `events` and `loop` are the single call's `--events` and `--no-loop`: `{"name": "steps", "want":
-"footsteps on wet pavement", "events": 4}` answered `steps.wav: step/tile (2.28 s, -18 LUFS, clean) [footsteps]`
+"footsteps on wet pavement", "events": 4}` answered `steps.wav: step/concrete (2.15 s, -21 LUFS, clean) [footsteps]`
 and `played: 4 events as a walk`, and `"loop": false` makes a bed once, with a fade in and out. A count, a length
 and "no loop" said in the `want` do the same: "three knocks on a door, 2 seconds" in an entry is played as a single
 `make` plays it (`knocks.wav: door/knock (2.00 s, -18 LUFS, clean) [knocks on a door]`, `played: 3 events as a
@@ -442,7 +443,7 @@ earshot sounds [--search WORDS] [--domain ui|game|motion|ambience|music] [--kind
 
 ```
 $ earshot sounds
-810 sounds in 310 families
+830 sounds in 320 families
 success/rise                0.73 s  three quick rising notes, a short soft confirmation
 success/fifth               0.69 s  two notes a fifth apart rising, an open clear signal
 ...
@@ -632,8 +633,8 @@ How the words were read (`earshot.brief.read`, run on each request; `brief.rank`
 | request | read as | top design |
 |---|---|---|
 | `a soft wooden success chime for a finance app, 400 ms, in D` | concepts success, bell; hard -0.5, energy -0.3; material wood; dur 0.4; key D | success/rise |
-| `an error sound but not too loud` | error; energy -0.42 | error/thud |
-| `the opposite of a success sound` | error | error/thud |
+| `an error sound but not too loud` | error; energy -0.42 | error/knock |
+| `the opposite of a success sound` | error | error/knock |
 | `a much bigger, darker whoosh` | whoosh; size +0.84, bright -0.6 | whoosh/deep |
 | `a kalimba note in E` | note, voice kalimba; key E | note/kalimba |
 | `a two-note success chime in D minor` | success, bell; key D, scale minor | success/rise |
@@ -641,7 +642,7 @@ How the words were read (`earshot.brief.read`, run on each request; `brief.rank`
 | `8-bit coin pickup` | coin; material retro (chip designs only) | coin/chip |
 | `rain on a tent, no loop` | rain | rain/tent |
 | `seamless forest ambience, 30 seconds` | forest, ambience; loop on; dur 30 | forest/morning |
-| `toggle dark mode` | toggle; bright -0.6 | toggle/rocker_on |
+| `toggle dark mode` | toggle; bright -0.6 | toggle/key_down |
 | `a wooden drawer closing` | close; material wood | drawer/wood (learned) |
 | `a sword being drawn` | swing | sword/draw (learned) |
 | `a kick drum` | kick drum | kick/soft |
@@ -830,8 +831,8 @@ sound is or does, the name its character.
 
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
-| learned (`sounds/learned.py`) | 235 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
-| interface (`sounds/interface.py`) | 42 | `hover/fingertip`, `toggle/key_down`, `toggle/key_up`, `type/mechanical`, `next/page`, `back/turn`, `open/drawer`, `close/drawer`, `send/swoosh`, `receive/cork`, `notify/knock`, `success/shutter`, `complete/shutter`, `warning/knock`, `error/knock`, `delete/snip`; other candidates `toggle/shutter_open`, `toggle/shutter_shut`, `toggle/rocker_on`, `toggle/rocker_off`, `type/light`, `back/leaf`, `close/door`, `complete/chop`, `error/chop`, `delete/sweep`, `notify/pop`, `success/click`, and the first designs of these jobs (`open/air`, `error/thud`, `receive/pop` ...) | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
+| learned (`sounds/learned.py`) | 249 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
+| interface (`sounds/interface.py`) | 29 | `hover/fingertip`, `toggle/key_down`, `toggle/key_up`, `type/mechanical`, `next/page`, `back/turn`, `open/drawer`, `close/drawer`, `send/swoosh`, `receive/cork`, `notify/knock`, `success/shutter`, `complete/shutter`, `warning/knock`, `error/knock`, `delete/snip`; other candidates `toggle/shutter_open`, `toggle/shutter_shut`, `toggle/rocker_on`, `toggle/rocker_off`, `type/light`, `back/leaf`, `close/door`, `complete/chop`, `error/chop`, `delete/sweep`, `notify/pop`, `success/click`, `like/pop` | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
 | interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation, when the words ask for music or a theme is named | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
@@ -1096,13 +1097,13 @@ six sounds. A spec without `set` makes only the ones it lists:
 ```
 $ earshot make --spec landing.json -o sounds
 5 sounds in sounds (wav), manifest.json
-open.wav: open/air (0.36 s, -18 LUFS, clean) [opening]
-toast.wav: notify/knock (0.40 s, -19 LUFS, clean) [toast notification]
-error.wav: error/thud (0.49 s, -18 LUFS, clean) [error]
+open.wav: open/drawer (0.68 s, -14 LUFS, clean) [opening]
+toast.wav: notify/knock (0.40 s, -18 LUFS, clean) [toast notification]
+error.wav: error/knock (0.58 s, -18 LUFS, clean) [error]
   not understood: address
 card.wav: thump/soft (0.09 s, -24 LUFS, clean) [thump, card, settles]
   not understood: pricing
-paid.wav: success/click (0.31 s, -17 LUFS, clean) [payment success]
+paid.wav: success/shutter (0.36 s, -15 LUFS, clean) [payment success]
 ```
 
 ## Recipe: a game

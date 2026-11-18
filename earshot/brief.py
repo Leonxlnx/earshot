@@ -135,6 +135,9 @@ ROLE = 2.0
 # things that merely share a word; outside an interface job these designs step back by BY_NAME ("a knock cue when a
 # guest arrives" is a door knocked on, "a capture button" a camera's shutter)
 REAL = 1.4
+# an interface design (earshot.sounds.interface) for a request that is not an interface job: what it is made of ("a
+# door closing" is door/shut, not the interface's close/door)
+WORLD = 0.2
 _rev = None
 _cache = {}
 
@@ -354,6 +357,9 @@ def _numbers(b, text):
     if m:
         b['dur'] = 0.5
         text = cut(m, text)
+    # "ten seconds", "two minutes": a number in words before a unit of time is that number
+    text = re.sub(r'\b(' + '|'.join(w for w in NUMBER_WORDS if ' ' not in w) + r')(?=\s+(?:seconds?|secs?|minutes?)\b)',
+                  lambda m_: str(NUMBER_WORDS[m_.group(1).lower()]), text, flags=re.I)
     m = GAP.search(text)
     if m:                                 # "two knocks 200 ms apart": the events' spacing, never the length
         b['gap'] = seconds(m)
@@ -390,6 +396,7 @@ NOT_EVENTS = frozenset(stem(w) for w in (
     'different', 'unique', 'shot', 'player', 'people', 'bit', 'sound', 'file', 'level', 'more', 'another', 'after'))
 TIMES = re.compile(r'\b(?:(twice|thrice)|(\d+|' + '|'.join(sorted(NUMBER_WORDS, key=len, reverse=True))
                    + r')\s+times)\b')
+TIMES_WORDS = frozenset(('twice', 'thrice'))      # read by TIMES (the events), never a thing
 COUNTDOWN = re.compile(r'\b(?:10|\d)(?:[\s,.\-]+(?:10|\d))+\b')    # "3 2 1", "5, 4, 3, 2, 1" (checked: down to 1)
 PLURAL_NOT = frozenset(('glass', 'bass', 'grass', 'brass', 'chaos', 'canvas', 'gas', 'news', 'lens', 'bus', 'its',
                         'this', 'is', 'was', 'has', 'does', 'goes', 'plus', 'less', 'across', 'always', 'perhaps',
@@ -963,7 +970,7 @@ def read(text, translate=True):
                 st.update(neg=False, skipped=0)   # a negation does not reach past "in a ...", "for ..."
             i += 1
             continue                       # articles and fillers keep a pending negation or intensifier
-        if not hit and not t.isdigit() and t not in L.STOP:
+        if not hit and not t.isdigit() and t not in L.STOP and t not in TIMES_WORDS:
             if not st['neg']:
                 b['words'].append(stem(t))
                 b['written'].setdefault(stem(t), t)
@@ -1252,16 +1259,25 @@ def _terms(row):
     return t
 
 
+def _made_of_recordings(row):
+    """True for an interface design made of learned recordings (earshot.sounds.interface: tags real and interface)"""
+    return IDF_SKIP_INTERFACE and {'real', 'interface'} <= set(row.get('tags', ()))
+
+
+IDF_SKIP_INTERFACE = True
+
+
 def index(rows):
     """the search index of a catalogue: (rows, terms, {word: [(row index, field score)]}, {word: weight}); a word's
     weight is 1 + log(N / designs that have it): rarer = heavier. N and the counts leave out the designs of
-    earshot.sounds.learned (a word only they have counts among them): a hundred recordings of footsteps and switches
-    do not make "step" or "switch" a common word, and the other designs score as they did before any were learned"""
+    earshot.sounds.learned and the interface designs made of them (a word only they have counts among them): a
+    hundred recordings of footsteps and switches, or a camera shutter played as five interface jobs, do not make
+    "step", "switch" or "shutter" a common word, and the other designs score as they did before any were made"""
     rows = list(rows)
     terms = [_terms(r) for r in rows]
     inv, df, dfr = {}, {}, {}
     for k, t in enumerate(terms):
-        count = dfr if t['learned'] else df
+        count = dfr if t['learned'] or _made_of_recordings(rows[k]) else df
         for w in set().union(*(t[f] for f in FIELD_WEIGHT)):
             count[w] = count.get(w, 0) + 1
             fs = sorted((FIELD_WEIGHT[f] for f in FIELD_WEIGHT if w in t[f]), reverse=True)
@@ -1276,7 +1292,7 @@ def index(rows):
             count[w] = count.get(w, 0) + 1
     for w, c in dfr.items():
         df.setdefault(w, c)
-    n = max(1, sum(not t['learned'] for t in terms))
+    n = max(1, sum(not t['learned'] and not _made_of_recordings(r) for r, t in zip(rows, terms)))
     # a job the request names is not less telling for being common in the catalogue: canonical words get a flatter
     # weight than plain words
     return rows, terms, inv, {w: 1.0 + (CONCEPT_IDF if w in L.CONCEPTS or w.startswith(('voice:', 'fam:')) else 1.0)
@@ -1425,6 +1441,50 @@ def uncovered(b, why):
         if said[c] not in out:
             out.append(said[c])
     return out
+
+
+# heads whose sound depends on what they belong to: a fax machine is no washing machine, a ship's horn no car's
+OWNED_HEADS = frozenset(stem(w) for w in (
+    'machine', 'gun', 'horn', 'door', 'lid', 'cry', 'call', 'howl', 'click', 'strike', 'torch', 'drive', 'field',
+    'toy', 'ding', 'bell', 'alarm', 'engine', 'motor', 'whistle', 'buzzer', 'beep', 'siren'))
+
+
+def owner_unknown(b, sid, why):
+    """the words of the request's own sound (as written) when its head is one whose sound depends on what it belongs
+    to (OWNED_HEADS: "a fax MACHINE", "a seagull CRY", "an elevator DING") and the design picked (`sid`, decided by
+    rank's `why`) answers neither that head nor the word before it that names its owner; None otherwise. A word that
+    describes, a material, a person or an article before the head is no owner ("a soft click", "a metal door")"""
+    from .sounds import registry
+    toks = [t for t in tokens(b.get('text') or '') if t not in ARTICLES]
+    ctx = set(b.get('context_words', ()))
+    for i, t in enumerate(toks):
+        if t in PUNCT or t in HEAD_END or t in L.NEGATIONS:
+            return None
+        if stem(t) not in OWNED_HEADS or t in ctx:
+            continue
+        nxt = toks[i + 1] if i + 1 < len(toks) else None
+        if nxt and not (nxt in PUNCT or nxt in HEAD_END or nxt in L.STOP or nxt.endswith('ing') or nxt == 'being'
+                        or not (_match(toks, i + 1)[1].get('c') or nxt in b['unknown'])):
+            continue                       # "a machine drone", "a toy tune": the head is the word after it
+        row = registry.get(sid).row()
+        own = ' '.join([sid.replace('/', ' ').replace('_', ' ')] + [str(s) for s in row.get('uses') or ()])
+        have = {stem(w) for w in WORD.findall(own.lower())} | {stem(w) for w in why} | set(why)
+        prev = toks[i - 1] if i else None
+        hit = _match(toks, i - 1)[1] if prev else {}
+        owner = (prev and prev not in L.STOP and prev not in L.MATERIALS and prev not in L.PERSON_WORDS
+                 and len(prev) > 2 and prev.isalpha() and not prev.endswith(DESCRIBING)
+                 and (not hit or 'c' in hit or 'v' in hit))
+        said = toks[i - 1:i + 1] if prev and (owner or prev.endswith(DESCRIBING)) else [t]
+        if (owner and stem(prev) not in have and (hit or {}).get('c') not in have
+                and (prev in b['unknown'] or stem(prev) not in _made_words())):
+            return ' '.join(said)         # "a fax machine": an owner no design is made of
+        if owner and stem(t) not in have and _match(toks, i)[1].get('c') not in have and sid not in _roles():
+            return ' '.join(said)         # "a spaceship door" answered by the spaceship's hum
+        if (not named(why) and stem(t) not in have and _match(toks, i)[1].get('c') not in have
+                and 'interface' not in row.get('tags', ())):
+            return ' '.join(said)         # "a squeaky toy" answered by the squeak alone
+        return None
+    return None
 
 
 def not_made(b, why=None):
@@ -1610,10 +1670,14 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             s *= BY_NAME      # "a success sound": no marimba figure; "a success chime", "on a harp": the figure
         elif ui_job and music and 'interface' in row.get('tags', ()):
             s *= BY_NAME
+        elif 'interface' in row.get('tags', ()) and thing and _world(b):
+            s *= WORLD        # "a door closing", "a knife chopping": the recording of the thing, not close/door
         elif job == row['id'] and not thing and not rival:
             s *= REAL         # "a success sound", "toggle on", "message received": the real thing of the job
         elif 'interface' in row.get('tags', ()) and (not ui_job or (lead and lead not in L.INTERFACE_JOBS)):
-            s *= BY_NAME      # the request is about something else ("when the brand pops up": a logo)
+            # the request is about something else ("when the brand pops up": a logo); a thing outside a product ("a
+            # door closing", "a camera shutter") is answered by its own recording, not the interface sound made of it
+            s *= BY_NAME if dom == 'ui' else WORLD
         elif (plain and t['learned'] and head in _roles().get(row['id'], ()) and not job
               and not (mat and mat not in t['mats'])):
             s *= ROLE         # "a tap", "hover", "toggle on": the recorded one; not when it is of another material
@@ -1639,6 +1703,20 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
     return _nearest(b, _named_member(b, out, idx), idx)[:top]
+
+
+# interface jobs that are no action of a thing: a request that names one is about a product ("a knock for a
+# notification"); open, close, next, back and a switch are also what a door, a drawer or a page does
+JOB_NOUNS = frozenset(('notify', 'success', 'error', 'warning', 'receive', 'send', 'delete', 'like', 'hover'))
+
+
+def _world(b):
+    """True when a request is about a thing in the world, not a product: no app, page or button (the domain), no
+    place of an interface job (a menu) and no job that only a product does (JOB_NOUNS): "a door closing", "a
+    metal door closing behind the player in a game", "a crisp click-clack like an old SLR". The interface designs
+    (earshot.sounds.interface) answer only the other requests"""
+    said = set(b['concepts']) | set(b['context'])
+    return b.get('domain') != 'ui' and not said & (JOB_NOUNS | L.INTERFACE_PLACES)
 
 
 def _nearest(b, out, idx):
@@ -1954,6 +2032,8 @@ def _named_member(b, out, idx=None):
         i = row['id']
         if not (_name_words(i) and _compound(i, seq)) or excluded(b, row, terms[k]):
             continue
+        if 'interface' in row.get('tags', ()) and _world(b):
+            continue                  # "a door closing" names close/door word for word, but asks for a door
         if b.get('dir') and terms[k]['dir'] == -b['dir']:
             continue
         if terms[k]['family'] & set(b.get('parts', ())) and not terms[k]['family'] & set(b['concepts']):

@@ -13,8 +13,22 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 
 ### Added
 
+- Learned from public-domain recordings: a crowd booing, a cat hissing, a lion roaring, an elephant, a bee, a rocket
+  launch, a record scratch, a squeaky toy, an elevator ding, a toaster, a blender, an egg cracked, a whisk, and walks
+  in mud, through puddles and in dry leaves; a pan set on a stove and a fridge door are no longer made.
 - Rain on wood, on a tin roof and on an umbrella are learned beds from public-domain recordings (`rain/wood`,
   `rain/tin_roof`, `rain/umbrella`).
+- A plain request for an interface job gets the design the `ui` set plays ("a success sound": `success/shutter`,
+  "open a menu": `open/drawer`, "delete": `delete/snip`); `open/air`, `close/air`, `error/thud`, `receive/pop`,
+  `type/key`, `next/swipe`, `back/page`, `back/swipe`, `complete/stamp`, `complete/latch`, `delete/crumple`,
+  `delete/swish` and `hover/pad` are removed.
+- A thing of the world is answered by its own recording, never by the interface sound made of it: "a door closing"
+  is `door/shut`, not `close/door`; the interface designs no longer weigh on how rare a word is.
+- A head whose sound depends on its owner ("a fax machine", "a seagull cry", "an elevator ding") says it is only
+  the nearest when the design picked answers neither the owner nor the head.
+- "ten seconds" in words is a length; "twice" is no unknown thing; "in a bathroom", "in a stairwell" set the room.
+- A request that asks for a change as the sound plays ("getting louder"), for a sound heard through something
+  ("behind a closed door", "underwater"), or for a length the design does not keep, says so in the result.
 - **`earshot make "WORDS" -o FILE`** (`earshot/make.py`, MCP `make`, `api.make`): the request is read, the catalogue
   ranked, the best design rendered with the request's controls, audited (clicks, cut tails, clipping, DC, comb ring,
   rising glides, stacked attacks; a failed take is re-rendered on up to three more seeds) and written as wav, flac,
@@ -55,13 +69,13 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - A length within 0.1 s of the one asked prints no note; a length word that is not followed ("a short soft whoosh")
   says to give the length in seconds.
 - `earshot.api` raises the plain missing-extra sentence (MissingExtra) instead of a bare ModuleNotFoundError.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 235 designs of
-  everyday, interface, game and film sounds learned from 571 recorded events in the public domain (the sources of all
+- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 249 designs of
+  everyday, interface, game and film sounds learned from 604 recorded events in the public domain (the sources of all
   learned material, beds, drums and instrument notes included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and
   CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of
   `earshot/data/resyn/`, `textures/`, `drums/` and `notes/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 12.50 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
+  stored as numbers: 13.81 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
   variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
   the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
