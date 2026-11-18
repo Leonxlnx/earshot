@@ -110,11 +110,61 @@ renders in about 1-2 s per second of sound: a 30 s bed takes up to a minute.
 
 **What not to expect.** No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for
 sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded. The film sounds
-(whooshes, booms, risers, falls, the braam) are layered from learned recordings and nobody has rated them yet; the
-invented film sounds they replace, the drums invented from physics and the invented realistic sounds were rated low
+(whooshes, booms, risers, falls, the braam) are layered from learned recordings; the owner rated the fast whoosh
+4 of 5, the deep whoosh and the braam 3 to 3.5, the boom, title slam, riser, tape stop and suck-in impact 1 to 2;
+the invented film sounds they replace, the drums invented from physics and the invented realistic sounds were rated low
 by the owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
 models did not predict his ratings. Say plainly that a learned sound is a new take of a public-domain recording,
 not a sound invented from nothing.
+
+**Scoring a motion video** (a launch film, product demo, explainer or social clip). Measured on 39 reference motion
+design videos (2026-11-18, `docs/motion-sfx-study.md`); [measured] is a number from them, [convention] is common
+practice they did not test.
+- Music carries the film. 34 of the 35 videos with sound are music-led, about 11 have a voice-over, one is scored with
+  effects alone [measured]. In 21 of the 35 no effect stands out of the music at all; where effects do stand out,
+  a music-led video has 1 to 4 of them, 0.2 to 1.3 per 10 seconds [measured]. Do not put a sound on every cut:
+  pick the two to five moments that matter (a reveal, the logo, a key UI action, a title change).
+- What gets a sound, and what to ask for (each phrase checked with the reader today):
+  - a stop: the most used move [measured: 47 in 16 videos]. Cut the music and everything for 0.15 to 0.5 s just
+    before a reveal or a title, then come back on a hit. It is an edit of the bed, not a file.
+  - something appears or a card flips: a short low thump, about 50 ms, 130 to 320 Hz, dry [measured].
+    Ask "a soft thump" (thump/soft, 0.14 s; trim its tail to about 0.1 s). In a run, one per element, about
+    200 ms apart.
+  - a UI click, a cursor press, a word highlighted: a bright dry tick, 7 to 10 kHz, nothing under 1 kHz, mono, a
+    few tens of ms [measured]. Ask "a mouse click" (click/mouse, in range). Avoid "a soft ui tick": it plays a
+    metal tick that rings.
+  - a title card changes, a big transition: a mid-low hit of about 0.3 s that swells in over about 0.1 s, half of
+    it under 100 Hz [measured]. Ask "a short boom" (boom/short, 0.2 s, the nearest). Not "a title slam" or "a
+    title hit": they play a door-like slam and a game hit.
+  - the logo end card: the logo lands on a short low hit, 0.2 to 0.3 s, body around 200 to 300 Hz, fast end
+    [measured: 9 of 11 end cards looked at; in some it may be the track's own last hit]. Ask "a short boom" on
+    the logo frame and let the music ring out under it. Never "a logo reveal hit": it plays a felt piano note
+    today.
+  - a move across the screen: a noise whoosh, mono, as long as the move (0.3 to 1 s), falling off fast after its
+    peak [measured, mostly one video]. Ask "a fast whoosh" (whoosh/fast, rated 4 of 5 by the owner) or "a whoosh
+    for a transition" (whoosh/soft, 0.6 s); "a deep whoosh" for a big slow move. A small fast move: "a quick
+    swish" (flick/thin, 0.16 s).
+  - a text or image breaking apart: "a glitch transition" (glitch/short) [measured: 3 in 3 videos].
+  - a reveal after a build: "a reverse swell into a cut" (rise/reverse, 1.5 s, ends at its peak); put its end on
+    the reveal frame [measured: once].
+  - typing on screen: "typing on a keyboard, 2 seconds" for a real keyboard; the designed typing in the
+    references is brighter (keys around 9 kHz) than this recording [measured].
+- What does not get a sound: small motion that rides the music (text easing in word by word, icons drifting,
+  backgrounds), and most cuts in a music-led film. The editors cut the picture on the music's accents and let the
+  music carry the cut [measured: 8 of 9 hard cuts in random windows have an onset within 150 ms, 6 of them on
+  the beat grid]. So cut on the music's beats first; add an effect only where the music has no accent.
+- Never as an effect in a motion video: marimba, bells, chimes, glockenspiel, piano or synth notes, unless the video
+  is about music or is a game [measured: no instrument note used as an effect in 35 videos; the owner's rule].
+  Not used in any of the 39 either: braams, explosions, fire whooshes, tape stops, impacts with a reverse suck-in,
+  long risers [measured]. Use them only when the picture shows that thing.
+- Where the sound sits against the frame [measured, few cases]: a hit starts about 80 ms before the picture
+  changes and peaks about 60 ms after it; the hit after a stop lands about 50 ms after the change; a whoosh peaks
+  on the fastest frame of the move [convention].
+- Levels against the music bed [measured]: hits about 18 dB over the music's median level at that moment, a swish
+  about 20 dB, the hit after a stop and word ticks about 8 dB, a logo hit as loud as the music was (the music has
+  thinned or stopped). Clicks, whooshes and hits near mono; thumps slightly wide; everything dry, no reverb tail.
+- Endings [measured]: 26 of 35 end at body level (the last 3 s within 3 LU of the whole), 7 fade out. End with the
+  logo hit and the music's last note, no long silence.
 
 Everything earshot renders is free to use in any product, commercial too, without credit. The learned material
 comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`,

@@ -268,3 +268,96 @@ found exposed in any of the eight films.
 Rebuild: `python eval/forge/pro/run_timeline.py ref_1 ...` (earshot timeline + sheet), `viewer.py overview|crops`,
 `study.py` (measure, export, manifest, registry, stats, category sheets), `extra.py` (ridges, pulse rates),
 `film_table.py`. The curated event list with every time and note is `eval/forge/pro/events.py`.
+
+## Part 2 (2026-11-18): 39 reference motion design videos
+
+The owner's collection of 39 reference motion design videos (launch films, product demos, explainers, social
+clips), measured only; six of the eight films above are among them. Third-party work, kept local, never learned
+from; nothing of it is in the repo.
+
+### Method
+- Audio of all 39 decoded to 48 kHz stereo. 2 have no audio track and 2 are digital silence: 35 have sound.
+- Candidates on 10 ms STFT frames: high-band (> 1.5 kHz) and low-band (< 200 Hz) spectral-flux transients, 1-16 kHz
+  noise swells of 0.12-4 s, and drops (the level 15 dB or more under its 3 s median for 80 ms or more). About 5 000
+  candidates; 772 stand 6-8 dB over the surrounding median or off the eighth-note grid of the tracked beat.
+- The 308 strongest went through earshot's listening models: 15 effect descriptions (whoosh, swish, riser, boom,
+  impact, click, pop, typing, shutter, glitch, paper, chime, bass drop, tape stop, reversed swell) against music,
+  an instrument melody, a drum beat, speech and a synth chord. 34 were heard as an effect. Most loud transients in
+  music-led videos are the music's own drums and bass.
+- Measured set: those 34, every candidate of the one effects-only video, the drops, and 32 moments looked at in
+  low-resolution contact sheets (12 frames per second, 0.5 s either side); 111 events in 23 videos after removing
+  duplicates. Each is measured against a local bed (the quietest 150 ms in the 0.8 s before) on 5 ms frames
+  smoothed to 20 ms. Levels over the music are the loudest 50 ms over the median level of the 1.5 s around.
+- Limits: an effect mixed at or under the music's level is not separable from it, so counts are a floor. The
+  effects-only video supplies 49 of the 111 events. Kinds are the listening model's best description checked
+  against the numbers and, for 32 moments, the picture; 44 of the 136 contact sheets were looked at. Timing against
+  the frame rests on few cases.
+
+### Inventory
+- Loudness: median -14.8 LUFS integrated, range -23.1 to -6.9.
+- 34 of 35 tracks are music-led; one is effects only (LRA 12.2 LU, 39 % of frames 50 dB under its peak). About 11
+  carry a voice-over (speech heard as the top label of their candidates; rough).
+- Effects that stand out of the bed: found in 14 of 35 videos; none separable in 21. The 13 music-led videos with
+  effects have 1-4 each, 0.19-1.29 per 10 s (median 0.42). The effects-only video has 43 effects and 6 drops in
+  29.5 s.
+- Cuts: in one random window per video (17 videos), 9 held a hard picture change; 8 of them have an onset 6-13 dB
+  over the music within 150 ms, 6 of those on the music's eighth-note grid. The edit is cut to the music's accents
+  and the music carries the cut.
+- Endings: 26 of 35 end at body level (last 3 s within 3 LU of the whole), 7 fade (-6 to -32 LU), 7 leave more
+  than 0.5 s of silence. Of 11 logo end cards looked at, 9 land on a low event (a hit, thump or low swell at or
+  under the logo); in 4 of the 9 the same spectrum recurs in the track or the listening model heard music, so it
+  may be the track's own last hit.
+
+### Kinds, by how often they occur
+Median [middle half]. cp = bed-subtracted spectral centroid at the peak; lo200 = share under 200 Hz; pk15 = share
+of the 300 Hz-12 kHz energy in its 15 strongest 23 Hz bins (0.2-0.4 noise, above 0.7 tonal or a narrow body);
+side = side/mid; tail = share of the energy later than 150 ms after the peak.
+
+| kind | n (videos) | length | attack | cp | lo200 | pk15 | over music | side | tail |
+|---|---|---|---|---|---|---|---|---|---|
+| drop, then a hit | 47 (16) | gap 0.15-0.5 s; hit 0.21 s [0.09..0.52] | 30 ms | 417 Hz | 0.65 | 0.70 | +7.8 dB [5.1..12.8] | -12 dB | 0.00 |
+| boom / low hit | 15 (4) | 0.25 s [0.15..1.22] | 0.15 s | 289 Hz | 0.91 | 0.67 | about the music at end cards | -13 dB | 0.00 |
+| pop / thump | 12 (4) | 0.05 s [0.04..0.07] | 20 ms | 150 Hz [132..318] | 0.97 | 0.82 | +13..+15 (2 over music) | -7 dB | 0.00 |
+| click / tick | 11 (5) | 20-30 ms core | 10 ms | 7-10 kHz (designed) | 0.01 | 0.41 | +8 (word tick) | -34 dB | 0.06 |
+| hit (title, end card) | 5 (5) | 0.32 s [0.28..0.36] | 0.12 s | 577 Hz | 0.74 | 0.69 | +17.6 dB [13..33] | -19 dB | 0.11 |
+| noise burst | 5 (1) | 0.45 s | 0.26 s | 1.2 kHz | 0.03 | 0.55 | silent bed | -4 dB | 0.00 |
+| whoosh | 4 (1) | 0.41 s [0.20..0.61] | 0.26 s | 1.5 kHz | 0.50 | 0.47 | silent bed | -29 dB | 0.11 |
+| glitch | 3 (3) | 40 ms core | 10 ms | 0.7-4.9 kHz | 0.02 | 0.85 | +17 dB | -14 dB | 0.12 |
+| swish | 2 (2) | 0.14 s | 20 ms | 4.6 kHz | 0.00 | 0.48 | +20 dB | -31 dB | 0.06 |
+| riser / swell | 2 (2) | 0.7-2.2 s build | 0.17 s | 314 Hz | 0.29 | 0.82 | +17.5 dB | -21 dB | 0.34 |
+| zip (tonal sweep) | 2 (1) | 0.24 s, rising 1.6-4.4 oct | 0.15 s | 2.2 kHz | 0.82 | 0.95 | silent bed | mono | 0.35 |
+| tonal blip | 2 (1) | 40 ms | 20 ms | 2.0 kHz | 0.00 | 0.93 | silent bed | | 0.00 |
+
+Not found in any of the 39: braams, explosions, fire whooshes, tape stops, impacts with a reverse suck-in, camera
+shutters, paper foley, and any instrument note (marimba, bell, glockenspiel, piano, synth lead) used as an effect.
+The only tonal effects are designed blips and zips in the effects-only video and two short tonal swells that open
+a video on its title.
+
+### What the frequent kinds are made of
+- **Drop**: the whole mix cut for 0.15-0.5 s, then a hit about 8 dB over the music, about 50 ms after the picture
+  changes. The most common designed move: 47 drops in 16 videos.
+- **Low hit** (end cards, big moments): about 0.25 s, its body around 200-300 Hz with 90 % under 200 Hz, a fast end
+  (t20 about 60 ms); at one end card the top of a 1.5 s low swell that stops at its peak. Not a long sub-bass tone.
+- **Pop / thump** (something appears, a card flips): a low body at 130-320 Hz, about 50 ms, dry, a little wide (L/R
+  correlation about 0.7); in a run one per element about 200-230 ms apart.
+- **Click / tick** (a UI press, a cursor, a word highlighted): bright noise at 7-10 kHz, almost nothing under 1 kHz,
+  mono, a few tens of ms.
+- **Hit** (a title card changes, an end card): about 0.3 s, it swells in over about 0.1 s, half its energy under
+  100 Hz; onset about 80 ms before the frame change, peak about 60 ms after it.
+- **Whoosh and swish**: noise, mono, dry, falling off fast after the peak (t20 about 50 ms); a swish is 0.14 s
+  around 4.6 kHz.
+
+### Density and mix
+- Music-led videos: 0.2-1.3 effects per 10 s where any stand out, none separable in 21 of 35 videos. Effects sit
+  8-20 dB over the music's median level at that moment; a logo hit about at the music's level, as the music thins.
+- Clicks, whooshes, swishes and hits are near mono (side 12-34 dB under mid); thumps a little wide; only designed
+  blips and textures are decorrelated. Every short effect is dry (tail share 0.00-0.12).
+
+### earshot today against these (one take per natural request)
+In range: "a mouse click", "a reverse swell into a cut", "a glitch transition" (a little long). Near: "a soft
+thump" (twice as long as the reference thump), "a short boom" (for a title or logo hit), "a quick swish" (0.9 oct
+too bright). Off: "a pop when an element appears" plays a bright tonal pop with no low body; "a deep boom" and "a
+cinematic hit" play a 130 Hz sine with a 1 s decay; "a title slam" and "a title hit" play a door-like slam and a
+game hit; "a logo reveal hit" plays a felt piano note; "a riser before the drop" does not get brighter as it rises;
+"a whoosh for a transition" is tonal (pk15 0.75) where the references are noise (0.47); "a soft ui tick" rings
+like metal. The skill's motion section routes requests to the phrases that work.
