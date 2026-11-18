@@ -157,10 +157,14 @@ def doubt(b, cands):
     named = brief.named(top['why']) or brief.thing_named(top['id'], top['why'])
     heard = top.get('z') is not None and top['z'] >= GUESS_Z
     close = bool(others) and top['score'] - others[0]['score'] <= GUESS_HAIR * abs(top['score'])
+    # a request in another language is read only for the English words it holds: the pick is a guess that says
+    # how to ask
+    english = 'the request does not read as English, write it in English'
     if (named or heard) and not close:
-        return None
-    return 'another kind of sound fits almost as well' if close else 'no job or sound word matched' + (
+        return english if b.get('foreign') else None
+    why = 'another kind of sound fits almost as well' if close else 'no job or sound word matched' + (
         ' and it does not clearly sound like the request' if b.get('listened') else '')
+    return f'{why}; {english}' if b.get('foreign') else why
 
 
 def alternatives(b, cands, pick, k=3, others_first=False):

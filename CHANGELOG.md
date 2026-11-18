@@ -28,6 +28,10 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   "a counter ticking up, 1.5 seconds" with 12 events is 1.5 s long; knocks and steps keep their 0.12 s limit.
 - A row with a count and a length too short for the usual ring ("a soft thump", 3 events, 0.6 s) keeps the length,
   and the last event is faded out to end with the file instead of being cut.
+- A gap said with a count ("three soft thumps, 200 ms apart") is the time from one event to the next, and the row
+  is as long as that makes it.
+- A request that does not read as English is answered as a guess that says so ("write it in English"); a job word
+  it still holds ("Erfolgston für die App") keeps its pick.
 - `knock/double` is two strikes by design: the audit no longer marks its two attacks as stacked layers.
 - A length within 0.1 s of the one asked prints no note; a length word that is not followed ("a short soft whoosh")
   says to give the length in seconds.
