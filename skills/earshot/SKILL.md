@@ -298,8 +298,8 @@ seconds, no loop" (rain/street), "the heavy wooden front door falls shut" (door/
 (keys/bunch), "a phone vibrating on a table" (phone/vibrate), "distant thunder" (thunder/distant, 7.7 s),
 "footsteps on concrete, 4 seconds" (step/concrete, 7 steps), "pouring water into a glass" (drink/pour, 4.9 s). A
 bed loops unless the words say "no loop". The catalogue has no recording of many kitchen and street things. Then
-either the answer says it is a guess ("a whisk beating eggs in a bowl": `earshot makes no whisk; water/drop is
-only the nearest sound it has`), or an app's sound answers for the real thing without a doubt: "a kitchen timer
+either the answer says it is a guess ("a kettle whistling": `earshot makes no kettle; whistle/referee is only the
+nearest sound it has`), or an app's sound answers for the real thing without a doubt: "a kitchen timer
 ringing" answered `timer/done (1.68 s, A5, marimba ...)`, three notes on a marimba, an app's timer and not a
 kitchen's bell. Read what the picked design is before it goes under a picture (`earshot sounds --search "kitchen
 timer"` prints each design's words), and leave a moment silent or record it rather than use a stand-in.
@@ -310,7 +310,7 @@ comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md`, `earshot/
 
 ## When earshot has no such sound: build it
 
-The catalogue cannot hold everything. When the answer says `earshot makes no rocket launch; ... is only the nearest
+The catalogue cannot hold everything. When the answer says `earshot makes no fax machine; ... is only the nearest
 sound it has`, do not put the stand-in under the picture: build the sound from the catalogue's own parts with a
 recipe. You design it, earshot renders it and checks it like every other sound. No model is loaded and nothing is
 downloaded. A recipe takes longer than a catalogue sound, because every layer and every event is a take of its
@@ -342,18 +342,29 @@ A recipe:
 
     {"name": "dragon_roar", "says": "a dragon roaring", "space": "hall",
      "layers": [
-      {"sound": "horse/neigh", "pitch": -12, "lowpass": 4000},
-      {"sound": "cow/moo", "pitch": -9, "at": 0.15, "gain": -3},
-      {"sound": "fire/whoosh", "pitch": -5, "at": 0.6, "gain": -9},
-      {"source": "noise", "color": "brown", "dur": 3.0, "lowpass": [70, 150], "gain": -16, "swell": 0.6,
+      {"sound": "lion/roar", "pitch": -5},
+      {"sound": "horse/neigh", "pitch": -12, "at": 0.1, "gain": -9, "lowpass": 3500},
+      {"sound": "fire/whoosh", "pitch": -5, "at": 0.5, "gain": -10},
+      {"source": "noise", "color": "brown", "dur": 3.5, "lowpass": [70, 150], "gain": -18, "swell": 0.6,
        "decay": 1.5}]}
 
 A layer names a design (`"sound"`) or a plain source (`"source": "noise"` with `dur` and `color`, or `"sine"` with
 `dur` and `hz` from 20 to 150). On a layer: `seed` (another take), `dur` (the length asked of the design itself),
-`pitch` (semitones, -24 to 12), `reverse`, `cut` ([from, to] in seconds), `halt`, `lowpass` and `highpass` (Hz, or
+`pitch` (semitones, -24 to 12), `glide` (the pitch in semitones at the end of the take: the pitch moves there from
+`pitch` over the take, as a tape that slows down, so `"glide": -14` on a running motor winds it down), `reverse`,
+`cut` ([from, to] in seconds), `halt`, `lowpass` and `highpass` (Hz, or
 [from, to] to move the cutoff), `pan`, `gain` (dB), `at` (its start in seconds), `fade_in`, `fade_out`, `swell`,
 `decay`, the design's own axes (`size`, `bright`, `hard`, `energy`, `ring`, `motion`, `width`, -1 to 1, where it has
-them) and `events` (`count`, `gap`, `faster`, `softer`, `loose`). The whole takes `name`, `says`, `layers` (1 to 8),
+them), `events` (`count`, `gap`, `faster`, `softer`, `loose`) and `follow` (`layer`, `amount`, `smooth`: the layer's
+loudness follows another layer's, named by its index from 0; `amount` 1 makes it exactly as loud as the other layer is
+against its own loudest moment, and an amount under 0 makes it give way where the other is loud, as a bed ducks under a
+hit). Twigs that snap with the gusts of the wind:
+`{"sound": "twigs/snap", "gain": -14, "events": {"count": 24, "gap": 0.33, "loose": 0.9},
+"follow": {"layer": 0, "amount": 0.9, "smooth": 0.4}}` under a first layer `{"sound": "wind/trees", "dur": 8.5}`.
+One sound as the body of another ("rain on a tin can": the hits of one thing ringing through another) is not in the
+form: built from a struck design's partials it did not come nearer the real recordings than the plain sound, so where
+the catalogue has the real surface (`rain/wood`, `rain/tin_roof`, `step/floorboard`), use it. The whole takes `name`,
+`says`, `layers` (1 to 8),
 `dur`, `space` (dry, booth, room, studio, hall, plate, cathedral) and `kind` (`event`, or `ambience` for a bed). A
 mistake is answered in one sentence that names the field and what it takes
 (`layers[1].pitch is a number of semitones from -24 to 12, not 40`). The same recipe goes into Python
@@ -363,22 +374,20 @@ mistake is answered in one sentence that names the field and what it takes
 Ten worked recipes from the cookbook, each with the thought behind it, its layers and the line earshot printed
 for it (`earshot recipe <name>` prints the whole recipe):
 
-1. A dragon's roar (`dragon_roar`). A huge animal's voice with fire in it. Animal voices an octave down are the
-   body, a burst of flame the breath, a little rumble the size, a hall the cave.
-   `horse/neigh` pitch -12 lowpass 4000; `cow/moo` pitch -9 at 0.15 gain -3; `pig/oink` pitch -15 gain -5;
-   `fire/whoosh` pitch -5 at 0.6 gain -9; brown noise 3 s lowpass [70, 150] gain -16 swell 0.6 decay 1.5; space hall.
-   `dragon_roar.wav: recipe/dragon_roar (5.26 s, peak at 2.66 s, -14 LUFS, clean) [recipe]`
-2. A rocket launch (`rocket_launch`). An ignition, a bang, then a roar that swells and stays. A burner and a
-   near explosion start it; a jet pass and a campfire, both slowed, are the roar.
-   `gas_stove/ignite` gain -8; `explosion/near` pitch -5 at 0.25 gain -3 lowpass 3500; `pass/jet` pitch -7 at 0.3
-   gain -2 swell 0.8; `fire/camp` dur 6 pitch -5 at 0.3 gain -9 swell 0.6 decay 3; brown noise 6 s at 0.3 lowpass
-   [90, 240] gain -12 swell 1 decay 3; dur 6.5.
-   `rocket_launch.wav: recipe/rocket_launch (6.46 s, peak at 0.30 s, -14 LUFS, clean) [recipe]`
-3. A monster's growl (`monster_growl`). A wet, slow breath in a big throat. A snore and a purr an octave down,
-   cut to under three seconds, a pig's grunt lower still.
-   `snore/person` pitch -10 cut [0, 2.8] lowpass 3000 decay 0.5; `cat/purr` pitch -12 cut [0, 2.8] gain -6 decay
-   0.6; `pig/oink` pitch -15 at 0.35 gain -4; brown noise 2.5 s lowpass 120 gain -18 swell 0.4 decay 1.2; space room.
-   `monster_growl.wav: recipe/monster_growl (2.63 s, peak at 1.64 s, -14 LUFS, clean) [recipe]`
+1. A dragon's roar (`dragon_roar`, a sketch). A huge animal's voice with fire in it. A real lion's roar a fourth down is the
+   body, a horse an octave down inside it, a burst of flame the breath, a little rumble the size, a hall the cave.
+   `lion/roar` pitch -5; `horse/neigh` pitch -12 at 0.1 gain -9 lowpass 3500; `fire/whoosh` pitch -5 at 0.5 gain
+   -10; brown noise 3.5 s lowpass [70, 150] gain -18 swell 0.6 decay 1.5; space hall.
+   `dragon_roar.wav: recipe/dragon_roar (3.69 s, peak at 0.19 s, -14 LUFS, clean) [recipe]`
+2. A car crash (`car_crash`). The skid, one impact of metal and weight, the debris after. Five real recordings,
+   the impact three of them at one moment.
+   `tyres/screech` cut [0, 1.6] decay 0.2 gain -2; at 1.5 `car_door/slam` pitch -7; at 1.52 `metal/drop` pitch -5
+   gain -3; at 1.58 `glass/break` gain -6; at 2.1 `can/drop` pitch -3 gain -12.
+   `car_crash.wav: recipe/car_crash (3.11 s, peak at 1.58 s, -14 LUFS, clean) [recipe]`
+3. A monster's growl (`monster_growl`). A big animal's voice far down with a wet throat in it.
+   `lion/roar` pitch -9 lowpass 3000; `snore/person` pitch -10 cut [0, 2.8] gain -5 decay 0.5; `pig/oink` pitch
+   -15 at 0.35 gain -6; space room.
+   `monster_growl.wav: recipe/monster_growl (3.37 s, peak at 0.24 s, -14 LUFS, clean) [recipe]`
 4. A spaceship door (`spaceship_door`). Air released, a motor that runs and stops, a panel that slides, a stop.
    `spray_can/spray` cut [0, 0.5] highpass 800 gain -9; `drill/electric` pitch -9 cut [0.5, 1.3] at 0.15 gain -7
    lowpass 3000 fade_in 0.1 halt 0.7; `door/slide` at 0.15 gain -2; `lock/latch` pitch -5 at 1.25 gain -3; space
@@ -394,7 +403,7 @@ for it (`earshot recipe <name>` prints the whole recipe):
    its metal boss, the weight behind the blow; the swing before them.
    `sword/swing` cut [0, 0.25] gain -9; then all at 0.2: `clash/sword`; `knock/hollow` pitch -7 gain -3;
    `saucepan/hit` pitch -7 gain -10 lowpass 3000 decay 0.3; `punch/body` gain -6.
-   `sword_on_shield.wav: recipe/sword_on_shield (0.90 s, peak at 0.27 s, -14 LUFS, clean) [recipe]`
+   `sword_on_shield.wav: recipe/sword_on_shield (0.90 s, peak at 0.22 s, -14 LUFS, clean) [recipe]`
 7. A campfire in the wind (`campfire_wind`). An ambience is two real beds and what happens in them: the fire, the
    wind coming up, a gust, twigs that snap when they snap (`loose`). `kind` ambience levels it as a bed.
    `fire/camp` dur 8; `wind/trees` dur 8 gain -5 swell 2; pink noise 6 s at 1 lowpass [500, 1400] highpass 150
@@ -407,25 +416,34 @@ for it (`earshot recipe <name>` prints the whole recipe):
    brown noise 1.6 s lowpass [180, 420] gain -10 swell 1.2 fade_out 0.05; `land/wood` pitch -5 at 1.5 gain -3;
    `dice/throw` pitch -10 at 1.55; `knock/hollow` pitch -3 at 1.52 gain -6 decay 0.15, events count 6 gap 0.08
    faster 1.3 softer -2.5 loose 0.6; space studio.
-   `bowling_strike.wav: recipe/bowling_strike (3.07 s, peak at 1.25 s, -16 LUFS, clean) [recipe]`
-9. A heartbeat getting faster (`heartbeat_faster`). The catalogue's heartbeat is a steady run; one beat cut out
-   of it and repeated with shrinking gaps is the request.
-   `heart/beat` cut [0, 0.6] decay 0.12, events count 9 gap 0.95 faster 0.9.
-   `heartbeat_faster.wav: recipe/heartbeat_faster (5.99 s, peak at 5.44 s, -16 LUFS, clean) [recipe]`
-10. A giant's footsteps (`giant_footsteps`). Weight, slowness, the ground answering. Heavy drops far lower, four
-    times, each with a short rumble and something small breaking after it, in a hall.
-    `heavy_drop/floor` pitch -9; `land/dirt` pitch -12 at 0.02 gain -4; brown noise 0.9 s lowpass 90 at 0.02 gain
-    -11 decay 0.8; `twigs/snap` pitch -5 cut [0, 0.6] decay 0.2 at 0.25 gain -13; each with events count 4 gap
-    1.15; space hall.
-    `giant_footsteps.wav: recipe/giant_footsteps (4.80 s, peak at 2.66 s, -14 LUFS, clean) [recipe]`
+   `bowling_strike.wav: recipe/bowling_strike (3.08 s, peak at 1.25 s, -16 LUFS, clean) [recipe]`
+9. A woodpecker (`woodpecker`). A hard beak on a hollow trunk, very fast, twice. One real knock raised a little,
+   repeated as new takes 45 ms apart, with a forest far under it.
+   `knock/hollow` pitch 4, events count 12 gap 0.045 softer -0.3; `knock/hollow` seed 2 pitch 4 at 1.4 gain -1,
+   events count 10 gap 0.045 softer -0.3; `forest/morning` dur 3.2 gain -20.
+   `woodpecker.wav: recipe/woodpecker (3.01 s, peak at 0.05 s, -14 LUFS, clean) [recipe]`
+10. A giant's footsteps (`giant_footsteps`, a sketch). Weight, slowness, the ground answering. A real step on
+    old floorboards an octave down and a heavy drop lower, four times, each with a short rumble, in a hall.
+    `step/floorboard` pitch -12; `heavy_drop/floor` pitch -7 at 0.01 gain -3; brown noise 0.8 s lowpass 100 at
+    0.02 gain -12 decay 0.7; each with events count 4 gap 1.1; space hall.
+    `giant_footsteps.wav: recipe/giant_footsteps (4.75 s, peak at 2.26 s, -15 LUFS, clean) [recipe]`
 
-The cookbook (`earshot/data/recipes`, `earshot recipe --list`) holds recipes for things people ask for and no
-design is: a rocket launch, a dragon roar, a monster growl, a spaceship door, a giant's footsteps and more. A
-request that names one of them is answered by its recipe, and the answer says `built from parts by the cookbook
-recipe ...` and what the parts are; `earshot recipe dragon_roar` prints the recipe to change it. A recipe marked
-`sketch` (in `earshot recipe --list`: a geiger counter, a whale call, footsteps in mud) is one that earshot's
-listening model does not hear as its thing yet. The catalogue answers such a request as before, and one line
-names the sketch as a start: `a start from parts: earshot make --recipe geiger_counter`. Improve it before use.
+The cookbook (`earshot/data/recipes`, `earshot recipe --list`) holds 74 recipes for things people ask for and no
+design is. 32 answer a request that names their thing: a car crash, a cannon, a welding torch, a warp drive, a
+woodpecker, a werewolf howl, a seagull, a monster growl and more. The answer says `built from parts by the cookbook
+recipe ...` and what the parts are; `earshot recipe car_crash` prints the recipe to change it. When the catalogue
+has a recording of the thing itself, the recording answers ("a rocket launch" is `rocket/launch`, "footsteps in
+mud" is `step/mud`). The other 42 are marked `sketch` (a dragon roar, a fax machine, a ship's horn, a washing
+machine, a wolf pack, a heartbeat getting faster, a giant's footsteps): earshot's listening model does not hear them as their thing
+yet, or not clearly better than the catalogue's nearest sound. The catalogue answers such a request as before, and
+one line names the sketch as a start: `a start from parts: earshot make --recipe heartbeat_faster`. Improve it
+before use.
+
+A cookbook sound follows what the request asks of it where a recipe can: "far away" puts it in a hall, duller and
+6 dB softer; "up close" takes the room away; "soft" or "quiet" is 6 dB softer; "three times" plays the whole three
+times; a length cuts it. Each is said in the answer (`as asked: far away (in a hall, duller and 6 dB softer)`), and
+what is not followed is said too (`not followed: louder; a cookbook sound is made at the loudest level of its
+kind`). Your own recipes are JSON files you keep in your project and render with `earshot make --recipe <file>`.
 
 You cannot hear the result. `clean` says the file has no clicks, no cut tail and no clipping; it does not say the
 sound is a dragon. Say what it is built from when you hand it over, and say that a person should listen once.

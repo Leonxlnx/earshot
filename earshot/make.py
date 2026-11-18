@@ -158,7 +158,8 @@ def doubt(b, cands):
     same = {fam} | {k.split('/')[0] for k, v in L.TWINS.items() if v == top['id']}    # door/knock: knock/* too
     others = [c for c in cands[1:] if c['id'].split('/')[0] not in same and L.TWINS.get(c['id']) != top['id']
               and L.FILM_CYMBAL.get(c['id'].split('/')[0]) != top['id']]
-    named = brief.named(top['why']) or brief.thing_named(top['id'], top['why'])
+    named = (brief.named(top['why']) or brief.thing_named(top['id'], top['why'])
+             or brief.use_said(b, top['id']))      # "a bumblebee", "booing and jeering": a whole job of the recording
     heard = top.get('z') is not None and top['z'] >= GUESS_Z
     close = bool(others) and top['score'] - others[0]['score'] <= GUESS_HAIR * abs(top['score'])
     # a request in another language is read only for the English words it holds: the pick is a guess that says
@@ -234,6 +235,71 @@ def gist(sid, width=GIST):
     return text[:width].rsplit(' ', 1)[0].rstrip(' ,;:') + ' ...'
 
 
+STRONG = 0.7          # a ranked design scoring this share of the nearest one is a start of its own
+
+
+def starts(b, cands, k=3):
+    """k starting points besides the nearest design for a thing no design is ("a trumpet", "a fax machine"): each of
+    another family; first the ranked designs that score near the nearest one (STRONG) and the design of its kind of
+    sound (brief.read's `kind`), then the designs described most like the nearest one and the request (recordings
+    and the same kind of sound first; no interface sound for a thing of the world), the third not of the same size
+    as the other two when another size is near"""
+    from .sounds import registry
+    pick = cands[0]['id']
+    d = registry.get(pick)
+    seen, out = {pick.split('/')[0]}, []
+
+    def add(sid):
+        f = sid.split('/')[0]
+        if len(out) < k and f not in seen and sid != pick:
+            seen.add(f)
+            out.append(sid)
+
+    best = cands[0]['score'] or 0.0
+    for c in cands[1:]:
+        if c['score'] is not None and best > 0 and c['score'] >= STRONG * best:
+            add(c['id'])
+    if b.get('kind') and b['kind'] != pick:
+        try:
+            add(registry.get(b['kind']).id)
+        except ValueError:
+            pass
+    roles = brief._roles()
+    face = 'interface' in d.tags
+
+    def said(r):
+        texts = [r['id'].replace('/', ' ').replace('_', ' ')] + [str(s) for k in ('says', 'tags', 'uses')
+                                                                for s in r.get(k) or ()]
+        return {brief.stem(w) for s in texts for w in brief.WORD.findall(s.lower()) if w not in L.STOP}
+
+    want = said(d.row()) | set(brief._said_words(b.get('text')))
+    rows = [r for r in registry.rows() if r['id'].split('/')[0] not in seen and r['loop'] == d.loop
+            and brief.chip(r) == brief.chip(d.row()) and ('interface' in r.get('tags', ()) or False) <= face]
+
+    def like(r):        # how much a design is described as the nearest one and the request are; a recording first
+        w = said(r)
+        return (len(want & w) / math.sqrt(len(w) + 1) + 0.3 * (r['kind'] == d.kind) + 0.2 * (r['id'] in roles))
+
+    pool = sorted(rows, key=lambda r: (-like(r), r['id']))
+    size = d.dur or 1.0
+    sizes = []
+    for r in pool:              # the most alike first; the third not of the same size as the other two
+        if len(out) >= k:
+            break
+        if r['id'].split('/')[0] in seen:
+            continue
+        band = round(math.log((r['dur_s'] or 1.0) / size))
+        if len(out) == k - 1 and len(sizes) >= 2 and len(set(sizes + [band])) == 1 and any(
+                round(math.log((q['dur_s'] or 1.0) / size)) != band for q in pool[:40]
+                if q['id'].split('/')[0] not in seen):
+            continue
+        sizes.append(band)
+        add(r['id'])
+    for c in cands[1:]:
+        add(c['id'])
+    return out
+
+
 def guess(b, cands, also=None):
     """the alternatives line when the pick is a guess (`doubt`), else None: why it is a guess and the alternatives
     (default: the ranked candidates, other families first), each with what it sounds like in a few words (`gist`),
@@ -241,6 +307,8 @@ def guess(b, cands, also=None):
     why = doubt(b, cands)
     if why is None:
         return None
+    if why.startswith('earshot makes no ') and cands:
+        also = starts(b, cands)
     if also is None:
         fam = cands[0]['id'].split('/')[0]
         also = [c['id'] for c in cands[1:] if c['id'].split('/')[0] != fam]
@@ -502,6 +570,9 @@ def unfollowed(b, sound, why, ignored, req, given, takes):
                   r'|\b(?:from|in) the next room\b|\bunder ?water\b|\bmuffled\b', text)
     if m and not {'underwater', 'muffled'} & set(re.findall('[a-z]+', sound)):
         out.append(f'not followed: "{m.group(0)}"; the sound is heard as in the same room, not through anything')
+    if b.get('pan'):            # make places no sound between the speakers: a passing sound moves as it was recorded
+        out.append(f'not followed: "{b["pan"]}"; earshot does not pan a sound: it plays as designed, pan it in an '
+                   'editor')
     return out
 
 
@@ -639,12 +710,14 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         b['loop'] = False
     if not sound:       # a thing the cookbook builds from parts and no design of the catalogue was found by
         from . import recipe as R
-        cooked = R.answer(b, cands[0]['why'] if cands else ())
+        cooked = R.answer(b, found_by(cands[0]['why'], cands[0]['id']) if cands else ())
         if cooked:
-            given = [k for k, v in (('theme', theme), ('pitch', pitch), ('voice', voice), ('material', material),
-                                    ('events', events)) if v is not None] + [a for a, v in axes.items() if v]
-            return from_recipe(cooked, out, n=n, seed=seed, fmt=fmt, mono=mono, lufs=lufs, sr=sr, bits=bits,
-                               listen=listen, want=want, dur=b.get('dur'), cands=cands, given=given)
+            given = [k for k, v in (('theme', theme), ('pitch', pitch), ('voice', voice), ('material', material))
+                     if v is not None] + [a for a, v in axes.items() if v]
+            cooked, level, asked = asked_of_recipe(cooked, b, events, seed)
+            return from_recipe(cooked, out, n=n, seed=seed, fmt=fmt, mono=mono, lufs=level if lufs is None else lufs,
+                               sr=sr, bits=bits, listen=listen, want=want, dur=b.get('dur'), cands=cands, given=given,
+                               asked=asked)
     if not cands:
         absent = brief.not_made(b)
         raise ValueError(f'no sound in the catalogue answers {want!r}'
@@ -695,7 +768,7 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
             lines.append('build it from parts: earshot recipe --example')
     elif also:
         lines.append('also: ' + ', '.join(also))
-    start = None if sound else R.answer(b, cands[0]['why'], sketch=True)
+    start = None if sound else R.answer(b, found_by(cands[0]['why'], cands[0]['id']), sketch=True)
     if start:           # a cookbook recipe of this thing that is a sketch: named as a start, not given as the answer
         lines.append(f'a start from parts: earshot make --recipe {start["name"]} (a sketch of {start["says"]}; '
                      f'`earshot recipe {start["name"]}` prints it to change)')
@@ -732,15 +805,88 @@ def _tmp_wav(sound, seed, req):
     return master.write(os.path.join(tempfile.mkdtemp(), 'heard.wav'), y)
 
 
+def found_by(why, sound=None):
+    """the words the catalogue's first design was found by, a phrase ("ph:launch rocket") as its words: when they hold
+    every word of a cookbook thing the catalogue has that sound itself, and its design answers, not the recipe. With
+    the design's id, only the words of what it is (its id and `says`) count: a lion's roar listed for "a dragon roar"
+    is the nearest of a dragon, a recording of a rocket launch is the thing"""
+    words = [w for x in why or () for w in str(x).split(':')[-1].split()]
+    if sound is None:
+        return tuple(words)
+    from .sounds import registry
+    try:
+        d = registry.get(sound)
+    except ValueError:
+        return tuple(words)
+    own = {brief.stem(w) for w in brief.WORD.findall(' '.join([d.id.replace('/', ' ').replace('_', ' '), *d.says])
+                                                      .lower())}
+    return tuple(w for w in words if brief.stem(w) in own or w in own)
+
+
+FAR_SPACE = 'hall'         # a cookbook sound asked for far away: in this space, duller and softer
+FAR_LOWPASS = 3000.0       # Hz: the most of its top a far sound keeps
+SOFTER = 6.0               # dB under the loudest level of its kind: a cookbook sound asked for soft, quiet or far away
+CLOSE_SPACES = ('dry', 'booth')
+REPEAT_GAP = 0.3           # s of quiet between one whole of a recipe and the next ("three times")
+
+
+def asked_of_recipe(rc, b, events=None, seed=0):
+    """what a request asks of a cookbook thing that the recipe form can do: (recipe, lufs, lines). Far away ("in
+    the distance"): the whole in a hall, every layer duller, 6 dB softer; up close: no room; soft or quiet: 6 dB
+    softer; N times (or events=N): every layer N times, one whole after the other, when no layer is a row of its
+    own. What it cannot do (louder: a cookbook sound is made at the loudest level of its kind; a row of rows) is a
+    `not followed:` line; the length asked is the whole's `dur` (from_recipe)"""
+    import copy
+    from . import recipe as R
+    from .sounds import registry
+    rc, lines, level = copy.deepcopy(R.check(rc)), [], None
+    softer = registry.LOUDEST['bed' if rc.get('kind') == 'ambience' else ''] - SOFTER
+    ax = b.get('axes') or {}
+    if ax.get('space', 0) >= 0.3:
+        if rc.get('space', 'dry') in ('dry', 'booth', 'room', 'studio'):
+            rc['space'] = FAR_SPACE
+        for lay in rc['layers']:
+            lp = lay.get('lowpass')
+            lay['lowpass'] = [min(x, FAR_LOWPASS) for x in lp] if isinstance(lp, list) else min(lp or 2e4, FAR_LOWPASS)
+        level = softer
+        lines.append(f'as asked: far away (in a {rc["space"]}, duller and 6 dB softer)')
+    elif ax.get('space', 0) <= -0.3:
+        if rc.get('space', 'dry') not in CLOSE_SPACES:
+            rc['space'] = 'dry'
+        lines.append('as asked: up close (no room around it)')
+    if ax.get('energy', 0) <= -0.5 or (ax.get('hard', 0) <= -0.3 and ax.get('energy', 0) < 0):
+        if level is None:
+            level = softer
+            lines.append('as asked: softer (6 dB under the usual level)')
+    elif ax.get('energy', 0) >= 0.5:
+        lines.append('not followed: louder; a cookbook sound is made at the loudest level of its kind')
+    count = events if events is not None else (b.get('events') if b.get('row') or b.get('perform') else None)
+    if count is not None and int(count) > 1:
+        count = int(count)
+        if any(lay.get('events') for lay in rc['layers']):
+            lines.append(f'not followed: {count} times; this recipe is a row of events already, played once')
+        elif count > R.EVENT_RANGE['count'][1]:
+            lines.append(f'not followed: {count} times; a recipe repeats at most {R.EVENT_RANGE["count"][1]} times')
+        else:
+            one = len(R.render(rc, seed=seed)[0]) / 48000.0
+            gap = round(min(one + REPEAT_GAP, R.EVENT_RANGE['gap'][1]), 3)
+            for lay in rc['layers']:
+                lay['events'] = {'count': count, 'gap': gap}
+            rc.pop('dur', None)
+            lines.append(f'as asked: {count} times, {gap:.2f} s apart')
+    return rc, level, lines
+
+
 def from_recipe(recipe, out=None, n=1, seed=0, fmt=None, mono=False, lufs=None, sr=48000, bits=24, listen=False,
-                want=None, dur=None, cands=None, given=()):
+                want=None, dur=None, cands=None, given=(), asked=()):
     """a recipe (earshot.recipe: a dict, JSON text, the path of a JSON file, "-" or a cookbook name) rendered and
     written as `make` writes a sound: the same result ('summary', 'sound': "recipe/<name>", 'files', 'takes' with
     the audit, level, length and peak_s of each) plus 'source': "recipe" and 'parts' (what it is built from). n
     takes are the seeds seed .. seed + n - 1: other takes of every layer. dur: a length to cut the sound at. With
     listen, `heard` says how well the first take matches `want` (else the recipe's `says`). cands: the catalogue's
     ranking of the request, when the cookbook answered it; the result then says so and names the nearest designs;
-    given: the controls the caller set with that request, which a recipe does not follow, said in one line"""
+    given: the controls the caller set with that request, which a recipe does not follow, said in one line; asked:
+    the lines of what the request asked of the recipe (asked_of_recipe)"""
     import tempfile
     from . import recipe as R
     from .synth import master
@@ -762,6 +908,7 @@ def from_recipe(recipe, out=None, n=1, seed=0, fmt=None, mono=False, lufs=None, 
         lines.append(f'built from parts by the cookbook recipe {rc["name"]}: no design of the catalogue is this '
                      f'sound; `earshot recipe {rc["name"]}` prints the recipe to change'
                      + (f'; the nearest designs: {", ".join(also)} (sound=<id>)' if also else ''))
+    lines += list(asked)
     if given:
         lines.append(f'not followed: {", ".join(given)}; a recipe plays as it is written')
     lines += list(dict.fromkeys(note for t in takes for note in t.get('notes', ())))

@@ -1139,7 +1139,8 @@ def test_an_interface_moment_gets_no_figure_unless_the_words_ask_for_one(idx, te
     ('a frog croaking', 'frog/croak'), ('glass breaking', 'glass/break'),
     ('a reload sound for my shooter game', 'gun/reload'),
     ('footsteps on stone', 'step/stone'), ('room tone at night', 'room_tone/'),
-    ('steps through puddles', 'splash/'), ('chopping an onion', 'knife/chop'), ('water boiling in a pot', 'pot/boil'),
+    ('steps through puddles', 'step/puddle'), ('chopping an onion', 'knife/chop'),
+    ('water boiling in a pot', 'pot/boil'),
     ('turning on the gas burner', 'gas_stove/ignite'),
     # the same words where they mean what they did
     ('a tap on the screen', 'keyboard/'), ('pull to refresh', 'slide/'), ('crickets at night', 'night/crickets'),
@@ -1147,7 +1148,8 @@ def test_an_interface_moment_gets_no_figure_unless_the_words_ask_for_one(idx, te
 ])
 def test_a_recorded_thing_is_reached_by_its_plain_request(idx, text, want):
     """a tap that runs is a faucet and no press, one frog is no night of crickets, glass that breaks is the recorded
-    glass, a shooter's reload a gun's, a stone floor no gravel, "at night" says when, a step into a puddle splashes"""
+    glass, a shooter's reload a gun's, a stone floor no gravel, "at night" says when, steps through puddles walk in
+    them"""
     got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
     assert got.startswith(want), (text, got)
 
@@ -1159,9 +1161,46 @@ def test_a_bee_is_the_recorded_bee(idx):
     assert cands[0]['id'] == 'bee/buzz' and doubt(b, cands) is None, cands[:2]
 
 
+@pytest.mark.parametrize('text,want', [
+    ('a tiger roar', 'lion/roar'), ('a dragon roars', 'lion/roar'), ('booing and jeering', 'crowd/boo'),
+    ('a vinyl scratch', 'record/scratch'), ('a rubber duck squeak', 'toy/squeak'),
+    ('the lift arrives', 'elevator/ding'),
+    ('a bumblebee', 'bee/buzz'), ('a food processor', 'blender/run'), ('beating eggs', 'whisk/beat'),
+    ('an elephant trumpet', 'elephant/trumpet'), ('footsteps through puddles', 'step/puddle'),
+    ('a drawer opening', 'drawer/'),
+])
+def test_a_whole_job_of_a_recording_reaches_it_without_doubt(idx, text, want):
+    """a recording is reached by a job it is named for said whole ("the lift arrives") or by a word of it that names
+    nothing else ("a tiger roar"); a word of NOT_MADE inside such a job is that recording ("an elephant trumpet")"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=4)
+    assert cands[0]['id'].startswith(want) and doubt(b, cands) is None, (text, cands[:2], doubt(b, cands))
+
+
+@pytest.mark.parametrize('text,nearest', [
+    ('a trumpet', 'win/fanfare'), ('a fire alarm', 'timer/done'), ('a toy gun', 'cap_gun/shot'),
+    ('a mouse squeak', 'toy/squeak'), ('a fridge humming', 'space_hum/ship'), ('an airlock hissing open', 'door/slide'),
+    ('a pan set on the stove', 'pot_lid/set'), ('a kettle whistling', 'whistle/referee'),
+])
+def test_a_thing_no_design_is_gets_its_nearest_and_says_so(idx, text, nearest):
+    """a trumpet is no elephant, a fire alarm no fire, a toy gun no heavy shot and a mouse's squeak no mouse click:
+    each is answered by its nearest design and the answer says earshot makes none"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=4)
+    assert cands[0]['id'] == nearest and (doubt(b, cands) or '').startswith('earshot makes no '), (text, cands[:2])
+
+
+def test_panning_words_are_read_and_not_unknown():
+    b = brief.read('a car passing from left to right')
+    assert b['pan'] == 'from left to right' and not {'left', 'right'} & set(b['unknown'])
+
+
 @pytest.mark.parametrize('text,never', [
     ('chopping', 'pro_riser/'), ('the camera pushes into the product', ('camera/', 'shutter/')),
     ('a wake-up-ish ring that says your eggs are done boiling', 'pot/'),      # what ended is not the sound
+    ('a wake-up-ish ring that says your eggs are done boiling', 'egg/'),      # what a ring says is no egg cracked
 ])
 def test_a_word_of_an_id_or_of_another_trade_picks_no_design(idx, text, never):
     """chopping is the knife's, not the riser whose member is called chop; the camera of a film that moves takes no

@@ -516,7 +516,7 @@ Python: `from earshot.pack import pack; pack('assets/arcade', 'assets/arcade_all
 ## When earshot has no such sound: build it
 
 The catalogue cannot hold everything. For a thing no design is, `make` answers with the nearest design and says so
-(`earshot makes no rocket launch; ... is only the nearest sound it has`), and adds `build it from parts: earshot
+(`earshot makes no fax machine; ... is only the nearest sound it has`), and adds `build it from parts: earshot
 recipe --example`. A recipe is that: a sound built from the catalogue's own parts, written as a small JSON form.
 Whoever asks designs it; earshot renders it and checks it like every other sound. No model is loaded.
 
@@ -532,10 +532,10 @@ earshot make "a dragon roaring" --recipe roar.json -o roar.wav --listen     # an
 ```python
 from earshot.make import make
 make(recipe={'name': 'dragon_roar', 'says': 'a dragon roaring', 'space': 'hall', 'layers': [
-    {'sound': 'horse/neigh', 'pitch': -12, 'lowpass': 4000},
-    {'sound': 'cow/moo', 'pitch': -9, 'at': 0.15, 'gain': -3},
-    {'sound': 'fire/whoosh', 'pitch': -5, 'at': 0.6, 'gain': -9},
-    {'source': 'noise', 'color': 'brown', 'dur': 3.0, 'lowpass': [70, 150], 'gain': -16, 'swell': 0.6,
+    {'sound': 'lion/roar', 'pitch': -5},
+    {'sound': 'horse/neigh', 'pitch': -12, 'at': 0.1, 'gain': -9, 'lowpass': 3500},
+    {'sound': 'fire/whoosh', 'pitch': -5, 'at': 0.5, 'gain': -10},
+    {'source': 'noise', 'color': 'brown', 'dur': 3.5, 'lowpass': [70, 150], 'gain': -18, 'swell': 0.6,
      'decay': 1.5}]}, out='roar.wav')
 ```
 
@@ -567,6 +567,7 @@ A layer is a catalogue design (`"sound": "door/slam"`) or a plain source (`"sour
 | `size`, `bright`, `hard`, `energy`, `ring`, `motion`, `width` | the design's own axes, -1 to 1, where it has them; one it lacks is said in a note |
 | `dur` | the length asked of the design itself: an ambience any length, a whoosh, a recording within 0.6 to 1.8 times its own; of a source, its length (required) |
 | `pitch` | semitones, -24 to 12, as a tape does it: lower is also slower and bigger |
+| `glide` | semitones, -24 to 12: where the pitch has moved to by the end of the take, from `pitch` (or 0) at its start, straight in semitones, as a tape that slows down or speeds up: `{"sound": "vacuum/cleaner", "cut": [0.8, 2.6], "glide": -14, "decay": 1.2}` is a motor winding down |
 | `reverse` | played backwards: a decay becomes a swell that ends on its strike |
 | `cut` | `[from, to]` in seconds: the part of the take that is used |
 | `halt` | seconds, 0.05 to 10: the take runs down to a stop, as a motor does when its power is cut |
@@ -577,6 +578,7 @@ A layer is a catalogue design (`"sound": "door/slam"`) or a plain source (`"sour
 | `fade_in`, `fade_out` | seconds: fades at its ends; when not said, an ambience gets 0.1 and 0.3 s and a source 0.01 and 0.02 s |
 | `swell`, `decay` | seconds: a slow rise from 30 dB down at its start, a slow fall to nothing at its end |
 | `events` | `{"count", "gap", "faster", "softer", "loose"}`: the layer 2 to 64 times, each a new take, `gap` seconds apart; each gap `faster` times the one before (under 1: faster and faster); each event `softer` dB against the one before; `loose` 0 to 1 moves each up to half its gap early or late |
+| `follow` | `{"layer", "amount", "smooth"}`: the layer's loudness follows another layer's, named by its index from 0 (`"follow": 0` is the short form). The other layer's level is measured over `smooth` seconds (0.005 to 2, default 0.05) as a share of its loudest moment; `amount` 1 (the default) makes this layer exactly that loud, 0.5 half of the way, and an amount under 0 makes it give way where the other is loud (-1: silent at the other's loudest moment) |
 | `color` | of noise: `white`, `pink` (default) or `brown` |
 | `hz`, `to` | of a sine: 20 to 150 Hz, gliding to `to` |
 
@@ -591,8 +593,26 @@ samples. A recipe is rendered as written: the request's controls (`--pitch`, the
 it, `--dur` cuts it. In a set, a recipe is one of its sounds: `{"name": "roar", "recipe": {...}}` (or the name of a
 cookbook recipe), with `seed`, `lufs` and `dur`; it is levelled with the set.
 
-One sound as the body of another ("the hits of X ringing through the resonance of Y") is not in the form: the
-engine has no way to take a resonance from a design that holds for any pair of designs.
+`follow` ties one layer to another. Twigs that snap as the gusts come, in the wind's own rise and fall:
+
+```json
+{"name": "twigs_in_the_gusts", "says": "wind gusting through trees, dry twigs snapping as the gusts come",
+ "kind": "ambience", "dur": 8.0, "layers": [
+  {"sound": "wind/trees", "dur": 8.5, "swell": 0.5},
+  {"sound": "twigs/snap", "gain": -14, "at": 0.3, "events": {"count": 24, "gap": 0.33, "loose": 0.9},
+   "follow": {"layer": 0, "amount": 0.9, "smooth": 0.4}}]}
+```
+
+The same field with an amount under 0 makes a bed give way to a hit (rain that ducks under a thunder clap:
+`"follow": {"layer": 1, "amount": -0.7, "smooth": 0.25}` on the rain), and with a short `smooth` a rattle comes and
+goes with a motor.
+
+One sound as the body of another ("rain on a tin can": the hits of one thing ringing through another) is not in the
+form. It was built and measured: plain rain driven through the partials and colour of a struck design (a knock on a
+table, a dropped tin can) comes no nearer the real recordings of rain on wood and on a tin roof for the listening
+model than the plain rain does, and a metal body moves it no nearer rain on tin. What is heard of rain on a thing is
+the colour of the whole, and a knock's colour is not that colour. Where the catalogue has the real surface
+(`rain/wood`, `rain/tin_roof`, `rain/window`, `rain/umbrella`, `step/floorboard`, `step/tile`), use that design.
 
 ### Ten worked recipes
 
@@ -602,28 +622,58 @@ inside and no clipping, not that the sound was judged by ear.
 
 | the thing | the thought | the layers | the result |
 |---|---|---|---|
-| a dragon's roar, `dragon_roar` | a huge animal's voice with fire in it, in a cave | `horse/neigh` -12 semitones, `cow/moo` -9, `pig/oink` -15, `fire/whoosh` -5 as the breath, brown noise under 70 to 150 Hz, space hall | 5.26 s, peak at 2.66 s, -14 LUFS, clean |
-| a rocket launch, `rocket_launch` | an ignition, a bang, a roar that swells and stays | `gas_stove/ignite`, `explosion/near` -5, `pass/jet` -7 and `fire/camp` -5 with a swell, brown noise under 90 to 240 Hz | 6.46 s, peak at 0.30 s, -14 LUFS, clean |
-| a monster's growl, `monster_growl` | a wet, slow breath in a big throat | `snore/person` -10 and `cat/purr` -12, both cut to 2.8 s, `pig/oink` -15, brown noise under 120 Hz, space room | 2.63 s, peak at 1.64 s, -14 LUFS, clean |
+| a dragon's roar, `dragon_roar` (a sketch) | a huge animal's voice with fire in it, in a cave | `lion/roar` -5 semitones as the voice, `horse/neigh` -12 inside it, `fire/whoosh` -5 as the breath, brown noise under 70 to 150 Hz, space hall | 3.69 s, peak at 0.19 s, -14 LUFS, clean |
+| a car crash, `car_crash` | the skid, one impact of metal and weight, the debris after | `tyres/screech` cut to 1.6 s, then at 1.5 s `car_door/slam` -7, `metal/drop` -5, `glass/break`, `can/drop` -3 | 3.11 s, peak at 1.58 s, -14 LUFS, clean |
+| a monster's growl, `monster_growl` | a big animal's voice far down, a wet throat in it | `lion/roar` -9 under 3000 Hz, `snore/person` -10 cut to 2.8 s, `pig/oink` -15, space room | 3.37 s, peak at 0.24 s, -14 LUFS, clean |
 | a spaceship door, `spaceship_door` | air released, a motor that runs and stops, a panel, a stop | `spray_can/spray` over 800 Hz, `drill/electric` -9 with `halt` 0.7, `door/slide`, `lock/latch` -5, space studio | 1.67 s, peak at 0.46 s, -14 LUFS, clean |
 | a robot powering down, `robot_power_down` | a switch, motors that lose speed, the body settling | `switch/industrial`, `drill/electric` -5 with `halt` 1.6, `vacuum/cleaner` -7 with `halt` 1.8, `spray_can/spray`, `dumbbell/place` -3 | 2.91 s, peak at 0.25 s, -14 LUFS, clean |
-| a sword on a shield, `sword_on_shield` | the clang, the wood, the boss and the weight at one moment, the swing before | `sword/swing`, then at 0.2 s `clash/sword`, `knock/hollow` -7, `saucepan/hit` -7 under 3000 Hz, `punch/body` | 0.90 s, peak at 0.27 s, -14 LUFS, clean |
+| a sword on a shield, `sword_on_shield` | the clang, the wood, the boss and the weight at one moment, the swing before | `sword/swing`, then at 0.2 s `clash/sword`, `knock/hollow` -7, `saucepan/hit` -7 under 3000 Hz, `punch/body` | 0.90 s, peak at 0.22 s, -14 LUFS, clean |
 | a campfire in the wind, `campfire_wind` | two real beds and what happens in them | `fire/camp`, `wind/trees` with a swell, pink noise under 500 to 1400 Hz as a gust, `twigs/snap` five times with `loose` 0.9, kind ambience | 7.65 s, peak at 0.54 s, -22 LUFS, clean |
-| a bowling strike, `bowling_strike` | a ball rolling nearer, one hit, pins that scatter | brown noise under 180 to 420 Hz with a swell, `land/wood` -5, `dice/throw` -10, `knock/hollow` -3 six times, each softer and later, space studio | 3.07 s, peak at 1.25 s, -16 LUFS, clean |
-| a heartbeat getting faster, `heartbeat_faster` | one beat cut out of the steady run, the gaps shrinking | `heart/beat` cut to its first 0.6 s, nine times, each gap 0.9 of the one before | 5.99 s, peak at 5.44 s, -16 LUFS, clean |
-| a giant's footsteps, `giant_footsteps` | weight, slowness, the ground answering | `heavy_drop/floor` -9, `land/dirt` -12, brown noise under 90 Hz, `twigs/snap` -5, each four times, 1.15 s apart, space hall | 4.80 s, peak at 2.66 s, -14 LUFS, clean |
+| a bowling strike, `bowling_strike` | a ball rolling nearer, one hit, pins that scatter | brown noise under 180 to 420 Hz with a swell, `land/wood` -5, `dice/throw` -10, `knock/hollow` -3 six times, each softer and later, space studio | 3.08 s, peak at 1.25 s, -16 LUFS, clean |
+| a woodpecker, `woodpecker` | a hard beak on a hollow trunk, very fast, twice, in a forest | `knock/hollow` +4 twelve times 0.045 s apart, again ten times at 1.4 s, `forest/morning` at -20 | 3.01 s, peak at 0.05 s, -14 LUFS, clean |
+| a giant's footsteps, `giant_footsteps` (a sketch) | weight, slowness, the ground answering | `step/floorboard` -12, `heavy_drop/floor` -7, brown noise under 100 Hz, each four times, 1.1 s apart, space hall | 4.75 s, peak at 2.26 s, -15 LUFS, clean |
 
 ### The cookbook
 
-`earshot/data/recipes` holds recipes for things people ask for and no design is. A request that names one of them
-(`"a dragon roar"`, `"a giant's footsteps"`) is answered by its recipe unless the catalogue's own first design was
-found by those very words; the answer says `built from parts by the cookbook recipe dragon_roar` and names the
-nearest designs, which `--sound <id>` still gives. `earshot recipe --list` prints each recipe with its parts.
+`earshot/data/recipes` holds 74 recipes for things people ask for and no design is. 32 of them answer a request
+that names their thing (`"a car crash"`, `"a werewolf howl"`, `"a welding torch"`, `"a woodpecker"`, `"a cannon
+firing"`); the answer says `built from parts by the cookbook recipe car_crash` and names the nearest designs, which
+`--sound <id>` still gives. `earshot recipe --list` prints each recipe with its parts.
 
-A recipe with `"sketch": true` is one that earshot's listening model does not hear as its thing yet (a geiger
-counter, a whale call, footsteps in mud, a subway arriving, a magic portal, thunder far away). It is never given as
-the answer: the catalogue answers as before, and one more line names the sketch as a start (`a start from parts:
-earshot make --recipe geiger_counter`).
+The catalogue comes first. When the design the words found is the thing itself (its id or its description holds
+every word of the thing), the design answers and the recipe does not: `"a rocket launch"` is the recording
+`rocket/launch`, `"footsteps in mud"` the walk `step/mud`. A recording only listed for a thing it is not stays its
+nearest, and the cookbook's recipe answers if it is not a sketch.
+
+A recipe answers on its own only when earshot's listening model hears it as its thing (a match of z 3.0 or more)
+and clearly better than the catalogue's nearest design (by 1.0 or more), and the audit finds it clean. The other 42
+carry `"sketch": true` (a dragon roar, a fax machine, a ship's horn, a washing machine, a wolf pack, a helicopter
+landing, a heartbeat getting faster, a giant's footsteps, a chainsaw and more). The dragon is one: built on a
+lion's roar a fourth lower, it matches "a dragon roar" no better than the lion's roar alone (`lion/roar`, which
+answers). A sketch is never given as the answer: the
+catalogue answers as before, and one more line names the sketch as a start (`a start from parts: earshot make
+--recipe heartbeat_faster`).
+
+What the request asks of a cookbook thing is followed where the form can do it, and each is said in the answer:
+
+| asked | done | the line |
+|---|---|---|
+| a length (`"a werewolf howl, 3 seconds"`) | the file is cut there with a fade; a length the layers do not reach is said | (a note when it is not kept) |
+| far away, in the distance | the whole in a hall, every layer under 3000 Hz, 6 dB under the usual level | `as asked: far away (in a hall, duller and 6 dB softer)` |
+| up close | no room around it | `as asked: up close (no room around it)` |
+| soft, quiet | 6 dB under the usual level | `as asked: softer (6 dB under the usual level)` |
+| loud, louder | not followed: a cookbook sound is made at the loudest level of its kind | `not followed: louder; ...` |
+| three times, twice, `--events 3` | every layer that many times, one whole after the other | `as asked: 2 times, 3.41 s apart` (a car crash twice) |
+| three times, of a recipe that is a row already | not followed | `not followed: 3 times; this recipe is a row of events already, played once` |
+
+`earshot make "a werewolf howl far away"` printed:
+
+```
+q.wav: recipe/werewolf_howl (7.71 s, peak at 1.49 s, -20 LUFS, clean) [recipe]
+built from: lion/roar (-4 semitones, under 3000 Hz); wolf/howl (-4 semitones, under 3000 Hz); wolf/howl (-8 semitones, under 2500 Hz)
+built from parts by the cookbook recipe werewolf_howl: no design of the catalogue is this sound; `earshot recipe werewolf_howl` prints the recipe to change; the nearest designs: wind/window, wind/mountain, wind/open (sound=<id>)
+as asked: far away (in a hall, duller and 6 dB softer)
+```
 
 ## The request language
 
@@ -1203,8 +1253,8 @@ thunder.wav: thunder/distant (7.70 s, -21 LUFS, clean) [thunder, distant]
 
 The entries asked for "steady rain on a terrace, 8 seconds, no loop", "the heavy wooden front door falls shut",
 "keys jingling", "a phone vibrating on a table" and "distant thunder". A thing the catalogue has no recording of
-comes back as a guess that says so: "a whisk beating eggs in a bowl" answered `also (the pick is a guess: earshot
-makes no whisk; water/drop is only the nearest sound it has)`. Leave such a moment silent or record it; a stand-in
+comes back as a guess that says so: "a kettle whistling" answered `also (the pick is a guess: earshot makes no
+kettle; whistle/referee is only the nearest sound it has)`. Leave such a moment silent or record it; a stand-in
 is heard as one. A designed sound (a whoosh between cuts, a pop for a caption) belongs on the few cuts or captions
 the edit wants felt, not on each.
 

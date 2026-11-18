@@ -62,6 +62,12 @@ ONCE_WORDS = ('one-shot', 'oneshot')
 CONTEXT_WORDS = ('for', 'when', 'while', 'as', 'after', 'before', 'during', 'whenever', 'once', 'where', 'until',
                  'whilst', 'if', 'into')   # "a whoosh into the logo": where it lands
 PLACE_WORDS = ('in', 'under', 'over', 'across', 'behind', 'beneath', 'inside')
+# a sound that tells something ("a ring that says the eggs are done"): what follows is what it means, not its sound
+MEANING_WORDS = ('says', 'say', 'tells', 'tell', 'means', 'signals', 'announces', 'lets')
+ROOM_WORDS = ('room', 'door', 'apartment', 'flat', 'house', 'office', 'building', 'cell', 'cabin')
+# a sound that moves between the speakers ("a car passing from left to right"): read into b['pan']
+PAN = re.compile(r'\b(?:from (?:the )?(?:left|right) to (?:the )?(?:left|right)|(?:left|right) to (?:left|right)'
+                 r'|panning|panned|pans|(?:from|on|to) the (?:left|right)(?: side)?|in stereo)\b')
 # the place or product a sound plays in ("my running app", "a coffee shop checkout", "a video about dogs"): the
 # words of that phrase say where it plays, not what it is, once the request names its sound elsewhere (`_settings`).
 # A game is not one of them: its world shapes the sound ("an impact in a boxing game" is a punch)
@@ -843,6 +849,13 @@ def read(text, translate=True):
             st['where'] = 'context'        # "an impact FOR a logo reveal": where it plays, not what it is
             i += 1
             continue
+        if t in ('that', 'which') and nxt in MEANING_WORDS:
+            st['where'] = 'context'        # "a ring that SAYS your eggs are done": what it means, not what it is
+            i += 2
+            continue
+        if t in ('next', 'adjacent', 'neighbouring', 'neighboring') and nxt in ROOM_WORDS:
+            i += 2                         # "heard from the next room": where it is heard (make.unfollowed)
+            continue
         if t in CONTEXT_WORDS:
             st['event'] = True             # "sound when the player grabs ...": the event, said before the sound
         if st['any'] and t == 'with' and st['where'] == 'concepts':
@@ -1050,6 +1063,10 @@ def read(text, translate=True):
         b['dir'] = 0
     b['context_words'] = sorted(ctx_words)
     b['phrases'] = _phrases(toks, b['written'])
+    m = PAN.search((text or '').lower())
+    b['pan'] = m.group(0) if m else None            # where it moves between the speakers (make.unfollowed)
+    if m:
+        b['unknown'] = [w for w in b['unknown'] if w not in WORD.findall(m.group(0))]
     if not b['foreign']:
         _head_unknown(b, toks)
     return b
@@ -1089,6 +1106,9 @@ def _surface_next(toks, i):
         t = toks[k]
         k += 1
         if t in ARTICLES or t in L.INTENSIFIERS or (modifier(t) and t not in L.MATERIALS):
+            continue
+        if t in L.SURFACE_KIN:           # "on a CAR windshield", "on the STAIRS": a surface, whatever else it names
+            n += 1
             continue
         if t in L.MATERIALS:
             if L.MATERIALS[t] in ('retro', 'digital'):
@@ -1432,9 +1452,10 @@ def uncovered(b, why):
     that decided (lexicon.PLAYED_AS), nor what is said to happen to the thing ("a checkbox being ticked")"""
     seen, said, out = set(why), b.get('written') or {}, []
     head = next(iter(b['concepts']), None)
+    gone = set(WORD.findall(not_made(b, why) or ''))     # "a fire alarm": the fire is the alarm's, said as missing
     for c in list(b['concepts']) + list(b.get('parts', ())):
         if (c not in said or c in seen or L.BROADER.get(c) in seen or c in L.GENERIC or said[c] in L.SOUND_NOUNS
-                or c in b.get('framed', ()) or c not in _families()):
+                or c in b.get('framed', ()) or c not in _families() or set(WORD.findall(said[c])) & gone):
             continue
         if L.PLAYED_AS.get(c) in seen or (c != head and said[c].endswith('ed')):
             continue                  # a purchase played as a success; "a checkbox being ticked": what happens to it
@@ -1502,9 +1523,11 @@ def not_made(b, why=None):
     for p in L.NOT_MADE_PHRASES:
         if f' {p} ' in f' {text} ' and not set(p.split()) & ctx and set(p.split()) <= said:
             return p
+    whole = {w for p in why or () if p.startswith('ph:') for w in p[3:].split()}
     for t in toks:
         if (t in L.NOT_MADE and t in b['unknown'] and stem(t) in b['words'] and t in said and t not in ctx
-                and stem(t) not in ctx and stem(t) not in _made_words('families')):  # (no family is named for it)
+                and stem(t) not in ctx and stem(t) not in _made_words('families')  # (no family is named for it)
+                and stem(t) not in whole):     # "an elephant trumpet": a whole job of the design picked
             return t
     for c, whose in L.ONE_VOICE.items():      # "a woman crying": the only crying is a baby's (lexicon.ONE_VOICE)
         person = next((t for t in toks if t in L.PERSON_WORDS and t in said and t not in ctx), None)
@@ -1584,7 +1607,8 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     # the interface job alone ("tap", "hover", "toggle on", "type"), no thing named ("next page": a page): ROLE
     own = set().union(*(_family_words(i) for i, r in _roles().items() if head in r))
     alone = _interface_only(b)                                           # as learned_ok lets a role answer
-    thing = any(terms[k]['learned'] and (_family_words(rows[k]['id']) & said) - own for k in named_)
+    thing = any(terms[k]['learned'] and ((_family_words(rows[k]['id']) & said) - own
+                                         or use_said(b, rows[k]['id'], terms[k])) for k in named_)
     plain = alone and not said & TONE_STEMS and not thing
     # an interface job without musical words: no pitched design (any interface job named: `ui_job`), and the real
     # thing of the job (INTERFACE_JOBS) raised when the job is the head, or the first job of a request whose head is
@@ -1670,7 +1694,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             s *= BY_NAME      # "a success sound": no marimba figure; "a success chime", "on a harp": the figure
         elif ui_job and music and 'interface' in row.get('tags', ()):
             s *= BY_NAME
-        elif 'interface' in row.get('tags', ()) and thing and _world(b):
+        elif 'interface' in row.get('tags', ()) and thing and _world(b, thing):
             s *= WORLD        # "a door closing", "a knife chopping": the recording of the thing, not close/door
         elif job == row['id'] and not thing and not rival:
             s *= REAL         # "a success sound", "toggle on", "message received": the real thing of the job
@@ -1710,12 +1734,21 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
 JOB_NOUNS = frozenset(('notify', 'success', 'error', 'warning', 'receive', 'send', 'delete', 'like', 'hover'))
 
 
-def _world(b):
+def _world(b, thing=False):
     """True when a request is about a thing in the world, not a product: no app, page or button (the domain), no
     place of an interface job (a menu) and no job that only a product does (JOB_NOUNS): "a door closing", "a
     metal door closing behind the player in a game", "a crisp click-clack like an old SLR". The interface designs
-    (earshot.sounds.interface) answer only the other requests"""
+    (earshot.sounds.interface) answer only the other requests. With a recorded thing named (`thing`), a job said as
+    what it does ("a train ARRIVING", "the lift ARRIVES") is no product's job"""
     said = set(b['concepts']) | set(b['context'])
+    if thing:
+        written, toks = b.get('written') or {}, tokens(b.get('text') or '')
+        fams = _all_family_words()
+
+        def acts(w):            # the job's word right after a recorded thing's: "a train ARRIVING"
+            return w.endswith(('ing', 'ives', 'ves')) and any(
+                t == w and n and stem(toks[n - 1]) in fams for n, t in enumerate(toks))
+        said = {c for c in said if not acts(str(written.get(c, '')))}
     return b.get('domain') != 'ui' and not said & (JOB_NOUNS | L.INTERFACE_PLACES)
 
 
@@ -1742,6 +1775,10 @@ def _nearest(b, out, idx):
     kind = b.get('kind')
     if kind and free(kind) and b.get('absent') and (not out or not_made(b, out[0]['why']) == b['absent']):
         out = first(kind, [])
+    gone = not_made(b, out[0]['why']) if out else None
+    near = L.SOUND_KINDS.get(gone) if gone in L.NOT_MADE or gone in L.NOT_MADE_PHRASES else None
+    if near and free(near) and out[0]['id'] != near:
+        out = first(near, [])         # "a fire alarm", "a trumpet": the nearest of a thing no design is
     sur = b.get('surface')
     if sur and out and not b.get('absent'):
         fam = out[0]['id'].split('/')[0]
@@ -1755,6 +1792,32 @@ def _nearest(b, out, idx):
     if not out:
         sid = next((i for i in list(L.NEAREST_ANY) + [r['id'] for r in rows] if free(i)), None)
         out = [{'id': sid, 'score': 0.0, 'why': []}] if sid else []
+    # a recording the request names by every word of its id ("soccer ball kick": ball/kick, "steps on gravel":
+    # step/gravel) goes first, before a design reached by one of those words alone (a kick drum)
+    ctx = set(b.get('context_words', ()))
+    plain = {w for w in _said_words(b.get('text')) if w not in ctx} | {
+        stem(w) for w in (b.get('surface') or {}).get('words', ())}
+    jobs = {c for c in b['concepts'] if c in L.FAMILY_SENSE.values() and c not in b.get('framed', ())}
+    whole = [r for r in out if b.get('domain') != 'ui'
+             and (_family_words(r['id']) <= plain or L.FAMILY_SENSE.get(r['id'].split('/')[0]) in jobs)
+             and _name_words(r['id']) - {stem(L.FAMILY_SENSE.get(r['id'].split('/')[0], '-'))}
+             and _name_words(r['id']) <= plain]
+    order = [stem(w) for w in tokens(b.get('text') or '')]
+    whole.sort(key=lambda r: -max([n for n, w in enumerate(order) if w in _family_words(r['id'])] or [-1]))
+    top = out[0]['id'] if out else None     # the family said last is the head: "door slam" is a slam
+    if (whole and top and whole[0]['id'] != top and whole[0]['id'] in _roles()     # the first one so named,
+            and 'interface' not in rows[pos[whole[0]['id']]].get('tags', ())):      # if a recording ("door slam"
+        out = first(whole[0]['id'], [])                                            # is slam/door, no recording)
+    # a ground said as a word that describes it ("MUDDY footsteps", "sandy steps"): the member named for it
+    kin = set(L.SURFACE_KIN) | {v for vs in L.SURFACE_KIN.values() for v in vs}
+    grounds = {stem(g) for g in (w[:-2] if len(w) > 4 and w[-2] == w[-3] else w[:-1] for w in b.get('unknown', ())
+                                 if w.endswith('y') and len(w) > 3) if g in kin}
+    if grounds and out:
+        fam = out[0]['id'].split('/')[0]
+        sid = next((r['id'] for r in out if r['id'].split('/')[0] == fam and _name_words(r['id']) & grounds
+                    and free(r['id'])), None)
+        if sid and sid != out[0]['id']:
+            out = first(sid, [])
     return out
 
 
@@ -1815,8 +1878,10 @@ def learned_ok(b, sid, t, said):
         #                                 sound asked for; "a ring when the eggs are done boiling" is a timer
     if 'absent' not in _cache:
         _cache['absent'] = frozenset(stem(w) for w in L.NOT_MADE)
-    if (said - set(b.get('context_words', ()))) & _cache['absent'] & t['uses']:
-        return True                     # "a bee buzzing": no bee exists; the recorded fly lists it as its nearest
+    if {'sw:' + w for w in (said - set(b.get('context_words', ()))) & _cache['absent']} & t['uses']:
+        return True                     # "a mosquito": none exists; the recorded fly lists it alone as its nearest
+    if use_said(b, sid, t):
+        return True                     # "a tiger roar", "the lift arrives": a whole job it is named for
     if (b.get('events') or 0) > 1 and any(v == sid and _family_words(k) & set(b.get('counted', ()))
                                           for k, v in L.TWINS.items()):
         return True                     # "four knocks": a number of events only the recorded twin can perform
@@ -1835,6 +1900,50 @@ def learned_ok(b, sid, t, said):
     if sid.split('/')[0] in L.SOUND_FAMILIES:            # "a whoosh" names no recorded rope: "a rope whoosh" does
         return by_family and bool(_name_words(sid) & said)
     return by_family
+
+
+def use_said(b, sid, t=None):
+    """True when the request says, outside where it plays, a whole job a recorded design (earshot.sounds.learned) is
+    named for that names nothing else: one word the reader knows no job of and no family is named by ("a TIGER roar":
+    lion/roar lists tiger; "a BUMBLEBEE") or a job of several words as a whole ("the LIFT ARRIVES", "a RUBBER DUCK
+    squeak", "BEATING EGGS")"""
+    if t is None:
+        idx = _default_index()
+        k = next((n for n, r in enumerate(idx[0]) if r['id'] == sid), None)
+        if k is None:
+            return False
+        t = idx[1][k]
+    if not t.get('learned'):
+        return False
+    if sid.split('/')[0] in L.CROWD_OF.values() and set(tokens(b.get('text') or '')) & L.UNISON_WORDS:
+        return False                    # "people clapping together": one clap of many hands, no audience
+    ctx = set(b.get('context_words', ()))
+    ctx |= {stem(w) for w in ctx}
+    lone = {stem(w) for w in b.get('unknown', ()) if w not in ctx and stem(w) not in ctx}
+    have = set().union(*(t[f] for f in FIELD_WEIGHT)) | _family_words(sid) | _name_words(sid)
+    keys = [p for p in b.get('phrases', ()) if not set(p[3:].split()) & ctx]
+    if any(p in t['uses'] for p in keys):
+        return True
+    # one word: only where the design also holds every other unknown word and every family word the request says
+    # and its head ("a monkey screech" is no car's screech, "a bicycle chain" no bicycle bell)
+    head = next((c for c in b['concepts'] if c not in L.GENERIC), None)
+    fams = {w for w in _said_words(b.get('text')) if w not in ctx and w in _all_family_words()}
+    things = {stem(w) for w in b.get('unknown', ()) if not w.endswith('ing')} & lone   # "driving": what it does
+    hits = [w for w in b.get('unknown', ()) if stem(w) in lone and 'sw:' + stem(w) in t['uses']
+            and stem(w) not in _made_words('families')
+            and not (w.endswith(DESCRIBING) and len(w) > 5)]    # "cinematic", "synthy": what it is like
+    if hits and all(w.endswith('ing') for w in hits):
+        things = lone                   # "booing and jeering": what is done names it only with every other word
+    return bool(hits) and not (things | fams) - have and (head is None or head in have)
+
+
+def _all_family_words():
+    """the stems of every word of every family name of the catalogue ('bicycle_bell' -> bicycle, bell)"""
+    idx = _default_index()
+    if _cache.get('allfam_key') != id(idx):
+        _cache['allfam_key'] = id(idx)
+        _cache['allfam'] = frozenset().union(*(_family_words(r['id']) for r in idx[0]))
+    return _cache['allfam']
 
 
 def _name_words(sid):

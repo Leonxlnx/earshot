@@ -486,6 +486,27 @@ def test_a_missing_thing_and_a_missing_surface_are_said_with_alternatives(text, 
         assert line.startswith(start + '; also: ' + fam + '/'), line
 
 
+@pytest.mark.parametrize('text', ['a trumpet', 'a fax machine', 'a lawn mower', 'a whale song', 'a seagull cry'])
+def test_the_starts_for_a_missing_thing_are_of_other_families(text):
+    """the three alternatives offered for a thing no design is are three starting points of three other families,
+    not three members of one"""
+    from earshot import brief
+    from earshot.make import doubt, starts
+    b = brief.read(text)
+    cands = brief.rank(b, top=8)
+    assert doubt(b, cands).startswith('earshot makes no ')
+    fams = [s.split('/')[0] for s in starts(b, cands)]
+    assert len(fams) == 3 and len(set(fams)) == 3 and cands[0]['id'].split('/')[0] not in fams, fams
+
+
+def test_a_pan_asked_for_is_said_not_followed():
+    from earshot import brief
+    from earshot.make import unfollowed
+    b = brief.read('a car passing from left to right')
+    lines = unfollowed(b, 'pass/car', [], [], {}, set(), [])
+    assert any(x.startswith('not followed: "from left to right"; earshot does not pan') for x in lines), lines
+
+
 @pytest.mark.parametrize('text', ['rain on a tin roof', 'footsteps on snow', 'a ball bouncing on wood',
                                   'a dog barking', 'a heartbeat getting faster', 'a typewriter', 'a slap'])
 def test_what_exists_is_answered_without_a_note(text):

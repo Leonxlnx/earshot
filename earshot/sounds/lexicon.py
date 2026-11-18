@@ -28,7 +28,7 @@ CONCEPTS = {
                    'unchecked', 'uncheck', 'deselect', 'off switch', 'turn something off', 'flip off', 'inactive',
                    'on to off', 'opt out', 'opt-out', 'mute'),
     'light_switch': ('light switch', 'lamp', 'lights', 'wall switch', 'flick the lights'),
-    'open': ('expand', 'unfold', 'pop up', 'pops open', 'pop open', 'drawer open', 'menu open', 'sheet open', 'show',
+    'open': ('expand', 'unfold', 'pop up', 'pops open', 'pop open', 'menu open', 'sheet open', 'show',
              'appear', 'enter', 'entrance', 'panel open', 'opening', 'slide up', 'bottom sheet', 'reveal panel',
              'show up', 'shows up', 'open up', 'unfurl', 'maximize', 'maximise', 'fan out', 'fans out'),
     'close': ('collapse', 'hide', 'dismiss', 'disappear', 'fold', 'minimize', 'minimise', 'shut', 'exit',
@@ -194,7 +194,8 @@ CONCEPTS = {
     'shield': ('block', 'parry', 'guard', 'deflect', 'armor', 'armour', 'barrier', 'force field', 'buckler',
                'bounce off', 'bouncing off', 'bounces off', 'glance off', 'ricochet off', 'stop a hit',
                'stop an arrow', 'stopping an arrow', 'blocked hit'),
-    'teleport': ('warp', 'portal', 'blink', 'beam up', 'beam me up', 'beam-me-up', 'respawn', 'spawn', 'vanish',
+    'teleport': ('teleporter', 'teleporting', 'warp', 'portal', 'blink',
+                 'beam up', 'beam me up', 'beam-me-up', 'respawn', 'spawn', 'vanish',
                  'reappear', 'materialize', 'materialise', 'dematerialize', 'poof', 'warpy', 'disappear and reappear',
                  'gone in a flash', 'fast travel', 'phase out', 'blink away'),
     'magic': ('magical', 'mystical', 'spell', 'cast', 'spell cast', 'enchant', 'enchanted', 'enchantment', 'witch',
@@ -215,7 +216,7 @@ CONCEPTS = {
     # an arrow is heard where it lands (the recorded arrow/hit), not as a gunshot
     'arrow': ('arrows', 'archery', 'archer', 'arrow hit'),
     'laser': ('blaster', 'zap', 'pew', 'pew pew', 'pew-pew', 'ray gun', 'raygun', 'beam', 'phaser', 'plasma'),
-    'door': ('gate', 'hatch', 'door open', 'door close', 'creak', 'creaky', 'door slam', 'airlock', 'latch',
+    'door': ('gate', 'hatch', 'door open', 'door close', 'creak', 'creaky', 'door slam', 'latch',
              'tür'),
     'chest': ('treasure chest', 'chest open', 'crate open', 'box open', 'open a box', 'unbox', 'unboxing',
               'loot box', 'lootbox', 'loot crate', 'lid', 'goodies', 'box of goodies', 'treasure box'),
@@ -423,24 +424,28 @@ CONCEPTS = {
     'stir': ('teaspoon',),
     'ignite': ('igniter', 'gas stove', 'gas burner', 'gas hob', 'gas cooker', 'burner', 'stove lighting',
                'light the stove', 'lighting the stove'),
-    'fridge': ('refrigerator', 'freezer', 'fridge door', 'refrigerator door'),
 }
 
 # sounds the catalogue has nothing of: voices that say or sing words, a shout, sobbing (a scream, a sneeze, a burp
 # and the farm animals are recordings: earshot.sounds.learned), instruments no design plays, and eating and kitchen
-# things no recording plays (chewing, an egg, a whisk). A request that names one is answered with the nearest design
-# and says so (make.doubt), not with a confident wrong sound. Exact words, as written, and only where the reader
-# understood them as nothing else (brief.not_made: "saying yes" is a success)
+# things no recording plays (chewing, a kettle, a fridge). A request that names one is answered with the nearest
+# design and says so (make.doubt), not with a confident wrong sound. Exact words, as written, and only where the
+# reader understood them as nothing else (brief.not_made: "saying yes" is a success). A word of this list inside a
+# whole phrase a design is named for is that design ("an elephant trumpeting" is no trumpet)
 NOT_MADE = frozenset((
     'yell', 'yelling', 'shout', 'shouting', 'sob', 'sobbing',
     'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying', 'narrator', 'narration',
     'voiceover', 'voice-over',
     'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
-    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'egg', 'eggs', 'whisk', 'whisking',
-    # insects other than the recorded fly: its buzz is the nearest (the fly lists them as jobs: brief.learned_ok)
-    'bee', 'bees', 'mosquito', 'mosquitoes', 'toaster', 'kettle', 'blender'))
+    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'kettle', 'fridge', 'refrigerator', 'freezer', 'airlock',
+    # insects other than the recorded fly and bee: the fly's buzz is the nearest (it lists them: brief.learned_ok)
+    'mosquito', 'mosquitoes'))
 NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone', 'kitchen timer',
-                    'egg timer')
+                    'egg timer', 'fire alarm', 'smoke alarm', 'car alarm', 'burglar alarm', 'toy gun', 'water gun',
+                    'nerf gun', 'mouse squeak', 'mouse squeaks', 'mouse squeaking', 'mice squeaking',
+                    'fridge hum', 'fridge humming', 'refrigerator hum', 'refrigerator humming', 'measuring tape',
+                    'tape measure', 'pan set',
+                    'pan placed', 'pan put down', 'saucepan set', 'saucepan placed', 'saucepan put down')
 # a voice the catalogue has of one kind of person only (the recording's): said of another person it is not made ("a
 # woman crying": the crying is a baby's; brief.not_made)
 ONE_VOICE = {'cry': frozenset(('baby', 'babies', 'infant', 'infants', 'newborn', 'toddler'))}
@@ -475,7 +480,10 @@ WORD_WITHOUT = {'toast': frozenset(('bite', 'bites', 'biting', 'bitten', 'crunch
                                     'burnt', 'slice')),
                 # water or a machine that runs takes no steps
                 'run': frozenset(('faucet', 'water', 'engine', 'motor', 'machine', 'fridge', 'shower', 'hose',
-                                  'dishwasher', 'fan'))}
+                                  'dishwasher', 'fan')),
+                # a dart thrown at a board is no quick dodge; ping pong is a game, not a notification
+                'dart': frozenset(('board', 'dartboard', 'bullseye', 'thrown', 'throw', 'throwing', 'hitting', 'hits')),
+                'ping': frozenset(('pong',))}
 # a job done with the same thing as another one's family: a recorded lock answers an unlocking too (brief.learned_ok)
 SAME_THING = {'unlock': 'lock'}
 # what many people doing a thing at once is ("people clapping": an audience), unless they do it as one ("clapping
@@ -527,9 +535,7 @@ STATUS_WORDS = frozenset(('finished', 'done', 'complete', 'completed', 'failed',
 # two jobs that together mean a third: (a, b) -> c ("losing the buff" is a power-down; "the timer is done" a timer)
 COMPOSE = {('lose', 'power_up'): 'power_down', ('lose', 'shield'): 'power_down', ('timer', 'success'): 'timer',
            ('lose', 'heal'): 'hurt', ('countdown', 'success'): 'countdown', ('cymbal', 'reverse'): 'reverse',
-           # a step into a puddle is a small splash; a fridge opened or shut is the fridge's door; a stove turned on
-           # or its clicks are its igniter; a stream from a tap is the tap
-           ('footstep', 'splash'): 'splash', ('open', 'fridge'): 'fridge', ('close', 'fridge'): 'fridge',
+           # a stove turned on or its clicks are its igniter; a stream from a tap is the tap
            ('switch_on', 'ignite'): 'ignite', ('click', 'ignite'): 'ignite', ('stream', 'faucet'): 'faucet'}
 # a concept that implies a broader one: the broader one is added at BROADER_WEIGHT
 BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggle', 'menu_select': 'menu',
@@ -906,11 +912,22 @@ STOP = frozenset('a an the of for to in on at by with and or as is are be been b
 SOUND_KINDS = {
     'roar': 'rumble/quake', 'roaring': 'rumble/quake', 'growl': 'rumble/quake', 'growling': 'rumble/quake',
     'snarl': 'rumble/quake', 'avalanche': 'rumble/quake', 'landslide': 'rumble/quake',
-    'launch': 'explosion/far', 'liftoff': 'explosion/far', 'lift-off': 'explosion/far', 'blastoff': 'explosion/far',
-    'takeoff': 'pass/jet', 'hiss': 'spray_can/spray', 'hissing': 'spray_can/spray', 'fizz': 'spray_can/spray',
-    'fizzing': 'spray_can/spray', 'steam': 'spray_can/spray', 'squeak': 'door/creak', 'squeaking': 'door/creak',
-    'squeaky': 'door/creak', 'squeal': 'tyres/screech', 'squealing': 'tyres/screech',
-    'boo': 'crowd/cheer', 'booing': 'crowd/cheer', 'jeer': 'crowd/cheer', 'jeering': 'crowd/cheer',
+    'launch': 'rocket/launch', 'liftoff': 'rocket/launch', 'lift-off': 'rocket/launch',
+    'blastoff': 'rocket/launch', 'takeoff': 'pass/jet', 'hiss': 'spray_can/spray', 'hissing': 'spray_can/spray',
+    'fizz': 'spray_can/spray', 'fizzing': 'spray_can/spray', 'steam': 'spray_can/spray', 'squeak': 'door/creak',
+    'squeaking': 'door/creak', 'squeaky': 'door/creak', 'squeal': 'tyres/screech', 'squealing': 'tyres/screech',
+    'boo': 'crowd/boo', 'booing': 'crowd/boo', 'jeer': 'crowd/boo', 'jeering': 'crowd/boo',
+    # a thing of lexicon.NOT_MADE or NOT_MADE_PHRASES and the design nearest to it (brief._nearest)
+    'trumpet': 'win/fanfare', 'kettle': 'whistle/referee', 'airlock': 'door/slide', 'fire alarm': 'timer/done',
+    'smoke alarm': 'timer/done', 'car alarm': 'siren/pass', 'burglar alarm': 'siren/pass', 'toy gun': 'cap_gun/shot',
+    'water gun': 'spray_can/spray', 'nerf gun': 'cap_gun/shot', 'mouse squeak': 'toy/squeak',
+    'mouse squeaks': 'toy/squeak', 'mouse squeaking': 'toy/squeak', 'mice squeaking': 'toy/squeak',
+    'fridge hum': 'space_hum/ship', 'fridge humming': 'space_hum/ship', 'refrigerator hum': 'space_hum/ship',
+    'refrigerator humming': 'space_hum/ship', 'dart': 'arrow/hit', 'pong': 'ball/bounce',
+    'measuring tape': 'zip_tie/pull', 'tape measure': 'zip_tie/pull', 'pan set': 'pot_lid/set',
+    'pan placed': 'pot_lid/set',
+    'pan put down': 'pot_lid/set', 'saucepan set': 'pot_lid/set', 'saucepan placed': 'pot_lid/set',
+    'saucepan put down': 'pot_lid/set',
     'moan': 'sigh/person', 'moaning': 'sigh/person', 'groan': 'sigh/person', 'groaning': 'sigh/person',
     'whisper': 'sigh/person', 'whispering': 'sigh/person', 'grunt': 'cough/person', 'hiccup': 'burp/person',
     'gulp': 'burp/person', 'slurp': 'straw/bubbles', 'gurgle': 'straw/bubbles', 'gurgling': 'straw/bubbles',
@@ -918,7 +935,7 @@ SOUND_KINDS = {
     'whir': 'drill/electric', 'whirr': 'drill/electric', 'whirring': 'drill/electric', 'idling': 'car_engine/start',
     'mower': 'car_engine/start', 'chainsaw': 'saw/wood', 'sanding': 'broom/sweep', 'scrubbing': 'broom/sweep',
     'scraping': 'broom/sweep', 'brushing': 'broom/sweep', 'lightsaber': 'laser/beam', 'humming': 'space_hum/ship',
-    'pecking': 'knock/wood', 'chattering': 'dice/roll', 'trumpeting': 'train/horn', 'shredder': 'paper/rip',
+    'pecking': 'knock/wood', 'chattering': 'dice/roll', 'trumpeting': 'elephant/trumpet', 'shredder': 'paper/rip',
     'printer': 'paper/page', 'curtain': 'cloth/rustle', 'ladder': 'metal/drop', 'wrench': 'metal/drop'}
 # the designs tried in this order when no word of a request found anything: a request always gets a nearest sound,
 # said to be only that (brief.rank, make.doubt)

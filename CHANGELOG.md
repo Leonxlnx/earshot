@@ -13,9 +13,20 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 
 ### Added
 
+- The cookbook holds 74 recipes built from the catalogue's parts (a car crash, a welding torch, a woodpecker, a
+  cannon, a warp drive and more); 32 answer requests of their thing, the others are sketches named as a start; a
+  thing the catalogue has a recording of (a rocket launch, footsteps in mud) is answered by the recording; far away,
+  up close, softer, a length and "N times" asked of a cookbook thing are followed or said not to be.
 - Learned from public-domain recordings: a crowd booing, a cat hissing, a lion roaring, an elephant, a bee, a rocket
   launch, a record scratch, a squeaky toy, an elevator ding, a toaster, a blender, an egg cracked, a whisk, and walks
   in mud, through puddles and in dry leaves; a pan set on a stove and a fridge door are no longer made.
+- The reader reaches a recording by a whole job it is named for or a word that names nothing else ("the lift
+  arrives", "a tiger roar", "a rubber duck squeak", "muddy footsteps", "soccer ball kick"); a trumpet, a fire alarm,
+  a toy gun, a mouse's squeak, a fridge, a kettle and an airlock get their nearest and say earshot makes none; a
+  ring "that says the eggs are done" is no egg; "from left to right" is said not followed (earshot does not pan);
+  the three alternatives for a missing thing are of three other families, described most like it.
+- A recipe layer can follow another layer's loudness or give way to it (`follow`: twigs that snap with the gusts,
+  rain that ducks under a thunder clap) and glide in pitch over its take (`glide`: a motor winding down).
 - Rain on wood, on a tin roof and on an umbrella are learned beds from public-domain recordings (`rain/wood`,
   `rain/tin_roof`, `rain/umbrella`).
 - A plain request for an interface job gets the design the `ui` set plays ("a success sound": `success/shutter`,
