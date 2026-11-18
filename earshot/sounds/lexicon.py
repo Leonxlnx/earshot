@@ -347,23 +347,32 @@ CONCEPTS = {
     # ---- what a request calls any short sound: names the kind, not the job
     'cue': ('alert', 'alert tone', 'audio cue', 'sound cue', 'signal', 'earcon', 'ui sound', 'feedback sound',
             'tune', 'melody'),
+    # ---- what animals, a crowd and a few household things do (recordings: earshot.sounds.learned, FAMILY_SENSE)
+    'bark': ('barking', 'barks', 'woof', 'woofs', 'yap', 'yapping', 'yip'),
+    'meow': ('meowing', 'meows', 'miaow', 'mew', 'mewing'),
+    'moo': ('mooing', 'moos', 'lowing'),
+    'chirp': ('chirping', 'chirps', 'tweet', 'twitter', 'twittering'),
+    'hoot': ('hooting', 'hoots'),
+    'caw': ('cawing', 'caws'),
+    'cheer': ('cheering', 'cheers and applause', 'whooping'),
+    'sizzle': ('sizzling', 'sizzles', 'frying'),
+    'pour': ('pouring', 'poured', 'pours'),
+    'flush': ('flushing', 'flushes'),
 }
 
-# sounds the catalogue has nothing of: voices (speech, singing, screams, a crowd's cheering), animals, and instruments
-# no design plays. A request that names one is answered with the nearest design and says so (make.doubt), not with
-# a confident wrong sound. Exact words, as written, and only where the reader understood them as nothing else
-# (brief.not_made: "saying yes" is a success)
+# sounds the catalogue has nothing of: voices (speech, singing, screams), the animals no recording plays (a dog, a
+# cat, a horse, a cow, a rooster, a wolf and birds are recordings: earshot.sounds.learned), and instruments no design
+# plays. A request that names one is answered with the nearest design and says so (make.doubt), not with a confident
+# wrong sound. Exact words, as written, and only where the reader understood them as nothing else (brief.not_made:
+# "saying yes" is a success)
 NOT_MADE = frozenset((
-    'dog', 'dogs', 'bark', 'barks', 'barking', 'woof', 'puppy', 'cat', 'cats', 'meow', 'meows', 'meowing', 'purr',
-    'purring', 'horse', 'neigh', 'cow', 'moo', 'rooster', 'chicken', 'sheep', 'goat', 'pig', 'oink', 'duck', 'quack',
-    'frog', 'croak', 'wolf', 'scream', 'screams', 'screaming', 'shriek', 'shrieking', 'yell', 'yelling', 'shout',
-    'shouting', 'baby', 'cry', 'crying', 'cries', 'sob', 'sobbing', 'laugh', 'laughs', 'laughing', 'laughter',
-    'giggle', 'cheer', 'cheering', 'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying',
-    'narrator', 'narration', 'voiceover', 'voice-over', 'cough', 'sneeze', 'burp',
+    'purr', 'purring', 'chicken', 'sheep', 'goat', 'pig', 'oink', 'duck', 'quack', 'frog', 'croak', 'scream',
+    'screams', 'screaming', 'shriek', 'shrieking', 'yell', 'yelling', 'shout', 'shouting', 'sob', 'sobbing',
+    'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying', 'narrator', 'narration',
+    'voiceover', 'voice-over', 'sneeze', 'burp',
     'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
-    'trumpet', 'honk', 'honking'))
-NOT_MADE_PHRASES = ('car horn', 'air horn', 'electric guitar', 'guitar solo', 'drum solo', 'police siren',
-                    'phone ringing', 'ringtone', 'crowd cheering', 'cheering crowd', 'stadium crowd')
+    'trumpet'))
+NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone')
 # concepts that say what kind of thing is wanted without saying which: they do not end the head of a request
 GENERIC = frozenset(('ambience', 'note', 'beep', 'bell', 'open', 'achievement', 'cue', 'thud', 'sting'))
 # words of a short sound: an instrument named just before one is played ("a kalimba ping", "a marimba hit")
@@ -418,7 +427,9 @@ BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggl
 FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride': 'cymbal', 'kick': 'kick_drum',
                 'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music',
                 # recorded things (earshot.sounds.learned) whose family is the job by another word
-                'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter', 'pass': 'flyby'}
+                'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter', 'pass': 'flyby',
+                'heart': 'heartbeat', 'dog': 'bark', 'cat': 'meow', 'cow': 'moo', 'owl': 'hoot',
+                'crow': 'caw', 'crowd': 'cheer', 'pan': 'sizzle', 'drink': 'pour', 'toilet': 'flush'}
 # the tonal interface figures (earshot.sounds.ui): listeners heard them as unrecognisable, so a plain "tap",
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
@@ -458,16 +469,17 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'door/close': 'door/shut', 'explosion/distant': 'explosion/far', 'hit/punch': 'punch/body',
          'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge', 'keys/jingle': 'keys/bunch',
          'swish/soft': 'flick/thin', 'pop/soft': 'thump/appear', 'knock/desk': 'knock/table',
-         'tap/table': 'tap/fingertip'}
+         'tap/table': 'tap/fingertip', 'bell/bike': 'bicycle_bell/ring', 'tape/peel': 'tape/roll',
+         'water/pour': 'drink/pour', 'heartbeat/pulse': 'heart/beat', 'shot/pistol': 'gunshot/rifle'}
 # words that ask for the action a person performs, not its single event (earshot.synth.perform; brief.performance):
-# a walk, knocking, typing, a bunch of keys shaken, glasses clinked. A plural of the thing itself ("footsteps",
-# "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key press") give one
-# event, since a game triggers one step per step
+# a walk, knocking, typing, a bunch of keys shaken, glasses clinked, a dog barking. A plural of the thing itself
+# ("footsteps", "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key
+# press") give one event, since a game triggers one step per step
 PERFORM_WORDS = frozenset((
     'walk', 'walks', 'walking', 'walked', 'footsteps', 'steps', 'stepping', 'pacing', 'strolling', 'marching',
     'running', 'treading', 'knocking', 'knocks', 'typing', 'typed', 'keystrokes', 'jingle', 'jingles', 'jingling',
     'jangle', 'jangling', 'rattling', 'shaking', 'shaken', 'clinking', 'clinks', 'clinked', 'toasting', 'clapping',
-    'scattering', 'scattered', 'spilling', 'spilled', 'tumbling', 'clattering'))
+    'scattering', 'scattered', 'spilling', 'spilled', 'tumbling', 'clattering', 'barking', 'yapping'))
 # phrases that ask for the action in so many words
 PERFORM_PHRASES = ('on and off', 'off and on', 'a bunch of', 'a handful of', 'a burst of', 'a run of', 'over and over',
                    'again and again', 'in a row')
@@ -477,7 +489,7 @@ PERFORM_PHRASES = ('on and off', 'off and on', 'a bunch of', 'a handful of', 'a 
 ROW_WORDS = {'knock': 'knock', 'step': 'walk', 'footstep': 'walk', 'clap': 'row', 'tap': 'row', 'click': 'row',
              'beep': 'row', 'bleep': 'row', 'countdown': 'count'}
 # the action form of a row word -> the row word: "clapping", "knocking, 4 seconds" name the action, not one event
-# (brief.acted). Applause is not one: it is a crowd, which earshot does not make
+# (brief.acted). Applause is not one: it is a crowd (a recording of an audience, earshot.sounds.learned)
 ACTION_WORDS = {'clapping': 'clap', 'knocking': 'knock', 'tapping': 'tap', 'clicking': 'click', 'beeping': 'beep',
                 'bleeping': 'bleep', 'stepping': 'step', 'walking': 'step'}
 # words that ask for a single event ("a single knock", "one step", "just one key press")
@@ -485,7 +497,10 @@ SINGLE_WORDS = ('a single', 'one single', 'single', 'just one', 'only one', 'one
 # a twin that is the same thing only when the request says one of these words: the learned coins/floor is a handful
 # of coins, so "a coin dropped on the table" keeps the invented single coin
 TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile'),
-              'pop/soft': ('appear', 'appears', 'appearing', 'element', 'elements', 'screen', 'card', 'cards')}
+              'pop/soft': ('appear', 'appears', 'appearing', 'element', 'elements', 'screen', 'card', 'cards'),
+              # a gun named, not a pistol: the recorded rifle shot (gunshot/rifle); an arrow "shot" or a pistol
+              # keeps the invented one
+              'shot/pistol': ('gunshot', 'gunshots', 'gun', 'guns', 'gunfire', 'rifle', 'firearm', 'shotgun')}
 # a cymbal of the drum kit (earshot.sounds.drums) -> the film's cymbal (a learned crash cymbal struck hard, the
 # material of earshot.sounds.motion): a film request ("a cymbal crash for the trailer") gets the film's, a request
 # with a word of the kit ("a crash cymbal at the end of the fill") the kit's

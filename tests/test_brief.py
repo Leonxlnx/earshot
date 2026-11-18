@@ -756,7 +756,7 @@ def test_a_tape_is_not_a_tap(idx):
     assert 'downlifter' in brief.read('tape stop')['concepts']
     assert 'downlifter' in brief.read('a tape-stop at the end of the song')['concepts']
     r = brief.rank(brief.read('packing tape ripped off a box'), idx=idx, top=3)
-    assert r[0]['id'] == 'tape/peel', r
+    assert r[0]['id'] in ('tape/peel', 'tape/roll'), r          # the invented tape or its recording (lexicon.TWINS)
 
 
 def test_a_material_named_takes_the_recorded_role_away(idx):
@@ -803,9 +803,9 @@ def test_the_action_form_of_a_row_word_names_the_action_only_as_the_sound_itself
 
 
 @pytest.mark.parametrize('text,word', [
-    ('a dog barking', 'dog'), ('dogs barking in the distance', None), ('a violin melody for the intro', 'violin'),
-    ('a car horn honk', 'car horn'), ('someone saying welcome back', 'saying'),
-    ('a crowd cheering in a stadium', 'crowd cheering'), ('kids laughing on a playground', 'laughing'),
+    ('a violin melody for the intro', 'violin'), ('someone saying welcome back', 'saying'),
+    ('an electric guitar solo', 'electric guitar'), ('a duck quacking', 'duck'),
+    ('a woman screaming in a horror scene', 'screaming'),
 ])
 def test_a_sound_the_catalogue_has_nothing_of_is_said_so(idx, text, word):
     """the pick of such a request is a guess, and the doubt names what is missing (or nothing is ranked at all)"""
@@ -823,6 +823,23 @@ def test_a_sound_the_catalogue_has_nothing_of_is_said_so(idx, text, word):
                                   'glass clink, cheers', 'accordion expand sound'])
 def test_nothing_missing_when_the_catalogue_has_it(text):
     assert brief.not_made(brief.read(text)) is None
+
+
+@pytest.mark.parametrize('text,sid', [
+    ('a dog barking', 'dog/bark'), ('a small dog yapping', 'dog/small'), ('a cat meowing', 'cat/meow'),
+    ('a car horn honk', 'car_horn/honk'), ('a police siren', 'siren/pass'), ('applause', 'applause/audience'),
+    ('a crowd cheering in a stadium', 'crowd/cheer'), ('a baby crying', 'baby/cry'),
+    ('my phone vibrating on the desk', 'phone/vibrate'), ('soda can opening', 'can/open'),
+    ('a toilet flush', 'toilet/flush'), ('a referee whistle', 'whistle/referee'),
+])
+def test_a_thing_recorded_is_answered_without_doubt(idx, text, sid):
+    """animals, a crowd, a horn, a siren and household things are recordings (earshot.sounds.learned): the request
+    is answered with the thing itself and nothing says it is missing"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=8)
+    assert brief.not_made(b) is None and cands[0]['id'] == sid, [c['id'] for c in cands[:3]]
+    assert not (doubt(b, cands) or '').startswith('earshot makes no'), doubt(b, cands)
 
 
 def test_into_names_where_the_sound_lands(idx):

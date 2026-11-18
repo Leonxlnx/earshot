@@ -574,6 +574,16 @@ def test_the_action_form_of_a_row_word_is_the_action(tmp_path):
         assert 'performance' not in make(text, str(tmp_path / 'o.wav'))['takes'][0]
 
 
+def test_a_dog_barks_once_or_in_a_run(tmp_path):
+    """"a dog bark" is one bark; "a dog barking" a recorded run of barks; "three barks" three, whatever plays them"""
+    one = make('a dog bark', str(tmp_path / 'a.wav'))
+    assert one['sound'] == 'dog/bark' and 'performance' not in one['takes'][0] and one['takes'][0]['checks']['ok']
+    run = make('a dog barking', str(tmp_path / 'b.wav'))['takes'][0]
+    assert run['performance']['events'] >= 2
+    three = make('three barks', str(tmp_path / 'c.wav'))
+    assert three['sound'] == 'dog/bark' and three['takes'][0]['performance']['events'] == 3
+
+
 def test_a_length_asked_of_a_scattered_or_shaken_action_holds(tmp_path):
     """the pattern reshaped over the length, or the stretch of a recording of the whole action, said plainly"""
     ice = make('ice cubes dropped in a glass, 3 seconds', str(tmp_path / 'i.wav'))['takes'][0]

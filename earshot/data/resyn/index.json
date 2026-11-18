@@ -25852,5 +25852,7491 @@
    2,
    3
   ]
+ },
+ {
+  "id": "dog/bark",
+  "says": [
+   "a dog barking, a full close bark",
+   "a medium-sized dog giving a sharp loud woof"
+  ],
+  "uses": [
+   "dog",
+   "bark",
+   "dog bark",
+   "barking dog",
+   "woof"
+  ],
+  "tags": [
+   "dog",
+   "animal",
+   "pet",
+   "bark"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.435,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "dog-bark-3.npz",
+    "source": "bigsoundbank/2954.wav@14.960-15.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.136,
+    "dur_s": 0.44,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.26,
+     "centroid": 572,
+     "end_db": -103.5,
+     "tail_ms": 189.8,
+     "start_db": -181.6,
+     "rise_ms": 5.81,
+     "peak": -5.9
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.433
+    },
+    "bytes": 5837,
+    "credit": {
+     "title": "Barking Dog #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/barking-dog-2-s2954.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     14.96,
+     15.4
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.63,
+     "shape_db": 1.81
+    }
+   },
+   {
+    "file": "dog-bark-1.npz",
+    "source": "bigsoundbank/2954.wav@2.380-2.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.14,
+    "dur_s": 0.42,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.04,
+     "centroid": 637,
+     "end_db": -102.2,
+     "tail_ms": 195.5,
+     "start_db": -192.2,
+     "rise_ms": 7.29,
+     "peak": -0.7
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.293
+    },
+    "bytes": 5908,
+    "credit": {
+     "title": "Barking Dog #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/barking-dog-2-s2954.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.38,
+     2.8
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 5.3,
+     "shape_db": 2.23
+    }
+   },
+   {
+    "file": "dog-bark-2.npz",
+    "source": "bigsoundbank/2954.wav@4.990-5.420",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.116,
+    "dur_s": 0.43,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.41,
+     "centroid": 673,
+     "end_db": -100.9,
+     "tail_ms": 178.2,
+     "start_db": -151.9,
+     "rise_ms": 14.83,
+     "peak": -5.3
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.532
+    },
+    "bytes": 6462,
+    "credit": {
+     "title": "Barking Dog #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/barking-dog-2-s2954.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.99,
+     5.42
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.38,
+     "shape_db": 1.65
+    },
+    "allows": [
+     "rising_glide"
+    ]
+   },
+   {
+    "file": "dog-bark-4.npz",
+    "source": "bigsoundbank/2353.wav@4.670-5.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.136,
+    "dur_s": 0.43,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.94,
+     "centroid": 678,
+     "end_db": -55.5,
+     "tail_ms": 18.4,
+     "start_db": -126.7,
+     "rise_ms": 1.56,
+     "peak": -2.1
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.666
+    },
+    "bytes": 7625,
+    "credit": {
+     "title": "Old dog barking #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/old-dog-barking-2-s2353.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.67,
+     5.1
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.65,
+     "shape_db": 1.55
+    }
+   },
+   {
+    "file": "dog-bark-6.npz",
+    "source": "bigsoundbank/2954.wav@2.380-3.250",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.14,
+    "dur_s": 0.87,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.01,
+     "centroid": 720,
+     "end_db": -104.6,
+     "tail_ms": 244.2,
+     "start_db": -192.2,
+     "rise_ms": 7.29,
+     "peak": -0.7
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.773
+    },
+    "bytes": 10555,
+    "credit": {
+     "title": "Barking Dog #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/barking-dog-2-s2954.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.38,
+     3.25
+    ],
+    "events": 2,
+    "late": 1,
+    "fidelity": {
+     "env_db": 5.15,
+     "shape_db": 2.21
+    },
+    "pace": null
+   },
+   {
+    "file": "dog-bark-8.npz",
+    "source": "bigsoundbank/2954.wav@0.070-0.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.086,
+    "dur_s": 0.73,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.06,
+     "centroid": 728,
+     "end_db": -103.2,
+     "tail_ms": 225.2,
+     "start_db": -95.8,
+     "rise_ms": 5.46,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.762
+    },
+    "bytes": 9286,
+    "credit": {
+     "title": "Barking Dog #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/barking-dog-2-s2954.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.07,
+     0.8
+    ],
+    "events": 2,
+    "late": 1,
+    "fidelity": {
+     "env_db": 5.35,
+     "shape_db": 2.01
+    },
+    "pace": null
+   },
+   {
+    "file": "dog-bark-5.npz",
+    "source": "freesound_c1/277058.mp3@0.000-0.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0173,
+    "dur_s": 0.389,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.76,
+     "centroid": 800,
+     "end_db": -193.2,
+     "tail_ms": 209.9,
+     "start_db": -108.5,
+     "rise_ms": 2.0,
+     "peak": -2.2
+    },
+    "measured": {
+     "hard_db": 4.52,
+     "ring_x": 1.369
+    },
+    "bytes": 11931,
+    "credit": {
+     "title": "Single Dog Bark",
+     "author": "kwahmah_02",
+     "page": "https://freesound.org/people/kwahmah_02/sounds/277058/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.389
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.81,
+     "shape_db": 1.45
+    },
+    "lossy": true
+   },
+   {
+    "file": "dog-bark-7.npz",
+    "source": "bigsoundbank/2353.wav@0.060-1.620",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.6967,
+    "dur_s": 1.56,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.26,
+     "centroid": 825,
+     "end_db": -51.2,
+     "tail_ms": 20.4,
+     "start_db": -105.1,
+     "rise_ms": 11.6,
+     "peak": -0.6
+    },
+    "measured": {
+     "hard_db": 5.27,
+     "ring_x": 1.551
+    },
+    "bytes": 23160,
+    "credit": {
+     "title": "Old dog barking #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/old-dog-barking-2-s2353.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.06,
+     1.62
+    ],
+    "events": 3,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.91,
+     "shape_db": 1.84
+    },
+    "pace": null,
+    "allows": [
+     "rising_glide"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   2,
+   0,
+   3,
+   6,
+   4,
+   7,
+   5
+  ],
+  "allows": [
+   "rising_glide"
+  ],
+  "pattern": {
+   "name": "row",
+   "events": [
+    2,
+    3
+   ],
+   "pace": [
+    2.0,
+    3.0
+   ],
+   "nouns": [
+    "bark",
+    "woof"
+   ]
+  }
+ },
+ {
+  "id": "dog/small",
+  "says": [
+   "a small dog yapping, a high short bark",
+   "a little dog giving a shrill yip"
+  ],
+  "uses": [
+   "small dog",
+   "yap",
+   "yip",
+   "puppy",
+   "little dog"
+  ],
+  "tags": [
+   "dog",
+   "animal",
+   "pet",
+   "small",
+   "high"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.597,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "dog-small-4.npz",
+    "source": "freesound_c1/163459.mp3@0.270-1.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.532,
+    "dur_s": 1.68,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.42,
+     "centroid": 1273,
+     "end_db": -102.1,
+     "tail_ms": 932.7,
+     "start_db": -138.5,
+     "rise_ms": 61.67,
+     "peak": -4.8
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.286
+    },
+    "bytes": 22141,
+    "credit": {
+     "title": "LBS_FX DOG Small Alert Bark001.wav",
+     "author": "LittleBigSounds",
+     "page": "https://freesound.org/people/LittleBigSounds/sounds/163459/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.27,
+     1.95
+    ],
+    "events": 2,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.5,
+     "shape_db": 1.21
+    },
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "dog-small-3.npz",
+    "source": "freesound_c1/163459.mp3@0.270-0.740",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.14,
+    "dur_s": 0.47,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.38,
+     "centroid": 1274,
+     "end_db": -61.7,
+     "tail_ms": 109.5,
+     "start_db": -138.5,
+     "rise_ms": 61.67,
+     "peak": -4.8
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.699
+    },
+    "bytes": 9198,
+    "credit": {
+     "title": "LBS_FX DOG Small Alert Bark001.wav",
+     "author": "LittleBigSounds",
+     "page": "https://freesound.org/people/LittleBigSounds/sounds/163459/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.27,
+     0.74
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.52,
+     "shape_db": 1.29
+    },
+    "lossy": true
+   },
+   {
+    "file": "dog-small-1.npz",
+    "source": "bigsoundbank/0682.wav@0.660-1.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.152,
+    "dur_s": 0.634,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.67,
+     "centroid": 1398,
+     "end_db": -193.9,
+     "tail_ms": 142.5,
+     "start_db": -147.7,
+     "rise_ms": 4.31,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.688
+    },
+    "bytes": 10342,
+    "credit": {
+     "title": "Barking of a Spitz",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/barking-of-a-spitz-s0682.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.66,
+     1.294
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.9,
+     "shape_db": 1.99
+    },
+    "allows": [
+     "rising_glide"
+    ]
+   },
+   {
+    "file": "dog-small-2.npz",
+    "source": "freesound_c1/484297.mp3@0.540-1.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0628,
+    "dur_s": 0.56,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.17,
+     "centroid": 1528,
+     "end_db": -111.4,
+     "tail_ms": 257.9,
+     "start_db": -188.2,
+     "rise_ms": 18.21,
+     "peak": -0.3
+    },
+    "measured": {
+     "hard_db": 1.76,
+     "ring_x": 1.307
+    },
+    "bytes": 14633,
+    "credit": {
+     "title": "Small dog bark",
+     "author": "giddster",
+     "page": "https://freesound.org/people/giddster/sounds/484297/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.54,
+     1.1
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.33,
+     "shape_db": 1.02
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   2,
+   3,
+   1,
+   0
+  ],
+  "allows": [
+   "rising_glide"
+  ],
+  "pattern": {
+   "name": "row",
+   "events": [
+    2,
+    3
+   ],
+   "pace": [
+    2.0,
+    3.0
+   ],
+   "nouns": [
+    "bark",
+    "yap",
+    "yip"
+   ]
+  }
+ },
+ {
+  "id": "cat/meow",
+  "says": [
+   "a cat meowing up close",
+   "a house cat giving a long plaintive meow"
+  ],
+  "uses": [
+   "cat",
+   "meow",
+   "kitty",
+   "kitten",
+   "miaow"
+  ],
+  "tags": [
+   "cat",
+   "animal",
+   "pet"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.35,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "cat-meow-3.npz",
+    "source": "bigsoundbank/1898.wav@0.640-1.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.036,
+    "dur_s": 0.96,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.2,
+     "centroid": 971,
+     "end_db": -110.9,
+     "tail_ms": 191.7,
+     "start_db": -113.0,
+     "rise_ms": 0.67,
+     "peak": -2.2
+    },
+    "measured": {
+     "hard_db": 6.61,
+     "ring_x": 1.046
+    },
+    "bytes": 17343,
+    "credit": {
+     "title": "Meow Cat #10",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/meow-cat-10-s1898.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.64,
+     1.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.61,
+     "shape_db": 0.96
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "cat-meow-5.npz",
+    "source": "bigsoundbank/1895.wav@0.600-1.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0265,
+    "dur_s": 0.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.62,
+     "centroid": 1106,
+     "end_db": -103.4,
+     "tail_ms": 138.9,
+     "start_db": -120.9,
+     "rise_ms": 11.33,
+     "peak": -3.2
+    },
+    "measured": {
+     "hard_db": 5.7,
+     "ring_x": 1.008
+    },
+    "bytes": 13836,
+    "credit": {
+     "title": "Meow cat #7",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/meow-cat-7-s1895.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.6,
+     1.2
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.01,
+     "shape_db": 0.97
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "cat-meow-4.npz",
+    "source": "bigsoundbank/1893.wav@0.200-2.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.776,
+    "dur_s": 2.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.53,
+     "centroid": 1156,
+     "end_db": -106.5,
+     "tail_ms": 116.3,
+     "start_db": -109.9,
+     "rise_ms": 88.69,
+     "peak": -1.7
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.586
+    },
+    "bytes": 27861,
+    "credit": {
+     "title": "Meow cat #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/meow-cat-5-s1893.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.2,
+     2.2
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.16,
+     "shape_db": 1.64
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "cat-meow-2.npz",
+    "source": "bigsoundbank/1891.wav@0.070-1.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0035,
+    "dur_s": 1.63,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.1,
+     "centroid": 1206,
+     "end_db": -117.9,
+     "tail_ms": 210.1,
+     "start_db": -104.6,
+     "rise_ms": 130.79,
+     "peak": -1.4
+    },
+    "measured": {
+     "hard_db": 5.99,
+     "ring_x": 1.047
+    },
+    "bytes": 28962,
+    "credit": {
+     "title": "Meow cat #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/meow-cat-3-s1891.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.07,
+     1.7
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.68,
+     "shape_db": 1.57
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "cat-meow-1.npz",
+    "source": "bigsoundbank/1889.wav@1.500-2.850",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.1658,
+    "dur_s": 1.35,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.02,
+     "centroid": 1319,
+     "end_db": -101.9,
+     "tail_ms": 115.5,
+     "start_db": -108.5,
+     "rise_ms": 76.08,
+     "peak": -2.8
+    },
+    "measured": {
+     "hard_db": 7.56,
+     "ring_x": 1.041
+    },
+    "bytes": 20918,
+    "credit": {
+     "title": "Meow cat #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/meow-cat-1-s1889.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.5,
+     2.85
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.26,
+     "shape_db": 1.26
+    },
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   4,
+   3,
+   0,
+   2,
+   1
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "crow/caw",
+  "says": [
+   "a crow cawing, a harsh rasping call",
+   "a raven or crow croaking caw"
+  ],
+  "uses": [
+   "crow",
+   "caw",
+   "raven"
+  ],
+  "tags": [
+   "bird",
+   "crow",
+   "animal",
+   "harsh"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.352,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "crow-caw-1.npz",
+    "source": "bigsoundbank/3462.wav@0.600-2.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.16,
+    "dur_s": 1.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.37,
+     "centroid": 2035,
+     "end_db": -91.7,
+     "tail_ms": 91.6,
+     "start_db": -105.8,
+     "rise_ms": 65.08,
+     "peak": -3.3
+    },
+    "measured": {
+     "hard_db": 8.5,
+     "ring_x": 1.155
+    },
+    "bytes": 26862,
+    "credit": {
+     "title": "Carrion Crow #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/carrion-crow-2-s3462.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.6,
+     2.0
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.47,
+     "shape_db": 1.59
+    }
+   },
+   {
+    "file": "crow-caw-3.npz",
+    "source": "bigsoundbank/2765.wav@0.000-0.420",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0152,
+    "dur_s": 0.352,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.87,
+     "centroid": 2806,
+     "end_db": -92.6,
+     "tail_ms": 36.7,
+     "start_db": -163.2,
+     "rise_ms": 22.38,
+     "peak": -5.3
+    },
+    "measured": {
+     "hard_db": 2.04,
+     "ring_x": 1.377
+    },
+    "bytes": 19928,
+    "credit": {
+     "title": "Crow #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/crow-2-s2765.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.352
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.93,
+     "shape_db": 0.77
+    }
+   },
+   {
+    "file": "crow-caw-2.npz",
+    "source": "bigsoundbank/2764.wav@0.000-0.320",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.043,
+    "dur_s": 0.32,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.85,
+     "centroid": 3355,
+     "end_db": -88.4,
+     "tail_ms": 48.9,
+     "start_db": -171.9,
+     "rise_ms": 2.12,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 7.06,
+     "ring_x": 1.242
+    },
+    "bytes": 15224,
+    "credit": {
+     "title": "Crow #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/crow-1-s2764.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.32
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.95,
+     "shape_db": 0.84
+    }
+   }
+  ],
+  "walk": [
+   0,
+   2,
+   1
+  ]
+ },
+ {
+  "id": "rooster/crow",
+  "says": [
+   "a rooster crowing, cock-a-doodle-doo",
+   "a cockerel calling at dawn"
+  ],
+  "uses": [
+   "rooster",
+   "cockerel",
+   "cock-a-doodle-doo"
+  ],
+  "tags": [
+   "rooster",
+   "bird",
+   "farm",
+   "animal"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.785,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "rooster-crow-2.npz",
+    "source": "bigsoundbank/0283.wav@0.330-2.250",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4898,
+    "dur_s": 1.92,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.07,
+     "centroid": 1225,
+     "end_db": -93.3,
+     "tail_ms": 131.1,
+     "start_db": -116.5,
+     "rise_ms": 17.27,
+     "peak": -1.0
+    },
+    "measured": {
+     "hard_db": 6.8,
+     "ring_x": 1.722
+    },
+    "bytes": 27610,
+    "credit": {
+     "title": "Rooster Song",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/song-of-rooster-s0283.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.33,
+     2.25
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.91,
+     "shape_db": 1.99
+    }
+   },
+   {
+    "file": "rooster-crow-1.npz",
+    "source": "bigsoundbank/0440.wav@0.500-2.150",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2145,
+    "dur_s": 1.65,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.01,
+     "centroid": 1554,
+     "end_db": -194.3,
+     "tail_ms": 159.8,
+     "start_db": -120.2,
+     "rise_ms": 10.56,
+     "peak": -0.2
+    },
+    "measured": {
+     "hard_db": 7.21,
+     "ring_x": 1.653
+    },
+    "bytes": 28447,
+    "credit": {
+     "title": "Cock Song #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/cock-song-1-s0440.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.5,
+     2.15
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.65,
+     "shape_db": 1.75
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "owl/hoot",
+  "says": [
+   "an owl hooting at night, a soft round hoo",
+   "a tawny owl call"
+  ],
+  "uses": [
+   "owl",
+   "hoot",
+   "night bird"
+  ],
+  "tags": [
+   "owl",
+   "bird",
+   "night",
+   "animal"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.08,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "owl-hoot-1.npz",
+    "source": "bigsoundbank/1763.wav@0.170-1.250",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.536,
+    "dur_s": 1.08,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.32,
+     "centroid": 829,
+     "end_db": -104.1,
+     "tail_ms": 346.6,
+     "start_db": -153.0,
+     "rise_ms": 193.6,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.241
+    },
+    "bytes": 10800,
+    "credit": {
+     "title": "Tawny Owl #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/tawny-owl-1-s1763.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.17,
+     1.25
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.18,
+     "shape_db": 1.06
+    }
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "horse/neigh",
+  "says": [
+   "a horse neighing, a whinny",
+   "a horse calling with a shaking high whinny"
+  ],
+  "uses": [
+   "horse",
+   "neigh",
+   "whinny"
+  ],
+  "tags": [
+   "horse",
+   "animal",
+   "farm"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "horse-neigh-1.npz",
+    "source": "bigsoundbank/0284.wav@0.000-1.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.6168,
+    "dur_s": 1.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.2,
+     "centroid": 1137,
+     "end_db": -92.5,
+     "tail_ms": 221.8,
+     "start_db": -144.1,
+     "rise_ms": 1.67,
+     "peak": -1.0
+    },
+    "measured": {
+     "hard_db": 3.61,
+     "ring_x": 1.1
+    },
+    "bytes": 34972,
+    "credit": {
+     "title": "Neighing of a Horse #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/neighing-of-a-horse-1-s0284.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.03,
+     "shape_db": 1.44
+    }
+   },
+   {
+    "file": "horse-neigh-2.npz",
+    "source": "bigsoundbank/0863.wav@0.000-2.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.7153,
+    "dur_s": 2.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.77,
+     "centroid": 1410,
+     "end_db": -194.3,
+     "tail_ms": 927.9,
+     "start_db": -115.6,
+     "rise_ms": 7.79,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 6.96,
+     "ring_x": 1.092
+    },
+    "bytes": 33423,
+    "credit": {
+     "title": "Horse Neighing #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/horse-neighing-3-s0863.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.4
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.38,
+     "shape_db": 1.62
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "horse/trot",
+  "says": [
+   "horse hooves trotting on hard ground",
+   "a clip-clop of hooves"
+  ],
+  "uses": [
+   "hooves",
+   "clip clop",
+   "horse trotting",
+   "trot",
+   "gallop"
+  ],
+  "tags": [
+   "horse",
+   "hooves",
+   "foley"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.425,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "horse-trot-2.npz",
+    "source": "bigsoundbank/0610.wav@6.000-8.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0135,
+    "dur_s": 2.3,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.08,
+     "centroid": 488,
+     "end_db": -99.5,
+     "tail_ms": 97.8,
+     "start_db": -94.5,
+     "rise_ms": 3.33,
+     "peak": -11.2
+    },
+    "measured": {
+     "hard_db": 2.34,
+     "ring_x": 1.01
+    },
+    "bytes": 40181,
+    "credit": {
+     "title": "Horse Trotting",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/horse-trotting-s0610.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     6.0,
+     8.3
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.34,
+     "shape_db": 1.44
+    }
+   },
+   {
+    "file": "horse-trot-1.npz",
+    "source": "bigsoundbank/0610.wav@0.000-2.550",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1562,
+    "dur_s": 2.55,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.04,
+     "centroid": 519,
+     "end_db": -91.1,
+     "tail_ms": 147.8,
+     "start_db": -231.0,
+     "rise_ms": 1.46,
+     "peak": -9.0
+    },
+    "measured": {
+     "hard_db": 0.76,
+     "ring_x": 1.0
+    },
+    "bytes": 38952,
+    "credit": {
+     "title": "Horse Trotting",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/horse-trotting-s0610.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.55
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.65,
+     "shape_db": 1.65
+    },
+    "allows": [
+     "silence"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ],
+  "allows": [
+   "silence"
+  ]
+ },
+ {
+  "id": "cow/moo",
+  "says": [
+   "a cow mooing, a long low moo",
+   "cattle lowing"
+  ],
+  "uses": [
+   "cow",
+   "moo",
+   "cattle"
+  ],
+  "tags": [
+   "cow",
+   "animal",
+   "farm",
+   "low"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.8,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "cow-moo-2.npz",
+    "source": "bigsoundbank/2385.wav@0.000-3.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.5922,
+    "dur_s": 3.562,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.01,
+     "centroid": 402,
+     "end_db": -125.8,
+     "tail_ms": 467.8,
+     "start_db": -156.1,
+     "rise_ms": 0.52,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 4.42,
+     "ring_x": 1.409
+    },
+    "bytes": 64297,
+    "credit": {
+     "title": "Cow moos #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/cow-moos-5-s2385.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.562
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.67,
+     "shape_db": 0.87
+    }
+   },
+   {
+    "file": "cow-moo-1.npz",
+    "source": "bigsoundbank/2384.wav@0.000-2.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.6275,
+    "dur_s": 2.8,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.13,
+     "centroid": 450,
+     "end_db": -131.7,
+     "tail_ms": 420.6,
+     "start_db": -160.4,
+     "rise_ms": 4.88,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 4.24,
+     "ring_x": 1.698
+    },
+    "bytes": 39345,
+    "credit": {
+     "title": "Cow moos #4",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/cow-moos-4-s2384.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.8
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.32,
+     "shape_db": 0.98
+    }
+   },
+   {
+    "file": "cow-moo-3.npz",
+    "source": "bigsoundbank/2382.wav@0.000-2.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.157,
+    "dur_s": 2.595,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.87,
+     "centroid": 589,
+     "end_db": -130.1,
+     "tail_ms": 289.5,
+     "start_db": -240.0,
+     "rise_ms": 1.9,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 6.57,
+     "ring_x": 1.041
+    },
+    "bytes": 57866,
+    "credit": {
+     "title": "Cow moos #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/cow-moos-2-s2382.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.595
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.84,
+     "shape_db": 0.95
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0,
+   2
+  ]
+ },
+ {
+  "id": "wolf/howl",
+  "says": [
+   "a wolf howling, a long rising and falling howl",
+   "a lone howl at night"
+  ],
+  "uses": [
+   "wolf",
+   "howl",
+   "howling"
+  ],
+  "tags": [
+   "wolf",
+   "animal",
+   "night"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.4,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "wolf-howl-1.npz",
+    "source": "freesound_c1/472402.mp3@0.000-4.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.706,
+    "dur_s": 4.4,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.08,
+     "centroid": 227,
+     "end_db": -107.1,
+     "tail_ms": 276.2,
+     "start_db": -155.4,
+     "rise_ms": 11.88,
+     "peak": -1.1
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.83
+    },
+    "bytes": 39240,
+    "credit": {
+     "title": "22_Lobo_aullando.wav",
+     "author": "JoseAgudelo",
+     "page": "https://freesound.org/people/JoseAgudelo/sounds/472402/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.4
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.0,
+     "shape_db": 0.77
+    },
+    "lossy": true,
+    "allows": [
+     "rising_glide"
+    ]
+   }
+  ],
+  "walk": [
+   0
+  ],
+  "allows": [
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "applause/audience",
+  "says": [
+   "a small audience applauding",
+   "people clapping their hands after a show"
+  ],
+  "uses": [
+   "applause",
+   "clapping audience",
+   "people clapping",
+   "ovation"
+  ],
+  "tags": [
+   "crowd",
+   "applause",
+   "people",
+   "clapping"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.625,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "applause-audience-1.npz",
+    "source": "bigsoundbank/2483.wav@0.000-4.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.6235,
+    "dur_s": 3.452,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.77,
+     "centroid": 821,
+     "end_db": -118.6,
+     "tail_ms": 108.5,
+     "start_db": -117.1,
+     "rise_ms": 13.56,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 6.64,
+     "ring_x": 1.045
+    },
+    "bytes": 41608,
+    "credit": {
+     "title": "Applause concert bar #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/applause-concert-bar-5-s2483.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.452
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.33,
+     "shape_db": 1.03
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "applause-audience-3.npz",
+    "source": "bigsoundbank/2482.wav@0.000-3.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3613,
+    "dur_s": 2.295,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.34,
+     "centroid": 965,
+     "end_db": -126.7,
+     "tail_ms": 154.2,
+     "start_db": -183.4,
+     "rise_ms": 14.0,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 4.8,
+     "ring_x": 1.071
+    },
+    "bytes": 39215,
+    "credit": {
+     "title": "Applause Concert Bar #4",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/applause-concert-bar-4-s2482.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.295
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.24,
+     "shape_db": 1.1
+    }
+   },
+   {
+    "file": "applause-audience-2.npz",
+    "source": "bigsoundbank/2481.wav@0.000-3.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3317,
+    "dur_s": 2.625,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.56,
+     "centroid": 967,
+     "end_db": -128.0,
+     "tail_ms": 388.9,
+     "start_db": -181.1,
+     "rise_ms": 12.83,
+     "peak": -2.7
+    },
+    "measured": {
+     "hard_db": 5.03,
+     "ring_x": 1.101
+    },
+    "bytes": 33908,
+    "credit": {
+     "title": "Applause concert bar #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/applause-concert-bar-3-s2481.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.625
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.42,
+     "shape_db": 1.12
+    }
+   }
+  ],
+  "walk": [
+   0,
+   2,
+   1
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "crowd/cheer",
+  "says": [
+   "a crowd cheering and whooping",
+   "people cheering with applause"
+  ],
+  "uses": [
+   "cheer",
+   "crowd cheer",
+   "cheering crowd",
+   "crowd"
+  ],
+  "tags": [
+   "crowd",
+   "people",
+   "cheer"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "crowd-cheer-3.npz",
+    "source": "freesound_c1/365132.mp3@0.500-5.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.7508,
+    "dur_s": 4.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.97,
+     "centroid": 888,
+     "end_db": -106.6,
+     "tail_ms": 199.7,
+     "start_db": -174.9,
+     "rise_ms": 23.29,
+     "peak": -9.9
+    },
+    "measured": {
+     "hard_db": 5.8,
+     "ring_x": 1.07
+    },
+    "bytes": 32990,
+    "credit": {
+     "title": "Crowd Cheering",
+     "author": "SoundsExciting",
+     "page": "https://freesound.org/people/SoundsExciting/sounds/365132/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.5,
+     5.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.93,
+     "shape_db": 1.31
+    },
+    "lossy": true
+   },
+   {
+    "file": "crowd-cheer-2.npz",
+    "source": "freesound_c1/400586.mp3@0.000-4.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3227,
+    "dur_s": 4.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.2,
+     "centroid": 1139,
+     "end_db": -101.7,
+     "tail_ms": 190.7,
+     "start_db": -144.0,
+     "rise_ms": 186.77,
+     "peak": -10.3
+    },
+    "measured": {
+     "hard_db": 7.66,
+     "ring_x": 1.031
+    },
+    "bytes": 50548,
+    "credit": {
+     "title": "Medium crowd cheering 02",
+     "author": "misjoc",
+     "page": "https://freesound.org/people/misjoc/sounds/400586/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.23,
+     "shape_db": 1.06
+    },
+    "lossy": true
+   },
+   {
+    "file": "crowd-cheer-1.npz",
+    "source": "freesound_c1/182572.mp3@0.000-4.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.6212,
+    "dur_s": 4.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.34,
+     "centroid": 1947,
+     "end_db": -111.1,
+     "tail_ms": 211.5,
+     "start_db": -158.7,
+     "rise_ms": 2.33,
+     "peak": 0.1
+    },
+    "measured": {
+     "hard_db": 8.22,
+     "ring_x": 1.006
+    },
+    "bytes": 53404,
+    "credit": {
+     "title": "Short Crowd Cheer 2.flac",
+     "author": "qubodup",
+     "page": "https://freesound.org/people/qubodup/sounds/182572/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.35,
+     "shape_db": 1.13
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   2,
+   1,
+   0
+  ]
+ },
+ {
+  "id": "laugh/person",
+  "says": [
+   "a person laughing",
+   "a short burst of real laughter"
+  ],
+  "uses": [
+   "laugh",
+   "laughter",
+   "giggle"
+  ],
+  "tags": [
+   "laugh",
+   "voice",
+   "people"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.595,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "laugh-person-1.npz",
+    "source": "freesound_c1/388252.mp3@0.000-1.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0037,
+    "dur_s": 1.791,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.88,
+     "centroid": 1236,
+     "end_db": -96.3,
+     "tail_ms": 146.0,
+     "start_db": -108.8,
+     "rise_ms": 10.62,
+     "peak": -21.3
+    },
+    "measured": {
+     "hard_db": 5.85,
+     "ring_x": 1.972
+    },
+    "bytes": 31726,
+    "credit": {
+     "title": "Laugh 01.wav",
+     "author": "ANARKYA",
+     "page": "https://freesound.org/people/ANARKYA/sounds/388252/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.791
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.06,
+     "shape_db": 1.43
+    },
+    "lossy": true
+   },
+   {
+    "file": "laugh-person-2.npz",
+    "source": "bigsoundbank/1660.wav@0.200-3.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.0433,
+    "dur_s": 3.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.19,
+     "centroid": 1952,
+     "end_db": -73.9,
+     "tail_ms": 53.7,
+     "start_db": -120.2,
+     "rise_ms": 4.56,
+     "peak": -0.8
+    },
+    "measured": {
+     "hard_db": 8.22,
+     "ring_x": 1.123
+    },
+    "bytes": 69177,
+    "credit": {
+     "title": "Laughter of Children",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/laughter-of-children-s1660.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.2,
+     3.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.77,
+     "shape_db": 1.22
+    },
+    "allows": [
+     "rising_glide"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "laugh/crowd",
+  "says": [
+   "a small group of people laughing together",
+   "an audience laughing"
+  ],
+  "uses": [
+   "audience laugh",
+   "laugh track",
+   "crowd laughing",
+   "laughter"
+  ],
+  "tags": [
+   "laugh",
+   "crowd",
+   "people"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "laugh-crowd-1.npz",
+    "source": "freesound_c1/138112.mp3@0.200-3.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.359,
+    "dur_s": 3.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.73,
+     "centroid": 1252,
+     "end_db": -117.3,
+     "tail_ms": 348.2,
+     "start_db": -110.7,
+     "rise_ms": 15.75,
+     "peak": -11.1
+    },
+    "measured": {
+     "hard_db": 6.02,
+     "ring_x": 1.174
+    },
+    "bytes": 34828,
+    "credit": {
+     "title": "Small Crowd Laughing",
+     "author": "snakebarney",
+     "page": "https://freesound.org/people/snakebarney/sounds/138112/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.2,
+     3.2
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 4.26,
+     "shape_db": 1.34
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "gasp/breath",
+  "says": [
+   "a sharp gasp of surprise",
+   "a quick startled intake of breath"
+  ],
+  "uses": [
+   "gasp",
+   "startle"
+  ],
+  "tags": [
+   "breath",
+   "voice",
+   "people"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.8,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "gasp-breath-1.npz",
+    "source": "freesound_c1/344407.mp3@0.000-0.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2167,
+    "dur_s": 0.667,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.12,
+     "centroid": 539,
+     "end_db": -94.9,
+     "tail_ms": 230.2,
+     "start_db": -149.0,
+     "rise_ms": 1.96,
+     "peak": -6.0
+    },
+    "measured": {
+     "hard_db": 2.46,
+     "ring_x": 1.46
+    },
+    "bytes": 12132,
+    "credit": {
+     "title": "Male Gasp 1.wav",
+     "author": "jawbutch",
+     "page": "https://freesound.org/people/jawbutch/sounds/344407/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.667
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.81,
+     "shape_db": 1.23
+    },
+    "lossy": true,
+    "allows": [
+     "rising_glide"
+    ]
+   },
+   {
+    "file": "gasp-breath-2.npz",
+    "source": "freesound_c1/344415.mp3@0.000-0.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1802,
+    "dur_s": 0.8,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.26,
+     "centroid": 560,
+     "end_db": -86.0,
+     "tail_ms": 312.0,
+     "start_db": -134.7,
+     "rise_ms": 2.17,
+     "peak": -13.7
+    },
+    "measured": {
+     "hard_db": 0.9,
+     "ring_x": 1.185
+    },
+    "bytes": 21510,
+    "credit": {
+     "title": "Male Gasp 4.wav",
+     "author": "jawbutch",
+     "page": "https://freesound.org/people/jawbutch/sounds/344415/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.8
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.22,
+     "shape_db": 0.94
+    },
+    "lossy": true
+   },
+   {
+    "file": "gasp-breath-3.npz",
+    "source": "freesound_c1/333396.mp3@0.000-1.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1575,
+    "dur_s": 1.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.93,
+     "centroid": 1179,
+     "end_db": -87.7,
+     "tail_ms": 200.6,
+     "start_db": -110.8,
+     "rise_ms": 6.23,
+     "peak": -11.8
+    },
+    "measured": {
+     "hard_db": 3.88,
+     "ring_x": 1.736
+    },
+    "bytes": 19249,
+    "credit": {
+     "title": "Gasp 4.wav",
+     "author": "jayfrosting",
+     "page": "https://freesound.org/people/jayfrosting/sounds/333396/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.0
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.28,
+     "shape_db": 1.56
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2
+  ],
+  "allows": [
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "cough/person",
+  "says": [
+   "a person coughing",
+   "a dry cough from the chest"
+  ],
+  "uses": [
+   "cough",
+   "coughing"
+  ],
+  "tags": [
+   "cough",
+   "voice",
+   "people"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.35,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "cough-person-3.npz",
+    "source": "bigsoundbank/2183.wav@0.000-1.900",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0747,
+    "dur_s": 1.898,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.53,
+     "centroid": 977,
+     "end_db": -161.9,
+     "tail_ms": 293.5,
+     "start_db": -240.0,
+     "rise_ms": 0.5,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 4.89,
+     "ring_x": 1.095
+    },
+    "bytes": 41449,
+    "credit": {
+     "title": "Man cough #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-cough-5-s2183.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.898
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.71,
+     "shape_db": 1.32
+    }
+   },
+   {
+    "file": "cough-person-2.npz",
+    "source": "bigsoundbank/0654.wav@0.200-1.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4118,
+    "dur_s": 1.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.18,
+     "centroid": 990,
+     "end_db": -88.4,
+     "tail_ms": 36.4,
+     "start_db": -239.3,
+     "rise_ms": 4.65,
+     "peak": -0.7
+    },
+    "measured": {
+     "hard_db": 6.23,
+     "ring_x": 1.206
+    },
+    "bytes": 24817,
+    "credit": {
+     "title": "Woman cough",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/woman-cough-s0654.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.2,
+     1.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.0,
+     "shape_db": 1.3
+    }
+   },
+   {
+    "file": "cough-person-1.npz",
+    "source": "bigsoundbank/0654.wav@2.300-3.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3038,
+    "dur_s": 1.3,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.19,
+     "centroid": 1082,
+     "end_db": -80.6,
+     "tail_ms": 65.3,
+     "start_db": -239.6,
+     "rise_ms": 15.88,
+     "peak": -0.4
+    },
+    "measured": {
+     "hard_db": 6.5,
+     "ring_x": 1.265
+    },
+    "bytes": 26054,
+    "credit": {
+     "title": "Woman cough",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/woman-cough-s0654.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.3,
+     3.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.56,
+     "shape_db": 1.2
+    }
+   },
+   {
+    "file": "cough-person-4.npz",
+    "source": "bigsoundbank/0488.wav@0.200-1.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2052,
+    "dur_s": 0.9,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.06,
+     "centroid": 1942,
+     "end_db": -115.7,
+     "tail_ms": 78.2,
+     "start_db": -240.0,
+     "rise_ms": 6.23,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 5.05,
+     "ring_x": 1.2
+    },
+    "bytes": 20132,
+    "credit": {
+     "title": "Man cough #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-cough-s0488.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.2,
+     1.1
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.94,
+     "shape_db": 1.52
+    },
+    "allows": [
+     "silence"
+    ]
+   }
+  ],
+  "walk": [
+   2,
+   1,
+   0,
+   3
+  ],
+  "allows": [
+   "silence"
+  ]
+ },
+ {
+  "id": "kiss/lips",
+  "says": [
+   "a short kiss, a small wet smack of the lips",
+   "a quick peck"
+  ],
+  "uses": [
+   "kiss",
+   "smooch",
+   "peck"
+  ],
+  "tags": [
+   "kiss",
+   "lips",
+   "people"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.4,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "kiss-lips-2.npz",
+    "source": "bigsoundbank/0178.wav@0.950-1.350",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0602,
+    "dur_s": 0.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.02,
+     "centroid": 5060,
+     "end_db": -129.7,
+     "tail_ms": 261.3,
+     "start_db": -197.7,
+     "rise_ms": 0.38,
+     "peak": -1.4
+    },
+    "measured": {
+     "hard_db": 2.95,
+     "ring_x": 1.087
+    },
+    "bytes": 9258,
+    "credit": {
+     "title": "Kisses #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/kisses-s0178.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.95,
+     1.35
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.85,
+     "shape_db": 0.94
+    }
+   },
+   {
+    "file": "kiss-lips-3.npz",
+    "source": "bigsoundbank/0178.wav@2.950-3.350",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.247,
+    "dur_s": 0.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.82,
+     "centroid": 6134,
+     "end_db": -134.0,
+     "tail_ms": 97.4,
+     "start_db": -177.4,
+     "rise_ms": 1.96,
+     "peak": 0.8
+    },
+    "measured": {
+     "hard_db": 3.96,
+     "ring_x": 1.053
+    },
+    "bytes": 9251,
+    "credit": {
+     "title": "Kisses #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/kisses-s0178.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.95,
+     3.35
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.19,
+     "shape_db": 0.6
+    }
+   },
+   {
+    "file": "kiss-lips-1.npz",
+    "source": "bigsoundbank/2201.wav@0.000-0.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0688,
+    "dur_s": 0.29,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.09,
+     "centroid": 8374,
+     "end_db": -142.7,
+     "tail_ms": 117.4,
+     "start_db": -147.5,
+     "rise_ms": 1.44,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 4.39,
+     "ring_x": 1.128
+    },
+    "bytes": 9192,
+    "credit": {
+     "title": "Kiss #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/kiss-3-s2201.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.29
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.23,
+     "shape_db": 1.73
+    }
+   }
+  ],
+  "walk": [
+   2,
+   0,
+   1
+  ]
+ },
+ {
+  "id": "heart/beat",
+  "says": [
+   "a heart beating up close, lub-dub lub-dub",
+   "a deep heartbeat thumping"
+  ],
+  "uses": [
+   "heartbeat",
+   "heart beat",
+   "heart"
+  ],
+  "tags": [
+   "heart",
+   "body",
+   "low",
+   "thump"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "thud",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.4,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "heart-beat-1.npz",
+    "source": "bigsoundbank/0218.wav@0.000-3.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0192,
+    "dur_s": 3.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.92,
+     "centroid": 94,
+     "end_db": -83.8,
+     "tail_ms": 47.6,
+     "start_db": -147.9,
+     "rise_ms": 1.56,
+     "peak": -0.1
+    },
+    "measured": {
+     "hard_db": 0.97,
+     "ring_x": 1.184
+    },
+    "bytes": 23714,
+    "credit": {
+     "title": "Heart Beat",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/heart-beat-s0218.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.4
+    ],
+    "events": 3,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.88,
+     "shape_db": 1.17
+    },
+    "pace": 0.74,
+    "allows": [
+     "stacked"
+    ]
+   }
+  ],
+  "walk": [
+   0
+  ],
+  "allows": [
+   "stacked"
+  ]
+ },
+ {
+  "id": "baby/cry",
+  "says": [
+   "a baby crying",
+   "an infant wailing"
+  ],
+  "uses": [
+   "baby",
+   "baby crying",
+   "infant",
+   "cry",
+   "crying"
+  ],
+  "tags": [
+   "baby",
+   "voice",
+   "people"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "baby-cry-2.npz",
+    "source": "freesound_c1/151085.mp3@6.750-10.250",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1542,
+    "dur_s": 3.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.41,
+     "centroid": 2003,
+     "end_db": -112.7,
+     "tail_ms": 141.9,
+     "start_db": -179.3,
+     "rise_ms": 27.79,
+     "peak": -2.5
+    },
+    "measured": {
+     "hard_db": 7.38,
+     "ring_x": 1.267
+    },
+    "bytes": 76325,
+    "credit": {
+     "title": "01 baby crying hard.wav",
+     "author": "PickleJones",
+     "page": "https://freesound.org/people/PickleJones/sounds/151085/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     6.75,
+     10.25
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.24,
+     "shape_db": 0.98
+    },
+    "lossy": true
+   },
+   {
+    "file": "baby-cry-3.npz",
+    "source": "freesound_c1/151085.mp3@2.000-5.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.166,
+    "dur_s": 3.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.06,
+     "centroid": 2294,
+     "end_db": -96.7,
+     "tail_ms": 115.7,
+     "start_db": -154.5,
+     "rise_ms": 12.44,
+     "peak": -8.0
+    },
+    "measured": {
+     "hard_db": 8.2,
+     "ring_x": 1.015
+    },
+    "bytes": 83996,
+    "credit": {
+     "title": "01 baby crying hard.wav",
+     "author": "PickleJones",
+     "page": "https://freesound.org/people/PickleJones/sounds/151085/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.0,
+     5.5
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.28,
+     "shape_db": 1.17
+    },
+    "lossy": true
+   },
+   {
+    "file": "baby-cry-1.npz",
+    "source": "freesound_c1/436915.mp3@1.200-3.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.528,
+    "dur_s": 2.2,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.13,
+     "centroid": 2549,
+     "end_db": -104.6,
+     "tail_ms": 186.6,
+     "start_db": -150.8,
+     "rise_ms": 144.46,
+     "peak": -0.2
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.737
+    },
+    "bytes": 37773,
+    "credit": {
+     "title": "baby crying loud",
+     "author": "organicmanpl",
+     "page": "https://freesound.org/people/organicmanpl/sounds/436915/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.2,
+     3.4
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.61,
+     "shape_db": 1.0
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   2,
+   0,
+   1
+  ]
+ },
+ {
+  "id": "car_horn/honk",
+  "says": [
+   "a car horn honking",
+   "a short beep of a car horn"
+  ],
+  "uses": [
+   "car horn",
+   "honk",
+   "beep beep"
+  ],
+  "tags": [
+   "car",
+   "horn",
+   "street",
+   "vehicle"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": false,
+  "dur_s": 0.496,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "car-horn-honk-5.npz",
+    "source": "bigsoundbank/0258.wav@0.000-1.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4397,
+    "dur_s": 1.6,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.0,
+     "centroid": 1182,
+     "end_db": -89.7,
+     "tail_ms": 116.4,
+     "start_db": -233.2,
+     "rise_ms": 12.35,
+     "peak": -6.8
+    },
+    "measured": {
+     "hard_db": 3.3,
+     "ring_x": 1.665
+    },
+    "bytes": 26618,
+    "credit": {
+     "title": "Recent Car Horn #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/recent-car-horn-2-s0258.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.6
+    ],
+    "events": 2,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.47,
+     "shape_db": 1.53
+    },
+    "pace": 28.57,
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "car-horn-honk-3.npz",
+    "source": "bigsoundbank/3505.wav@0.000-0.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.166,
+    "dur_s": 0.496,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.32,
+     "centroid": 1260,
+     "end_db": -130.6,
+     "tail_ms": 230.9,
+     "start_db": -237.8,
+     "rise_ms": 13.25,
+     "peak": -2.2
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.368
+    },
+    "bytes": 6175,
+    "credit": {
+     "title": "Horn #12",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/horn-12-s3505.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.496
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.47,
+     "shape_db": 1.04
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "car-horn-honk-1.npz",
+    "source": "bigsoundbank/3506.wav@0.000-0.900",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.332,
+    "dur_s": 0.888,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.0,
+     "centroid": 1272,
+     "end_db": -122.5,
+     "tail_ms": 76.6,
+     "start_db": -237.9,
+     "rise_ms": 13.23,
+     "peak": -2.1
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.594
+    },
+    "bytes": 10967,
+    "credit": {
+     "title": "Horn #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/horn-3-s3506.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.888
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.1,
+     "shape_db": 0.93
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "car-horn-honk-4.npz",
+    "source": "bigsoundbank/0260.wav@0.000-0.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0077,
+    "dur_s": 0.494,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.19,
+     "centroid": 1294,
+     "end_db": -110.3,
+     "tail_ms": 236.6,
+     "start_db": -105.4,
+     "rise_ms": 8.25,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 4.36,
+     "ring_x": 2.039
+    },
+    "bytes": 9193,
+    "credit": {
+     "title": "Car horn #4",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/car-horn-4-s0260.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.494
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.07,
+     "shape_db": 1.42
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "car-horn-honk-2.npz",
+    "source": "bigsoundbank/0257.wav@0.000-0.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0488,
+    "dur_s": 0.482,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.0,
+     "centroid": 1506,
+     "end_db": -116.4,
+     "tail_ms": 57.5,
+     "start_db": -175.5,
+     "rise_ms": 3.56,
+     "peak": -3.0
+    },
+    "measured": {
+     "hard_db": 6.88,
+     "ring_x": 1.865
+    },
+    "bytes": 10404,
+    "credit": {
+     "title": "Recent car horn #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/recent-car-horn-1-s0257.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.482
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.05,
+     "shape_db": 1.28
+    },
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   2,
+   4,
+   1,
+   3,
+   0
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "siren/pass",
+  "says": [
+   "a two-tone emergency siren passing by",
+   "a police or ambulance siren going past"
+  ],
+  "uses": [
+   "siren",
+   "police siren",
+   "ambulance"
+  ],
+  "tags": [
+   "siren",
+   "street",
+   "vehicle"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 6.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "siren-pass-1.npz",
+    "source": "bigsoundbank/2029.wav@5.000-11.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.9167,
+    "dur_s": 6.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.86,
+     "centroid": 1264,
+     "end_db": -109.0,
+     "tail_ms": 271.6,
+     "start_db": -178.2,
+     "rise_ms": 1040.81,
+     "peak": -1.6
+    },
+    "measured": {
+     "hard_db": 6.74,
+     "ring_x": 1.1
+    },
+    "bytes": 22177,
+    "credit": {
+     "title": "Gendarmerie, Siren, Passage",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/gendarmerie-siren-passage-s2029.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     5.0,
+     11.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 2.26,
+     "shape_db": 1.04
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "siren-pass-2.npz",
+    "source": "bigsoundbank/2030.wav@4.000-10.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 2.6132,
+    "dur_s": 6.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.05,
+     "centroid": 1576,
+     "end_db": -113.9,
+     "tail_ms": 289.4,
+     "start_db": -178.4,
+     "rise_ms": 32.31,
+     "peak": -3.1
+    },
+    "measured": {
+     "hard_db": 7.83,
+     "ring_x": 1.181
+    },
+    "bytes": 24559,
+    "credit": {
+     "title": "2 Tons Siren, Passage",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/2-tons-siren-passage-s2030.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.0,
+     10.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 2.49,
+     "shape_db": 1.1
+    },
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "bicycle_bell/ring",
+  "says": [
+   "a bicycle bell rung with the thumb, a bright metal ring",
+   "a bike bell ringing"
+  ],
+  "uses": [
+   "bicycle bell",
+   "bike bell",
+   "bicycle",
+   "bike",
+   "ring ring"
+  ],
+  "tags": [
+   "bell",
+   "bicycle",
+   "metal"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.18,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "bicycle-bell-ring-3.npz",
+    "source": "bigsoundbank/0974.wav@4.220-8.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2707,
+    "dur_s": 4.18,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 8.48,
+     "centroid": 4889,
+     "end_db": -115.7,
+     "tail_ms": 3693.5,
+     "start_db": -139.4,
+     "rise_ms": 1.5,
+     "peak": -1.5
+    },
+    "measured": {
+     "hard_db": 7.01,
+     "ring_x": 1.471
+    },
+    "bytes": 8732,
+    "credit": {
+     "title": "Bicycle Bell #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/bicycle-bell-3-s0974.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.22,
+     8.4
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 1.42,
+     "shape_db": 0.53
+    }
+   },
+   {
+    "file": "bicycle-bell-ring-2.npz",
+    "source": "bigsoundbank/0974.wav@0.000-4.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.234,
+    "dur_s": 4.2,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 9.34,
+     "centroid": 5133,
+     "end_db": -103.3,
+     "tail_ms": 3818.2,
+     "start_db": -151.1,
+     "rise_ms": 1.15,
+     "peak": -1.1
+    },
+    "measured": {
+     "hard_db": 10.72,
+     "ring_x": 1.094
+    },
+    "bytes": 7917,
+    "credit": {
+     "title": "Bicycle Bell #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/bicycle-bell-3-s0974.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.2
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 0.88,
+     "shape_db": 0.31
+    }
+   },
+   {
+    "file": "bicycle-bell-ring-1.npz",
+    "source": "bigsoundbank/1102.wav@0.000-3.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.164,
+    "dur_s": 3.3,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.56,
+     "centroid": 6731,
+     "end_db": -127.4,
+     "tail_ms": 2350.8,
+     "start_db": -124.3,
+     "rise_ms": 217.77,
+     "peak": -4.3
+    },
+    "measured": {
+     "hard_db": 9.12,
+     "ring_x": 1.61
+    },
+    "bytes": 16759,
+    "credit": {
+     "title": "Bell Bike #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/bell-bike-5-s1102.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.3
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 1.69,
+     "shape_db": 0.46
+    }
+   }
+  ],
+  "walk": [
+   2,
+   1,
+   0
+  ]
+ },
+ {
+  "id": "train/pass",
+  "says": [
+   "a train passing close by, wheels clattering over the rails",
+   "a passenger train rushing past"
+  ],
+  "uses": [
+   "train",
+   "railway",
+   "passing train"
+  ],
+  "tags": [
+   "train",
+   "rail",
+   "vehicle"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 5.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "train-pass-2.npz",
+    "source": "bigsoundbank/0900.wav@4.000-9.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 2.472,
+    "dur_s": 5.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.5,
+     "centroid": 921,
+     "end_db": -102.1,
+     "tail_ms": 181.5,
+     "start_db": -188.0,
+     "rise_ms": 0.79,
+     "peak": -2.0
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.487
+    },
+    "bytes": 28077,
+    "credit": {
+     "title": "Passage of a train #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/train-passes-s0900.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.0,
+     9.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.4,
+     "shape_db": 1.04
+    }
+   },
+   {
+    "file": "train-pass-1.npz",
+    "source": "bigsoundbank/3416.wav@7.500-12.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.2803,
+    "dur_s": 5.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.75,
+     "centroid": 1300,
+     "end_db": -105.7,
+     "tail_ms": 198.7,
+     "start_db": -205.5,
+     "rise_ms": 4.19,
+     "peak": -1.0
+    },
+    "measured": {
+     "hard_db": 4.32,
+     "ring_x": 1.119
+    },
+    "bytes": 31291,
+    "credit": {
+     "title": "Passage of a train #6",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/passage-of-a-train-6-s3416.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     7.5,
+     12.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.22,
+     "shape_db": 1.29
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "train/horn",
+  "says": [
+   "a train horn blowing, a loud deep blare",
+   "a locomotive horn"
+  ],
+  "uses": [
+   "train horn",
+   "locomotive"
+  ],
+  "tags": [
+   "train",
+   "horn",
+   "vehicle",
+   "loud"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "train-horn-2.npz",
+    "source": "bigsoundbank/2847.wav@0.000-3.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.26,
+    "dur_s": 3.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.52,
+     "centroid": 975,
+     "end_db": -140.1,
+     "tail_ms": 1513.2,
+     "start_db": -190.6,
+     "rise_ms": 7.1,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.865
+    },
+    "bytes": 21940,
+    "credit": {
+     "title": "Train Horn #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/train-horn-3-s2847.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.5
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.16,
+     "shape_db": 0.63
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "train-horn-1.npz",
+    "source": "bigsoundbank/2846.wav@0.000-3.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.128,
+    "dur_s": 3.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.32,
+     "centroid": 1013,
+     "end_db": -142.0,
+     "tail_ms": 1300.2,
+     "start_db": -186.9,
+     "rise_ms": 0.69,
+     "peak": -0.6
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.938
+    },
+    "bytes": 23512,
+    "credit": {
+     "title": "Train Horn #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/train-horn-2-s2846.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.5
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.31,
+     "shape_db": 0.68
+    },
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "train-horn-3.npz",
+    "source": "bigsoundbank/0277.wav@0.000-1.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.089,
+    "dur_s": 1.754,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.33,
+     "centroid": 1072,
+     "end_db": -116.4,
+     "tail_ms": 107.2,
+     "start_db": -126.8,
+     "rise_ms": 1.48,
+     "peak": -3.1
+    },
+    "measured": {
+     "hard_db": 5.1,
+     "ring_x": 1.153
+    },
+    "bytes": 40734,
+    "credit": {
+     "title": "Train horn #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/train-horn-s0277.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.754
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.06,
+     "shape_db": 0.87
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0,
+   2
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "helicopter/rotor",
+  "says": [
+   "a helicopter hovering, the rotor chopping the air",
+   "helicopter blades thudding overhead"
+  ],
+  "uses": [
+   "helicopter",
+   "chopper",
+   "rotor"
+  ],
+  "tags": [
+   "helicopter",
+   "aircraft",
+   "vehicle"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "helicopter-rotor-1.npz",
+    "source": "bigsoundbank/0264.wav@0.000-4.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 3.0962,
+    "dur_s": 4.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.16,
+     "centroid": 528,
+     "end_db": -106.3,
+     "tail_ms": 163.2,
+     "start_db": -170.5,
+     "rise_ms": 23.54,
+     "peak": -1.1
+    },
+    "measured": {
+     "hard_db": 4.34,
+     "ring_x": 1.245
+    },
+    "bytes": 31942,
+    "credit": {
+     "title": "Helicopter #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/helicopter-2-s0264.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.12,
+     "shape_db": 1.22
+    }
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "doorbell/ring",
+  "says": [
+   "a doorbell ringing, ding dong",
+   "a house door chime"
+  ],
+  "uses": [
+   "doorbell",
+   "door bell",
+   "ding dong"
+  ],
+  "tags": [
+   "bell",
+   "door",
+   "house"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.674,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "doorbell-ring-3.npz",
+    "source": "bigsoundbank/2365.wav@0.000-4.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0293,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.35,
+     "centroid": 747,
+     "end_db": -124.0,
+     "tail_ms": 1261.0,
+     "start_db": -110.5,
+     "rise_ms": 1.85,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 9.53,
+     "ring_x": 1.912
+    },
+    "bytes": 14012,
+    "credit": {
+     "title": "Doorbell #6",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/doorbell-6-s2365.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 1.93,
+     "shape_db": 0.65
+    }
+   },
+   {
+    "file": "doorbell-ring-2.npz",
+    "source": "bigsoundbank/0160.wav@0.000-2.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.014,
+    "dur_s": 2.8,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.92,
+     "centroid": 1100,
+     "end_db": -110.7,
+     "tail_ms": 176.9,
+     "start_db": -148.2,
+     "rise_ms": 2.27,
+     "peak": 0.1
+    },
+    "measured": {
+     "hard_db": 6.76,
+     "ring_x": 1.676
+    },
+    "bytes": 15729,
+    "credit": {
+     "title": "Doorbell #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/doorbell-2-s0160.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.8
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.24,
+     "shape_db": 0.95
+    }
+   },
+   {
+    "file": "doorbell-ring-1.npz",
+    "source": "bigsoundbank/0161.wav@0.000-3.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0065,
+    "dur_s": 3.674,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.0,
+     "centroid": 1392,
+     "end_db": -122.0,
+     "tail_ms": 290.0,
+     "start_db": -114.7,
+     "rise_ms": 3.9,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 6.47,
+     "ring_x": 1.509
+    },
+    "bytes": 20684,
+    "credit": {
+     "title": "Doorbell #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/doorbell-3-s0161.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.674
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 1.86,
+     "shape_db": 0.77
+    }
+   },
+   {
+    "file": "doorbell-ring-4.npz",
+    "source": "bigsoundbank/2880.wav@0.000-4.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.105,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.49,
+     "centroid": 1487,
+     "end_db": -124.6,
+     "tail_ms": 627.5,
+     "start_db": -198.6,
+     "rise_ms": 5.94,
+     "peak": -1.6
+    },
+    "measured": {
+     "hard_db": 8.19,
+     "ring_x": 1.86
+    },
+    "bytes": 21961,
+    "credit": {
+     "title": "Doorbell #8",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/doorbell-8-s2880.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 1.27,
+     "shape_db": 0.47
+    }
+   },
+   {
+    "file": "doorbell-ring-5.npz",
+    "source": "bigsoundbank/3046.wav@0.000-2.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0525,
+    "dur_s": 2.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.66,
+     "centroid": 8323,
+     "end_db": -128.1,
+     "tail_ms": 914.9,
+     "start_db": -151.3,
+     "rise_ms": 362.71,
+     "peak": -1.3
+    },
+    "measured": {
+     "hard_db": 6.53,
+     "ring_x": 1.47
+    },
+    "bytes": 38748,
+    "credit": {
+     "title": "Mechanical Entrance Doorbell #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/mechanical-entrance-doorbell-3-s3046.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.6
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.7,
+     "shape_db": 0.72
+    }
+   }
+  ],
+  "walk": [
+   2,
+   1,
+   0,
+   3,
+   4
+  ]
+ },
+ {
+  "id": "phone/vibrate",
+  "says": [
+   "a phone vibrating on a table, a buzzing rattle",
+   "a mobile phone buzzing"
+  ],
+  "uses": [
+   "vibrate",
+   "vibration",
+   "phone buzz"
+  ],
+  "tags": [
+   "phone",
+   "buzz",
+   "device"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.6,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "phone-vibrate-2.npz",
+    "source": "freesound_c1/369839.mp3@2.150-3.750",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2973,
+    "dur_s": 1.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.33,
+     "centroid": 316,
+     "end_db": -94.3,
+     "tail_ms": 168.5,
+     "start_db": -155.4,
+     "rise_ms": 1.44,
+     "peak": -28.4
+    },
+    "measured": {
+     "hard_db": 2.12,
+     "ring_x": 1.161
+    },
+    "bytes": 40409,
+    "credit": {
+     "title": "Cell phone vibrate, on table hard surface.wav",
+     "author": "SpliceSound",
+     "page": "https://freesound.org/people/SpliceSound/sounds/369839/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.15,
+     3.75
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.18,
+     "shape_db": 0.73
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "phone-vibrate-1.npz",
+    "source": "freesound_c1/369839.mp3@0.150-1.750",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3038,
+    "dur_s": 1.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.59,
+     "centroid": 325,
+     "end_db": -93.9,
+     "tail_ms": 172.8,
+     "start_db": -122.2,
+     "rise_ms": 1.4,
+     "peak": -28.4
+    },
+    "measured": {
+     "hard_db": 1.31,
+     "ring_x": 1.228
+    },
+    "bytes": 40598,
+    "credit": {
+     "title": "Cell phone vibrate, on table hard surface.wav",
+     "author": "SpliceSound",
+     "page": "https://freesound.org/people/SpliceSound/sounds/369839/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.15,
+     1.75
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.54,
+     "shape_db": 0.93
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "phone-vibrate-3.npz",
+    "source": "freesound_c1/515295.mp3@0.000-1.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2908,
+    "dur_s": 1.063,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 8.37,
+     "centroid": 3722,
+     "end_db": -71.4,
+     "tail_ms": 30.9,
+     "start_db": -130.6,
+     "rise_ms": 109.6,
+     "peak": -11.5
+    },
+    "measured": {
+     "hard_db": 0.67,
+     "ring_x": 1.213
+    },
+    "bytes": 34929,
+    "credit": {
+     "title": "Phone vibration",
+     "author": "Breviceps",
+     "page": "https://freesound.org/people/Breviceps/sounds/515295/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.063
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.73,
+     "shape_db": 0.99
+    },
+    "lossy": true,
+    "polarity": -1,
+    "allows": [
+     "rising_glide"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   0,
+   2
+  ],
+  "allows": [
+   "ring",
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "phone/ring",
+  "says": [
+   "a telephone ringing, a warbling electronic ring",
+   "a desk phone ringing twice"
+  ],
+  "uses": [
+   "phone ringing",
+   "telephone",
+   "incoming call"
+  ],
+  "tags": [
+   "phone",
+   "ring",
+   "device"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.6,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "phone-ring-2.npz",
+    "source": "freesound_c1/275163.mp3@3.000-4.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0845,
+    "dur_s": 1.6,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.33,
+     "centroid": 2221,
+     "end_db": -113.7,
+     "tail_ms": 522.3,
+     "start_db": -147.8,
+     "rise_ms": 118.15,
+     "peak": -1.4
+    },
+    "measured": {
+     "hard_db": 7.02,
+     "ring_x": 1.0
+    },
+    "bytes": 22115,
+    "credit": {
+     "title": "Phone Old Landline Ringing",
+     "author": "robotjay",
+     "page": "https://freesound.org/people/robotjay/sounds/275163/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     3.0,
+     4.6
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.46,
+     "shape_db": 0.98
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "phone-ring-1.npz",
+    "source": "freesound_c1/275163.mp3@0.000-1.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1032,
+    "dur_s": 1.6,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.33,
+     "centroid": 2222,
+     "end_db": -109.6,
+     "tail_ms": 500.0,
+     "start_db": -148.6,
+     "rise_ms": 117.02,
+     "peak": -1.3
+    },
+    "measured": {
+     "hard_db": 7.22,
+     "ring_x": 1.0
+    },
+    "bytes": 22029,
+    "credit": {
+     "title": "Phone Old Landline Ringing",
+     "author": "robotjay",
+     "page": "https://freesound.org/people/robotjay/sounds/275163/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.6
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.4,
+     "shape_db": 0.94
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "can/open",
+  "says": [
+   "a soda can opened, a sharp crack and a fizz",
+   "a drink can tab pulled with a hiss"
+  ],
+  "uses": [
+   "soda can",
+   "soda",
+   "fizz",
+   "open can"
+  ],
+  "tags": [
+   "can",
+   "drink",
+   "fizz",
+   "metal"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.7,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "can-open-1.npz",
+    "source": "bigsoundbank/0116.wav@0.000-0.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0915,
+    "dur_s": 0.7,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.77,
+     "centroid": 5896,
+     "end_db": -96.4,
+     "tail_ms": 177.8,
+     "start_db": -162.2,
+     "rise_ms": 0.44,
+     "peak": 3.2
+    },
+    "measured": {
+     "hard_db": 8.73,
+     "ring_x": 1.146
+    },
+    "bytes": 15707,
+    "credit": {
+     "title": "Can of soda (opening)",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/can-of-soda-opening-s0116.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.7
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.88,
+     "shape_db": 1.13
+    }
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "drink/pour",
+  "says": [
+   "water poured into a mug, a filling gurgle",
+   "a drink poured into a glass"
+  ],
+  "uses": [
+   "pour",
+   "pouring"
+  ],
+  "tags": [
+   "water",
+   "drink",
+   "liquid"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.75,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "drink-pour-3.npz",
+    "source": "bigsoundbank/0117.wav@0.000-1.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4005,
+    "dur_s": 1.7,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.66,
+     "centroid": 1480,
+     "end_db": -80.8,
+     "tail_ms": 90.7,
+     "start_db": -116.0,
+     "rise_ms": 1.85,
+     "peak": -3.6
+    },
+    "measured": {
+     "hard_db": 1.67,
+     "ring_x": 1.017
+    },
+    "bytes": 42310,
+    "credit": {
+     "title": "Glass of Soda",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/glass-of-soda-s0117.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.7
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 4.0,
+     "shape_db": 1.51
+    }
+   },
+   {
+    "file": "drink-pour-2.npz",
+    "source": "bigsoundbank/3312.wav@0.000-4.750",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.007,
+    "dur_s": 4.75,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.12,
+     "centroid": 2040,
+     "end_db": -114.3,
+     "tail_ms": 502.0,
+     "start_db": -239.0,
+     "rise_ms": 0.52,
+     "peak": -1.0
+    },
+    "measured": {
+     "hard_db": 8.62,
+     "ring_x": 1.028
+    },
+    "bytes": 75850,
+    "credit": {
+     "title": "Hot Water in Mug #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/hot-water-in-mug-2-s3312.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.75
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 5.07,
+     "shape_db": 2.12
+    },
+    "allows": [
+     "clicks"
+    ]
+   },
+   {
+    "file": "drink-pour-1.npz",
+    "source": "bigsoundbank/1156.wav@0.200-5.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2562,
+    "dur_s": 4.8,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.83,
+     "centroid": 2241,
+     "end_db": -115.5,
+     "tail_ms": 203.5,
+     "start_db": -183.3,
+     "rise_ms": 1.42,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 10.09,
+     "ring_x": 1.058
+    },
+    "bytes": 74768,
+    "credit": {
+     "title": "Cold water in mug #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/cold-water-in-mug-s1156.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.2,
+     5.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 4.54,
+     "shape_db": 1.76
+    }
+   }
+  ],
+  "walk": [
+   2,
+   1,
+   0
+  ],
+  "allows": [
+   "clicks"
+  ]
+ },
+ {
+  "id": "pan/sizzle",
+  "says": [
+   "food sizzling in a hot frying pan",
+   "oil crackling and spitting in a pan"
+  ],
+  "uses": [
+   "sizzle",
+   "frying",
+   "fry"
+  ],
+  "tags": [
+   "kitchen",
+   "fry",
+   "hiss"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "pan-sizzle-1.npz",
+    "source": "bigsoundbank/0145.wav@0.000-4.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2357,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.06,
+     "centroid": 10759,
+     "end_db": -95.1,
+     "tail_ms": 132.2,
+     "start_db": -190.4,
+     "rise_ms": 663.33,
+     "peak": -3.3
+    },
+    "measured": {
+     "hard_db": 7.85,
+     "ring_x": 1.093
+    },
+    "bytes": 52202,
+    "credit": {
+     "title": "Frying pan #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/frying-pan-3-s0145.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.75,
+     "shape_db": 1.05
+    }
+   },
+   {
+    "file": "pan-sizzle-2.npz",
+    "source": "bigsoundbank/0143.wav@0.500-4.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2268,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.95,
+     "centroid": 10818,
+     "end_db": -100.3,
+     "tail_ms": 147.3,
+     "start_db": -194.4,
+     "rise_ms": 0.42,
+     "peak": -3.8
+    },
+    "measured": {
+     "hard_db": 10.5,
+     "ring_x": 1.159
+    },
+    "bytes": 49631,
+    "credit": {
+     "title": "Frying in the Pan #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/frying-in-the-pan-1-s0143.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.5,
+     4.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.06,
+     "shape_db": 1.42
+    },
+    "allows": [
+     "rising_glide"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "toilet/flush",
+  "says": [
+   "a toilet flushing",
+   "water rushing down a toilet bowl"
+  ],
+  "uses": [
+   "toilet",
+   "flush"
+  ],
+  "tags": [
+   "water",
+   "bathroom"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.881,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "toilet-flush-2.npz",
+    "source": "bigsoundbank/0838.wav@0.000-4.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3698,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.85,
+     "centroid": 2044,
+     "end_db": -124.2,
+     "tail_ms": 466.5,
+     "start_db": -238.3,
+     "rise_ms": 6.46,
+     "peak": -1.7
+    },
+    "measured": {
+     "hard_db": 4.77,
+     "ring_x": 1.021
+    },
+    "bytes": 50660,
+    "credit": {
+     "title": "Flush #4",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/flush-4-s0838.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.08,
+     "shape_db": 1.3
+    }
+   },
+   {
+    "file": "toilet-flush-1.npz",
+    "source": "bigsoundbank/2610.wav@0.000-3.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.5603,
+    "dur_s": 3.763,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.53,
+     "centroid": 2625,
+     "end_db": -123.0,
+     "tail_ms": 302.9,
+     "start_db": -208.4,
+     "rise_ms": 12.52,
+     "peak": -1.2
+    },
+    "measured": {
+     "hard_db": 5.35,
+     "ring_x": 1.0
+    },
+    "bytes": 53963,
+    "credit": {
+     "title": "Flush #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/flush-5-s2610.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.763
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.22,
+     "shape_db": 1.5
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "pencil/write",
+  "says": [
+   "a pencil writing on paper",
+   "graphite scratching across a sheet of paper"
+  ],
+  "uses": [
+   "writing on paper",
+   "pencil",
+   "signature",
+   "handwriting",
+   "scribble"
+  ],
+  "tags": [
+   "paper",
+   "desk",
+   "scratch"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.75,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "pencil-write-2.npz",
+    "source": "bigsoundbank/3233.wav@0.250-3.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3797,
+    "dur_s": 2.75,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 8.03,
+     "centroid": 1194,
+     "end_db": -97.6,
+     "tail_ms": 151.8,
+     "start_db": -184.8,
+     "rise_ms": 2.85,
+     "peak": -7.2
+    },
+    "measured": {
+     "hard_db": 2.69,
+     "ring_x": 1.112
+    },
+    "bytes": 43072,
+    "credit": {
+     "title": "Pencil #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/pencil-2-s3233.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.25,
+     3.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.32,
+     "shape_db": 1.05
+    },
+    "allows": [
+     "clicks"
+    ]
+   },
+   {
+    "file": "pencil-write-3.npz",
+    "source": "bigsoundbank/3237.wav@0.000-1.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2023,
+    "dur_s": 1.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 8.15,
+     "centroid": 2487,
+     "end_db": -82.3,
+     "tail_ms": 33.6,
+     "start_db": -197.8,
+     "rise_ms": 35.1,
+     "peak": -2.4
+    },
+    "measured": {
+     "hard_db": 3.43,
+     "ring_x": 0.888
+    },
+    "bytes": 32842,
+    "credit": {
+     "title": "Pencil, signature #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/pencil-signature-2-s3237.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.5
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.55,
+     "shape_db": 1.27
+    }
+   },
+   {
+    "file": "pencil-write-1.npz",
+    "source": "bigsoundbank/3236.wav@0.150-3.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1718,
+    "dur_s": 3.05,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 8.28,
+     "centroid": 3867,
+     "end_db": -89.1,
+     "tail_ms": 126.6,
+     "start_db": -115.4,
+     "rise_ms": 2.08,
+     "peak": -2.9
+    },
+    "measured": {
+     "hard_db": 2.65,
+     "ring_x": 1.07
+    },
+    "bytes": 59727,
+    "credit": {
+     "title": "Pencil, signature #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/pencil-signature-1-s3236.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.15,
+     3.2
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.57,
+     "shape_db": 1.23
+    }
+   }
+  ],
+  "walk": [
+   2,
+   0,
+   1
+  ],
+  "allows": [
+   "clicks"
+  ]
+ },
+ {
+  "id": "marker/whiteboard",
+  "says": [
+   "a marker writing on a whiteboard, a squeaky felt tip",
+   "a felt-tip pen drawn across a board"
+  ],
+  "uses": [
+   "marker",
+   "whiteboard",
+   "felt pen"
+  ],
+  "tags": [
+   "marker",
+   "board",
+   "squeak"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "marker-whiteboard-2.npz",
+    "source": "bigsoundbank/0807.wav@7.400-11.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 2.3308,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.83,
+     "centroid": 2781,
+     "end_db": -114.1,
+     "tail_ms": 433.7,
+     "start_db": -179.3,
+     "rise_ms": 7.06,
+     "peak": -11.9
+    },
+    "measured": {
+     "hard_db": 1.57,
+     "ring_x": 1.003
+    },
+    "bytes": 42904,
+    "credit": {
+     "title": "Whiteboard marker",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/whiteboard-marker-s0807.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     7.4,
+     11.4
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.37,
+     "shape_db": 0.89
+    }
+   },
+   {
+    "file": "marker-whiteboard-1.npz",
+    "source": "bigsoundbank/0807.wav@0.000-4.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2177,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.6,
+     "centroid": 4465,
+     "end_db": -111.4,
+     "tail_ms": 297.9,
+     "start_db": -115.7,
+     "rise_ms": 0.46,
+     "peak": -12.7
+    },
+    "measured": {
+     "hard_db": 3.65,
+     "ring_x": 1.197
+    },
+    "bytes": 54010,
+    "credit": {
+     "title": "Whiteboard marker",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/whiteboard-marker-s0807.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     4.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.72,
+     "shape_db": 1.43
+    },
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "tape/roll",
+  "says": [
+   "sticky tape pulled off a roll, a ripping screech",
+   "packing tape unrolled"
+  ],
+  "uses": [
+   "tape",
+   "sticky tape",
+   "duct tape",
+   "packing"
+  ],
+  "tags": [
+   "tape",
+   "peel",
+   "rip"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "tape-roll-1.npz",
+    "source": "bigsoundbank/0298.wav@0.000-3.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0152,
+    "dur_s": 3.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.4,
+     "centroid": 5722,
+     "end_db": -90.4,
+     "tail_ms": 200.7,
+     "start_db": -188.7,
+     "rise_ms": 0.88,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 10.48,
+     "ring_x": 1.043
+    },
+    "bytes": 57778,
+    "credit": {
+     "title": "Adhesive tape #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/adhesive-tape-2-s0298.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.91,
+     "shape_db": 1.05
+    }
+   },
+   {
+    "file": "tape-roll-2.npz",
+    "source": "bigsoundbank/0299.wav@0.000-2.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0755,
+    "dur_s": 2.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.41,
+     "centroid": 7284,
+     "end_db": -93.4,
+     "tail_ms": 120.2,
+     "start_db": -139.3,
+     "rise_ms": 26.73,
+     "peak": -0.8
+    },
+    "measured": {
+     "hard_db": 10.61,
+     "ring_x": 1.362
+    },
+    "bytes": 47195,
+    "credit": {
+     "title": "Adhesive tape #3",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/adhesive-tape-3-s0299.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.7,
+     "shape_db": 0.81
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "hammer/nail",
+  "says": [
+   "a hammer driving a nail into wood, a few hard knocks",
+   "hammering a nail into a board"
+  ],
+  "uses": [
+   "hammer",
+   "hammering",
+   "nail"
+  ],
+  "tags": [
+   "hammer",
+   "tool",
+   "wood",
+   "metal"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.2,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "hammer-nail-1.npz",
+    "source": "bigsoundbank/0005.wav@2.200-4.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.086,
+    "dur_s": 2.2,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.23,
+     "centroid": 2238,
+     "end_db": -111.4,
+     "tail_ms": 395.5,
+     "start_db": -159.0,
+     "rise_ms": 0.4,
+     "peak": -1.1
+    },
+    "measured": {
+     "hard_db": 7.85,
+     "ring_x": 1.017
+    },
+    "bytes": 20522,
+    "credit": {
+     "title": "Nail and Hammer #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/nail-and-hammer-1-s0005.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.2,
+     4.4
+    ],
+    "events": 4,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.93,
+     "shape_db": 1.13
+    },
+    "pace": 1.77
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "saw/wood",
+  "says": [
+   "a hand saw cutting through wood",
+   "a saw rasping back and forth"
+  ],
+  "uses": [
+   "saw",
+   "sawing",
+   "cutting wood"
+  ],
+  "tags": [
+   "saw",
+   "tool",
+   "wood"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.35,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "saw-wood-1.npz",
+    "source": "bigsoundbank/0559.wav@0.050-2.750",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.8175,
+    "dur_s": 2.7,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.25,
+     "centroid": 1675,
+     "end_db": -56.1,
+     "tail_ms": 10.9,
+     "start_db": -233.7,
+     "rise_ms": 20.65,
+     "peak": -6.3
+    },
+    "measured": {
+     "hard_db": 5.73,
+     "ring_x": 1.007
+    },
+    "bytes": 55766,
+    "credit": {
+     "title": "Saw Wood",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/saw-wood-s0559.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.05,
+     2.75
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.58,
+     "shape_db": 1.11
+    }
+   },
+   {
+    "file": "saw-wood-2.npz",
+    "source": "bigsoundbank/0559.wav@4.200-6.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0537,
+    "dur_s": 2.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.98,
+     "centroid": 1790,
+     "end_db": -120.7,
+     "tail_ms": 234.3,
+     "start_db": -106.7,
+     "rise_ms": 20.92,
+     "peak": -3.3
+    },
+    "measured": {
+     "hard_db": 3.1,
+     "ring_x": 1.06
+    },
+    "bytes": 45617,
+    "credit": {
+     "title": "Saw Wood",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/saw-wood-s0559.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.2,
+     6.2
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.51,
+     "shape_db": 1.13
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "drill/electric",
+  "says": [
+   "an electric drill whirring",
+   "a power drill spinning up and drilling"
+  ],
+  "uses": [
+   "drill",
+   "drilling",
+   "power tool"
+  ],
+  "tags": [
+   "drill",
+   "tool",
+   "motor"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.925,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "drill-electric-1.npz",
+    "source": "bigsoundbank/0184.wav@0.150-4.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1918,
+    "dur_s": 3.85,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.53,
+     "centroid": 3435,
+     "end_db": -86.8,
+     "tail_ms": 86.8,
+     "start_db": -135.7,
+     "rise_ms": 25.48,
+     "peak": -1.2
+    },
+    "measured": {
+     "hard_db": 8.23,
+     "ring_x": 1.145
+    },
+    "bytes": 50383,
+    "credit": {
+     "title": "Drill",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/drill-s0184.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.15,
+     4.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.69,
+     "shape_db": 1.07
+    }
+   },
+   {
+    "file": "drill-electric-2.npz",
+    "source": "bigsoundbank/0791.wav@5.400-9.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2903,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.18,
+     "centroid": 3740,
+     "end_db": -83.1,
+     "tail_ms": 77.9,
+     "start_db": -196.6,
+     "rise_ms": 144.58,
+     "peak": -11.4
+    },
+    "measured": {
+     "hard_db": 5.38,
+     "ring_x": 1.024
+    },
+    "bytes": 47154,
+    "credit": {
+     "title": "Drill",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/drill-s0791.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     5.4,
+     9.4
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.87,
+     "shape_db": 1.11
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "whistle/referee",
+  "says": [
+   "a referee whistle blown, a short shrill blast",
+   "a sports whistle"
+  ],
+  "uses": [
+   "whistle",
+   "referee"
+  ],
+  "tags": [
+   "whistle",
+   "sport",
+   "high"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "whistle-referee-1.npz",
+    "source": "freesound_c1/538422.mp3@0.000-0.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.128,
+    "dur_s": 0.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.18,
+     "centroid": 2745,
+     "end_db": -96.3,
+     "tail_ms": 112.3,
+     "start_db": -130.9,
+     "rise_ms": 59.38,
+     "peak": -5.6
+    },
+    "measured": {
+     "hard_db": 8.43,
+     "ring_x": 1.003
+    },
+    "bytes": 15366,
+    "credit": {
+     "title": "Referee whistle sound.wav",
+     "author": "Rosa-Orenes256",
+     "page": "https://freesound.org/people/Rosa-Orenes256/sounds/538422/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.5
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.92,
+     "shape_db": 1.45
+    },
+    "lossy": true,
+    "allows": [
+     "rising_glide"
+    ]
+   }
+  ],
+  "walk": [
+   0
+  ],
+  "allows": [
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "vacuum/cleaner",
+  "says": [
+   "a vacuum cleaner switched on and running",
+   "a household vacuum whining and roaring"
+  ],
+  "uses": [
+   "vacuum",
+   "vacuum cleaner",
+   "hoover"
+  ],
+  "tags": [
+   "vacuum",
+   "motor",
+   "house"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.25,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "vacuum-cleaner-2.npz",
+    "source": "freesound_c1/182007.mp3@0.300-4.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3987,
+    "dur_s": 4.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.74,
+     "centroid": 4991,
+     "end_db": -87.9,
+     "tail_ms": 82.3,
+     "start_db": -119.6,
+     "rise_ms": 1225.48,
+     "peak": -5.3
+    },
+    "measured": {
+     "hard_db": 3.45,
+     "ring_x": 1.896
+    },
+    "bytes": 25239,
+    "credit": {
+     "title": "Vacuum cleaner Bomann 1600 Watt",
+     "author": "ohrpilot",
+     "page": "https://freesound.org/people/ohrpilot/sounds/182007/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.3,
+     4.3
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.69,
+     "shape_db": 1.32
+    },
+    "lossy": true
+   },
+   {
+    "file": "vacuum-cleaner-1.npz",
+    "source": "freesound_c1/542149.mp3@1.000-5.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4642,
+    "dur_s": 4.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.44,
+     "centroid": 5673,
+     "end_db": -107.8,
+     "tail_ms": 248.9,
+     "start_db": -125.5,
+     "rise_ms": 1752.88,
+     "peak": -5.8
+    },
+    "measured": {
+     "hard_db": 4.16,
+     "ring_x": 1.156
+    },
+    "bytes": 42215,
+    "credit": {
+     "title": "Vacuum Cleaner",
+     "author": "AO-SoundPawz",
+     "page": "https://freesound.org/people/AO-SoundPawz/sounds/542149/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.0,
+     5.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.92,
+     "shape_db": 1.24
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "gunshot/rifle",
+  "says": [
+   "a rifle shot outdoors with its echo",
+   "a loud gunshot cracking and rolling away"
+  ],
+  "uses": [
+   "gunshot",
+   "gun",
+   "rifle",
+   "firearm"
+  ],
+  "tags": [
+   "gun",
+   "shot",
+   "loud"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "boom",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.461,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "gunshot-rifle-1.npz",
+    "source": "bigsoundbank/0397.wav@0.700-3.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3023,
+    "dur_s": 2.461,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 6.94,
+     "centroid": 1725,
+     "end_db": -137.3,
+     "tail_ms": 1493.8,
+     "start_db": -239.1,
+     "rise_ms": 20.1,
+     "peak": -0.9
+    },
+    "measured": {
+     "hard_db": 7.03,
+     "ring_x": 1.428
+    },
+    "bytes": 19575,
+    "credit": {
+     "title": "Shot of Winchester Magnum XTR",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/shot-of-winchester-magnum-xtr-s0397.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.7,
+     3.161
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.53,
+     "shape_db": 1.55
+    },
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   0
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "car_engine/start",
+  "says": [
+   "a car engine starting, the starter cranking then idling",
+   "an engine turning over and running"
+  ],
+  "uses": [
+   "engine",
+   "engine start",
+   "engine starting",
+   "ignition"
+  ],
+  "tags": [
+   "car",
+   "engine",
+   "vehicle"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": false,
+  "dur_s": 3.6,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "car-engine-start-1.npz",
+    "source": "bigsoundbank/0967.wav@0.000-3.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.197,
+    "dur_s": 3.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.82,
+     "centroid": 423,
+     "end_db": -96.8,
+     "tail_ms": 113.0,
+     "start_db": -237.9,
+     "rise_ms": 3.17,
+     "peak": -2.1
+    },
+    "measured": {
+     "hard_db": 6.98,
+     "ring_x": 1.121
+    },
+    "bytes": 63235,
+    "credit": {
+     "title": "Big diesel engine",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/big-diesel-engine-s0967.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.6
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.67,
+     "shape_db": 1.1
+    }
+   },
+   {
+    "file": "car-engine-start-2.npz",
+    "source": "bigsoundbank/0189.wav@0.000-3.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0628,
+    "dur_s": 3.6,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.9,
+     "centroid": 437,
+     "end_db": -108.8,
+     "tail_ms": 220.7,
+     "start_db": -183.0,
+     "rise_ms": 20.0,
+     "peak": -0.2
+    },
+    "measured": {
+     "hard_db": 6.93,
+     "ring_x": 1.827
+    },
+    "bytes": 40305,
+    "credit": {
+     "title": "Car, Starting and Departure",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/car-starting-and-departure-s0189.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     3.6
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.86,
+     "shape_db": 1.18
+    }
+   },
+   {
+    "file": "car-engine-start-3.npz",
+    "source": "bigsoundbank/0966.wav@2.300-6.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3125,
+    "dur_s": 3.7,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.85,
+     "centroid": 1814,
+     "end_db": -109.3,
+     "tail_ms": 264.2,
+     "start_db": -181.2,
+     "rise_ms": 18.35,
+     "peak": -0.3
+    },
+    "measured": {
+     "hard_db": 7.15,
+     "ring_x": 1.057
+    },
+    "bytes": 62754,
+    "credit": {
+     "title": "Small gasoline engine",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/small-gasoline-engine-s0966.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.3,
+     6.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.6,
+     "shape_db": 1.12
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2
+  ]
+ },
+ {
+  "id": "chirp/robin",
+  "says": [
+   "a robin chirping and twittering",
+   "a short bright song phrase of a small garden robin"
+  ],
+  "uses": [
+   "chirp",
+   "tweet"
+  ],
+  "tags": [
+   "robin",
+   "animal",
+   "high"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.136,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "chirp-robin-1.npz",
+    "source": "bigsoundbank/1671.wav@0.110-2.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4515,
+    "dur_s": 2.09,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.61,
+     "centroid": 4767,
+     "end_db": -124.5,
+     "tail_ms": 270.9,
+     "start_db": -143.9,
+     "rise_ms": 30.88,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 10.93,
+     "ring_x": 1.068
+    },
+    "bytes": 25050,
+    "credit": {
+     "title": "Robin #5",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/robin-5-s1671.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.11,
+     2.2
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.8,
+     "shape_db": 1.84
+    }
+   },
+   {
+    "file": "chirp-robin-3.npz",
+    "source": "bigsoundbank/1673.wav@0.220-2.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3292,
+    "dur_s": 2.38,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.21,
+     "centroid": 6175,
+     "end_db": -123.1,
+     "tail_ms": 417.6,
+     "start_db": -140.3,
+     "rise_ms": 22.4,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 9.15,
+     "ring_x": 1.032
+    },
+    "bytes": 27136,
+    "credit": {
+     "title": "Robin #7",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/robin-7-s1673.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.22,
+     2.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.69,
+     "shape_db": 1.72
+    },
+    "allows": [
+     "rising_glide"
+    ]
+   },
+   {
+    "file": "chirp-robin-2.npz",
+    "source": "bigsoundbank/1667.wav@0.140-2.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.386,
+    "dur_s": 2.136,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.24,
+     "centroid": 6279,
+     "end_db": -138.2,
+     "tail_ms": 171.2,
+     "start_db": -160.8,
+     "rise_ms": 20.73,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 9.99,
+     "ring_x": 1.166
+    },
+    "bytes": 23532,
+    "credit": {
+     "title": "Robin #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/robin-1-s1667.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.14,
+     2.276
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.86,
+     "shape_db": 1.94
+    }
+   }
+  ],
+  "walk": [
+   0,
+   2,
+   1
+  ],
+  "allows": [
+   "rising_glide"
+  ]
+ },
+ {
+  "id": "clash/sword",
+  "says": [
+   "two swords clashing, a ringing metal clang",
+   "blades striking each other"
+  ],
+  "uses": [
+   "sword clash",
+   "sword fight"
+  ],
+  "tags": [
+   "sword",
+   "metal",
+   "blade"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "clash-sword-1.npz",
+    "source": "freesound_c1/334169.mp3@0.000-0.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0678,
+    "dur_s": 0.5,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 9.19,
+     "centroid": 5931,
+     "end_db": -93.2,
+     "tail_ms": 64.2,
+     "start_db": -151.5,
+     "rise_ms": 4.58,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 5.97,
+     "ring_x": 1.822
+    },
+    "bytes": 10404,
+    "credit": {
+     "title": "Sword Clash",
+     "author": "loudernoises",
+     "page": "https://freesound.org/people/loudernoises/sounds/334169/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.5
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.64,
+     "shape_db": 0.96
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0
+  ]
  }
 ]
