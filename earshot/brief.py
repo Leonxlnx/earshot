@@ -780,6 +780,12 @@ def read(text):
         b['concepts'] = status[:1] + [c for c in b['concepts'] if c != status[0]]
     b['axes'] = {a: round(max(-1.0, min(1.0, v)), 2) for a, v in b['axes'].items() if abs(v) >= 0.05}
     b['dir'] = (b['dir'] > 0) - (b['dir'] < 0)
+    # in a film or video "the drop" is the edit: everything cut for a moment, then a hit (lexicon.MOTION_DROP); a
+    # falling sound only when the words say what falls (a sub drop, a bass drop, a downlifter)
+    if (b['domain'] == 'motion' and set(tokens(text)) & L.MOTION_DROP and b['dir'] < 0
+            and not set(b['concepts']) & {'sub_drop', 'downlifter', 'riser'}):
+        b['concepts'] = b['concepts'] + ['hit']
+        b['dir'] = 0
     b['context_words'] = sorted(ctx_words)
     b['phrases'] = _phrases(toks, b['written'])
     return b

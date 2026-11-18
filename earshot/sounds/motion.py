@@ -9,12 +9,12 @@ bright: a low thump of about 50 ms when something appears, a bright click of 20-
 0.1 s swell into it under a title (half its energy under 100 Hz), a low hit of 0.2-0.3 s at the logo, whooshes of
 plain noise that are gone within tens of ms after their peak. They use no instrument note, bell or synthesised tone
 as an effect. The film sounds are built from real recordings in the public domain, as a sound designer builds them:
-learned things of earshot.sounds.learned and the close-miked strokes of earshot.sounds.drums (kicks, toms, snares,
-congas, orchestral bass drums, timpani, tam-tams, heavy drops, swells of air, breaths and flames, drum rolls, low
-brass, whooshes, clicks) reshaped with earshot.synth.design (reverse, layer, stretch, contour, opening, halt, fade)
-and glued by one room ("real material" below); a take of a recording is heard as real where invented booms, slams
-and risers were heard as unrealistic. The rest is invented, shaped after class statistics of licensed film effects
-(the film study in
+learned things of earshot.sounds.learned and the close-miked strokes of earshot.sounds.drums (car doors and car boots
+slammed shut, explosions, orchestral bass drums, timpani, tam-tams, swells of air, breaths and flames, drum rolls,
+low brass, whooshes, clicks, soft kicks and congas for the smallest thumps) reshaped with earshot.synth.design
+(reverse, layer, stretch, contour, opening, halt, fade) and glued by one room ("real material" below); a take of a
+recording is heard as real where invented booms, slams and risers were heard as unrealistic. The rest is invented,
+shaped after class statistics of licensed film effects (the film study in
 docs/motion-sfx-study.md and docs/launch-video-sound.md, and a library of effects filed by film action that was
 measured). Medians over a class, never one recording:
     air     a film whoosh is a rounded swell, not a pointed one: it stays within 20 dB of its peak for about two
@@ -381,6 +381,7 @@ def _grit(r, a, f, rate, length=0.0015, spread=0.5, cluster=0.0, sharp=0.6):
 REAL = ('energy', 'size', 'bright', 'hard', 'ring', 'space', 'width')
 REAL_AIR = ('energy', 'size', 'bright', 'hard', 'space', 'width')
 REAL_MOVE = REAL_AIR + ('motion',)
+REAL_SOFT = ('energy', 'size', 'bright', 'ring', 'space', 'width')    # a low body whose strike hard does not move
 # the pitch detector reads the noise of a real whoosh or swell as gliding up (a swing speeds up, a swell opens):
 # that is the recording, not a synthesized whip
 GLIDE = ('rising_glide',)
@@ -414,13 +415,14 @@ def _natural(sid, c, k=0):
     return float(e['members'][L.pick(sid, c.seed + k)]['dur_s'])
 
 
-def _tr(c, size=1.0, ring=None, bright=0.0, hard=0.0):
+def _tr(c, size=1.0, ring=None, bright=0.0, hard=0.0, strike=True):
     """the shared axes as the transforms of a take (design.take), around a design's own size, ring, tilt (dB per
     octave) and hardness: size 0.8 .. 1.25 times, ring 0.6 .. 1.7 times (when the design rings), bright 2 dB per
-    octave and energy 0.6 more, hard and 0.4 of energy on the strike; a little take-to-take variation (vary)"""
+    octave and energy 0.6 more, hard and 0.4 of energy on the strike (strike=False: energy only, for a design whose
+    strike the hard axis does not move audibly, which then does not list it); a little take-to-take variation"""
     e = c.energy
     out = dict(size=size * c.lerp('size', 0.8, 1.25, 1.0, log=True), bright=2.0 * c.bright + 0.6 * e + bright,
-               hard=float(np.clip(c.hard + 0.4 * e + hard, -1.0, 1.0)), vary=0.5 * c.vary)
+               hard=float(np.clip((c.hard if strike else 0.0) + 0.4 * e + hard, -1.0, 1.0)), vary=0.5 * c.vary)
     if ring is not None:
         out['ring'] = ring * c.lerp('ring', 0.6, 1.7, 1.0, log=True)
     return out
@@ -508,8 +510,9 @@ def whoosh_soft(c, r):
 # real whooshes whose spectrum is a broad band of air (15 strongest bins under 0.65 of the 300 Hz-12 kHz energy,
 # where a swung stick or a rope whistles at 0.85-0.99), with a build of 0.2-0.3 s before their loudest moment
 AIR_PASS = (('lrn', 'whoosh/heavy', 0), ('lrn', 'whoosh/low', 0), ('lrn', 'fire/whoosh', 1))
-# short ones, for a swish: whips of air and a club swung, bright
-AIR_FLICK = (('lrn', 'whoosh/airy', 0), ('lrn', 'whip/swish', 0), ('lrn', 'whoosh/airy', 2), ('lrn', 'golf/swing', 0))
+# short ones, for a swish: whips of air and sticks swung (the family of the swung stick), bright
+AIR_FLICK = (('lrn', 'whoosh/airy', 0), ('lrn', 'whip/swish', 0), ('lrn', 'whoosh/stick', 2),
+             ('lrn', 'whoosh/airy', 2), ('lrn', 'swish/fast', 0))
 
 
 def _air_pass(c, r, pool, T, before, low, size=0.95, shape='db', bright=0.0):
@@ -589,10 +592,10 @@ def swoosh_out(c, r):
         uses=('swish', 'flick', 'text move', 'small move', 'quick swish', 'soft swish'), tags=('real',), domains=DOM,
         dur=0.22, axes=REAL_AIR, prior=1.06, allows=GLIDE)
 def flick_thin(c, r):
-    """the smallest move, a swish: a short real whip of air (AIR_FLICK: a whip, a club swung, by the seed) with
-    nothing under 2 kHz, 2 dB per octave brighter, 15 % of its length before its loudest moment and the rest
+    """the smallest move, a swish: a short real whip of air (AIR_FLICK: a whip, a stick swung, by the seed) with
+    nothing under 1.5 kHz, 1.5 dB per octave brighter, 35 % of its length before its loudest moment and the rest
     falling away; mono, dry"""
-    return _dry(_air_pass(c, r, AIR_FLICK, c.seconds(), 0.15, 2000.0, size=0.85, shape='power', bright=2.0), c, r, 0.1)
+    return _dry(_air_pass(c, r, AIR_FLICK, c.seconds(), 0.35, 1500.0, size=0.9, shape='power', bright=1.5), c, r, 0.1)
 
 
 @design('flick/paper', kind='whoosh',
@@ -681,82 +684,85 @@ def _small(y, drive=6.0, top=190.0):
     return dsp.butter(fx.saturate(y, drive, 'tanh', level='peak'), 'low', top, order=2)
 
 
-# Motion films put short, dry, low hits under their titles and logos: about a quarter to a third of a second, most
-# of the energy under 200 Hz, a swell of a tenth of a second into the hit and an end that is quick, close to mono
-# (class figures of designed motion-video effects). They are built from close-miked drum strokes, which are dry:
-# a deep kick for the weight, a floor tom for the body, a snare far under them for the mid that carries the hit on
-# small speakers, and a real low whoosh's build for the swell.
+# Motion films put short, dry hits under their titles and logos: about a quarter to a third of a second, a swell of
+# a tenth of a second into the hit and a quick end, close to mono, centred at 250-600 Hz with half of the energy
+# under 100 Hz (class figures of designed motion-video effects); the part above 300 Hz of a title hit is a burst of
+# noise about as long as the hit, that of a logo hit almost nothing. They are built from heavy things closed hard
+# and recorded close, which are not drums: a car door slammed shut (a solid body at 100-400 Hz under its latch), a
+# car boot (a hollow lid, brighter), and a real low whoosh's build for the swell. No skin, no note.
 AIR_IN = (('lrn', 'whoosh/heavy', 0), ('lrn', 'whoosh/low', 2), ('lrn', 'whoosh/low', 0))   # builds of low air
 
 
-def _swell(c, r, seconds, k=0):
+def _swell(c, r, seconds, k=0, strike=True):
     """the swell into a hit: the last `seconds` s of the build of a real low whoosh (design.rise: up to its loudest
     moment), faded in along a straight line, so it is within 20 dB of its end for nine tenths of its length"""
-    y = ops.rise(_pool(c, r, AIR_IN, k=k, **_tr(c)))
+    y = ops.rise(_pool(c, r, AIR_IN, k=k, **_tr(c, strike=strike)))
     y = dsp.butter(ops.span(y, max(0.0, ops.end(y) - seconds)), 'high', 60.0, order=2)
     return _lv(ops.fade(y, seconds, 0.0, 'lin'))
 
 
-def _hit(c, r, parts, swell, gain, keep, shape='power'):
-    """a short hit of close drum strokes: parts are (thing in the drum store, gain dB, size, ring) lined up at
-    their strikes (the first is the take meta names) with the click of a real rim stroke far under them (the
-    beater: 26 dB down, 10 dB more or less with hard), led in by a swell of air (`swell` s, `gain` dB, 4 dB less
-    a unit of hard, ending 8 ms before the strike); the hit is kept `keep` s after the strike (ring: 0.75 .. 1.4
-    times) and fades over
-    its last 70 % (shape: design.fade; a quarter sine keeps the body to the end, as a damped drum does)"""
+def _hit(c, r, parts, swell, gain, keep, low=None, shape='power', strike=True):
+    """a short hit of heavy things closed hard: parts are (learned thing, gain dB, size, ring, top Hz or None) lined
+    up at their strikes (the first is the take meta names; top: nothing over it, a latch or a rattle left out), led
+    in by a swell of air (`swell` s, `gain` dB, ending 8 ms before the strike); low: the weight under it at that
+    many dB, the low end of a real close explosion (explosion/near under 150 Hz: a rumble of noise, no skin and no
+    note). The hit is kept `keep` s after the strike (ring: 0.75 .. 1.4 times) and fades over its last 70 % (shape:
+    design.fade; a quarter sine keeps the body to the end); one channel, spread a little by the room's
+    decorrelation (_dry)"""
     rows = []
-    for k, (sid, g, size, ring) in enumerate(parts):
-        y = _lv(_kit(c, r, sid, k=k, main=k == 0, **_tr(c, size=size, ring=ring)))
-        rows.append((y, g, 0.0))
-    click = _lv(_kit(c, r, 'rim/click', k=len(parts), **_tr(c, ring=0.6)))
-    rows.append((dsp.butter(click, 'high', 800.0, order=2), -26.0 + 10.0 * c.hard, 0.0))   # the beater: hard
+    for k, (sid, g, size, ring, top) in enumerate(parts):
+        y = _real(c, r, sid, k=k, main=k == 0, **_tr(c, size=size, ring=ring, strike=strike))
+        rows.append((_lv(dsp.butter(y, 'low', top, order=4) if top else y), g, 0.0))
+    if low is not None:
+        blast = dsp.butter(_real(c, r, 'explosion/near', **_tr(c, size=1.2, ring=0.8, strike=strike)), 'low', 150.0,
+                           order=4)
+        rows.append((ops.span(_lv(blast), 0.0, 0.5, fout=0.3), low + 3.0 * c.size, 0.0))
     if swell:
-        sw = _swell(c, r, swell)
-        rows.append((sw, gain + 2.0 * c.energy - 4.0 * c.hard, -0.008, ops.end(sw)))   # ends 8 ms before the strike
+        sw = _swell(c, r, swell, strike=strike)
+        rows.append((sw, gain + 2.0 * c.energy, -0.008, ops.end(sw)))                 # ends 8 ms before the strike
     y, t0 = ops.layer(rows)
     keep *= c.lerp('ring', 0.75, 1.4, 1.0, log=True)
-    return ops.span(y, 0.0, t0 + keep, fout=0.7 * keep, shape=shape)
+    return ops.span(y, 0.0, t0 + keep, fout=0.7 * keep, shape=shape).mean(axis=1)
 
 
 @design('boom/deep', kind='boom',
-        says=('a deep low hit with a short swell into it', 'a short heavy low boom that stops',
-              'a dry deep thud with weight'),
+        says=('a deep heavy thud with a short swell into it', 'a short heavy low boom that stops',
+              'a dry deep slam with weight'),
         uses=('impact', 'boom', 'deep boom', 'cinematic boom', 'cinematic hit', 'low hit', 'reveal'), tags=('real',),
-        domains=('motion',), dur=0.45, axes=REAL, allows=('pre_swell', 'stacked', 'truncated'))   # a quick end
+        domains=('motion',), dur=0.45, axes=REAL_SOFT, allows=('pre_swell', 'stacked', 'truncated'))   # a quick end
 def boom_deep(c, r):
-    """a deep film hit, short as motion films use it: a real deep kick drum (kick/deep, close-miked) with a real
-    floor tom 3 dB under it and a real snare 12 dB under them, led in by 0.1 s of a real low whoosh's build, kept
-    0.22 s after the strike and fading over its last 70 %; close and near mono"""
-    y = _hit(c, r, (('kick/deep', 0.0, 1.1, 1.0), ('tom/floor', -3.0, 1.15, 0.8), ('snare/fat', -12.0, 1.2, 0.6)),
-             0.1, -5.0, 0.22)
+    """a deep film hit, short as motion films use it: a real car door slammed shut (car_door/slam) taken a quarter
+    bigger and without its latch (nothing over 1.2 kHz), with the low end of a real close explosion (explosion/near
+    under 150 Hz: a rumble, not a tone) 6 dB under it, led in by 0.1 s of a real low whoosh's build, kept 0.22 s
+    after the strike; close and near mono"""
+    y = _hit(c, r, (('car_door/slam', 0.0, 1.25, 1.0, 1200.0),), 0.1, -5.0, 0.22, low=0.0, strike=False)
     return _dry(y, c, r, 0.2)
 
 
 @design('boom/short', kind='boom',
-        says=('a short low hit with a quick end', 'a tight low punch under a logo', 'a short dull low thud'),
+        says=('a short heavy thud with a quick end', 'a tight low slam under a logo', 'a short dull solid hit'),
         uses=('impact', 'hit on a cut', 'cut', 'accent', 'boom', 'short boom', 'logo', 'logo hit', 'logo reveal',
-              'end card'), tags=('real',), domains=('motion',), dur=0.3, axes=REAL,
+              'end card'), tags=('real',), domains=('motion',), dur=0.3, axes=REAL_SOFT,
         allows=('pre_swell', 'stacked', 'truncated'))     # motion films end their hits within tens of ms
 def boom_short(c, r):
-    """the low hit under a logo: a real floor tom (tom/floor) on a real deep kick drum 2 dB under it and a muted
-    conga 10 dB under them for the body at 200-400 Hz, led in by 0.1 s of a real low whoosh's build, kept 0.18 s
-    after the strike: a quarter second, nine tenths of it under 200 Hz, close and near mono"""
-    y = _hit(c, r, (('tom/floor', 0.0, 1.0, 0.7), ('kick/deep', -2.0, 1.0, 0.7), ('conga/muted', -10.0, 1.1, 0.7)),
-             0.1, -5.0, 0.18)
+    """the low hit under a logo: the body of a real car door slammed shut (car_door/slam, nothing over 900 Hz: no
+    latch), led in by 0.1 s of a real low whoosh's build, kept 0.18 s after the strike: a quarter second centred
+    near 250 Hz, almost nothing above 300 Hz, close and near mono"""
+    y = _hit(c, r, (('car_door/slam', 0.0, 1.1, 0.8, 1200.0),), 0.1, -6.0, 0.18, low=-7.0, strike=False)
     return _dry(y, c, r, 0.2)
 
 
 @design('hit/drop', kind='hit',
-        says=('a short punchy low hit', 'a dry drum hit landing hard', 'a tight thud with a little snap'),
+        says=('a short heavy slam', 'a solid thud landing hard', 'a heavy lid shut with a little snap'),
         uses=('drop', 'impact after silence', 'hit after a stop', 'stop', 'hit on a cut', 'impact'), tags=('real',),
-        domains=('motion',), dur=0.25, axes=REAL, allows=('stacked',))
+        domains=('motion',), dur=0.25, axes=REAL, prior=1.15, allows=('stacked', 'truncated'))
 def hit_drop(c, r):
-    """the hit that lands after everything stops: a real kick drum (kick/punch) with a real floor tom 4 dB under it
-    and a real fat snare 3 dB under them, struck together, kept 0.2 s; a fifth of a second, centred near 400 Hz,
-    two thirds under 200 Hz. The silence before it is the edit, not part of the sound"""
-    y = _hit(c, r, (('kick/punch', 0.0, 1.0, 0.7), ('tom/floor', -4.0, 1.0, 0.6), ('snare/fat', -3.0 + 3.0 * c.hard,
-                                                                                    1.0, 0.6)), 0.0, 0.0, 0.2)
-    return _dry(ops.fade(y, 0.012, 0.0, 'lin'), c, r, 0.2)
+    """the hit that lands after everything stops: a real car door slammed shut (car_door/slam) with a real car boot
+    slammed 4 dB under it (car_trunk/slam: the hollow lid that carries the mid), struck together, kept 0.2 s; a
+    fifth of a second centred near 400 Hz. The silence before it is the edit, not part of the sound"""
+    y = _hit(c, r, (('car_door/slam', 0.0, 1.0, 0.8, None), ('car_trunk/slam', -7.0, 1.0, 0.8, None)), 0.0, 0.0, 0.2,
+             low=-6.0)
+    return _dry(y, c, r, 0.2)
 
 
 @design('thump/appear', kind='thud',
@@ -812,12 +818,12 @@ def boom_wide(c, r):
               'cinematic hit', 'intro'), tags=('real',), domains=('motion', 'ui'), dur=0.45, axes=REAL,
         allows=('pre_swell', 'stacked'))
 def slam_title(c, r):
-    """a title landing: 0.15 s of a real low whoosh's build swells into a real deep kick drum (kick/deep) with a
-    real floor tom 5 dB under it and a real fat snare as loud as the kick (the mid that carries the hit on small
-    speakers; more with hard), kept 0.3 s after the strike and fading over its last 70 %: a third of a second,
-    about half of it under 100 Hz, close and near mono"""
-    y = _hit(c, r, (('kick/deep', 0.0, 1.0, 0.8), ('tom/floor', -5.0, 1.0, 0.7),
-                    ('snare/fat', 0.0 + 3.0 * c.hard, 0.95, 0.6)), 0.15, -3.0, 0.3)
+    """a title landing: 0.15 s of a real low whoosh's build swells into a real car door slammed shut (car_door/slam:
+    a solid body with half its energy under 100 Hz) and a real car boot slammed with it 2 dB under it (car_trunk/slam:
+    the hollow lid, the mid that carries the hit on small speakers), kept 0.3 s after the strike and fading over
+    its last 70 %: a third of a second, close and near mono"""
+    y = _hit(c, r, (('car_door/slam', 0.0, 1.0, 0.9, None), ('car_trunk/slam', -2.0, 1.0, 0.9, None)), 0.15, -3.0,
+             0.35, low=2.0)
     return _dry(y, c, r, 0.2)
 
 
@@ -830,16 +836,17 @@ def slam_title(c, r):
 def impact_suck(c, r):
     """the breath before a hit: real air drawn in (_build: a breath, a burst of flame or a deep whoosh played
     backwards, from 20 dB down, louder and brighter to its end, 45 % of the length) ends where the title hit lands,
-    made heavier: a real deep kick drum and floor tom a fifth bigger, a real fat snare 4 dB under them (more with
-    hard), kept 0.45 s, and the low end of a second deep kick under them for weight (_low, made audible on small
-    speakers); close and near mono"""
+    made heavier: a real car door slammed shut a fifth bigger, a real car boot slammed 3 dB under it, kept 0.45 s,
+    and the low end of a real close explosion under them for weight (explosion/near under 150 Hz: a rumble, not a
+    tone); close and near mono"""
     T = c.length() or 1.2
     pre = _build(c, r, 0.45 * T, hz=500.0, start=-20.0)
-    hit = _hit(c, r, (('kick/deep', 0.0, 1.2, 1.0), ('tom/floor', -3.0, 1.2, 0.9),
-                      ('snare/fat', -4.0 + 3.0 * c.hard, 1.05, 0.7)), 0.0, 0.0, 0.45)
-    low = ops.span(_lv(_small(_low(c, r, size=1.1, ring=1.0), 5.0)), 0.0, 0.6, fout=0.4, shape='db')
-    y, _ = ops.layer([(ops.fade(pre, 0.05, 0.0), -4.0 + 2.0 * c.energy, 0.0, ops.end(pre)), (_lv(hit), 0.0, 0.0),
-                      (low, -3.0 + 2.0 * c.energy, 0.0)])
+    hit = _hit(c, r, (('car_door/slam', 0.0, 1.2, 1.0, None), ('car_trunk/slam', -3.0, 1.15, 1.0, None)), 0.0, 0.0,
+               0.45)
+    low = dsp.butter(_real(c, r, 'explosion/near', **_tr(c, size=1.2, ring=0.9)), 'low', 150.0, order=4)
+    low = ops.span(_lv(low), 0.0, 0.6, fout=0.4, shape='db')
+    y, _ = ops.layer([(ops.fade(pre, 0.05, 0.0), -8.0 + 2.0 * c.energy, 0.0, ops.end(pre)), (_lv(hit), 0.0, 0.0),
+                      (low, 0.0 + 2.0 * c.energy, 0.0)])
     return _dry(y, c, r, 0.3)
 
 
@@ -1335,13 +1342,13 @@ def type_run(c, r):
 def sting_reveal(c, r):
     """a reveal as motion films end on a logo: a build of real air played backwards (_build: a blow of breath, a
     burst of flame, a deep whoosh, by the seed; from 20 dB down, two thirds of the length) swells into the low hit
-    of boom/short (a real floor tom, a deep kick drum and a muted conga) 3 dB over the swell, which stops a fifth of a
+    of boom/short (a real car door slammed shut, without its latch) 3 dB over the swell, which stops a fifth of a
     second later; close and near mono"""
     T = c.length() or 1.0
     sw = _build(c, r, 0.7 * T, hz=500.0, start=-20.0)
-    hit = _hit(c, r, (('tom/floor', 0.0, 1.0, 0.7), ('kick/deep', -2.0, 1.0, 0.7), ('conga/muted', -10.0, 1.1, 0.7)),
-               0.0, 0.0, 0.2 * c.lerp('size', 0.8, 1.5, 1.0, log=True))
-    y, _ = ops.layer([(ops.fade(sw, 0.1, 0.0), -3.0 + 2.0 * c.energy, 0.0, ops.end(sw)), (_lv(hit), 0.0, 0.0)])
+    hit = _hit(c, r, (('car_door/slam', 0.0, 1.1, 0.8, 900.0),), 0.0, 0.0,
+               0.2 * c.lerp('size', 0.8, 1.5, 1.0, log=True), low=-2.0)
+    y, _ = ops.layer([(ops.fade(sw, 0.1, 0.0), -7.0 + 2.0 * c.energy, 0.0, ops.end(sw)), (_lv(hit), 0.0, 0.0)])
     return _dry(y, c, r, 0.3)
 
 

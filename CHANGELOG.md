@@ -177,8 +177,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
 - **Motion effects as motion films use them**, all from recordings: a 50 ms low thump for something appearing
-  (`thump/appear`), short dry low hits with a swell of air into them under a title (`slam/title`) and a logo
-  (`boom/short`, `boom/deep`, `sting/reveal`), the hit after a stop (`hit/drop`), a bright click (`tick/soft`),
+  (`thump/appear`), short dry hits of real car doors and boots slammed shut with a swell of air into them under a
+  title (`slam/title`) and a logo (`boom/short`, `boom/deep`, `sting/reveal`), the hit after a stop (`hit/drop`;
+  "a drop" in a film), a big far explosion that rolls (`explosion/far`), a bright click (`tick/soft`),
   whooshes and risers of plain air that keep the length asked for, a glitch cut from real buzzes and clicks, a shine
   of air (`shine/air`), a tape stop of a real roll running down (`stop/tape`); a motion job gets no instrument note
   or synthesised tone unless its words ask for music (`brief.FILM_MUSIC`).

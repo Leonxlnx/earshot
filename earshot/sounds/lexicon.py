@@ -444,6 +444,8 @@ MOTION_JOBS = frozenset(('logo', 'sting', 'impact', 'whoosh', 'swish', 'flyby', 
 # shine on a product): in an app they keep their interface sounds
 MOTION_DOMAIN_JOBS = frozenset(('startup', 'shimmer', 'pop', 'open', 'thud', 'riser', 'reverse', 'sub_drop',
                                 'downlifter', 'text'))
+# the word for the moment a film cuts everything and lands a hit (brief.read: in a film or video, not a fall)
+MOTION_DROP = frozenset(('drop', 'drops'))
 # an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. An invented
 # tactile sound scores 1 to 2 of 5 in listening tests and the recorded one 4 to 5, so a request that names the thing
 # and reaches the invented one gets the recording (brief._preferred); the invented one still answers to its own id
@@ -454,7 +456,8 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'pen/click': 'pen/ballpoint', 'zipper/pull': 'zipper/jacket', 'scissors/snip': 'scissors/cut',
          'match/strike': 'match/light', 'stapler/press': 'stapler/desk', 'drawer/slide': 'drawer/wood',
          'door/close': 'door/shut', 'explosion/distant': 'explosion/far', 'hit/punch': 'punch/body',
-         'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge', 'keys/jingle': 'keys/bunch'}
+         'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge', 'keys/jingle': 'keys/bunch',
+         'swish/soft': 'flick/thin', 'pop/soft': 'thump/appear'}
 # words that ask for the action a person performs, not its single event (earshot.synth.perform; brief.performance):
 # a walk, knocking, typing, a bunch of keys shaken, glasses clinked. A plural of the thing itself ("footsteps",
 # "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key press") give one
@@ -480,7 +483,8 @@ ACTION_WORDS = {'clapping': 'clap', 'knocking': 'knock', 'tapping': 'tap', 'clic
 SINGLE_WORDS = ('a single', 'one single', 'single', 'just one', 'only one', 'one', 'a lone', 'an isolated')
 # a twin that is the same thing only when the request says one of these words: the learned coins/floor is a handful
 # of coins, so "a coin dropped on the table" keeps the invented single coin
-TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile')}
+TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile'),
+              'pop/soft': ('appear', 'appears', 'appearing', 'element', 'elements', 'screen', 'card', 'cards')}
 # a cymbal of the drum kit (earshot.sounds.drums) -> the film's cymbal (a learned crash cymbal struck hard, the
 # material of earshot.sounds.motion): a film request ("a cymbal crash for the trailer") gets the film's, a request
 # with a word of the kit ("a crash cymbal at the end of the fill") the kit's

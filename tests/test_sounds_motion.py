@@ -76,7 +76,8 @@ def test_catalogue_entries():
         d = registry.get(sid)
         assert d.domains[0] == 'motion', sid
         assert 2 <= len(d.says) <= 3 and len(d.uses) >= 4 and d.dur, sid
-        assert {'energy', 'size', 'bright', 'hard', 'space', 'width'} <= set(d.axes), sid
+        hard = set() if d.axes == motion.REAL_SOFT else {'hard'}      # a low body whose strike hard does not move
+        assert {'energy', 'size', 'bright', 'space', 'width'} | hard <= set(d.axes), sid
 
 
 def _clean(sid, seed=1):
@@ -174,9 +175,7 @@ def test_hard_is_a_faster_onset(sid):
 
 
 @pytest.mark.slow
-@pytest.mark.xfail(strict=True, reason='hits of close drum strokes: hard +0.9 measures 0.7-3 dB less strike over body '
-                   'on this metric although each stroke alone measures more; not understood yet')
-@pytest.mark.parametrize('sid', ['slam/title', 'boom/short'])
+@pytest.mark.parametrize('sid', ['slam/title', 'hit/drop', 'impact/suck'])
 def test_hard_is_a_harder_strike_in_the_film_designs(sid):
     def strike(y):                      # dB of the strike (1 ms before to 4 ms after it) over the 12-60 ms after it
         p = _mono(y) ** 2
@@ -274,6 +273,18 @@ def test_title_and_logo_hits_are_short_low_and_swell_in(seed):
     assert 0.3 < _share(title, 0, 100) < 0.85                           # half of the title hit under 100 Hz
     assert _share(logo, 0, 200) > 0.6 and _share(deep, 0, 200) > 0.7    # the logo and deep hits nearly all low
     assert _peaky(title) < 0.9                                          # a hit, not a tone
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize('sid', ['slam/title', 'boom/short', 'boom/deep', 'hit/drop'])
+def test_the_hits_have_no_skin_tone(sid):
+    """the hits are heavy things slammed, not drums: nothing between 60 and 250 Hz still sounds 150 ms after the
+    loudest moment (a drum's head rings there for a quarter second and longer)"""
+    for seed in (1, 2):
+        y = _take(sid, seed)[0]
+        e = _env(dsp.butter(_mono(y), 'band', (60.0, 250.0)), 240)
+        i = int(np.argmax(e))
+        assert e[i + 30:].max(initial=0.0) < 0.1 * e[i], (sid, seed)
 
 
 @pytest.mark.slow
