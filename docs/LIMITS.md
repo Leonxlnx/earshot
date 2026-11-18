@@ -85,7 +85,7 @@ their recordings and against references, and checked by models, but no listener 
   layer two designs into one, or synthesise from a free description. A request nothing answers is an error; a
   request that answers only loosely gets the nearest design, and the `also` and `not understood` lines say so.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
-  the recording in the public domain; the store has 201 things. For other real things the catalogue has designs
+  the recording in the public domain; the store has 227 things. For other real things the catalogue has designs
   invented from physics (`action`, `object`), which the owner rated 1-2 of 5.
 - New sounds from a class of recordings. Sampling new members from a model of several recordings was tried and
   rated 1-2; it was dropped. A learned design plays its own recordings and new takes of them.
@@ -95,11 +95,16 @@ their recordings and against references, and checked by models, but no listener 
   recordings: a dog barking (a big and a small one), a cat, a robin, a crow, a rooster, an owl, a horse neighing
   and trotting, a cow, a wolf; applause, a crowd cheering, laughter, a gasp, a cough, a kiss, a heartbeat, a baby
   crying; a car horn, a siren passing, an engine starting, a train's horn and a train passing, a helicopter, a
-  bicycle bell. Instruments play single notes, chords of a pad and short figures, no melody. To a request for
-  speech, a voice that says or sings words, a scream or a shout, sobbing, a sneeze or a burp, a pig, a duck, a
-  sheep, a goat, a chicken, a frog, a cat purring, a violin, a cello, a viola, a saxophone, a flute, a clarinet, an
-  oboe, bagpipes, a trumpet, an electric guitar, a guitar or drum solo, an air horn or a ringtone, `make` answers
-  "earshot makes no ...". Crying is a baby's: asked of another person it is not made.
+  bicycle bell; a woman's scream, a sneeze, a yawn, a sigh, snoring, a burp, a bite into an apple; a sheep, a goat,
+  a chicken, a cat purring, a duck, a pig, a frog, a fly; cutlery on a plate, a broom, a running tap, a spray can,
+  velcro, a glass and a plate breaking, a cash register; tyres screeching, a motorcycle passing, a gun reloaded.
+  Instruments play single notes, chords of a pad and short figures, no melody. To a request for speech, a voice
+  that says or sings words, a shout or a yell, sobbing, a violin, a cello, a viola, a saxophone, a flute, a
+  clarinet, an oboe, bagpipes, a trumpet, an electric guitar, a guitar or drum solo, an air horn or a ringtone,
+  `make` answers "earshot makes no ...". Crying is a baby's: asked of another person it is not made. Other everyday
+  things have no recording yet and get the nearest design or nothing: a gulp, chewing, a mosquito, a seagull, a
+  pigeon, an elephant, a lion, a monkey, a snake's hiss, a padlock, a kettle, a toaster, a printer, a shopping cart,
+  a dishwasher, a bus, an airplane passing close, knife chops on a board, a tennis or basketball hit.
 - Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
   `not in this sound: ...` for the other; ask again for it, or make a set.
 - Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
@@ -174,7 +179,7 @@ its files and `manifest.json` but does not delete the files of names removed fro
 
 **Engineering.** No models and no network at render time, but the package still installs the listening stack (torch,
 transformers). ogg, mp3, m4a and webm need ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of
-sound. The learned store adds 11.05 MB, the textures 5.40 MB, the drums 1.31 MB and the instrument notes 0.83 MB
+sound. The learned store adds 12.15 MB, the textures 5.40 MB, the drums 1.31 MB and the instrument notes 0.83 MB
 to the package. The lab's
 recordings, renders, listening pages, request sets and the tool that builds the learned store are not in the
 repository: the store can be used and credited, not rebuilt, from the repository alone, and the request numbers
