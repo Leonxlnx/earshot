@@ -36751,150 +36751,6 @@
   ]
  },
  {
-  "id": "pan/set",
-  "says": [
-   "a pan set down on the stove, a metal knock",
-   "a saucepan placed on the hob"
-  ],
-  "uses": [
-   "pan on stove",
-   "saucepan",
-   "pot on stove",
-   "frying pan",
-   "hob",
-   "pan"
-  ],
-  "tags": [
-   "kitchen",
-   "metal",
-   "pan",
-   "cooking"
-  ],
-  "domains": [
-   "game",
-   "motion"
-  ],
-  "kind": "hit",
-  "tonal": false,
-  "default": true,
-  "dur_s": 0.895,
-  "axes": [
-   "energy",
-   "size",
-   "bright",
-   "hard",
-   "ring",
-   "space",
-   "width"
-  ],
-  "members": [
-   {
-    "file": "pan-set-1.npz",
-    "source": "bigsoundbank/0382.wav@0.000-1.000",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0032,
-    "dur_s": 0.999,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "hard",
-     "ring",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 0.0,
-     "centroid": 1090,
-     "end_db": -135.7,
-     "tail_ms": 642.1,
-     "start_db": -82.8,
-     "rise_ms": 2.62,
-     "peak": -0.2
-    },
-    "measured": {
-     "hard_db": 8.57,
-     "ring_x": 1.972
-    },
-    "bytes": 7988,
-    "credit": {
-     "title": "Aluminum pan bottom 26cm",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/fond-poele-en-aluminium-26cm-sample-s0382.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "excerpt_s": [
-     0.0,
-     0.999
-    ],
-    "events": 1,
-    "late": 1,
-    "fidelity": {
-     "env_db": 2.12,
-     "shape_db": 0.74
-    }
-   },
-   {
-    "file": "pan-set-2.npz",
-    "source": "bigsoundbank/0380.wav@0.000-0.800",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.003,
-    "dur_s": 0.791,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "hard",
-     "ring",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 0.0,
-     "centroid": 1354,
-     "end_db": -134.2,
-     "tail_ms": 524.4,
-     "start_db": -97.1,
-     "rise_ms": 3.65,
-     "peak": -0.1
-    },
-    "measured": {
-     "hard_db": 10.38,
-     "ring_x": 2.083
-    },
-    "bytes": 7097,
-    "credit": {
-     "title": "Aluminum saucepan base 20cm",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/fond-casserole-en-aluminium-20cm-sample-s0380.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "excerpt_s": [
-     0.0,
-     0.791
-    ],
-    "events": 1,
-    "late": 1,
-    "fidelity": {
-     "env_db": 2.36,
-     "shape_db": 0.8
-    }
-   }
-  ],
-  "walk": [
-   0,
-   1
-  ]
- },
- {
   "id": "gas_stove/ignite",
   "says": [
    "a gas stove lit, the igniter clicking and the flame catching",
@@ -37036,147 +36892,6 @@
   "walk": [
    0,
    1
-  ]
- },
- {
-  "id": "fridge/door",
-  "says": [
-   "a fridge door closed, a soft sealed thump",
-   "a refrigerator door shut"
-  ],
-  "uses": [
-   "fridge",
-   "refrigerator",
-   "fridge door",
-   "freezer"
-  ],
-  "tags": [
-   "kitchen",
-   "door",
-   "house"
-  ],
-  "domains": [
-   "game",
-   "motion"
-  ],
-  "kind": "object",
-  "tonal": false,
-  "default": true,
-  "dur_s": 1.1,
-  "axes": [
-   "energy",
-   "size",
-   "bright",
-   "hard",
-   "ring",
-   "space",
-   "width"
-  ],
-  "members": [
-   {
-    "file": "fridge-door-2.npz",
-    "source": "bigsoundbank/1158.wav@21.500-22.600",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.2003,
-    "dur_s": 1.1,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "hard",
-     "ring",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 3.45,
-     "centroid": 163,
-     "end_db": -83.6,
-     "tail_ms": 115.6,
-     "start_db": -116.6,
-     "rise_ms": 1.08,
-     "peak": -0.0
-    },
-    "measured": {
-     "hard_db": 6.51,
-     "ring_x": 1.772
-    },
-    "bytes": 17302,
-    "credit": {
-     "title": "Fridge door",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/fridge-door-s1158.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "excerpt_s": [
-     21.5,
-     22.6
-    ],
-    "events": 1,
-    "late": 1,
-    "fidelity": {
-     "env_db": 2.74,
-     "shape_db": 1.03
-    }
-   },
-   {
-    "file": "fridge-door-1.npz",
-    "source": "bigsoundbank/1158.wav@7.100-8.200",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.1935,
-    "dur_s": 1.1,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "hard",
-     "ring",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 4.54,
-     "centroid": 194,
-     "end_db": -89.7,
-     "tail_ms": 108.4,
-     "start_db": -104.9,
-     "rise_ms": 3.31,
-     "peak": -0.0
-    },
-    "measured": {
-     "hard_db": 7.46,
-     "ring_x": 1.788
-    },
-    "bytes": 16213,
-    "credit": {
-     "title": "Fridge door",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/fridge-door-s1158.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "excerpt_s": [
-     7.1,
-     8.2
-    ],
-    "events": 1,
-    "late": 1,
-    "fidelity": {
-     "env_db": 3.0,
-     "shape_db": 1.02
-    }
-   }
-  ],
-  "walk": [
-   1,
-   0
   ]
  },
  {
@@ -37480,5 +37195,2581 @@
    "rising_glide",
    "stacked"
   ]
+ },
+ {
+  "id": "crowd/boo",
+  "says": [
+   "a crowd booing, a long disapproving boo",
+   "an audience booing a bad performance"
+  ],
+  "uses": [
+   "boo",
+   "booing",
+   "boos",
+   "jeering",
+   "crowd booing",
+   "audience booing"
+  ],
+  "tags": [
+   "crowd",
+   "voice",
+   "people",
+   "audience"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "crowd-boo-2.npz",
+    "source": "freesound_t1/504621.mp3@5.000-9.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.238,
+    "dur_s": 4.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.47,
+     "centroid": 707,
+     "end_db": -90.1,
+     "tail_ms": 110.2,
+     "start_db": -142.9,
+     "rise_ms": 161.27,
+     "peak": -0.9
+    },
+    "measured": {
+     "hard_db": 6.38,
+     "ring_x": 1.941
+    },
+    "bytes": 27997,
+    "credit": {
+     "title": "Booing Crowd",
+     "author": "NeoSpica",
+     "page": "https://freesound.org/people/NeoSpica/sounds/504621/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     5.0,
+     9.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.66,
+     "shape_db": 1.05
+    },
+    "lossy": true
+   },
+   {
+    "file": "crowd-boo-1.npz",
+    "source": "freesound_t1/264378.mp3@2.000-6.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.208,
+    "dur_s": 4.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.93,
+     "centroid": 1146,
+     "end_db": -86.3,
+     "tail_ms": 93.4,
+     "start_db": -151.3,
+     "rise_ms": 33.31,
+     "peak": -0.3
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.142
+    },
+    "bytes": 28345,
+    "credit": {
+     "title": "crowd booing",
+     "author": "HowardV",
+     "page": "https://freesound.org/people/HowardV/sounds/264378/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.0,
+     6.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.17,
+     "shape_db": 1.4
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "cat/hiss",
+  "says": [
+   "a cat hissing, an angry spitting hiss",
+   "a frightened cat hissing"
+  ],
+  "uses": [
+   "cat hiss",
+   "cat hissing",
+   "angry cat",
+   "hissing cat"
+  ],
+  "tags": [
+   "cat",
+   "animal",
+   "pet",
+   "angry"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.035,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "cat-hiss-1.npz",
+    "source": "freesound_t1/485952.mp3@0.000-0.670",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0838,
+    "dur_s": 0.67,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.2,
+     "centroid": 209,
+     "end_db": -68.5,
+     "tail_ms": 21.0,
+     "start_db": -85.5,
+     "rise_ms": 1.54,
+     "peak": -11.5
+    },
+    "measured": {
+     "hard_db": 0.17,
+     "ring_x": 1.111
+    },
+    "bytes": 32320,
+    "credit": {
+     "title": "Cat Hissing",
+     "author": "aunrea",
+     "page": "https://freesound.org/people/aunrea/sounds/485952/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.67
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.88,
+     "shape_db": 0.93
+    },
+    "lossy": true
+   },
+   {
+    "file": "cat-hiss-2.npz",
+    "source": "freesound_t1/532225.mp3@1.900-3.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.714,
+    "dur_s": 1.4,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.46,
+     "centroid": 1040,
+     "end_db": -83.7,
+     "tail_ms": 73.9,
+     "start_db": -116.2,
+     "rise_ms": 96.33,
+     "peak": -23.0
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.467
+    },
+    "bytes": 23433,
+    "credit": {
+     "title": "cat hiss.wav",
+     "author": "patchytherat",
+     "page": "https://freesound.org/people/patchytherat/sounds/532225/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.9,
+     3.3
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.17,
+     "shape_db": 1.06
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "lion/roar",
+  "says": [
+   "a lion roaring, a deep loud roar",
+   "a big cat roaring"
+  ],
+  "uses": [
+   "lion",
+   "lion roar",
+   "tiger",
+   "tiger roar",
+   "big cat",
+   "dragon",
+   "dragon roar",
+   "monster roar"
+  ],
+  "tags": [
+   "lion",
+   "animal",
+   "wild",
+   "low"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.175,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "lion-roar-2.npz",
+    "source": "freesound_t1/559600.mp3@11.350-13.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.148,
+    "dur_s": 1.95,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.75,
+     "centroid": 84,
+     "end_db": -119.3,
+     "tail_ms": 387.1,
+     "start_db": -125.9,
+     "rise_ms": 1.46,
+     "peak": -0.2
+    },
+    "measured": {
+     "hard_db": 0.0,
+     "ring_x": 1.904
+    },
+    "bytes": 14687,
+    "credit": {
+     "title": "LION ROAR",
+     "author": "Podcapocalipsis",
+     "page": "https://freesound.org/people/Podcapocalipsis/sounds/559600/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     11.35,
+     13.3
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.6,
+     "shape_db": 1.24
+    },
+    "lossy": true
+   },
+   {
+    "file": "lion-roar-1.npz",
+    "source": "freesound_t1/611721.mp3@0.000-6.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2045,
+    "dur_s": 6.4,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.64,
+     "centroid": 594,
+     "end_db": -111.2,
+     "tail_ms": 121.9,
+     "start_db": -132.3,
+     "rise_ms": 3.38,
+     "peak": -9.8
+    },
+    "measured": {
+     "hard_db": 1.23,
+     "ring_x": 1.27
+    },
+    "bytes": 55190,
+    "credit": {
+     "title": "Big Lion Roar",
+     "author": "_justMonke_",
+     "page": "https://freesound.org/people/_justMonke_/sounds/611721/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     6.4
+    ],
+    "events": 2,
+    "late": 2,
+    "fidelity": {
+     "env_db": 4.11,
+     "shape_db": 1.59
+    },
+    "pace": 0.23,
+    "lossy": true
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "rocket/launch",
+  "says": [
+   "a rocket launch, a long low roar of the engines",
+   "a space rocket lifting off"
+  ],
+  "uses": [
+   "rocket",
+   "rocket launch",
+   "liftoff",
+   "blast off",
+   "space launch",
+   "jet engine",
+   "jet taking off",
+   "takeoff",
+   "take off",
+   "afterburner"
+  ],
+  "tags": [
+   "rocket",
+   "engine",
+   "roar",
+   "low",
+   "vehicle"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 7.3,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "rocket-launch-1.npz",
+    "source": "freesound_t1/849949.mp3@20.000-28.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4195,
+    "dur_s": 8.0,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.93,
+     "centroid": 62,
+     "end_db": -92.0,
+     "tail_ms": 124.3,
+     "start_db": -158.7,
+     "rise_ms": 2.02,
+     "peak": -12.2
+    },
+    "measured": {
+     "hard_db": 1.59,
+     "ring_x": 1.114
+    },
+    "bytes": 66934,
+    "credit": {
+     "title": "NASA Artemis II Moon Rocket Launch",
+     "author": "qubodup",
+     "page": "https://freesound.org/people/qubodup/sounds/849949/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     20.0,
+     28.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.71,
+     "shape_db": 1.62
+    },
+    "lossy": true,
+    "allows": [
+     "clicks"
+    ]
+   },
+   {
+    "file": "rocket-launch-2.npz",
+    "source": "freesound_t1/182794.mp3@19.000-25.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.486,
+    "dur_s": 6.6,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.7,
+     "centroid": 477,
+     "end_db": -130.9,
+     "tail_ms": 562.9,
+     "start_db": -220.8,
+     "rise_ms": 5.92,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 4.33,
+     "ring_x": 1.125
+    },
+    "bytes": 48054,
+    "credit": {
+     "title": "Rocket Launch.flac",
+     "author": "qubodup",
+     "page": "https://freesound.org/people/qubodup/sounds/182794/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     19.0,
+     25.6
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.37,
+     "shape_db": 1.43
+    },
+    "lossy": true,
+    "allows": [
+     "clicks"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "clicks"
+  ]
+ },
+ {
+  "id": "record/scratch",
+  "says": [
+   "a record scratch, a needle dragged across vinyl",
+   "a vinyl record scratched to a stop"
+  ],
+  "uses": [
+   "record scratch",
+   "vinyl scratch",
+   "needle scratch",
+   "record stop",
+   "turntable"
+  ],
+  "tags": [
+   "vinyl",
+   "record",
+   "funny"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.674,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "record-scratch-1.npz",
+    "source": "freesound_t1/71853.mp3@0.000-0.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0512,
+    "dur_s": 0.448,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.01,
+     "centroid": 1040,
+     "end_db": -92.4,
+     "tail_ms": 56.7,
+     "start_db": -108.6,
+     "rise_ms": 0.85,
+     "peak": -1.3
+    },
+    "measured": {
+     "hard_db": 1.66,
+     "ring_x": 1.859
+    },
+    "bytes": 11804,
+    "credit": {
+     "title": "record_scratch.wav",
+     "author": "ludvique",
+     "page": "https://freesound.org/people/ludvique/sounds/71853/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.448
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 4.12,
+     "shape_db": 1.56
+    },
+    "lossy": true
+   },
+   {
+    "file": "record-scratch-2.npz",
+    "source": "freesound_t1/369673.mp3@16.750-17.650",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0498,
+    "dur_s": 0.9,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.21,
+     "centroid": 1108,
+     "end_db": -89.6,
+     "tail_ms": 57.7,
+     "start_db": -239.0,
+     "rise_ms": 1.92,
+     "peak": -1.0
+    },
+    "measured": {
+     "hard_db": 2.66,
+     "ring_x": 1.098
+    },
+    "bytes": 43484,
+    "credit": {
+     "title": "Record Scratches.wav",
+     "author": "filmsndfx",
+     "page": "https://freesound.org/people/filmsndfx/sounds/369673/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     16.75,
+     17.65
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.16,
+     "shape_db": 1.01
+    },
+    "lossy": true,
+    "allows": [
+     "clicks"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "clicks"
+  ]
+ },
+ {
+  "id": "toy/squeak",
+  "says": [
+   "a squeaky rubber toy squeezed",
+   "a dog toy squeaking"
+  ],
+  "uses": [
+   "squeaky toy",
+   "squeak toy",
+   "rubber toy",
+   "dog toy",
+   "rubber duck",
+   "squeeze toy"
+  ],
+  "tags": [
+   "toy",
+   "rubber",
+   "squeak",
+   "funny"
+  ],
+  "domains": [
+   "game",
+   "motion",
+   "ui"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.448,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "toy-squeak-1.npz",
+    "source": "freesound_t1/468443.mp3@0.000-0.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.022,
+    "dur_s": 0.446,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.81,
+     "centroid": 5053,
+     "end_db": -80.0,
+     "tail_ms": 40.1,
+     "start_db": -130.2,
+     "rise_ms": 48.94,
+     "peak": -4.6
+    },
+    "measured": {
+     "hard_db": 10.13,
+     "ring_x": 1.381
+    },
+    "bytes": 12268,
+    "credit": {
+     "title": "Squeaky Toy #1",
+     "author": "Breviceps",
+     "page": "https://freesound.org/people/Breviceps/sounds/468443/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.446
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.18,
+     "shape_db": 0.71
+    },
+    "lossy": true,
+    "polarity": -1
+   },
+   {
+    "file": "toy-squeak-2.npz",
+    "source": "freesound_t1/861824.mp3@0.000-0.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0103,
+    "dur_s": 0.449,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.86,
+     "centroid": 6785,
+     "end_db": -84.2,
+     "tail_ms": 84.9,
+     "start_db": -134.0,
+     "rise_ms": 21.65,
+     "peak": -4.7
+    },
+    "measured": {
+     "hard_db": 6.11,
+     "ring_x": 1.462
+    },
+    "bytes": 13104,
+    "credit": {
+     "title": "Squeaky Toy 6",
+     "author": "qubodup",
+     "page": "https://freesound.org/people/qubodup/sounds/861824/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.449
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.72,
+     "shape_db": 1.17
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "elevator/ding",
+  "says": [
+   "an elevator arriving with a ding",
+   "a lift chime as the doors open"
+  ],
+  "uses": [
+   "elevator",
+   "elevator ding",
+   "elevator bell",
+   "lift arrives",
+   "elevator arrival"
+  ],
+  "tags": [
+   "elevator",
+   "building",
+   "arrival"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.96,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "elevator-ding-2.npz",
+    "source": "freesound_t1/467299.mp3@0.000-2.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0243,
+    "dur_s": 2.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.0,
+     "centroid": 1057,
+     "end_db": -109.4,
+     "tail_ms": 1170.0,
+     "start_db": -151.4,
+     "rise_ms": 0.46,
+     "peak": -3.2
+    },
+    "measured": {
+     "hard_db": 6.18,
+     "ring_x": 1.952
+    },
+    "bytes": 10407,
+    "credit": {
+     "title": "Elevator Ding.wav",
+     "author": "XfiXy8",
+     "page": "https://freesound.org/people/XfiXy8/sounds/467299/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.0
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 1.0,
+     "shape_db": 0.45
+    },
+    "lossy": true
+   },
+   {
+    "file": "elevator-ding-1.npz",
+    "source": "freesound_t1/879807.mp3@0.000-1.920",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0035,
+    "dur_s": 1.92,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.0,
+     "centroid": 1406,
+     "end_db": -135.7,
+     "tail_ms": 849.6,
+     "start_db": -122.7,
+     "rise_ms": 2.21,
+     "peak": -9.6
+    },
+    "measured": {
+     "hard_db": 7.51,
+     "ring_x": 1.989
+    },
+    "bytes": 12219,
+    "credit": {
+     "title": "Elevator Ding",
+     "author": "Qvantor",
+     "page": "https://freesound.org/people/Qvantor/sounds/879807/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.92
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 1.54,
+     "shape_db": 0.67
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "bee/buzz",
+  "says": [
+   "a bee buzzing close by",
+   "a honeybee flying around flowers"
+  ],
+  "uses": [
+   "bee",
+   "bees",
+   "bumblebee",
+   "honeybee",
+   "wasp",
+   "buzzing bee",
+   "hornet"
+  ],
+  "tags": [
+   "insect",
+   "buzz",
+   "animal"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.175,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "bee-buzz-1.npz",
+    "source": "freesound_t1/846433.mp3@0.250-2.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1075,
+    "dur_s": 2.35,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.68,
+     "centroid": 403,
+     "end_db": -105.4,
+     "tail_ms": 360.6,
+     "start_db": -124.3,
+     "rise_ms": 0.67,
+     "peak": -7.4
+    },
+    "measured": {
+     "hard_db": 3.61,
+     "ring_x": 1.09
+    },
+    "bytes": 44997,
+    "credit": {
+     "title": "Insects - Bee; Honeybee, Buzz, Close Perspective",
+     "author": "TheKingOfGeeks360",
+     "page": "https://freesound.org/people/TheKingOfGeeks360/sounds/846433/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.25,
+     2.6
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.97,
+     "shape_db": 1.0
+    },
+    "lossy": true
+   },
+   {
+    "file": "bee-buzz-2.npz",
+    "source": "freesound_t1/582683.mp3@2.000-6.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 1.892,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.06,
+     "centroid": 1027,
+     "end_db": -90.2,
+     "tail_ms": 128.8,
+     "start_db": -177.3,
+     "rise_ms": 13.54,
+     "peak": -35.1
+    },
+    "measured": {
+     "hard_db": 6.9,
+     "ring_x": 1.067
+    },
+    "bytes": 47706,
+    "credit": {
+     "title": "Bee Buzz",
+     "author": "AKkingStudio",
+     "page": "https://freesound.org/people/AKkingStudio/sounds/582683/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     2.0,
+     6.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 3.8,
+     "shape_db": 1.17
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "elephant/trumpet",
+  "says": [
+   "an elephant trumpeting",
+   "a loud elephant call"
+  ],
+  "uses": [
+   "elephant",
+   "trumpeting elephant",
+   "elephant call",
+   "elephant trumpet",
+   "mammoth"
+  ],
+  "tags": [
+   "elephant",
+   "animal",
+   "wild"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.699,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "elephant-trumpet-2.npz",
+    "source": "freesound_t1/139052.mp3@0.000-1.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.3752,
+    "dur_s": 1.498,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.22,
+     "centroid": 709,
+     "end_db": -127.2,
+     "tail_ms": 358.7,
+     "start_db": -115.5,
+     "rise_ms": 63.58,
+     "peak": -2.1
+    },
+    "measured": {
+     "hard_db": 3.69,
+     "ring_x": 1.614
+    },
+    "bytes": 23255,
+    "credit": {
+     "title": "Elephant scream.wav",
+     "author": "Jasher70",
+     "page": "https://freesound.org/people/Jasher70/sounds/139052/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.498
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.65,
+     "shape_db": 1.09
+    },
+    "lossy": true
+   },
+   {
+    "file": "elephant-trumpet-1.npz",
+    "source": "freesound_t1/527845.mp3@0.050-1.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1047,
+    "dur_s": 1.9,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.59,
+     "centroid": 1433,
+     "end_db": -85.1,
+     "tail_ms": 622.9,
+     "start_db": -109.6,
+     "rise_ms": 66.71,
+     "peak": -8.4
+    },
+    "measured": {
+     "hard_db": 4.36,
+     "ring_x": 1.793
+    },
+    "bytes": 37479,
+    "credit": {
+     "title": "Elephant Trumpets Growls.flac",
+     "author": "D.jones",
+     "page": "https://freesound.org/people/D.jones/sounds/527845/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.05,
+     1.95
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.08,
+     "shape_db": 0.87
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "toaster/pop",
+  "says": [
+   "a toaster popping up the toast",
+   "toast springing out of a toaster"
+  ],
+  "uses": [
+   "toaster",
+   "toast pops",
+   "toaster pop",
+   "pop up toaster"
+  ],
+  "tags": [
+   "kitchen",
+   "toaster",
+   "mechanism",
+   "metal"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.85,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "toaster-pop-1.npz",
+    "source": "freesound_t1/444430.mp3@0.000-0.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0575,
+    "dur_s": 0.8,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.87,
+     "centroid": 4739,
+     "end_db": -111.0,
+     "tail_ms": 329.6,
+     "start_db": -188.5,
+     "rise_ms": 0.88,
+     "peak": -7.7
+    },
+    "measured": {
+     "hard_db": 3.81,
+     "ring_x": 1.099
+    },
+    "bytes": 19592,
+    "credit": {
+     "title": "Toaster Pop.wav",
+     "author": "MTJohnson",
+     "page": "https://freesound.org/people/MTJohnson/sounds/444430/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.8
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.07,
+     "shape_db": 0.96
+    },
+    "lossy": true
+   },
+   {
+    "file": "toaster-pop-2.npz",
+    "source": "freesound_t1/709969.mp3@1.100-2.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2162,
+    "dur_s": 0.9,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.09,
+     "centroid": 7512,
+     "end_db": -97.5,
+     "tail_ms": 385.5,
+     "start_db": -135.5,
+     "rise_ms": 11.33,
+     "peak": -0.1
+    },
+    "measured": {
+     "hard_db": 6.35,
+     "ring_x": 1.369
+    },
+    "bytes": 24160,
+    "credit": {
+     "title": "Toaster popping up",
+     "author": "Squidems",
+     "page": "https://freesound.org/people/Squidems/sounds/709969/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.1,
+     2.0
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.12,
+     "shape_db": 1.05
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "blender/run",
+  "says": [
+   "a kitchen blender running",
+   "a blender whirring and mixing"
+  ],
+  "uses": [
+   "blender",
+   "smoothie",
+   "food processor",
+   "blending"
+  ],
+  "tags": [
+   "kitchen",
+   "motor",
+   "machine"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 4.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "blender-run-1.npz",
+    "source": "freesound_t1/231596.mp3@5.000-9.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1675,
+    "dur_s": 4.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.28,
+     "centroid": 1911,
+     "end_db": -84.2,
+     "tail_ms": 69.2,
+     "start_db": -153.2,
+     "rise_ms": 2.52,
+     "peak": -5.8
+    },
+    "measured": {
+     "hard_db": 6.84,
+     "ring_x": 1.034
+    },
+    "bytes": 30768,
+    "credit": {
+     "title": "Blender.mp3",
+     "author": "JoaoSamplers",
+     "page": "https://freesound.org/people/JoaoSamplers/sounds/231596/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     5.0,
+     9.0
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.22,
+     "shape_db": 1.29
+    },
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "egg/crack",
+  "says": [
+   "an egg cracked on the rim of a bowl",
+   "cracking an egg"
+  ],
+  "uses": [
+   "egg",
+   "crack an egg",
+   "egg crack",
+   "cracking egg",
+   "eggshell"
+  ],
+  "tags": [
+   "kitchen",
+   "egg",
+   "crack",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.145,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "egg-crack-1.npz",
+    "source": "freesound_t1/244723.mp3@0.030-0.850",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0788,
+    "dur_s": 0.82,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.6,
+     "centroid": 3663,
+     "end_db": -97.1,
+     "tail_ms": 84.4,
+     "start_db": -132.9,
+     "rise_ms": 0.4,
+     "peak": -1.2
+    },
+    "measured": {
+     "hard_db": 1.37,
+     "ring_x": 1.001
+    },
+    "bytes": 39927,
+    "credit": {
+     "title": "egg crack1.wav",
+     "author": "Reitanna",
+     "page": "https://freesound.org/people/Reitanna/sounds/244723/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.03,
+     0.85
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.55,
+     "shape_db": 0.77
+    },
+    "lossy": true,
+    "allows": [
+     "clicks",
+     "stacked"
+    ]
+   },
+   {
+    "file": "egg-crack-2.npz",
+    "source": "freesound_t1/244743.mp3@0.030-1.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.181,
+    "dur_s": 1.47,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.93,
+     "centroid": 10455,
+     "end_db": -96.7,
+     "tail_ms": 86.9,
+     "start_db": -149.7,
+     "rise_ms": 0.38,
+     "peak": -0.4
+    },
+    "measured": {
+     "hard_db": 11.72,
+     "ring_x": 1.004
+    },
+    "bytes": 38369,
+    "credit": {
+     "title": "egg crack20.wav",
+     "author": "Reitanna",
+     "page": "https://freesound.org/people/Reitanna/sounds/244743/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.03,
+     1.5
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.27,
+     "shape_db": 0.62
+    },
+    "lossy": true,
+    "allows": [
+     "clicks",
+     "pre_swell",
+     "stacked"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "clicks",
+   "pre_swell",
+   "stacked"
+  ]
+ },
+ {
+  "id": "whisk/beat",
+  "says": [
+   "a whisk beating eggs in a bowl",
+   "whisking batter quickly"
+  ],
+  "uses": [
+   "whisk",
+   "whisking",
+   "beating eggs",
+   "beat eggs",
+   "batter",
+   "whip cream"
+  ],
+  "tags": [
+   "kitchen",
+   "whisk",
+   "bowl",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.7,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "whisk-beat-1.npz",
+    "source": "freesound_t1/132474.mp3@18.200-22.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1735,
+    "dur_s": 3.8,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.33,
+     "centroid": 4606,
+     "end_db": -106.8,
+     "tail_ms": 79.9,
+     "start_db": -120.4,
+     "rise_ms": 0.65,
+     "peak": -16.7
+    },
+    "measured": {
+     "hard_db": 10.89,
+     "ring_x": 1.1
+    },
+    "bytes": 63361,
+    "credit": {
+     "title": "Beating Eggs.wav",
+     "author": "touchysound",
+     "page": "https://freesound.org/people/touchysound/sounds/132474/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     18.2,
+     22.0
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.68,
+     "shape_db": 1.01
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   },
+   {
+    "file": "whisk-beat-2.npz",
+    "source": "freesound_t1/132474.mp3@22.550-24.150",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1425,
+    "dur_s": 1.6,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.05,
+     "centroid": 4696,
+     "end_db": -115.1,
+     "tail_ms": 168.5,
+     "start_db": -134.0,
+     "rise_ms": 0.58,
+     "peak": -13.8
+    },
+    "measured": {
+     "hard_db": 10.39,
+     "ring_x": 1.001
+    },
+    "bytes": 32335,
+    "credit": {
+     "title": "Beating Eggs.wav",
+     "author": "touchysound",
+     "page": "https://freesound.org/people/touchysound/sounds/132474/",
+     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     22.55,
+     24.15
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 2.34,
+     "shape_db": 0.89
+    },
+    "lossy": true,
+    "allows": [
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "ring"
+  ]
+ },
+ {
+  "id": "step/mud",
+  "says": [
+   "a footstep in thick wet mud",
+   "a squelching step pulled out of mud"
+  ],
+  "uses": [
+   "footstep"
+  ],
+  "tags": [
+   "mud",
+   "wet",
+   "ground"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "thud",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.66,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "step-mud-1.npz",
+    "source": "bigsoundbank/0495.wav@6.550-9.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0655,
+    "dur_s": 2.9,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.44,
+     "centroid": 4715,
+     "end_db": -84.3,
+     "tail_ms": 103.9,
+     "start_db": -104.8,
+     "rise_ms": 0.48,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 9.61,
+     "ring_x": 1.01
+    },
+    "bytes": 67198,
+    "credit": {
+     "title": "Steps in the Mud",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-in-the-mud-s0495.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/mud",
+    "excerpt_s": [
+     6.55,
+     9.45
+    ],
+    "events": 5,
+    "pace": 1.48
+   },
+   {
+    "file": "step-mud-2.npz",
+    "source": "bigsoundbank/0495.wav@6.570-7.150",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.004,
+    "dur_s": 0.58,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.92,
+     "centroid": 5104,
+     "end_db": -72.9,
+     "tail_ms": 20.6,
+     "start_db": -107.1,
+     "rise_ms": 1.65,
+     "peak": -0.1
+    },
+    "measured": {
+     "hard_db": -0.03,
+     "ring_x": 1.022
+    },
+    "bytes": 32636,
+    "credit": {
+     "title": "Steps in the Mud",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-in-the-mud-s0495.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/mud",
+    "excerpt_s": [
+     6.57,
+     7.15
+    ],
+    "events": 1,
+    "pace": null,
+    "allows": [
+     "stacked"
+    ]
+   },
+   {
+    "file": "step-mud-3.npz",
+    "source": "bigsoundbank/0495.wav@7.210-7.850",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0055,
+    "dur_s": 0.64,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.99,
+     "centroid": 2876,
+     "end_db": -72.5,
+     "tail_ms": 54.6,
+     "start_db": -91.6,
+     "rise_ms": 1.1,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 3.09,
+     "ring_x": 1.0
+    },
+    "bytes": 29824,
+    "credit": {
+     "title": "Steps in the Mud",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-in-the-mud-s0495.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/mud",
+    "excerpt_s": [
+     7.21,
+     7.85
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-mud-4.npz",
+    "source": "bigsoundbank/0495.wav@3.270-3.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0445,
+    "dur_s": 0.68,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.44,
+     "centroid": 3950,
+     "end_db": -69.0,
+     "tail_ms": 40.9,
+     "start_db": -102.5,
+     "rise_ms": 2.75,
+     "peak": -9.4
+    },
+    "measured": {
+     "hard_db": 1.56,
+     "ring_x": 1.017
+    },
+    "bytes": 35718,
+    "credit": {
+     "title": "Steps in the Mud",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-in-the-mud-s0495.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/mud",
+    "excerpt_s": [
+     3.27,
+     3.95
+    ],
+    "events": 1,
+    "pace": null
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "allows": [
+   "stacked"
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ],
+   "feet": [
+    2,
+    3
+   ]
+  }
+ },
+ {
+  "id": "step/puddle",
+  "says": [
+   "a footstep splashing in shallow water",
+   "shoes stepping through a puddle"
+  ],
+  "uses": [
+   "footstep"
+  ],
+  "tags": [
+   "water",
+   "puddle",
+   "wet"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "thud",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.78,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "step-puddle-1.npz",
+    "source": "bigsoundbank/0690.wav@0.750-4.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0835,
+    "dur_s": 4.2,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.22,
+     "centroid": 4900,
+     "end_db": -88.2,
+     "tail_ms": 77.1,
+     "start_db": -123.4,
+     "rise_ms": 1.27,
+     "peak": -5.4
+    },
+    "measured": {
+     "hard_db": 9.82,
+     "ring_x": 1.081
+    },
+    "bytes": 90302,
+    "credit": {
+     "title": "Shoes in the Water",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/shoes-in-the-water-s0690.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/water",
+    "excerpt_s": [
+     0.75,
+     4.95
+    ],
+    "events": 5,
+    "pace": 1.08,
+    "allows": [
+     "clicks"
+    ]
+   },
+   {
+    "file": "step-puddle-2.npz",
+    "source": "bigsoundbank/0690.wav@1.750-2.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0475,
+    "dur_s": 0.7,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.78,
+     "centroid": 3720,
+     "end_db": -77.8,
+     "tail_ms": 180.5,
+     "start_db": -124.8,
+     "rise_ms": 2.92,
+     "peak": -6.5
+    },
+    "measured": {
+     "hard_db": 0.57,
+     "ring_x": 1.004
+    },
+    "bytes": 33232,
+    "credit": {
+     "title": "Shoes in the Water",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/shoes-in-the-water-s0690.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/water",
+    "excerpt_s": [
+     1.75,
+     2.45
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-puddle-3.npz",
+    "source": "bigsoundbank/0690.wav@3.470-4.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0645,
+    "dur_s": 0.73,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.41,
+     "centroid": 4098,
+     "end_db": -76.3,
+     "tail_ms": 142.4,
+     "start_db": -120.9,
+     "rise_ms": 1.27,
+     "peak": -5.4
+    },
+    "measured": {
+     "hard_db": 0.83,
+     "ring_x": 1.221
+    },
+    "bytes": 34512,
+    "credit": {
+     "title": "Shoes in the Water",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/shoes-in-the-water-s0690.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/water",
+    "excerpt_s": [
+     3.47,
+     4.2
+    ],
+    "events": 1,
+    "pace": null,
+    "allows": [
+     "clicks"
+    ]
+   },
+   {
+    "file": "step-puddle-4.npz",
+    "source": "bigsoundbank/0690.wav@0.770-1.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0568,
+    "dur_s": 0.83,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.68,
+     "centroid": 4557,
+     "end_db": -72.9,
+     "tail_ms": 97.4,
+     "start_db": -118.7,
+     "rise_ms": 1.17,
+     "peak": -6.6
+    },
+    "measured": {
+     "hard_db": 2.12,
+     "ring_x": 1.0
+    },
+    "bytes": 36611,
+    "credit": {
+     "title": "Shoes in the Water",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/shoes-in-the-water-s0690.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/water",
+    "excerpt_s": [
+     0.77,
+     1.6
+    ],
+    "events": 1,
+    "pace": null,
+    "allows": [
+     "stacked"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "allows": [
+   "clicks",
+   "stacked"
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ],
+   "feet": [
+    1,
+    2
+   ]
+  }
+ },
+ {
+  "id": "step/leaves",
+  "says": [
+   "a footstep in dry fallen leaves",
+   "a crisp rustling crunch of autumn leaves underfoot"
+  ],
+  "uses": [
+   "footstep"
+  ],
+  "tags": [
+   "leaves",
+   "dry",
+   "forest"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "thud",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.755,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "step-leaves-1.npz",
+    "source": "bigsoundbank/2889.wav@10.690-14.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0025,
+    "dur_s": 4.26,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.81,
+     "centroid": 11065,
+     "end_db": -70.5,
+     "tail_ms": 42.1,
+     "start_db": -99.0,
+     "rise_ms": 0.52,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 10.57,
+     "ring_x": 1.005
+    },
+    "bytes": 89603,
+    "credit": {
+     "title": "Feet in leaves #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/feet-in-leaves-2-s2889.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/leaves",
+    "excerpt_s": [
+     10.69,
+     14.95
+    ],
+    "events": 4,
+    "pace": 0.72
+   },
+   {
+    "file": "step-leaves-2.npz",
+    "source": "bigsoundbank/2889.wav@10.690-11.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0025,
+    "dur_s": 0.76,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.81,
+     "centroid": 11225,
+     "end_db": -78.5,
+     "tail_ms": 57.4,
+     "start_db": -98.8,
+     "rise_ms": 73.08,
+     "peak": -0.1
+    },
+    "measured": {
+     "hard_db": 7.64,
+     "ring_x": 1.026
+    },
+    "bytes": 35822,
+    "credit": {
+     "title": "Feet in leaves #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/feet-in-leaves-2-s2889.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/leaves",
+    "excerpt_s": [
+     10.69,
+     11.45
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-leaves-3.npz",
+    "source": "bigsoundbank/2889.wav@13.100-13.850",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0027,
+    "dur_s": 0.75,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.77,
+     "centroid": 11232,
+     "end_db": -73.5,
+     "tail_ms": 29.2,
+     "start_db": -90.5,
+     "rise_ms": 15.69,
+     "peak": -4.5
+    },
+    "measured": {
+     "hard_db": 7.79,
+     "ring_x": 1.059
+    },
+    "bytes": 36486,
+    "credit": {
+     "title": "Feet in leaves #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/feet-in-leaves-2-s2889.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/leaves",
+    "excerpt_s": [
+     13.1,
+     13.85
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-leaves-4.npz",
+    "source": "bigsoundbank/2889.wav@15.350-16.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0027,
+    "dur_s": 0.75,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.78,
+     "centroid": 10903,
+     "end_db": -74.1,
+     "tail_ms": 33.6,
+     "start_db": -86.7,
+     "rise_ms": 24.29,
+     "peak": -2.2
+    },
+    "measured": {
+     "hard_db": 5.53,
+     "ring_x": 1.034
+    },
+    "bytes": 35770,
+    "credit": {
+     "title": "Feet in leaves #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/feet-in-leaves-2-s2889.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/leaves",
+    "excerpt_s": [
+     15.35,
+     16.1
+    ],
+    "events": 1,
+    "pace": null
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pattern": {
+   "name": "walk",
+   "events": [
+    6,
+    8
+   ],
+   "feet": [
+    1,
+    2
+   ]
+  }
  }
 ]
