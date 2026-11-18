@@ -170,3 +170,6 @@ for _m, (_v, _n, _d, _a, _b) in TICKS.items():
     design(f'tick/{_m}', kind='tick', says=(_a, _b), uses=('tap', 'tick', 'click', 'detent', 'select', 'timer'),
            tags=(_m,), domains=('ui', 'game', 'motion'), dur=0.08 if _d else 0.3, pitch=_n, material=_m,
            axes=('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy'))(_tick(_v, _n, _d))
+
+# the interface roles made of recorded things (a key, a switch, a page, knocks): what a plain interface request gets
+from . import interface  # noqa: E402,F401

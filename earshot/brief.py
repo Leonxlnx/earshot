@@ -97,6 +97,11 @@ BY_NAME = 0.5
 # a learned design whose interface job (its `roles`) is the request's head: a plain "tap", "hover", "toggle on",
 # "next", "type" gets the recorded tap, tick, switch or key chosen for that job (earshot.sounds.sets 'ui')
 ROLE = 2.0
+# the sound of a real thing chosen for an interface job (lexicon.INTERFACE_JOBS), for a request of that job without
+# musical words: the pitched figures step back by BY_NAME, so this only needs to win among its own alternatives and
+# things that merely share a word; outside an interface job these designs step back by BY_NAME ("a knock cue when a
+# guest arrives" is a door knocked on, "a capture button" a camera's shutter)
+REAL = 1.4
 _rev = None
 _cache = {}
 
@@ -125,6 +130,12 @@ def stem(w):
 
 # a request that says one of these asks for a tone: the tonal interface figures answer it (BY_NAME)
 TONE_STEMS = frozenset(stem(w) for w in ('tone', 'tonal', 'note', 'musical', 'melodic', 'pitched', 'chime', 'marimba'))
+# a request that says one of these (or names an instrument, a voice, or music as its domain) asks for music: only then
+# does an interface job get a pitched design (lexicon.INTERFACE_JOBS); otherwise it gets the sound of a real thing
+MUSIC_STEMS = TONE_STEMS | frozenset(stem(w) for w in (
+    'notes', 'melody', 'jingle', 'arpeggio', 'arpeggiated', 'tune', 'tuneful', 'instrument', 'music', 'musically',
+    'harmony', 'chord', 'bell', 'bells', 'ding', 'chiming', 'xylophone', 'glockenspiel', 'vibraphone', 'harp',
+    'piano', 'pizzicato', 'kalimba', 'celesta', 'synth', 'synthesizer', 'ringtone'))
 
 
 def _key(words_):
@@ -1097,8 +1108,18 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     # the interface job alone ("tap", "hover", "toggle on", "type"), no thing named ("next page": a page): ROLE
     own = set().union(*(_family_words(i) for i, r in _roles().items() if head in r))
     alone = _interface_only(b)                                           # as learned_ok lets a role answer
-    plain = alone and not said & TONE_STEMS and not any(
-        terms[k]['learned'] and (_family_words(rows[k]['id']) & said) - own for k in named_)
+    thing = any(terms[k]['learned'] and (_family_words(rows[k]['id']) & said) - own for k in named_)
+    plain = alone and not said & TONE_STEMS and not thing
+    # an interface job without musical words: no pitched design (any interface job named: `ui_job`), and the real
+    # thing of the job (INTERFACE_JOBS) raised when the job is the head, or the first job of a request whose head is
+    # a word too common to lead ("a modal slides in": open), the kind of sound ("a swoosh that flies away": send)
+    # or the place of the job ("open a menu": open)
+    music = bool(said & MUSIC_STEMS) or bool(b.get('voice')) or dom == 'music' or 'music' in b['concepts']
+    ui_job = dom != 'game' and mat != 'retro' and any(c in L.INTERFACE_JOBS for c in b['concepts'])
+    lead = None if head in L.SOUND_FAMILIES or head in L.INTERFACE_PLACES else head
+    job = L.INTERFACE_JOBS.get(lead) or (next((L.INTERFACE_JOBS[c] for c in b['concepts'] if c in L.INTERFACE_JOBS),
+                                              None) if lead is None else None)
+    job = job if ui_job else None
     pool = (named_ or [k for k in invented if dom in rows[k].get('domains', ())]
             or invented or list(score))                # nothing named: the closest in feel, in the request's domain
     if mat == 'retro' and not any(chip(rows[k]) for k in pool):
@@ -1118,7 +1139,15 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
         s *= row.get('prior', 1.0)
         if row['id'] in L.BY_NAME_ONLY and alone and not said & TONE_STEMS:
             s *= BY_NAME
-        elif (plain and t['learned'] and head in _roles().get(row['id'], ())
+        elif ui_job and not music and _pitched(row, t):
+            s *= BY_NAME      # "a success sound": no marimba figure; "a success chime", "on a harp": the figure
+        elif ui_job and music and 'interface' in row.get('tags', ()):
+            s *= BY_NAME
+        elif job == row['id'] and not thing:
+            s *= REAL         # "a success sound", "toggle on", "message received": the real thing of the job
+        elif 'interface' in row.get('tags', ()) and (not ui_job or (lead and lead not in L.INTERFACE_JOBS)):
+            s *= BY_NAME      # the request is about something else ("when the brand pops up": a logo)
+        elif (plain and t['learned'] and head in _roles().get(row['id'], ()) and not job
               and not (mat and mat not in t['mats'])):
             s *= ROLE         # "a tap", "hover", "toggle on": the recorded one; not when it is of another material
             #                   than the request names ("a wooden tap" is no plastic key)
@@ -1141,6 +1170,12 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
     return _named_member(b, out, idx)[:top]
+
+
+def _pitched(row, t):
+    """True for an invented design with a note in it (a figure on an instrument, a tick of a wood block, a game's
+    menu blip): on a website it reads as a toy or a ringtone"""
+    return not t['learned'] and bool(row.get('pitch'))
 
 
 def _roles():

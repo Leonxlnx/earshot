@@ -423,6 +423,17 @@ FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride'
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
 BY_NAME_ONLY = frozenset(('tap/tone', 'hover/tone', 'toggle/up', 'toggle/down', 'next/step'))
+# the interface jobs and the sound of a real thing that plays each (earshot.sounds.interface: a switch, a page, two
+# knocks, a pop). A plain request for the job gets it; a pitched interface design (a figure on a marimba, a tick of a
+# wood block) answers only a request that asks for music (brief.MUSIC_STEMS, an instrument named), and these then
+# step back. tap and type stay with the recorded keys (earshot.sounds.learned `roles`)
+INTERFACE_JOBS = {'hover': 'hover/fingertip', 'switch_on': 'toggle/rocker_on', 'switch_off': 'toggle/rocker_off',
+                  'toggle': 'toggle/rocker_on', 'next': 'next/page', 'back': 'back/page', 'undo': 'back/page',
+                  'open': 'open/air', 'close': 'close/air', 'send': 'send/swoosh', 'receive': 'receive/pop',
+                  'notify': 'notify/knock', 'success': 'success/click', 'warning': 'warning/knock',
+                  'error': 'error/thud', 'delete': 'delete/crumple'}
+# where an interface job happens, not what it is: "open a menu" is an opening (brief.rank)
+INTERFACE_PLACES = frozenset(('menu',))
 # an invented design -> the learned design (earshot.sounds.learned: recordings) of the same thing. An invented
 # tactile sound scores 1 to 2 of 5 in listening tests and the recorded one 4 to 5, so a request that names the thing
 # and reaches the invented one gets the recording (brief._preferred); the invented one still answers to its own id

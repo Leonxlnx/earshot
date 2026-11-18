@@ -539,7 +539,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     a sprite repeats a region of the decoded audio, away from the file's padded ends. The result also carries
     `also` and `not_in_sound` by the name of each sound asked for in words; the summary shows them only where the
     pick is in doubt, and says when two names got the same sound; two names that play different recordings of one
-    learned design (toggle_on and toggle_off of `ui`) get a plain note saying which recording each plays."""
+    learned design (an on and an off of one switch) get a plain note saying which recording each plays."""
     from .sounds import registry
     from .synth import master
     from .sounds import sets
@@ -547,7 +547,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
         spec = {'set': spec} if spec in sets.SETS else read_json(spec)
     items, skipped, quiet = list(spec.get('sounds') or []), [], ()
     if spec.get('set'):
-        base = sets.get(spec['set'])
+        base = sets.get(spec['set'], theme or spec.get('theme'))     # a theme named: the tonal figures
         theme = theme or spec.get('theme') or base['theme']
         named = {it.get('name') for it in items}
         have = set(registry.ids())

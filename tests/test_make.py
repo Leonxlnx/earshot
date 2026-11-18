@@ -161,7 +161,7 @@ def test_also_is_filled_from_the_catalogue(tmp_path):
         assert len(part.split(' (', 1)[1]) <= 44, part                 # about 40 characters each
     res = make('pause menu open', str(tmp_path / 'p.wav'))
     s = res['summary']
-    assert 'also (the pick is a guess' in s and 'open/lift' in s     # "menu open" is a job of open/lift: the pick
+    assert s.startswith('p.wav: open/air')                         # "menu open" is a job of open/air: the pick
     res = make('crickets at night', str(tmp_path / 'n.wav'), dur=2, loop=False)
     assert len(res['also']) == 3 and 'also: ' + ', '.join(res['also']) in res['summary']
     assert sum(1 for ln in res['summary'].splitlines() if 'also' in ln) == 1
@@ -273,7 +273,7 @@ def test_a_set_of_one_shots_is_full_and_balanced(tmp_path):
     src = learned.index()[tap['sound']]['members'][tap['member']['n'] - 1]['credit']['title']
     assert src.startswith('Computer Keyboard - single key')          # the fullest mechanical key
     assert tap['member']['recording'] == f"recording {tap['member']['n']} of {tap['member']['of']}"
-    assert {r['name']: r['sound'] for r in res['sounds']}['hover'] == 'leather/grab'
+    assert {r['name']: r['sound'] for r in res['sounds']}['hover'] == 'hover/fingertip'
 
 
 def test_make_set_spec_file_with_a_byte_order_mark(tmp_path):

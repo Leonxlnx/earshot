@@ -254,16 +254,17 @@ def test_rank_default_index_is_cached():
 
 
 def test_plain_interface_jobs_get_recorded_keys_and_switches(idx):
-    """a plain tap, click, hover, toggle, next or key press is the recorded design chosen for that job (the learned
-    index's roles, the ui set's sounds); the tonal figures answer when named or asked for as a tone; a recording
-    answers only a request that names its thing"""
+    """a plain tap, click, hover, toggle, next or key press is the real sound chosen for that job (the sound of a
+    real thing, lexicon.INTERFACE_JOBS, else the learned index's roles); the tonal figures answer when named or asked
+    for as a tone; a recording answers only a request that names its thing"""
     from earshot.sounds import learned, registry
     roles = {r: sid for sid, e in learned.index().items() for r in e.get('roles', ())}
     for text, job in (('tap', 'tap'), ('a button press', 'tap'), ('click', 'click'), ('hover', 'hover'),
                       ('toggle on', 'switch_on'), ('toggle off', 'switch_off'), ('switch', 'toggle'),
                       ('next', 'next'), ('type', 'type'), ('key press', 'type'), ('select', 'menu_select')):
         got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
-        assert got == roles[job] and 'real' in registry.get(got).tags, (text, got)
+        want = L.INTERFACE_JOBS.get(job) or roles[job]
+        assert got == want and 'real' in registry.get(got).tags, (text, got)
     assert brief.rank(brief.read('a tonal tap'), idx=idx, top=1)[0]['id'] == 'tap/tone'
     assert brief.rank(brief.read('a two-note next step chime'), idx=idx, top=1)[0]['id'] == 'next/step'
     for text in ('sword on armour', 'a heavy impact', 'a soft wooden success chime', 'thin swish', 'water droplet',

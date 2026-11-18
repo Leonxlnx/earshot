@@ -125,13 +125,14 @@ def test_every_model_loads():
 
 
 def test_the_ui_set_plays_the_designs_chosen_for_its_roles():
+    """tap is the recorded key chosen for it; every role is a sound of a real thing (a learned design, or one made
+    of learned designs by earshot.sounds.interface), none a figure on an instrument"""
     ui = dict(sets.SETS['ui']['sounds'])
     roles = {r: sid for sid, e in INDEX.items() for r in e.get('roles', ())}
-    assert ui['tap'] == roles['tap'] and ui['hover'] == roles['hover'] and ui['next'] == roles['next']
-    assert ui['toggle_on'] == ui['toggle_off'] == roles['switch_on'] == roles['switch_off']
-    assert ui['type'] == roles['type'] and all(INDEX[s]['default'] for s in roles.values())
-    for name in ('tap', 'hover', 'toggle_on', 'toggle_off', 'next', 'type'):
-        assert 'real' in registry.get(ui[name]).tags, name
+    assert ui['tap'] == roles['tap'] and INDEX[ui['tap']]['default']
+    for name, sid in ui.items():
+        d = registry.get(sid)
+        assert 'real' in d.tags and not d.pitch and not d.voice, name
 
 
 # ---- renders
@@ -261,14 +262,12 @@ def test_seeds_of_one_recording_are_performances(sid):
     assert max(c) / min(c) < 1.35 and max(lv) - min(lv) < 2.5, (c, lv)
 
 
-def test_back_and_next_are_two_keys_of_one_keyboard():
-    ui = sets.SETS['ui']
-    sound = dict(ui['sounds'])
-    assert sound['back'] == sound['next'] == 'keyboard/laptop'
-    back, nxt = (learned.pick('keyboard/laptop', ui['seeds'][n]) for n in ('back', 'next'))   # the set pins them
-    members = INDEX['keyboard/laptop']['members']
-    assert members[back]['quality']['centroid'] < members[nxt]['quality']['centroid']        # back the lower one
-    assert members[back]['quality']['peak'] < members[nxt]['quality']['peak']                # and the softer
+def test_back_and_next_are_one_page_turned_two_ways():
+    """next and back are the same page: back the darker and shorter flick"""
+    ui = dict(sets.SETS['ui']['sounds'])
+    assert ui['next'] == 'next/page' and ui['back'] == 'back/page'
+    nxt, back = (registry.render(ui[n], seed=0)[0] for n in ('next', 'back'))
+    assert _centroid(back) < 0.85 * _centroid(nxt) and len(back) < len(nxt)
 
 
 # recordings with the best listening score (1 to 5) of their thing, which seed 0 plays first by design
@@ -306,17 +305,11 @@ def test_a_retake_plays_the_same_recording():
 
 
 def test_the_ui_set_plays_the_members_chosen_for_its_roles():
-    """tap the fullest mechanical key, type the other mechanical key, toggles two lamp switches (the off the
-    darker one), hover the soft leather touch"""
+    """tap is the fullest mechanical key (the set pins its seed)"""
     ui = sets.SETS['ui']
     sound = dict(ui['sounds'])
     src = {n: INDEX[sound[n]]['members'][learned.pick(sound[n], s)]['source'] for n, s in ui['seeds'].items()}
-    assert src['tap'] == 'freesound-380142' and src['type'] != src['tap']
-    assert src['toggle_off'] != src['toggle_on']
-    off = INDEX['switch/lamp']['members'][learned.pick('switch/lamp', ui['seeds']['toggle_off'])]
-    assert off.get('rating_final') == 3
-    hover = INDEX['leather/grab']['members'][learned.pick('leather/grab', ui['seeds']['hover'])]
-    assert hover['quality']['centroid'] == min(m['quality']['centroid'] for m in INDEX['leather/grab']['members'])
+    assert src['tap'] == 'freesound-380142'
 
 
 def _loudest(y, ms):

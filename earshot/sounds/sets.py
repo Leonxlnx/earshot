@@ -12,21 +12,25 @@ game audio teams work from; a product rarely needs more than a dozen distinct so
 event making noise.
 """
 SETS = {
-    # the touches are recorded keys and switches (earshot.sounds.learned): tonal touches are hard to recognise as
-    # touches, a real key reads at once. tap is the fullest mechanical key (keyboard/mechanical, first in its walk),
-    # type the other mechanical key; next and back the two laptop keys nearest that key (next member 4, back
-    # member 1: the darker and softer); toggle_on and toggle_off two recordings of switch/lamp, the off the darker one
-    # (member 1), the on member 2; hover the softest, lowest short touch that is not thin (leather/grab member 1).
-    # No theme: the figures play in their own key and voice (moved to C, darker and softer, they sound dull)
-    'ui': dict(says='a product interface: app, website, dashboard', theme=None,
-               seeds={'tap': 0, 'type': 1, 'hover': 1, 'toggle_on': 1, 'toggle_off': 0, 'back': 4, 'next': 3},
+    # every role is a real thing a hand does (earshot.sounds.interface, made of learned recordings): a key, a switch,
+    # a page, knocks, a pop, a stick through the air, a stapler, paper. A row of pitched notes on a marimba or a bell
+    # reads as a toy or a ringtone on a website, so the figures (earshot.sounds.ui) play only when a theme is named:
+    # `themed` is the set then. tap is the fullest mechanical key (keyboard/mechanical, first in its walk); the pairs
+    # are one thing done two ways (the switch on smaller and brighter, off bigger and duller; the page forward, back
+    # darker and shorter; open a click and air leaving, close air drawn in and a latch)
+    'ui': dict(says='a product interface: app, website, dashboard', theme=None, seeds={'tap': 0},
                quiet=('hover',), sounds=(
-        ('tap', 'keyboard/mechanical'), ('hover', 'leather/grab'), ('toggle_on', 'switch/lamp'),
-        ('toggle_off', 'switch/lamp'), ('type', 'keyboard/mechanical'), ('back', 'keyboard/laptop'),
-        ('next', 'keyboard/laptop'), ('open', 'open/lift'), ('close', 'close/drop'),
-        ('send', 'send/lift'), ('receive', 'receive/drop'), ('notify', 'notify/pair'), ('success', 'success/rise'),
-        ('complete', 'success/triad'), ('warning', 'warning/pulse'), ('error', 'error/fall'),
-        ('delete', 'delete/drop'))),
+        ('tap', 'keyboard/mechanical'), ('hover', 'hover/fingertip'), ('toggle_on', 'toggle/rocker_on'),
+        ('toggle_off', 'toggle/rocker_off'), ('type', 'type/key'), ('back', 'back/page'), ('next', 'next/page'),
+        ('open', 'open/air'), ('close', 'close/air'), ('send', 'send/swoosh'), ('receive', 'receive/pop'),
+        ('notify', 'notify/knock'), ('success', 'success/click'), ('complete', 'complete/stamp'),
+        ('warning', 'warning/knock'), ('error', 'error/thud'), ('delete', 'delete/crumple')),
+               themed=(
+        ('tap', 'tap/tone'), ('hover', 'hover/tone'), ('toggle_on', 'toggle/up'), ('toggle_off', 'toggle/down'),
+        ('type', 'tap/tone'), ('back', 'back/step'), ('next', 'next/step'), ('open', 'open/lift'),
+        ('close', 'close/drop'), ('send', 'send/lift'), ('receive', 'receive/drop'), ('notify', 'notify/pair'),
+        ('success', 'success/rise'), ('complete', 'success/triad'), ('warning', 'warning/pulse'),
+        ('error', 'error/fall'), ('delete', 'delete/drop'))),
     'game': dict(says='a modern game: menus, rewards, jingles and the common actions', theme='tine', sounds=(
         ('menu_move', 'menu/move'), ('menu_select', 'menu/select'), ('menu_back', 'menu/back'),
         ('coin', 'coin/bright'), ('pickup', 'pickup/blip'), ('gem', 'gem/sparkle'), ('heal', 'heal/chime'),
@@ -50,7 +54,12 @@ SETS = {
 }
 
 
-def get(name):
+def get(name, theme=None):
+    """the set by name; with a theme named, a set that has a `themed` list plays that one (the tonal figures,
+    which the theme puts in one key, voice and room)"""
     if name not in SETS:
         raise ValueError(f'unknown set {name!r}: one of {", ".join(SETS)}')
-    return SETS[name]
+    base = SETS[name]
+    if theme and base.get('themed'):
+        return dict(base, sounds=base['themed'], seeds={}, quiet=())
+    return base

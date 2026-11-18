@@ -182,6 +182,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 
 ### Changed
 
+- **The `ui` set and plain interface requests are real things** (a switch, a page, knocks; `sounds/interface.py`);
+  figures on instruments answer only musical words or a named theme.
 - **The README** puts making first and listening second; the 0.4 and 0.3 notes moved to a short history.
 - **Package metadata**: version 1.0.0, development status Beta, a description and keywords for both halves; the
   learned models, textures and their credits ship as package data.
