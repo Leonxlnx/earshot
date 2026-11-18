@@ -22,13 +22,23 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
   `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
   `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 227 designs of
-  everyday, interface, game and film sounds learned from 557 recorded events in the public domain (the sources of all
+- Every take of `make` says where things happen in the file: `peak_s` (the loudest moment, also "peak at" on the
+  plain line), `onset_s` (where it starts to be heard) and, for a row of events, `events_s` (each event's start).
+- A row of events no hand plays (ticks, clicks, blips, a counter) follows as close as its own length lets it, so
+  "a counter ticking up, 1.5 seconds" with 12 events is 1.5 s long; knocks and steps keep their 0.12 s limit.
+- A row with a count and a length too short for the usual ring ("a soft thump", 3 events, 0.6 s) keeps the length,
+  and the last event is faded out to end with the file instead of being cut.
+- `knock/double` is two strikes by design: the audit no longer marks its two attacks as stacked layers.
+- A length within 0.1 s of the one asked prints no note; a length word that is not followed ("a short soft whoosh")
+  says to give the length in seconds.
+- `earshot.api` raises the plain missing-extra sentence (MissingExtra) instead of a bare ModuleNotFoundError.
+- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 235 designs of
+  everyday, interface, game and film sounds learned from 571 recorded events in the public domain (the sources of all
   learned material, beds, drums and instrument notes included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and
   CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of
   `earshot/data/resyn/`, `textures/`, `drums/` and `notes/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 12.15 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
+  stored as numbers: 12.50 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
   variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
   the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
@@ -38,6 +48,7 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   real things 1-2 of 5.
 - Animals, people without words, street, house, desk and sport sounds are recordings now (44 designs: a dog barking).
 - More everyday things are recordings now (26 designs: a scream, a sneeze, a sheep, a duck, a glass breaking).
+- Kitchen things are recordings now (8 designs: a knife chop, a pot boiling, a gas stove lit, a fridge door shut).
 - **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
   beds from 12 BigSoundBank textures (5.40 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
   `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
@@ -296,6 +307,11 @@ The changes of the last two days, in the order they were built:
   seconds asked of footsteps no longer choose the surface. The skill and `docs/MAKE.md` say when a page, a game, a
   film or a clip needs a sound and when none, what a set does with your own list, how long and how loud sounds come
   out and where a file's loudest moment lies.
+- The reader reaches the newest recordings by their plain requests ("a tap running", "a frog croaking", "glass
+  breaking", a shooter's reload; a bee is said to be missing, with the fly as the nearest), reads "twice" as two
+  events of one row, "200 ms apart" as the gap and hours as a length, gives a request that only asks for a cue the
+  notification's knocks and a purchase in an app the success click, and no longer answers a request in another
+  language from a look-alike word (German "die").
 
 ### Fixed
 

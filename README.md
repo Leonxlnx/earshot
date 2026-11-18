@@ -45,7 +45,7 @@ sound is, then its character.
 
 | group | designs | how it is made | examples |
 |---|---|---|---|
-| learned things | 227 | learned from 557 recorded events in the public domain (animals, people without words, street, house and devices among them) | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
+| learned things | 235 | learned from 571 recorded events in the public domain (animals, people without words, street, house and devices among them) | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
 | interface | 26 | things a hand does, built from learned recordings: a key, a rocker switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper; no note | `keyboard/mechanical`, `toggle/rocker_on`, `next/page`, `notify/knock`, `success/click`, `error/thud` |
 | interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba); for interfaces only when the words ask for music or a theme is named | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 31 | 13 learned from 12 real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
@@ -89,12 +89,12 @@ one request in three or four of the held-out kind needs a second call, which is 
 
 ### Learned sounds: what they are
 
-The 227 learned designs, 13 ambience beds, the recorded drums, the instrument notes and the film sounds layered
+The 235 learned designs, 13 ambience beds, the recorded drums, the instrument notes and the film sounds layered
 from them are not invented. Each comes from recordings in
 the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an
 explicit public-domain dedication. earshot keeps each recording as numbers, not audio: the level of 56 bands on a
 2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
-(`earshot/synth/resyn.py`). The store is 12.15 MB for 557 recorded events (`earshot/data/resyn/`; a few are several
+(`earshot/synth/resyn.py`). The store is 12.50 MB for 571 recorded events (`earshot/data/resyn/`; a few are several
 events cut from one recording, 26 are recordings of a whole action such as a walk), 5.40 MB for 12 textures
 (`earshot/data/textures/`), 1.31 MB for 130 drum strokes (`earshot/data/drums/`) and 0.83 MB for 97 single notes
 of four instruments (`earshot/data/notes/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh

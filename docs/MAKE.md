@@ -147,9 +147,15 @@ In Python: `from earshot.make import make; make('a door shutting', 'door.wav', s
 as a dict (`summary`, `sound`, `files`, `why`, `also`, `not_in_sound`, `unknown`, `takes`, and `heard` with
 `listen=True`). `make()` also takes `sr` and `bits` for the written file.
 
+Every take (`takes` in Python, `--json`, the MCP result) also says where things happen, in seconds from the start
+of the file: `peak_s` (the loudest moment), `onset_s` (where the sound starts to be heard) and, for a row of events
+(footsteps, knocks, `--events N`), `events_s` (each event's start); the plain line shows the peak. The hit goes on
+the frame at t: start the file at t minus `peak_s`. "a whoosh for a transition" answered `whoosh/soft (0.39 s, peak
+at 0.24 s, ...)`: for its loudest moment on 12.000 s, start it at 11.76 s.
+
 ## Learned sounds
 
-227 designs of everyday, interface, game and film sounds, animals, people, street and house sounds, 13 ambience beds, 33 drum and percussion designs and the
+235 designs of everyday, interface, game and film sounds, animals, people, street and house sounds, 13 ambience beds, 33 drum and percussion designs and the
 notes of four instruments are learned from recordings whose authors put them in the public domain. They are not
 invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
@@ -159,9 +165,9 @@ sound made from nothing, and it exists only because someone recorded the thing a
 
 | | one-shots | ambience beds | drums | instrument notes |
 |---|---|---|---|---|
-| designs | 227 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
-| recordings | 557 recorded events (a few are several events cut from one recording; 26 are recordings of a whole action) | 12 textures of 12-42 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
-| store | `earshot/data/resyn/`: 12.15 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 5.40 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
+| designs | 235 (`earshot/sounds/learned.py`) | 13 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
+| recordings | 571 recorded events (a few are several events cut from one recording; 26 are recordings of a whole action) | 12 textures of 12-42 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
+| store | `earshot/data/resyn/`: 12.50 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 5.40 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
 | sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer, Freesound (the hand claps) | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
@@ -434,7 +440,7 @@ earshot sounds [--search WORDS] [--domain ui|game|motion|ambience|music] [--kind
 
 ```
 $ earshot sounds
-802 sounds in 306 families
+810 sounds in 310 families
 success/rise                0.73 s  three quick rising notes, a short soft confirmation
 success/fifth               0.69 s  two notes a fifth apart rising, an open clear signal
 ...
@@ -698,7 +704,7 @@ sound is or does, the name its character.
 
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
-| learned (`sounds/learned.py`) | 227 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
+| learned (`sounds/learned.py`) | 235 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
 | interface (`sounds/interface.py`) | 26 | `hover/fingertip`, `toggle/rocker_on`, `toggle/rocker_off`, `type/key`, `next/page`, `back/page`, `open/air`, `close/air`, `send/swoosh`, `receive/pop`, `notify/knock`, `success/click`, `complete/stamp`, `warning/knock`, `error/thud`, `delete/crumple`; other candidates `hover/pad`, `next/swipe`, `back/swipe`, `open/drawer`, `receive/cork`, `notify/pop`, `success/shutter`, `complete/latch`, `delete/swish` | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
 | interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation, when the words ask for music or a theme is named | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |

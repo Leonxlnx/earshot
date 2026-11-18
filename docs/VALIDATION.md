@@ -188,7 +188,7 @@ store and to drop members it scored lowest where a design had others.
   a click's rise within 1 ms; a model is 3.6-35 kB (median 9.1 kB); a render takes 0.26-0.33 s per second of sound.
   Weak: soft onsets smear (a bag drop's rise went from 61 to 99 ms); a fast swipe; impacts whose mid band is partly
   carried as noise (takes differ by about 3 dB there).
-- **The store**: 227 designs, 557 members, 12.15 MB (25 of the designs are material of the film sounds,
+- **The store**: 235 designs, 571 members, 12.50 MB (25 of the designs are material of the film sounds,
   below; 23 members are recordings of a whole action, played by a performance); nothing the owner rated
   1-2, no duplicates, at most five single-event members per thing (six notes of low brass for the braam). Seed 0
   plays the member with the best listening score. Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a

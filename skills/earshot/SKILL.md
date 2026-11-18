@@ -28,7 +28,7 @@ are measured.
   designed sound (a whoosh, a pop) only on the few cuts or captions the edit wants felt. A thing the catalogue has
   no recording of (the answer says so) is better recorded or left silent than replaced by a stand-in.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (227 designs:
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (235 designs:
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
 paper, books, glass, ice, water, metal, swings, punches, falls, explosions, animals such as a dog, a cat and birds,
 people without words such as applause, laughter and a cough, a car horn, a siren, a phone ringing or vibrating
@@ -234,8 +234,13 @@ practice they did not test.
     (click/mouse) is the whole mouse button, 0.2 s.
   - a number counting up [not in the measurements]: a row of the same tick as one file, asked with a count and a
     length. `earshot make "a soft ui tick" -o count.wav --events 8 --dur 1.5` answered `count.wav: tick/soft
-    (1.50 s, -15 LUFS, clean) [ui tick]` and `played: 8 events as a row at 6.2 a second`. Events of a row follow no
-    closer than 0.12 s: twelve asked in 1.5 s came out 1.73 s long, and the answer said so.
+    (1.50 s, -15 LUFS, clean) [ui tick]` and `played: 8 events as a row at 6.2 a second`. Ticks, clicks and blips
+    follow as close as their own length lets them: `--events 12` on "a counter ticking up, 1.5 seconds" answered
+    `tick/metal (1.50 s, ...)`; knocks and steps a hand or foot plays keep 0.12 s at the closest.
+  - where the hit is: every take says `peak_s` (the loudest moment; also on the plain line as "peak at"),
+    `onset_s` (where it starts to be heard) and for a row `events_s` (each event's start), in seconds from the start
+    of the file. The hit goes on the frame at t: start the file at t minus peak_s. "a whoosh for a transition"
+    answered `whoosh/soft (0.39 s, peak at 0.24 s, ...)`: for its peak on 12.000 s, start it at 11.76 s.
   - a title card changes, a big transition: a mid-low hit of about 0.3 s that swells in over about 0.1 s, half of
     it under 100 Hz [measured]. Ask "a title hit" or "a title slam" (slam/title: a low body in a short burst of
     air, about a third of a second, then its air dies away).
