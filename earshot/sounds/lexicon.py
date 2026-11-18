@@ -583,6 +583,11 @@ INTERFACE_JOBS = {'hover': 'hover/fingertip', 'switch_on': 'toggle/key_down', 's
                   'error': 'error/knock', 'delete': 'delete/snip', 'like': 'like/pop'}
 # where an interface job happens, not what it is: "open a menu" is an opening (brief.rank)
 INTERFACE_PLACES = frozenset(('menu',))
+# words that say which one of a thing or in which room it is, never what it belongs to: "the front door", "a kitchen
+# timer" are a door and a timer (brief.owner_unknown); "a garage door" or "a car door" name another thing
+WHICH_ONE = frozenset(('front', 'back', 'side', 'main', 'rear', 'top', 'bottom', 'inner', 'outer', 'upper', 'lower',
+                       'old', 'new', 'big', 'little', 'small', 'large', 'kitchen', 'bathroom', 'bedroom', 'hall',
+                       'hallway', 'cellar', 'basement', 'attic', 'office', 'closet', 'entrance'))
 # the jobs of a motion film (a logo, a title hit, a transition, a riser, a glitch ...). Motion films use no
 # instrument note, bell or synthesised tone as an effect: their effects are short low hits, thumps, clicks and
 # passes of air, and their tonal content is their music. A request for one of these jobs (or one whose domain is a

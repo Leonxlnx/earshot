@@ -470,6 +470,7 @@ def test_a_request_nothing_knows_gets_the_nearest_and_says_so(tmp_path):
     ('a stomach growl', 'earshot makes no stomach growl; rumble/quake is only the nearest'),
     ('a paper shredder', 'earshot makes no paper shredder; paper/rip is only the nearest'),
     ('rain on a tarp', 'no rain on a tarp: rain/tent is the nearest surface'),
+    ('a garage door rolling up', 'earshot makes no garage door; door/creak is only the nearest'),
 ])
 def test_a_missing_thing_and_a_missing_surface_are_said_with_alternatives(text, start):
     """the thing or what it does is unknown: the nearest kind of sound, said to be only that; the sound exists but
@@ -579,7 +580,8 @@ def test_a_counted_action_in_a_row_is_one_file_and_a_count_of_things_is_many(tmp
     assert len(claps['files']) == 1 and claps['takes'][0]['performance']['events'] == 3
     count = make('a countdown 3 2 1', str(tmp_path / 'n.wav'))
     assert count['takes'][0]['performance']['pattern'] == 'count' and count['takes'][0]['dur_s'] > 2.0
-    assert len(make('five coin pickups', str(tmp_path / 'p.wav'))['files']) == 5
+    coins = make('five coin pickups', str(tmp_path / 'p.wav'))
+    assert len(coins['files']) == 5 and 'not understood' not in coins['summary']     # "five" is the count
     one = make('a single knock on the table', str(tmp_path / 'o.wav'))
     assert 'performance' not in one['takes'][0]
     two = make(out=str(tmp_path / 't.wav'), sound='tick/wood', events=2)

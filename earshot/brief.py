@@ -1067,6 +1067,11 @@ def read(text, translate=True):
     b['pan'] = m.group(0) if m else None            # where it moves between the speakers (make.unfollowed)
     if m:
         b['unknown'] = [w for w in b['unknown'] if w not in WORD.findall(m.group(0))]
+    if b['events'] and b['events'] > 1:     # "five coin pickups": the number word was read as the count
+        b['unknown'] = [w for w in b['unknown'] if NUMBER_WORDS.get(w) != b['events']]
+    plain = [t for t in toks if t not in PUNCT and t not in ARTICLES]
+    which = {t for t, nxt in zip(plain, plain[1:]) if t in L.WHICH_ONE and nxt not in b['unknown']}
+    b['unknown'] = [w for w in b['unknown'] if w not in which]     # "the front door": which door, understood
     if not b['foreign']:
         _head_unknown(b, toks)
     return b
@@ -1133,6 +1138,9 @@ def _head_unknown(b, toks):
     unknown = set(b['unknown']) - {w for q in QUOTED.findall(b['text'] or '') for w in words(q)}
     if not (unknown or set(toks) & L.SOUND_KINDS.keys()):
         return
+    job = _match(toks, 0)[1].get('c') if toks else None
+    if job in L.INTERFACE_JOBS or L.BROADER.get(job) in L.INTERFACE_JOBS:
+        return                             # "toggle dark mode", "open settings": a job, and what it acts on
     made, seq, i = _made_words(), [], 0
     while i < len(toks):
         t = toks[i]
@@ -1493,7 +1501,7 @@ def owner_unknown(b, sid, why):
         prev = toks[i - 1] if i else None
         hit = _match(toks, i - 1)[1] if prev else {}
         owner = (prev and prev not in L.STOP and prev not in L.MATERIALS and prev not in L.PERSON_WORDS
-                 and len(prev) > 2 and prev.isalpha() and not prev.endswith(DESCRIBING)
+                 and prev not in L.WHICH_ONE and len(prev) > 2 and prev.isalpha() and not prev.endswith(DESCRIBING)
                  and (not hit or 'c' in hit or 'v' in hit))
         said = toks[i - 1:i + 1] if prev and (owner or prev.endswith(DESCRIBING)) else [t]
         if (owner and stem(prev) not in have and (hit or {}).get('c') not in have
@@ -1521,6 +1529,8 @@ def not_made(b, why=None):
     said = set(_said_words(b.get('text')).values())
     text = ' '.join(toks)
     for p in L.NOT_MADE_PHRASES:
+        if any(p in L.CONCEPTS.get(c, ()) for c in why or ()):
+            continue                   # "a kitchen timer ringing": a name of the job the design was picked for
         if f' {p} ' in f' {text} ' and not set(p.split()) & ctx and set(p.split()) <= said:
             return p
     whole = {w for p in why or () if p.startswith('ph:') for w in p[3:].split()}

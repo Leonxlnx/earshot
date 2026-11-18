@@ -140,6 +140,9 @@ before: numba is the one new requirement, and the listening stack moved to an ex
 - **Digital silence is counted across all channels** (#29; thanks, @liugedragon): `digital_silence_frac` is the share
   of frames where every channel is under 1e-6; one silent channel or phase cancellation no longer counts.
 - **An empty picture-only range is an error** (#30; thanks, @liugedragon), not an empty timeline.
+- **Fewer false guesses**: "toggle dark mode", "the front door", "a kitchen timer ringing" and "a riser" are no
+  longer called guesses, and a number word read as the count is no longer "not understood"; the credits of the
+  ambience textures name the seconds of the published recording.
 
 ## 0.4.1 - 2026-11-06
 

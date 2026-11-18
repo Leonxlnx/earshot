@@ -207,8 +207,8 @@ Ask for each thing the picture shows as that thing, with its place or surface, a
 balance: "steady rain on a terrace, 8 seconds, no loop" (rain/street), "the heavy wooden front door falls shut"
 (door/shut), "keys jingling" (keys/bunch), "a phone vibrating on a table" (phone/vibrate), "distant thunder"
 (thunder/distant), "footsteps on concrete, 4 seconds" (step/concrete, a walk). Read what the picked design is
-before it goes under a picture: "a kitchen timer ringing" answered `timer/done`, an app's timer figure on a
-marimba, with `earshot makes no kitchen timer; timer/done is only the nearest sound it has`. Leave a moment silent, record it, or build it, rather than use a stand-in.
+before it goes under a picture: "a kitchen timer ringing" answers `timer/done`, the catalogue's timer, which is an
+app's timer figure on a marimba, not a wind-up bell. Leave a moment silent, record it, or build it, rather than use a stand-in.
 
 ### Building what is missing: recipes
 

@@ -156,6 +156,9 @@ def doubt(b, cands):
     # FILM_CYMBAL), not another kind of sound; a learned pick
     # whose thing the request names is no guess (brief.thing_named)
     same = {fam} | {k.split('/')[0] for k, v in L.TWINS.items() if v == top['id']}    # door/knock: knock/* too
+    sense = L.FAMILY_SENSE.get(fam, fam)    # rise/* and riser/* are both the riser (lexicon.FAMILY_SENSE)
+    same |= {c['id'].split('/')[0] for c in cands
+             if L.FAMILY_SENSE.get(c['id'].split('/')[0], c['id'].split('/')[0]) == sense}
     others = [c for c in cands[1:] if c['id'].split('/')[0] not in same and L.TWINS.get(c['id']) != top['id']
               and L.FILM_CYMBAL.get(c['id'].split('/')[0]) != top['id']]
     named = (brief.named(top['why']) or brief.thing_named(top['id'], top['why'])

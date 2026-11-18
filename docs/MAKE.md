@@ -1289,16 +1289,15 @@ $ earshot make --spec scene.json -o scene
 rain.wav: rain/street (7.93 s, peak at 4.12 s, -30 LUFS, clean) [terrace, rain]
   7.93 s, shorter than the 8 s asked: the longest this sound is made
 door.wav: door/shut (2.54 s, peak at 1.27 s, -20 LUFS, clean) [door, shut]
-  also (the pick is a guess: earshot makes no front door; door/shut is only the nearest sound it has): car_door/slam (a car door slammed shut), cupboard/shut (a wooden cupboard door closing), gate/metal (a large metal gate swung shut). Name one with sound=<id>
-  not understood: front
+  also: door/close, door/creak, door/open
 keys.wav: keys/bunch (4.21 s, peak at 1.57 s, -15 LUFS, clean) [keys jingling]
   played: 18 events (a recording of the whole action)
 phone.wav: phone/vibrate (1.64 s, peak at 0.38 s, -15 LUFS, clean) [phone, table, vibrating]
 thunder.wav: thunder/distant (7.70 s, peak at 3.22 s, -21 LUFS, clean) [thunder, distant]
 ```
 
-The door is the right recording, but "front door" is read as a thing earshot does not have, so the answer calls it
-a guess: read the design id against the picture, not only the guess line.
+The door is the right recording: a word that says which one or in which room ("front", "kitchen") leaves the thing
+known, while one that names another thing ("a garage door") is answered as a guess that says so.
 
 The entries asked for "steady rain on a terrace, 8 seconds, no loop", "the heavy wooden front door falls shut",
 "keys jingling", "a phone vibrating on a table" and "distant thunder". A thing the catalogue has no recording of

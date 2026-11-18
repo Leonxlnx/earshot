@@ -1295,6 +1295,34 @@ def test_a_known_thing_is_not_said_to_be_missing(idx, text, want):
     assert not (doubt(b, cands) or '').startswith('earshot makes no'), doubt(b, cands)
 
 
+@pytest.mark.parametrize('text,want', [
+    ('toggle dark mode', 'toggle/'), ('the heavy wooden front door falls shut', 'door/shut'),
+    ('five coin pickups', 'coin/'), ('a riser before the drop', 'rise/'), ('a kitchen timer ringing', 'timer/done'),
+])
+def test_a_job_and_what_it_acts_on_which_one_a_count_and_a_name_of_the_job_are_no_guess(idx, text, want):
+    """an interface job said with the thing it acts on, a word that says which one ("front", "kitchen"), a number
+    read as the count, the riser's two families and a name the lexicon gives a job leave nothing missing"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=8)
+    assert cands[0]['id'].startswith(want) and doubt(b, cands) is None, (cands[:2], doubt(b, cands))
+    assert not {'five', 'front', 'kitchen'} & set(b['unknown']), b['unknown']
+
+
+@pytest.mark.parametrize('text,said', [
+    ('toggle a fax machine', 'earshot makes no fax machine'), ('a garage door rolling up', 'earshot makes no garage'),
+    ('a front loader dumping gravel', 'earshot makes no front loader'), ('five fax machines', 'earshot makes no fax'),
+    ('a kitchen mixer whirring', 'earshot makes no kitchen mixer'),
+    ('the back door slams', 'another kind of sound fits almost as well'),
+])
+def test_the_neighbours_of_those_stay_honest(idx, text, said):
+    """an unknown thing after a job, an owner that names another door, an unknown thing after "front" or "kitchen"
+    or a count, and two families of different sounds that tie still say so"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    assert (doubt(b, brief.rank(b, idx=idx, top=8)) or '').startswith(said)
+
+
 @pytest.mark.parametrize('text,want,material', [
     ('rain on wood', 'rain/', 'wood'), ('a ball bouncing on wood', 'ball/bounce', 'wood'),
     ('water dripping on metal', 'water/drop', 'metal'), ('footsteps in mud', 'step/mud', None),
