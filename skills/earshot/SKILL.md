@@ -8,7 +8,7 @@ description: Make sounds with earshot whenever a product, game, page, animation 
 ## Making sounds
 When a product, game, page or film needs a sound and no recording is given, make it: earshot picks a design from its
 catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
-complete on its own.
+complete on its own. If the `earshot` command is not installed yet, see Setup at the end.
 
 **When a sound, and when none.** Most moments get none. A sound belongs where something happened that a person
 should notice without looking at it. What follows is common practice; only the motion video numbers further down
@@ -306,10 +306,14 @@ inside the MCP server or one Python script the models load once and repeat calls
 handful of calls, use MCP or a short script (`from earshot import api; api.find(...); api.realness(...)`).
 
 ## Setup (once)
+This skill is the instructions; the tool is a Python package. If the `earshot` command is missing, install it:
 ```
-pip install -e "/path/to/earshot[mcp,llm]"   # or the repo venv: /path/to/earshot/.venv/bin/python -m earshot ...
+pip install "earshot @ git+https://github.com/Leonxlnx/earshot"                 # makes sounds: no model, no GPU
+pip install "earshot[listen,mcp] @ git+https://github.com/Leonxlnx/earshot"     # adds listening and the MCP server
 earshot doctor                           # packages, ffmpeg, models (pinned revision, cache state); --load times them
 ```
+Making sounds needs only the first line. Listening downloads two open models (~1.1 GB) on first use. In a clone of
+the repo, `pip install -e ".[all]"` does the same from the folder.
 Two ways in, same functions:
 - **CLI**: `earshot <command> ... [--json] [--out result.json]`. Text output starts with a plain summary; times are
   m:ss.ss in text and seconds in JSON.
