@@ -34003,15 +34003,13 @@
   "uses": [
    "bite",
    "crunch",
-   "eating",
-   "chewing",
    "apple bite",
    "carrot"
   ],
   "tags": [
    "food",
    "crunch",
-   "eat"
+   "apple"
   ],
   "domains": [
    "game",
@@ -34934,12 +34932,12 @@
    "a single frog calling at a pond"
   ],
   "uses": [
-   "frog",
    "croak",
    "croaking",
    "ribbit",
    "toad",
-   "frog croaking"
+   "frog croaking",
+   "frog call"
   ],
   "tags": [
    "frog",
@@ -35531,7 +35529,7 @@
   "uses": [
    "motorcycle",
    "motorbike",
-   "bike passing",
+   "motorcycle passing",
    "scooter"
   ],
   "tags": [
