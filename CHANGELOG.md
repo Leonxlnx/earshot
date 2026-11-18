@@ -270,6 +270,9 @@ The changes of the last two days, in the order they were built:
 - The second drum roll recording plays last: the engine clicks at one of its onsets.
 - A hand clap is a single clap of one person clapping (`clap/hands`, from "Solo Clap" on Freesound, CC0); "three
   claps" and "clapping" play it.
+- The reader understands more requests that describe the moment instead of naming the job ("a title lands", "the
+  camera pushes in", "a swoosh as the message goes out", "grab a card to drag it", "the logo locks up", "the numbers
+  count up"); a thud for a film or a title is never a drum of the kit unless the words name one.
 
 ### Fixed
 

@@ -1088,13 +1088,22 @@ def chip(row):
     return 'retro' in row['tags'] or row.get('material') == 'retro'
 
 
+def kit_out(b, row):
+    """True for a drum of the kit (kick, tom, snare) asked for by a film or motion request that names no part of the
+    kit: "a thud as the logo settles" is the film's low hit, "a kick drum on the beat of the trailer" the kit's"""
+    return (b.get('domain') == 'motion' and row['id'].split('/')[0] in L.KIT_DRUMS
+            and not set(tokens(b.get('text') or '')) & L.KIT_WORDS)
+
+
 def excluded(b, row, t):
     """True when the request's hard filters rule a design out whatever it sounds like: chip sound asked for and the
     design is not one (or the other way round), a loop asked for and the design is a one-shot, or the design plays a
-    job the request rules out ("not an error")"""
+    job the request rules out ("not an error"), or it is a drum of the kit a film request did not ask for (kit_out)"""
     if (b.get('material') == 'retro') != chip(row):
         return True
     if b.get('loop') and not row.get('loop'):
+        return True
+    if kit_out(b, row):
         return True
     return any(c in t['uses'] or c in t['name'] for c in b.get('not', ()))
 
@@ -1249,10 +1258,16 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     # a word too common to lead ("a modal slides in": open), the kind of sound ("a swoosh that flies away": send)
     # or the place of the job ("open a menu": open)
     music = bool(said & MUSIC_STEMS) or bool(b.get('voice')) or dom == 'music' or 'music' in b['concepts']
-    ui_job = dom not in ('game', 'motion') and mat != 'retro' and any(c in L.INTERFACE_JOBS for c in b['concepts'])
+    # a sound word as the head and the moment after it ("a quick swoosh as the message goes out"): the job of the
+    # moment when its real thing is that kind of sound (a send is a swoosh; a modal opening is no thump)
+    kinds = {r['id']: r.get('kind') for r in rows}
+    moment = next((c for c in b['context'] if c in L.INTERFACE_JOBS and kinds.get(L.INTERFACE_JOBS[c]) == head),
+                  None) if head in L.SOUND_FAMILIES and not any(c in L.INTERFACE_JOBS for c in b['concepts']) else None
+    ui_job = dom not in ('game', 'motion') and mat != 'retro' and (
+        any(c in L.INTERFACE_JOBS for c in b['concepts']) or bool(moment))
     lead = None if head in L.SOUND_FAMILIES or head in L.INTERFACE_PLACES else head
-    job = L.INTERFACE_JOBS.get(lead) or (next((L.INTERFACE_JOBS[c] for c in b['concepts'] if c in L.INTERFACE_JOBS),
-                                              None) if lead is None else None)
+    job = L.INTERFACE_JOBS.get(lead) or (next((L.INTERFACE_JOBS[c] for c in b['concepts'] + [moment]
+                                               if c in L.INTERFACE_JOBS), None) if lead is None else None)
     job = job if ui_job else None
     # a page or an app (its domain said: a button, a list, a screen) asks for the sound of a real thing too: a
     # pitched design answers it only when the words ask for music, for jobs that all have a design without a note
@@ -1284,6 +1299,8 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     out = []
     for k, retro in zip(pool, is_retro):
         row, t, s = rows[k], terms[k], score[k]
+        if kit_out(b, row):
+            continue
         for c in b.get('not', ()):
             if c in t['uses'] or c in t['name']:
                 s *= 0.5                                       # "not an error", "smooth, not clicky"

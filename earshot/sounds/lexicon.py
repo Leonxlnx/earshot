@@ -40,7 +40,7 @@ CONCEPTS = {
     'undo': ('redo', 'revert'),
     'next': ('forward', 'continue', 'proceed', 'advance', 'onward', 'onwards', 'next step', 'next page', 'next slide',
              'page change', 'tab', 'navigate', 'navigation', 'move ahead', 'moving ahead', 'go ahead', 'step forward',
-             'setup wizard'),
+             'setup wizard', 'switch between', 'switch tabs', 'tab change', 'change tabs'),
     'success': ('confirm', 'confirmation', 'confirmed', 'done', 'complete', 'completion', 'saved', 'save', 'ok',
                 'okay', 'correct', 'correct answer', 'right answer', 'it worked', 'worked', 'approved', 'approve',
                 'verified', 'verify', 'valid', 'task done', 'check mark', 'checkmark', 'tick mark', 'yes',
@@ -74,10 +74,11 @@ CONCEPTS = {
                 'message comes in', 'comes in', 'chat message', 'got a message', 'got a text', 'new chat'),
     'send': ('sent', 'message sent', 'submit', 'outgoing', 'share', 'upload', 'fire off', 'send off',
              'fly away', 'flies away', 'whoosh away', 'sending', 'text sent', 'flown off', 'fly off', 'flew off',
-             'zoom off', 'zoom away', 'email sent', 'off it goes', 'outbox', 'dispatch'),
+             'zoom off', 'zoom away', 'email sent', 'off it goes', 'outbox', 'dispatch', 'goes out', 'go out',
+             'went out'),
     'delete': ('remove', 'trash', 'bin', 'discard', 'clear', 'erase', 'archive', 'throw away', 'throwing away',
                'throw out', 'recycle', 'wastebasket', 'dispose', 'throw in the bin', 'throwing stuff in the bin',
-               'get rid of', 'wipe', 'scrap', 'junk', 'garbage', 'rubbish'),
+               'get rid of', 'wipe', 'scrap', 'junk', 'garbage', 'rubbish', 'thrown away', 'thrown out'),
     'like': ('like button', 'favorite', 'favourite', 'favoriting', 'favouriting', 'favorited', 'favourited', 'fave',
              'heart icon', 'heart button', 'hearting', 'hearted', 'love', 'star', 'bookmark', 'upvote', 'reaction',
              'double tap', 'double-tap',
@@ -90,7 +91,9 @@ CONCEPTS = {
     'clock': ('clock tick', 'ticking clock', 'tick tock', 'ticktock', 'tick-tock', 'stopwatch', 'wall clock',
               'grandfather clock', 'running out of time', 'time running out', 'time is running out'),
     'tick': ('tic', 'detent', 'ratchet', 'notch', 'slider', 'slider tick', 'step by step', 'stepper', 'scrub',
-             'scrubbing'),
+             'scrubbing', 'count up', 'counts up', 'counting up', 'count-up', 'tick up', 'ticks up', 'ticking up',
+             'snap into place', 'snaps into place', 'snapped into place', 'snapping into place', 'click into place',
+             'clicks into place', 'clicked into place', 'clicking into place'),
     'type': ('typing', 'keystroke', 'key press', 'keypress', 'key click', 'keyboard', 'keyboard click', 'typewriter',
              'mechanical keyboard', 'text typing', 'typing text', 'type out', 'typed out', 'typewriter-style',
              'typewriter style', 'kinetic type', 'letter by letter', 'per letter', 'one letter at a time',
@@ -99,13 +102,15 @@ CONCEPTS = {
     'swipe': ('slide', 'scroll', 'drag', 'carousel', 'card slide', 'slide change', 'slide in', 'slide out',
               'brush aside', 'push aside', 'pushed aside', 'flick aside', 'swipe aside', 'swipe left', 'swipe right',
               'page through'),
-    'refresh': ('reload', 'sync', 'pull to refresh', 'update'),
+    'refresh': ('reload', 'sync', 'pull to refresh', 'update', 'pull down to refresh', 'pulling down to refresh',
+                'pulled down to refresh', 'pull-to-refresh'),
     'loading': ('load', 'progress', 'processing', 'thinking', 'waiting', 'spinner', 'busy', 'buffering'),
     'purchase': ('buy', 'bought', 'payment', 'pay', 'paid', 'checkout', 'order placed', 'cash register',
                  'transaction', 'sale', 'sold', 'ka-ching', 'kaching', 'cha-ching'),
-    'add': ('add to cart', 'added', 'plus', 'new item', 'insert', 'create', 'created'),
+    'add': ('add to cart', 'added', 'plus', 'new item', 'insert', 'create', 'created', 'basket', 'shopping cart',
+            'shopping basket', 'shopping bag'),
     'unlock': ('login', 'log in', 'sign in', 'access granted', 'authenticated'),
-    'lock': ('logout', 'log out', 'sign out', 'secure'),
+    'lock': ('logout', 'log out', 'sign out', 'secure', 'lock up', 'locks up', 'locked up', 'locking up'),
     'record': ('recording', 'start recording', 'rec', 'record button', 'voice memo'),
     'shutter': ('camera shutter', 'camera', 'take a picture', 'take a photo', 'taking a picture', 'taking a photo',
                 'snapshot', 'screenshot', 'screen capture', 'screen grab', 'slr', 'dslr', 'polaroid', 'photo snap',
@@ -216,17 +221,27 @@ CONCEPTS = {
     'whoosh': ('swoosh', 'woosh', 'air movement', 'transition', 'rush of air', 'air rush', 'wind rush', 'wind-rush',
                'fly through', 'flying through', 'fly across', 'flies across', 'fly in', 'whip pan', 'whooshy',
                'rushing air', 'air sweep', 'rushing', 'blowing past', 'blow past', 'rushing past', 'zoomy',
-               'fly off screen', 'slides off', 'swooshy', 'wusch', 'übergang'),
+               'fly off screen', 'slides off', 'swooshy', 'wusch', 'übergang',
+               # the camera of a film moving fast (a zoom), something leaving the frame
+               'zoom', 'zoom in', 'camera zoom', 'flies off',
+               # the camera moving through the shot
+               'camera push in', 'camera pushes in', 'camera pushing in', 'camera pull out', 'camera pulls out',
+               'camera pulling out', 'camera pan', 'camera pans', 'camera panning', 'camera move', 'camera moves',
+               'camera sweeps', 'push in on', 'pushes in on', 'pull back to reveal', 'pulls back to reveal'),
     # something carried past the listener (a whoosh too: BROADER)
     'flyby': ('fly by', 'fly-by', 'flyover', 'fly over', 'flies past', 'flying past', 'fly past', 'whoosh by',
               'pass by', 'passing by', 'pass', 'zoom by', 'zoom past', 'zooming past', 'streak past', 'drive by',
               'drive-by'),
     'swish': ('swoop', 'flick', 'whip', 'whippy', 'quick whoosh', 'fast pass', 'zing', 'swishy', 'fwip', 'fwoop',
-              'vwip', 'shwip'),
+              'vwip', 'shwip',
+              # a line or stroke drawn on by itself in a film
+              'line draws on', 'line draw on', 'line drawing on', 'stroke draws on', 'stroke draw on'),
     'riser': ('uplifter', 'build', 'build up', 'build-up', 'buildup', 'tension', 'tension build', 'anticipation',
               'crescendo', 'suspense', 'suspenseful', 'ramp up', 'swell', 'keeps climbing', 'keep climbing',
               'getting tenser', 'getting louder', 'about to happen', 'lead in', 'lead-in', 'ramp', 'rising tension'),
     'downlifter': ('down lifter', 'downer', 'wind down', 'winding down', 'decelerate', 'sink', 'settle',
+                   'settle into', 'settles into', 'settled into', 'settling into', 'come to rest', 'comes to rest',
+                   'coming to rest', 'came to rest',
                    'fall away', 'fade away', 'fades away', 'falling sweep', 'down sweep', 'sweep down', 'pitch drop',
                    'pitch dropping', 'pitch-dropping', 'tension release', 'release of tension', 'calm down',
                    'calming down', 'drop away', 'dropping away', 'drops away', 'die down', 'dies down',
@@ -250,7 +265,8 @@ CONCEPTS = {
     'shimmer': ('sparkle', 'twinkle', 'twinkly', 'glitter', 'glittery', 'shine', 'glint', 'gleam', 'fairy dust',
                 'fairy-dust', 'pixie dust', 'magic dust', 'fairy'),
     'pop': ('bubble pop', 'plop', 'pop in', 'pop-in', 'popin', 'bloop', 'boop', 'soap bubble', 'blop',
-            'bop', 'pip up', 'boing in'),
+            'bop', 'pip up', 'boing in', 'scale in', 'scales in', 'scaled in', 'scaling in', 'bounce in',
+            'bounces in', 'bounced in', 'bouncing in'),
     'reverse': ('reverse cymbal', 'reverse swell', 'reverse whoosh', 'suck', 'suck back', 'rewind', 'backwards',
                 'inhale'),
     'pad': ('synth pad', 'atmosphere pad', 'sustained chord', 'held chord', 'chord bed', 'background chord',
@@ -561,7 +577,10 @@ TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile'),
 # with a word of the kit ("a crash cymbal at the end of the fill") the kit's
 FILM_CYMBAL = {'crash': 'cymbal/orchestral'}
 KIT_WORDS = frozenset(('fill', 'fills', 'kit', 'beat', 'beats', 'drum', 'drums', 'drummer', 'groove', 'backbeat',
-                       'band', 'song', 'track', 'loop', 'hi-hat', 'snare', 'kick'))
+                       'band', 'song', 'track', 'loop', 'hi-hat', 'snare', 'kick', 'tom', 'toms'))
+# the drums of the kit: a film or motion request without a word of the kit (KIT_WORDS) gets none of them, its thud
+# or hit is the film's own low hit
+KIT_DRUMS = frozenset(('kick', 'tom', 'snare'))
 # families that name a kind of sound, not a thing: a recorded one (whoosh/rope, knock/hollow) answers a request that
 # also names its thing or character (brief.learned_ok), or plays the interface job it is chosen for (its roles)
 SOUND_FAMILIES = frozenset(('whoosh', 'swish', 'swipe', 'click', 'tap', 'tick', 'knock', 'pop', 'thud', 'boom', 'hit',
@@ -684,7 +703,16 @@ DOMAIN_SENSE = {('music', 'crash'): 'cymbal', ('game', 'kick'): 'hit',
                 ('game', 'collapse'): 'break', ('motion', 'collapse'): 'break', ('ui', 'slide out'): 'open',
                 ('ui', 'slide in'): 'open', ('game', 'activate'): 'power_up', ('game', 'jingle'): 'cue',
                 ('game', 'enable'): 'power_up', ('ui', 'page'): '', ('ui', 'card'): '', ('game', 'star'): 'coin',
-                ('game', 'stars'): 'coin', ('ui', 'item'): '', ('motion', 'horn'): 'braam'}
+                ('game', 'stars'): 'coin', ('ui', 'item'): '', ('motion', 'horn'): 'braam',
+                # what happens on a screen: a file picked up to drag it is a light tick; a title or logo that lands
+                # or settles is a thud, bars that grow a riser, a wipe and a camera zoom moves of the film
+                ('ui', 'pickup'): 'tick', ('ui', 'pick up'): 'tick', ('motion', 'land'): 'thud',
+                ('motion', 'lands on'): 'thud', ('motion', 'grow'): 'riser', ('motion', 'bar'): '',
+                ('motion', 'wipe'): 'whoosh', ('game', 'basket'): '',
+                # a card or panel flipped over is a short swish; a logo that settles, comes to rest or locks up is
+                # the logo's own low hit, not a falling sweep or a lock; in an app a thing grabbed is a light tick
+                ('motion', 'flip'): 'swish', ('motion', 'settle into'): '', ('motion', 'come to rest'): '',
+                ('motion', 'lock up'): '', ('ui', 'grab'): 'tick'}
 # which way a job moves, for designs whose own words do not say it
 CONCEPT_DIR = {'riser': 1, 'downlifter': -1, 'power_up': 1, 'power_down': -1, 'level_up': 1, 'sub_drop': -1,
                'switch_on': 1, 'switch_off': -1, 'open': 1, 'close': -1, 'next': 1, 'back': -1, 'send': 1,
@@ -737,8 +765,9 @@ DOMAIN_WORDS = {'ui': 'ui', 'app': 'ui', 'website': 'ui', 'site': 'ui', 'web': '
                 'modal': 'ui', 'dialog': 'ui', 'onboarding': 'ui', 'screen': 'ui', 'email': 'ui', 'homepage': 'ui',
                 'sidebar': 'ui', 'avatar': 'ui', 'chat': 'ui', 'toolbar': 'ui', 'navbar': 'ui', 'cart': 'ui',
                 'feed': 'ui', 'profile': 'ui', 'login': 'ui', 'signup': 'ui', 
-                'list': 'ui', 'wishlist': 'ui', 'carousel': 'ui',
+                'list': 'ui', 'wishlist': 'ui', 'carousel': 'ui', 'kanban': 'ui', 'sidebar': 'ui', 'toolbar': 'ui',
                 'slider': 'ui', 'accordion': 'ui', 'clipboard': 'ui', 'icon': 'ui', 'nav': 'ui', 'checkbox': 'ui',
+                'file': 'ui', 'folder': 'ui', 'document': 'ui', 'chart': 'motion', 'zoom': 'motion',
                 'documentary': 'motion', 'teaser': 'motion', 'slideshow': 'motion',
                 'sim': 'game', 'simulator': 'game', 'arena': 'game', 'brawler': 'game', 'mmorpg': 'game',
                 'tactics': 'game', 'strategy': 'game', 'popup': 'ui', 'pop-up': 'ui', 'dropdown': 'ui',
@@ -761,7 +790,8 @@ DOMAIN_WORDS = {'ui': 'ui', 'app': 'ui', 'website': 'ui', 'site': 'ui', 'web': '
 # phrases that only say where a sound plays: read as the domain, never as the paper, shot or screen in them
 DOMAIN_PHRASES = {'title card': 'motion', 'end card': 'motion', 'lower third': 'motion', 'product shot': 'motion',
                   'hero shot': 'motion', 'title screen': 'game', 'home screen': 'ui', 'lock screen': 'ui',
-                  'landing page': 'ui', 'hero section': 'ui', 'cut scene': 'game', 'cutscene': 'game'}
+                  'landing page': 'ui', 'hero section': 'ui', 'cut scene': 'game', 'cutscene': 'game',
+                  'next shot': 'motion', 'two shots': 'motion', 'between shots': 'motion'}
 DOMAIN_STRONG = frozenset(('game', 'gaming', 'platformer', 'rpg', 'shooter', 'trailer', 'video', 'film', 'movie',
                            'app', 'website', 'dashboard'))
 

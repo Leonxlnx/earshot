@@ -985,6 +985,62 @@ def test_a_job_keeps_its_only_sounds_and_a_word_its_company(idx, text, want):
     assert got.startswith(want), (text, got)
 
 
+@pytest.mark.parametrize('text,want', [
+    ('when you pick up a file to drag it', ('tick/', 'tock/')),
+    ('the big title lands on screen with real weight', ('boom/', 'thump/', 'slam/', 'hit/drop')),
+    ('the logo settles into the middle at the end of the film', ('boom/short', 'sting/reveal', 'thump/')),
+    ('a short papery crunch when an email is thrown away', 'delete/crumple'),
+    ('the camera zooms fast into the laptop screen', 'whoosh/'),
+    ('a quick light swoosh as the message goes out', 'send/swoosh'),
+    ('the bars of the chart grow up one after another', 'rise/air'),
+    ('switching between tabs in the dashboard', 'next/'),
+    ('the old screen flies off to the left', ('whoosh/', 'swoosh/')),
+    ('a quick bright wipe to the next shot', ('whoosh/', 'swoosh/', 'swish/')),
+    ('a pop when someone likes a photo in my cat app', ('like/pop', 'pop/')),
+    ('thump when the card appears', 'thump/'),
+    ('success chime for the checkout of a coffee shop website', 'success/rise'),
+])
+def test_a_described_moment_reaches_its_job_and_keeps_its_sound(idx, text, want):
+    """a request that describes the moment on the screen without the job's name: a file picked up to drag it is a
+    light tick, a title that lands or a logo that settles a low hit, bars that grow a riser, a camera zoom and a wipe
+    passes of air; a sound word with a moment after it gets the job's real thing when that is the same kind of sound
+    (a send is a swoosh, not a thump for a card appearing); a chime asked for keeps its notes"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text,want', [
+    ('grabbing a card on the kanban board', ('tick/', 'tock/')),
+    ('the photo clicks into place in the collage app', ('tick/', 'tock/')),
+    ('the logo locks up at the end of the brand film', ('boom/short', 'sting/reveal')),
+    ('the logo comes to rest in the centre of the frame in the ad', ('boom/short', 'sting/reveal')),
+    ('the camera pushes in on the product in the commercial', 'whoosh/'),
+    ('the camera pans across the mountains in the documentary', 'whoosh/'),
+    ('a line draws on across the map in the video', ('flick/', 'swish/')),
+    ('the card flips over in the animation', ('flick/', 'swish/')),
+    ('the numbers count up to a million in the explainer video', ('tick/', 'clock/tick')),
+    ('the price ticks up as the user adds extras in the app', ('tick/', 'clock/tick')),
+])
+def test_a_moment_word_reaches_its_kind_of_sound(idx, text, want):
+    """the words people use for a moment on a screen: a thing grabbed or clicked into place is a light tick, a logo
+    that locks up or comes to rest the logo's low hit, a camera move a pass of air, a line drawn on or a card flipped a
+    short swish, numbers counting up ticks"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text', ['a thud as the logo appears at the end of the film',
+                                  'a dull thud on the cut in the movie', 'thud for the title card in my video'])
+def test_a_film_thud_is_no_drum_of_the_kit(idx, text):
+    assert not any(r['id'].startswith(('kick/', 'tom/', 'snare/'))
+                   for r in brief.rank(brief.read(text), idx=idx, top=8))
+
+
+def test_a_film_request_that_names_the_kit_keeps_its_drum(idx):
+    got = brief.rank(brief.read('a kick drum thud for the beat of the trailer music'), idx=idx, top=1)[0]['id']
+    assert got.startswith('kick/'), got
+
+
 @pytest.mark.parametrize('text', ['achievement unlocked sound', 'trophy unlocked in a racing game'])
 def test_an_unlocked_achievement_is_no_lock(idx, text):
     assert not brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(('lock/', 'keys/', 'bottle/'))
