@@ -1,9 +1,10 @@
-"""earshot make: ask for a sound in words and get it, made in code.
+"""earshot make: ask for a sound in words and get it, made in code from designs and from recordings learned as
+numbers.
 
-    earshot make "a soft success chime for a finance app" -o public/success.ogg
+    earshot make "a soft success sound for a finance app" -o public/success.ogg
     earshot make "coin pickup, bright" -o sfx/coin.wav --n 3            # coin_1.wav .. coin_3.wav: three takes
     earshot make "rain on a window" -o rain.ogg --dur 20                # a seamless loop
-    earshot make --set ui --theme glass -o public/sounds --format ogg   # a ready-made set as one family
+    earshot make --set ui -o public/sounds --format ogg                 # a ready-made set as one family
     earshot make --spec sounds.json -o public/sounds                    # your own set in one call (make_set)
     earshot sounds --search "notification"                              # the catalogue, compact
 
@@ -443,7 +444,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         raise ValueError(f'no sound in the catalogue answers {want!r}'
                          + (f' (earshot makes no {absent})' if absent else '')
                          + ': `earshot sounds` lists what there is; name '
-                         'the sound itself (a chime, a click, a whoosh, rain) or the job it plays (success, coin, logo)')
+                         'the sound itself (a chime, a click, a whoosh, rain) or the job it plays '
+                         '(success, coin, logo)')
     req = _request(b, theme)
     heard = None
     pick = cands[0]
@@ -520,7 +522,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
         {"set": "ui", "theme": "glass" | {...}, "format": ["webm", "mp3"], "out": "public/sounds", "mono": true,
          "lufs": -18, "sprite": "sprite.webm",
          "sounds": [{"name": "tap", "want": "a soft tap for buttons"},
-                    {"name": "success", "want": "a happy two-note success chime", "dur": 0.5, "axes": {"bright": 0.2}}]}
+                    {"name": "success", "want": "a quick success sound", "axes": {"bright": 0.2}}]}
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
     takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
     seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). A name's take is its `seed` when
@@ -709,11 +711,11 @@ def _axes(args):
 
 
 def add_cli(sub):
-    p = sub.add_parser('make', help='make a sound in code from a request in words (or a whole set from a spec)')
-    p.add_argument('want', nargs='?', help='the request in words, e.g. "a soft success chime for a finance app"')
+    p = sub.add_parser('make', help='make a sound from a request in words (or a whole set from a spec)')
+    p.add_argument('want', nargs='?', help='the request in words, e.g. "a soft success sound for a finance app"')
     p.add_argument('-o', '--output', help='the file to write; its extension picks the format (wav, flac, ogg, mp3, '
                                           'm4a, webm). With --spec: the folder')
-    p.add_argument('--spec', help='a JSON file of a whole set: {"set": "ui", "theme": "felt", "format": "webm,mp3", '
+    p.add_argument('--spec', help='a JSON file of a whole set: {"set": "ui", "format": "webm,mp3", '
                                   '"sounds": [{"name": "tap", "want": "a soft tap"}, ...]}; docs/MAKE.md has every '
                                   'field. Re-running a spec into the same folder rewrites its files and manifest.json')
     p.add_argument('--set', dest='set_name', help='a ready-made set: ui, game, arcade or film (one family, one call)')
@@ -725,23 +727,28 @@ def add_cli(sub):
     p.add_argument('--sound', help='a design id from `earshot sounds` instead of (or on top of) the words')
     p.add_argument('--n', type=int, default=1, help='how many takes (file_1 .. file_n)')
     p.add_argument('--seed', type=int, default=0)
-    p.add_argument('--theme', help='a theme preset (soft, glass, wood, felt, tine, metal, electric, digital, retro)')
+    p.add_argument('--theme', help='a theme preset (soft, glass, wood, felt, tine, metal, electric, digital, retro): '
+                                   'the voice, key and room of tonal figures; a set with a theme named plays its '
+                                   'figures on that instrument, without one its sounds of real things')
     p.add_argument('--pitch', help='a note (C5) or Hz')
     p.add_argument('--dur', type=float, help='seconds: how long a figure of notes sounds (damped by the hand to end '
                                              'there; a figure rings no longer than it rings), the hold of a pad, the '
                                              'length of an ambience (shorter than its shortest loop: a cut, not a '
-                                             'loop, unless the words say "loop") or a whoosh; a music loop keeps '
-                                             'whole bars; a counted action ("three knocks", footsteps) is spread '
-                                             'over it; a single struck sound (a tap, a hit) rings as it rings: '
-                                             'it ignores --dur and says so')
-    p.add_argument('--voice', help='the instrument or patch of a tonal sound: marimba (the default of figures), '
-                                   'harp, pizzicato and felt_piano are real instruments learned note by note; '
-                                   'kalimba, glockenspiel, vibraphone, soft_pluck ... are models')
+                                             'loop, unless the words say "loop") or a whoosh; a sound learned from '
+                                             'recordings within 0.6 to 1.8 times its natural length; a music loop '
+                                             'keeps whole bars; a counted action ("three knocks", footsteps) is '
+                                             'spread over it; a single struck sound (a tap, a hit) rings as it '
+                                             'rings: it ignores --dur and says so')
+    p.add_argument('--voice', help='the instrument or patch of a tonal sound, played only when named here or in the '
+                                   'words: marimba (the figures\' own voice), harp, pizzicato and felt_piano are '
+                                   'real instruments learned note by note; kalimba, glockenspiel, vibraphone, '
+                                   'soft_pluck ... are models')
     p.add_argument('--material', help='what a tap, click or knock is made of')
     p.add_argument('--events', type=int, help='a thing a person does several times in a row (footsteps, a knock, '
-                                              'typing, coins, keys, clinking glasses): 1 = one event, 2 or more = '
-                                              'the action with that many (any other one-shot: a row of that many '
-                                              'in one file); default: as the words say')
+                                              'typing, coins, keys, clinking glasses, a dog barking): 1 = one '
+                                              'event, 2 or more = the action with that many (any other one-shot: a '
+                                              'row of that many in one file); default: as the words say ("three '
+                                              'knocks", "clapping, 4 seconds")')
     for a in ('bright', 'hard', 'ring', 'size', 'space', 'width', 'energy', 'motion'):
         p.add_argument(f'--{a}', type=float, help='-1 .. 1, 0 = as designed')
     p.add_argument('--lufs', type=float, help='momentary-max loudness instead of a -1 dBFS peak')

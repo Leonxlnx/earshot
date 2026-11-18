@@ -1188,7 +1188,7 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     job = job if ui_job else None
     # a page or an app (its domain said: a button, a list, a screen) asks for the sound of a real thing too: a
     # pitched design answers it only when the words ask for music, for jobs that all have a design without a note
-    # ("a pop for each icon"; a startup or a like, whose designs all have notes, keep them)
+    # ("a pop for each icon"; a startup, whose designs all have notes, keeps them)
     ui_dom = dom == 'ui' and mat != 'retro' and bool(b['concepts']) and set(b['concepts']) <= _real_jobs(idx)
     # a motion job (a logo, a hit, a transition ...; an intro, an appearance, a shine, or any job a design without a
     # note plays, when a film or video is the domain), not a game, and no word that asks for notes: a design with a
@@ -1313,7 +1313,7 @@ def learned_ok(b, sid, t, said):
         return True                     # "four knocks": a number of events only the recorded twin can perform
     own = said - set(b.get('context_words', ()))         # "passes a save point flag": the flag is where, not what
     if sid.split('/')[0] in L.SOUND_FAMILIES and any(v == sid and _family_words(k) & own and _name_words(k) <= own
-                                                     for k, v in L.TWINS.items()):
+                                                     and _twin_said(b, k) for k, v in L.TWINS.items()):
         return True                     # "a knock on the desk" names knock/desk, whose recorded thing this is
     framed = set(b.get('framed', ()))
     if framed and asked - framed:
@@ -1453,14 +1453,18 @@ def _preferred(b, sid, out, idx, twins=True):
     return None
 
 
+def _twin_said(b, sid):
+    """True unless the invented sid's recorded twin is the same thing only with words the request does not say
+    (lexicon.TWIN_WORDS: "a coin dropped" is one coin, not the recorded handful)"""
+    return sid not in L.TWIN_WORDS or bool(set(tokens(b.get('text') or '')) & set(L.TWIN_WORDS[sid]))
+
+
 def _learned_twin(b, sid, out, idx):
     """the learned design of the same thing as the invented sid (lexicon.TWINS: "knocking on a wooden door" is
     door/knock, not knock/door; and for a film request without a word of the drum kit, the film's cymbal for the
     kit's: lexicon.FILM_CYMBAL) when it answers the request too (it is ranked: the request names its thing) and
     nothing rules it out (the hard filters, a direction against the request's), or None"""
-    twin = L.TWINS.get(sid)
-    if sid in L.TWIN_WORDS and not set(tokens(b.get('text') or '')) & set(L.TWIN_WORDS[sid]):
-        twin = None                                  # "a coin dropped": one coin, not the recorded handful
+    twin = L.TWINS.get(sid) if _twin_said(b, sid) else None
     fam = sid.split('/')[0]
     if (not twin and fam in L.FILM_CYMBAL and b.get('domain') == 'motion'
             and not set(tokens(b.get('text') or '')) & L.KIT_WORDS):

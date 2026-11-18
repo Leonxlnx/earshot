@@ -198,6 +198,13 @@ def latch_complete(c, r):
     return _room(c, r, _two(a, b, _gap(c, 0.11), -1.0))
 
 
+def pop_like(c, r):
+    """a small bright pop of the lips over a fingertip on wood: a light, quick pop with a soft body under it"""
+    a = _take(c, r, 'pop/mouth', 1, size=-0.6, bright=1.5)
+    b = _take(c, r, 'fingers/drumming', 1, size=0.3, bright=-1.0, energy=-0.4)
+    return _room(c, r, _cut(D.layer([(a, 0.0, 0.0), (b, -6.0, 0.002)])[0], 0.008, 0.15, 0.06))
+
+
 def crumple_delete(c, r):
     """a sheet of paper crumpled quickly in the hand"""
     return _room(c, r, _cut(_take(c, r, 'paper/ball', 0, size=-0.2), 0.04, 0.45, 0.15))
@@ -276,6 +283,9 @@ ROLES = {
     'complete/latch': (latch_complete, 'click', ('a latch snapped shut and a soft pop after it',
                                                  'a metal click followed by a round pop'),
                        ('complete', 'success', 'done', 'closed'), 0.45),
+    'like/pop': (pop_like, 'pop', ('a small bright pop of the lips with a soft tap under it',
+                                   'a light quick pop with a soft body'),
+                 ('like', 'favorite', 'heart icon', 'upvote'), 0.24),
     'delete/crumple': (crumple_delete, 'noise', ('a sheet of paper crumpled quickly in the hand',
                                                  'a short paper crunch'),
                        ('delete', 'remove', 'trash', 'discard', 'clear'), 0.5),
@@ -286,7 +296,7 @@ ROLES = {
 # the default design of each job (the one a plain request and the ui set get)
 DEFAULTS = ('hover/fingertip', 'type/key', 'toggle/rocker_on', 'toggle/rocker_off', 'next/page', 'back/page',
             'open/air', 'close/air', 'send/swoosh', 'receive/pop', 'notify/knock', 'warning/knock', 'error/thud',
-            'success/click', 'complete/stamp', 'delete/crumple')
+            'success/click', 'complete/stamp', 'delete/crumple', 'like/pop')
 
 # audit findings that are the design: two strikes are two attacks (and two copies of one strike a short comb in the
 # tail), a swish or breath before a click or thud is its lead-in
@@ -306,7 +316,8 @@ PARTS = {'hover/fingertip': ('fingers/drumming',), 'hover/pad': ('click/trackpad
          'receive/cork': ('cork/bottle',), 'notify/knock': ('knock/hollow',), 'notify/pop': ('pop/mouth',),
          'warning/knock': ('door/knock',), 'error/thud': ('bag/drop',), 'success/click': ('pen/ballpoint',),
          'success/shutter': ('camera/shutter',), 'complete/stamp': ('stapler/desk', 'book/place'),
-         'complete/latch': ('lock/latch', 'pop/mouth'), 'delete/crumple': ('paper/ball',),
+         'complete/latch': ('lock/latch', 'pop/mouth'), 'like/pop': ('pop/mouth', 'fingers/drumming'),
+         'delete/crumple': ('paper/ball',),
          'delete/swish': ('swish/fast', 'bag/drop')}
 TWO = ('notify/knock', 'notify/pop', 'warning/knock', 'error/thud', 'success/click', 'complete/latch')
 

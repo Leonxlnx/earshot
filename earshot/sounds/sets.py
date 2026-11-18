@@ -45,12 +45,14 @@ SETS = {
         ('explosion', 'explosion/chip'), ('hurt', 'hurt/chip'), ('power_up', 'power_up/chip'),
         ('power_down', 'power_down/chip'), ('one_up', 'one_up/chip'), ('level_up', 'level_up/chip'),
         ('win', 'win/chip'), ('lose', 'lose/chip'), ('text', 'text/chip'))),
+    # the kinds of effect professional motion films use (docs/motion-sfx-study.md): passes of air, short low hits,
+    # thumps, ticks and clicks, made of real things; no note, bell or synthesised tone (the film's music has those)
     'film': dict(says='a product film or motion-design piece: moves, arrivals, hits and a logo', theme=None, sounds=(
-        ('whoosh', 'whoosh/fast'), ('whoosh_soft', 'whoosh/soft'), ('slide', 'slide/panel'), ('pop', 'pop/soft'),
-        ('tick', 'tock/wood'), ('click', 'click/soft'), ('type', 'typing_key/light'), ('shutter', 'shutter/dslr'),
-        ('hit', 'slam/title'), ('impact', 'boom/deep'), ('drop', 'fall/sub'), ('riser', 'rise/air'),
-        ('swell', 'rise/reverse'), ('glint', 'shine/glint'), ('chime', 'success/rise'), ('sting', 'sting/reveal'),
-        ('logo', 'logo/bloom'))),
+        ('whoosh', 'whoosh/fast'), ('whoosh_soft', 'whoosh/soft'), ('slide', 'slide/panel'),
+        ('pop', 'thump/appear'), ('tick', 'tick/soft'), ('click', 'click/mouse'), ('type', 'typing_key/light'),
+        ('shutter', 'shutter/dslr'), ('hit', 'slam/title'), ('impact', 'boom/deep'), ('drop', 'fall/sub'),
+        ('riser', 'rise/air'), ('swell', 'rise/reverse'), ('glint', 'shine/air'), ('success', 'success/click'),
+        ('sting', 'sting/reveal'), ('logo', 'boom/short'))),
 }
 
 

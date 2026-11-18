@@ -331,3 +331,13 @@ def test_ready_made_sets_name_designs_of_the_catalogue():
         assert len(files) == len(set(files)), name
         assert [i for _, i in s['sounds'] if i not in have] == [], name
         assert s['theme'] is None or s['theme'] in theme.THEMES
+
+
+def test_sets_for_films_and_interfaces_play_no_note():
+    """a set that is not for a game (and no theme named) plays real things: no design with a note in it (a figure
+    on an instrument, a bell, a synthesised tone) answers a motion or interface job unless music is asked for"""
+    for name, s in sets.SETS.items():
+        if name in ('game', 'arcade'):
+            continue
+        noted = [i for _, i in s['sounds'] if registry.get(i).pitch or 'tonal' in registry.get(i).tags]
+        assert noted == [], name

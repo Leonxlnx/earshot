@@ -79,7 +79,8 @@ CONCEPTS = {
                'throw out', 'recycle', 'wastebasket', 'dispose', 'throw in the bin', 'throwing stuff in the bin',
                'get rid of', 'wipe', 'scrap', 'junk', 'garbage', 'rubbish'),
     'like': ('like button', 'favorite', 'favourite', 'favoriting', 'favouriting', 'favorited', 'favourited', 'fave',
-             'heart', 'love', 'star', 'bookmark', 'upvote', 'reaction', 'double tap', 'double-tap',
+             'heart icon', 'heart button', 'hearting', 'hearted', 'love', 'star', 'bookmark', 'upvote', 'reaction',
+             'double tap', 'double-tap',
              'appreciate', 'kudos', 'wishlist', 'wish list'),
     'timer': ('alarm', 'time up', 'times up', 'time is up', 'timer done', 'timer alarm', 'kitchen timer', 'egg timer',
               'oven timer', 'oven', 'microwave', 'timer end', 'timer finished', 'alarm clock', 'wake up', 'wake-up',
@@ -193,8 +194,10 @@ CONCEPTS = {
                   'blowing up', 'blown up', 'blew up', 'firecracker', 'burst', 'noise burst', 'firework',
                   'fireworks', 'dynamite', 'tnt', 'nuke', 'detonator', 'landmine'),
     'shoot': ('shot', 'gun', 'gunshot', 'gunfire', 'fire weapon', 'firing', 'pistol', 'handgun', 'revolver', 'rifle',
-              'shotgun', 'cannon', 'bullet', 'projectile', 'arrow', 'bow shot', 'crossbow', 'musket', 'sniper',
+              'shotgun', 'cannon', 'bullet', 'projectile', 'crossbow', 'musket', 'sniper',
               'fire a weapon', 'pull the trigger'),
+    # an arrow is heard where it lands (the recorded arrow/hit), not as a gunshot
+    'arrow': ('arrows', 'archery', 'archer', 'arrow hit'),
     'laser': ('blaster', 'zap', 'pew', 'pew pew', 'pew-pew', 'ray gun', 'raygun', 'beam', 'phaser', 'plasma'),
     'door': ('gate', 'hatch', 'door open', 'door close', 'creak', 'creaky', 'door slam', 'airlock', 'latch',
              'tür'),
@@ -262,7 +265,7 @@ CONCEPTS = {
     'knock': ('tock', 'thock', 'wood knock', 'rap', 'tok', 'door knock', 'knock knock', 'knock on the door',
               'klopfen', 'anklopfen'),
     'beep': ('bleep', 'bleepy', 'beepy', 'pip', 'blip'),
-    'buzz': ('buzzer', 'buzzy', 'vibrate', 'vibration', 'haptic', 'raspberry', 'blat', 'grumpy honk'),
+    'buzz': ('buzzer', 'buzzy', 'raspberry', 'blat', 'grumpy honk'),
     'hum': ('humming', 'whir', 'whirr', 'drone hum'),
     'crackle': ('crackling', 'crackly'),
     'pluck': ('plucky', 'string pluck', 'strum', 'plink', 'plinky', 'twang'),
@@ -314,7 +317,9 @@ CONCEPTS = {
     'keyring': ('key ring', 'keychain', 'jingle keys', 'keys jingle', 'jingling keys', 'bunch of keys', 'car keys',
                 'house keys'),
     'scissors': ('snip', 'cutting paper'),
-    'heartbeat': ('heart beat', 'heart pounding', 'heartbeat pulse'),
+    'heartbeat': ('heart', 'heart beat', 'heart pounding', 'heartbeat pulse', 'beating heart'),
+    # a phone or a game pad shaking in the hand (a phone buzzing on a table): the recording, not a buzzer's tone
+    'vibrate': ('vibration', 'vibrating', 'haptic', 'haptics', 'haptic feedback'),
     # ---- places and weather
     'storm': ('stormy', 'storm outside', 'distant storm'),
     'rain': ('rainfall', 'drizzle', 'downpour', 'rainy', 'pitter-patter', 'pitter patter', 'rainstorm',
@@ -399,7 +404,12 @@ PERSON_WORDS = frozenset(('woman', 'women', 'man', 'men', 'girl', 'girls', 'boy'
 # app is a notification; "a toast at a wedding", "cups going clink for a toast" are glasses; brief.read)
 WORD_WITH = {'toast': (frozenset(('glass', 'glasses', 'cup', 'cups', 'clink', 'clinking', 'cheers', 'champagne',
                                   'wine', 'wedding', 'drink', 'drinks', 'bride', 'groom', 'party', 'raise',
-                                  'raising')), 'glass_object')}
+                                  'raising')), 'glass_object'),
+             # "shoot an arrow": the arrow, not a gun
+             'shoot': (frozenset(('arrow', 'arrows')), 'arrow'),
+             # "a heart" is a heartbeat; a heart tapped on a post or a song is a like
+             'heart': (frozenset(('tap', 'taps', 'tapped', 'tapping', 'icon', 'button', 'click', 'clicked', 'post',
+                                  'song', 'photo', 'app', 'feed')), 'like')}
 # a job done with the same thing as another one's family: a recorded lock answers an unlocking too (brief.learned_ok)
 SAME_THING = {'unlock': 'lock'}
 # what many people doing a thing at once is ("people clapping": an audience), unless they do it as one ("clapping
@@ -484,7 +494,7 @@ INTERFACE_JOBS = {'hover': 'hover/fingertip', 'switch_on': 'toggle/rocker_on', '
                   'toggle': 'toggle/rocker_on', 'next': 'next/page', 'back': 'back/page', 'undo': 'back/page',
                   'open': 'open/air', 'close': 'close/air', 'send': 'send/swoosh', 'receive': 'receive/pop',
                   'notify': 'notify/knock', 'success': 'success/click', 'warning': 'warning/knock',
-                  'error': 'error/thud', 'delete': 'delete/crumple'}
+                  'error': 'error/thud', 'delete': 'delete/crumple', 'like': 'like/pop'}
 # where an interface job happens, not what it is: "open a menu" is an opening (brief.rank)
 INTERFACE_PLACES = frozenset(('menu',))
 # the jobs of a motion film (a logo, a title hit, a transition, a riser, a glitch ...). Motion films use no
@@ -512,7 +522,8 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge', 'keys/jingle': 'keys/bunch',
          'swish/soft': 'flick/thin', 'pop/soft': 'thump/appear', 'knock/desk': 'knock/table',
          'tap/table': 'tap/fingertip', 'bell/bike': 'bicycle_bell/ring', 'tape/peel': 'tape/roll',
-         'water/pour': 'drink/pour', 'heartbeat/pulse': 'heart/beat', 'shot/pistol': 'gunshot/rifle'}
+         'water/pour': 'drink/pour', 'heartbeat/pulse': 'heart/beat', 'shot/pistol': 'gunshot/rifle',
+         'click/soft': 'click/mouse'}
 # words that ask for the action a person performs, not its single event (earshot.synth.perform; brief.performance):
 # a walk, knocking, typing, a bunch of keys shaken, glasses clinked, a dog barking. A plural of the thing itself
 # ("footsteps", "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key
@@ -542,7 +553,9 @@ TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile'),
               'pop/soft': ('appear', 'appears', 'appearing', 'element', 'elements', 'screen', 'card', 'cards'),
               # a gun named, not a pistol: the recorded rifle shot (gunshot/rifle); an arrow "shot" or a pistol
               # keeps the invented one
-              'shot/pistol': ('gunshot', 'gunshots', 'gun', 'guns', 'gunfire', 'rifle', 'firearm', 'shotgun')}
+              'shot/pistol': ('gunshot', 'gunshots', 'gun', 'guns', 'gunfire', 'rifle', 'firearm', 'shotgun'),
+              # a click of the cursor or the mouse: the recorded mouse button; another soft click keeps its own
+              'click/soft': ('cursor', 'cursors', 'mouse', 'pointer', 'trackpad')}
 # a cymbal of the drum kit (earshot.sounds.drums) -> the film's cymbal (a learned crash cymbal struck hard, the
 # material of earshot.sounds.motion): a film request ("a cymbal crash for the trailer") gets the film's, a request
 # with a word of the kit ("a crash cymbal at the end of the fill") the kit's

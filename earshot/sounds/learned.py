@@ -37,7 +37,7 @@ knock, type, scatter, shake, pair). A plain take never plays a whole-action memb
 ones; the request decides between the two (earshot.brief.performance, make's `events`). A walk alternates the two
 single steps its pattern names as its `feet` (one session, alike in loudness, brightness and length: one walker,
 not a limp) and is heard from standing height where the pattern says how far (`far`: a gravel walk recorded at
-the feet loses a little of its closest crunch).
+the feet loses a little of its closest crunch), unless the request asks for it close or dry (space under 0).
 
     from earshot.sounds import registry
     y, meta = registry.render('step/pebbles', seed=1)            # meta['member']: which recording was played
@@ -299,8 +299,10 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     c.seed = int(seed)
     r = dsp.rng(registry.seed_of(sid, seed) ^ 0x5EED)
     pat = e.get('pattern') or {}
-    # a walk is heard from standing height: the pattern's `far` tilts every step (dB per octave around 1 kHz)
-    far = {'bright': float(pat['far'])} if pat.get('name') == 'walk' and pat.get('far') else None
+    # a walk is heard from standing height: the pattern's `far` tilts every step (dB per octave around 1 kHz); a
+    # request that asks for a close or dry sound (space under 0) hears the recording's own closeness
+    near = (request.get('space') or 0.0) < 0
+    far = {'bright': float(pat['far'])} if pat.get('name') == 'walk' and pat.get('far') and not near else None
     whole = wholes(e)
     walk = order(sid)
     play, p, cut, long = None, {}, None, False

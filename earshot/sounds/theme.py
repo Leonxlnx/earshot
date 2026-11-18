@@ -20,7 +20,7 @@ FIELDS = ('voice', 'material', 'key', 'scale', 'space', 'axes', 'says')
 THEMES = {
     'soft': dict(voice='marimba', material='soft', key='C', scale='major', space='room',
                  axes=dict(bright=-0.2, hard=-0.4),
-                 says='a real marimba played softly: warm, rounded, mid-register: the default of product UI'),
+                 says='a real marimba played softly: warm, rounded, mid-register'),
     'glass': dict(voice='glockenspiel', material='glass', key='D', scale='major', space='studio',
                   axes=dict(bright=0.2, ring=0.1), says='clear, bright, bell-like'),
     'wood': dict(voice='marimba', material='wood', key='G', scale='pentatonic', space='room',
