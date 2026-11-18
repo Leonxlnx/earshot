@@ -15,6 +15,8 @@ with the tables in earshot.sounds.lexicon, without any model:
 - the first one named is the head of the request; what follows "with" describes a part of it ("a bell with an airy
   whoosh") and what follows "for", "when", "during" ... once the head is named is its context (where it plays): both
   count less;
+- the app, site, store or video it plays in ("in my running app, a success sound", "piano lessons website hover
+  sound") names no sound once the request names one outside it; with nothing else named its words count as ever;
 - "like a ..." is a comparison, not the job "like"; what follows "than" is a reference and is skipped; "the
   opposite of X" and "X but the other way" turn X into its opposite;
 - negations flip adjectives ("not harsh") and turn a named job into one to avoid ("not an error");
@@ -57,6 +59,20 @@ ONCE_WORDS = ('one-shot', 'oneshot')
 CONTEXT_WORDS = ('for', 'when', 'while', 'as', 'after', 'before', 'during', 'whenever', 'once', 'where', 'until',
                  'whilst', 'if', 'into')   # "a whoosh into the logo": where it lands
 PLACE_WORDS = ('in', 'under', 'over', 'across', 'behind', 'beneath', 'inside')
+# the place or product a sound plays in ("my running app", "a coffee shop checkout", "a video about dogs"): the
+# words of that phrase say where it plays, not what it is, once the request names its sound elsewhere (`_settings`).
+# A game is not one of them: its world shapes the sound ("an impact in a boxing game" is a punch)
+SETTING_WORDS = frozenset(('app', 'apps', 'webapp', 'site', 'website', 'webpage', 'homepage', 'page', 'dashboard',
+                           'panel', 'screen', 'store', 'shop', 'checkout', 'platform', 'tool', 'brand', 'channel',
+                           'podcast', 'video', 'reel', 'trailer', 'presentation', 'menu', 'widget', 'tab', 'tracker',
+                           'inbox'))
+# places that also name a part of a thing ("a shop door", "screen time", "a panel slide"): they end the phrase only
+# where nothing but a sound word or the end of a clause follows
+SETTING_LOOSE = frozenset(('screen', 'store', 'shop', 'panel', 'menu'))
+SETTING_TOPIC = ('video', 'reel', 'trailer', 'podcast', 'channel', 'presentation')   # "a video about dogs"
+# the phrase begins the request or a clause, or follows one of these ("for my app", "the menu of a website")
+SETTING_OPEN = ('for', 'in', 'on', 'inside', 'within', 'at', 'of', 'from')
+SETTING_BREAK = ('with', 'to', 'about', 'by', 'than', 'like', 'but')   # these end a phrase that is no place
 # words whose ending is not an ending ('evening' is not 'even', 'string' is not 'str')
 STEM_KEEP = frozenset(('evening', 'morning', 'ceiling', 'string', 'strings', 'thing', 'things', 'ring', 'rings',
                        'spring', 'springs', 'swing', 'sling', 'wing', 'wings', 'king', 'bring', 'during', 'nothing',
@@ -531,6 +547,42 @@ def _next_concept(toks, i):
     return None
 
 
+def _settings(toks):
+    """the token indices of the phrases that say where a sound plays: a place or product word (SETTING_WORDS) with up
+    to three words before it, from the start of a clause or a "for", "in", "on", "of" ... ("in my running club app",
+    "a coffee shop checkout page", "the Thunder app's inbox"), and what a video or podcast is about ("a video about
+    dogs"). A word that begins a job of its own ("menu select", "page turn") is no place; a phrase that opens with
+    an event, a verb of an interface job or a sound ("when a picture slides off the screen", "swipe to dismiss") is
+    none either"""
+    span = set()
+    for k, t in enumerate(toks):
+        if t not in SETTING_WORDS or _match(toks, k)[0] > k + 1:
+            continue
+        nx = toks[k + 1] if k + 1 < len(toks) else None
+        if t in SETTING_LOOSE and not (nx is None or nx in PUNCT or nx in L.STOP or nx in SETTING_WORDS
+                                       or nx in L.SOUND_NOUNS):
+            continue
+        i, n = k - 1, 0                  # back to where the phrase opens; at most three words of its own
+        while i >= 0 and toks[i] not in PUNCT and toks[i] not in SETTING_OPEN:
+            p = toks[i]
+            if (p in CONTEXT_WORDS or p in PLACE_WORDS or p in SETTING_BREAK or p in L.SOUND_NOUNS or p in SCOPE_END
+                    or _match(toks, i)[1].get('c') in L.INTERFACE_JOBS):
+                break
+            if p not in ARTICLES and p not in SETTING_WORDS and p not in L.STOP:
+                if n == 3:
+                    break
+                n += 1
+            i -= 1
+        else:
+            j = k + 1
+            if t in SETTING_TOPIC and j < len(toks) and toks[j] == 'about':
+                j += 1
+                while j < len(toks) and toks[j] not in PUNCT and toks[j] not in CONTEXT_WORDS:
+                    j += 1
+            span.update(range(i + 1, j))
+    return span
+
+
 def read(text):
     """a request as a brief (module doc): {'text', 'concepts', 'parts', 'context', 'refs', 'not', 'words', 'hints',
     'axes', 'dir', 'material', 'voice', 'domain', 'dur', 'dur_max', 'pitch', 'key', 'scale', 'n', 'notes', 'loop',
@@ -559,11 +611,13 @@ def read(text):
     toks = tokens(_numbers(b, text))
     n_tok = len(toks)
     st = {'scale': 1.0, 'neg': False, 'where': 'concepts', 'than': False, 'opposite': False, 'head': False,
-          'any': False, 'object': False, 'simile': False, 'skipped': 0, 'event': False}
+          'any': False, 'object': False, 'simile': False, 'skipped': 0, 'event': False, 'i': 0}
     domains, particles, src, ctx_words, outcomes = {}, [], {}, set(), []
     if _old_device(toks):
         b['material'] = 'retro'            # "old Nintendo games", "an ancient home computer"
     phrasal, skip = _phrasal(toks), set()
+    # the words of where it plays ("for my running app") and what they named, against what the rest named
+    settings, inside, outside, voiced = _settings(toks), set(), set(), []
 
     def add(c, tok, where=None, said=None):
         if st['object'] and st['where'] == 'concepts':
@@ -578,6 +632,10 @@ def read(text):
                 b['not'].append(c)
             st['neg'], st['scale'] = False, 1.0
             return
+        if st['i'] in settings:
+            inside.add(c)
+        elif where != 'context':
+            outside.add(c)
         if all(c not in b[k] for k in ('concepts', 'parts', 'context')):
             b[where].append(c)
             src[c] = tok
@@ -600,6 +658,7 @@ def read(text):
         t = toks[i]
         nxt = toks[i + 1] if i + 1 < n_tok else None
         prev = toks[i - 1] if i else None
+        st['i'] = i
         if i in skip:                       # the particle of a separable verb already read
             i += 1
             continue
@@ -705,7 +764,9 @@ def read(text):
                 b['dir'] += hit['d'] * (1 if st['scale'] > 0 else -1)
             if 'v' in hit:
                 v = hit['v']
-                b['voice'] = b['voice'] or v
+                if not b['voice']:
+                    b['voice'] = v
+                    voiced.append(i in settings)     # "a piano lessons website": where, not the instrument
                 k = i - 1                  # "on a soft piano": articles and adjectives stand between
                 while k >= 0 and (toks[k] in ARTICLES or modifier(toks[k])):
                     k -= 1
@@ -776,6 +837,13 @@ def read(text):
                 continue
         st.update(scale=1.0, neg=False, skipped=0)
         i += 1
+    if outside - L.GENERIC:                # "in my running app, a success sound": the running says where, not what
+        gone = inside - outside
+        for k in ('concepts', 'parts', 'context', 'framed'):
+            b[k] = [c for c in b[k] if c not in gone]
+        if voiced and voiced[0]:
+            b['voice'] = None
+        ctx_words.update(w for k in settings for w in (toks[k], stem(toks[k])))
     named = set(b['concepts']) | set(b['parts']) | set(b['context'])
     if named & {'toggle', 'light_switch'} and not named & {'switch_on', 'switch_off'}:
         for p, nx in particles:            # "toggles dark mode on", "flip it off"

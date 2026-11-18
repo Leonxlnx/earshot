@@ -190,6 +190,35 @@ def test_context_after_for():
     assert 'open' in b['concepts']
 
 
+def test_where_it_plays_names_no_sound_once_one_is_named():
+    """the words of a place or product it plays in ("my running app", "a piano lessons website") say where, not
+    what, when the request names its sound elsewhere; with nothing else named they count as before"""
+    b = brief.read('in my running app, a success sound')
+    assert b['concepts'] == ['success'] and 'footstep' not in b['context']
+    b = brief.read('piano lessons website hover sound')
+    assert b['concepts'] == ['hover'] and b['voice'] is None
+    assert 'footstep' in brief.read('a sound for my running app')['concepts']
+
+
+@pytest.mark.parametrize('text,want', [
+    ('in my running app, a success sound', 'success/'),
+    ("the dog walking app's error sound", 'error/'),
+    ('piano lessons website hover sound', ('hover/', 'hover_tick/')),
+    ('the Thunder app needs a notification sound', 'notify/'),
+    ('weather dashboard rain widget click', ('switch/', 'click/', 'pen/click', 'tap/', 'keyboard/')),
+    ('thunder sound for my weather app', 'thunder/'),
+    ('dog bark for my pet store website', 'dog/'),
+    ('a rain ambience for my sleep app', 'rain/'),
+    ('a bell for a shop door', 'bell/shop'),
+    ('footsteps for a horror game', 'step/'),
+])
+def test_the_thing_asked_for_wins_over_where_it_plays(idx, text, want):
+    """an asked job or sound wins over a sounding word in the app, site or video it is for; a request whose place
+    is the thing itself or shapes it ("for my weather app", "for a horror game") keeps it"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
 def test_like_as_comparison_and_as_job():
     assert 'like' not in brief.read('something quiet, like a whisper of a click')['concepts']
     assert 'like' in brief.read('a like button tap')['concepts']

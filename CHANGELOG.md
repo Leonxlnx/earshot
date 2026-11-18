@@ -131,6 +131,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   ring, size, space, width, energy, motion) with intensifiers, negation ("not harsh", "not an error"), "the opposite
   of", comparisons, voices named as the instrument or as the player, materials, "8-bit" as a hard filter for chip
   sound, lengths and ceilings, pitches, keys, counts of takes and notes, loop or one-shot, domains. No model.
+- The app, site, store or video a sound is for names no sound once the request names one: "in my running app, a
+  success sound" is a success sound, not footsteps, and "the Thunder app needs a notification sound" no thunder.
 - **The catalogue** (`earshot/sounds/`: `registry.py` with the `@design` contract, `earshot sounds`, MCP `sounds`):
   the learned sounds and beds above; 45 figures for interfaces, games and brands that any voice can play (`ui.py`,
   `game.py`, `brand.py` on `figure.py`) and 3 material ticks; 51 single notes of 36 instruments and 15 patches
