@@ -41,7 +41,10 @@ from .sounds import lexicon as L
 
 NOTE = re.compile(r'(?<![A-Za-z0-9#])([A-Ga-g])([#b]?)(-?\d)(?![A-Za-z0-9])')
 HZ = re.compile(r'(\d+(?:\.\d+)?)\s*(k?hz)\b', re.I)
-DUR = re.compile(r'(?<![\w.-])(\d+(?:\.\d+)?)\s*(ms|msec|milliseconds?|s|sec|secs|seconds?|min|minutes?)\b', re.I)
+DUR = re.compile(r'(?<![\w.-])(\d+(?:\.\d+)?)\s*(ms|msec|milliseconds?|s|sec|secs|seconds?|min|minutes?|h|hrs?|hours?)'
+                 r'\b', re.I)
+# "200 ms apart", "0.2 seconds between each": the time from one event of a row to the next, not the file's length
+GAP = re.compile(DUR.pattern + r'\s+(?:apart|between\s+(?:each|them|every))\b', re.I)
 LIMIT = re.compile(r'\b(under|below|less than|at most|max|maximum|no longer than|within|up to|shorter than|tops)\s*$',
                    re.I)
 NUMBER_WORDS = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
@@ -312,6 +315,10 @@ def _numbers(b, text):
     """take the hard numbers out of a request into the brief: key, count, pitch, length; the text without them"""
     def cut(m, s):
         return s[:m.start()] + ' , ' + s[m.end():]
+
+    def seconds(m):                       # "200 ms", "3 minutes", "10 hours"
+        v, u = float(m.group(1)), m.group(2).lower()
+        return v / 1000.0 if u.startswith('ms') or u.startswith('mil') else v * {'m': 60.0, 'h': 3600.0}.get(u[0], 1.0)
     m = KEY.search(text)
     if m:
         b['key'] = m.group(1)[0].upper() + m.group(1)[1:]
@@ -334,10 +341,13 @@ def _numbers(b, text):
     if m:
         b['dur'] = 0.5
         text = cut(m, text)
+    m = GAP.search(text)
+    if m:                                 # "two knocks 200 ms apart": the events' spacing, never the length
+        b['gap'] = seconds(m)
+        text = cut(m, text)
     m = DUR.search(text)
     if m:
-        v, u = float(m.group(1)), m.group(2).lower()
-        v = v / 1000.0 if u.startswith('m') and not u.startswith('min') else v * 60.0 if u.startswith('min') else v
+        v = seconds(m)
         lim = LIMIT.search(text[:m.start()])
         if lim:
             b['dur_max'] = v              # "under 80 ms": a ceiling, not a length to stretch to
@@ -362,7 +372,8 @@ EVENTS = re.compile(r'\b(\d+|' + '|'.join(sorted(NUMBER_WORDS, key=len, reverse=
                     r'([a-z]+)\b', re.I)
 NOT_EVENTS = frozenset(stem(w) for w in (
     'variation', 'variant', 'version', 'take', 'option', 'alternative', 'note', 'tone', 'beat', 'pulse', 'second', 's',
-    'sec', 'ms', 'msec', 'millisecond', 'minute', 'min', 'hz', 'khz', 'time', 'octave', 'semitone', 'bar', 'of',
+    'sec', 'ms', 'msec', 'millisecond', 'minute', 'min', 'hour', 'hr', 'h', 'hz', 'khz', 'time', 'octave', 'semitone',
+    'bar', 'of',
     'different', 'unique', 'shot', 'player', 'people', 'bit', 'sound', 'file', 'level', 'more', 'another', 'after'))
 TIMES = re.compile(r'\b(?:(twice|thrice)|(\d+|' + '|'.join(sorted(NUMBER_WORDS, key=len, reverse=True))
                    + r')\s+times)\b')
@@ -401,7 +412,8 @@ def _action(b, text):
     if m and b['events'] is None:                           # "a dog barking twice", "knock three times"
         v = m.group(1) or m.group(2)
         b['events'] = {'twice': 2, 'thrice': 3}.get(v) or (int(v) if v.isdigit() else NUMBER_WORDS[v])
-        b['row'] = next((rows[stem(w)] for w in WORD.findall(low[:m.start()]) if stem(w) in rows), None)
+        # done that many times in one go: a row, in the thing's own pattern when it has one ("a knock twice")
+        b['row'] = next((rows[stem(w)] for w in WORD.findall(low[:m.start()]) if stem(w) in rows), 'row')
         b['counted'] = [stem(w) for w in WORD.findall(low[:m.start()])]        # what is done that many times
     if any(re.search(r'(?<![\w-])' + re.escape(w) + r'(?![\w-])', low) for w in L.SINGLE_WORDS):
         if not (b['events'] and b['events'] > 1):
@@ -554,6 +566,20 @@ def _next_concept(toks, i):
     return None
 
 
+def _joined(t):
+    """a word of a request in another language as the lexicon words written together in it: two of them
+    ("Türklopfen": tür klopfen), or one of five letters or more before an ending the lexicon does not know
+    ("Erfolgston": erfolg); a known or short word as it is"""
+    if len(t) < 7 or not t.isalpha() or _known(t):
+        return [t]
+    exact = _reverse()['c=']
+    for k in range(len(t) - 3, 2, -1):
+        head, tail = t[:k], t[k:]
+        if head in exact and head not in L.FOREIGN_ALIKE and (tail in exact or k >= 5):
+            return [head, tail] if tail in exact else [head]
+    return [t]
+
+
 def _settings(toks):
     """the token indices of the phrases that say where a sound plays: a place or product word (SETTING_WORDS) with up
     to three words before it, from the start of a clause or a "for", "in", "on", "of" ... ("in my running club app",
@@ -604,7 +630,9 @@ def read(text):
     ("sound when the player grabs a boost"), `phrases` the runs of content words a design's multi-word job is
     matched against (`_phrases`); `events` the number of events of an action ("three knocks": 3, "a single step":
     1), `row` the pattern of earshot.synth.perform when the counted thing is one a person performs in a row
-    (lexicon.ROW_WORDS: "four knocks": knock, "a countdown 3 2 1": count), `perform` True when the request asks
+    (lexicon.ROW_WORDS: "four knocks": knock, "a countdown 3 2 1": count; anything done "twice" or "three times":
+    row), `gap` the seconds from one event to the next ("200 ms apart"), `foreign` True when the request is not
+    written in English, `perform` True when the request asks
     for the action a person performs ("walking", "knocking", "keys
     jingling"), `act` the action form of a row word it says ("clapping": `acted`) and `plural` the stems of the
     plural nouns it says ("footsteps": footstep): `performance` decides
@@ -613,9 +641,14 @@ def read(text):
          'axes': {},
          'dir': 0, 'material': None, 'voice': None, 'domain': None, 'dur': None, 'dur_max': None, 'pitch': None,
          'key': None, 'scale': None, 'n': None, 'notes': None, 'loop': None, 'unknown': [], 'written': {},
-         'framed': []}
+         'framed': [], 'gap': None}
     _action(b, text)
     toks = tokens(_numbers(b, text))
+    # a request in another language ("Erfolgston für die App"): its function words and their English look-alikes
+    # (German "die", French "pour") name nothing; what is left is read as ever ("ein Klick" is still a click)
+    b['foreign'] = any(t in L.FOREIGN_WORDS or (not t.isascii() and not _known(t)) for t in toks)
+    if b['foreign']:
+        toks = [p for t in toks if t not in L.FOREIGN_WORDS and t not in L.FOREIGN_ALIKE for p in _joined(t)]
     n_tok = len(toks)
     st = {'scale': 1.0, 'neg': False, 'where': 'concepts', 'than': False, 'opposite': False, 'head': False,
           'any': False, 'object': False, 'simile': False, 'skipped': 0, 'event': False, 'i': 0}
@@ -722,6 +755,10 @@ def read(text):
                 st['event'] = True
             i += 2
             continue
+        if st['head'] and t in ('at', 'by') and nxt == 'night':
+            st['where'] = 'context'        # "room tone at night", "a street by night": when it is, not crickets
+            i += 1
+            continue
         if st['head'] and (t in CONTEXT_WORDS or t == 'to' or (t in PLACE_WORDS and nxt in ARTICLES)):
             st['where'] = 'context'        # "an impact FOR a logo reveal": where it plays, not what it is
             i += 1
@@ -810,6 +847,8 @@ def read(text):
                     where = 'parts'            # "grabs a speed boost": the thing grabbed is the sound
                 elif j - i == 1 and t in L.COLOUR_WORDS:
                     where = 'parts'            # "a windy zip": the weather colours the sound
+                elif prev in ('done', 'finished', 'finishes', 'stopped', 'stops') and t.endswith('ing'):
+                    where = 'context'          # "the eggs are done boiling": what ended, not the sound
                 add(c, key, where, said)
                 nx = toks[j] if j < n_tok else None
                 if (key in _status_keys() and not st['simile'] and st['where'] == 'concepts'
@@ -1178,12 +1217,16 @@ def uncovered(b, why):
     a short sound ('ping', 'pluck': lexicon.SOUND_NOUNS, which any struck design is); a job counts as
     covered when its broader word decided ('swish' by a whoosh). Context ("for a logo"), the event and comparisons
     (`framed`: "when the player grabs a boost", "like a door slamming"), voices, adjectives, materials and numbers
-    never count, nor a job the reader inferred without the request naming it"""
+    never count, nor a job the reader inferred without the request naming it, nor a job that is played as the one
+    that decided (lexicon.PLAYED_AS), nor what is said to happen to the thing ("a checkbox being ticked")"""
     seen, said, out = set(why), b.get('written') or {}, []
+    head = next(iter(b['concepts']), None)
     for c in list(b['concepts']) + list(b.get('parts', ())):
         if (c not in said or c in seen or L.BROADER.get(c) in seen or c in L.GENERIC or said[c] in L.SOUND_NOUNS
                 or c in b.get('framed', ()) or c not in _families()):
             continue
+        if L.PLAYED_AS.get(c) in seen or (c != head and said[c].endswith('ed')):
+            continue                  # a purchase played as a success; "a checkbox being ticked": what happens to it
         if said[c] not in out:
             out.append(said[c])
     return out
@@ -1288,14 +1331,38 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     # a word too common to lead ("a modal slides in": open), the kind of sound ("a swoosh that flies away": send)
     # or the place of the job ("open a menu": open)
     music = bool(said & MUSIC_STEMS) or bool(b.get('voice')) or dom == 'music' or 'music' in b['concepts']
+    # a job of an app that is played as another one (lexicon.PLAYED_AS: a purchase that went through is a success)
+    # is ranked as that job, unless the words ask for music, a game, a recorded thing ("a cash register") or the
+    # till's ring ("ka-ching"); where the request names an interface job of its own after it ("a sale
+    # notification"), the purchase is only what that job is about
+    via = L.PLAYED_AS.get(head)
+    if (via and not music and not thing and dom not in ('game', 'motion') and mat != 'retro'
+            and (b.get('written') or {}).get(head) not in L.TILL_WORDS):
+        rest = [c for c in b['concepts'] if c != head]
+        if any(c in L.INTERFACE_JOBS for c in rest):
+            return rank(dict(b, concepts=rest, context=[head] + list(b['context'])), top=top, idx=idx)
+        swap = dict(b, concepts=list(dict.fromkeys([via] + rest)),
+                    written=dict(b.get('written') or {}, **{via: (b.get('written') or {}).get(head, via)}))
+        return rank(swap, top=top, idx=idx)
+    # a request that only says there should be a cue ("a feedback sound for my app", "an alert when a driver is
+    # nearby") and names no job, no thing and no music is ranked as the notification it is
+    if (b['concepts'] == ['cue'] and not b.get('parts') and not music and not thing and dom in (None, 'ui')
+            and mat != 'retro' and not any(c in _families() or c in L.INTERFACE_JOBS for c in b['context'])):
+        said_ = dict(b.get('written') or {})
+        return rank(dict(b, concepts=['notify'], written=dict(said_, notify=said_.get('cue', 'cue'))), top=top, idx=idx)
     # a sound word as the head and the moment after it ("a quick swoosh as the message goes out"): the job of the
     # moment when its real thing is that kind of sound (a send is a swoosh; a modal opening is no thump)
     kinds = {r['id']: r.get('kind') for r in rows}
     moment = next((c for c in b['context'] if c in L.INTERFACE_JOBS and kinds.get(L.INTERFACE_JOBS[c]) == head),
                   None) if head in L.SOUND_FAMILIES and not any(c in L.INTERFACE_JOBS for c in b['concepts']) else None
+    # a request whose own words name nothing a design exists for ("a copy to clipboard confirmation": no design is a
+    # copy) is the interface job of its moment (a confirmation: a success): it gets that job's real thing, no figure
+    unmade = not any(c in _families() or c in L.INTERFACE_JOBS for c in b['concepts'])
+    if moment is None and unmade:
+        moment = next((c for c in b['context'] if c in L.INTERFACE_JOBS), None)
     ui_job = dom not in ('game', 'motion') and mat != 'retro' and (
         any(c in L.INTERFACE_JOBS for c in b['concepts']) or bool(moment))
-    lead = None if head in L.SOUND_FAMILIES or head in L.INTERFACE_PLACES else head
+    lead = None if head in L.SOUND_FAMILIES or head in L.INTERFACE_PLACES or (moment and unmade) else head
     job = L.INTERFACE_JOBS.get(lead) or (next((L.INTERFACE_JOBS[c] for c in b['concepts'] + [moment]
                                                if c in L.INTERFACE_JOBS), None) if lead is None else None)
     job = job if ui_job else None
@@ -1423,6 +1490,14 @@ def learned_ok(b, sid, t, said):
     asked = set(b['concepts'])                           # "... muffled and bubbly": a part, not a recorded splash
     if _roles().get(sid, frozenset()) & asked and _interface_only(b):
         return True                     # the interface job alone ("a click like an old SLR" is a shutter's click)
+    head = next((c for c in b['concepts'] if c not in L.GENERIC), None)
+    if L.JOB_THING.get(head) == sid.split('/')[0] and head in t['uses']:
+        return True                     # "chopping an onion": a job only this thing does (lexicon.JOB_THING), as the
+        #                                 sound asked for; "a ring when the eggs are done boiling" is a timer
+    if 'absent' not in _cache:
+        _cache['absent'] = frozenset(stem(w) for w in L.NOT_MADE)
+    if (said - set(b.get('context_words', ()))) & _cache['absent'] & t['uses']:
+        return True                     # "a bee buzzing": no bee exists; the recorded fly lists it as its nearest
     if (b.get('events') or 0) > 1 and any(v == sid and _family_words(k) & set(b.get('counted', ()))
                                           for k, v in L.TWINS.items()):
         return True                     # "four knocks": a number of events only the recorded twin can perform
@@ -1552,16 +1627,21 @@ def _preferred(b, sid, out, idx, twins=True):
     if 'real' in rows[pos[sid]].get('tags', ()):
         return None
     own = next((r['score'] for r in out if r['id'] == sid), None)
-    name = _name_words(sid)
     said = _cache.setdefault('said_stems', {})
     for r in out:
         k = pos[r['id']]
         if r['id'].split('/')[0] != fam or 'real' not in rows[k].get('tags', ()):
             continue
         if r['id'] not in said:
-            said[r['id']] = {stem(w) for w in WORD.findall(' '.join(list(rows[k].get('says', ()))
-                                                                     + list(rows[k].get('tags', ()))).lower())}
-        if (rows[k].get('prior', 1.0) >= prior and name <= said[r['id']] | _name_words(r['id']) and own is not None
+            says = set(WORD.findall(' '.join(rows[k].get('says', ())).lower()))
+            ws = says | set(WORD.findall(' '.join(rows[k].get('tags', ())).lower()))
+            said[r['id']] = ({stem(w) for w in ws}, says)
+        stems, says = said[r['id']]
+        # every word of the name; one that the descriptions say only of many ("small stones": gravel) is another
+        # thing than the name's one (a stone floor)
+        same = all(stem(n) in _name_words(r['id']) or (stem(n) in stems and not (n + 's' in says and n not in says))
+                   for n in name_.split('_') if n.isalpha())
+        if (rows[k].get('prior', 1.0) >= prior and same and own is not None
                 and r['score'] >= MEMBER_SHARE * own and not excluded(b, rows[k], terms[k])
                 and not (b.get('dir') and terms[k]['dir'] == -b['dir'])):
             return r['id']

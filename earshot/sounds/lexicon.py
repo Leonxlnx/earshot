@@ -49,7 +49,8 @@ CONCEPTS = {
                 'check off', 'a little yes', 'saying yes', 'well done', 'good job', 'great job', 'nice work',
                 'all set', 'you are in', 'in the bag', 'nailed it', 'success state', 'thumbs up', 'got it right',
                 'payment goes through', 'booking confirmed', 'order confirmed', 'sync complete', 'upload complete',
-                'reassurance', 'sorted', 'erfolg'),
+                'reassurance', 'sorted', 'erfolg', 'approval', 'acknowledgement', 'acknowledgment',
+                'positive feedback'),
     'error': ('fail', 'failure', 'wrong', 'invalid', 'denied', 'deny', 'rejected', 'reject', 'incorrect',
               'wrong answer', 'forbidden', 'blocked', 'not allowed', 'mistake', 'oops', 'uh oh', 'uh-oh', 'nope',
               'declined', 'unauthorized', 'problem', 'failed login', 'login failed', 'saying no', 'says no',
@@ -235,7 +236,8 @@ CONCEPTS = {
                # the camera of a film moving fast (a zoom), something leaving the frame
                'zoom', 'zoom in', 'camera zoom', 'flies off',
                # the camera moving through the shot
-               'camera push in', 'camera pushes in', 'camera pushing in', 'camera pull out', 'camera pulls out',
+               'camera push in', 'camera pushes in', 'camera pushing in', 'camera pushes into', 'camera moves into',
+               'camera pull out', 'camera pulls out',
                'camera pulling out', 'camera pan', 'camera pans', 'camera panning', 'camera move', 'camera moves',
                'camera sweeps', 'push in on', 'pushes in on', 'pull back to reveal', 'pulls back to reveal'),
     # something carried past the listener (a whoosh too: BROADER)
@@ -334,7 +336,11 @@ CONCEPTS = {
               'flipping through', 'notebook', 'book', 'page turn', 'page flip', 'flip pages', 'flipping pages',
               'turn the page', 'turning pages', 'leaf through'),
     'water': ('drip', 'droplet', 'water drop', 'water droplet', 'drop of water', 'liquid', 'leaky tap',
-              'leaky faucet', 'faucet', 'tap drip'),
+              'leaky faucet', 'tap drip'),
+    # a tap that water runs from (a recording): "a tap running" is no press and no walk
+    'faucet': ('water tap', 'tap water', 'tap running', 'running tap', 'kitchen tap', 'bathroom tap',
+               'water from a tap', 'running water from a tap', 'water running from a tap', 'turn on the tap',
+               'turning on the tap'),
     'coin_object': ('coin drop', 'coin dropping', 'dropping a coin', 'drop a coin', 'coin spin', 'coin on table',
                     'coin flip', 'coin toss', 'penny', 'loose change', 'coin rattle', 'small change', 'spare change'),
     'glass_object': ('clink', 'cheers', 'toast glass', 'glass tap', 'glasses clink', 'wine glass', 'glass clink',
@@ -364,9 +370,8 @@ CONCEPTS = {
              'walla'),
     'forest': ('birds', 'birdsong', 'birds singing', 'woods', 'woodland', 'jungle', 'nature', 'meadow', 'garden',
                'birds chirping', 'songbirds', 'tweeting', 'park'),
-    'night': ('crickets', 'cricket', 'insects', 'evening', 'summer night', 'cicadas', 'frogs croaking',
-              'croaking frogs', 'frog chorus', 'bugs', 'after dark', 'nighttime', 'night time', 'midnight',
-              'dusk', 'night sounds'),
+    'night': ('crickets', 'cricket', 'insects', 'evening', 'summer night', 'cicadas', 'frog chorus', 'bugs',
+              'after dark', 'nighttime', 'night time', 'midnight', 'dusk', 'night sounds'),
     'thunder': ('lightning', 'thunderstorm', 'thunderclap', 'thunder clap', 'rolling thunder', 'rolling rumble'),
     'room_tone': ('room tone', 'silence', 'quiet room', 'office', 'indoor ambience', 'air conditioning', 'indoor',
                   'indoors', 'empty room', 'hvac', 'ventilation'),
@@ -407,6 +412,18 @@ CONCEPTS = {
     'sizzle': ('sizzling', 'sizzles', 'frying'),
     'pour': ('pouring', 'poured', 'pours'),
     'flush': ('flushing', 'flushes'),
+    # one frog (a recording); a chorus of them is the night's bed
+    'croak': ('ribbit', 'toad', 'frog croaking', 'croaking frog', 'frog call'),
+    # a gun loaded again (a recording); a page loaded again is a refresh (DOMAIN_SENSE, WORD_WITH)
+    'gun_reload': ('gun reload', 'reload a gun', 'reloading a gun', 'weapon reload', 'reload a weapon', 'cock a gun',
+                   'rack the slide'),
+    # ---- what is done in a kitchen (recordings)
+    'chop': ('dicing', 'chopping board', 'cutting board'),
+    'boil': ('simmer', 'boiling water', 'water boiling', 'rolling boil'),
+    'stir': ('teaspoon',),
+    'ignite': ('igniter', 'gas stove', 'gas burner', 'gas hob', 'gas cooker', 'burner', 'stove lighting',
+               'light the stove', 'lighting the stove'),
+    'fridge': ('refrigerator', 'freezer', 'fridge door', 'refrigerator door'),
 }
 
 # sounds the catalogue has nothing of: voices that say or sing words, a shout, sobbing (a scream, a sneeze, a burp
@@ -419,8 +436,11 @@ NOT_MADE = frozenset((
     'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying', 'narrator', 'narration',
     'voiceover', 'voice-over',
     'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
-    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'egg', 'eggs', 'whisk', 'whisking'))
-NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone')
+    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'egg', 'eggs', 'whisk', 'whisking',
+    # insects other than the recorded fly: its buzz is the nearest (the fly lists them as jobs: brief.learned_ok)
+    'bee', 'bees', 'mosquito', 'mosquitoes', 'toaster', 'kettle', 'blender'))
+NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone', 'kitchen timer',
+                    'egg timer')
 # a voice the catalogue has of one kind of person only (the recording's): said of another person it is not made ("a
 # woman crying": the crying is a baby's; brief.not_made)
 ONE_VOICE = {'cry': frozenset(('baby', 'babies', 'infant', 'infants', 'newborn', 'toddler'))}
@@ -438,12 +458,24 @@ WORD_WITH = {'toast': (frozenset(('glass', 'glasses', 'cup', 'cups', 'clink', 'c
              'heart': (frozenset(('tap', 'taps', 'tapped', 'tapping', 'icon', 'button', 'click', 'clicked', 'post',
                                   'song', 'photo', 'app', 'feed')), 'like'),
              # "a clink" is two glasses; the clink of a key or of keys is the keys'
-             'clink': (frozenset(('key', 'keys', 'keyring', 'keychain')), 'keyring')}
+             'clink': (frozenset(('key', 'keys', 'keyring', 'keychain')), 'keyring'),
+             # a gun, not a page, is loaded again
+             'reload': (frozenset(('gun', 'guns', 'weapon', 'rifle', 'pistol', 'shotgun', 'ammo', 'magazine',
+                                   'shooter', 'fps')), 'gun_reload'),
+             # the camera of a film that moves is no photo taken
+             'camera': (frozenset(('pushes', 'pushing', 'pans', 'panning', 'pulls', 'pulling', 'moves', 'moving',
+                                   'zooms', 'zooming', 'tracks', 'tracking', 'dollies', 'dolly', 'sweeps', 'orbits',
+                                   'tilts', 'glides', 'drifts', 'flies')), 'whoosh'),
+             # what bubbles in a pot boils; bubbles alone are under water
+             'bubbl': (frozenset(('pot', 'soup', 'stew', 'sauce', 'saucepan', 'stove', 'hob', 'kettle')), 'boil')}
 # a word that is no job at all when the request also says one of these words: toast bitten, buttered or out of a
 # toaster is bread, not a notification (brief.read: the word is then read as a plain word)
 WORD_WITHOUT = {'toast': frozenset(('bite', 'bites', 'biting', 'bitten', 'crunch', 'crunchy', 'crunching', 'bread',
                                     'butter', 'buttered', 'toaster', 'breakfast', 'eat', 'eating', 'jam', 'crispy',
-                                    'burnt', 'slice'))}
+                                    'burnt', 'slice')),
+                # water or a machine that runs takes no steps
+                'run': frozenset(('faucet', 'water', 'engine', 'motor', 'machine', 'fridge', 'shower', 'hose',
+                                  'dishwasher', 'fan'))}
 # a job done with the same thing as another one's family: a recorded lock answers an unlocking too (brief.learned_ok)
 SAME_THING = {'unlock': 'lock'}
 # what many people doing a thing at once is ("people clapping": an audience), unless they do it as one ("clapping
@@ -494,7 +526,11 @@ STATUS_WORDS = frozenset(('finished', 'done', 'complete', 'completed', 'failed',
                           'approved', 'declined', 'rejected', 'denied'))
 # two jobs that together mean a third: (a, b) -> c ("losing the buff" is a power-down; "the timer is done" a timer)
 COMPOSE = {('lose', 'power_up'): 'power_down', ('lose', 'shield'): 'power_down', ('timer', 'success'): 'timer',
-           ('lose', 'heal'): 'hurt', ('countdown', 'success'): 'countdown', ('cymbal', 'reverse'): 'reverse'}
+           ('lose', 'heal'): 'hurt', ('countdown', 'success'): 'countdown', ('cymbal', 'reverse'): 'reverse',
+           # a step into a puddle is a small splash; a fridge opened or shut is the fridge's door; a stove turned on
+           # or its clicks are its igniter; a stream from a tap is the tap
+           ('footstep', 'splash'): 'splash', ('open', 'fridge'): 'fridge', ('close', 'fridge'): 'fridge',
+           ('switch_on', 'ignite'): 'ignite', ('click', 'ignite'): 'ignite', ('stream', 'faucet'): 'faucet'}
 # a concept that implies a broader one: the broader one is added at BROADER_WEIGHT
 BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggle', 'menu_select': 'menu',
            'menu_back': 'back', 'coin': 'pickup', 'gem': 'pickup', 'service_bell': 'bell', 'level_up': 'power_up',
@@ -515,7 +551,17 @@ FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride'
                 'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter', 'pass': 'flyby',
                 'heart': 'heartbeat', 'dog': 'bark', 'car_horn': 'honk', 'baby': 'cry', 'phone': 'telephone', 
                 'cat': 'meow', 'cow': 'moo', 'owl': 'hoot',
-                'crow': 'caw', 'crowd': 'cheer', 'pan': 'sizzle', 'drink': 'pour', 'toilet': 'flush'}
+                'crow': 'caw', 'crowd': 'cheer', 'pan': 'sizzle', 'drink': 'pour', 'toilet': 'flush',
+                'frog': 'croak', 'gun': 'gun_reload', 'spoon': 'stir', 'gas_stove': 'ignite'}
+# a job that only one recorded thing does, where the thing's family also holds other sounds: {job: family}. A request
+# for the job reaches the recordings of that family that list it ("chopping an onion": the knife on the board, not
+# the knife's swish; "water boiling": the pot that boils, not the pot struck; brief.learned_ok)
+JOB_THING = {'chop': 'knife', 'boil': 'pot'}
+# a job of an app that has no sound of its own on a page: the job it is played as. A purchase or payment that went
+# through is confirmed like any other success, with the same short click; the till's ring answers its own words only
+# ("a cash register", "ka-ching": TILL_WORDS), a chime the words that ask for notes, and a game keeps its coins
+PLAYED_AS = {'purchase': 'success'}
+TILL_WORDS = frozenset(('cash register', 'ka-ching', 'kaching', 'cha-ching'))
 # the tonal interface figures (earshot.sounds.ui): listeners heard them as unrecognisable, so a plain "tap",
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
 # when the request names them or asks for a tone ("a tonal tap": brief.BY_NAME)
@@ -557,7 +603,7 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'swish/soft': 'flick/thin', 'pop/soft': 'thump/appear', 'knock/desk': 'knock/table',
          'tap/table': 'tap/fingertip', 'bell/bike': 'bicycle_bell/ring', 'tape/peel': 'tape/roll',
          'water/pour': 'drink/pour', 'heartbeat/pulse': 'heart/beat', 'shot/pistol': 'gunshot/rifle',
-         'click/soft': 'click/mouse'}
+         'click/soft': 'click/mouse', 'break/glass': 'glass/break'}
 # words that ask for the action a person performs, not its single event (earshot.synth.perform; brief.performance):
 # a walk, knocking, typing, a bunch of keys shaken, glasses clinked, a dog barking. A plural of the thing itself
 # ("footsteps", "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key
@@ -574,7 +620,8 @@ PERFORM_PHRASES = ('on and off', 'off and on', 'a bunch of', 'a handful of', 'a 
 # that many events, in this pattern of earshot.synth.perform (a countdown "3 2 1" is a `count`). Any other counted
 # thing ("five coin pickups", "3 variations", "two versions") is that many separate files
 ROW_WORDS = {'knock': 'knock', 'step': 'walk', 'footstep': 'walk', 'clap': 'row', 'tap': 'row', 'click': 'row',
-             'beep': 'row', 'bleep': 'row', 'countdown': 'count'}
+             'beep': 'row', 'bleep': 'row', 'countdown': 'count', 'thump': 'row', 'thud': 'row', 'bump': 'row',
+             'pop': 'row', 'tick': 'row', 'blip': 'row'}
 # the action form of a row word -> the row word: "clapping", "knocking, 4 seconds" name the action, not one event
 # (brief.acted). Applause is not one: it is a crowd (a recording of an audience, earshot.sounds.learned)
 ACTION_WORDS = {'clapping': 'clap', 'knocking': 'knock', 'tapping': 'tap', 'clicking': 'click', 'beeping': 'beep',
@@ -720,6 +767,7 @@ DOMAIN_SENSE = {('music', 'crash'): 'cymbal', ('game', 'kick'): 'hit',
                 ('game', 'fail'): 'lose', ('game', 'failure'): 'lose', ('ui', 'sheet'): 'open',
                 ('game', 'collapse'): 'break', ('motion', 'collapse'): 'break', ('ui', 'slide out'): 'open',
                 ('ui', 'slide in'): 'open', ('game', 'activate'): 'power_up', ('game', 'jingle'): 'cue',
+                ('game', 'reload'): 'gun_reload',
                 ('game', 'enable'): 'power_up', ('ui', 'page'): '', ('ui', 'card'): '', ('game', 'star'): 'coin',
                 ('game', 'stars'): 'coin', ('ui', 'item'): '', ('motion', 'horn'): 'braam',
                 # what happens on a screen: a file picked up to drag it is a light tick; a title or logo that lands
@@ -743,7 +791,19 @@ CONCEPT_DIR = {'riser': 1, 'downlifter': -1, 'power_up': 1, 'power_down': -1, 'l
                'receive': -1, 'success': 1, 'error': -1, 'win': 1, 'lose': -1, 'jump': 1, 'land': -1,
                'startup': 1, 'shutdown': -1}
 # words the stemmer would send to the wrong concept ('waving' is not 'waves', 'beating' eggs is no beat of music)
-NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating'))
+NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating', 'dice'))
+# function words of German, French, Spanish, Italian and Dutch that are no English words: a request that says one, or
+# a word with a letter outside a to z that the lexicon does not know ("für"), is not written in English. In such a
+# request these words and their English look-alikes (FOREIGN_ALIKE: German "die" is no death, French "pour" no
+# pouring, "Regen" no healing) are read as nothing (brief.read)
+FOREIGN_WORDS = frozenset((
+    'für', 'der', 'das', 'den', 'dem', 'ein', 'eine', 'einen', 'einer', 'und', 'mit', 'wenn', 'beim', 'zum', 'zur',
+    'vom', 'ist', 'nicht', 'auf', 'bei', 'oder', 'wird', 'ich', 'le', 'les', 'une', 'avec', 'dans', 'sur', 'et', 'du',
+    'des', 'quand', 'est', 'el', 'los', 'las', 'para', 'con', 'por', 'una', 'del', 'cuando', 'il', 'gli', 'che',
+    'het', 'een', 'voor', 'geluid', 'bruit', 'sonido', 'suono'))
+FOREIGN_ALIKE = frozenset(('die', 'pour', 'sale', 'car', 'chat', 'pain', 'main', 'fin', 'bad', 'hell', 'fast', 'bald',
+                           'toll', 'war', 'gift', 'hat', 'gut', 'once', 'pie', 'sin', 'tan', 'bin', 'regen', 'boot',
+                           'lid', 'bug'))
 # adjectives that are also a job's word: before a thing they say how it is done ("a careful step", "a cautious
 # knock") and only soften it ({axis: delta}); alone they are the job ("a 'hey, careful' sound": a warning)
 MANNER_WORDS = {'careful': dict(energy=-0.3, hard=-0.2), 'cautious': dict(energy=-0.3, hard=-0.2)}

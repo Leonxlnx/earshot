@@ -1114,3 +1114,101 @@ def test_stemmed_words_name_no_domain():
     """'cute' is no 'cut' (a film's edit): a cute sound asks for no film"""
     assert brief.read('a cute happy sound when you double-tap to love a post')['domain'] != 'motion'
     assert brief.read('a cute little pop')['domain'] != 'motion'
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a copy to clipboard confirmation', 'success/click'),
+    ('a subtle acknowledgement sound for a form', 'success/click'),
+    ('a positive feedback sound for my app', 'success/click'),
+    ('a soft approval sound', 'success/click'),
+    ('a cue when the message is sent', 'send/swoosh'),
+    ('a success chime', 'success/rise'),
+    ('a success sound on a marimba', 'success/rise'),
+    ('a level complete jingle for my game', 'win/fanfare'),
+])
+def test_an_interface_moment_gets_no_figure_unless_the_words_ask_for_one(idx, text, want):
+    """a request whose own words name nothing a design exists for is the interface job of its moment and gets that
+    job's real thing; a chime, an instrument by name and a game's jingle keep their notes"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got == want, (text, got)
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a tap running', 'faucet/run'), ('running water from a tap', 'faucet/run'),
+    ('a frog croaking', 'frog/croak'), ('glass breaking', 'glass/break'),
+    ('a reload sound for my shooter game', 'gun/reload'),
+    ('footsteps on stone', 'step/stone'), ('room tone at night', 'room_tone/'),
+    ('steps through puddles', 'splash/'), ('chopping an onion', 'knife/chop'), ('water boiling in a pot', 'pot/boil'),
+    ('opening the fridge', 'fridge/door'), ('turning on the gas burner', 'gas_stove/ignite'),
+    # the same words where they mean what they did
+    ('a tap on the screen', 'keyboard/'), ('pull to refresh', 'slide/'), ('crickets at night', 'night/crickets'),
+    ('footsteps on gravel', 'step/pebbles'), ('a camera shutter', 'camera/shutter'),
+])
+def test_a_recorded_thing_is_reached_by_its_plain_request(idx, text, want):
+    """a tap that runs is a faucet and no press, one frog is no night of crickets, glass that breaks is the recorded
+    glass, a shooter's reload a gun's, a stone floor no gravel, "at night" says when, a step into a puddle splashes"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+def test_a_bee_is_said_to_be_missing_and_gets_the_fly(idx):
+    from earshot.make import doubt
+    b = brief.read('a bee buzzing')
+    cands = brief.rank(b, idx=idx, top=4)
+    assert cands[0]['id'] == 'fly/buzz' and doubt(b, cands).startswith('earshot makes no bee;'), cands[:2]
+
+
+@pytest.mark.parametrize('text,never', [
+    ('chopping', 'pro_riser/'), ('the camera pushes into the product', ('camera/', 'shutter/')),
+    ('a wake-up-ish ring that says your eggs are done boiling', 'pot/'),      # what ended is not the sound
+])
+def test_a_word_of_an_id_or_of_another_trade_picks_no_design(idx, text, never):
+    """chopping is the knife's, not the riser whose member is called chop; the camera of a film that moves takes no
+    photo"""
+    assert not any(r['id'].startswith(never) for r in brief.rank(brief.read(text), idx=idx, top=1))
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a feedback sound for my app', 'notify/knock'),
+    ('an alert when a delivery driver is nearby in a food ordering app', 'notify/knock'),
+    ('a cue when the payment method is verified', 'success/click'),
+    ('a purchase sound', 'success/click'), ('bike shop checkout purchase sound', 'success/click'),
+    # the till by its own words, notes by theirs, and a game's shop keep their sounds
+    ('a cash register', 'cash_register/open'), ('a purchase chime', 'purchase/chime'),
+])
+def test_a_cue_and_a_purchase_get_the_plain_sound_of_their_job(idx, text, want):
+    """a request that only says there should be a cue is a notification's knocks; a purchase that went through in an
+    app is confirmed by the success click, never by a chime or a bell the words did not ask for"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got == want, (text, got)
+
+
+def test_times_a_gap_and_hours():
+    """"twice" is two events of one row, "200 ms apart" the gap between events and no length, hours are a length"""
+    b = brief.read('a dog barking twice')
+    assert (b['events'], b['row'], b['n']) == (2, 'row', None)
+    assert brief.read('a knock two times')['row'] == 'knock'
+    b = brief.read('two knocks 200 ms apart')
+    assert b['events'] == 2 and b['gap'] == pytest.approx(0.2) and b['dur'] is None
+    assert brief.read('three beeps 0.2 seconds apart, 2 seconds')['dur'] == pytest.approx(2.0)
+    b = brief.read('rain, 10 hours')
+    assert b['dur'] == pytest.approx(36000.0) and b['events'] is None
+    b = brief.read('three knocks, 2 seconds')
+    assert b['dur'] == pytest.approx(2.0) and b['gap'] is None
+    b = brief.read('three soft thumps, 200 ms apart')
+    assert (b['events'], b['row']) == (3, 'row') and b['gap'] == pytest.approx(0.2) and b['dur'] is None
+    b = brief.read('three soft thumps over 0.6 seconds')
+    assert (b['events'], b['row']) == (3, 'row') and b['dur'] == pytest.approx(0.6)
+
+
+def test_a_request_in_another_language_is_no_chance_match(idx):
+    """German "die" is no death: the request is marked as not English and nothing is picked for a look-alike; words
+    the lexicon knows are still read, and English keeps its words"""
+    b = brief.read('Erfolgston für die App')
+    assert b['foreign'] and 'lose' not in b['concepts']
+    assert brief.rank(b, idx=idx, top=1)[0]['id'] == 'success/click'
+    assert brief.rank(brief.read('le son pour le bouton'), idx=idx, top=1) == []
+    assert brief.read('Türklopfen, dreimal')['concepts'] == ['door', 'knock']
+    b = brief.read('a sound when the player dies')
+    assert not b['foreign'] and 'lose' in b['concepts']
+    assert 'lose' in brief.read('die sound for a platformer')['concepts']
