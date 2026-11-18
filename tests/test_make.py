@@ -703,3 +703,56 @@ def test_cli_edges_are_one_line_and_exit_1(tmp_path, capsys, monkeypatch, argv, 
     assert len(lines) == 1 and said in lines[0]
     assert cli.main(['make', '--set', 'nope', '-o', str(tmp_path / 's')]) == 1
     assert "unknown set 'nope': one of ui" in capsys.readouterr().err
+
+
+def test_a_take_says_where_its_peak_and_onset_are(tmp_path):
+    res = make('a fast whoosh', out=str(tmp_path / 'w.wav'))
+    t = res['takes'][0]
+    y, sr = sf.read(t['file'])
+    a = np.abs(y).max(axis=1) if y.ndim == 2 else np.abs(y)
+    assert 0.0 <= t['onset_s'] <= t['peak_s'] <= t['dur_s']
+    assert a[int(round(t['peak_s'] * sr))] == pytest.approx(a.max(), rel=0.5)
+    assert f"peak at {t['peak_s']:.2f} s" in res['summary'] and 'events_s' not in t
+
+
+def test_a_row_says_when_each_event_starts(tmp_path):
+    t = make('a soft thump', out=str(tmp_path / 'r.wav'), events=3, dur=0.6)['takes'][0]
+    assert len(t['events_s']) == 3 and t['events_s'] == sorted(t['events_s'])
+    assert t['events_s'][0] == pytest.approx(t['onset_s'], abs=0.03)
+
+
+def test_a_row_of_thumps_keeps_its_length_and_rings_out(tmp_path):
+    res = make('a soft thump', out=str(tmp_path / 'c.wav'), events=3, dur=0.6)
+    t = res['takes'][0]
+    assert t['dur_s'] == pytest.approx(0.6, abs=0.01) and t['performance']['events'] == 3
+    assert t['checks']['ok'], t['checks']
+    assert 'by hand' not in res['summary']
+
+
+def test_ticks_follow_closer_than_a_hand(tmp_path):
+    res = make('a counter ticking up, 1.5 seconds', out=str(tmp_path / 't.wav'), events=12)
+    t = res['takes'][0]
+    assert t['dur_s'] == pytest.approx(1.5, abs=0.01) and t['performance']['events'] == 12
+    assert 'by hand' not in res['summary']
+    res = make('three knocks on a door, 0.2 seconds', out=str(tmp_path / 'k.wav'), events=3)
+    assert res['takes'][0]['dur_s'] > 0.25          # a hand's knocks keep their limit
+
+
+def test_a_double_knock_is_two_strikes_by_design(tmp_path):
+    for seed in range(3):
+        t = make(sound='knock/double', out=str(tmp_path / f'd{seed}.wav'), seed=seed)['takes'][0]
+        assert t['checks']['ok'], t['checks']
+
+
+def test_a_gap_between_events_spaces_the_row(tmp_path):
+    t = make('a soft thump, 200 ms apart', out=str(tmp_path / 'g.wav'), events=3)['takes'][0]
+    assert t['checks']['ok'] and len(t['events_s']) == 3
+    assert np.diff(t['events_s']) == pytest.approx([0.2, 0.2], abs=0.04)
+
+
+def test_a_length_within_a_tenth_of_a_second_says_nothing(tmp_path):
+    from earshot.make import _note
+    t = {'dur_s': 7.93, 'note': '7.93 s, shorter than the 8 s asked: the longest this sound is made'}
+    assert _note(t, 8.0) is None
+    t = {'dur_s': 5.0, 'note': '5.00 s, shorter than the 8 s asked: the longest this sound is made'}
+    assert _note(t, 8.0) == '5.00 s, shorter than the 8 s asked'

@@ -62,6 +62,14 @@ MOST = 64            # events a performance has at most (a length asked for fill
 GAPS = {'walk': (0.25, 1.5), 'knock': (0.12, 1.5), 'row': (0.12, 1.5), 'type': (0.06, 1.0), 'pair': (0.1, 1.5),
         'count': (1.0, 1.0)}
 OWN = ('scatter', 'shake')
+# things a hand or a foot does: their rows keep the GAPS limit. Any other event (a tick, a click, a blip, a counter)
+# follows as close as its own length lets it without sounding over itself (`own_gap`): a number counting up in a
+# film ticks 15 to 30 times a second
+HAND = ('knock', 'clap', 'tap', 'step', 'footstep', 'stomp', 'slap', 'punch', 'kick', 'drum', 'door', 'hand',
+        'knuckle', 'finger', 'foot')
+OWN_GAP = (0.02, 0.12)   # s: the closest a row of events that no hand plays may follow (its own length, within this)
+OWN_DB = 20.0            # dB under its loudest at which an event no longer sounds over the next one
+LAST_RING = 0.1          # s the last event of a length asked keeps at least, before the events are held apart
 SWING = 0.35         # s one swing of a shake takes (its usual 10-18 impacts at 10-20 a second fall in two or three)
 FADE = 0.05         # s over which `fit` fades a performance out at the length asked for
 RING_DB = 40.0       # dB under its loudest at which an event has sounded: a fade from there is not heard as a cut
@@ -81,16 +89,32 @@ def count(name, r, events=None, dur=None, rate=None, usual=None):
     return int(r.integers(lo, hi + 1))
 
 
-def fill(name, events, dur, rate, ring):
+def by_hand(thing=None, sound=None):
+    """True when the events of a row are done by a hand or a foot (HAND: the counted word, else the design's family
+    or name), so they keep the GAPS limit; False for a tick, a click, a blip, a counter"""
+    words = [str(thing or '')] + str(sound or '').replace('/', '_').split('_')
+    return any(w.rstrip('s') in HAND or w in HAND for w in words if w)
+
+
+def own_gap(y):
+    """the closest s a row may follow an event y with: its length down to OWN_DB under its loudest, within OWN_GAP"""
+    return float(np.clip(ring_of(y, 0.0, OWN_DB), *OWN_GAP))
+
+
+def fill(name, events, dur, rate, ring, lo=None):
     """how a pattern's events fill a length of `dur` s: (n, gap, fits). The first event at LEAD, the last `ring` s
     before the end so it has sounded, the gaps even (the plan adds the pattern's human spread around them). events:
     the number asked for, else the number that keeps the pattern's natural `rate` (events a second) closest (a
-    countdown: as many whole seconds as fit). fits is False when the gap had to be held inside GAPS: the events are
-    played at that gap and the length follows from it"""
-    lo, hi = GAPS[name]
+    countdown: as many whole seconds as fit). lo: the closest gap, in place of the pattern's (GAPS; a row no hand
+    plays: `own_gap`). Where the usual ring leaves the events closer than that, the last one rings less (at least
+    LAST_RING; `close` and the caller's taper measure and shape it) before the gap is held. fits is False when the
+    gap had to be held: the events are played at that gap and the length follows from it"""
+    lo, hi = (GAPS[name][0] if lo is None else lo), GAPS[name][1]
     room = max(dur - LEAD - ring, 0.0)                    # from the first onset to the last
     whole = np.floor(room * rate + 1e-6) if name == 'count' else np.round(room * rate)
     n = int(np.clip(events or whole + 1, 2, MOST))
+    if name != 'count' and room < (n - 1) * lo:
+        room = max(room, min((n - 1) * lo, dur - LEAD - LAST_RING))
     gap = room / (n - 1)
     held = float(np.clip(gap, lo, hi))
     if name == 'count':                                   # one a second: a little room after the last is fine
@@ -140,23 +164,38 @@ def ease(y, onset=0.0, db=RING_DB, most=0.25):
     return y
 
 
-def close(p, rings):
+def taper(y, room):
+    """an event y that would still sound `room` s after its start (the end of a length asked) ended there: faded out
+    over the last half of it (cos²), so the file ends on its tail, not on a cut"""
+    y = np.array(y, np.float64)
+    n = max(dsp.n_of(room), 1)
+    if len(y) <= n:
+        return y
+    y = y[:n]
+    j = max(n // 2, 1)
+    g = np.cos(np.linspace(0, np.pi / 2, j)) ** 2
+    y[-j:] *= g if y.ndim == 1 else g[:, None]
+    return y
+
+
+def close(p, rings, keep=False):
     """the plan p (a length filled by `fill`: p['dur'] set) with its events placed so that the last rings out before
     the end: rings[i] (s, `ring_of`) is how long event i sounds. When an event's onset plus its ring passes the end
     (less the end fade, FADE: the last event, or an earlier one that rings longer), the onsets are drawn together
     toward the first (the human spread kept) until none does; where that would bring them closer on average than a
-    hand repeats the stroke (GAPS), the last events are left out. Returns the plan (the same dict when nothing
-    moves) and how many events it keeps"""
+    hand repeats the stroke (GAPS, or the plan's 'lo'), the last events are left out, unless `keep` (a number of
+    events asked for): then all stay at that closest gap and the caller tapers what still sounds at the end (`taper`).
+    Returns the plan (the same dict when nothing moves) and how many events it keeps"""
     on = np.asarray(p['onsets'])
     ring = np.asarray(rings[:len(on)], np.float64)
     n, end = len(on), (p.get('dur') or 0.0) - FADE
     if not p.get('dur') or p['pattern'] not in GAPS or n < 2 or (on + ring).max() <= end:
         return p, n
-    lo = GAPS[p['pattern']][0]
+    lo = p.get('lo') or GAPS[p['pattern']][0]
     while True:
         # the most the onsets (from the first) may be scaled by for every event to have sounded by the end
         s = min(1.0, float(((end - LEAD - ring[1:n]) / np.maximum(on[1:n] - LEAD, 1e-9)).min()))
-        if n == 2 or s * (on[n - 1] - on[0]) / (n - 1) >= lo:
+        if keep or n == 2 or s * (on[n - 1] - on[0]) / (n - 1) >= lo:
             break
         n -= 1
     s = max(s, lo * (n - 1) / max(float(on[n - 1] - on[0]), 1e-9))
@@ -195,6 +234,8 @@ def said(p, dur, real, thing=None):
     n, gap, thing = len(p['onsets']), p['gap'], thing or CHIEF.get(p['pattern'], 'event')
     if p['pattern'] == 'count':
         why = 'a countdown keeps one beat a second'
+    elif p.get('lo') and gap <= p['lo']:
+        why = f'{thing}s closer than {gap:g} s would sound over each other'
     elif gap <= GAPS[p['pattern']][0]:
         why = f'{thing}s cannot follow closer than {gap:g} s by hand'
     else:
@@ -234,7 +275,8 @@ def _keys(members, n, r, size, tone):
     return ds, db
 
 
-def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, deep=None, spread=1.0, ring=None):
+def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, deep=None, spread=1.0, ring=None,
+         lo=None):
     """the performance of a pattern: {'pattern', 'onsets' (s, the first at LEAD), 'gains' (linear), 'members' (the
     recording of each event), 'nudge' (per event: offsets for the caller's energy, size and bright axes, small),
     'pace' (events per second over the whole)}. events: the number asked for; dur: the length asked for. With
@@ -246,13 +288,16 @@ def plan(name, r, members=(0,), events=None, dur=None, usual=None, pace=None, de
     usual (lo, hi) and pace (lo, hi) events a second: the thing's own, in place of the pattern's. type only:
     deep, a deeper key (a space bar) kept for the pauses between words instead of the darkest of `members`; spread,
     how much each key's size, brightness and level differ (1 = a little; more when few recordings stand for a whole
-    keyboard, so the same key never comes back the same)"""
+    keyboard, so the same key never comes back the same)
+    lo: the closest gap of a row no hand plays (`own_gap`), in place of the pattern's GAPS limit; kept as 'lo'"""
     p = PATTERNS[name]
     rate = float(r.uniform(*(pace or p['pace'])))
     filled, room = None, None
     if dur and ring is not None and name in GAPS and (events or 2) > 1:
-        n, gap, fits = fill(name, events, dur, rate, ring)
+        n, gap, fits = fill(name, events, dur, rate, ring, lo)
         filled = {'gap': round(gap, 3), 'fits': bool(fits), 'dur': float(dur) if fits else None}
+        if lo is not None:
+            filled['lo'] = float(lo)
         rate = 1.0 / gap
     elif dur and ring is not None and name in OWN and (events or 2) > 1:
         room = max(dur - LEAD - ring, 0.0)                # from the first onset to the last

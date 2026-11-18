@@ -88,6 +88,8 @@ def _paths(out, n, fmt):
 
 def _line(meta, path, why):
     bits = [f"{meta['dur_s']:.2f} s"]
+    if meta.get('peak_s') is not None:
+        bits[0] += f", peak at {meta['peak_s']:.2f} s"
     if meta.get('pitch'):
         bits.append(meta['pitch'])
     if meta.get('voice'):
@@ -319,9 +321,12 @@ def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0, thing=None):
     from .synth import perform as P
     d = registry.get(sound)
     dur = req.get('dur')
-    p = P.plan(name, dsp.rng(registry.seed_of(sound, seed) ^ 0x60E5), events=events, dur=dur,
-               ring=min(max(d.dur or 0.35, 0.35), 0.6))
     one = {k: v for k, v in req.items() if k != 'dur'}
+    lo = None           # a row no hand plays (a tick, a blip, a counter) follows as close as its event's own length
+    if dur and name in P.GAPS and name != 'count' and not P.by_hand(thing, sound):
+        lo = P.own_gap(registry.render(sound, seed=seed, check=False, **one)[0])
+    p = P.plan(name, dsp.rng(registry.seed_of(sound, seed) ^ 0x60E5), events=events, dur=dur,
+               ring=min(max(d.dur or 0.35, 0.35), 0.6), lo=lo)
     parts, first = [], None
     for i, nudge in enumerate(p['nudge']):
         ax = {**one, 'energy': max(-1.0, min(1.0, float(one.get('energy', 0.0)) + nudge['energy']))}
@@ -330,10 +335,14 @@ def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0, thing=None):
         parts.append((y, 0.0))
     # the last event rings out before the end: measured LIFT dB deeper, as finish folds the strikes and raises what
     # follows them by up to that
-    p, kept = P.close(p, [P.ring_of(z, 0.0, P.RING_DB + registry.LIFT) for z, _ in parts])
+    rings = [P.ring_of(z, 0.0, P.RING_DB + registry.LIFT) for z, _ in parts]
+    p, kept = P.close(p, rings, keep=events is not None)
     parts = parts[:kept]
     if p.get('dur') and p['pattern'] in P.GAPS:           # no later event covers the last one's own end
         parts[-1] = (P.ease(parts[-1][0]), 0.0)
+        end = p['dur'] - P.FADE                           # an event still sounding there is tapered to end on it
+        parts = [(P.taper(z, end - t), 0.0) if t + r > end else (z, 0.0)
+                 for (z, _), t, r in zip(parts, p['onsets'], rings)]
     y = master.finish(P.mix(parts, p), peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
                       sparse=registry.LIFT)
     if p.get('dur'):
@@ -410,6 +419,12 @@ def unfollowed(b, sound, why, ignored, req, given, takes):
     if req.get('dur') and 'dur' not in ignored:     # "a short whoosh, 0.3 seconds": the length said it, and was kept
         words = [w for w in words if w not in LENGTH_WORDS]
     out, what, axes = [], [], []
+    length = [w for w in words if w in LENGTH_WORDS and brief.modifier(w)
+              and set(ignored) & set(L.MODIFIERS[brief.modifier(w)]) and not req.get('dur')]
+    if length:          # "a short whoosh": the length in seconds is what sets it
+        quoted = ', '.join(dict.fromkeys('"' + w + '"' for w in length))
+        out.append(f'not followed: {quoted}; say the length in seconds instead ("0.3 seconds")')
+        words = [w for w in words if w not in length]
     for k in [k for k in ignored if k in PLAIN]:
         said = [w for w in words if brief.modifier(w) and k in L.MODIFIERS[brief.modifier(w)]]
         if k in given or said:
@@ -432,6 +447,41 @@ def unfollowed(b, sound, why, ignored, req, given, takes):
     return out
 
 
+def marks(y, events=1):
+    """where things happen in a take y, in s from the start of the file: {'peak_s': the loudest moment (the largest
+    sample of the loudest 50 ms), 'onset_s': where the sound starts to be heard (its 5 ms level first within 40 dB
+    of its loudest)}, and for a row of `events` over 1 'events_s': each event's start (the largest rises of the 5 ms
+    level, at least 20 ms apart). The hit goes on the frame at t: start the file at t - peak_s"""
+    import numpy as np
+    from .forge import dsp
+    y = np.asarray(y, np.float64)
+    m = y ** 2 if y.ndim == 1 else np.mean(y ** 2, axis=1)
+    if not len(m) or not m.any():
+        return {'peak_s': 0.0, 'onset_s': 0.0}
+    w = max(dsp.n_of(0.05), 1)
+    c = np.concatenate([[0.0], np.cumsum(m)])
+    i = int(np.argmax(c[w:] - c[:-w])) if len(m) > w else 0
+    a = np.abs(y) if y.ndim == 1 else np.abs(y).max(axis=1)
+    peak = i + int(np.argmax(a[i:i + w]))
+    k = max(dsp.n_of(0.005), 1)
+    e = 10 * np.log10(np.convolve(m, np.ones(k) / k, 'same') + 1e-20)
+    out = {'peak_s': round(peak / dsp.SR, 3), 'onset_s': round(int(np.argmax(e > e.max() - 40.0)) / dsp.SR, 3)}
+    if events and events > 1:
+        h = max(dsp.n_of(0.001), 1)
+        f = e[::h]
+        rise = np.maximum(f[k // h * 2:] - f[:-(k // h * 2)], 0.0)      # how much the level climbs over 10 ms
+        rise[f[k // h * 2:] < e.max() - 30.0] = 0.0
+        apart, picks = 20, []
+        for j in np.argsort(-rise, kind='stable'):
+            if rise[j] <= 0 or len(picks) == events:
+                break
+            if all(abs(int(j) - q) >= apart for q in picks):
+                picks.append(int(j))
+        out['events_s'] = sorted(round(q * h / dsp.SR, 3) for q in picks)
+        out['events_s'][0] = min(out['events_s'][0], out['onset_s'])
+    return out
+
+
 def take(sound, seed, req, lufs=None, peak_db=-1.0, perform=None):
     """one clean take of a design: the first of TRIES seeds (seed, seed + 101, ...) that passes the audit, else the
     first one with its warnings: (y, meta). perform: (True, events) plays the design as a performance
@@ -449,9 +499,26 @@ def take(sound, seed, req, lufs=None, peak_db=-1.0, perform=None):
         else:
             y, meta = registry.render(sound, seed=seed + 101 * k, lufs=lufs, peak_db=peak_db, **req)
         if meta['checks']['ok']:
-            return y, meta
+            first = (y, meta)
+            break
         first = first or (y, meta)
-    return first
+    y, meta = first
+    meta.update(marks(y, (meta.get('performance') or {}).get('events') or 1))
+    return y, meta
+
+
+CLOSE_ENOUGH = 0.1      # s: a take within this of the length asked is the length asked: nothing to say
+
+
+def _note(t, dur):
+    """a take's note as it is worth saying: None for a length within CLOSE_ENOUGH of the one asked (a loop cut to
+    the nearest whole cycle), and no reason that is not true (a bed can be made longer than one take of it)"""
+    note = t.get('note')
+    if not note or not dur:
+        return note
+    if abs(t['dur_s'] - dur) <= CLOSE_ENOUGH and ' asked' in note:
+        return None
+    return note.replace(': the longest this sound is made', '')
 
 
 def _heard(path, queries):
@@ -515,6 +582,10 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if b.get('dur_max') and 'dur' not in req and (registry.get(pick['id']).dur or 0) > b['dur_max']:
         req['dur'] = b['dur_max']                # "under 150 ms": only shortens a design that is longer
     perf = performance(b, pick['id'], events)
+    if b.get('gap') and perf and len(perf) > 2 and perf[1] and not req.get('dur'):
+        # "three cards landing, 200 ms apart": the row lasts that many gaps and the last event's usual ring
+        ring = min(max(registry.get(pick['id']).dur or 0.35, 0.35), 0.6)
+        req['dur'] = round(0.02 + (int(perf[1]) - 1) * float(b['gap']) + ring, 3)
     n = takes_asked(b, pick['why'], perf, n)
     paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
     takes = []
@@ -553,7 +624,7 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if held:
         lines.append(held)
         ign = [k for k in ign if k != 'dur']
-    lines += list(dict.fromkeys(t['note'] for t in takes if t.get('note')))
+    lines += list(dict.fromkeys(_note(t, req.get('dur')) for t in takes if _note(t, req.get('dur'))))
     given = {a for a, v in axes.items() if v} | {k for k, v in (('voice', voice), ('material', material)) if v}
     lines += unfollowed(b, pick['id'], pick['why'], ign, req, given, takes)
     unknown = _unknown(b, pick['why'])

@@ -73,6 +73,11 @@ def _render(sound_id, takes):
     return fn
 
 
+# audit findings that are one member's design: a knock-knock is two taps 55 ms apart, which the audit measures as two
+# separate attacks (at 0.01 and 0.07 s on every take): the thing itself, not layers stacked on one hit
+MEMBER_ALLOWS = {'knock/double': ('stacked',)}
+
+
 def register():
     """add every named bank member of the CATEGORIES to the catalogue"""
     from ..forge import bank, knobs
@@ -81,6 +86,7 @@ def register():
         if cat not in CATEGORIES or NUMBERED.match(member):
             continue
         kind, uses, domains, allows = CATEGORIES[cat]
+        allows = allows + MEMBER_ALLOWS.get(row['id'], ())
         info = bank.category_info(cat)
         k = knobs.describe(bank.get(row['id']))
         takes = {'pitch': bool(k.get('pitch')), 'dur': bool(k.get('dur'))}

@@ -267,3 +267,20 @@ def test_a_length_lets_the_last_event_ring_out(text, sid):
     for dur in (2.0, 4.0):
         y, meta = learned.perform(sid, seed=0, dur=dur)
         assert meta['dur_s'] == pytest.approx(dur, abs=0.03) and meta['checks']['ok'], (text, dur, meta['checks'])
+
+
+def test_a_row_no_hand_plays_follows_its_own_length():
+    assert perform.by_hand('knock') and perform.by_hand(None, 'step/pebbles') and perform.by_hand('claps')
+    assert not perform.by_hand('tick', 'tick/metal') and not perform.by_hand(None, 'ui_pop/blip')
+    n, gap, fits = perform.fill('row', 12, 1.5, 3.0, 0.35, lo=0.03)
+    assert n == 12 and fits and gap >= 0.03
+    n, gap, fits = perform.fill('row', 15, 1.5, 3.0, 0.35)          # a hand: held at its limit
+    assert not fits and gap == perform.GAPS['row'][0]
+
+
+def test_a_short_length_takes_its_ring_from_the_last_event_before_it_holds_the_gaps():
+    n, gap, fits = perform.fill('row', 3, 0.6, 3.0, 0.5)
+    assert n == 3 and fits and gap >= perform.GAPS['row'][0]
+    y = np.ones((dsp.n_of(0.5), 2))
+    z = perform.taper(y, 0.2)
+    assert len(z) == dsp.n_of(0.2) and abs(z[-1]).max() < 1e-3

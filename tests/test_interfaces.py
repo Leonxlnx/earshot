@@ -637,3 +637,16 @@ def test_mcp_stdio_warm_start_answers_and_preloads(wav, tmp_path):
         return meas, await s.call_tool('describe', {'path': path})
     meas, desc = anyio.run(_stdio_session, calls, str(log), 'earshot.mcp_server', '--warm')
     assert not _is_error(meas) and not _is_error(desc) and 'models warm' in log.read_text(encoding='utf-8')
+
+
+def test_the_api_says_the_plain_sentence_for_a_missing_extra(monkeypatch):
+    from earshot import api, extras
+
+    def gone(*a, **k):
+        raise ModuleNotFoundError("No module named 'torch'", name='torch')
+    monkeypatch.setitem(api._FUNCS, 'describe', ('make', '_gone_for_test'))
+    import earshot.make as M
+    monkeypatch.setattr(M, '_gone_for_test', gone, raising=False)
+    with pytest.raises(extras.MissingExtra) as e:
+        api.describe('x.wav')
+    assert 'pip install' in str(e.value) and 'torch' in str(e.value)
