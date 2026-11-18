@@ -36420,5 +36420,1065 @@
    1,
    0
   ]
+ },
+ {
+  "id": "knife/chop",
+  "says": [
+   "a knife chopping once on a wooden cutting board",
+   "one clean chop through a vegetable"
+  ],
+  "uses": [
+   "chop",
+   "knife chop",
+   "cutting board",
+   "chopping board",
+   "single chop",
+   "chopping",
+   "chopping vegetables",
+   "dicing",
+   "slicing vegetables"
+  ],
+  "tags": [
+   "kitchen",
+   "knife",
+   "wood",
+   "board",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.56,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "knife-chop-1.npz",
+    "source": "bigsoundbank/2068.wav@4.140-4.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.043,
+    "dur_s": 0.56,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.28,
+     "centroid": 3465,
+     "end_db": -109.7,
+     "tail_ms": 256.8,
+     "start_db": -121.7,
+     "rise_ms": 0.46,
+     "peak": -0.6
+    },
+    "measured": {
+     "hard_db": 4.56,
+     "ring_x": 1.264
+    },
+    "bytes": 19942,
+    "credit": {
+     "title": "Cutting board, zucchini #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/cutting-board-zucchini-1-s2068.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     4.14,
+     4.7
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.01,
+     "shape_db": 0.86
+    }
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "pot/boil",
+  "says": [
+   "water boiling in a pot, bubbling hard",
+   "a pot of soup bubbling on the stove"
+  ],
+  "uses": [
+   "boil",
+   "boiling",
+   "boiling water",
+   "bubbling pot",
+   "simmer",
+   "simmering"
+  ],
+  "tags": [
+   "kitchen",
+   "water",
+   "pot",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "noise",
+  "tonal": false,
+  "default": true,
+  "dur_s": 3.5,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "pot-boil-2.npz",
+    "source": "bigsoundbank/0491.wav@1.000-4.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1943,
+    "dur_s": 3.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.84,
+     "centroid": 737,
+     "end_db": -105.4,
+     "tail_ms": 153.8,
+     "start_db": -166.3,
+     "rise_ms": 2.65,
+     "peak": -7.9
+    },
+    "measured": {
+     "hard_db": 4.73,
+     "ring_x": 1.04
+    },
+    "bytes": 42901,
+    "credit": {
+     "title": "Big broth in a pot",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/big-broth-in-a-pot-s0491.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.0,
+     4.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.68,
+     "shape_db": 1.88
+    }
+   },
+   {
+    "file": "pot-boil-1.npz",
+    "source": "bigsoundbank/0149.wav@1.000-4.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.4843,
+    "dur_s": 3.5,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 7.05,
+     "centroid": 7617,
+     "end_db": -92.3,
+     "tail_ms": 120.9,
+     "start_db": -155.5,
+     "rise_ms": 1.52,
+     "peak": -3.7
+    },
+    "measured": {
+     "hard_db": 10.25,
+     "ring_x": 1.096
+    },
+    "bytes": 51670,
+    "credit": {
+     "title": "Boiling water",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/boiling-water-s0149.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.0,
+     4.5
+    ],
+    "events": 1,
+    "late": 4,
+    "fidelity": {
+     "env_db": 4.37,
+     "shape_db": 1.7
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "pot_lid/set",
+  "says": [
+   "a metal pot lid set down, a ringing clank",
+   "putting the lid on a saucepan"
+  ],
+  "uses": [
+   "pot lid",
+   "lid",
+   "saucepan lid",
+   "lid on pot"
+  ],
+  "tags": [
+   "kitchen",
+   "metal",
+   "pot",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.072,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "pot-lid-set-1.npz",
+    "source": "bigsoundbank/0379.wav@0.000-1.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0035,
+    "dur_s": 1.072,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.75,
+     "centroid": 2175,
+     "end_db": -132.2,
+     "tail_ms": 672.8,
+     "start_db": -89.3,
+     "rise_ms": 2.31,
+     "peak": -0.6
+    },
+    "measured": {
+     "hard_db": 10.77,
+     "ring_x": 1.929
+    },
+    "bytes": 9443,
+    "credit": {
+     "title": "Aluminum lid 20 cm",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/couvercle-en-aluminium-20cm-sample-s0379.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     1.072
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 1.81,
+     "shape_db": 0.59
+    }
+   }
+  ],
+  "walk": [
+   0
+  ]
+ },
+ {
+  "id": "pan/set",
+  "says": [
+   "a pan set down on the stove, a metal knock",
+   "a saucepan placed on the hob"
+  ],
+  "uses": [
+   "pan on stove",
+   "saucepan",
+   "pot on stove",
+   "frying pan",
+   "hob",
+   "pan"
+  ],
+  "tags": [
+   "kitchen",
+   "metal",
+   "pan",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.895,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "pan-set-1.npz",
+    "source": "bigsoundbank/0382.wav@0.000-1.000",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0032,
+    "dur_s": 0.999,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.0,
+     "centroid": 1090,
+     "end_db": -135.7,
+     "tail_ms": 642.1,
+     "start_db": -82.8,
+     "rise_ms": 2.62,
+     "peak": -0.2
+    },
+    "measured": {
+     "hard_db": 8.57,
+     "ring_x": 1.972
+    },
+    "bytes": 7988,
+    "credit": {
+     "title": "Aluminum pan bottom 26cm",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/fond-poele-en-aluminium-26cm-sample-s0382.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.999
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.12,
+     "shape_db": 0.74
+    }
+   },
+   {
+    "file": "pan-set-2.npz",
+    "source": "bigsoundbank/0380.wav@0.000-0.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.003,
+    "dur_s": 0.791,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.0,
+     "centroid": 1354,
+     "end_db": -134.2,
+     "tail_ms": 524.4,
+     "start_db": -97.1,
+     "rise_ms": 3.65,
+     "peak": -0.1
+    },
+    "measured": {
+     "hard_db": 10.38,
+     "ring_x": 2.083
+    },
+    "bytes": 7097,
+    "credit": {
+     "title": "Aluminum saucepan base 20cm",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/fond-casserole-en-aluminium-20cm-sample-s0380.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     0.791
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.36,
+     "shape_db": 0.8
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "gas_stove/ignite",
+  "says": [
+   "a gas stove lit, the igniter clicking and the flame catching",
+   "a gas burner turned on with a soft whoosh"
+  ],
+  "uses": [
+   "gas stove",
+   "stove",
+   "burner",
+   "igniter",
+   "gas hob",
+   "light the stove",
+   "cooker"
+  ],
+  "tags": [
+   "kitchen",
+   "gas",
+   "flame",
+   "cooking"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.4,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "gas-stove-ignite-1.npz",
+    "source": "bigsoundbank/0058.wav@1.200-3.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.209,
+    "dur_s": 2.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 9.51,
+     "centroid": 2781,
+     "end_db": -120.2,
+     "tail_ms": 1217.2,
+     "start_db": -130.3,
+     "rise_ms": 0.96,
+     "peak": -10.1
+    },
+    "measured": {
+     "hard_db": 11.06,
+     "ring_x": 1.65
+    },
+    "bytes": 22066,
+    "credit": {
+     "title": "Gas stove #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/gas-stove-2-s0058.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     1.2,
+     3.2
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 3.38,
+     "shape_db": 1.09
+    }
+   },
+   {
+    "file": "gas-stove-ignite-2.npz",
+    "source": "bigsoundbank/0057.wav@0.000-2.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 2.2332,
+    "dur_s": 2.8,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 6.44,
+     "centroid": 5429,
+     "end_db": -114.1,
+     "tail_ms": 451.3,
+     "start_db": -162.5,
+     "rise_ms": 0.48,
+     "peak": -11.5
+    },
+    "measured": {
+     "hard_db": 9.12,
+     "ring_x": 1.027
+    },
+    "bytes": 27530,
+    "credit": {
+     "title": "Gas stove #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/gas-stove-1-s0057.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.0,
+     2.8
+    ],
+    "events": 1,
+    "late": 2,
+    "fidelity": {
+     "env_db": 4.39,
+     "shape_db": 1.48
+    }
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ]
+ },
+ {
+  "id": "fridge/door",
+  "says": [
+   "a fridge door closed, a soft sealed thump",
+   "a refrigerator door shut"
+  ],
+  "uses": [
+   "fridge",
+   "refrigerator",
+   "fridge door",
+   "freezer"
+  ],
+  "tags": [
+   "kitchen",
+   "door",
+   "house"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 1.1,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "fridge-door-2.npz",
+    "source": "bigsoundbank/1158.wav@21.500-22.600",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2003,
+    "dur_s": 1.1,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.45,
+     "centroid": 163,
+     "end_db": -83.6,
+     "tail_ms": 115.6,
+     "start_db": -116.6,
+     "rise_ms": 1.08,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 6.51,
+     "ring_x": 1.772
+    },
+    "bytes": 17302,
+    "credit": {
+     "title": "Fridge door",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/fridge-door-s1158.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     21.5,
+     22.6
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 2.74,
+     "shape_db": 1.03
+    }
+   },
+   {
+    "file": "fridge-door-1.npz",
+    "source": "bigsoundbank/1158.wav@7.100-8.200",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1935,
+    "dur_s": 1.1,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.54,
+     "centroid": 194,
+     "end_db": -89.7,
+     "tail_ms": 108.4,
+     "start_db": -104.9,
+     "rise_ms": 3.31,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 7.46,
+     "ring_x": 1.788
+    },
+    "bytes": 16213,
+    "credit": {
+     "title": "Fridge door",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/fridge-door-s1158.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     7.1,
+     8.2
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.0,
+     "shape_db": 1.02
+    }
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ]
+ },
+ {
+  "id": "spoon/stir",
+  "says": [
+   "a spoon stirring in a mug of coffee, small clinks",
+   "stirring tea with a teaspoon"
+  ],
+  "uses": [
+   "stir",
+   "stirring",
+   "teaspoon",
+   "spoon in cup",
+   "stir coffee",
+   "stir tea"
+  ],
+  "tags": [
+   "kitchen",
+   "spoon",
+   "cup",
+   "ceramic"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "object",
+  "tonal": false,
+  "default": true,
+  "dur_s": 2.0,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "spoon-stir-2.npz",
+    "source": "bigsoundbank/0410.wav@9.800-11.800",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1442,
+    "dur_s": 2.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.15,
+     "centroid": 1973,
+     "end_db": -114.8,
+     "tail_ms": 104.4,
+     "start_db": -127.5,
+     "rise_ms": 1.38,
+     "peak": -5.5
+    },
+    "measured": {
+     "hard_db": -0.31,
+     "ring_x": 1.0
+    },
+    "bytes": 43908,
+    "credit": {
+     "title": "Spoon into a Mug of Coffee",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/spoon-into-a-mug-of-coffee-s0410.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     9.8,
+     11.8
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.09,
+     "shape_db": 1.12
+    }
+   },
+   {
+    "file": "spoon-stir-1.npz",
+    "source": "bigsoundbank/0410.wav@0.300-2.300",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0808,
+    "dur_s": 2.0,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.59,
+     "centroid": 2641,
+     "end_db": -110.4,
+     "tail_ms": 74.6,
+     "start_db": -125.9,
+     "rise_ms": 0.71,
+     "peak": -1.5
+    },
+    "measured": {
+     "hard_db": 5.13,
+     "ring_x": 1.105
+    },
+    "bytes": 49330,
+    "credit": {
+     "title": "Spoon into a Mug of Coffee",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/spoon-into-a-mug-of-coffee-s0410.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.3,
+     2.3
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.15,
+     "shape_db": 1.05
+    },
+    "allows": [
+     "clicks",
+     "ring"
+    ]
+   }
+  ],
+  "walk": [
+   1,
+   0
+  ],
+  "allows": [
+   "clicks",
+   "ring"
+  ]
+ },
+ {
+  "id": "plate/set",
+  "says": [
+   "a plate set down on a table",
+   "a ceramic dish placed on a wooden table"
+  ],
+  "uses": [
+   "plate",
+   "dish",
+   "set the table",
+   "serve",
+   "plate down",
+   "serving"
+  ],
+  "tags": [
+   "kitchen",
+   "plate",
+   "ceramic",
+   "table"
+  ],
+  "domains": [
+   "game",
+   "motion"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.675,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "plate-set-1.npz",
+    "source": "bigsoundbank/1189.wav@0.400-1.050",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.125,
+    "dur_s": 0.65,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.32,
+     "centroid": 1558,
+     "end_db": -116.6,
+     "tail_ms": 387.2,
+     "start_db": -120.6,
+     "rise_ms": 5.15,
+     "peak": -8.0
+    },
+    "measured": {
+     "hard_db": 7.19,
+     "ring_x": 1.353
+    },
+    "bytes": 11455,
+    "credit": {
+     "title": "Large Plate, set on Table",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/large-plate-set-on-table-s1189.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     0.4,
+     1.05
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.69,
+     "shape_db": 1.22
+    },
+    "allows": [
+     "rising_glide",
+     "stacked"
+    ]
+   },
+   {
+    "file": "plate-set-2.npz",
+    "source": "bigsoundbank/1190.wav@9.400-10.100",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1003,
+    "dur_s": 0.7,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.75,
+     "centroid": 2791,
+     "end_db": -107.5,
+     "tail_ms": 110.8,
+     "start_db": -159.4,
+     "rise_ms": 1.25,
+     "peak": -2.2
+    },
+    "measured": {
+     "hard_db": 7.4,
+     "ring_x": 1.038
+    },
+    "bytes": 17628,
+    "credit": {
+     "title": "Small plate, set on table",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/small-plate-set-on-table-s1190.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "excerpt_s": [
+     9.4,
+     10.1
+    ],
+    "events": 1,
+    "late": 1,
+    "fidelity": {
+     "env_db": 3.35,
+     "shape_db": 1.08
+    },
+    "allows": [
+     "stacked"
+    ]
+   }
+  ],
+  "walk": [
+   0,
+   1
+  ],
+  "allows": [
+   "rising_glide",
+   "stacked"
+  ]
  }
 ]
