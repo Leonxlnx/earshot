@@ -10,6 +10,8 @@ Python API (models load lazily on first use and stay warm):
 
 or explicitly: `from earshot import api` / `from earshot.describe import describe`.
 Sounds made from a request in words (no models): `from earshot.make import make; make('a soft success chime', 'a.wav')`.
+Making sounds needs only the base install; the listening and measuring functions need an extra (earshot.extras), and
+without it they raise earshot.extras.MissingExtra, whose message is the install command.
 """
 import importlib
 
@@ -23,6 +25,9 @@ _FUNCS = {'rank': ('search', 'rank'), 'find': ('search', 'find'), 'ab': ('compar
 
 
 def __getattr__(name):
+    if name in _CALLABLE or name in _FUNCS:
+        from . import extras
+        extras.check(name)      # earshot.describe without the listen extra: one sentence with the install command
     if name in _CALLABLE:
         return importlib.import_module(f'earshot.{name}')
     if name in _FUNCS:

@@ -35,7 +35,8 @@ from .cli import common
 from .sounds import lexicon as L
 from .report import emit, read_json
 
-SET_FIELDS = ('name', 'want', 'sound', 'pitch', 'dur', 'voice', 'material', 'seed', 'n', 'axes', 'lufs')
+SET_FIELDS = ('name', 'want', 'sound', 'pitch', 'dur', 'voice', 'material', 'seed', 'n', 'axes', 'lufs', 'events',
+              'loop')
 TRIES = 4
 GUESS_Z, GUESS_HAIR = 2.0, 0.06     # `guess`: semantic support, and how close another family may come (share)
 # formats whose encoder pads the start and end of a file and records it only in a note some players ignore (the LAME
@@ -44,6 +45,39 @@ GUESS_Z, GUESS_HAIR = 2.0, 0.06     # `guess`: semantic support, and how close a
 PADDED = ('mp3', 'm4a')
 SEAM_SAFE = 'flac'      # what a loop of a set is written as in place of a padded format
 GIST = 40               # characters of a design's description next to an alternative of a guess
+MAX_DUR = 120.0         # seconds: the longest sound one call makes (an ambience loops seamlessly: a player repeats it)
+MAX_TAKES = 12          # takes of one request in one call (the most a request's words can ask for, brief.read)
+MAX_EVENTS = 64         # events of one performance (earshot.synth.perform.MOST)
+
+
+def _whole(v, what, lo, hi):
+    """v as a whole number from lo to hi ("3" counts as 3), else a ValueError that says what is wrong"""
+    span = f' from {lo} to {hi}' if hi < 2 ** 31 - 1 else ''
+    try:
+        if isinstance(v, bool) or isinstance(v, float) and not v.is_integer():
+            raise ValueError
+        i = int(v.strip()) if isinstance(v, str) else int(v)
+    except (TypeError, ValueError):
+        raise ValueError(f'{what} is a whole number{span}, not {v!r}') from None
+    if not lo <= i <= hi:
+        raise ValueError(f'{what} is a whole number from {lo} to {hi}, not {i}')
+    return i
+
+
+def _length(v, what='dur'):
+    """a length asked for, in seconds, over 0 and at most MAX_DUR; None stays None"""
+    if v is None:
+        return None
+    try:
+        s = float(v)
+    except (TypeError, ValueError):
+        raise ValueError(f'{what} is a length in seconds, not {v!r}') from None
+    if not s > 0:
+        raise ValueError(f'{what} is a length in seconds over 0, not {v!r}')
+    if s > MAX_DUR:
+        raise ValueError(f'{s:g} s is longer than earshot makes in one sound (at most {MAX_DUR:g} s); an ambience or '
+                         'music loop is seamless, so make it shorter and let the player repeat it')
+    return s
 
 
 def _paths(out, n, fmt):
@@ -354,6 +388,14 @@ PLAIN = {'bright': 'brightness', 'hard': 'hardness', 'ring': 'ring', 'size': 'si
          'width': 'width', 'energy': 'strength', 'motion': 'speed'}
 
 
+LENGTH_WORDS = {'short', 'shorter', 'long', 'longer', 'brief', 'briefer', 'longish', 'shortish'}
+
+
+def words_of(b):
+    """the words of a request, lower case"""
+    return set(brief.WORD.findall((b.get('text') or '').lower()))
+
+
 def unfollowed(b, sound, why, ignored, req, given, takes):
     """the plain lines for what a request asked and the sound could not follow (registry.render's `ignored`), each
     with what the sound does instead. An axis is said only when the caller set it (`given`) or a word of the request
@@ -365,6 +407,8 @@ def unfollowed(b, sound, why, ignored, req, given, takes):
     picked = set(why) | {w.split(':')[-1] for w in why} | set(own) | {brief.stem(w) for w in own}
     words = [w for w in brief.WORD.findall((b.get('text') or '').lower())
              if brief.stem(w) not in picked and w not in picked]
+    if req.get('dur') and 'dur' not in ignored:     # "a short whoosh, 0.3 seconds": the length said it, and was kept
+        words = [w for w in words if w not in LENGTH_WORDS]
     out, what, axes = [], [], []
     for k in [k for k in ignored if k in PLAIN]:
         said = [w for w in words if brief.modifier(w) and k in L.MODIFIERS[brief.modifier(w)]]
@@ -382,6 +426,8 @@ def unfollowed(b, sound, why, ignored, req, given, takes):
         elif k in ('pitch', 'voice', 'material') and req.get(k) is not None:
             if brief.stem(str(req[k])) in picked or str(req[k]) in picked:
                 continue
+            if k != 'pitch' and k not in given and str(req[k]).lower() not in words_of(b):
+                continue        # read from another word ("a chair": wood), not asked for: nothing to say
             out.append(f'not followed: {k} {req[k]}; this sound has no {k} to set and plays as designed')
     return out
 
@@ -433,10 +479,25 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     meta['performance'] says what was played"""
     from .sounds import registry
     from .synth import master
-    if not (want or sound):
+    if not ((want and str(want).strip()) or sound):
         raise ValueError('say what sound you want (want=...) or name one (sound=...)')
+    bad = [a for a in axes if a not in registry.AXES]
+    if bad:
+        raise ValueError(f'unknown option {", ".join(bad)}: make takes want, out, sound, n, seed, theme, listen, fmt, '
+                         f'mono, lufs, sr, bits, pitch, dur, voice, material, loop, events and the axes '
+                         f'{", ".join(registry.AXES)} (-1 to 1)')
+    for a, v in axes.items():
+        if v is not None and not isinstance(v, (int, float)) or isinstance(v, bool):
+            raise ValueError(f'{a} is a number from -1 to 1, not {v!r}')
+    n, seed, dur = _whole(n, 'n (takes)', 1, MAX_TAKES), _whole(seed, 'seed', -2 ** 31, 2 ** 31 - 1), _length(dur)
+    events = None if events is None else _whole(events, 'events', 1, MAX_EVENTS)
+    if listen:      # before anything is made: listening needs the models' packages
+        from . import extras
+        extras.need(*extras.LISTEN, what='make with listen')
     b, cands = choose(want, sound, top=8, listen=True if listen else None, pitch=pitch, dur=dur, voice=voice,
                       material=material, axes=axes)
+    if b.get('dur') is not None:        # a length the words asked for ("rain, 10 hours") has the same bounds
+        b['dur'] = _length(b['dur'], 'the length asked for')
     if loop is False:
         b['loop'] = False
     if not cands:
@@ -472,7 +533,7 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
                f"{played['events']} events as a {played['pattern']}"
                + (f" at {played['pace']:.1f} a second" if played.get('pace') else ''))
         lines.append(f'played: {how}; one event: events=1 or "a single ..."')
-    elif perf is not None:
+    elif perf is not None and b.get('domain') != 'ui':     # a press of an interface is one event: nothing left open
         lines.append('played: one event; the action: events=<n> or say it ("footsteps", "knocking", "three knocks")')
     missing = [] if sound else brief.uncovered(b, pick['why'])
     if missing:
@@ -493,7 +554,8 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         lines.append(held)
         ign = [k for k in ign if k != 'dur']
     lines += list(dict.fromkeys(t['note'] for t in takes if t.get('note')))
-    lines += unfollowed(b, pick['id'], pick['why'], ign, req, {a for a, v in axes.items() if v}, takes)
+    given = {a for a, v in axes.items() if v} | {k for k, v in (('voice', voice), ('material', material)) if v}
+    lines += unfollowed(b, pick['id'], pick['why'], ign, req, given, takes)
     unknown = _unknown(b, pick['why'])
     if unknown:
         lines.append(f"not understood: {', '.join(unknown)}")
@@ -525,7 +587,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
                     {"name": "success", "want": "a quick success sound", "axes": {"bright": 0.2}}]}
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
     takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
-    seed, n, axes, lufs. Every sound shares the theme (one voice, key and room). A name's take is its `seed` when
+    seed, n, axes, lufs, events (a thing done in a row, as in `make`) and loop (false: once). Every sound shares the
+    theme (one voice, key and room). A name's take is its `seed` when
     given, else the next take of its design (the first name of a learned design gets its best recording). Level:
     every one-shot is made as it is made alone (true peak -1 dBFS) and the set is balanced by the loudest 50 ms
     (balance()): none more than BALANCE dB over the quietest, a ready-made set's `quiet` names at the quietest,
@@ -546,7 +609,13 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     from .synth import master
     from .sounds import sets
     if isinstance(spec, str):
+        if spec not in sets.SETS and not os.path.isfile(spec):
+            raise ValueError(f'unknown set {spec!r}: one of {", ".join(sets.SETS)}, or the path of a JSON spec')
         spec = {'set': spec} if spec in sets.SETS else read_json(spec)
+    if not isinstance(spec, dict) or not isinstance(spec.get('sounds') or [], list) or not all(
+            isinstance(it, dict) for it in spec.get('sounds') or []):
+        raise ValueError('a set spec is {"set": "ui"} and / or '
+                         '{"sounds": [{"name": "tap", "want": "a soft tap"}, ...]}')
     items, skipped, quiet = list(spec.get('sounds') or []), [], ()
     if spec.get('set'):
         base = sets.get(spec['set'], theme or spec.get('theme'))     # a theme named: the tonal figures
@@ -564,6 +633,7 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     if bad or None in names or len(set(names)) != len(names):
         raise ValueError(f'unknown fields {bad}: a sound takes {", ".join(SET_FIELDS)}' if bad else
                          'every sound of a set needs its own "name"')
+    seed = _whole(seed, 'seed', -2 ** 31, 2 ** 31 - 1)
     out = out or spec.get('out') or 'sounds'
     theme = theme or spec.get('theme')
     fmts = _formats(fmt or spec.get('format') or 'wav')
@@ -571,11 +641,28 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     top = lufs if lufs is not None else spec.get('lufs')
     rows, lines, ys, alts, missed, first, played, pending, takes = [], [], [], {}, {}, {}, {}, [], {}
     for it in items:
+        if not ((it.get('want') and str(it['want']).strip()) or it.get('sound')):
+            raise ValueError(f'{it["name"]}: say what sound you want ("want") or name one ("sound")')
+        it = {**it, 'dur': _length(it.get('dur'), f'{it["name"]}: dur')}
+        if it.get('n') is not None:
+            it['n'] = _whole(it['n'], f'{it["name"]}: n (takes)', 1, MAX_TAKES)
+        if it.get('seed') is not None:
+            it['seed'] = _whole(it['seed'], f'{it["name"]}: seed', -2 ** 31, 2 ** 31 - 1)
+        if it.get('events') is not None:
+            it['events'] = _whole(it['events'], f'{it["name"]}: events', 1, MAX_EVENTS)
+        if it.get('loop') not in (None, True, False):
+            raise ValueError(f'{it["name"]}: loop is true or false, not {it["loop"]!r}')
         b, cands = choose(it.get('want'), it.get('sound'), pitch=it.get('pitch'), dur=it.get('dur'),
                           voice=it.get('voice'), material=it.get('material'), axes=it.get('axes'))
+        if b.get('dur') is not None:
+            b['dur'] = _length(b['dur'], f'{it["name"]}: the length asked for')
         if not cands:
             raise ValueError(f'{it["name"]}: no sound in the catalogue answers {it.get("want")!r}')
-        d = registry.get(cands[0]['id'])
+        d = registry.get(cands[0]['id'] if it.get('sound') else twin(b, cands[0]['id']))
+        if it.get('loop') is False:
+            b['loop'] = False
+        # a thing done in a row is played as `make` plays it ("three knocks, 2 seconds", footsteps, events=4)
+        perf = performance(b, d.id, it.get('events')) if it.get('want') or it.get('events') else None
         alone = it.get('lufs') is None and top is None and not d.loop and d.kind not in registry.LOUDEST
         level = None if alone else it.get('lufs', (TOP if top is None else top) + WEIGHT.get(d.kind, -4.0))
         k = int(it.get('n') or b['n'] or 1)
@@ -583,12 +670,16 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
         for j, p in enumerate(_paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0])):
             s = int(it['seed']) + j if it.get('seed') is not None else seed + takes.get(d.id, 0)
             takes[d.id] = takes.get(d.id, 0) + 1
-            y, meta = take(d.id, s, _request(b, theme), lufs=level)
+            y, meta = take(d.id, s, _request(b, theme), lufs=level, perform=perf)
             if meta.get('member'):
                 mine[meta['member']['n']] = meta['member']
             lines.append(None)            # the file's line, written once the set is balanced
             pending.append({'p': p, 'y': y, 'meta': meta, 'd': d, 'alone': alone, 'name': it['name'],
                             'line': len(lines) - 1, 'why': ', '.join(brief.shown(b, cands[0]['why']))})
+            done = meta.get('performance')
+            if done and j == 0:
+                lines.append(f"  played: {done['events']} events" + (
+                    ' (a recording of the whole action)' if done.get('recording') else f" as a {done.get('pattern')}"))
             if meta.get('note'):
                 lines.append(f"  {meta['note']}")
             if meta.get('loop') and _loop_formats(fmts) != fmts:
@@ -731,7 +822,8 @@ def add_cli(sub):
                                    'the voice, key and room of tonal figures; a set with a theme named plays its '
                                    'figures on that instrument, without one its sounds of real things')
     p.add_argument('--pitch', help='a note (C5) or Hz')
-    p.add_argument('--dur', type=float, help='seconds: how long a figure of notes sounds (damped by the hand to end '
+    p.add_argument('--dur', type=float, help='seconds, up to 120: how long a figure of notes sounds (damped by the '
+                                             'hand to end '
                                              'there; a figure rings no longer than it rings), the hold of a pad, the '
                                              'length of an ambience (shorter than its shortest loop: a cut, not a '
                                              'loop, unless the words say "loop") or a whoosh; a sound learned from '

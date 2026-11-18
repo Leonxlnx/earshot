@@ -20,7 +20,7 @@ import threading
 
 import numpy as np
 
-from .. import audio, config
+from .. import audio, config, extras
 from . import hub
 
 WIN_S = 10.0
@@ -117,6 +117,8 @@ def _set_precision(model, torch):
 
 class Clap:
     def __init__(self, model_id=None):
+        # before the cache is looked at: without torch nothing is downloaded that could not be loaded
+        extras.need('torch', 'transformers', what='listening to sound (the CLAP model)')
         config.ensure_dirs()
         self.model_id = model_id or config.CLAP_MODEL
         self.spec = hub.ensure(self.model_id, config.CLAP_REVISION if self.model_id == config.CLAP_MODEL else None)

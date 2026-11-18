@@ -17,7 +17,7 @@ import warnings
 
 import numpy as np
 
-from .. import audio, config
+from .. import audio, config, extras
 from . import hub
 from .clap import _load_hf, _set_precision
 
@@ -29,6 +29,7 @@ _inst = None
 
 class AST:
     def __init__(self, model_id=None):
+        extras.need('torch', 'transformers', what='listening to sound (the AudioSet tagger)')
         config.ensure_dirs()
         self.model_id = model_id or config.AST_MODEL
         self.spec = hub.ensure(self.model_id, config.AST_REVISION if self.model_id == config.AST_MODEL else None)

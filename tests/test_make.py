@@ -5,6 +5,7 @@ files with a byte order mark, the catalogue listing, the command line, and packi
 file goes to tmp_path."""
 import json
 import os
+import re
 import shutil
 
 import numpy as np
@@ -602,3 +603,103 @@ def test_a_design_named_inside_its_family_wins_over_the_default():
         b, cands = choose(want, top=4)
         assert cands[0]['id'] == 'stop/tape'
         assert cands[1]['score'] < 0.9 * cands[0]['score']                 # no near tie: not a guess
+
+
+# ---- the edges of the call: each ends in a result or one plain sentence, before anything is rendered
+
+@pytest.mark.parametrize('kw, said', [
+    (dict(want='   '), 'say what sound you want'),
+    (dict(want='rain on a window', dur=0), 'length in seconds over 0'),
+    (dict(want='rain on a window', dur=-3), 'length in seconds over 0'),
+    (dict(want='rain on a window', dur=600), 'at most 120 s'),
+    (dict(want='rain on a window', dur=36000), 'at most 120 s'),
+    (dict(want='a click', n=0), 'n (takes) is a whole number from 1 to 12'),
+    (dict(want='a click', n=1000), 'n (takes) is a whole number from 1 to 12'),
+    (dict(want='a click', seed='abc'), 'seed is a whole number'),
+    (dict(want='footsteps on wood', events='three'), 'events is a whole number from 1 to 64'),
+    (dict(want='footsteps on wood', events=-2), 'events is a whole number'),
+    (dict(want='footsteps on wood', events=2.5), 'events is a whole number'),
+    (dict(want='footsteps on wood', events=1000), 'events is a whole number'),
+    (dict(want='a click', colour='red'), 'unknown option colour'),
+    (dict(want='a click', bright='very'), 'bright is a number from -1 to 1'),
+])
+def test_a_hurried_call_gets_one_plain_sentence(tmp_path, kw, said):
+    out = tmp_path / 'x.wav'
+    with pytest.raises(ValueError, match=re.escape(said)):
+        make(out=str(out), **kw)
+    assert not out.exists()
+
+
+def test_a_seed_given_as_text_is_the_number_and_a_long_request_is_read(tmp_path):
+    a = make('a click', str(tmp_path / 'a.wav'), seed='3')
+    b = make('a click', str(tmp_path / 'b.wav'), seed=3)
+    assert a['takes'][0]['seed'] == b['takes'][0]['seed'] == 3
+    long = make(('a soft click for a button, ' * 200)[:5000], str(tmp_path / 'long.wav'))
+    assert os.path.exists(long['files'][0])
+
+
+def test_a_path_with_spaces_and_umlauts_in_a_new_folder_and_over_an_existing_file(tmp_path):
+    p = tmp_path / 'neuer Ordner' / 'Tür knallt zu.wav'
+    make('a door slam', str(p))
+    first = p.stat().st_size
+    make('a door slam', str(p), seed=1)
+    assert p.exists() and first > 0
+
+
+def test_a_set_names_the_sets_that_exist_and_checks_its_sounds(tmp_path):
+    with pytest.raises(ValueError, match="unknown set 'nope': one of ui, game, arcade, film"):
+        make_set('nope', out=str(tmp_path / 's'))
+    with pytest.raises(ValueError, match='a set spec is'):
+        make_set({'sounds': 'tap'}, out=str(tmp_path / 's'))
+    with pytest.raises(ValueError, match='tap: n'):
+        make_set({'sounds': [{'name': 'tap', 'want': 'a soft tap', 'n': 0}]}, out=str(tmp_path / 's'))
+    with pytest.raises(ValueError, match='at most 120 s'):
+        make_set({'sounds': [{'name': 'rain', 'want': 'rain', 'dur': 36000}]}, out=str(tmp_path / 's'))
+    with pytest.raises(ValueError, match='tap: say what sound'):
+        make_set({'sounds': [{'name': 'tap', 'want': ' '}]}, out=str(tmp_path / 's'))
+    assert not (tmp_path / 's').exists()
+
+
+def test_a_material_the_reader_took_from_another_word_is_not_reported_as_not_followed(tmp_path):
+    r = make('a wet coat taken off and dropped over a chair, heavy cloth', str(tmp_path / 'c.wav'))
+    assert 'material wood' not in r['summary']
+
+
+def test_a_length_that_was_kept_is_not_reported_as_not_followed(tmp_path):
+    r = make('a short whoosh, 0.3 seconds', str(tmp_path / 'w.wav'))
+    assert '"short"' not in r['summary']
+
+
+def test_a_set_plays_a_thing_done_in_a_row_as_make_does(tmp_path):
+    r = make_set({'sounds': [{'name': 'steps', 'want': 'footsteps on wet pavement', 'events': 4},
+                             {'name': 'knocks', 'want': 'three knocks on a door, 2 seconds'},
+                             {'name': 'rain', 'want': 'rain on a window', 'dur': 6, 'loop': False}]},
+                 out=str(tmp_path / 's'))
+    by = {s['name']: s for s in r['sounds']}
+    assert 'played: 4 events' in r['summary']
+    assert by['knocks']['dur_s'] == pytest.approx(2.0, abs=0.01)
+    assert by['rain']['loop'] is False
+    with pytest.raises(ValueError, match='steps: events is a whole number'):
+        make_set({'sounds': [{'name': 'steps', 'want': 'footsteps', 'events': 0}]}, out=str(tmp_path / 't'))
+
+
+def test_an_interface_press_gets_no_hint_about_events(tmp_path):
+    r = make('a tap on a button', str(tmp_path / 't.wav'))
+    assert 'played: one event' not in r['summary']
+    one = make('a single knock on a wooden door', str(tmp_path / 'k.wav'))
+    assert 'played: one event' in one['summary']
+
+
+@pytest.mark.parametrize('argv, said', [
+    (['--dur', '0'], 'dur is a length in seconds over 0'),
+    (['--dur', '36000'], 'at most 120 s'),
+    (['--n', '0'], 'n (takes) is a whole number'),
+    (['--events', '0'], 'events is a whole number'),
+])
+def test_cli_edges_are_one_line_and_exit_1(tmp_path, capsys, monkeypatch, argv, said):
+    monkeypatch.delenv('EARSHOT_DEBUG', raising=False)
+    assert cli.main(['make', 'rain on a window', '-o', str(tmp_path / 'x.wav')] + argv) == 1
+    lines = capsys.readouterr().err.strip().splitlines()
+    assert len(lines) == 1 and said in lines[0]
+    assert cli.main(['make', '--set', 'nope', '-o', str(tmp_path / 's')]) == 1
+    assert "unknown set 'nope': one of ui" in capsys.readouterr().err

@@ -196,6 +196,8 @@ def fetch(spec):
         raise RuntimeError(f'{spec.label} is {where} and {flag} is set, so earshot will not download it. Run once '
                            f'without {flag} (`earshot doctor --fetch` downloads the models, ~1.1 GB), copy a cache '
                            'there, or point EARSHOT_HOME at one.')
+    from .. import extras
+    extras.need('huggingface_hub', what='downloading the listening models')
     from huggingface_hub import snapshot_download   # a dependency of transformers
     pin = config.PINS.get(spec.model_id) if spec.pinned else None
     patterns = [*pin['files'], pin['weights']] if pin else list(CUSTOM_PATTERNS)

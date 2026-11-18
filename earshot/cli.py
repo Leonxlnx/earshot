@@ -82,7 +82,8 @@ def _register(sub, modules):
         try:
             importlib.import_module(f'earshot.{mod}').add_cli(sub)
         except Exception as e:  # a broken module must not break the others
-            failed[mod] = f'{type(e).__name__}: {e}'
+            from .extras import plain
+            failed[mod] = plain(e) or f'{type(e).__name__}: {e}'
     return failed
 
 
@@ -110,13 +111,15 @@ def main(argv=None):
     if args.command != 'mcp':  # a file name outside the console code page must never crash a print
         with contextlib.suppress(Exception):
             sys.stdout.reconfigure(errors='backslashreplace')
+    from . import extras
     try:
+        extras.check(args.command)      # a command whose extra is missing says so before it starts
         return args.func(args) or 0
     except Exception as e:  # readable one-line errors for agents; EARSHOT_DEBUG=1 shows the traceback
         if os.environ.get('EARSHOT_DEBUG'):
             raise
         from .report import error_line
-        error_line(args.command, f'{type(e).__name__}: {e}')
+        error_line(args.command, extras.plain(e, args.command) or f'{type(e).__name__}: {e}')
         return 1
 
 

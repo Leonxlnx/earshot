@@ -140,6 +140,9 @@ def _api(name):
     try:
         return api._fn(name)
     except Exception as e:  # noqa: BLE001
+        from .extras import plain
+        if plain(e, name):
+            raise ToolFailure(_failure(name, e)) from None
         mod = api._FUNCS.get(name, (name, name))[0]
         if importlib.util.find_spec(f'earshot.{mod}') is None:
             present = [k for k in (f.__name__[5:] for f, _, _ in TOOLS)
@@ -211,16 +214,27 @@ def _format(r, full=False, ignored=()):
     return '\n\n'.join(x for x in (head, body, note, ('JSON: ' if full else 'JSON (compact): ') + js) if x)
 
 
+def _failure(name, e):
+    """the one plain line of a failed call: the install command when a missing extra caused it, else the error's
+    type and message"""
+    from .extras import plain
+    said = plain(e, name)
+    return (said if said.startswith('earshot ') else f'{name}: {said}') if said else \
+        f'{name} failed: {type(e).__name__}: {e}'
+
+
 def _result(name, kw, fn=None):
     """(result dict, ignored kwargs) of one earshot call; any failure becomes a readable ToolFailure"""
     with _LOCK, contextlib.redirect_stdout(sys.stderr):
         fn = fn or _api(name)
         try:
+            from .extras import check
+            check(name)         # a tool whose extra is missing says so before it starts
             r, ignored = _call(fn, kw)
         except ToolFailure:
             raise
         except Exception as e:  # noqa: BLE001
-            raise ToolFailure(f'{name} failed: {type(e).__name__}: {e}') from None
+            raise ToolFailure(_failure(name, e)) from None
     return (r if isinstance(r, dict) else {'summary': str(r)}), ignored
 
 
@@ -637,7 +651,8 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                              'product: soft, glass, wood, felt, tine, metal, '
                                                              'electric, digital, retro')] = None,
               pitch: Annotated[str | None, Field(description='a note ("C5") or Hz for a tonal sound')] = None,
-              dur: Annotated[float | None, Field(description='seconds: how long a figure of notes sounds (damped '
+              dur: Annotated[float | None, Field(description='seconds, up to 120: how long a figure of notes sounds '
+                                                             '(damped '
                                                              'by the hand to end there; it rings no longer than it '
                                                              'rings), the hold of a pad, the length of an ambience '
                                                              '(shorter than its shortest loop: a cut, not a loop, '
@@ -715,7 +730,8 @@ def tool_make_set(out: Annotated[str, Field(description='absolute path of the fo
                                                                          '{"name": "success", "sound": '
                                                                          '"success/triad", "dur": 0.5}]; fields: '
                                                                          'name, want, sound, pitch, dur, voice, '
-                                                                         'material, seed, n, axes, lufs')] = None,
+                                                                         'material, seed, n, axes, lufs, events, '
+                                                                         'loop')] = None,
                   theme: Annotated[str | None, Field(description='one voice, key and room for the whole set: soft, '
                                                                  'glass, wood, felt, tine, metal, electric, '
                                                                  'digital, retro')] = None,
@@ -833,7 +849,8 @@ def warm():
                     vocab.get()
                 print(f'earshot mcp: models warm ({time.time() - t:.0f} s)', file=sys.stderr)
             except Exception as e:  # noqa: BLE001
-                print(f'earshot mcp: warm-up failed: {type(e).__name__}: {e}', file=sys.stderr)
+                from .extras import plain
+                print(f'earshot mcp: warm-up failed: {plain(e) or f"{type(e).__name__}: {e}"}', file=sys.stderr)
     threading.Thread(target=load, daemon=True).start()
 
 
@@ -851,7 +868,9 @@ def serve(args):
     try:
         srv = build()
     except ImportError as e:
-        print(f'earshot mcp needs the MCP SDK: pip install "earshot[mcp]" ({e})', file=sys.stderr)
+        from .extras import plain
+        said = plain(e) or f'needs the MCP SDK: pip install "earshot[mcp]" ({e})'
+        print(f'earshot mcp: {said}', file=sys.stderr)
         return 1
     if args.warm:
         warm()
