@@ -87,6 +87,7 @@ RETAKE = 101                # make.take's step between the seeds it tries: seeds
 # that recording to be played (warped that little): further, the pattern fills the length at the natural pace, as a
 # warp would slow or hurry the walk, the knock, the typing it holds
 WHOLE_FIT = 0.15
+LATE_END = 0.03     # s a warped whole recording may run past the length asked (its own end kept, not faded early)
 # the different keys a typing run lets be heard at least: with two, a run alternates 1, 2, 1, 2 and reads as a
 # machine; a thing with fewer single recordings borrows its neighbours' (borrow) and varies each key more
 KEYS = 4
@@ -335,8 +336,19 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
         for part in parts:
             if ref and not part[2]:
                 part[0] = part[0] * (ref / (np.abs(part[0]).max() + 1e-12))
+        # a length asked for: the last event placed early enough to ring out (its ring measured in the room it is
+        # played in) before the end; measured LIFT dB deeper, as finish below folds the strikes and raises what
+        # follows them by up to that
+        amount = c.space if 'space' in e['axes'] else 0.0
+        if p.get('dur') and p['pattern'] in P.GAPS:
+            deep = P.RING_DB + registry.LIFT
+            rings = [P.ring_of(space.room(z, c.room('room'), amount=amount, r=dsp.rng(0)), on, deep)
+                     for z, on, _ in parts]
+            p, kept = P.close(p, rings)
+            parts = parts[:kept]
+            parts[-1][0] = P.ease(parts[-1][0], parts[-1][1])     # no later event covers the last one's own end
         y = P.mix([(z, on) for z, on, _ in parts], p)
-        y = space.room(y, c.room('room'), amount=c.space if 'space' in e['axes'] else 0.0, r=r)
+        y = space.room(y, c.room('room'), amount=amount, r=r)
         play = {'pattern': p['pattern'], 'events': len(p['members']), 'pace': p['pace'],
                 'recordings': [keys[i][1] + 1 if keys[i][0] is e else f"{keys[i][0]['id']}#{keys[i][1] + 1}"
                                for i in p['members']]}
@@ -352,6 +364,10 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
         y = P.fit(y, p['dur'], fade=ring if p['pattern'] in P.OWN else 0.05)
     if long:                       # the stretch is the length asked (finish may have trimmed its faded end)
         y = P.fit(y, cut)
+    elif dur and not p and not cut and not 0 <= len(y) - dsp.n_of(dur) <= dsp.n_of(LATE_END):
+        # a whole recording warped to the length: finish may have trimmed its end (padded with silence), or its own
+        # end may lie a little later (left to ring out when within LATE_END)
+        y = P.fit(y, float(dur))
     meta = {'id': sid, 'kind': d.kind, 'seed': int(seed), 'dur_s': round(len(y) / dsp.SR, 3),
             'peak_dbfs': round(master.true_peak_db(y), 2), 'lufs_max': round(master.loudness(y), 1),
             'member': dict(c.member), 'performance': play}

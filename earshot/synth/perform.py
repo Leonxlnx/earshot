@@ -63,6 +63,8 @@ GAPS = {'walk': (0.25, 1.5), 'knock': (0.12, 1.5), 'row': (0.12, 1.5), 'type': (
         'count': (1.0, 1.0)}
 OWN = ('scatter', 'shake')
 SWING = 0.35         # s one swing of a shake takes (its usual 10-18 impacts at 10-20 a second fall in two or three)
+FADE = 0.05         # s over which `fit` fades a performance out at the length asked for
+RING_DB = 40.0       # dB under its loudest at which an event has sounded: a fade from there is not heard as a cut
 CHIEF = {'walk': 'step', 'knock': 'knock', 'row': 'event', 'type': 'key', 'pair': 'event', 'count': 'beat'}
 
 
@@ -96,9 +98,9 @@ def fill(name, events, dur, rate, ring):
     return n, held, abs(held - gap) < 1e-9
 
 
-def fit(y, dur, fade=0.05):
+def fit(y, dur, fade=FADE):
     """y (stereo, finished) at exactly `dur` s: a longer one faded out over its last `fade` s (the last event has
-    sounded by then: `fill` leaves it its ring), a shorter one padded with silence"""
+    sounded by then: `fill` leaves it a usual ring, `close` its measured one), a shorter one padded with silence"""
     n = dsp.n_of(dur)
     if len(y) >= n:
         y = np.array(y[:n])
@@ -106,6 +108,63 @@ def fit(y, dur, fade=0.05):
         y[n - k:] *= (np.cos(np.linspace(0, np.pi / 2, k)) ** 2)[:, None]
         return y
     return np.concatenate([y, np.zeros((n - len(y),) + y.shape[1:])])
+
+
+def ring_of(y, onset=0.0, db=RING_DB):
+    """s from an event's onset (s into y) to the last moment its 5 ms level is within `db` of its loudest: how long
+    the event sounds before a fade from there is no longer heard as a cut"""
+    y = np.asarray(y, np.float64)
+    m = y ** 2 if y.ndim == 1 else np.mean(y ** 2, axis=1)
+    k = dsp.n_of(0.005)
+    e = 10 * np.log10(np.convolve(m, np.ones(k) / k, 'same') + 1e-20)
+    return max(float(np.nonzero(e > e.max() - db)[0][-1]) / dsp.SR - onset, 0.0)
+
+
+def ease(y, onset=0.0, db=RING_DB, most=0.25):
+    """an event y whose own end is a cut (10 ms before its end still within `db` of its loudest: a recording that
+    stops while the thing still sounds, as a step on gravel does) faded out over the last third of what follows its
+    onset (s into y), at most `most` s; one that has died away is returned as it is. For the last event of a length
+    asked for, which no later event covers"""
+    y = np.asarray(y, np.float64)
+    m = y ** 2 if y.ndim == 1 else np.mean(y ** 2, axis=1)
+    k = dsp.n_of(0.005)
+    if len(m) < 4 * k:
+        return y
+    e = np.convolve(m, np.ones(k) / k, 'valid')           # 5 ms levels: its level just before its own end fade
+    if 10 * np.log10(e[-3 * k] + 1e-20) < 10 * np.log10(e.max() + 1e-20) - db:
+        return y
+    j = min(dsp.n_of(most), max((len(y) - dsp.n_of(onset)) // 3, k))
+    g = np.cos(np.linspace(0, np.pi / 2, j)) ** 2
+    y = np.array(y)
+    y[-j:] *= g if y.ndim == 1 else g[:, None]
+    return y
+
+
+def close(p, rings):
+    """the plan p (a length filled by `fill`: p['dur'] set) with its events placed so that the last rings out before
+    the end: rings[i] (s, `ring_of`) is how long event i sounds. When an event's onset plus its ring passes the end
+    (less the end fade, FADE: the last event, or an earlier one that rings longer), the onsets are drawn together
+    toward the first (the human spread kept) until none does; where that would bring them closer on average than a
+    hand repeats the stroke (GAPS), the last events are left out. Returns the plan (the same dict when nothing
+    moves) and how many events it keeps"""
+    on = np.asarray(p['onsets'])
+    ring = np.asarray(rings[:len(on)], np.float64)
+    n, end = len(on), (p.get('dur') or 0.0) - FADE
+    if not p.get('dur') or p['pattern'] not in GAPS or n < 2 or (on + ring).max() <= end:
+        return p, n
+    lo = GAPS[p['pattern']][0]
+    while True:
+        # the most the onsets (from the first) may be scaled by for every event to have sounded by the end
+        s = min(1.0, float(((end - LEAD - ring[1:n]) / np.maximum(on[1:n] - LEAD, 1e-9)).min()))
+        if n == 2 or s * (on[n - 1] - on[0]) / (n - 1) >= lo:
+            break
+        n -= 1
+    s = max(s, lo * (n - 1) / max(float(on[n - 1] - on[0]), 1e-9))
+    on = LEAD + (on[:n] - LEAD) * s
+    q = {**p, 'onsets': [float(t) for t in on], 'gains': p['gains'][:n], 'members': p['members'][:n],
+         'nudge': p['nudge'][:n], 'gap': round(float(on[-1] - on[0]) / (n - 1), 3)}
+    q['pace'] = round((n - 1) / float(on[-1] - on[0]), 2) if on[-1] > on[0] else None
+    return q, n
 
 
 def settle(n, first, ratio, room, events=None):

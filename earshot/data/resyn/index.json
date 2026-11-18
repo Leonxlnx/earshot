@@ -4502,6 +4502,9 @@
     }
    }
   ],
+  "allows": [
+   "stacked"
+  ],
   "walk": [
    0,
    1
@@ -6943,7 +6946,8 @@
    }
   ],
   "allows": [
-   "pre_swell"
+   "pre_swell",
+   "stacked"
   ],
   "walk": [
    1,
@@ -13223,6 +13227,7 @@
   ],
   "allows": [
    "clicks",
+   "pre_swell",
    "stacked"
   ],
   "walk": [
@@ -15829,12 +15834,13 @@
    }
   ],
   "allows": [
-   "clicks"
+   "clicks",
+   "stacked"
   ],
   "walk": [
-   2,
    0,
-   1
+   1,
+   2
   ]
  },
  {

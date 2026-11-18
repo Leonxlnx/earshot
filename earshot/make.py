@@ -293,6 +293,12 @@ def row(sound, seed, events, name, req, lufs=None, peak_db=-1.0, thing=None):
         y, m = registry.render(sound, seed=seed + i, check=False, **ax)
         first = first or m
         parts.append((y, 0.0))
+    # the last event rings out before the end: measured LIFT dB deeper, as finish folds the strikes and raises what
+    # follows them by up to that
+    p, kept = P.close(p, [P.ring_of(z, 0.0, P.RING_DB + registry.LIFT) for z, _ in parts])
+    parts = parts[:kept]
+    if p.get('dur') and p['pattern'] in P.GAPS:           # no later event covers the last one's own end
+        parts[-1] = (P.ease(parts[-1][0]), 0.0)
     y = master.finish(P.mix(parts, p), peak_db=peak_db, lufs=lufs, cap=registry.LOUDEST[''], lift=registry.LIFT,
                       sparse=registry.LIFT)
     if p.get('dur'):

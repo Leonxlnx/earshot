@@ -233,3 +233,37 @@ def test_a_recording_of_the_whole_action_plays_the_stretch_a_length_asks_for():
     assert meta['dur_s'] < 2.5 and 'not the 3 s asked' in meta['note']
     s = learned.stretch(np.concatenate([np.zeros((SR, 2)), np.ones((SR // 2, 2)), np.zeros((SR, 2))]), 1.0)
     assert len(s) == SR and s[SR // 2 + 10, 0] == pytest.approx(1.0) and s[SR // 2 - 1, 0] == 0.0     # the earliest
+
+
+def test_the_last_event_is_placed_to_ring_out_before_the_end():
+    """a length asked for: an event whose measured ring passes the end draws the onsets together (the spread kept,
+    the first where it was); none that passes leaves the plan as it is; a gap closer than a hand repeats drops the
+    last events; an event that stops while still sounding is faded over its own end, one that died away is not"""
+    p = perform.plan('walk', dsp.rng(4), members=(0, 1), dur=4.0, ring=0.4)
+    n = len(p['onsets'])
+    same, k = perform.close(p, [0.3] * n)
+    assert same is p and k == n
+    q, k = perform.close(p, [0.3] * (n - 1) + [1.2])
+    assert k == n and q['onsets'][0] == p['onsets'][0]
+    assert q['onsets'][-1] + 1.2 == pytest.approx(4.0 - perform.FADE)
+    ratio = np.diff(q['onsets']) / np.diff(p['onsets'])
+    assert np.allclose(ratio, ratio[0])                                    # the human spread kept
+    q, k = perform.close(p, [3.0] * n)
+    assert 2 <= k < n and len(q['gains']) == len(q['members']) == len(q['nudge']) == k
+    assert q['onsets'][-1] + 3.0 <= 4.0 - perform.FADE + 1e-9
+    assert perform.close({**p, 'dur': None}, [5.0] * n)[1] == n             # no length: nothing moves
+    t = np.arange(SR) / SR
+    ring = np.sin(2 * np.pi * 500 * t) * np.exp(-t / 0.05)                  # -40 dB at about 0.23 s
+    assert perform.ring_of(ring) == pytest.approx(0.05 * 40 / 8.686, abs=0.01)
+    assert perform.ring_of(ring, onset=0.1) == pytest.approx(perform.ring_of(ring) - 0.1, abs=1e-9)
+    assert np.array_equal(perform.ease(ring), ring)
+    cut = np.sin(2 * np.pi * 500 * t[:SR // 2])
+    eased = perform.ease(cut)
+    assert np.abs(eased[-100:]).max() < 1e-3 and np.array_equal(eased[:SR // 4], cut[:SR // 4])
+
+
+@pytest.mark.parametrize('text,sid', [('footsteps on gravel', 'step/pebbles'), ('knocking on a door', 'door/knock')])
+def test_a_length_lets_the_last_event_ring_out(text, sid):
+    for dur in (2.0, 4.0):
+        y, meta = learned.perform(sid, seed=0, dur=dur)
+        assert meta['dur_s'] == pytest.approx(dur, abs=0.03) and meta['checks']['ok'], (text, dur, meta['checks'])
