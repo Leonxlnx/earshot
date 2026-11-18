@@ -126,10 +126,15 @@ CONCEPTS = {
                     'character select', 'make a choice'),
     'menu_back': ('menu back', 'back out', 'leave menu', 'exit menu', 'close menu', 'submenu'),
     # ---- jobs in a game
-    'jump': ('hop', 'leap', 'boing', 'spring','double jump', 'trampoline'),
+    'jump': ('hop', 'leap', 'boing', 'spring','double jump', 'trampoline', 'springboard', 'spring board',
+             'bounce pad', 'jump pad', 'launch pad'),
     'land': ('landing', 'touch down', 'touchdown', 'drop down', 'hit the ground', 'hitting the ground',
              'hit the floor', 'hitting the floor', 'onto the floor', 'onto the ground', 'ground pound', 'fall down',
-             'come down', 'came down', 'coming down', 'back on the ground', 'feet hit', 'lands on'),
+             'come down', 'came down', 'coming down', 'back on the ground', 'feet hit', 'lands on',
+             # a card, a panel or a title that settles or comes to rest has landed, softly (JOB_FEEL): no falling
+             # sweep (what winds down as it settles is a 'downlifter'); on a screen it is a soft thump (DOMAIN_SENSE)
+             'settle', 'settle into', 'settles into', 'settled into', 'settling into', 'settle into place',
+             'settles into place', 'come to rest', 'comes to rest', 'coming to rest', 'came to rest'),
     'footstep': ('foot step', 'step', 'walk', 'run', 'ran', 'stomp', 'stroll', 'pace', 'tread', 'stride',
                  'schritt', 'schritte'),
     'dash': ('dodge', 'dodge roll', 'dodge-roll', 'sprint', 'lunge', 'dart', 'speed burst', 'speed-burst',
@@ -139,7 +144,12 @@ CONCEPTS = {
             'socked', 'thwack', 'fist', 'fighting', 'brawl', 'beat up', 'karate kick', 'roundhouse kick', 'flying kick',
             'land a punch', 'land a hit', 'land a jab',
             'land a blow', 'landing a punch', 'landing a hit', 'landing a jab', 'landing a blow',
-            'boxer', 'boxing', 'punching bag'),
+            'boxer', 'boxing', 'punching bag',
+            # one enemy of many beaten is the blow that beats it, played all through a level: no fanfare (a boss
+            # defeated is a win), no tune of losing (the player's own death is)
+            'enemy defeated', 'enemy is defeated', 'enemy killed', 'enemy is killed', 'enemy dies', 'enemy death',
+            'enemy destroyed', 'enemy is destroyed', 'enemy down', 'defeat an enemy', 'defeating an enemy',
+            'kill an enemy', 'killing an enemy', 'enemy kill'),
     'clang': ('clank', 'clonk', 'metal hit', 'metal impact', 'metallic hit', 'sword hit', 'clash', 'sword clash',
               'sword on armour', 'sword on armor', 'sword on shield', 'blade on metal'),
     'hurt': ('damage', 'stung', 'bee sting', 'bitten', 'scratched', 'burned', 'take damage', 'taking damage',
@@ -153,7 +163,7 @@ CONCEPTS = {
     'win': ('won', 'victory', 'victorious', 'level complete', 'level cleared', 'stage clear', 'stage complete',
             'beat the level', 'beat a stage', 'clear a stage', 'clear the level', 'triumph', 'flourish', 'triumphant',
             'fanfare', 'celebration', 'celebrate', 'winner', 'winning tune', 'ta-da', 'tada', 'ta da',
-            'finish line', 'first place', 'win the race', 'round won', 'champion', 'boss defeated', 'enemy defeated',
+            'finish line', 'first place', 'win the race', 'round won', 'champion', 'boss defeated',
             'defeat the boss', 'beat the boss', 'boss down', 'boss beaten',
             'celebratory', 'congratulations', 'congrats', 'jackpot', 'quest complete', 'mission complete'),
     'level_up': ('levelup', 'level-up', 'leveled up', 'levelled up', 'rank up', 'reach level', 'new level', 'xp',
@@ -239,9 +249,11 @@ CONCEPTS = {
     'riser': ('uplifter', 'build', 'build up', 'build-up', 'buildup', 'tension', 'tension build', 'anticipation',
               'crescendo', 'suspense', 'suspenseful', 'ramp up', 'swell', 'keeps climbing', 'keep climbing',
               'getting tenser', 'getting louder', 'about to happen', 'lead in', 'lead-in', 'ramp', 'rising tension'),
-    'downlifter': ('down lifter', 'downer', 'wind down', 'winding down', 'decelerate', 'sink', 'settle',
-                   'settle into', 'settles into', 'settled into', 'settling into', 'come to rest', 'comes to rest',
-                   'coming to rest', 'came to rest',
+    'downlifter': ('down lifter', 'downer', 'wind down', 'winding down', 'decelerate', 'sink',
+                   # what winds down when it settles: the energy, the dust, a crowd (a thing that settles has
+                   # landed: 'land')
+                   'settle down', 'settles down', 'settled down', 'settling down', 'energy settles',
+                   'energy settling', 'dust settles', 'dust settling',
                    'fall away', 'fade away', 'fades away', 'falling sweep', 'down sweep', 'sweep down', 'pitch drop',
                    'pitch dropping', 'pitch-dropping', 'tension release', 'release of tension', 'calm down',
                    'calming down', 'drop away', 'dropping away', 'drops away', 'die down', 'dies down',
@@ -253,7 +265,7 @@ CONCEPTS = {
     'sub_drop': ('sub drop', 'sub-drop', 'bass drop', 'sub boom', 'low boom', 'sub hit', '808 drop', 'low-end drop',
                  'bass hit', 'bass impact',
                  'low end drop', 'sub bass drop', 'deep drop', 'low drop', 'bass thump', 'feel more than hear',
-                 'chest thump', 'sub thump', 'low thump'),
+                 'chest thump', 'sub thump'),
     'braam': ('bwaaam', 'bwaam', 'braaam', 'horn blast', 'brass blast', 'trailer horn', 'inception horn', 'horn hit',
               'foghorn', 'fog horn', 'brass hit'),
     'logo': ('logo reveal', 'logo sting', 'brand', 'branding', 'sonic logo', 'audio logo', 'sound logo', 'mnemonic',
@@ -397,18 +409,17 @@ CONCEPTS = {
     'flush': ('flushing', 'flushes'),
 }
 
-# sounds the catalogue has nothing of: voices (speech, singing, screams), the animals no recording plays (a dog, a
-# cat, a horse, a cow, a rooster, a wolf and birds are recordings: earshot.sounds.learned), and instruments no design
-# plays. A request that names one is answered with the nearest design and says so (make.doubt), not with a confident
-# wrong sound. Exact words, as written, and only where the reader understood them as nothing else (brief.not_made:
-# "saying yes" is a success)
+# sounds the catalogue has nothing of: voices that say or sing words, a shout, sobbing (a scream, a sneeze, a burp
+# and the farm animals are recordings: earshot.sounds.learned), instruments no design plays, and eating and kitchen
+# things no recording plays (chewing, an egg, a whisk). A request that names one is answered with the nearest design
+# and says so (make.doubt), not with a confident wrong sound. Exact words, as written, and only where the reader
+# understood them as nothing else (brief.not_made: "saying yes" is a success)
 NOT_MADE = frozenset((
-    'purr', 'purring', 'chicken', 'sheep', 'goat', 'pig', 'oink', 'duck', 'quack', 'frog', 'croak', 'scream',
-    'screams', 'screaming', 'shriek', 'shrieking', 'yell', 'yelling', 'shout', 'shouting', 'sob', 'sobbing',
+    'yell', 'yelling', 'shout', 'shouting', 'sob', 'sobbing',
     'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying', 'narrator', 'narration',
-    'voiceover', 'voice-over', 'sneeze', 'burp',
+    'voiceover', 'voice-over',
     'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
-    'trumpet'))
+    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'egg', 'eggs', 'whisk', 'whisking'))
 NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone')
 # a voice the catalogue has of one kind of person only (the recording's): said of another person it is not made ("a
 # woman crying": the crying is a baby's; brief.not_made)
@@ -425,7 +436,14 @@ WORD_WITH = {'toast': (frozenset(('glass', 'glasses', 'cup', 'cups', 'clink', 'c
              'shoot': (frozenset(('arrow', 'arrows')), 'arrow'),
              # "a heart" is a heartbeat; a heart tapped on a post or a song is a like
              'heart': (frozenset(('tap', 'taps', 'tapped', 'tapping', 'icon', 'button', 'click', 'clicked', 'post',
-                                  'song', 'photo', 'app', 'feed')), 'like')}
+                                  'song', 'photo', 'app', 'feed')), 'like'),
+             # "a clink" is two glasses; the clink of a key or of keys is the keys'
+             'clink': (frozenset(('key', 'keys', 'keyring', 'keychain')), 'keyring')}
+# a word that is no job at all when the request also says one of these words: toast bitten, buttered or out of a
+# toaster is bread, not a notification (brief.read: the word is then read as a plain word)
+WORD_WITHOUT = {'toast': frozenset(('bite', 'bites', 'biting', 'bitten', 'crunch', 'crunchy', 'crunching', 'bread',
+                                    'butter', 'buttered', 'toaster', 'breakfast', 'eat', 'eating', 'jam', 'crispy',
+                                    'burnt', 'slice'))}
 # a job done with the same thing as another one's family: a recorded lock answers an unlocking too (brief.learned_ok)
 SAME_THING = {'unlock': 'lock'}
 # what many people doing a thing at once is ("people clapping": an audience), unless they do it as one ("clapping
@@ -578,9 +596,9 @@ TWIN_WORDS = {'coin/drop': ('coins', 'handful', 'change', 'pile'),
 FILM_CYMBAL = {'crash': 'cymbal/orchestral'}
 KIT_WORDS = frozenset(('fill', 'fills', 'kit', 'beat', 'beats', 'drum', 'drums', 'drummer', 'groove', 'backbeat',
                        'band', 'song', 'track', 'loop', 'hi-hat', 'snare', 'kick', 'tom', 'toms'))
-# the drums of the kit: a film or motion request without a word of the kit (KIT_WORDS) gets none of them, its thud
-# or hit is the film's own low hit
-KIT_DRUMS = frozenset(('kick', 'tom', 'snare'))
+# the drums of the kit and the hand drums: a film or motion request without a word of the kit (KIT_WORDS) or the
+# drum's own name gets none of them, its thud or hit is the film's own low hit
+KIT_DRUMS = frozenset(('kick', 'tom', 'snare', 'cajon', 'conga', 'bongo', 'darbuka', 'frame_drum'))
 # families that name a kind of sound, not a thing: a recorded one (whoosh/rope, knock/hollow) answers a request that
 # also names its thing or character (brief.learned_ok), or plays the interface job it is chosen for (its roles)
 SOUND_FAMILIES = frozenset(('whoosh', 'swish', 'swipe', 'click', 'tap', 'tick', 'knock', 'pop', 'thud', 'boom', 'hit',
@@ -712,14 +730,23 @@ DOMAIN_SENSE = {('music', 'crash'): 'cymbal', ('game', 'kick'): 'hit',
                 # a card or panel flipped over is a short swish; a logo that settles, comes to rest or locks up is
                 # the logo's own low hit, not a falling sweep or a lock; in an app a thing grabbed is a light tick
                 ('motion', 'flip'): 'swish', ('motion', 'settle into'): '', ('motion', 'come to rest'): '',
-                ('motion', 'lock up'): '', ('ui', 'grab'): 'tick'}
+                ('motion', 'lock up'): '', ('ui', 'grab'): 'tick',
+                # a card, a panel or a title that settles on a screen or in a film is a soft thump, as one that lands
+                ('motion', 'settle'): 'thud', ('motion', 'settle into place'): 'thud', ('ui', 'settle'): 'thud',
+                ('ui', 'settle into place'): 'thud', ('ui', 'settle into'): 'thud', ('ui', 'come to rest'): 'thud'}
+# a job word that also says how the thing sounds: what settles or comes to rest does so softly (brief.read adds
+# the adjective's axes and hints: the soft member of the job's family)
+JOB_FEEL = {'settle': 'soft', 'settle into': 'soft', 'settle into place': 'soft', 'come to rest': 'soft'}
 # which way a job moves, for designs whose own words do not say it
 CONCEPT_DIR = {'riser': 1, 'downlifter': -1, 'power_up': 1, 'power_down': -1, 'level_up': 1, 'sub_drop': -1,
                'switch_on': 1, 'switch_off': -1, 'open': 1, 'close': -1, 'next': 1, 'back': -1, 'send': 1,
                'receive': -1, 'success': 1, 'error': -1, 'win': 1, 'lose': -1, 'jump': 1, 'land': -1,
                'startup': 1, 'shutdown': -1}
-# words the stemmer would send to the wrong concept ('waving' is not 'waves')
-NOT_CONCEPT = frozenset(('waving', 'key', 'leaves'))
+# words the stemmer would send to the wrong concept ('waving' is not 'waves', 'beating' eggs is no beat of music)
+NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating'))
+# adjectives that are also a job's word: before a thing they say how it is done ("a careful step", "a cautious
+# knock") and only soften it ({axis: delta}); alone they are the job ("a 'hey, careful' sound": a warning)
+MANNER_WORDS = {'careful': dict(energy=-0.3, hard=-0.2), 'cautious': dict(energy=-0.3, hard=-0.2)}
 # what follows these words is a description of the sound's envelope ("a shimmering decay"), not a job
 ENVELOPE_WORDS = frozenset(('decay', 'tail', 'attack', 'release', 'ring', 'reverb', 'echo', 'finish'))
 # verbs of a job whose object is the real thing asked for ("grabs a speed boost" is a power-up)
@@ -792,6 +819,8 @@ DOMAIN_PHRASES = {'title card': 'motion', 'end card': 'motion', 'lower third': '
                   'hero shot': 'motion', 'title screen': 'game', 'home screen': 'ui', 'lock screen': 'ui',
                   'landing page': 'ui', 'hero section': 'ui', 'cut scene': 'game', 'cutscene': 'game',
                   'next shot': 'motion', 'two shots': 'motion', 'between shots': 'motion'}
+# an enemy beaten is a moment of a game: the phrase says the domain as well as the blow
+DOMAIN_PHRASES.update({p: 'game' for p in CONCEPTS['hit'] if 'enemy' in p.split()})
 DOMAIN_STRONG = frozenset(('game', 'gaming', 'platformer', 'rpg', 'shooter', 'trailer', 'video', 'film', 'movie',
                            'app', 'website', 'dashboard'))
 

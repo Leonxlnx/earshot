@@ -484,6 +484,13 @@ def _sense():
     return _cache['sense']
 
 
+def _job_feel():
+    """{stemmed phrase: adjective} of lexicon.JOB_FEEL"""
+    if 'job_feel' not in _cache:
+        _cache['job_feel'] = {_key(w.split()): m for w, m in L.JOB_FEEL.items()}
+    return _cache['job_feel']
+
+
 def _old_device(toks):
     """True when an old-sounding word comes within three words before a device word ("old Nintendo games")"""
     for i, t in enumerate(toks):
@@ -708,6 +715,13 @@ def read(text):
             st['simile'] = True            # "like a whisper of a click": a comparison, not the job "like"
             i += 1
             continue
+        if t in ('each', 'every') and nxt == 'time':
+            if st['head']:                 # "a tick each time a step number changes": whenever, where it plays
+                st['where'] = 'context'
+            else:
+                st['event'] = True
+            i += 2
+            continue
         if st['head'] and (t in CONTEXT_WORDS or t == 'to' or (t in PLACE_WORDS and nxt in ARTICLES)):
             st['where'] = 'context'        # "an impact FOR a logo reveal": where it plays, not what it is
             i += 1
@@ -750,6 +764,14 @@ def read(text):
         j, hit = _match(toks, i)
         if hit:
             key, said = _key(toks[i:j]), ' '.join(toks[i:j])
+            if ('c' in hit and j - i == 1 and t in L.MANNER_WORDS
+                    and _next_concept(toks, j) not in (None, hit['c'])):
+                del hit['c']               # "a careful step": how the step is taken, not a warning
+                axes(L.MANNER_WORDS[t], st['scale'])
+            feel = _job_feel().get(key) if 'c' in hit and st['scale'] > 0 else None
+            if feel:                       # "the card settles": it lands, and softly
+                axes(L.MODIFIERS[feel], st['scale'])
+                b['hints'].extend(h for h in _feel(feel) if h not in b['hints'])
             if 'm' in hit:
                 axes(hit['m'], st['scale'])
             elif j - i > 1:                # "a warm pad": the adjective inside a name still moves its axis
@@ -865,6 +887,11 @@ def read(text):
             for k in ('concepts', 'parts', 'context'):
                 b[k] = list(dict.fromkeys(to if x == c else x for x in b[k]))
             b['written'].setdefault(to, b['written'].get(c, tok))
+        elif tok in L.WORD_WITHOUT and set(toks) & L.WORD_WITHOUT[tok]:
+            for k in ('concepts', 'parts', 'context', 'framed'):    # "a crunchy bite into toast": bread, no job
+                b[k] = [x for x in b[k] if x != c]
+            b['words'].append(tok)
+            b['unknown'].append(b['written'].pop(c, tok))
     group = {t for t in toks if t not in ctx_words}
     for one, many in L.CROWD_OF.items():       # "people clapping": an audience, not a row of claps
         if one in b['concepts'] and group & L.GROUP_WORDS and not group & L.UNISON_WORDS:
@@ -1074,8 +1101,9 @@ def length_fit(b, row):
     if not d or row.get('loop') or row.get('kind') in STRETCH_KINDS:
         return 1.0
     f = 1.0
-    # "three knocks, 2 seconds", "clapping, 4 seconds": the length is the row's, not one event's
-    if b.get('dur') and not (b.get('events') or 0) > 1 and not acted(b):
+    # "three knocks, 2 seconds", "clapping, 4 seconds", "footsteps on concrete, 4 seconds": the length is the
+    # action's, not one event's
+    if b.get('dur') and not (b.get('events') or 0) > 1 and not acted(b) and not b.get('perform'):
         r = abs(math.log2(max(b['dur'], 0.01) / d))
         f *= max(0.5, 1.0 - LENGTH_SLOPE * max(0.0, r - 1.0))
     if b.get('dur_max') and d > b['dur_max']:
@@ -1089,10 +1117,12 @@ def chip(row):
 
 
 def kit_out(b, row):
-    """True for a drum of the kit (kick, tom, snare) asked for by a film or motion request that names no part of the
-    kit: "a thud as the logo settles" is the film's low hit, "a kick drum on the beat of the trailer" the kit's"""
-    return (b.get('domain') == 'motion' and row['id'].split('/')[0] in L.KIT_DRUMS
-            and not set(tokens(b.get('text') or '')) & L.KIT_WORDS)
+    """True for a drum of the kit or a hand drum (kick, tom, snare, cajon, conga ...) asked for by a film or motion
+    request that names no part of the kit nor the drum itself: "a thud as the logo settles" is the film's low hit,
+    "a kick drum on the beat of the trailer" the kit's, "a cajon hit for the video" the cajon's"""
+    fam = row['id'].split('/')[0]
+    return (b.get('domain') == 'motion' and fam in L.KIT_DRUMS
+            and not set(tokens(b.get('text') or '')) & (L.KIT_WORDS | set(fam.split('_'))))
 
 
 def excluded(b, row, t):

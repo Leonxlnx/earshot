@@ -10,7 +10,25 @@ When a product, game, page or film needs a sound and no recording is given, make
 catalogue and renders a new take (no models, about a second for a one-shot, nothing downloaded). This part is
 complete on its own.
 
-**What the catalogue holds.** Realistic things are learned from recordings in the public domain (201 designs:
+**When a sound, and when none.** Most moments get none. A sound belongs where something happened that a person
+should notice without looking at it. What follows is common practice; only the motion video numbers further down
+are measured.
+- A page or an app: a sound for what the user did on purpose and for what came of it (a switch thrown, a form
+  sent, a payment gone through, an error, a message arriving). None for what happens by itself or all the time: a
+  page loading (a browser plays nothing before the first click anyway), scrolling, an animation, the pointer
+  crossing the links of a marketing page. A page that changes after a click has had its sound with the click. A
+  landing page is served by three to six of the `ui` roles, not by all 17; `hover` is for tools in which hovering
+  is a choice, and it is the set's quietest sound.
+- A game: every action the player repeats gets a short sound in several takes (steps, jumps, hits, coins), a
+  reward and the end of a level get the longer figures on an instrument, a menu gets one small sound for moving and
+  one for choosing.
+- A motion video: two to five effects in a film that music leads ("Scoring a motion video" below says which).
+- A scene of a film, or a clip of real footage: one bed for the place (rain, a room, a street), then the real sound
+  of each thing the picture shows being done (a door, steps, keys, a pour, a sizzle), asked for as that thing. A
+  designed sound (a whoosh, a pop) only on the few cuts or captions the edit wants felt. A thing the catalogue has
+  no recording of (the answer says so) is better recorded or left silent than replaced by a stand-in.
+
+**What the catalogue holds.** Realistic things are learned from recordings in the public domain (227 designs:
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
 paper, books, glass, ice, water, metal, swings, punches, falls, explosions, animals such as a dog, a cat and birds,
 people without words such as applause, laughter and a cough, a car horn, a siren, a phone ringing or vibrating
@@ -35,14 +53,35 @@ owner: prefer a learned thing when one fits.
 2. Several that belong together (an interface, a game, a film's kit): ONE call, never a loop of `make`.
    `earshot make --set ui|game|arcade|film -o FOLDER --format webm,mp3 --sprite sprite`, or MCP `make_set` with
    `set`, `theme`, `format`, `sprite` and your own `sounds: [{"name": "tap", "want": "a soft tap"}, ...]` (fields:
-   name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs). One voice, key and room for the tonal
-   sounds; every one-shot as loud as made alone, within 2.5 dB of the others; loops and beds levelled by kind;
-   `manifest.json` written. Themes: soft (the default), glass, wood, felt, tine,
-   metal, electric, digital, retro. From the CLI your own list is a JSON file: `{"set": "ui", "format": "webm,mp3",
+   name, want, sound, pitch, dur, voice, material, seed, n, axes, lufs, events, loop). One voice, key and room for
+   the tonal sounds; every one-shot as loud as made alone, within 2.5 dB of the others; loops and beds levelled by
+   kind; `manifest.json` written. Themes: soft (the default), glass, wood, felt, tine, metal, electric, digital,
+   retro. From the CLI your own list is a JSON file: `{"set": "ui", "format": "webm,mp3",
    "sounds": [{"name": "tap", "want": "a soft tap"}, ...]}`, then `earshot make --spec FILE -o FOLDER` (a re-run
    rewrites the files and `manifest.json`; it does not delete files of names you removed).
+   Your own `sounds` come on top of the set named in `set` (the 17 of `ui` and yours; one with a name of the set
+   replaces that sound). Leave `set` out and only your list is made: that is the call for the handful of sounds a
+   landing page or a scene needs. An entry's `events` and `loop` are the single call's `--events` and `--no-loop`
+   (`{"name": "steps", "want": "footsteps on wet pavement", "events": 4}` answered `step/tile (2.28 s ...)`,
+   `played: 4 events as a walk`; `"loop": false` makes a bed once); a count, a length and "no loop" said in the
+   `want` do the same. An unknown field is an error that lists the fields. A spec of five entries without a set:
+   ```
+   $ earshot make --spec landing.json -o sounds
+   5 sounds in sounds (wav), manifest.json
+   open.wav: open/air (0.36 s, -18 LUFS, clean) [opening]
+   toast.wav: notify/knock (0.40 s, -19 LUFS, clean) [toast notification]
+   error.wav: error/thud (0.49 s, -18 LUFS, clean) [error]
+     not understood: address
+   card.wav: thump/soft (0.09 s, -24 LUFS, clean) [thump, card, settles]
+     not understood: pricing
+   paid.wav: success/click (0.31 s, -17 LUFS, clean) [payment success]
+   ```
+   (the `want`s were "a modal opening", "a toast notification", "an error sound for a wrong email address", "a soft
+   low thump when the pricing card settles", "a payment success sound").
 3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20) or
-   `--family step`, then `--sound ID`. Never list the whole catalogue (hundreds of lines).
+   `earshot sounds --family step` lists designs with their length and what they are; then make the one you chose
+   with `earshot make "WORDS" --sound ID` (`sounds` itself takes no `--sound`). Never list the whole catalogue
+   (hundreds of lines).
 
 **The ready-made sets.** `ui` (17), every role a normal sound, no instrument: tap a mechanical key
 (keyboard/mechanical), hover a fingertip barely touching wood (hover/fingertip), toggle_on and toggle_off a rocker
@@ -55,12 +94,19 @@ pop of the lips (receive/pop), notify two light knocks (notify/knock), success a
 one of these jobs in words gets the same design. With a theme named, `ui` plays the tonal figures in that theme's
 voice instead.
 `game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
-learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`), `arcade` (16 chip
+learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`; the others are
+`step/floorboard`, `person/fall`, `punch/body`, `explosion/near`, `splash/plunge`), `arcade` (16 chip
 sounds), `film` (motion-design starter; whooshes, hits and risers layered from learned film recordings).
+A game's rewards and results are figures on an instrument without being asked: "a coin pickup" is glockenspiel
+notes of 0.7 s (`coin/bright`), "a level complete fanfare" 2.9 s on a marimba (`win/fanfare`). One enemy defeated
+is a blow (`hit/crit`, 0.6 s), a boss defeated the fanfare.
 
 **How to ask.** Name the thing, the sound or the job first, then feelings, material, numbers, key:
 `"a footstep on gravel"`, `"a wooden drawer closing"`, `"a camera shutter"`, `"a soft success chime for a finance
 app"`, `"coin pickup, 8-bit"`, `"waves on a beach, 30 seconds"`, `"a wooden notification, 400 ms, in D minor"`.
+The moment may follow the sound: "a soft thump when the first headline lands" (thump/soft), "a tiny tick when new
+content drops into the feed after refreshing" (tick/soft); keep the sound or the job as the first thing named and
+the moment after "when", "as" or "each time", or the words of the moment are taken for the sound.
 A learned sound answers only when its thing is named: "a heavy impact" gets an invented boom, "a dumbbell dropped"
 the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". Interface and motion
 requests get normal sounds; notes on an instrument answer only when the words ask for music (an instrument, a
@@ -99,7 +145,10 @@ of different recordings differ in length and level. `--json` gives the number of
 - `same design as NAME: ... (the nearest: ID)` (sets): two names got one sound; give the second `"sound": ID` in
   your spec. `another recording of ID than NAME: ...` is not a problem: the two play different recordings of one
   learned design.
-- `not in this sound: WORDS`: part of the request is not in this file (one call, one sound); make it separately.
+- `not in this sound: WORDS`: part of the request is not in this file (one call, one sound). Read the words: a
+  second thing or job wants its own call; a verb or an adjective of the same thing is no missing sound ("a
+  checkbox being ticked" answered `toggle/rocker_on (0.22 s, -19 LUFS, clean) [checkbox]` and `not in this sound:
+  ticked`: the switch is the whole answer).
 - `not followed: ...` or `0.43 s, not the 2 s asked: ...`: the design has no such control or could not keep that
   length, and the line says what it does instead; fine unless it mattered, then pick another design.
 - `a cut of 4 s, not a loop: ...` / `a seamless loop of 8.00 s, ...` / `8.57 s: a music loop is whole bars ...`:
@@ -113,6 +162,33 @@ of different recordings differ in length and level. `--json` gives the number of
 - `recording 2 of 3` (in `--json` `member`, a performance and the manifest): which of a learned design's recordings
   played; the recording's own title is only in the store's `CREDITS.md`.
 - `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
+
+**How long, how loud, and where a file starts.** A timeline or a mix needs these three; the answer's line carries
+the first two.
+- Length (seed 0, read off real answers): an interface sound is 0.2 to 0.6 s (toggle 0.22, success 0.31, hover
+  0.34, notify 0.40, error 0.49, delete 0.61); in a motion video a tick is 0.04 s, a thump 0.06 to 0.09 s, a logo
+  hit 0.29 s, a whoosh 0.39 s, a riser 2.5 s; a game's figures run from 0.7 s (a coin) to 2.9 s (the win fanfare;
+  game over 2.1 s, a power-up 2.8 s); real things take their time: a door falling shut 2.5 s, a phone vibrating
+  1.6 s, keys jingling 2.4 s, distant thunder 7.7 s, six footsteps 3.5 s; a bed is 20 s unless a length is asked.
+  Seconds in the words, or `--dur`, set the length of a whoosh, a riser, a figure, a bed and an action
+  ("footsteps on concrete, 4 seconds" answered `step/concrete (4.00 s ...)`, `played: 7 events as a walk`); a
+  single struck sound rings as it rings and says so.
+- Level: a single `make` makes each file as loud as its kind allows (true peak -1 dBFS, at most -14 LUFS, a bed
+  -22), so single files are not a mix. `--lufs L` (`"lufs"` in a spec entry) sets one file's loudness:
+  `earshot make "a logo hit" -o logo.wav --lufs -24` answered `logo.wav: boom/short (0.29 s, -24 LUFS, clean)
+  [logo, hit]`, the plain call -17 LUFS. Sounds made as ONE spec are levelled against each other by kind, a first
+  balance to mix from. A scene's spec of five entries answered `rain.wav: rain/street (7.93 s, -30 LUFS, clean)`,
+  `door.wav: door/shut (2.54 s, -20 LUFS, clean)`, `thunder.wav: thunder/distant (7.70 s, -21 LUFS, clean)`,
+  `keys.wav: keys/bunch (2.38 s, -14 LUFS, clean)`, `phone.wav: phone/vibrate (1.64 s, -15 LUFS, clean)`: the bed
+  sits 9 to 16 LU under the things done in it. Against a music bed the motion section below has measured numbers.
+- Start: every file starts when its sound does (within 2 ms) and ends faded, but its loudest moment is not always
+  its start. Measured on files made for this text: `thump/soft` (0.09 s) is loudest 0.02 s in; `boom/short`
+  (0.29 s) 0.15 s in, after its short swell of air, so its file starts about 80 ms before the frame the hit lands
+  on; `whoosh/soft` (0.39 s) at 0.24 s, three fifths through; `rise/air` asked with `--dur 1.2` is loudest at 1.16
+  of its 1.17 s, so a riser starts its own length before the reveal. `--json` gives a take's length, peak level
+  and loudness, not the time of its loudest moment. earshot does not put files on a timeline: the editor, ffmpeg
+  or the page's code does, and `earshot timeline mix.wav --video film.mp4 --cues cues.json` (Loop 2) then shows
+  whether each cue has its sound.
 
 **Formats.** The extension picks it (wav, flac, ogg, webm, mp3, m4a; all but wav and flac need ffmpeg). Web:
 `earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite`, then load `sprite.json` (howler.js
@@ -150,10 +226,16 @@ practice they did not test.
     heavy body with a puff of air).
   - something appears or a card flips: a short low thump, about 50 ms, 130 to 320 Hz, dry [measured].
     Ask "a pop when an element appears", "a card flip" or "an element pops in on screen" (thump/appear, 0.06 s);
-    "a soft thump" (thump/soft, 0.09 s) for something landing. In a run, one per element, about 200 ms apart.
+    "a soft thump" (thump/soft, 0.09 s) for something landing or settling ("a soft low thump when the pricing card
+    settles" answered thump/soft). In a run, one per element, about 200 ms apart: make the thump once (`--n 3`
+    gives three takes of it) and place it once per element, so the gaps are the picture's.
   - a UI click, a cursor press, a word highlighted: a bright dry tick, 7 to 10 kHz, nothing under 1 kHz, mono, a
     few tens of ms [measured]. Ask "a cursor click" or "a soft ui tick" (tick/soft, 0.04 s); "a mouse click"
     (click/mouse) is the whole mouse button, 0.2 s.
+  - a number counting up [not in the measurements]: a row of the same tick as one file, asked with a count and a
+    length. `earshot make "a soft ui tick" -o count.wav --events 8 --dur 1.5` answered `count.wav: tick/soft
+    (1.50 s, -15 LUFS, clean) [ui tick]` and `played: 8 events as a row at 6.2 a second`. Events of a row follow no
+    closer than 0.12 s: twelve asked in 1.5 s came out 1.73 s long, and the answer said so.
   - a title card changes, a big transition: a mid-low hit of about 0.3 s that swells in over about 0.1 s, half of
     it under 100 Hz [measured]. Ask "a title hit" or "a title slam" (slam/title: a low body in a short burst of
     air, about a third of a second, then its air dies away).
@@ -181,12 +263,28 @@ practice they did not test.
   long risers [measured]. Use them only when the picture shows that thing.
 - Where the sound sits against the frame [measured, few cases]: a hit starts about 80 ms before the picture
   changes and peaks about 60 ms after it; the hit after a stop lands about 50 ms after the change; a whoosh peaks
-  on the fastest frame of the move [convention].
+  on the fastest frame of the move [convention]. Where the loudest moment of a made file lies is measured above
+  ("How long, how loud, and where a file starts"): `boom/short` 0.15 s in, `whoosh/soft` three fifths through.
 - Levels against the music bed [measured]: hits about 18 dB over the music's median level at that moment, a swish
   about 20 dB, the hit after a stop and word ticks about 8 dB, a logo hit as loud as the music was (the music has
   thinned or stopped). Clicks, whooshes and hits near mono; thumps slightly wide; everything dry, no reverb tail.
+  A made file's loudness is in its answer's line; set it with `--lufs`, or with a gain in the mix, after measuring
+  the music at the cue (`earshot measure`, or `kit.bed_level` in Loop 5).
 - Endings [measured]: 26 of 35 end at body level (the last 3 s within 3 LU of the whole), 7 fade out. End with the
   logo hit and the music's last note, no long silence.
+
+**Scoring a scene or a clip of real footage** (a film scene, a cooking short). Nothing here is measured; the
+requests are quoted as they were answered on 2026-11-18. Ask for each thing the picture shows as that thing, with
+its place or surface, and make them as one spec for a first balance (above): "steady rain on a terrace, 8
+seconds, no loop" (rain/street), "the heavy wooden front door falls shut" (door/shut, 2.5 s), "keys jingling"
+(keys/bunch), "a phone vibrating on a table" (phone/vibrate), "distant thunder" (thunder/distant, 7.7 s),
+"footsteps on concrete, 4 seconds" (step/concrete, 7 steps), "pouring water into a glass" (drink/pour, 4.9 s). A
+bed loops unless the words say "no loop". The catalogue has no recording of many kitchen and street things. Then
+either the answer says it is a guess ("a whisk beating eggs in a bowl": `earshot makes no whisk; water/drop is
+only the nearest sound it has`), or an app's sound answers for the real thing without a doubt: "a kitchen timer
+ringing" answered `timer/done (1.68 s, A5, marimba ...)`, three notes on a marimba, an app's timer and not a
+kitchen's bell. Read what the picked design is before it goes under a picture (`earshot sounds --search "kitchen
+timer"` prints each design's words), and leave a moment silent or record it rather than use a stand-in.
 
 Everything earshot renders is free to use in any product, commercial too, without credit. The learned material
 comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`,

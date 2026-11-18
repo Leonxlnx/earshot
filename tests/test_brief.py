@@ -833,8 +833,7 @@ def test_the_action_form_of_a_row_word_names_the_action_only_as_the_sound_itself
 
 @pytest.mark.parametrize('text,word', [
     ('a violin melody for the intro', 'violin'), ('someone saying welcome back', 'saying'),
-    ('an electric guitar solo', 'electric guitar'), ('a duck quacking', 'duck'),
-    ('a woman screaming in a horror scene', 'screaming'),
+    ('an electric guitar solo', 'electric guitar'), ('a woman shouting in a horror scene', 'shouting'),
 ])
 def test_a_sound_the_catalogue_has_nothing_of_is_said_so(idx, text, word):
     """the pick of such a request is a guess, and the doubt names what is missing (or nothing is ranked at all)"""
@@ -1039,6 +1038,71 @@ def test_a_film_thud_is_no_drum_of_the_kit(idx, text):
 def test_a_film_request_that_names_the_kit_keeps_its_drum(idx):
     got = brief.rank(brief.read('a kick drum thud for the beat of the trailer music'), idx=idx, top=1)[0]['id']
     assert got.startswith('kick/'), got
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a soft low thump when the pricing card settles', 'thump/'),
+    ('a short low thump', 'thump/'),
+    ('a card slides in from the right and settles, soft and short', ('slide/panel', 'thump/')),
+    ('the panel settles into place', ('thump/', 'land/soft', 'slide/panel')),
+    ('a modal settles into place', 'thump/'),
+    ('the title settles in the middle of the frame in the video', 'thump/'),
+    ('one careful step on creaky wooden planks', 'step/'),
+    ('a cautious knock on the door', ('door/knock', 'knock/')),
+    ('an enemy defeated sound', ('hit/', 'punch/')),
+    ('an enemy is killed in a platformer', ('hit/', 'punch/')),
+    ('a springboard throwing the player up into the air', 'jump/'),
+    ('a small metallic clink when a key is picked up', ('keys/', 'key/')),
+    ('a tiny bright tick each time a step number changes in the corner', 'tick/'),
+])
+def test_what_a_thing_does_on_a_page_in_a_game_or_a_film_is_its_own_sound(idx, text, want):
+    """requests written for a landing page, a platformer and a product video: a low thump is a thump and no sub
+    drop, a card or a panel that settles has landed softly (no falling sweep), "careful" and "cautious" before a
+    thing say how it is done (no warning), one enemy beaten is a blow (no fanfare, no tune of losing), a springboard
+    is a jump, the clink of a key is the keys', and what follows "each time" is where the sound plays (the step
+    number is no footstep)"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text,want', [
+    ("kind of a 'hey, careful' sound, more serious than a notification but not an error", 'warning/'),
+    ('boss defeated', 'win/'), ('the player dies', 'lose/'),
+    ('the dust settles after the explosion', ('fall/', 'downlifter/')),
+    ('sound after the drop in a promo video as the energy settles, 3 seconds', ('fall/', 'downlifter/')),
+    ('a toast slides up from the bottom', ('notify/', 'pop/', 'open/')), ('a heart beating', 'heart/'),
+    ('two glasses clinking', 'glass/'),
+])
+def test_the_words_of_a_moment_keep_their_other_meanings(idx, text, want):
+    """the same words where they are the job: "careful" alone is a warning, a boss defeated a win, the player's
+    death a loss, energy or dust that settles winds down, a toast on a screen is a notification, a heart beats and
+    glasses clink"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text,never', [
+    ('a crunchy bite into toast', ('notify/', 'receive/')),
+    ('a whisk beating eggs in a bowl', ('bed/',)),
+])
+def test_food_is_no_notification_and_no_music(idx, text, never):
+    """toast that is bitten is bread and beating eggs is no beat: neither a notification nor a music loop answers"""
+    b = brief.read(text)
+    assert 'notify' not in b['concepts'] and 'music' not in b['concepts']
+    assert not any(r['id'].startswith(never) for r in brief.rank(b, idx=idx, top=3))
+
+
+def test_a_whisk_is_not_made():
+    assert brief.not_made(brief.read('a whisk beating eggs in a bowl')) == 'whisk'
+
+
+@pytest.mark.parametrize('text,want', [('footsteps on concrete, 4 seconds', 'step/concrete'),
+                                       ('footsteps on concrete', 'step/concrete'),
+                                       ('footsteps on gravel, 5 seconds', ('step/pebbles', 'step/gravel'))])
+def test_a_length_said_with_an_action_does_not_choose_the_surface(idx, text, want):
+    """the seconds asked of a walk are the walk's: they do not pick the design whose single step is longest"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
 
 
 @pytest.mark.parametrize('text', ['achievement unlocked sound', 'trophy unlocked in a racing game'])
