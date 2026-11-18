@@ -845,3 +845,123 @@ def test_a_thing_recorded_is_answered_without_doubt(idx, text, sid):
 def test_into_names_where_the_sound_lands(idx):
     r = brief.rank(brief.read('suck back reverse whoosh into the logo'), idx=idx, top=3)
     assert r[0]['id'].startswith(('suck/', 'reverse_swell/', 'whoosh', 'rise/reverse')), r
+
+
+# ---- what people call things and jobs: one anchor per repaired cause, each with a second wording
+
+@pytest.mark.parametrize('text,want', [
+    ('punch cut hit', 'cut_hit/punch'), ('a cymbal reverse swell', 'reverse_swell/cymbal'),
+])
+def test_a_named_member_is_not_traded_for_a_plainer_namesake(idx, text, want):
+    """a design named word for word keeps its family when the namesake's family is only a part of its own ("cut hit"
+    names more than "hit": no fist on a body; a reverse swell is no forward one)"""
+    assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'] == want
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a bird chirping', 'chirp/'), ('a little bird singing on a branch', 'chirp/'),
+    ('birds singing at dawn', 'forest/'),
+    ('a telephone ringing', 'phone/ring'), ('the telephone rings twice', 'phone/ring'),
+    ('a horn honking', 'car_horn/'), ('someone honks at a crossing', 'car_horn/'),
+    ('a horn for the trailer title', 'braam/'), ('a gong', 'gong/'), ('an owl', 'owl/'),
+    ('a newborn crying in the next room', 'baby/cry'), ('a light flicker on the neon sign', 'glitch/'),
+    ('a flickering screen', 'glitch/'), ('a toast message slides in', 'notify/'),
+    ('glasses clinking for a toast', 'glass/'), ('slider moving step by step', 'tick/'),
+    ('a volume slider tick', 'tick/'), ('bass hit for the cut to black', ('boom/', 'sub_drop/', 'fall/sub')),
+    ('a bass impact on the title', ('boom/', 'sub_drop/', 'fall/sub', 'pro_sub_drop/')),
+])
+def test_everyday_names_of_things_and_jobs(idx, text, want):
+    """one bird is its call and birds are the forest; a telephone is a phone; a horn honks unless a film says it (a
+    braam); a gong and an owl are their recordings; crying is a job; a flicker is a glitch; a toast in an app is a
+    notification; a slider ticks; a film's bass hit is a sub hit"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text,want', [
+    ('people clapping', 'applause/'), ('the whole room claps', 'applause/'),
+    ('everyone clapping in unison', 'clap/'), ('people clapping together', 'clap/group'),
+])
+def test_many_people_clapping_is_an_audience(idx, text, want):
+    assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(want)
+
+
+@pytest.mark.parametrize('text', ['a woman crying', 'a man weeping'])
+def test_a_voice_of_another_person_is_not_made(idx, text):
+    """the only crying is a baby's (lexicon.ONE_VOICE): a grown person's is the nearest sound, and said so"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=8)
+    assert cands[0]['id'] == 'baby/cry' and doubt(b, cands).startswith('earshot makes no'), doubt(b, cands)
+
+
+@pytest.mark.parametrize('text,want', [
+    ('task complete', 'complete/'), ('checkout complete', 'complete/'), ('a success sound', 'success/click'),
+    ('switch', 'toggle/rocker_on'),
+])
+def test_a_family_of_the_job_named_by_its_word_wins(idx, text, want):
+    """the job's default (lexicon.INTERFACE_JOBS) is not raised over another interface family of the same job that
+    the request names by its own word"""
+    assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(want)
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a drop', 'hit/drop'), ('the drop after the build', 'hit/drop'), ('a big drop', 'hit/drop'),
+    ('a heavy drop', 'heavy_drop/'), ('a bag drop', 'bag/drop'),
+    ('item dropped into a list', 'land/'), ('a hit on the beat when the logo lands', 'hit/'),
+    ('hit on the beat cut', 'hit/'),
+])
+def test_a_drop_and_a_beat_are_when_a_hit_lands(idx, text, want):
+    """a drop with nothing else named is the film's hit (in an app: a soft landing; a thing a design drops named:
+    that thing); "on the beat" asks for no music"""
+    assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(want)
+
+
+def test_close_after_a_comma_is_near_and_times_count_events(idx):
+    for text in ('footsteps on gravel, close', 'a knock on the door, close'):
+        b = brief.read(text)
+        assert b['axes'].get('space', 0) < 0 and 'close' not in b['concepts'], b
+    assert brief.read('a dog barking twice')['events'] == 2
+    b = brief.read('knock three times')
+    assert b['events'] == 3 and brief.rank(b, idx=idx, top=1)[0]['id'] == 'door/knock'
+
+
+@pytest.mark.parametrize('text,bad', [
+    ('copied to clipboard', 'whoosh/'), ('a plate set down on the table', 'toggle/'), ('pull to refresh', None),
+    ('pop for each icon as it comes on screen', 'pop/pluck'), ('a soft pop for each list item', 'pop/pluck'),
+])
+def test_stems_and_jobs_without_a_design(idx, text, bad):
+    """'paste' is no 'past' and 'setting' no 'set'; a job no design plays reaches its gesture (a pull is a swipe, a
+    copy a click); an app's pop is no note"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)
+    assert got and (bad is None or not got[0]['id'].startswith(bad)), (text, got[:1])
+
+
+@pytest.mark.parametrize('text,want', [('a knock', 'door/knock'), ('a punch', 'punch/body')])
+def test_the_recording_answers_its_invented_twin_by_plain_name(idx, text, want):
+    """lexicon.TWINS: the recorded thing gives way to nothing invented of the same thing, ranked or not"""
+    assert brief.rank(brief.read(text), idx=idx, top=1)[0]['id'] == want
+
+
+@pytest.mark.parametrize('text,want', [
+    ('countdown before the video starts', 'countdown/'), ('a countdown for the intro of the film', 'countdown/'),
+    ('unlocking a door with a key', 'lock/'), ('a key turning in a lock to unlock it', 'lock/'),
+    ('toast sound for a wedding website', 'glass/'), ('the sound of a toast, cups going clink', 'glass/'),
+    ('that photo-snap noise phones make when you take a picture', ('shutter/', 'camera/')),
+])
+def test_a_job_keeps_its_only_sounds_and_a_word_its_company(idx, text, want):
+    """a film keeps the beeps of a countdown (no design without a note plays it); a recorded lock answers an
+    unlocking with a key; a toast with glasses or a wedding is glasses; a phone that takes a picture is a shutter"""
+    got = brief.rank(brief.read(text), idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text', ['achievement unlocked sound', 'trophy unlocked in a racing game'])
+def test_an_unlocked_achievement_is_no_lock(idx, text):
+    assert not brief.rank(brief.read(text), idx=idx, top=1)[0]['id'].startswith(('lock/', 'keys/', 'bottle/'))
+
+
+def test_stemmed_words_name_no_domain():
+    """'cute' is no 'cut' (a film's edit): a cute sound asks for no film"""
+    assert brief.read('a cute happy sound when you double-tap to love a post')['domain'] != 'motion'
+    assert brief.read('a cute little pop')['domain'] != 'motion'

@@ -61,7 +61,8 @@ PLACE_WORDS = ('in', 'under', 'over', 'across', 'behind', 'beneath', 'inside')
 STEM_KEEP = frozenset(('evening', 'morning', 'ceiling', 'string', 'strings', 'thing', 'things', 'ring', 'rings',
                        'spring', 'springs', 'swing', 'sling', 'wing', 'wings', 'king', 'bring', 'during', 'nothing',
                        'something', 'anything', 'everything', 'bus', 'gas', 'news', 'lens', 'chaos', 'canvas',
-                       'tape', 'tapes'))    # a tape is not a tap
+                       'tape', 'tapes', 'setting', 'settings', 'paste', 'pasted', 'cute'))
+# (a tape is no tap, a setting no set, paste no past, cute no cut)
 # a figure's shape in any words: "two-tone", "two-pulse", "two quick notes", "twice" -> '2-note'
 FIGURE_TEXT = re.compile(r'\b(one|two|three|four|five|six|seven|\d)(?:-(?:note|tone|step|pulse|beat)s?\b'
                          r'|(?:\s+[a-z]+){0,2}\s+notes\b)', re.I)
@@ -347,6 +348,8 @@ NOT_EVENTS = frozenset(stem(w) for w in (
     'variation', 'variant', 'version', 'take', 'option', 'alternative', 'note', 'tone', 'beat', 'pulse', 'second', 's',
     'sec', 'ms', 'msec', 'millisecond', 'minute', 'min', 'hz', 'khz', 'time', 'octave', 'semitone', 'bar', 'of',
     'different', 'unique', 'shot', 'player', 'people', 'bit', 'sound', 'file', 'level', 'more', 'another', 'after'))
+TIMES = re.compile(r'\b(?:(twice|thrice)|(\d+|' + '|'.join(sorted(NUMBER_WORDS, key=len, reverse=True))
+                   + r')\s+times)\b')
 COUNTDOWN = re.compile(r'\b(?:10|\d)(?:[\s,.\-]+(?:10|\d))+\b')    # "3 2 1", "5, 4, 3, 2, 1" (checked: down to 1)
 PLURAL_NOT = frozenset(('glass', 'bass', 'grass', 'brass', 'chaos', 'canvas', 'gas', 'news', 'lens', 'bus', 'its',
                         'this', 'is', 'was', 'has', 'does', 'goes', 'plus', 'less', 'across', 'always', 'perhaps',
@@ -378,6 +381,12 @@ def _action(b, text):
         if len(ds) > 1 and ds[-1] in (0, 1):
             b['events'], b['row'] = len(ds), 'count'   # "a countdown 3 2 1": three events a second apart
             break
+    m = TIMES.search(low)
+    if m and b['events'] is None:                           # "a dog barking twice", "knock three times"
+        v = m.group(1) or m.group(2)
+        b['events'] = {'twice': 2, 'thrice': 3}.get(v) or (int(v) if v.isdigit() else NUMBER_WORDS[v])
+        b['row'] = next((rows[stem(w)] for w in WORD.findall(low[:m.start()]) if stem(w) in rows), None)
+        b['counted'] = [stem(w) for w in WORD.findall(low[:m.start()])]        # what is done that many times
     if any(re.search(r'(?<![\w-])' + re.escape(w) + r'(?![\w-])', low) for w in L.SINGLE_WORDS):
         if not (b['events'] and b['events'] > 1):
             b['events'] = 1
@@ -600,6 +609,15 @@ def read(text):
                 st['where'] = 'concepts'
             i += 1
             continue
+        timing = next((p for p in L.TIMING_PHRASES if toks[i:i + len(p.split())] == p.split()), None)
+        if timing:                         # "a hit on the beat": when it lands, not music asked for
+            i += len(timing.split())
+            continue
+        if (t == 'close' and (nxt is None or nxt in PUNCT) and st['head'] and b['concepts']
+                and b['concepts'][0] not in L.OPPOSITE and (prev in PUNCT or prev in L.INTENSIFIERS)):
+            axes(L.PHRASE_MODIFIERS['up close'], st['scale'])   # "footsteps on gravel, close": near, not a closing
+            i += 1
+            continue
         if t == 'but':
             st.update(than=False, neg=False, scale=1.0)
             i += 1
@@ -773,6 +791,18 @@ def read(text):
     for k in ('concepts', 'parts', 'context'):         # "fails a stage" in a game is a loss, not an error
         b[k] = [x for x in (_sense().get((b['domain'], src.get(c)), c) for c in b[k]) if x]
     _compose(b)
+    for c, tok in list(src.items()):              # "a toast at a wedding": glasses, not a notification
+        if tok in L.WORD_WITH and set(toks) & L.WORD_WITH[tok][0]:
+            to = L.WORD_WITH[tok][1]
+            for k in ('concepts', 'parts', 'context'):
+                b[k] = list(dict.fromkeys(to if x == c else x for x in b[k]))
+            b['written'].setdefault(to, b['written'].get(c, tok))
+    group = {t for t in toks if t not in ctx_words}
+    for one, many in L.CROWD_OF.items():       # "people clapping": an audience, not a row of claps
+        if one in b['concepts'] and group & L.GROUP_WORDS and not group & L.UNISON_WORDS:
+            b['concepts'] = [many if c == one else c for c in b['concepts']]
+            if one in b['written']:
+                b['written'].setdefault(many, b['written'][one])
     if 'ambience' in b['concepts'] and 'drone' not in b['concepts'] and set(b['hints']) & L.DARK_MOODS:
         b['concepts'].insert(0, 'drone')               # "an ominous low bed" is a drone
     status = [c for c in outcomes if c in b['concepts'][1:]]
@@ -781,14 +811,35 @@ def read(text):
     b['axes'] = {a: round(max(-1.0, min(1.0, v)), 2) for a, v in b['axes'].items() if abs(v) >= 0.05}
     b['dir'] = (b['dir'] > 0) - (b['dir'] < 0)
     # in a film or video "the drop" is the edit: everything cut for a moment, then a hit (lexicon.MOTION_DROP); a
-    # falling sound only when the words say what falls (a sub drop, a bass drop, a downlifter)
-    if (b['domain'] == 'motion' and set(tokens(text)) & L.MOTION_DROP and b['dir'] < 0
-            and not set(b['concepts']) & {'sub_drop', 'downlifter', 'riser'}):
-        b['concepts'] = b['concepts'] + ['hit']
+    # falling sound only when the words say what falls (a sub drop, a bass drop, a downlifter). A drop said with no
+    # domain and nothing else as its sound ("a drop", "the drop after the build") is that hit too
+    # In an app a thing dropped with nothing else named is set down ("item dropped into a list": a soft landing)
+    own = [c for c in b['concepts'] if c not in b['framed']]
+    drop = set(tokens(text)) & (L.MOTION_DROP | ({'dropped', 'dropping'} if b['domain'] == 'ui' else set()))
+    if drop and any(t in drop and i and toks[i - 1] in _dropped_things() for i, t in enumerate(toks)):
+        drop = set()                   # "a heavy drop", "a bag drop": the thing a design drops, named
+    if (drop and b['dir'] < 0 and not set(own) & {'sub_drop', 'downlifter', 'riser'}
+            and (b['domain'] == 'motion' or (b['domain'] in (None, 'ui') and not own))):
+        job = 'land' if b['domain'] == 'ui' else 'hit'
+        if own:
+            b['concepts'] = b['concepts'] + [job]
+        else:                          # what else was named is when it plays ("the drop after the build")
+            b['context'] += [c for c in b['concepts'] if c not in b['context']]
+            b['concepts'] = [job]
         b['dir'] = 0
     b['context_words'] = sorted(ctx_words)
     b['phrases'] = _phrases(toks, b['written'])
     return b
+
+
+def _dropped_things():
+    """the family words of the designs of a thing dropped ('heavy_drop/floor', 'bag/drop', 'apple/drop'; not the
+    film's own hit/drop)"""
+    if 'dropped' not in _cache:
+        ids = [r['id'] for r in _default_index()[0]]
+        _cache['dropped'] = frozenset(w for i in ids if 'drop' in i.replace('/', '_').split('_')
+                                      for w in i.split('/')[0].split('_') if w not in ('drop', 'hit'))
+    return _cache['dropped']
 
 
 def phrase_key(words_):
@@ -1047,6 +1098,10 @@ def not_made(b):
         if (t in L.NOT_MADE and t in b['unknown'] and stem(t) in b['words'] and t in said and t not in ctx
                 and stem(t) not in ctx):
             return t
+    for c, whose in L.ONE_VOICE.items():      # "a woman crying": the only crying is a baby's (lexicon.ONE_VOICE)
+        person = next((t for t in toks if t in L.PERSON_WORDS and t in said and t not in ctx), None)
+        if c in b.get('concepts', ()) and person and not set(toks) & whose and c in b.get('written', {}):
+            return f"{person} {b['written'][c]}"
     return None
 
 
@@ -1131,12 +1186,25 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     job = L.INTERFACE_JOBS.get(lead) or (next((L.INTERFACE_JOBS[c] for c in b['concepts'] if c in L.INTERFACE_JOBS),
                                               None) if lead is None else None)
     job = job if ui_job else None
-    # a motion job (a logo, a hit, a transition ...; an intro, an appearance, a shine when a film or video is the
-    # domain), not a game, and no word that asks for notes: a design with a note in it steps back (FILM_TONE)
+    # a page or an app (its domain said: a button, a list, a screen) asks for the sound of a real thing too: a
+    # pitched design answers it only when the words ask for music, for jobs that all have a design without a note
+    # ("a pop for each icon"; a startup or a like, whose designs all have notes, keep them)
+    ui_dom = dom == 'ui' and mat != 'retro' and bool(b['concepts']) and set(b['concepts']) <= _real_jobs(idx)
+    # a motion job (a logo, a hit, a transition ...; an intro, an appearance, a shine, or any job a design without a
+    # note plays, when a film or video is the domain), not a game, and no word that asks for notes: a design with a
+    # note in it steps back (FILM_TONE; a countdown, all beeps, keeps them)
     film = (dom != 'game' and not (said & FILM_MUSIC) and not b.get('voice') and 'music' not in b['concepts']
-            and any(c in L.MOTION_JOBS or (dom == 'motion' and c in L.MOTION_DOMAIN_JOBS) for c in b['concepts']))
+            and any(c in L.MOTION_JOBS or (dom == 'motion' and (c in L.MOTION_DOMAIN_JOBS or c in _real_jobs(idx)))
+                    for c in b['concepts']))
     pool = (named_ or [k for k in invented if dom in rows[k].get('domains', ())]
             or invented or list(score))                # nothing named: the closest in feel, in the request's domain
+    # another family of the job's real things (earshot.sounds.interface) named by its own word ("task complete":
+    # complete/, a success by another word) is what was asked for: the job's default is not raised over it
+    job_c = next((c for c in b['concepts'] if L.INTERFACE_JOBS.get(c) == job), None) if job else None
+    rival = job_c and any(job_c in terms[k]['family'] and 'interface' in rows[k].get('tags', ())
+                          and '_' not in rows[k]['id'].split('/')[0]
+                          and rows[k]['id'].split('/')[0] != job.split('/')[0]
+                          and f"fam:{stem(rows[k]['id'].split('/')[0])}:{job_c}" in q for k in pool)
     if mat == 'retro' and not any(chip(rows[k]) for k in pool):
         # chip sound asked for and no chip design shares a word: every chip design, by feel and direction
         pool = [k for k in range(len(rows)) if chip(rows[k])]
@@ -1154,11 +1222,11 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
         s *= row.get('prior', 1.0)
         if row['id'] in L.BY_NAME_ONLY and alone and not said & TONE_STEMS:
             s *= BY_NAME
-        elif ui_job and not music and _pitched(row, t):
+        elif (ui_job or ui_dom) and not music and _pitched(row, t):
             s *= BY_NAME      # "a success sound": no marimba figure; "a success chime", "on a harp": the figure
         elif ui_job and music and 'interface' in row.get('tags', ()):
             s *= BY_NAME
-        elif job == row['id'] and not thing:
+        elif job == row['id'] and not thing and not rival:
             s *= REAL         # "a success sound", "toggle on", "message received": the real thing of the job
         elif 'interface' in row.get('tags', ()) and (not ui_job or (lead and lead not in L.INTERFACE_JOBS)):
             s *= BY_NAME      # the request is about something else ("when the brand pops up": a logo)
@@ -1187,6 +1255,14 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
                     'why': why.get(k, [w[5:] for w in q if w.startswith('feel:') and w[5:] in t['feel']])})
     out.sort(key=lambda r: (-r['score'], r['id']))
     return _named_member(b, out, idx)[:top]
+
+
+def _real_jobs(idx):
+    """the jobs (concepts) a design without a note in it plays as its family: the sound of a real thing exists"""
+    if _cache.get('real_key') != id(idx):
+        _cache['real_key'] = id(idx)
+        _cache['real_jobs'] = frozenset().union(*(t['family'] for r, t in zip(idx[0], idx[1]) if not _pitched(r, t)))
+    return _cache['real_jobs']
 
 
 def _pitched(row, t):
@@ -1244,7 +1320,9 @@ def learned_ok(b, sid, t, said):
         asked -= framed
         own -= {stem(w) for c in framed for w in WORD.findall((b.get('written') or {}).get(c, '').lower())}
     fam = _family_words(sid)                             # "a drum hit" names no brake drum: every word of it
-    by_family = t['exact'] in asked or (fam <= own if len(fam) > 1 else bool(fam & own))
+    by_family = (t['exact'] in asked or (any(L.SAME_THING.get(c, 0) == t['exact'] for c in asked)
+                                         and bool(_name_words(sid) & own))    # "unlocking a door with a key"
+                 or (fam <= own if len(fam) > 1 else bool(fam & own)))
     if sid.split('/')[0] in L.SOUND_FAMILIES:            # "a whoosh" names no recorded rope: "a rope whoosh" does
         return by_family and bool(_name_words(sid) & said)
     return by_family
@@ -1329,7 +1407,8 @@ def _twin(sid, out, idx):
         if r['id'] == sid:
             return None
         t = terms[pos[r['id']]]
-        if r['id'].split('/')[0] != fam and _name_words(r['id']) == name and jobs & t['family']:
+        if (r['id'].split('/')[0] != fam and _name_words(r['id']) == name and jobs & t['family']
+                and not _family_words(r['id']) < _family_words(sid)):   # "punch cut hit": no plain hit/punch
             return r['id']
     return None
 
@@ -1386,9 +1465,13 @@ def _learned_twin(b, sid, out, idx):
     if (not twin and fam in L.FILM_CYMBAL and b.get('domain') == 'motion'
             and not set(tokens(b.get('text') or '')) & L.KIT_WORDS):
         twin = L.FILM_CYMBAL[fam]                    # "a cymbal crash for the trailer": the film's cymbal
-    if not twin or not any(r['id'] == twin for r in out) or not _family_words(sid) & set(_said_words(b.get('text'))):
+    if not twin or not _family_words(sid) & set(_said_words(b.get('text'))):
         return None                     # only where the request says the invented one's family word ("punch impact"
         #                                 reaches hit/punch through impact/punch, but says no hit)
+    if not any(r['id'] == twin for r in out) and (fam not in L.SOUND_FAMILIES or set(b['concepts']) & (
+            set(L.INTERFACE_JOBS) | {'cue', 'notify'})):
+        return None                     # an unranked recording only for a kind of sound named as the thing itself
+        #                                 ("a knock": the door's knock, recorded; "a knock cue" keeps the cue)
     rows, terms = idx[0], idx[1]
     if _cache.get('pos_key') != id(idx):
         _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(rows)}
@@ -1404,7 +1487,9 @@ def _learned_first(b, out, idx):
     pref = _preferred(b, out[0]['id'], out, idx) if out else None
     if not pref or pref == out[0]['id']:
         return out
-    k = next(i for i, r in enumerate(out) if r['id'] == pref)
+    k = next((i for i, r in enumerate(out) if r['id'] == pref), None)
+    if k is None:                       # a learned twin the request reached through its invented one only
+        return [dict(out[0], id=pref)] + out
     best = dict(out[k], score=out[0]['score'], why=list(dict.fromkeys(out[k]['why'] + out[0]['why'])))
     return [best] + out[:k] + out[k + 1:]
 

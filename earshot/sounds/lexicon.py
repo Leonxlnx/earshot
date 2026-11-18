@@ -65,7 +65,8 @@ CONCEPTS = {
     'notify': ('notification', 'notice', 'ping', 'reminder', 'remind', 'badge', 'toast notification',
                'toast message', 'inbox', 'mention', 'dm', 'push notification', 'heads up', 'heads-up',
                'new notification', 'psst', 'look here', 'hey look', 'tap on the shoulder', 'nudge', 'poke',
-               'snackbar', 'banner', 'unread', 'you have mail', "you've got mail", 'new email', 'get attention',
+               'snackbar', 'banner', 'unread', 'toast',
+               'you have mail', "you've got mail", 'new email', 'get attention',
                'grab attention', 'calendar event',
                'appointment', 'check-in', 'check in'),
     'receive': ('incoming', 'incoming message', 'message received', 'new message', 'new text', 'text you',
@@ -79,7 +80,7 @@ CONCEPTS = {
                'get rid of', 'wipe', 'scrap', 'junk', 'garbage', 'rubbish'),
     'like': ('like button', 'favorite', 'favourite', 'favoriting', 'favouriting', 'favorited', 'favourited', 'fave',
              'heart', 'love', 'star', 'bookmark', 'upvote', 'reaction', 'double tap', 'double-tap',
-             'appreciate', 'kudos'),
+             'appreciate', 'kudos', 'wishlist', 'wish list'),
     'timer': ('alarm', 'time up', 'times up', 'time is up', 'timer done', 'timer alarm', 'kitchen timer', 'egg timer',
               'oven timer', 'oven', 'microwave', 'timer end', 'timer finished', 'alarm clock', 'wake up', 'wake-up',
               'wakeup', 'pomodoro', 'break over', 'session over', 'snooze'),
@@ -87,7 +88,8 @@ CONCEPTS = {
                   'traffic light', 'starting lights', 'start lights', 'before the start', 'beep beep beep'),
     'clock': ('clock tick', 'ticking clock', 'tick tock', 'ticktock', 'tick-tock', 'stopwatch', 'wall clock',
               'grandfather clock', 'running out of time', 'time running out', 'time is running out'),
-    'tick': ('tic', 'detent', 'ratchet', 'notch'),
+    'tick': ('tic', 'detent', 'ratchet', 'notch', 'slider', 'slider tick', 'step by step', 'stepper', 'scrub',
+             'scrubbing'),
     'type': ('typing', 'keystroke', 'key press', 'keypress', 'key click', 'keyboard', 'keyboard click', 'typewriter',
              'mechanical keyboard', 'text typing', 'typing text', 'type out', 'typed out', 'typewriter-style',
              'typewriter style', 'kinetic type', 'letter by letter', 'per letter', 'one letter at a time',
@@ -153,7 +155,8 @@ CONCEPTS = {
                  'get better', 'getting better', 'got stronger', 'get stronger', 'getting stronger', 'promotion',
                  'promoted', 'evolve', 'evolution'),
     'one_up': ('extra life', '1up', '1-up', 'one-up', 'bonus life'),
-    'achievement': ('trophy', 'reward', 'badge earned'),
+    'achievement': ('trophy', 'reward', 'badge earned', 'achievement unlocked', 'trophy unlocked', 'badge unlocked',
+                    'unlocked an achievement', 'unlock an achievement'),
     'coin': ('coin pickup', 'collect coin', 'gold', 'gold coin', 'money', 'token', 'ring pickup', 'cash pickup',
              'score', 'cash', 'rings', 'currency', 'bucks', 'coins', 'münze', 'münzen'),
     'gem': ('jewel', 'diamond', 'crystal pickup', 'treasure', 'rare item', 'gemstone', 'ruby', 'emerald', 'sapphire',
@@ -230,15 +233,17 @@ CONCEPTS = {
                'collision', 'hit on a cut', 'title slam', 'boom', 'wham', 'whomp'),
     'thud': ('thump', 'thunk', 'thwump', 'dull hit'),
     'sub_drop': ('sub drop', 'sub-drop', 'bass drop', 'sub boom', 'low boom', 'sub hit', '808 drop', 'low-end drop',
+                 'bass hit', 'bass impact',
                  'low end drop', 'sub bass drop', 'deep drop', 'low drop', 'bass thump', 'feel more than hear',
                  'chest thump', 'sub thump', 'low thump'),
     'braam': ('bwaaam', 'bwaam', 'braaam', 'horn blast', 'brass blast', 'trailer horn', 'inception horn', 'horn hit',
-              'foghorn', 'fog horn', 'brass hit', 'horn'),
+              'foghorn', 'fog horn', 'brass hit'),
     'logo': ('logo reveal', 'logo sting', 'brand', 'branding', 'sonic logo', 'audio logo', 'sound logo', 'mnemonic',
              'ident', 'signature', 'sonic identity', 'brand sound', 'company logo', 'audio branding'),
     'sting': ('stinger', 'music sting', 'musical sting', 'stab sting'),
     'glitch': ('glitchy', 'stutter', 'digital noise', 'error glitch', 'distortion', 'datamosh', 'static burst',
-               'malfunction', 'freaking out', 'freak out', 'bitcrush', 'corrupted', 'data corruption'),
+               'malfunction', 'freaking out', 'freak out', 'bitcrush', 'corrupted', 'data corruption', 'flicker',
+              'flickering', 'light flicker', 'neon flicker'),
     'shimmer': ('sparkle', 'twinkle', 'twinkly', 'glitter', 'glittery', 'shine', 'glint', 'gleam', 'fairy dust',
                 'fairy-dust', 'pixie dust', 'magic dust', 'fairy'),
     'pop': ('bubble pop', 'plop', 'pop in', 'pop-in', 'popin', 'bloop', 'boop', 'soap bubble', 'blop',
@@ -250,14 +255,14 @@ CONCEPTS = {
     'drone': ('tension bed', 'dark ambience', 'low drone'),
     'rumble': ('earthquake', 'quake', 'tremor', 'ground shake'),
     # ---- sources
-    'bell': ('ding', 'dong', 'ding dong', 'chime', 'ting', 'tinkle', 'gong', 'bell strike', 'bell hit', 'struck bell',
+    'bell': ('ding', 'dong', 'ding dong', 'chime', 'ting', 'tinkle', 'bell strike', 'bell hit', 'struck bell',
              'ring', 'ringing bell'),
     'service_bell': ('service', 'service bell', 'desk bell', 'hotel bell', 'reception bell', 'counter bell',
                      'reception', 'concierge', 'order up'),
     'knock': ('tock', 'thock', 'wood knock', 'rap', 'tok', 'door knock', 'knock knock', 'knock on the door',
               'klopfen', 'anklopfen'),
     'beep': ('bleep', 'bleepy', 'beepy', 'pip', 'blip'),
-    'buzz': ('buzzer', 'buzzy', 'vibrate', 'vibration', 'haptic', 'honk', 'raspberry', 'blat', 'grumpy honk'),
+    'buzz': ('buzzer', 'buzzy', 'vibrate', 'vibration', 'haptic', 'raspberry', 'blat', 'grumpy honk'),
     'hum': ('humming', 'whir', 'whirr', 'drone hum'),
     'crackle': ('crackling', 'crackly'),
     'pluck': ('plucky', 'string pluck', 'strum', 'plink', 'plinky', 'twang'),
@@ -274,7 +279,11 @@ CONCEPTS = {
     'hihat': ('hi-hat', 'hi hat', 'hat', 'closed hat', 'open hat', 'hh', 'hats'),
     'cymbal': ('cymbals', 'crash cymbal', 'ride cymbal', 'splash cymbal', 'china cymbal', 'cymbal crash',
                'ride bell', 'cymbal hit'),
-    'clap': ('handclap', 'hand clap', 'clapping', 'applause', 'claps'),
+    'clap': ('handclap', 'hand clap', 'clapping', 'claps'),
+    # many people clapping is an audience, not a row of claps (a recording: applause/)
+    'applause': ('applauding', 'applaud', 'applauds', 'ovation', 'standing ovation', 'round of applause',
+                 'clapping audience', 'clapping crowd',
+                 'audience applause', 'people applauding'),
     'finger_snap': ('finger snap', 'snap fingers', 'snapping fingers', 'finger click', 'fingersnap',
                     'snap your fingers', 'snapping your fingers'),
     'shaker': ('egg shaker', 'maraca', 'maracas'),
@@ -299,7 +308,7 @@ CONCEPTS = {
                     'coin flip', 'coin toss', 'penny', 'loose change', 'coin rattle', 'small change', 'spare change'),
     'glass_object': ('clink', 'cheers', 'toast glass', 'glass tap', 'glasses clink', 'wine glass', 'glass clink',
                      'champagne flutes', 'champagne flute', 'flutes', 'tapping together', 'clinking together',
-                     'raise a glass', 'propose a toast', 'wedding toast', 'toast'),
+                     'raise a glass', 'propose a toast', 'wedding toast', 'toasting'),
     'cork': ('cork pop', 'champagne', 'champagne pop', 'bottle pop', 'pop the cork', 'uncork', 'pop a bottle',
              'bubbly bottle', 'popping the bubbly'),
     'keyring': ('key ring', 'keychain', 'jingle keys', 'keys jingle', 'jingling keys', 'bunch of keys', 'car keys',
@@ -320,15 +329,15 @@ CONCEPTS = {
               'rocky shore', 'rocks', 'shingle', 'pebble beach'),
     'cafe': ('café', 'coffee shop', 'restaurant', 'bistro', 'diner', 'bar', 'pub', 'crowd murmur', 'chatter',
              'walla'),
-    'forest': ('birds', 'bird', 'birdsong', 'woods', 'woodland', 'jungle', 'nature', 'meadow', 'garden',
+    'forest': ('birds', 'birdsong', 'birds singing', 'woods', 'woodland', 'jungle', 'nature', 'meadow', 'garden',
                'birds chirping', 'songbirds', 'tweeting', 'park'),
     'night': ('crickets', 'cricket', 'insects', 'evening', 'summer night', 'cicadas', 'frogs croaking',
-              'croaking frogs', 'frog chorus', 'bugs', 'after dark', 'nighttime', 'night time', 'owl', 'midnight',
+              'croaking frogs', 'frog chorus', 'bugs', 'after dark', 'nighttime', 'night time', 'midnight',
               'dusk', 'night sounds'),
     'thunder': ('lightning', 'thunderstorm', 'thunderclap', 'thunder clap', 'rolling thunder', 'rolling rumble'),
     'room_tone': ('room tone', 'silence', 'quiet room', 'office', 'indoor ambience', 'air conditioning', 'indoor',
                   'indoors', 'empty room', 'hvac', 'ventilation'),
-    'city': ('traffic', 'street', 'urban', 'downtown', 'town', 'busy town', 'city street', 'metropolis', 'honking'),
+    'city': ('traffic', 'street', 'urban', 'downtown', 'town', 'busy town', 'city street', 'metropolis'),
     'space_hum': ('spaceship', 'space station', 'engine room', 'sci-fi ambience', 'machine room', 'server room',
                   'reactor', 'starship', 'space ship', 'ship interior', 'machine hum', 'machine humming',
                   'big machine', 'machine', 'mechanical whir', 'mechanical hum'),
@@ -351,7 +360,14 @@ CONCEPTS = {
     'bark': ('barking', 'barks', 'woof', 'woofs', 'yap', 'yapping', 'yip'),
     'meow': ('meowing', 'meows', 'miaow', 'mew', 'mewing'),
     'moo': ('mooing', 'moos', 'lowing'),
-    'chirp': ('chirping', 'chirps', 'tweet', 'twitter', 'twittering'),
+    # one bird is a bird's call ("a bird chirping"); birds, plural, are the forest's bed
+    'chirp': ('chirping', 'chirps', 'tweet', 'twitter', 'twittering', 'bird', 'bird call', 'birdcall', 'robin',
+              'sparrow', 'blackbird', 'songbird', 'bird chirping', 'bird singing', 'bird sings'),
+    'honk': ('honking', 'honks', 'horn', 'car horn', 'car honk', 'horn honk', 'toot', 'tooting', 'hooter'),
+    'cry': ('crying', 'cries', 'wail', 'wailing', 'weep', 'weeping', 'whimper', 'whimpering', 'tears'),
+    # a phone named as the thing that rings (a plain "phone" is often only the device a job happens on)
+    'telephone': ('phone call', 'incoming call', 'phone ringing', 'phone rings', 'ringing phone', 'landline',
+                  'rotary phone', 'desk phone', 'old phone', 'telephone ringing'),
     'hoot': ('hooting', 'hoots'),
     'caw': ('cawing', 'caws'),
     'cheer': ('cheering', 'cheers and applause', 'whooping'),
@@ -373,6 +389,28 @@ NOT_MADE = frozenset((
     'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
     'trumpet'))
 NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone')
+# a voice the catalogue has of one kind of person only (the recording's): said of another person it is not made ("a
+# woman crying": the crying is a baby's; brief.not_made)
+ONE_VOICE = {'cry': frozenset(('baby', 'babies', 'infant', 'infants', 'newborn', 'toddler'))}
+PERSON_WORDS = frozenset(('woman', 'women', 'man', 'men', 'girl', 'girls', 'boy', 'boys', 'adult', 'adults', 'lady',
+                          'guy', 'person', 'teenager', 'teen', 'mother', 'father', 'mom', 'dad', 'wife', 'husband',
+                          'actor', 'actress', 'soldier'))
+# a word whose job changes when the request also says one of these words: {word: (words, concept)} ("a toast" in an
+# app is a notification; "a toast at a wedding", "cups going clink for a toast" are glasses; brief.read)
+WORD_WITH = {'toast': (frozenset(('glass', 'glasses', 'cup', 'cups', 'clink', 'clinking', 'cheers', 'champagne',
+                                  'wine', 'wedding', 'drink', 'drinks', 'bride', 'groom', 'party', 'raise',
+                                  'raising')), 'glass_object')}
+# a job done with the same thing as another one's family: a recorded lock answers an unlocking too (brief.learned_ok)
+SAME_THING = {'unlock': 'lock'}
+# what many people doing a thing at once is ("people clapping": an audience), unless they do it as one ("clapping
+# together": one clap of many hands); brief.read
+CROWD_OF = {'clap': 'applause'}
+GROUP_WORDS = frozenset(('people', 'crowd', 'audience', 'everyone', 'everybody', 'room', 'spectators', 'fans',
+                         'guests', 'class', 'hall', 'stadium', 'listeners', 'viewers'))
+UNISON_WORDS = frozenset(('together', 'unison', 'once', 'single', 'one', 'sync'))
+# when a sound lands, not what it is: "a hit on the beat" asks for no music (brief.read skips these)
+TIMING_PHRASES = ('on the beat', 'on beat', 'to the beat', 'with the beat', 'on each beat', 'on every beat',
+                  'in time with the beat', 'in sync with the beat', 'in time with the music')
 # concepts that say what kind of thing is wanted without saying which: they do not end the head of a request
 GENERIC = frozenset(('ambience', 'note', 'beep', 'bell', 'open', 'achievement', 'cue', 'thud', 'sting'))
 # words of a short sound: an instrument named just before one is played ("a kalimba ping", "a marimba hit")
@@ -403,7 +441,8 @@ PHRASAL = {'put': {'away': 'close', 'down': 'land'}, 'tuck': {'away': 'close', '
            'cursor': {'over': 'hover', 'on': 'hover', 'onto': 'hover'},
            'zoom': {'past': 'flyby', 'by': 'flyby', 'off': 'send'}, 'fly': {'past': 'flyby', 'by': 'flyby'},
            'brush': {'aside': 'swipe', 'away': 'swipe'}, 'push': {'aside': 'swipe', 'away': 'swipe'},
-           'shrug': {'off': 'shield'}, 'knock': {'over': 'hit'}, 'wipe': {'out': 'lose', 'away': 'delete'}}
+           'shrug': {'off': 'shield'}, 'knock': {'over': 'hit'}, 'wipe': {'out': 'lose', 'away': 'delete'},
+           'set': {'down': 'land'}}
 # outcome words: named after the thing they happen to ("upload finished", "the buff runs out"), they are the job
 STATUS_WORDS = frozenset(('finished', 'done', 'complete', 'completed', 'failed', 'fails', 'succeeded', 'successful',
                           'successfully', 'worked', 'goes through', 'went through', 'runs out', 'ran out',
@@ -420,7 +459,9 @@ BROADER = {'switch_on': 'toggle', 'switch_off': 'toggle', 'light_switch': 'toggl
            'swish': 'whoosh', 'flyby': 'whoosh', 'coin_object': 'coin', 'glass_object': 'bell', 'countdown': 'timer',
            'kick_drum': 'drum', 'snare': 'drum', 'rimshot': 'drum', 'cross_stick': 'rimshot', 'tom': 'drum',
            'hihat': 'drum', 'cymbal': 'drum',
-           'drum_roll': 'drum', 'sting': 'cue'}
+           'drum_roll': 'drum', 'sting': 'cue',
+           # jobs no design plays by name: the gesture or sound that does them (a pull is a swipe, a copy a click)
+           'refresh': 'swipe', 'copy': 'click'}
 # a family whose name means something else in a request, or nothing: the job the family is for ('rise' and 'fall'
 # are directions, a 'crash' family is the cymbal though "a crash" is a collision, the one 'drum' family the roll,
 # a 'bed' the music under a video, not an ambience)
@@ -428,7 +469,8 @@ FAMILY_SENSE = {'rise': 'riser', 'fall': 'downlifter', 'crash': 'cymbal', 'ride'
                 'drum': 'drum_roll', 'snap': 'finger_snap', 'sticks': 'count_in', 'bed': 'music',
                 # recorded things (earshot.sounds.learned) whose family is the job by another word
                 'step': 'footstep', 'switch': 'toggle', 'keyboard': 'type', 'camera': 'shutter', 'pass': 'flyby',
-                'heart': 'heartbeat', 'dog': 'bark', 'cat': 'meow', 'cow': 'moo', 'owl': 'hoot',
+                'heart': 'heartbeat', 'dog': 'bark', 'car_horn': 'honk', 'baby': 'cry', 'phone': 'telephone', 
+                'cat': 'meow', 'cow': 'moo', 'owl': 'hoot',
                 'crow': 'caw', 'crowd': 'cheer', 'pan': 'sizzle', 'drink': 'pour', 'toilet': 'flush'}
 # the tonal interface figures (earshot.sounds.ui): listeners heard them as unrecognisable, so a plain "tap",
 # "hover", "toggle" or "next" gets a recorded switch, key or tap (earshot.sounds.learned, its `roles`); these answer
@@ -619,7 +661,9 @@ PHRASE_MODIFIERS = {'sharp attack': dict(hard=0.6), 'hard attack': dict(hard=0.6
                     'long tail': dict(ring=0.6), 'short tail': dict(ring=-0.5), 'long decay': dict(ring=0.6),
                     'short decay': dict(ring=-0.5), 'quick decay': dict(ring=-0.5), 'long release': dict(ring=0.5),
                     'in the distance': dict(space=0.7, energy=-0.3), 'far away': dict(space=0.7, energy=-0.3),
-                    'up close': dict(space=-0.6)}
+                    'up close': dict(space=-0.6), 'close by': dict(space=-0.6),
+                    'close-miked': dict(space=-0.6), 'close miked': dict(space=-0.6), 'close mic': dict(space=-0.6),
+                    'close to the mic': dict(space=-0.6), 'close to the microphone': dict(space=-0.6)}
 # a word whose job depends on the domain: (domain, word) -> concept, '' for none ("fails a stage" in a game is a
 # loss; a "card" in an app is a component, not paper)
 DOMAIN_SENSE = {('music', 'crash'): 'cymbal', ('game', 'kick'): 'hit',
@@ -627,7 +671,7 @@ DOMAIN_SENSE = {('music', 'crash'): 'cymbal', ('game', 'kick'): 'hit',
                 ('game', 'collapse'): 'break', ('motion', 'collapse'): 'break', ('ui', 'slide out'): 'open',
                 ('ui', 'slide in'): 'open', ('game', 'activate'): 'power_up', ('game', 'jingle'): 'cue',
                 ('game', 'enable'): 'power_up', ('ui', 'page'): '', ('ui', 'card'): '', ('game', 'star'): 'coin',
-                ('game', 'stars'): 'coin'}
+                ('game', 'stars'): 'coin', ('ui', 'item'): '', ('motion', 'horn'): 'braam'}
 # which way a job moves, for designs whose own words do not say it
 CONCEPT_DIR = {'riser': 1, 'downlifter': -1, 'power_up': 1, 'power_down': -1, 'level_up': 1, 'sub_drop': -1,
                'switch_on': 1, 'switch_off': -1, 'open': 1, 'close': -1, 'next': 1, 'back': -1, 'send': 1,
@@ -679,7 +723,9 @@ DOMAIN_WORDS = {'ui': 'ui', 'app': 'ui', 'website': 'ui', 'site': 'ui', 'web': '
                 'portfolio': 'ui', 'checkout': 'ui', 'settings': 'ui', 'button': 'ui', 'tooltip': 'ui',
                 'modal': 'ui', 'dialog': 'ui', 'onboarding': 'ui', 'screen': 'ui', 'email': 'ui', 'homepage': 'ui',
                 'sidebar': 'ui', 'avatar': 'ui', 'chat': 'ui', 'toolbar': 'ui', 'navbar': 'ui', 'cart': 'ui',
-                'feed': 'ui', 'profile': 'ui', 'login': 'ui', 'signup': 'ui',
+                'feed': 'ui', 'profile': 'ui', 'login': 'ui', 'signup': 'ui', 
+                'list': 'ui', 'wishlist': 'ui', 'carousel': 'ui',
+                'slider': 'ui', 'accordion': 'ui', 'clipboard': 'ui', 'icon': 'ui', 'nav': 'ui', 'checkbox': 'ui',
                 'documentary': 'motion', 'teaser': 'motion', 'slideshow': 'motion',
                 'sim': 'game', 'simulator': 'game', 'arena': 'game', 'brawler': 'game', 'mmorpg': 'game',
                 'tactics': 'game', 'strategy': 'game', 'popup': 'ui', 'pop-up': 'ui', 'dropdown': 'ui',
