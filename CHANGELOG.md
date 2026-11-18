@@ -27,6 +27,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   the three alternatives for a missing thing are of three other families, described most like it.
 - A recipe layer can follow another layer's loudness or give way to it (`follow`: twigs that snap with the gusts,
   rain that ducks under a thunder clap) and glide in pitch over its take (`glide`: a motor winding down).
+- Fuller recordings first: 21 learned things play their fullest clean recording at seed 0 (a small action with
+  body after the strike, from a quiet lossless source), and 14 bare one-click recordings are learned again with their
+  press and release, their approach or a whole cocking (a mouse, a trackpad, keyboard keys, a desk lamp, a stapler).
 - Rain on wood, on a tin roof and on an umbrella are learned beds from public-domain recordings (`rain/wood`,
   `rain/tin_roof`, `rain/umbrella`).
 - A plain request for an interface job gets the design the `ui` set plays ("a success sound": `success/shutter`,

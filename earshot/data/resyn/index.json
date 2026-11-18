@@ -5786,8 +5786,8 @@
    }
   ],
   "walk": [
-   0,
    1,
+   0,
    2,
    3,
    4
@@ -7029,10 +7029,10 @@
   ],
   "walk": [
    0,
+   4,
    1,
    2,
-   3,
-   4
+   3
   ],
   "allows": [
    "clicks"
@@ -8427,9 +8427,9 @@
   ],
   "walk": [
    1,
+   0,
    2,
-   3,
-   0
+   3
   ],
   "allows": [
    "pre_swell",
@@ -8476,18 +8476,16 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "gavel-strike-1.npz",
-    "source": "cuts/bigsoundbank/1590_00.wav",
+    "source": "bigsoundbank/1590.wav@0.000-0.545",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.024,
-    "dur_s": 0.32,
+    "onset_s": 0.049,
+    "dur_s": 0.545,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -8495,24 +8493,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.14,
-     "centroid": 1720,
-     "end_db": -84.4,
-     "tail_ms": 234.6,
-     "start_db": -122.9,
+     "span": 3.88,
+     "centroid": 2488,
+     "end_db": -108.5,
+     "tail_ms": 130.3,
+     "start_db": -175.3,
      "rise_ms": 0.42,
      "peak": -0.0
     },
     "measured": {
-     "hard_db": 8.42,
-     "ring_x": 1.578
+     "hard_db": 8.36,
+     "ring_x": 1.116
     },
-    "bytes": 6275,
+    "bytes": 10459,
     "credit": {
      "title": "Gavel, 3 Blows",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -8527,11 +8524,27 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.545
+    ],
+    "fidelity": {
+     "env_db": 3.38,
+     "shape_db": 1.03
+    },
+    "was": "cuts/bigsoundbank/1590_00.wav",
+    "allows": [
+     "stacked"
+    ]
    }
   ],
   "walk": [
    0
+  ],
+  "allows": [
+   "stacked"
   ]
  },
  {
@@ -8747,39 +8760,37 @@
    },
    {
     "file": "drawer-wood-3.npz",
-    "source": "cuts/bigsoundbank/0772_00.wav",
+    "source": "bigsoundbank/1500.wav@0.000-1.340",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.4875,
-    "dur_s": 0.955,
+    "onset_s": 0.936,
+    "dur_s": 1.338,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 2.81,
-     "centroid": 561,
-     "end_db": -86.5,
-     "tail_ms": 409.5,
-     "start_db": -85.3,
-     "rise_ms": 3.4,
-     "peak": -5.7
+     "span": 3.34,
+     "centroid": 370,
+     "end_db": -103.2,
+     "tail_ms": 275.8,
+     "start_db": -141.6,
+     "rise_ms": 3.62,
+     "peak": -0.0
     },
     "measured": {
-     "hard_db": 3.29,
-     "ring_x": 1.091
+     "hard_db": 1.02,
+     "ring_x": 1.127
     },
-    "bytes": 15887,
+    "bytes": 23444,
     "credit": {
-     "title": "Drawers of a dresser",
+     "title": "Wooden drawer, closing",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/drawers-of-a-dresser-s0772.html",
+     "page": "https://bigsoundbank.com/wooden-drawer-closing-s1500.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -8790,7 +8801,16 @@
       "dull"
      ]
     },
-    "rating_final": 2
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     1.338
+    ],
+    "fidelity": {
+     "env_db": 3.6,
+     "shape_db": 1.21
+    },
+    "was": "cuts/bigsoundbank/0772_00.wav"
    }
   ],
   "walk": [
@@ -9307,8 +9327,8 @@
    }
   ],
   "walk": [
-   2,
    0,
+   2,
    1
   ]
  },
@@ -9435,8 +9455,8 @@
    }
   ],
   "walk": [
-   1,
-   0
+   0,
+   1
   ]
  },
  {
@@ -11316,11 +11336,10 @@
    },
    {
     "file": "stapler-desk-2.npz",
-    "source": "cuts/bigsoundbank/0009_03.wav",
+    "source": "bigsoundbank/0009.wav@2.970-3.670",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.026,
-    "dur_s": 0.429,
+    "onset_s": 0.215,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -11332,19 +11351,19 @@
      "width"
     ],
     "quality": {
-     "span": 8.16,
-     "centroid": 5540,
-     "end_db": -74.7,
-     "tail_ms": 387.6,
-     "start_db": -105.4,
-     "rise_ms": 2.21,
-     "peak": -5.6
+     "span": 2.77,
+     "centroid": 4701,
+     "end_db": -115.3,
+     "tail_ms": 171.3,
+     "start_db": -153.7,
+     "rise_ms": 0.62,
+     "peak": 0.5
     },
     "measured": {
-     "hard_db": 10.06,
-     "ring_x": 1.118
+     "hard_db": 9.8,
+     "ring_x": 1.005
     },
-    "bytes": 5052,
+    "bytes": 10045,
     "credit": {
      "title": "Office stapler",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -11360,7 +11379,17 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     2.97,
+     3.67
+    ],
+    "fidelity": {
+     "env_db": 2.16,
+     "shape_db": 0.89
+    },
+    "was": "cuts/bigsoundbank/0009_03.wav"
    },
    {
     "file": "stapler-desk-3.npz",
@@ -11948,7 +11977,6 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
@@ -12049,11 +12077,10 @@
    },
    {
     "file": "pen-ballpoint-3.npz",
-    "source": "cuts/bigsoundbank/0613_11.wav",
+    "source": "bigsoundbank/0613.wav@6.810-7.510",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0393,
-    "dur_s": 0.455,
+    "onset_s": 0.1143,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -12061,24 +12088,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 9.4,
-     "centroid": 7117,
-     "end_db": -84.8,
-     "tail_ms": 386.9,
-     "start_db": -85.4,
+     "span": 2.8,
+     "centroid": 7656,
+     "end_db": -121.4,
+     "tail_ms": 411.9,
+     "start_db": -146.6,
      "rise_ms": 0.5,
      "peak": -1.1
     },
     "measured": {
-     "hard_db": 10.93,
-     "ring_x": 1.606
+     "hard_db": 9.53,
+     "ring_x": 1.116
     },
-    "bytes": 5965,
+    "bytes": 9371,
     "credit": {
      "title": "Pen click",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -12093,7 +12119,17 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     6.81,
+     7.51
+    ],
+    "fidelity": {
+     "env_db": 2.55,
+     "shape_db": 1.21
+    },
+    "was": "cuts/bigsoundbank/0613_11.wav"
    }
   ],
   "walk": [
@@ -14809,8 +14845,8 @@
    "clicks"
   ],
   "walk": [
-   0,
    2,
+   0,
    1
   ]
  },
@@ -17190,11 +17226,10 @@
    },
    {
     "file": "click-mouse-2.npz",
-    "source": "cuts/bigsoundbank/1735_01.wav",
+    "source": "bigsoundbank/1735.wav@0.000-0.474",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.025,
-    "dur_s": 0.265,
+    "onset_s": 0.1253,
+    "dur_s": 0.474,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -17206,19 +17241,19 @@
      "width"
     ],
     "quality": {
-     "span": 3.18,
-     "centroid": 11944,
-     "end_db": -85.9,
-     "tail_ms": 226.5,
-     "start_db": -96.6,
+     "span": 3.17,
+     "centroid": 11865,
+     "end_db": -125.8,
+     "tail_ms": 235.5,
+     "start_db": -237.3,
      "rise_ms": 0.83,
      "peak": -2.7
     },
     "measured": {
-     "hard_db": 10.71,
-     "ring_x": 1.215
+     "hard_db": 10.26,
+     "ring_x": 1.036
     },
-    "bytes": 4439,
+    "bytes": 7010,
     "credit": {
      "title": "Raspberry Mouse, Single Click",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -17234,7 +17269,17 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.474
+    ],
+    "fidelity": {
+     "env_db": 2.31,
+     "shape_db": 1.11
+    },
+    "was": "cuts/bigsoundbank/1735_01.wav"
    }
   ],
   "walk": [
@@ -17267,18 +17312,16 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "click-trackpad-1.npz",
-    "source": "cuts/bigsoundbank/1740_00.wav",
+    "source": "bigsoundbank/1740.wav@0.075-0.400",
     "origin": "corpus",
-    "rating": null,
     "onset_s": 0.0227,
-    "dur_s": 0.125,
+    "dur_s": 0.325,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -17286,24 +17329,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 5.1,
-     "centroid": 2593,
-     "end_db": -63.0,
-     "tail_ms": 63.1,
+     "span": 3.25,
+     "centroid": 338,
+     "end_db": -129.1,
+     "tail_ms": 154.4,
      "start_db": -237.4,
      "rise_ms": 1.21,
      "peak": -2.6
     },
     "measured": {
-     "hard_db": 5.38,
-     "ring_x": 1.269
+     "hard_db": 5.6,
+     "ring_x": 1.057
     },
-    "bytes": 6760,
+    "bytes": 9901,
     "credit": {
      "title": "MacBook trackpad, simple click",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -17318,7 +17360,17 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.075,
+     0.4
+    ],
+    "fidelity": {
+     "env_db": 3.1,
+     "shape_db": 1.17
+    },
+    "was": "cuts/bigsoundbank/1740_00.wav"
    },
    {
     "file": "click-trackpad-2.npz",
@@ -17369,8 +17421,8 @@
    }
   ],
   "walk": [
-   1,
-   0
+   0,
+   1
   ]
  },
  {
@@ -17546,59 +17598,59 @@
    },
    {
     "file": "switch-wall-4.npz",
-    "source": "freesound_e1/423512.mp3@2.499-2.744",
+    "source": "bigsoundbank/0026.wav@4.010-4.270",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0995,
-    "dur_s": 0.245,
+    "onset_s": 0.055,
+    "dur_s": 0.26,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 2.57,
-     "centroid": 2208,
-     "end_db": -107.0,
-     "tail_ms": 107.5,
-     "start_db": -239.6,
-     "rise_ms": 1.21,
-     "peak": -0.4
+     "span": 3.23,
+     "centroid": 3798,
+     "end_db": -87.8,
+     "tail_ms": 166.5,
+     "start_db": -154.4,
+     "rise_ms": 0.42,
+     "peak": -8.4
     },
     "measured": {
-     "hard_db": 7.72,
-     "ring_x": 1.261
+     "hard_db": 0.01,
+     "ring_x": 1.205
     },
-    "bytes": 6134,
+    "bytes": 7012,
     "credit": {
-     "title": "Light Switch Click On and Off",
-     "author": "SomeoneCool15",
-     "page": "https://freesound.org/people/SomeoneCool15/sounds/423512/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Electric switch",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/electric-switch-s0026.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     2.499,
-     2.744
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     4.01,
+     4.27
+    ],
+    "fidelity": {
+     "env_db": 2.5,
+     "shape_db": 0.91
+    },
+    "was": "freesound_e1/423512.mp3@2.499-2.744"
    },
    {
     "file": "switch-wall-5.npz",
-    "source": "freesound_e1/423512.mp3@3.187-3.327",
+    "source": "bigsoundbank/0026.wav@1.810-2.060",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0145,
-    "dur_s": 0.14,
+    "onset_s": 0.056,
+    "dur_s": 0.25,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -17611,34 +17663,38 @@
      "width"
     ],
     "quality": {
-     "span": 2.81,
-     "centroid": 1699,
-     "end_db": -106.8,
-     "tail_ms": 87.5,
-     "start_db": -122.9,
-     "rise_ms": 1.15,
-     "peak": -1.2
+     "span": 4.27,
+     "centroid": 3245,
+     "end_db": -98.0,
+     "tail_ms": 164.3,
+     "start_db": -156.0,
+     "rise_ms": 2.08,
+     "peak": -3.8
     },
     "measured": {
-     "hard_db": 7.76,
-     "ring_x": 1.625
+     "hard_db": 8.7,
+     "ring_x": 1.323
     },
-    "bytes": 5531,
+    "bytes": 5360,
     "credit": {
-     "title": "Light Switch Click On and Off",
-     "author": "SomeoneCool15",
-     "page": "https://freesound.org/people/SomeoneCool15/sounds/423512/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Electric switch",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/electric-switch-s0026.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     3.187,
-     3.327
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     1.81,
+     2.06
+    ],
+    "fidelity": {
+     "env_db": 2.24,
+     "shape_db": 0.91
+    },
+    "was": "freesound_e1/423512.mp3@3.187-3.327"
    },
    {
     "file": "switch-wall-6.npz",
@@ -17690,11 +17746,11 @@
    }
   ],
   "walk": [
+   1,
    2,
    3,
    4,
    5,
-   1,
    0
   ],
   "pattern": {
@@ -17794,11 +17850,10 @@
    },
    {
     "file": "switch-lamp-2.npz",
-    "source": "cuts/bigsoundbank/0036_01.wav",
+    "source": "bigsoundbank/0036.wav@0.000-0.540",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.07,
-    "dur_s": 0.339,
+    "onset_s": 0.0795,
+    "dur_s": 0.54,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -17806,24 +17861,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 3.76,
-     "centroid": 8093,
-     "end_db": -75.3,
-     "tail_ms": 219.0,
-     "start_db": -108.8,
+     "span": 3.75,
+     "centroid": 8236,
+     "end_db": -110.5,
+     "tail_ms": 175.3,
+     "start_db": -142.6,
      "rise_ms": 1.38,
-     "peak": -8.1
+     "peak": -8.0
     },
     "measured": {
-     "hard_db": 10.29,
-     "ring_x": 1.409
+     "hard_db": 9.23,
+     "ring_x": 1.137
     },
-    "bytes": 7365,
+    "bytes": 10818,
     "credit": {
      "title": "Switch desk lamp",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -17838,7 +17892,17 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.54
+    ],
+    "fidelity": {
+     "env_db": 2.74,
+     "shape_db": 0.86
+    },
+    "was": "cuts/bigsoundbank/0036_01.wav"
    },
    {
     "file": "switch-lamp-3.npz",
@@ -17891,8 +17955,8 @@
    }
   ],
   "walk": [
-   0,
    1,
+   0,
    2
   ],
   "roles": [
@@ -18023,7 +18087,6 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
@@ -18076,11 +18139,10 @@
    },
    {
     "file": "switch-electronic-2.npz",
-    "source": "cuts/bigsoundbank/0025_01.wav",
+    "source": "bigsoundbank/0025.wav@0.150-0.670",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.079,
-    "dur_s": 0.309,
+    "onset_s": 0.125,
+    "dur_s": 0.52,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -18088,24 +18150,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.97,
-     "centroid": 9033,
-     "end_db": -71.1,
-     "tail_ms": 184.4,
-     "start_db": -97.1,
+     "span": 4.67,
+     "centroid": 9055,
+     "end_db": -107.2,
+     "tail_ms": 161.0,
+     "start_db": -148.2,
      "rise_ms": 0.67,
      "peak": -4.0
     },
     "measured": {
-     "hard_db": 11.3,
-     "ring_x": 1.288
+     "hard_db": 11.39,
+     "ring_x": 1.101
     },
-    "bytes": 5448,
+    "bytes": 8826,
     "credit": {
      "title": "Electronic switch",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -18120,7 +18181,17 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.15,
+     0.67
+    ],
+    "fidelity": {
+     "env_db": 2.08,
+     "shape_db": 0.7
+    },
+    "was": "cuts/bigsoundbank/0025_01.wav"
    }
   ],
   "walk": [
@@ -18755,9 +18826,9 @@
    }
   ],
   "walk": [
+   0,
    2,
-   1,
-   0
+   1
   ],
   "pattern": {
    "name": "pair",
@@ -18798,18 +18869,16 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "keyboard-laptop-1.npz",
-    "source": "cuts/bigsoundbank/1726_10.wav",
+    "source": "bigsoundbank/1726.wav@3.630-4.330",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0182,
-    "dur_s": 0.525,
+    "onset_s": 0.157,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -18817,24 +18886,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 6.47,
-     "centroid": 2397,
-     "end_db": -77.4,
-     "tail_ms": 458.4,
-     "start_db": -70.6,
-     "rise_ms": 1.96,
-     "peak": -14.3
+     "span": 4.89,
+     "centroid": 5257,
+     "end_db": -113.4,
+     "tail_ms": 413.2,
+     "start_db": -134.1,
+     "rise_ms": 1.19,
+     "peak": -6.2
     },
     "measured": {
-     "hard_db": 4.26,
-     "ring_x": 1.929
+     "hard_db": 5.1,
+     "ring_x": 1.084
     },
-    "bytes": 11251,
+    "bytes": 12619,
     "credit": {
      "title": "Slow MacBook keyboard #1",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -18850,7 +18918,19 @@
       "quiet"
      ]
     },
-    "rating_final": 2
+    "rating": null,
+    "excerpt_s": [
+     3.63,
+     4.33
+    ],
+    "fidelity": {
+     "env_db": 2.58,
+     "shape_db": 0.93
+    },
+    "was": "cuts/bigsoundbank/1726_10.wav",
+    "allows": [
+     "ring"
+    ]
    },
    {
     "file": "keyboard-laptop-2.npz",
@@ -19063,7 +19143,10 @@
     "keystroke",
     "press"
    ]
-  }
+  },
+  "allows": [
+   "ring"
+  ]
  },
  {
   "id": "keyboard/desktop",
@@ -19098,35 +19181,33 @@
   "members": [
    {
     "file": "keyboard-desktop-1.npz",
-    "source": "cuts/bigsoundbank/1733_01.wav",
+    "source": "bigsoundbank/1733.wav@0.090-0.520",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0248,
-    "dur_s": 0.38,
+    "onset_s": 0.0583,
+    "dur_s": 0.43,
     "stereo": false,
     "dry": true,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.27,
-     "centroid": 3233,
-     "end_db": -95.3,
-     "tail_ms": 302.0,
-     "start_db": -73.2,
-     "rise_ms": 0.9,
+     "span": 4.29,
+     "centroid": 3706,
+     "end_db": -114.6,
+     "tail_ms": 177.0,
+     "start_db": -225.4,
+     "rise_ms": 0.58,
      "peak": -14.6
     },
     "measured": {
-     "hard_db": 2.53,
-     "ring_x": 1.086
+     "hard_db": 1.47,
+     "ring_x": 1.057
     },
-    "bytes": 9160,
+    "bytes": 15000,
     "credit": {
      "title": "Slow Keyboard",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -19141,7 +19222,17 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.09,
+     0.52
+    ],
+    "fidelity": {
+     "env_db": 2.93,
+     "shape_db": 0.99
+    },
+    "was": "cuts/bigsoundbank/1733_01.wav"
    },
    {
     "file": "keyboard-desktop-2.npz",
@@ -19193,11 +19284,10 @@
    },
    {
     "file": "keyboard-desktop-3.npz",
-    "source": "cuts/bigsoundbank/1733_05.wav",
+    "source": "bigsoundbank/1733.wav@1.450-1.930",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0335,
-    "dur_s": 0.335,
+    "onset_s": 0.0573,
+    "dur_s": 0.48,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -19205,24 +19295,23 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.19,
-     "centroid": 4695,
-     "end_db": -95.5,
-     "tail_ms": 274.1,
-     "start_db": -105.3,
+     "span": 3.94,
+     "centroid": 5128,
+     "end_db": -117.1,
+     "tail_ms": 189.1,
+     "start_db": -180.4,
      "rise_ms": 1.79,
      "peak": -3.1
     },
     "measured": {
-     "hard_db": 2.88,
-     "ring_x": 1.286
+     "hard_db": 9.23,
+     "ring_x": 1.042
     },
-    "bytes": 7908,
+    "bytes": 11015,
     "credit": {
      "title": "Slow Keyboard",
      "author": "BigSoundBank (bigsoundbank.com)",
@@ -19237,7 +19326,17 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     1.45,
+     1.93
+    ],
+    "fidelity": {
+     "env_db": 2.57,
+     "shape_db": 0.88
+    },
+    "was": "cuts/bigsoundbank/1733_05.wav"
    },
    {
     "file": "keyboard-desktop-4.npz",
@@ -19337,9 +19436,9 @@
    }
   ],
   "walk": [
-   0,
-   4,
    2,
+   4,
+   0,
    1,
    3
   ],
@@ -24929,9 +25028,9 @@
    }
   ],
   "walk": [
+   0,
    2,
    3,
-   0,
    1
   ]
  },
@@ -28936,9 +29035,9 @@
    }
   ],
   "walk": [
+   0,
    2,
    1,
-   0,
    3
   ],
   "allows": [
@@ -29415,8 +29514,8 @@
    }
   ],
   "walk": [
-   2,
    0,
+   2,
    1
   ]
  },
@@ -30779,11 +30878,11 @@
    }
   ],
   "walk": [
+   4,
    2,
    1,
    0,
-   3,
-   4
+   3
   ]
  },
  {
@@ -33483,8 +33582,8 @@
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ],
   "allows": [
    "ring",
@@ -34129,8 +34228,8 @@
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ]
  },
  {
@@ -35652,11 +35751,10 @@
   "members": [
    {
     "file": "gun-reload-1.npz",
-    "source": "bigsoundbank/1989.wav@0.080-0.680",
+    "source": "bigsoundbank_s4/1985.wav@0.000-0.480",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.2985,
-    "dur_s": 0.6,
+    "onset_s": 0.1593,
+    "dur_s": 0.477,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -35668,36 +35766,37 @@
      "width"
     ],
     "quality": {
-     "span": 3.07,
-     "centroid": 4091,
-     "end_db": -137.2,
-     "tail_ms": 274.8,
-     "start_db": -156.3,
-     "rise_ms": 0.42,
-     "peak": -0.0
+     "span": 3.58,
+     "centroid": 7691,
+     "end_db": -112.0,
+     "tail_ms": 119.1,
+     "start_db": -168.1,
+     "rise_ms": 6.29,
+     "peak": -6.3
     },
     "measured": {
-     "hard_db": 4.43,
-     "ring_x": 1.002
+     "hard_db": 7.33,
+     "ring_x": 1.097
     },
-    "bytes": 16690,
+    "bytes": 18065,
     "credit": {
-     "title": "Gun, loading #2",
+     "title": "Pistol, cocking #2",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/gun-loading-2-s1989.html",
+     "page": "https://bigsoundbank.com/pistol-cocking-2-s1985.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "excerpt_s": [
-     0.08,
-     0.68
-    ],
     "events": 1,
-    "late": 1,
     "fidelity": {
-     "env_db": 2.0,
-     "shape_db": 0.59
-    }
+     "env_db": 2.15,
+     "shape_db": 0.77
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.477
+    ],
+    "was": "bigsoundbank/1989.wav@0.080-0.680"
    },
    {
     "file": "gun-reload-2.npz",
@@ -35752,8 +35851,8 @@
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ],
   "allows": [
    "clicks"
@@ -36271,8 +36370,8 @@
    }
   ],
   "walk": [
-   1,
-   0
+   0,
+   1
   ],
   "allows": [
    "ring",
@@ -37188,8 +37287,8 @@
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ],
   "allows": [
    "rising_glide",
@@ -37924,8 +38023,8 @@
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ],
   "allows": [
    "clicks"

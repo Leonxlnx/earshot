@@ -84,6 +84,10 @@ FINISH = dict(lufs=-40.0, weight=1.5, presence=1.5, air=1.5, drive=3.0)
 # members (three seeds): loudest 50 ms +0.5 to +0.9 dB, the loudest 5 ms within 0.2 dB, centroid -1 to -5 %
 BODY_EXP, BODY_DB = 0.5, 6.0
 CREST, CUT = 14.0, 8.0       # dB: present() (a sound of 0.5 s and more, peaks over its loudest 50 ms)
+# dB the strike's crest may lose after the engine (None: as much as it loses; the sets and recipes were heard and
+# chosen so), ms of the bell that restores it
+ATTACK, ATTACK_MS = None, 3.0
+ATTACK_MAX = 2.0              # dB the bell raises the strike at most (more is heard as a click of its own)
 DEFAULT_OFF = 0.6           # prior factor of a design the index marks as not a default (`default`: false)
 RETAKE = 101                # make.take's step between the seeds it tries: seeds this far apart play one member
 # how far (a share of its length) a length asked of a performance may lie from a whole-action recording's own for
@@ -156,6 +160,7 @@ def take(e, c, r, k=None, room=True, nudge=None):
     ax = set(e['axes'])
     nudge = nudge or {}
     tilt = c.bright if 'bright' in ax else 0.0
+    own = k is None                 # the design's own take (another design that names a member plays it as it was)
     if k is None:
         k = pick(e['id'], c.seed, tilt)
         c.member = member(k + 1, len(e['members']))
@@ -173,13 +178,54 @@ def take(e, c, r, k=None, room=True, nudge=None):
     length = 1.0 if want is None else float(np.clip(want / (m['dur_s'] * size), *LENGTH))
     y = resyn.render(model(m['file']), r, length=length, pitch=pitch, size=size, bright=bright, hard=hard, ring=ring,
                      vary=VARY * c.vary)
+    at = dsp.n_of(max(m.get('onset_s', 0.0) * size - 0.002, 0.0))
+    strike = crest(y, at)
     if dry(e, m):
         y = body(resyn.finish(y, **FINISH))
     y = present(y)
     y = image(y * 10 ** (6.0 * energy / 20), c.lerp('width', 0.0, 2.0, 1.0) if 'width' in ax else 1.0, m)
-    if not room:
+    if room:
+        y = space.room(y, c.room('room'), amount=c.space if 'space' in ax else 0.0, r=r)
+    return attack(y, strike, at) if own else y
+
+
+def crest(y, at):
+    """dB of the peak over the RMS of the 22 ms from sample `at` (the strike: 2 ms before the main onset to 20 ms
+    after it), the channels summed; None when the take is shorter"""
+    seg = np.asarray(y)[at:at + dsp.n_of(0.022)]
+    seg = seg.mean(axis=1) if seg.ndim == 2 else seg
+    if len(seg) < dsp.n_of(0.022) or not np.any(seg):
+        return None
+    return float(20 * np.log10(np.abs(seg).max()) - 10 * np.log10(np.mean(seg ** 2)))
+
+
+def attack(y, strike, at):
+    """y with its strike as sharp as the engine played it: the steps after the engine (finish's saturation, body,
+    present's limiter, the room) may lower the crest of the strike's first 20 ms (crest()) by at most ATTACK dB;
+    a take that lost more has its loudest moment there raised by a short bell (ATTACK_MS wide) just as far as
+    brings it back, by ATTACK_MAX dB at most. Measured on thirty designs: a short dry strike (a gavel, a crutch, a pen cap, a knock on a
+    table) lost 1.2 to 1.7 dB, mostly to the saturation; the others lost under 0.5 dB"""
+    if strike is None or ATTACK is None:
         return y
-    return space.room(y, c.room('room'), amount=c.space if 'space' in ax else 0.0, r=r)
+    now = crest(y, at)
+    if now is None or strike - now <= ATTACK:
+        return y
+    n = dsp.n_of(0.022)
+    mono = np.asarray(y)[at:at + n].mean(axis=1)
+    p = at + int(np.argmax(np.abs(mono)))
+    h = dsp.n_of(ATTACK_MS / 1000) // 2
+    w = np.zeros(len(y))
+    lo, hi = max(p - h, 0), min(p + h + 1, len(y))
+    w[lo:hi] = np.hanning(2 * h + 1)[lo - (p - h):hi - (p - h)]
+    lo_g, hi_g = 1.0, 10 ** (min(strike - now, ATTACK_MAX) / 4)
+    for _ in range(24):                  # the smallest bell that brings the crest back within ATTACK - 0.02 dB
+        g = 0.5 * (lo_g + hi_g)
+        if strike - crest(y * (1 + (g - 1) * w)[:, None], at) > ATTACK - 0.02:
+            lo_g = g
+        else:
+            hi_g = g
+    g = min(hi_g, 10 ** (ATTACK_MAX / 20))
+    return y * (1 + (g - 1) * w)[:, None]
 
 
 def body(y):
