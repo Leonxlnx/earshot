@@ -46,11 +46,12 @@ sound is, then its character.
 | group | designs | how it is made | examples |
 |---|---|---|---|
 | learned things | 153 | learned from 364 recorded events in the public domain | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
-| interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba) | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
+| interface | 25 | things a hand does, built from learned recordings: a key, a rocker switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper; no note | `keyboard/mechanical`, `toggle/rocker_on`, `next/page`, `notify/knock`, `success/click`, `error/thud` |
+| interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba); for interfaces only when the words ask for music or a theme is named | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 31 | 12 learned from real textures, 19 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
 | chip | 24 | the channels of 8-bit consoles, band-limited | `coin/chip`, `jump/chip`, `laser/chip`, `explosion/chip` |
 | drums | 40 | 33 played from 130 recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented (drum-machine voices, a brush snare, a finger snap, stick counts) | `kick/soft`, `snare/tight`, `hat/closed`, `conga/muted`, `darbuka/hit`, `drum/roll`; `kick/electro` |
-| film and motion | 39 | 23 layered from learned film recordings (orchestral drums, timpani, tam-tams, cymbals, swells, rolls, low brass, real whooshes); 16 small ones invented (pops, tocks, glints, a glitch, key ticks) | `whoosh/fast`, `boom/deep`, `rise/reverse`, `braam/brass`, `explosion/huge`; `pop/soft` |
+| film and motion | 39 | 23 built from learned recordings as motion films use them: short dry hits (a heavy bag dropped on a real explosion's low end), low thumps, bright ticks, whooshes and risers of real air, a tape stop, a braam of real brass; 16 small ones invented (pops, tocks, glints, key ticks) | `slam/title`, `boom/short`, `thump/appear`, `tick/soft`, `whoosh/soft`, `rise/air`, `hit/drop`; `pop/soft` |
 | action and objects | 83 | invented from physics | `jump/soft`, `hit/punch`, `coin/drop`, `paper/tear`, `bell/desk` |
 | notes, synthesizer | 51, 14 | real instruments learned note by note (marimba, harp, pizzicato, upright piano), struck and string models, synth patches | `note/kalimba`, `pad/warm`, `braam/hit` |
 | music loops | 3 | a small grammar of harmony and feel | `bed/warm`, `bed/playful`, `bed/8bit` |
@@ -119,12 +120,13 @@ in the public domain.
 ### Themes and sets
 
 A theme is what makes a product's sounds one family: one voice, one key, one room and offsets on the axes, shared by
-every design that honours them. Presets: `soft` (a real marimba played softly, the default of product UI), `glass`
+every design that honours them. Presets: `soft` (a real marimba played softly, the default of the figures), `glass`
 (glockenspiel), `wood` (a real marimba, pentatonic in G), `felt` (a real upright piano played softly), `tine`
 (kalimba), `metal` (vibraphone), `electric` (electric piano), `digital` (glass pluck), `retro` (square lead); a dict
-changes one (`{"base": "wood", "key": "D"}`). Figures play the real marimba unless a request or a theme names
-another voice (`--voice harp`, "on a harp", "with pizzicato strings", "on a soft piano"): a bell or a glass timbre
-only when asked. A few game figures keep the voice they were written for (`coin/bright`: a glockenspiel).
+changes one (`{"base": "wood", "key": "D"}`). An interface or motion request gets no notes unless its words ask
+for music (an instrument, a chime, a jingle, a melody) or a theme is named. Figures play the real marimba unless a
+request or a theme names another voice (`--voice harp`, "on a harp", "with pizzicato strings", "on a soft
+piano"): a bell or a glass timbre only when asked. A few game figures keep the voice they were written for (`coin/bright`: a glockenspiel).
 
 The real instruments (`earshot/synth/played.py`) are a marimba with yarn mallets, a harp, pizzicato strings (a cello
 section up to B4, a solo violin above) and an upright piano played softly (the voice `felt_piano`): 97 single notes
@@ -134,11 +136,15 @@ on under the next one, the last rings out, and a figure whose top note lies abov
 A ready-made set makes the sounds a kind of product needs in one call with a `manifest.json`: `ui` (17 interface
 sounds), `game` (22: menus, rewards, jingles, actions), `arcade` (16 chip sounds), `film` (17 motion-design sounds).
 Every one-shot of a set is as loud as it is made alone and only turned down so that none lies more than 2.5 dB over
-the quietest (by its loudest 50 ms; `hover` in `ui` sits just under); loops and beds are levelled by kind. In `ui`
-the touches (tap, hover, the two toggles, typing, next and back) are real keys, a leather touch and a lamp switch,
-each the recording chosen for its role; the signals (open, close, send, receive, notify, success, complete,
-warning, error, delete) are tonal figures on the real marimba. A JSON spec adds to a set or describes your own (`earshot make --spec sounds.json`,
-MCP `make_set`).
+the quietest (by its loudest 50 ms; `hover` in `ui` sits just under); loops and beds are levelled by kind. Every
+role of `ui` is a normal sound, a thing a hand does: tap a mechanical key, hover a fingertip barely touching wood,
+the toggles a rocker switch (on smaller and brighter, off bigger and duller), type a desktop key, next and back a
+page flicked forward and dropped back, open and close a pen cap with air let out or drawn in, send a stick swung
+through the air, receive a pop of the lips, notify two light knocks, success a pen clicked in two parts, complete
+a stapler, warning two firm knocks on a door, error two dull thuds of a bag, delete paper crumpled. A plain
+interface request in words ("a success sound", "toggle dark mode") gets the same; the tonal figures play only when
+the words ask for music or a theme is named. A JSON spec adds to a set or describes your own (`earshot make --spec
+sounds.json`, MCP `make_set`).
 
 ```
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
@@ -204,9 +210,9 @@ asked for, damped like a player damps it.
 loud it is and which recording plays it; never the same recording twice in a row, never on a grid.
 
 **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are takes of
-130 recorded strokes (VCSL and Karoryfer) through the learned-sound engine; the seed walks through a drum's strokes
-and `energy` picks softer or harder ones. The drum-machine voices, the brush snare, the finger snap and the stick
-count are invented (`earshot/synth/drums.py`: a beater's contact, modes, wires and jingles as collisions).
+130 recorded strokes (VCSL, Karoryfer, and one person clapping for the hand clap) through the learned-sound
+engine; the seed walks through a drum's strokes and `energy` picks softer or harder ones. The drum-machine voices,
+the brush snare, the finger snap and the stick count are invented (`earshot/synth/drums.py`: a beater's contact, modes, wires and jingles as collisions).
 
 **Chip** (`chip.py`): pulse, triangle, noise and wavetable channels with every level step band-limited.
 

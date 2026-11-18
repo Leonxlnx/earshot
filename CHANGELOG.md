@@ -5,9 +5,9 @@
 earshot makes sounds. An agent asks for a sound in words and earshot renders a new take of a design from its
 catalogue, with no model and no network: interface sounds, everyday foley, ambience beds, game sounds, chip sound,
 drums, motion-design effects and three short music loops, one at a time or as a family with a sprite for the web.
-Realistic things (everyday sounds, the interface touches, ambiences, the acoustic drums) are learned from recordings
-in the public domain and kept as numbers, not audio, and computed anew at every request; tonal figures, chip sound
-and the music loops are written in code. The yardstick for what was kept is the owner's listening, 1 to 5 on six pages, not earshot's own
+Realistic things (everyday sounds, the interface sounds, the motion effects, ambiences, the acoustic drums) are
+learned from recordings in the public domain and kept as numbers, not audio, and computed anew at every request;
+tonal figures, chip sound and the music loops are written in code. The yardstick for what was kept is the owner's listening, 1 to 5 on six pages, not earshot's own
 listening models, which did not predict his ratings ([docs/VALIDATION.md](docs/VALIDATION.md#the-owners-listening)).
 Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. No new required dependencies.
 
@@ -36,15 +36,20 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design answers only a request that names its thing and wins a tie with an invented one. Why: the owner gave a
   recording and its renders the same rating on all 24 rows of his test, and rated sounds invented from formulas for
   real things 1-2 of 5.
+- Animals, people without words, street, house, desk and sport sounds are recordings now (44 designs: a dog barking).
 - **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
   beds from 12 BigSoundBank textures (5.42 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
   `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
   `underwater/deep`, `rain/street`, `wind/trees`. Takes of the texture's models are cut into pieces and stitched
   where the texture is in a similar state, so a bed plays for any length without a loop point. `rain/window`,
   `forest/morning` and the other scenes are made from rules.
-- **The interface set from real keys and switches**: in `make --set ui` (17 sounds) the tap, hover, toggles,
-  typing, next and back are learned keyboards, a leather touch and a lamp switch; the signals are tonal figures on
-  the real marimba. No bell or glass timbre unless a request or a theme asks for one.
+- **Interface sounds without instruments** (`earshot/sounds/interface.py`): the seventeen roles of `make --set ui`
+  are things a hand does, built from learned recordings: tap a mechanical key, hover a fingertip on wood, the
+  toggles a rocker switch (on smaller and brighter, off bigger and duller), type a desktop key, next and back a
+  page flicked forward and dropped back, open and close a pen cap with air, send a stick through the air, receive
+  a pop of the lips, notify two light knocks, success a pen click in two parts, complete a stapler, warning two
+  firm knocks, error two dull thuds of a bag, delete crumpled paper; nine more candidates by name. A request for an
+  interface job gets the same; the tonal figures answer only when the words ask for music or a theme is named.
 - **The best recording plays first** (`earshot/sounds/learned.py`, `walk` in `earshot/data/resyn/index.json`): a
   learned design's seeds walk its recordings from the one with the best listening score down; a recording scored 1
   of 5 is left out of the walk; a take that fails its audit is rendered again from the same recording.
@@ -77,28 +82,23 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, `earshot/synth/drums.py`): 40 designs in 21
   families. The acoustic kit and the hand percussion (33: kicks, snares, rims, toms, hi-hats, crashes, a ride,
   claps, shaker, tambourine, congas, bongos, cajon, darbuka, frame drum, clave, cabasa, slapstick, a snare roll and a
-  shaker roll) are takes of 130 recorded strokes in the public domain (VCSL and Karoryfer, 1.31 MB of numbers): the
-  seed walks through a design's strokes and `energy` picks softer or harder ones. Still invented: `kick/electro`,
+  shaker roll) are takes of 130 recorded strokes in the public domain (VCSL, Karoryfer and, for the hand claps, one
+  person clapping on Freesound; 1.31 MB of numbers): the seed walks through a design's strokes and `energy` picks
+  softer or harder ones. Still invented: `kick/electro`,
   `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count`. New:
   `conga/muted`, `bongo/low`, `darbuka/hit`, `frame_drum/deep`, `cabasa/hit`, `slapstick/crack`; removed:
   `ride/bell`, `cymbal/swell`, `conga/slap`, `cajon/slap`. The owner rated the drums invented from physics 1-2
   ("big problems, does not sound good"); the recorded ones are not rated yet.
 - **Film and motion sounds** (`earshot/sounds/motion.py`, `earshot/synth/design.py`): 39 designs. 23 are built
-  the way a sound designer layers them, from 21 learned film things (66 recordings in the public domain: orchestral
-  bass drums, timpani, tam-tams, crash cymbals, heavy drops, a door slam, swells of air, cymbal and gong, drum and
-  timpani rolls, low brass, deep, airy and fast whooshes, passes, thunder) reversed, moved, faded and glued by one
-  room: `whoosh/fast`, `whoosh/soft`, `whoosh/deep`, `whoosh/long`, `swoosh/in`, `swoosh/out`, `flick/thin`,
-  `flick/paper`, `pass/air`, `boom/deep`, `boom/short`, `boom/wide`, `slam/title`, `impact/suck`, `rise/reverse`,
-  `rise/air`, `rise/tension`, `suck/in`, `fall/air`, `fall/sub`, `sting/reveal`, `braam/brass`, `explosion/huge`.
-  16 small ones stay invented (pops, tocks, a blip, a glint, a shimmer sweep, a sparkle, a glitch, key ticks, a
-  sliding panel, a soft thump and knock, the soft sting). Removed: `whoosh/tonal`, `sting/tech` and the invented
-  `whoosh/airy` (the id is now the learned airy whoosh). The owner rated the invented film sounds 1-3 of 5; the
-  ones built from recordings are not rated yet. A film request for a cymbal gets the film's crash cymbal, a request
-  with a word of the drum kit the kit's. Rebuilt closer and drier: `whoosh/fast` is the recorded stick swoosh as
-  it is, close and dry; `rise/air` the decays of two real cymbal strokes played backwards, growing to the cut (the
-  steam riser is gone); `boom/deep` the low end of a real deep kick with a close explosion's low end under it, close
-  and dry; `slam/title` the front of a real heavy impact on that low end, 0.9 s; `braam/brass` and `impact/suck`
-  over the same low end without the hall.
+  the way a sound designer layers them, from 21 learned film things (66 recordings in the public domain: heavy
+  drops, car doors and boots slammed, explosions, swells of air, breaths and flames, drum and timpani rolls, low
+  brass, deep, airy and fast whooshes, passes, thunder, orchestral drums, tam-tams and cymbals) and the drum
+  store's strokes, reversed, stretched, layered, faded and glued by one room, following measurements of
+  professional motion videos (short, dry, near mono, low or very bright). 16 small ones stay invented (pops,
+  tocks, a blip, a glint, a shimmer sweep, a sparkle, key ticks, a sliding panel, a soft knock, the soft sting).
+  Removed: `whoosh/tonal`, `sting/tech` and the invented `whoosh/airy` (the id is now the learned airy whoosh).
+  The owner rated the earlier film sounds 1-3 of 5 (the fast whoosh 4); the rebuilt ones are not rated yet. A
+  film request for a cymbal gets the film's crash cymbal, a request with a word of the drum kit the kit's.
 - **Invented and learned twins** (`lexicon.TWINS`): 22 invented designs of real things have a learned design of
   the same thing (`knock/door` and `door/knock`, `coins/handful` and `coins/floor`, `paper/tear` and `paper/rip`
   ...); a request that names the thing gets the learned one, the invented one answers to its id. A single coin
@@ -177,8 +177,9 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **CI** (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
 - **Motion effects as motion films use them**, all from recordings: a 50 ms low thump for something appearing
-  (`thump/appear`), short dry hits of real car doors and boots slammed shut with a swell of air into them under a
-  title (`slam/title`) and a logo (`boom/short`, `boom/deep`, `sting/reveal`), the hit after a stop (`hit/drop`;
+  (`thump/appear`), short dry hits of a heavy bag dropped on a real explosion's low end with a swell of air into
+  them under a title (`slam/title`) and a logo (`boom/short`, `boom/deep`, `sting/reveal`; the car-door build by
+  name: `slam/door`, `boom/door`), the hit after a stop (`hit/drop`;
   "a drop" in a film), a big far explosion that rolls (`explosion/far`), a bright click (`tick/soft`),
   whooshes and risers of plain air that keep the length asked for, a glitch cut from real buzzes and clicks, a shine
   of air (`shine/air`), a tape stop of a real roll running down (`stop/tape`); a motion job gets no instrument note
@@ -186,8 +187,6 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 
 ### Changed
 
-- **The `ui` set and plain interface requests are real things** (a switch, a page, knocks; `sounds/interface.py`);
-  figures on instruments answer only musical words or a named theme.
 - **The README** puts making first and listening second; the 0.4 and 0.3 notes moved to a short history.
 - **Package metadata**: version 1.0.0, development status Beta, a description and keywords for both halves; the
   learned models, textures and their credits ship as package data.
@@ -196,46 +195,75 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `forge`) belongs to whoever rendered it: free for any use, commercial too, without credit. The README says so.
   The learned material comes from CC0 recordings, credited in `earshot/data/resyn/CREDITS.md`,
   `earshot/data/textures/CREDITS.md`, `earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
-- **A learned take says "recording 2 of 3"**, in the lines, `meta['member']`, a performance and the manifest, never
-  the title an uploader gave the recording; titles stay in the stores' indexes and `CREDITS.md`.
-- **An asked length holds for ambiences**: "rain on a window, 4 seconds" is 4 s, a cut with fades that says it is
-  no loop and how long the shortest seamless loop is; with "loop" or "seamless" in the request the shortest loop
-  stays and the answer says so; a music loop says it keeps whole bars.
-- **`not used by this sound: ...` is gone**: a control the request did not ask for in words is never listed (the
-  "fast" of "a fast whoosh" named the design); one that was asked and cannot be followed is said in plain words
-  (`not followed: "slow"; this sound has no control of its speed ...`, `0.43 s, not the 2 s asked ...`).
-- **A counted action in a row is one file for any design**: "four knocks on the table", "three claps", "a
-  countdown 3 2 1" play that many events in one file, each a new seed, in the knock, walk, row or count pattern;
-  "five coin pickups" and "3 variations" stay that many files.
-- **The action form of a row word is the action**: "clapping", "clicking", "beeping" play six to nine events at
-  the row's pace (about 2 to 3 s), "clapping, 4 seconds" claps over 4 s, "knocking" is the recorded door knock.
-- **A length holds for scattered and shaken actions**: "ice cubes in a glass, 3 seconds" settles over 3 s, a chain
-  rattles on; a thing played from a recording of the whole action plays its busiest stretch of the length asked,
-  unwarped, or says the recording is shorter ("coins dropping, 3 seconds").
-- **A design named inside its family wins over the family's default**: "tape stop" is `downlifter/tape`, no
-  longer `fall/air`.
-- **`fire/camp` keeps every crackle**: its recording is learned again with a model onset at each crackle (30 per
-  second, not 24 per chunk), and its two sides are two takes that share the crackles (no all-pass decorrelator).
-- **`waves/sand` is learned from "Small Waves, Froth and Beach"** (BigSoundBank, CC0, taken at 10 cm), its takes
-  without redrawn grain, so the foam keeps its bubbles; a loop of waves starts as a wave rises, not in a trough.
-- **`wind/trees` is learned from "Wind in a cornfield"** (BigSoundBank, CC0): dry leaves rustling at 2-10 kHz that
-  swell with each gust, in place of the wind model of the texture engine.
-- **`rain/window` drops the gutter's bubble**: the one tonal, regular drip in it; the rest is the same rain.
-- **Stitched waves are played whole** (`quilt`): each joins where its chunk was cut, not at a quiet moment inside its wash,
-  so a bed of waves is not resampled (lower and slower) to fill its length.
-- **Knocks on a table are real knuckles on a wooden table** (`knock/table`): "four knocks on the table",
-  "a knock on the desk".
-- **A single knock on a door is one whole knuckle knock with the door's body** (`door/knock` plays it first).
-- **Footsteps on tiles are hard shoes on a tiled floor, footsteps on concrete hard shoes on stone** (`step/tile`,
-  `step/concrete`).
-- **A walk alternates two alike steps** (pattern `feet`): one session, loudness, brightness and length close, no limp.
-- **A walk on gravel is heard from standing height** (pattern `far`): a little less of the closest crunch.
-- **A light switch, a punch and a book slammed shut play new close, dry recordings first** (`switch/wall`,
-  `punch/body`, `book/shut`).
-- **A tap outside an interface is a fingertip on a table** (`tap/fingertip`): "two taps", "a tap on the table";
-  "a tap" stays a key.
-- **A bunch of keys plays a recording of metal keys first** (`keys/bunch`).
-- **The second drum roll plays last** (`roll/drum`): the engine clicks at one of its onsets.
+
+The changes of the last two days, in the order they were built:
+
+- A design of the same name stands in for a request only when its family is the job asked for ("a deep impact" no
+  longer reaches `kick/deep`).
+- Seed 0 of a learned design plays its best recording; a set's one-shots are made as loud as alone and only balanced
+  by gain.
+- Tonal figures are played on real instruments learned note by note: marimba, harp, pizzicato strings, an upright
+  piano.
+- Everyday things answer with the action a person performs (a walk, knocking, typing) when the words ask for it;
+  `events` sets it.
+- The fast whoosh is the recorded stick swoosh as it is; the interface figures sit between A3 and G5; the chip
+  power-up starts a fifth lower.
+- A typing run on a keyboard with few recordings borrows the other keyboards' keys and keeps the space bar for the
+  pauses.
+- An instrument named after a job chooses the voice ("a success sound on a soft piano"); `make` over MCP takes
+  `events`.
+- A note is levelled as it is played, so a run of notes has no jump in level between neighbours.
+- A tonal figure asked shorter than it rings keeps its spacing and is damped by the hand to end at that length.
+- Three pizzicato C5 takes without a steady pitch left the notes store; every remaining note plays within 5 cents.
+- The source archive carries the changelog, the docs, the plugin's files and the tests' own files; numba is declared.
+- A request for a thing no design is answers "earshot makes no X"; "five coin pickups" is five takes.
+- An asked length holds for ambiences: shorter than the shortest seamless loop it is a cut with fades that says so.
+- `not used by this sound` is gone: only a control asked for in words that the sound cannot follow is named, in plain
+  words.
+- A counted action in a row ("four knocks on the table", "three claps", "a countdown 3 2 1") is one file for any
+  one-shot.
+- A design named inside its family wins over the family's default ("tape stop").
+- A learned take says "recording 2 of 3", never the title of its source recording; titles stay in the indexes and
+  credits.
+- A length asked with a count is the file's length, the events spread over it at a pace a hand keeps.
+- The action form of a row word is the action: "clapping", "clicking", "beeping" are a row; "clapping, 4 seconds"
+  claps for 4 s.
+- Scattered and shaken actions keep an asked length; a recording of a whole action plays its busiest stretch of that
+  length.
+- A recording that passes its audit plays first; the last event of a walk or a row rings out before the length asked.
+- The `ui` set and plain interface requests are normal sounds, things a hand does (`sounds/interface.py`); no
+  instrument.
+- Instruments answer an interface request only when its words ask for music (an instrument, a chime, a jingle, a
+  melody) or a theme is named.
+- The skill says which moments of a motion video get which sound, from measurements of 39 professional motion videos.
+- `fire/camp` keeps every crackle: learned with an onset at each, its two sides two takes that share them.
+- `waves/sand` is learned from a recording at the water's edge and keeps its foam; waves are joined where they were
+  cut.
+- `wind/trees` is learned from wind through a field of dry leaves ("Wind in a cornfield", BigSoundBank, CC0).
+- `rain/window` drops the gutter's ringing drip, the one tonal, regular sound in it.
+- Motion sounds are the short, dry, low things motion videos use: a 50 ms thump (`thump/appear`), a bright tick
+  (`tick/soft`), whooshes of air.
+- A motion request gets no design made of notes unless its words ask for music or for a game.
+- A whoosh holds an asked length, a riser is real air played backwards to a clean cut, a tape stop a real roll run
+  down to a halt (`stop/tape`).
+- A fire whoosh plays a real burst of flame first.
+- The title hit, the logo hit, the booms and the hit after a stop are heavy real things slammed, no drum stroke left.
+- "An explosion far away" plays a long rolling blast first (`explosion/far`).
+- In a film or video "a drop" is the hit after the silence (`hit/drop`); "pops in on screen" is the thump; "a soft
+  swish" is real air.
+- The default title and logo hits are a heavy bag dropped on a real explosion's low end with real air into them;
+  `slam/door` and `boom/door` keep a car door's build.
+- Knocks on a table are real knuckles on a wooden table (`knock/table`).
+- A single knock on a door is one whole knuckle knock with the door's body (`door/knock` plays it first).
+- Footsteps on tiles are hard shoes on a tiled floor, footsteps on concrete hard shoes on stone.
+- A walk alternates the two single steps of a surface that are most alike, so it does not limp.
+- A walk on gravel is heard from standing height.
+- A light switch, a punch and a book slammed shut play new close, dry recordings first.
+- A tap outside an interface is a fingertip on a table (`tap/fingertip`); "a tap" stays a key.
+- A bunch of keys plays a recording of metal keys first.
+- The second drum roll recording plays last: the engine clicks at one of its onsets.
+- A hand clap is a single clap of one person clapping (`clap/hands`, from "Solo Clap" on Freesound, CC0); "three
+  claps" and "clapping" play it.
 
 ### Fixed
 

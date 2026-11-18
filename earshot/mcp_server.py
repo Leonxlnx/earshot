@@ -670,20 +670,23 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
               full: Full = False) -> str:
     """Make a sound in code from a request in words and write it to a file (no models, about a second; nothing is
     downloaded). Every sound is computed at request time: the realistic ones (everyday things, footsteps, doors,
-    keys and switches, ambiences, drums) are rendered from models learned from public-domain recordings, shipped
-    as numbers, no audio file; figures, chip sound and the music loops are invented in code. Covers interface sounds
-    (taps, toggles, success, error, notifications), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit),
-    everyday foley, motion-design effects (whooshes, impacts, risers, braams, logos), drums, instrument notes and
-    ambience loops. A learned design's seeds walk through its recordings, so `n` gives different real takes; the
-    best recording of a thing plays first. Tonal figures are played on real instruments learned note by note
-    (marimba by default; harp, pizzicato strings and felt_piano, an upright piano, by `voice`). A thing a person
+    keys and switches, interface sounds, motion effects, ambiences, drums) are rendered from models learned from
+    public-domain recordings, shipped as numbers, no audio file; figures, chip sound and the music loops are invented
+    in code. Covers interface sounds (taps, toggles, success, error, notifications: things a hand does, no
+    instrument), game sounds (coins, jumps, hits, explosions, fanfares, 8-bit), everyday foley, motion-design
+    effects as motion videos use them (short dry hits under a title or a logo, thumps, ticks, whooshes and risers of
+    air), drums, instrument notes and ambience loops. An interface or motion request gets no notes unless its words
+    ask for music (an instrument, a chime, a jingle, a melody) or a game sound. A learned design's seeds walk through its
+    recordings, so `n` gives different real takes ("recording 2 of 3" says which); the best recording of a thing
+    plays first. Tonal figures are played on real instruments learned note by note (marimba by default; harp,
+    pizzicato strings and felt_piano, an upright piano, by `voice`). A thing a person
     does in a row is played as that action when the words ask for it ("footsteps on gravel", "knocking", "typing")
     and as one event otherwise ("a footstep"); `events` sets it. A counted action done in a row ("four knocks on
     the table", "three claps", "a countdown 3 2 1") is one file of that many events, whatever the design; a length
     asked with it ("three knocks, 2 seconds", "footsteps, 5 seconds") is the file's length, the events spread over
     it at a pace a person keeps; a count of separate things ("five coin pickups", "3 variations") is that many
-    files. The answer names the design chosen
-    and why, what else would fit (`also`), and any words that were not understood, so one call is usually enough;
+    files. The answer names the design chosen and why, what else would fit (`also`), and any words that were not
+    understood, so one call is usually enough; a thing in no design is an error that says "earshot makes no ...";
     call again with
     `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. Use it
     whenever a product, a game or a film needs a sound and no recording is at hand; use make_set when it needs
@@ -698,9 +701,10 @@ def set_help():
     """the description of make_set's `set`, with each set's size counted from earshot.sounds.sets"""
     from .sounds import sets
     n = {k: len(v['sounds']) for k, v in sets.SETS.items()}
-    return (f'a ready-made set: "ui" ({n["ui"]} interface sounds: real keys and switches for the touches, soft '
-            f'tonal figures for the signals), "game" ({n["game"]}: menus, rewards, jingles, actions), "arcade" '
-            f'({n["arcade"]} chip sounds), "film" ({n["film"]}: a motion-design starter)')
+    return (f'a ready-made set: "ui" ({n["ui"]} interface sounds, each a normal thing a hand does: a key, a switch, '
+            f'a page, knocks, a pen click; with a theme: tonal figures in its voice), "game" ({n["game"]}: menus, '
+            f'rewards, jingles, actions), "arcade" ({n["arcade"]} chip sounds), "film" ({n["film"]}: a '
+            f'motion-design starter)')
 
 
 def tool_make_set(out: Annotated[str, Field(description='absolute path of the folder for the files and '

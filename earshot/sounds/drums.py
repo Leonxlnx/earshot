@@ -6,8 +6,9 @@ Why recordings. A drum is its detail: the stick's exact strike, the head's pitch
 wires answering the bottom head, a cymbal's wash opening up. Invented from physics these scored 1-2 of 5 in listening
 tests, while a take out of earshot.synth.resyn is heard as the recording itself. So a drum here is one THING
 (`snare/tight`, `tom/floor`) and its recordings are its members: public-domain one-shots played by drummers in
-velocity layers (Versilian Community Sample Library, Karoryfer Big Rusty Drums; CC0), kept as a few kilobytes of
-numbers each (never audio) in earshot/data/drums/ and played as new takes.
+velocity layers (Versilian Community Sample Library, Karoryfer Big Rusty Drums; CC0) and, for `clap/hands`, single
+claps cut out of a recording of one person clapping (Freesound; CC0), kept as a few kilobytes of numbers each (never
+audio) in earshot/data/drums/ and played as new takes.
 
 How a take is chosen and played (take()):
     energy   how hard it is played: the members are stored softest first with their velocity within their

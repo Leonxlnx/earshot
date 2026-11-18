@@ -1,7 +1,7 @@
 {
   "name": "earshot",
   "version": "1.0.0",
-  "description": "Make sound effects, interface figures on real instruments, everyday foley, drums and ambience from a request in words (computed at request time; the realistic ones from models learned from public-domain recordings, no audio shipped), and describe, match, measure and critique sound an agent cannot hear.",
+  "description": "Make sound effects for interfaces, motion videos, games and films, everyday foley, drums and ambience from a request in words (computed at request time; the realistic ones from models learned from public-domain recordings, no audio shipped), and describe, match, measure and critique sound an agent cannot hear.",
   "author": {
     "name": "Leon Lin"
   },

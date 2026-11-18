@@ -14,13 +14,16 @@ complete on its own.
 footsteps on eight surfaces, doors, drawers, locks, switches, keyboards, a mouse click, a camera shutter, cloth,
 paper, books, glass, ice, water, metal, swings, punches, falls, explosions ...) and 12 ambience beds learned from
 real textures (fire, three shores, crickets, a brook, a cafe, a street, distant city, room tone, underwater, rain on
-a terrace). The acoustic drum kit and hand percussion are learned too (130 recorded strokes; seeds walk through a
-drum's strokes, `energy` picks softer or harder ones), and so are the instruments that play the tonal figures: a
-marimba (the default), a harp, pizzicato strings and an upright piano (`felt_piano`), 97 recorded single notes.
-Only numbers ship, no audio file: every sound is computed when it is asked for. Written in code: the figures
-themselves (success, error, notify, coin, level up: the notes, their timing and the room), chip sound, the
-drum-machine voices, a brush snare, a finger snap and stick counts, rain on a window, wind in trees and a forest,
-the other instruments' notes, pads, three music loops, and the film bank.
+a terrace, wind in dry leaves). The interface sounds are things a hand does, from those recordings: a key, a rocker
+switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper. The film and motion
+effects are short, dry hits, thumps, ticks and whooshes of air built from recordings. The acoustic drum kit and hand
+percussion are learned too (130 recorded strokes; seeds walk through a drum's strokes, `energy` picks softer or
+harder ones), and so are the instruments that play the tonal figures when music is asked for: a marimba (the
+default voice), a harp, pizzicato strings and an upright piano (`felt_piano`), 97 recorded single notes. Only
+numbers ship, no audio file: every sound is computed when it is asked for. Written in code: the figures themselves
+(success, error, notify, coin, level up: the notes, their timing and the room), chip sound, the drum-machine voices,
+a brush snare, a finger snap and stick counts, rain on a window and a forest, the other instruments' notes, pads,
+three music loops, and the film bank.
 Realistic things that no one recorded (jumps, magic, game hits) are invented designs and were rated low by the
 owner: prefer a learned thing when one fits.
 
@@ -39,10 +42,16 @@ owner: prefer a learned thing when one fits.
 3. The catalogue, only when a pick was wrong and `also` does not help: `earshot sounds --search WORDS` (top 20) or
    `--family step`, then `--sound ID`. Never list the whole catalogue (hundreds of lines).
 
-**The ready-made sets.** `ui` (17): tap, hover, two toggles, type, next and back are real keys and switches; open,
-close, send, receive, notify, success, complete, warning, error, delete are figures on the real marimba. Under toggle_off
-and next the line `another recording of ... than toggle_on` (`than back`) says the pair are two recordings of one
-learned switch or keyboard design, as meant.
+**The ready-made sets.** `ui` (17), every role a normal sound, no instrument: tap a mechanical key
+(keyboard/mechanical), hover a fingertip barely touching wood (hover/fingertip), toggle_on and toggle_off a rocker
+switch (toggle/rocker_on smaller and brighter, toggle/rocker_off bigger and duller), type a desktop key (type/key),
+next and back a page flicked forward and dropped back (next/page, back/page), open a pen cap pulled and air let out
+(open/air), close air drawn in onto the cap (close/air), send a stick swung through the air (send/swoosh), receive a
+pop of the lips (receive/pop), notify two light knocks (notify/knock), success a pen clicked in two parts
+(success/click), complete a stapler pressed down (complete/stamp), warning two firm knocks on a door
+(warning/knock), error two dull thuds of a bag (error/thud), delete paper crumpled (delete/crumple). A request for
+one of these jobs in words gets the same design. With a theme named, `ui` plays the tonal figures in that theme's
+voice instead.
 `game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
 learned ones in a spec where a real sound matters, e.g. `{"name": "door", "sound": "door/shut"}`), `arcade` (16 chip
 sounds), `film` (motion-design starter; whooshes, hits and risers layered from learned film recordings).
@@ -51,11 +60,12 @@ sounds), `film` (motion-design starter; whooshes, hits and risers layered from l
 `"a footstep on gravel"`, `"a wooden drawer closing"`, `"a camera shutter"`, `"a soft success chime for a finance
 app"`, `"coin pickup, 8-bit"`, `"waves on a beach, 30 seconds"`, `"a wooden notification, 400 ms, in D minor"`.
 A learned sound answers only when its thing is named: "a heavy impact" gets an invented boom, "a dumbbell dropped"
-the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". An instrument named as the
-player sets the voice of a figure: "a notification on a harp", "a success sound with pizzicato strings", "an error
-sound on a soft piano" (or `voice`: marimba, harp, pizzicato, felt_piano, kalimba, glockenspiel ...); a theme sets
-one voice for many calls. A material picks the voice of a tonal sound (wooden: marimba); a bell or glass timbre only
-when you ask for one.
+the recording. Feelings: "softer", "darker", "bigger", "longer", "drier", "not harsh". Interface and motion
+requests get normal sounds; notes on an instrument answer only when the words ask for music (an instrument, a
+chime, a jingle, a melody, a motif) or for chip sound. An instrument named as the player sets the voice of a
+figure: "a notification on a harp", "a success sound with pizzicato strings", "an error sound on a soft piano" (or
+`voice`: marimba, harp, pizzicato, felt_piano, kalimba, glockenspiel ...); a theme sets one voice for many calls. A
+material picks the voice of a tonal sound (wooden: marimba); a bell or glass timbre only when you ask for one.
 **One event or the action.** A thing a person does several times in a row (footsteps, knocking, typing, coins,
 keys, clinking glasses) is played as the action when the words ask for it: "footsteps on gravel", "knocking",
 "three knocks", "typing on a keyboard", "5 seconds of typing". "a footstep on gravel" or "a single knock on a door"
@@ -96,6 +106,10 @@ of different recordings differ in length and level. `--json` gives the number of
 - `3 knocks 1.5 s apart: 3.25 s, not the 10 s asked (...)`: a counted action could not fill the length at a pace a
   person keeps (or a countdown at one a second); the file is as long as the line says.
 - `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
+- an error `no sound in the catalogue answers '...' (earshot makes no THING): ...`: there is no such thing; say so
+  and offer the nearest thing `earshot sounds --search` finds, never a stand-in passed off as the thing.
+- `recording 2 of 3` (in `--json` `member`, a performance and the manifest): which of a learned design's recordings
+  played; the recording's own title is only in the store's `CREDITS.md`.
 - `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
 
 **Formats.** The extension picks it (wav, flac, ogg, webm, mp3, m4a; all but wav and flac need ffmpeg). Web:
@@ -109,11 +123,12 @@ renders in about 1-2 s per second of sound: a 30 s bed takes up to a minute.
 (20-40 s). Use it only when a describe-the-sound request came back as a guess.
 
 **What not to expect.** No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for
-sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded. The film sounds
-(whooshes, booms, risers, falls, the braam) are layered from learned recordings; the owner rated the fast whoosh
-4 of 5, the deep whoosh and the braam 3 to 3.5, the boom, title slam, riser, tape stop and suck-in impact 1 to 2;
-the invented film sounds they replace, the drums invented from physics and the invented realistic sounds were rated low
-by the owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
+sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded: the answer is an
+error that says so (often "earshot makes no X"). The film and motion sounds (whooshes, hits, thumps, ticks,
+risers, the braam) are built from learned recordings; the owner rated the fast whoosh 4 of 5 and the deep whoosh
+and the braam 3 to 3.5; the hits, thumps, risers, the tape stop and the suck-in impact were rebuilt after his
+ratings and are not rated yet. The drums invented from physics and the invented realistic sounds were rated low by
+the owner. Do not say how a made sound sounds beyond its descriptions: no one but the owner has listened, and earshot's
 models did not predict his ratings. Say plainly that a learned sound is a new take of a public-domain recording,
 not a sound invented from nothing.
 
@@ -127,26 +142,29 @@ practice they did not test.
 - What gets a sound, and what to ask for (each phrase checked with the reader today):
   - a stop: the most used move [measured: 47 in 16 videos]. Cut the music and everything for 0.15 to 0.5 s just
     before a reveal or a title, then come back on a hit. It is an edit of the bed, not a file.
+  - the hit after the stop: ask "an impact after silence" or "a drop in the video" (hit/drop, about 0.25 s: a
+    heavy body with a puff of air).
   - something appears or a card flips: a short low thump, about 50 ms, 130 to 320 Hz, dry [measured].
-    Ask "a soft thump" (thump/soft, 0.14 s; trim its tail to about 0.1 s). In a run, one per element, about
-    200 ms apart.
+    Ask "a pop when an element appears", "a card flip" or "an element pops in on screen" (thump/appear, 0.06 s);
+    "a soft thump" (thump/soft, 0.09 s) for something landing. In a run, one per element, about 200 ms apart.
   - a UI click, a cursor press, a word highlighted: a bright dry tick, 7 to 10 kHz, nothing under 1 kHz, mono, a
-    few tens of ms [measured]. Ask "a mouse click" (click/mouse, in range). Avoid "a soft ui tick": it plays a
-    metal tick that rings.
+    few tens of ms [measured]. Ask "a cursor click" or "a soft ui tick" (tick/soft, 0.04 s); "a mouse click"
+    (click/mouse) is the whole mouse button, 0.2 s.
   - a title card changes, a big transition: a mid-low hit of about 0.3 s that swells in over about 0.1 s, half of
-    it under 100 Hz [measured]. Ask "a short boom" (boom/short, 0.2 s, the nearest). Not "a title slam" or "a
-    title hit": they play a door-like slam and a game hit.
+    it under 100 Hz [measured]. Ask "a title hit" or "a title slam" (slam/title: a low body in a short burst of
+    air, about a third of a second, then its air dies away).
   - the logo end card: the logo lands on a short low hit, 0.2 to 0.3 s, body around 200 to 300 Hz, fast end
-    [measured: 9 of 11 end cards looked at; in some it may be the track's own last hit]. Ask "a short boom" on
-    the logo frame and let the music ring out under it. Never "a logo reveal hit": it plays a felt piano note
-    today.
+    [measured: 9 of 11 end cards looked at; in some it may be the track's own last hit]. Ask "a logo hit", "a
+    logo reveal hit" or "a short boom" (boom/short, about 0.3 s) on the logo frame and let the music ring out under
+    it; "a logo reveal" (sting/reveal, 0.8 s) swells into the same hit; "a deep boom" (boom/deep) is darker.
   - a move across the screen: a noise whoosh, mono, as long as the move (0.3 to 1 s), falling off fast after its
-    peak [measured, mostly one video]. Ask "a fast whoosh" (whoosh/fast, rated 4 of 5 by the owner) or "a whoosh
-    for a transition" (whoosh/soft, 0.6 s); "a deep whoosh" for a big slow move. A small fast move: "a quick
-    swish" (flick/thin, 0.16 s).
-  - a text or image breaking apart: "a glitch transition" (glitch/short) [measured: 3 in 3 videos].
-  - a reveal after a build: "a reverse swell into a cut" (rise/reverse, 1.5 s, ends at its peak); put its end on
-    the reveal frame [measured: once].
+    peak [measured, mostly one video]. Ask "a whoosh for a transition" (whoosh/soft, 0.4 s; it holds a length
+    asked: "a short whoosh, 0.3 seconds") or "a fast whoosh" (whoosh/fast, rated 4 of 5 by the owner); "a deep
+    whoosh" for a big slow move. A small fast move: "a quick swish" or "a soft swish" (flick/thin, 0.2 s).
+  - a text or image breaking apart: "a glitch transition" (glitch/short, 0.3 s) [measured: 3 in 3 videos].
+  - a reveal after a build: "a reverse swell into a cut" (rise/reverse, about 1.4 s, ends at its peak); put its
+    end on the reveal frame [measured: once]. "a riser before the drop" (rise/air, 2.5 s) is air growing to a cut.
+  - a sparkle on a product: "sparkle on the product reveal" (shine/air: bright air, no note).
   - typing on screen: "typing on a keyboard, 2 seconds" for a real keyboard; the designed typing in the
     references is brighter (keys around 9 kHz) than this recording [measured].
 - What does not get a sound: small motion that rides the music (text easing in word by word, icons drifting,

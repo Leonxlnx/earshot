@@ -156,7 +156,9 @@ sound good"). Bells, glass and glockenspiel timbres for interface sounds (1). Ne
 of several recordings (1-2): class sampling was dropped.
 
 **What followed.** Realistic sounds are learned from public-domain recordings (`earshot/sounds/learned.py`), the
-interface touches are real keys and switches, the ambience beds he rated 2-3 were replaced by learned textures,
+interface sounds are things a hand does with an object (instruments answer only when music is asked for, after he
+rated the marimba signals 2 to 3 and asked for no instruments on a normal web page), the ambience beds he rated 2-3
+were replaced by learned textures,
 nine music beds were removed, the acoustic drums and hand percussion are played from 130 recorded strokes (VCSL and
 Karoryfer; not rated yet), the figures are played on real instruments learned note by note (a marimba by default;
 a harp, pizzicato strings and an upright piano by name), and short sounds are
@@ -191,26 +193,38 @@ store and to drop members it scored lowest where a design had others.
   1-2, no duplicates, at most five single-event members per thing (six notes of low brass for the braam). Seed 0
   plays the member with the best listening score. Admission rules in the lab build: no chopped start or end, a full band, a natural tail, not faint, a
   clear onset, a single event.
-- **Ambience textures** (`earshot/synth/quilt.py`, 11 BigSoundBank textures, 3.87 MB; the wind in trees was
-  removed: its recording's leaves do not follow its gusts, and `wind/trees` is made by the texture engine): a take differs from its
+- **Ambience textures** (`earshot/synth/quilt.py`, 11 BigSoundBank textures, 3.87 MB; `wind/trees` is learned from
+  wind through a field of dry leaves (maize), whose leaf band carries two thirds of the power and is dry, after no
+  recording of trees passed that check; the fire is learned with an onset at every crackle and its two sides are two
+  takes sharing the crackles; the waves from a recording at the water's edge, joined where they were cut; the rain
+  on a window without its gutter's ringing drip): a take differs from its
   recording by 2.4-3.6 dB at band-envelope level, the same as two takes differ from each other, except the crickets
   (4.4 dB against 2.2: two crickets in one band lose their beating). The joints of a stitched bed differ by 0.9-1.5
   times the texture's own variation (the pebble and rock shores about 1.5). The sea beds are 26-30 s with five waves
   each, the fire 24 s. A bed renders in 1.0-1.7 s of CPU per second of sound.
-- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, 1.31 MB): 130 strokes from VCSL and Karoryfer
-  (Big Rusty Drums), stored softest first with their velocity within their instrument; the seed walks through a
-  design's strokes and `energy` picks softer or harder ones. Nobody has rated them yet.
+- **Drums** (`earshot/sounds/drums.py`, `earshot/data/drums/`, 1.31 MB): 130 strokes from VCSL, Karoryfer
+  (Big Rusty Drums) and, for `clap/hands`, single claps cut from one person clapping (Freesound), stored softest
+  first with their velocity within their instrument; the seed walks through a design's strokes and `energy` picks
+  softer or harder ones. Rated: the kick 4 of 5, the earlier claps 3.3.
 - **Sources**: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an explicit
   public-domain dedication; each recording is credited in the `CREDITS.md` of `earshot/data/resyn/`, `textures/`,
   `drums/` and `notes/`.
 - **Instrument notes** (`earshot/synth/played.py`, `earshot/data/notes/`, 0.83 MB): 97 single notes from VSCO-2 CE
   and VCSL (marimba 14, harp 24, pizzicato 45, upright piano 14), each played as a take moved to the pitch asked for
   with the tuning measured on the recording. Not rated by the owner yet.
-- **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 23 motion designs are layers of 21
-  learned film things (66 recordings) (orchestral bass drums, timpani, tam-tams, crash cymbals, heavy drops, a door slam, swells
-  of air, cymbal and gong, drum and timpani rolls, low brass, deep, airy and fast whooshes, passes, thunder),
-  reversed, moved, faded and glued by one room. The owner rated the invented film sounds they replace 1 to 3 of 5;
-  the ones built from recordings have not been rated by anyone yet.
+- **Film sounds** (`earshot/sounds/motion.py` on `earshot/synth/design.py`): 23 motion designs are built from 21
+  learned film things (66 recordings) and the drum store's strokes, reversed, stretched, layered, faded and glued
+  by one room, and follow measurements of 39 professional motion videos ([motion-sfx-study.md](motion-sfx-study.md)):
+  the title hit about a third of a second with a 0.15 s swell of air into it and its centroid at 312-432 Hz
+  (reference middle half from 388 Hz), the logo hit 0.2-0.3 s, the thump of something appearing about 50 ms, the
+  click a tick at 5-10 kHz cut 40 ms after it, a transition plain air gone within tens of ms of its peak. The hits
+  are a heavy bag dropped on a real explosion's low end (no drum, no door); the car-door build stays by name
+  (`slam/door`, `boom/door`). The owner rated the earlier film sounds 1 to 3 of 5 (the fast whoosh 4); the rebuilt
+  ones are not rated yet.
+- **Interface sounds** (`earshot/sounds/interface.py`): the seventeen roles of `ui` and the interface jobs asked in
+  words are things a hand does, built from fixed recordings of the learned store; measured, their tonality (how far a
+  steady partial stands over the spectrum around it) is 6 to 18 dB, against 20 to 33 dB for the marimba figures
+  they replace. Not rated as a set yet.
 
 ### Understanding requests
 
@@ -233,8 +247,8 @@ recording of the thing the request names is a right answer. Without those additi
 the same catalogue, so the learned designs cost C about one and a half points. Development numbers are optimistic by
 construction; C is the number to quote. Four of the development misses (three taps, one hover) are requests whose
 accepted learned answer was the interface set's earlier tap or hover recording; the reader now gives them the
-touches the `ui` set plays (`keyboard/mechanical`, `leather/grab`). About one held-out request in three or four (long descriptions and
-casual paraphrases) needs a second call, which is what `also`, the guess note and `sound=<id>` are for.
+designs the `ui` set plays (`keyboard/mechanical`, `hover/fingertip`). About one held-out request in three or
+four (long descriptions and casual paraphrases) needs a second call, which is what `also`, the guess note and `sound=<id>` are for.
 `--listen` (the sound atlas) was not re-measured on the v1 catalogue.
 
 **The audit.** Every take `make` writes passes `forge.sfx.check` (clicks, cut tails, clipping, DC, comb ring, rising

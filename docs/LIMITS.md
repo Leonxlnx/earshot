@@ -106,15 +106,20 @@ family and the learned beds were built after his last ratings: each learned take
   `also`, `--sound` and a person's ears.
 
 **What is weak or unverified.**
-- **Film sounds from recordings are not rated.** The first motion designs were invented from class statistics of
-  film effects and the owner rated them 1 to 3 of 5 (booms, slams and thumps 1, risers and falls 1-2). 23 of the 39
-  motion designs (whooshes, the pass, booms, the slam, the suck-in hit, risers, falls, the reveal sting, the braam,
-  the explosion) are now layers of learned recordings (orchestral drums, timpani, tam-tams, cymbals, heavy drops, a
-  door slam, swells, rolls, low brass, real whooshes and thunder); nobody has listened to them yet. The other 16
-  (pops, tocks, a blip, glints, a sparkle, a glitch, key ticks, a sliding panel, a soft thump and knock, the soft
-  sting) are still invented.
-- **Drums.** The acoustic kit and the hand percussion are now takes of 130 recorded strokes (VCSL and Karoryfer);
-  nobody has rated them yet. The drums invented from physics that they replace were rated 1-2 by the owner ("big
+- **The rebuilt motion sounds are not rated.** The motion and film sounds follow measurements of professional
+  motion videos: short, dry hits, thumps, ticks and whooshes of air, built from learned recordings (a heavy bag
+  dropped on a real explosion's low end for the title and logo hits, a soft kick and conga for the thump, a mouse
+  click for the tick, real whooshes, breaths and flames for the air). The owner rated the fast whoosh 4 of 5 and
+  the earlier hits, booms, risers and the tape stop 1 to 2; the rebuilt ones have not been rated. The measurements
+  come from 39 videos and find effects only where they stand out of the music, so quieter effects under the music
+  are not counted. 16 of the 39 motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a sliding panel,
+  a soft knock, the soft sting) are still invented.
+- **Interface sounds without instruments are not rated as a set.** The seventeen roles of `ui` are things a hand does,
+  built from learned recordings; single roles were rated 1.5 to 4 as figures and keys, the new set as a whole not
+  yet. Which object a role uses is a choice of taste: the other candidates are in the catalogue by name.
+- **Drums.** The acoustic kit and the hand percussion are now takes of 130 recorded strokes (VCSL and Karoryfer; the
+  hand claps from one person clapping, Freesound); only the kick (4 of 5) and the claps (3.3, before their present
+  recordings) were rated. The drums invented from physics that they replace were rated 1-2 by the owner ("big
   problems, does not sound good"). Still invented: `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`
   (drum-machine voices), `snare/brush`, `snap/finger` and `sticks/count`, which no public-domain recording covers.
 - **One carrier per band.** The learned model keeps one tone per band: two crickets in one band lose their beating
@@ -122,9 +127,6 @@ family and the learned beds were built after his last ratings: each learned take
 - **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms).
 - **Sea joints.** A stitched bed joins pieces where the texture is in a similar state; on the pebble and rock
   shores the joints differ by about 1.5 times the texture's own variation, more than in the other beds.
-- **The interface touches are quieter than the figures** when each is made alone: the recorded taps, toggles and
-  keys measured 5 dB under the tonal figures at their loudest 50 ms. A set turns its one-shots down to within 2.5 dB
-  of the quietest, so in a set they sit together.
 - **Takes of a learned design differ in length and level**, because they are different recordings. Make
   pick-at-random takes as a set, where none lies more than 2.5 dB over the quietest.
 - **Performances.** Only the learned things whose index names a pattern or holds a recording of the whole action
@@ -136,8 +138,9 @@ family and the learned beds were built after his last ratings: each learned take
 - **Invented realistic sounds** remain in the catalogue for things no learned design covers (jumps, landings, game
   hits, shots, magic). The owner rated their kind 1-2. A learned design wins a tie with them, but a request that
   names only an invented one gets it.
-- **Instrument notes and bells** were rated 2-3 and 1 as models; figures now play a real marimba unless asked
-  otherwise, and the real instruments are not rated yet.
+- **Instrument notes and bells** were rated 2-3 and 1 as models; the figures on the real instruments were rated 2 to
+  3 as interface signals, which is why interface and motion requests get no notes unless the words ask for music.
+  Figures play a real marimba unless asked otherwise.
 - **`--listen` and the atlas** were not re-measured on the v1 catalogue; the atlas is built from each design's
   default render and is stale after designs change until it is rebuilt (`python -m earshot.sounds.atlas build
   --work DIR`, repeated until done).

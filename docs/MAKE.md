@@ -4,9 +4,9 @@ An agent asks for a sound in words; earshot reads the request, ranks its catalog
 the best one, audits it without models and writes the file. No model is loaded and nothing is downloaded. A design is
 either written in code (figures, chip sound, the drum-machine voices, ambience from rules, notes, the music loops)
 or learned from recordings in the public domain and kept as numbers ([Learned sounds](#learned-sounds)): everyday
-things, the interface touches, most ambience beds, the acoustic drums and hand percussion. Either way every sound is
-computed when it is asked for; no audio file is shipped or played back. Everything rendered belongs to whoever
-rendered it: free for any use, commercial too, without credit.
+things, the interface sounds, the film and motion effects, most ambience beds, the acoustic drums and hand
+percussion. Either way every sound is computed when it is asked for; no audio file is shipped or played back.
+Everything rendered belongs to whoever rendered it: free for any use, commercial too, without credit.
 
 - [make](#make) - [learned sounds](#learned-sounds) - [make --set / --spec](#a-whole-set) - [sounds](#sounds) -
   [pack](#pack)
@@ -162,7 +162,7 @@ sound made from nothing, and it exists only because someone recorded the thing a
 | designs | 153 (`earshot/sounds/learned.py`) | 12 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
 | recordings | 364 recorded events (a few are several events cut from one recording; 13 are recordings of a whole action) | 11 textures of 12-30 s | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
 | store | `earshot/data/resyn/`: 7.00 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 3.87 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
-| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer | VSCO-2 CE, VCSL |
+| sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank | VCSL, Karoryfer, Freesound (the hand claps) | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
 All the sources together: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or
@@ -203,10 +203,10 @@ Short dry members (clicks, taps, ticks, pops, knocks under 0.6 s) get a gentle f
 no limiter); airy sounds never do: the owner heard a whoosh get worse with it.
 
 **Which requests reach them.** A learned design answers only a request that names its thing ("a footstep on gravel",
-"a camera shutter", "a wooden drawer"), the interface job it plays ("hover" is a dial's click, "toggle" a lamp
-switch, "next" a laptop key), or its family's own word. A feeling alone never reaches a recording, and a request for
-"a heavy impact" does not reach a recorded dumbbell. Where a learned and an invented design answer the same request,
-the learned one wins a tie (`registry.LEARNED` = 1.1); 34 learned designs that the store marks as not a default
+"a camera shutter", "a wooden drawer"), the interface job it plays (through the interface designs: "hover" is a
+fingertip on wood, "toggle" a rocker switch, "next" a page flicked forward), or its family's own word. A feeling
+alone never reaches a recording, and a request for "a heavy impact" does not reach a recorded dumbbell. Where a
+learned and an invented design answer the same request, the learned one wins a tie (`registry.LEARNED` = 1.1); 34 learned designs that the store marks as not a default
 choice (`"default": false` in its index) rank lower (0.6 times that prior).
 
 ### Performances
@@ -216,7 +216,9 @@ learned thing a person does several times in a row (a walk, a knock, typing, coi
 played as that action when the request asks for it (`earshot/synth/perform.py`, `learned.perform`): a recording of
 the whole action where the store has one (13 recordings of 9 things: walks on gravel, wood, concrete, tiles and in
 heels, a knock run, toasts, keys and a lock, coin handfuls, punches, a book falling), else its single recordings in
-a pattern: `walk` (two feet in turn, 100-120 steps a minute), `knock` (three or four hits about 0.2 s apart),
+a pattern: `walk` (two feet in turn, 100-120 steps a minute; the feet are the two single steps of one session most
+alike in loudness, brightness and length, so one walker does not limp, and a gravel walk recorded at the feet is
+heard from standing height), `knock` (three or four hits about 0.2 s apart),
 `type` (5-8 keys a second, irregular gaps, a deeper space bar between words), `scatter` (impacts that come sooner
 and softer), `shake` (dense impacts in two or three swings), `pair` (an event and its answer). Never the same
 recording twice in a row, never on a grid, every event its own take, one room for all.
@@ -300,13 +302,36 @@ delete.{webm,mp3}: delete/drop (0.77 s, E4, marimba, -14 LUFS, clean) [named]
 17 sounds in public/sounds\sprite.webm + sprite.mp3 (25.5 s, 219 kB, 399 kB), map sprite.json
 ```
 
-The touches of the `ui` set (tap, hover, the two toggles, type, next and back) are real keys and switches; the owner
-twice heard the tonal taps and toggles as unrecognisable and rated real keys 4 of 5. Each touch plays the recording
-chosen for its role (`seeds` in `earshot.sounds.sets`): tap the fullest mechanical key, type the other one, hover a
-soft leather touch (`leather/grab`), the two toggles two recordings of `switch/lamp` (off the darker), back and
-next two recordings of `keyboard/laptop`; the `another recording of` line under the second of each pair says which.
-The signals (open, close, send, receive, notify, success, complete, warning, error, delete) are tonal figures on
-the real marimba; `ui` has no theme, so they play in the key and voice they were written for.
+Every sound of the `ui` set is a normal sound, a thing a hand does with an object, built from learned recordings
+(`earshot/sounds/interface.py`); no note, no instrument, no synthesised tone. A row of pitched notes on a website
+reads as a toy or a ringtone. The seventeen roles:
+
+| role | design | made of |
+|---|---|---|
+| tap | `keyboard/mechanical` | the fullest key of a mechanical keyboard |
+| hover | `hover/fingertip` | a fingertip touching a wooden table very lightly, no click (the quietest of the set) |
+| toggle_on, toggle_off | `toggle/rocker_on`, `toggle/rocker_off` | a rocker switch: on smaller and brighter, off bigger and duller |
+| type | `type/key` | one full key of a desktop keyboard |
+| next, back | `next/page`, `back/page` | a page flicked forward; dropped back darker and shorter |
+| open, close | `open/air`, `close/air` | a pen cap pulled and air let out; air drawn in ending on the cap snapped on |
+| send | `send/swoosh` | a thin stick swung fast through the air |
+| receive | `receive/pop` | a soft round pop of the lips |
+| notify | `notify/knock` | two light knuckle knocks on hollow wood |
+| success | `success/click` | a ballpoint pen clicked in two parts, the second brighter |
+| complete | `complete/stamp` | a stapler pressed down firmly with a dull thump under it |
+| warning | `warning/knock` | two firm, dull knocks on a door |
+| error | `error/thud` | two low, dull thuds of a soft bag, the second bigger and lower |
+| delete | `delete/crumple` | a sheet of paper crumpled fast |
+
+A pair is one thing done two ways, so a listener tells them apart without seeing the name; a signal of two strikes
+keeps them 90 to 160 ms apart, the second of a positive one brighter, of a negative one lower. Each design plays
+fixed recordings of the learned store, so a set always sounds like the same objects. Other candidates per role are
+in the catalogue (`hover/pad`, `next/swipe`, `back/swipe`, `open/drawer`, `receive/cork`, `notify/pop`,
+`success/shutter`, `complete/latch`, `delete/swish`) and take a role by name in a spec. A request for one interface
+job in words ("a success sound", "a notification", "toggle dark mode") gets the same design; a figure on an
+instrument answers only when the words ask for music (an instrument, a chime, a jingle, a melody) or for chip sound,
+or when a theme is named: a set with a theme plays the tonal figures (`success/rise`, `notify/pair` ...) in that
+theme's voice, key and room.
 
 **Several formats.** `--format webm,mp3` (a list or a comma string in a spec, in the MCP tool) writes every sound
 once per format; `manifest.json` names each sound's `file` (the first format) and `files` (all), and the set's
@@ -318,7 +343,7 @@ in place of mp3 or m4a it is written once as flac (below).
 
 | set | theme | sounds |
 |---|---|---|
-| `ui` | none | 17: tap, hover, toggle_on, toggle_off, type, back, next (real keys and switches); open, close, send, receive, notify, success, complete, warning, error, delete (figures on the marimba) |
+| `ui` | none | 17: tap, hover, toggle_on, toggle_off, type, back, next, open, close, send, receive, notify, success, complete, warning, error, delete (things a hand does, from recordings; with a theme: tonal figures in its voice) |
 | `game` | tine | 22: menu_move, menu_select, menu_back, coin, pickup, gem, heal, power_up, power_down, level_up, checkpoint, secret, win, lose, jump, land, step, hit, hurt, explosion, splash, door |
 | `arcade` | retro | 16 chip sounds: menu_move, menu_select, menu_back, coin, pickup, jump, laser, explosion, hurt, power_up, power_down, one_up, level_up, win, lose, text |
 | `film` | none | 17: a product film's moves, arrivals, hits, builds and a logo ([Film and motion](#film-and-motion)) |
@@ -382,7 +407,7 @@ rain.{webm,flac}: rain/window (12.00 s, -30 LUFS, seamless loop, clean) [named]
 20 sounds in myset\sprite.webm + sprite.mp3 (39.4 s, 334 kB, 606 kB), map sprite.json
 ```
 
-The wood theme plays the figures on a marimba in D; the recorded touches have no voice and keep their own sound. A
+With a theme named, `ui` is its tonal figures: the wood theme plays them on a marimba in D. A
 loop in a set with several formats is written as flac in place of mp3 or m4a, once, and says so under its line; its
 manifest `files` list what was written. The sprite still holds every sound in every sprite format: the loop plays
 without a seam from the sprite's webm, and may not from its mp3.
@@ -528,7 +553,18 @@ What is recognised:
   major thirds, sixths and sevenths into minor ones.
 - **One event or the action.** For a thing a person does several times in a row, a plural, an action word, a count
   or a length ("footsteps", "knocking", "three knocks", "5 seconds of typing") asks for the action, a bare singular
-  or "a single" for one event ([Performances](#performances)).
+  or "a single" for one event ([Performances](#performances)). A counted action of any one-shot ("four knocks on
+  the table", "three claps", "a countdown 3 2 1") is one file of that many events; a count of separate things ("five
+  coin pickups", "3 variations") is that many files. The action form of a row word ("clapping", "clicking",
+  "beeping", "tapping") is a row at the pattern's pace. A length asked with an action ("three knocks, 2 seconds",
+  "clapping, 4 seconds") is the file's length, the events spread over it at a pace a hand keeps.
+- **Interface and motion jobs.** A request for an interface job ("a success sound", "a notification", "toggle dark
+  mode") gets the interface design of that job, a normal sound (`lexicon.INTERFACE_JOBS`); a motion job ("a title
+  hit", "a logo reveal", "a transition") gets the film group's hits, thumps, ticks and whooshes. Neither gets a
+  design made of notes unless the words ask for music (an instrument, a chime, a jingle, a melody, a motif, a pad)
+  or for chip sound, or the request is for a game.
+- **Things earshot does not make.** A request whose thing is in no design is an error that says so: `no sound in
+  the catalogue answers '...' (earshot makes no THING): ...`, never a stand-in.
 - **Direction.** "rising", "falling", "going up" ... prefer designs whose gesture moves that way.
 - **Loop or not.** "loop", "seamless", "looping", "endless" ask for a loop; "no loop", "one-shot" for the scene
   once.
@@ -609,7 +645,7 @@ and axes only.
 
 | preset | voice | key | space | axes | says |
 |---|---|---|---|---|---|
-| `soft` | marimba (real) | C major | room | bright -0.2, hard -0.4 | a real marimba played softly: warm, rounded, mid-register: the default of product UI |
+| `soft` | marimba (real) | C major | room | bright -0.2, hard -0.4 | a real marimba played softly: warm, rounded, mid-register: the default voice of the figures |
 | `glass` | glockenspiel | D major | studio | bright +0.2, ring +0.1 | clear, bright, bell-like |
 | `wood` | marimba (real) | G pentatonic | room | bright -0.1, ring -0.2 | a real marimba: warm, dry, organic |
 | `felt` | felt_piano (a real upright piano) | F major | room | bright -0.3, hard -0.3 | an intimate soft piano |
@@ -632,9 +668,11 @@ The fields of a theme dict (`{"base": "wood", "key": "D"}` changes a preset; a d
 
 A minor scale (`minor`, `minor_pentatonic`) turns every figure's major thirds, sixths and sevenths into minor ones;
 the other scales leave the figures' intervals as designed. The words of a request lay their key and scale over the
-theme's, and a material or voice in the request wins over the theme's voice. Without a theme or a voice in the
-request, figures play the real marimba: a bell, a glockenspiel or a glass timbre only when asked for (the owner
-rated glass and glockenspiel interface sounds 1 of 5 and every figure on a synthesised voice 1-2). An instrument
+theme's, and a material or voice in the request wins over the theme's voice. A request for an interface or motion
+job gets a figure only when its words ask for music (an instrument, a chime, a jingle, a melody, a motif) or for
+chip sound, or a theme is named; otherwise it gets the normal sounds of the interface set or the film group. Without
+a theme or a voice in the request, figures play the real marimba: a bell, a glockenspiel or a glass timbre only
+when asked for (the owner rated glass and glockenspiel interface sounds 1 of 5 and every figure on a synthesised voice 1-2). An instrument
 named in the request plays the figure: "a notification on a harp", "a success sound with pizzicato strings", "an
 error sound on a soft piano" (`felt_piano`), or `--voice harp`. A few game figures keep the voice they were written
 for (`coin/bright`: a glockenspiel).
@@ -647,11 +685,12 @@ sound is or does, the name its character.
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
 | learned (`sounds/learned.py`) | 153 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
-| interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation | all 8 axes, pitch (the root), voice or material, dur |
+| interface (`sounds/interface.py`) | 25 | `hover/fingertip`, `toggle/rocker_on`, `toggle/rocker_off`, `type/key`, `next/page`, `back/page`, `open/air`, `close/air`, `send/swoosh`, `receive/pop`, `notify/knock`, `success/click`, `complete/stamp`, `warning/knock`, `error/thud`, `delete/crumple`; other candidates `hover/pad`, `next/swipe`, `back/swipe`, `open/drawer`, `receive/cork`, `notify/pop`, `success/shutter`, `complete/latch`, `delete/swish` | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
+| interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation, when the words ask for music or a theme is named | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
 | material ticks (`sounds/ui.py`) | 3 | `tick/wood`, `tick/glass`, `tick/metal` | taps and detents that should not be a note | 7 axes (not motion), pitch |
-| ambience (`sounds/nature.py`) | 31 in 15 families | learned from real textures (12): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`; from rules (19): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/trees`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
+| ambience (`sounds/nature.py`) | 31 in 15 families | learned from real textures (12): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`, `wind/trees`; from rules (19): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
 | drums (`sounds/drums.py`) | 40 in 21 families | from recorded strokes (33): `kick/soft`, `kick/punch`, `kick/deep`, `snare/tight`, `snare/fat`, `rim/click`, `rim/shot`, `tom/high`, `tom/mid`, `tom/floor`, `hat/closed`, `hat/open`, `hat/pedal`, `crash/bright`, `crash/dark`, `ride/ping`, `clap/hands`, `clap/group`, `shaker/tick`, `tambourine/hit`, `tambourine/shake`, `conga/open`, `conga/muted`, `bongo/high`, `bongo/low`, `cajon/bass`, `darbuka/hit`, `frame_drum/deep`, `clave/click`, `cabasa/hit`, `slapstick/crack`, `drum/roll`, `shaker/roll`; invented (7): `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count` | music loops, motion design, games | energy (velocity: softer or harder strokes), size, bright, hard, ring, space, width; pitch on tuned drums |
 | film and motion (`sounds/motion.py`) | see below | | product films, title sequences, interface animation | |
 | action (`sounds/action.py`) | 47 in 23 families | `jump/*`, `land/*`, `step/grass` .. `step/metal` (6 surfaces), `swing/*`, `hit/punch` ..., `explosion/*`, `shot/*`, `door/*`, `break/*`, `splash/*`, `teleport/*`, `magic/*`, `countdown/*`, `laser/beam` and `rumble/quake` (loops) | games and animation; invented from physics | energy, size, bright, hard, ring, space, width; pitch for the tonal ones; dur for loops |
@@ -696,54 +735,75 @@ also: snare/brush, snare/fat, snare/electro
 ### Film and motion
 
 The sounds a product film, a title sequence or an interface animation is cut with, by role: air and movement (a
-fast and a soft whoosh, a deep pass, a sliding panel, a flick), hits (a boom under a logo or a title, a soft
-thump, a knock), builds and falls (a riser, a reversed swell, a sub drop), small arrivals (pops, a tick, a click,
-key presses), light (a glint, a shimmer), a camera shutter and short stingers. The first designs of this group were
-invented from class statistics of film effects, and the owner rated them 1 to 3 of 5 (booms, slams and thumps 1,
-risers and falls 1-2). 23 of the 39 designs of `earshot/sounds/motion.py` are now built from real material, the way
-a sound designer builds them: takes of learned film recordings (21 things, 66 recordings in the public domain, in
-the learned store) reshaped by `earshot/synth/design.py` (reverse, layer at a moment, carry past the listener, fade)
-within the range where a take stays natural, and glued by one room. No oscillator and no synthetic sweep is in
-them. The seed is a performance: it picks the recordings (another drum, another cymbal) and every take draws fresh
-noise; `meta['member']` names the main recording. Nobody has rated these yet.
+fast and a soft whoosh, a deep pass, a sliding panel, a flick), hits (a short hit under a title or a logo, the hit
+after a stop, a long boom, a thump when something appears), builds and falls (a riser of air, a reversed swell, a
+tape stop), small arrivals (a tick, pops, key presses), light (a shine of air, a glint), a glitch and short
+stingers.
+
+They follow measurements of professional motion videos ([motion-sfx-study.md](motion-sfx-study.md)): such films
+are led by music and add few effects, and those are short, dry, near mono and either low or very bright. A thing
+appearing gets a low thump of about 50 ms (`thump/appear`), a click a bright tick of 20-40 ms at 5-10 kHz
+(`tick/soft`), a title a hit of about a third of a second with a short swell of air into it (`slam/title`), the
+logo a low hit of about a quarter second (`boom/short`), the moment after the music stops a short heavy hit
+(`hit/drop`: "a drop" in a film or video), a transition a whoosh of plain air that is gone right after its peak and
+holds the length asked for (`whoosh/soft`). None of them uses an instrument note, a bell or a synthesised tone, and
+a motion request gets no design made of notes unless its words ask for music (an instrument, a melody, a chord) or
+for a game.
+
+23 of the 39 designs of `earshot/sounds/motion.py` are built from real material, the way a sound designer builds
+them: takes of learned recordings (21 film things, 66 recordings in the public domain, in the learned store, and
+the close-miked strokes of the drum store) reshaped by `earshot/synth/design.py` (reverse, layer at a moment,
+stretch, contour, carry past the listener, halt, fade) within the range where a take stays natural, and glued by
+one room. The seed is a performance: it picks the recordings and every take draws fresh noise; `meta['member']`
+names the main recording.
 
 | family | designs | made of |
 |---|---|---|
 | air | `whoosh/fast` | a real stick swung through the air, as recorded: close and dry, nothing layered over it |
-| | `whoosh/soft` | a real airy whoosh, a little smaller and darker, no rumble under 120 Hz, trimmed around its peak |
+| | `whoosh/soft` | a real whoosh that is noise and not a whistle (a heavy whoosh, a deep whoosh or a calm burst of flame, by the seed), swelling for three quarters of the length and gone within tens of ms after its peak, near mono, dry |
 | | `whoosh/deep` | a real deep or heavy whoosh, a real bass drum's decay played backwards 12 dB under it |
 | | `whoosh/long` | a real deep whoosh, bigger and slower, led in by a swell of real air played backwards |
 | | `swoosh/in`, `swoosh/out` | a real airy whoosh up to its peak and stopped there; from just before its peak on |
-| | `flick/thin`, `flick/paper` | a real fast swish taken small and bright; a real page turned |
+| | `flick/thin` | a short real whip of air (a whip or a swung stick, by the seed) with nothing under 1.5 kHz, mono, dry: "a soft swish" |
+| | `flick/paper` | a real page turned, fitted to the length |
 | | `pass/air` | a real deep whoosh carried past the listener: across the stereo field, level by distance, pitch falling 1.5 semitones |
-| hits | `boom/deep` | the low end of a real deep kick drum (nothing over 150 Hz) with a real close explosion's low end 4 dB under it, made audible on small speakers by harmonics at 70-180 Hz, falling for 2.6 s, close and dry |
-| | `boom/short` | a real timpani with a real bass drum 4 dB under it, both damped, nearly dry |
+| hits | `slam/title` | 0.15 s of a real low whoosh's build swelling into a real heavy bag dropped on the low end of a real close explosion; the whoosh's decay goes on after the strike as the air of the hit; about a third of a second, close, near mono. No door, no drum |
+| | `boom/short` | a real heavy bag dropped (nothing over 900 Hz) on the low end of a real close explosion, led in by 0.1 s of a low whoosh's build: a quarter second |
+| | `boom/deep` | the low end of a real close explosion with the heavy bag a quarter bigger 3 dB under it, led in by a whoosh's build: a short deep hit |
+| | `hit/drop` | the heavy bag on the explosion's low end with a puff of real air after the strike, 0.2 s; the silence before it is the edit |
+| | `slam/door`, `boom/door` | the same hits built of a real car door and a car boot slammed shut, by name only |
+| | `thump/appear` | a real soft kick drum with a muted conga 9 dB under it and a faint real mouse click, cut 50 ms after the strike |
+| | `thump/soft` | a real soft kick drum and a cajon's bass stroke, 80 ms, dry |
+| | `impact/suck` | real air drawn in backwards (a breath, a burst of flame or a deep whoosh) ending on the heavy bag a fifth bigger with the explosion's low end under it |
+| | `fall/sub` | the long boom by name: the low end of a real deep kick drum with a real close explosion's low end under it, only falling, 2 s |
 | | `boom/wide` | a real tam-tam struck hard over a real bass drum, wider than recorded |
-| | `slam/title` | the first 0.22 s of a real heavy impact on the boom's low end 2 dB under it, 0.9 s in all, close and dry |
-| | `impact/suck` | the build of a real airy whoosh played backwards into a real heavy drop on the boom's low end, close and dry |
-| | `explosion/huge` | a real near explosion, a real bass drum 3 dB and a real roll of thunder 9 dB under it |
-| builds | `rise/reverse` | a real crash cymbal's decay played backwards, a real tam-tam's 9 dB under it |
-| | `rise/air` | the decays of two real close-miked cymbal strokes (crash/bright, crash/dark 5 dB under it) played backwards and lined up at their ends, growing in level and brightness to a clean cut |
+| | `explosion/huge` | a real near explosion, a real bass drum 3 dB and a real roll of thunder 9 dB under it, in a hall |
+| builds | `rise/reverse` | real air played backwards (a breath, a deep whoosh or a burst of flame), louder and brighter to a 10 ms close |
+| | `rise/air` | two builds of real air played backwards, lined up at their ends, growing louder and brighter to a clean cut; no cymbal, no tone |
 | | `rise/tension` | a real drum or timpani roll in crescendo, a real suspended cymbal rolled 6 dB under it |
 | | `suck/in` | a real airy whoosh's tail played backwards, stopped where its peak was |
+| | `stop/tape` | a real timpani or snare roll with a held low brass note under it, read at a speed that falls to a halt |
 | falls | `fall/air` | the decay of a recorded swell of air, fading straight in dB |
-| | `fall/sub` | a real orchestral bass drum, as big and dark as the engine takes it, a real timpani 10 dB under it |
-| stingers | `sting/reveal` | a real cymbal decay played backwards into a real bass drum and tam-tam |
-| | `braam/brass` | real low brass (tubas, trombones, horns) on the root, fifth and octave over the boom's low end, led in by a reversed cymbal, no added room |
+| small | `tick/soft` | a real small click (a mouse button or a small switch) with nothing under 1.2 kHz, cut 40 ms after the strike |
+| | `shine/air` | the build of real air above 2.5 kHz with a real shaker struck once on its top: light without a note |
+| | `glitch/short` | slices of a real electric buzzer, an electronic switch and a mouse click on a gate that speeds up |
+| stingers | `sting/reveal` | a build of real air played backwards into the low hit of `boom/short` |
+| | `braam/brass` | real low brass (tubas, trombones, horns) on the root, fifth and octave over a low end of real recordings, led in by a reversed cymbal, no added room |
 
-Still invented, from class statistics of small film sounds (0.1-0.25 s, a 10-20 ms rise, mono): `slide/panel`,
-`thump/soft`, `knock/soft`, `pop/soft`, `pop/bubble`, `pop/pluck`, `tock/wood`, `tock/glass`, `blip/soft`,
-`shine/glint`, `shine/sweep`, `sparkle/burst`, `glitch/short`, `type/soft`, `type/run`, `sting/soft`. Removed:
-`whoosh/tonal`, `sting/tech`, and the invented `whoosh/airy` (that id is now the learned airy whoosh). The learned
-film things answer by their own names too (`timpani/hit`, `gong/hit`, `cymbal/orchestral`, `brass/low`,
-`thunder/roll`, `pass/car` ...), and the bank's film sounds (`whoosh_fast/crisp`, rated 4) stay reachable.
+Invented, from class statistics of small film sounds (0.1-0.25 s, a 10-20 ms rise, mono): `slide/panel`,
+`knock/soft`, `pop/soft`, `pop/bubble`, `pop/pluck`, `tock/wood`, `tock/glass`, `blip/soft`, `shine/glint`,
+`shine/sweep`, `sparkle/burst`, `type/soft`, `type/run`, `sting/soft`. The learned film things answer by their own
+names too (`timpani/hit`, `gong/hit`, `cymbal/orchestral`, `brass/low`, `thunder/roll`, `pass/car`,
+`car_door/slam`, `explosion/far` ...), and the bank's film sounds (`whoosh_fast/crisp`) stay reachable. "An
+explosion far away" is `explosion/far`, a long rolling blast; "a fire whoosh" plays a real burst of flame first.
 
-Controls: energy (a harder, brighter strike and more of the lower layers), size (the takes
-0.8-1.25 times the design's own size: bigger is lower and longer), bright (2 dB per octave), hard (the strike), ring
-(0.6-1.7 times the ring, on the hits), space, width, and motion on `pass/air` (how far it travels, 0.5-2.5
-semitones of fall). `dur` sets a build's length (it ends on its peak) and how much of a tail is heard. A cymbal in
-a film request is the film's crash cymbal (`cymbal/orchestral`); with a word of the drum kit ("fill", "kit",
-"beat", "drums") it is the kit's `crash/*`.
+Controls: energy (a harder, brighter strike and more of the lower layers), size (the takes 0.8-1.25 times the
+design's own size: bigger is lower and longer), bright (2 dB per octave), hard (the strike; not on `slam/title`,
+`boom/short`, `boom/deep` and `hit/drop`, whose body has no strike to raise), ring (on the hits that ring), space,
+width, and motion on `pass/air` (how far it travels, 0.5-2.5 semitones of fall). `dur` sets a build's length (it
+ends on its peak), a whoosh's length and how much of a tail is heard. A cymbal in a film request is the film's
+crash cymbal (`cymbal/orchestral`); with a word of the drum kit ("fill", "kit", "beat", "drums") it is the kit's
+`crash/*`.
 
 ```
 $ earshot make "a fast whoosh as the title flies in" -o whoosh.wav
@@ -913,7 +973,12 @@ also: forest/morning, rain/leaves, wind/trees
 ```
 
 The night is a learned bed (a BigSoundBank recording of a field at night), rendered once with a fade in and out.
-For the film's moves and hits see [Film and motion](#film-and-motion).
+For the film's moves and hits see [Film and motion](#film-and-motion). A logo with notes is asked for in words that
+name music (a voice, "a sonic logo", "a motif"); "a logo hit" or "a logo reveal" without them gets a short low hit.
+
+- **Few effects**: motion films are led by music; give two to five moments a sound (a stop and the hit after it,
+  something appearing, a click, the title, the logo) and leave the rest to the music. The skill's "Scoring a motion
+  video" says which words give which sound.
 
 - **Beds once, not looped**: `--no-loop` gives a scene with a fade in and out at the length the shot needs.
 - **In the film's key**: `--pitch` or "in D" for logos, stingers and notes, so they sit with the music.
