@@ -223,6 +223,19 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 - **`rain/window` drops the gutter's bubble**: the one tonal, regular drip in it; the rest is the same rain.
 - **Stitched waves are played whole** (`quilt`): each joins where its chunk was cut, not at a quiet moment inside its wash,
   so a bed of waves is not resampled (lower and slower) to fill its length.
+- **Knocks on a table are real knuckles on a wooden table** (`knock/table`): "four knocks on the table",
+  "a knock on the desk".
+- **A single knock on a door is one whole knuckle knock with the door's body** (`door/knock` plays it first).
+- **Footsteps on tiles are hard shoes on a tiled floor, footsteps on concrete hard shoes on stone** (`step/tile`,
+  `step/concrete`).
+- **A walk alternates two alike steps** (pattern `feet`): one session, loudness, brightness and length close, no limp.
+- **A walk on gravel is heard from standing height** (pattern `far`): a little less of the closest crunch.
+- **A light switch, a punch and a book slammed shut play new close, dry recordings first** (`switch/wall`,
+  `punch/body`, `book/shut`).
+- **A tap outside an interface is a fingertip on a table** (`tap/fingertip`): "two taps", "a tap on the table";
+  "a tap" stays a key.
+- **A bunch of keys plays a recording of metal keys first** (`keys/bunch`).
+- **The second drum roll plays last** (`roll/drum`): the engine clicks at one of its onsets.
 
 ### Fixed
 

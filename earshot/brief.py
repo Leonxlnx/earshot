@@ -1222,9 +1222,11 @@ def learned_ok(b, sid, t, said):
     """True when a learned design (earshot.sounds.learned: recordings of one thing) may answer the request: the
     request names its thing, as a job or a word it says (`said`: _said_words stems): the job its family is by name
     ("a footstep on gravel": step/, a footstep by lexicon.FAMILY_SENSE; "toggle dark mode": switch/), the
-    interface job it plays (its `roles`: "hover" is a tick of a dial) or its family's own word ("a wooden drawer",
-    "a pot clanging"). A recording never answers by feel alone nor by a job its thing merely has: "sword on armour"
-    is a clang, but no recorded pot or anvil; "a heavy impact" reaches no recorded dumbbell; "a cue when the car
+    interface job it plays (its `roles`: "hover" is a tick of a dial), its family's own word ("a wooden drawer",
+    "a pot clanging") or the whole name of the invented design it is the recording of (lexicon.TWINS: "a knock on the
+    desk" names knock/desk, "a tap on the table" tap/table). A recording never answers by feel alone nor by a job
+    its thing merely has: "sword on armour" is a clang, but no recorded pot or anvil; "a heavy impact" reaches no
+    recorded dumbbell; "a cue when the car
     passes a checkpoint" names a cue, and the passing car is the event, not a recording asked for (`framed`, when
     the request names something else as its sound)"""
     asked = set(b['concepts'])                           # "... muffled and bubbly": a part, not a recorded splash
@@ -1234,6 +1236,9 @@ def learned_ok(b, sid, t, said):
                                           for k, v in L.TWINS.items()):
         return True                     # "four knocks": a number of events only the recorded twin can perform
     own = said - set(b.get('context_words', ()))         # "passes a save point flag": the flag is where, not what
+    if sid.split('/')[0] in L.SOUND_FAMILIES and any(v == sid and _family_words(k) & own and _name_words(k) <= own
+                                                     for k, v in L.TWINS.items()):
+        return True                     # "a knock on the desk" names knock/desk, whose recorded thing this is
     framed = set(b.get('framed', ()))
     if framed and asked - framed:
         asked -= framed

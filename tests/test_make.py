@@ -507,12 +507,13 @@ def test_an_asked_length_holds_for_an_ambience_and_a_loop_says_its_bars(tmp_path
 
 
 def test_a_counted_action_in_a_row_is_one_file_and_a_count_of_things_is_many(tmp_path):
-    """"four knocks on the table" picks a design that is not recorded as an action (knock/desk) and still plays one
+    """"four knocks on the table" picks the recorded knuckles on a table (knock/table) and plays one
     file of four knocks; "three claps" one file of three; "five coin pickups" stays five files; "a single" one event"""
     knocks = make('four knocks on the table', str(tmp_path / 'k.wav'))
     p = knocks['takes'][0]['performance']
-    assert knocks['sound'] == 'knock/desk' and len(knocks['files']) == 1
-    assert p['pattern'] == 'knock' and p['events'] == 4 and len(set(p['seeds'])) == 4
+    assert knocks['sound'] == 'knock/table' and len(knocks['files']) == 1
+    rec = p['recordings']
+    assert p['pattern'] == 'knock' and p['events'] == 4 and all(a != b for a, b in zip(rec, rec[1:]))
     assert 'played: 4 events as a knock' in knocks['summary'] and knocks['takes'][0]['checks']['ok']
     claps = make('three claps', str(tmp_path / 'c.wav'))
     assert len(claps['files']) == 1 and claps['takes'][0]['performance']['events'] == 3

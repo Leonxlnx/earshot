@@ -17,7 +17,7 @@ from earshot.synth import resyn
 SR = dsp.SR
 INDEX = learned.index()
 IDS = list(INDEX)
-LIMIT = 8_000_000                     # bytes the whole store may weigh
+LIMIT = 8_400_000                     # bytes the whole store may weigh
 # three interface designs (sets 'ui') and a footstep: rendered in the fast tier (every member: --slow)
 FAST = ('keyboard/mechanical', 'switch/lamp', 'leather/grab', 'step/pebbles')
 # the character suffixes of the first pass's automatic names, and engine words: never in a name ('light' is a verb
@@ -293,7 +293,6 @@ def test_the_walk_holds_every_member_but_those_rated_one():
         assert all(e['members'][k].get('rating_final') == 1 for k in out), sid
         assert walk or not e['members'], sid
         assert not whole & set(walk) or whole == set(range(len(e['members']))), sid
-    assert len(learned.order('step/tile')) < len(INDEX['step/tile']['members'])        # a tile step scored 1
 
 
 def test_a_retake_plays_the_same_recording():
@@ -329,3 +328,66 @@ def test_interface_members_sit_near_the_figures():
     lifted = learned.body(raw)
     assert abs(_loudest(lifted, 5.0) - _loudest(raw, 5.0)) < 0.5                    # the strike keeps its level
     assert _loudest(lifted, 50.0) > _loudest(raw, 50.0) + 0.3                        # what follows it comes up
+
+
+WALKS = sorted(sid for sid, e in INDEX.items() if (e.get('pattern') or {}).get('name') == 'walk')
+
+
+def _session(m):
+    """the recording a member was cut from ('cuts/bigsoundbank/0165_07.wav', 'bigsoundbank/0165.wav@1.038-1.633')"""
+    s = m['source'].split('@')[0]
+    return re.sub(r'^cuts/', '', re.sub(r'_\d\d(\.\w+)$', r'\1', s)).replace('.wav', '').rsplit('.', 1)[0]
+
+
+def _foot(e, k, seed):
+    """(loudest 50 ms dB, centroid Hz) of member k as a walk plays it"""
+    c = registry.Controls(registry.get(e['id']))
+    c.seed = seed
+    y = np.asarray(learned.take(e, c, dsp.rng(seed), k=k, room=False), np.float64)
+    P = np.abs(np.fft.rfft(y.mean(axis=1))) ** 2
+    f = np.fft.rfftfreq(len(y), 1 / SR)
+    return _loudest(y, 50.0), (P * f).sum() / P.sum()
+
+
+def test_a_walk_alternates_two_feet_alike():
+    """one walker in one pair of shoes: the two single steps a walk alternates (pattern `feet`) are cut from one
+    recording session and measure alike as the walk plays them (loudest 50 ms within 3 dB, centroids within a
+    factor 1.2: a left and a right foot, not a limp); a walk of a length plays those two in turn"""
+    assert {'step/floorboard', 'step/tile', 'step/concrete', 'step/pebbles'} <= set(WALKS)
+    for sid in WALKS:
+        e = INDEX[sid]
+        a, b = e['pattern']['feet']
+        assert e['members'][a].get('events', 1) == 1 and e['members'][b].get('events', 1) == 1, sid
+        if a == b:
+            continue
+        assert _session(e['members'][a]) == _session(e['members'][b]), sid
+        fa, fb = [np.mean([_foot(e, k, s) for s in (0, 1)], axis=0) for k in (a, b)]
+        assert abs(fa[0] - fb[0]) < 3.0, (sid, fa, fb)
+        assert max(fa[1], fb[1]) / min(fa[1], fb[1]) < 1.2, (sid, fa, fb)
+    y, meta = learned.perform('step/floorboard', seed=0, dur=5.0)
+    a, b = INDEX['step/floorboard']['pattern']['feet']
+    rec = meta['performance']['recordings']
+    assert rec[0::2] == [a + 1] * len(rec[0::2]) and rec[1::2] == [b + 1] * len(rec[1::2])
+
+
+def test_a_gravel_walk_is_heard_from_standing_height():
+    """a walk on gravel is tilted darker as the pattern's `far` says (the closest crunch of a recording made at the
+    feet a little softer), and only the walk: a single step keeps its recording's brightness"""
+    def cen(y):
+        P = np.abs(np.fft.rfft(y.mean(axis=1))) ** 2
+        f = np.fft.rfftfreq(len(y), 1 / SR)
+        return (P * f).sum() / P.sum()
+    e = INDEX['step/pebbles']
+    assert e['pattern']['far'] < 0
+    walk, _ = learned.perform('step/pebbles', seed=0)
+    k = learned.wholes(e)[0]
+    c = registry.Controls(registry.get('step/pebbles'))
+    c.seed = 0
+    near = np.asarray(learned.take(e, c, dsp.rng(registry.seed_of('step/pebbles', 0) ^ 0x5EED), k=k), np.float64)
+    assert cen(walk) < 0.95 * cen(near)
+
+
+def test_a_member_the_engine_plays_with_a_fault_comes_last():
+    """the second drum roll clicks where the engine sets an onset at a window edge: it plays after the other"""
+    e = INDEX['roll/drum']
+    assert e['members'][e['walk'][-1]]['file'] == 'roll-drum-2.npz'

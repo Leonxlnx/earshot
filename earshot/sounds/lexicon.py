@@ -457,7 +457,8 @@ TWINS = {'knock/door': 'door/knock', 'coins/handful': 'coins/floor', 'coin/drop'
          'match/strike': 'match/light', 'stapler/press': 'stapler/desk', 'drawer/slide': 'drawer/wood',
          'door/close': 'door/shut', 'explosion/distant': 'explosion/far', 'hit/punch': 'punch/body',
          'swing/blade': 'sword/swing', 'splash/small': 'splash/plunge', 'keys/jingle': 'keys/bunch',
-         'swish/soft': 'flick/thin', 'pop/soft': 'thump/appear'}
+         'swish/soft': 'flick/thin', 'pop/soft': 'thump/appear', 'knock/desk': 'knock/table',
+         'tap/table': 'tap/fingertip'}
 # words that ask for the action a person performs, not its single event (earshot.synth.perform; brief.performance):
 # a walk, knocking, typing, a bunch of keys shaken, glasses clinked. A plural of the thing itself ("footsteps",
 # "coins", "ice cubes") asks for it too; "a single", "one" and a bare singular ("a footstep", "a key press") give one

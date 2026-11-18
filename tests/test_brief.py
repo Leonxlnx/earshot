@@ -608,6 +608,10 @@ NEW_ANCHORS = [
     ('small change', ('coin/', 'coins/')),
     # a learned design that is the thing asked for wins over its invented twin (lexicon.TWINS)
     ('knocking on a wooden door', ('door/knock',)),
+    ('four knocks on the table', ('knock/table',)),
+    ('a knock on the desk', ('knock/table',)),
+    ('a tap on the table', ('tap/fingertip',)),
+    ('two taps', ('tap/fingertip',)),
     ('coins dropped on a table', ('coins/floor',)),
     ('a handful of coins', ('coins/floor',)),
     ('a coin dropped on the table', ('coin/drop',)),

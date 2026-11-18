@@ -2565,9 +2565,156 @@
     ],
     "events": 1,
     "pace": null
+   },
+   {
+    "file": "punch-body-6.npz",
+    "source": "freesound_e1/424144.mp3@0.173-0.520",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0767,
+    "dur_s": 0.347,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.44,
+     "centroid": 296,
+     "end_db": -98.3,
+     "tail_ms": 121.9,
+     "start_db": -145.1,
+     "rise_ms": 8.29,
+     "peak": -0.5
+    },
+    "measured": {
+     "hard_db": 4.54,
+     "ring_x": 1.55
+    },
+    "bytes": 10652,
+    "credit": {
+     "title": "Fist Punch or kick",
+     "author": "rcroller",
+     "page": "https://freesound.org/people/rcroller/sounds/424144/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.173,
+     0.52
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "punch-body-7.npz",
+    "source": "freesound_e1/503277.mp3@1.954-2.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0055,
+    "dur_s": 0.446,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.08,
+     "centroid": 161,
+     "end_db": -96.1,
+     "tail_ms": 221.7,
+     "start_db": -86.9,
+     "rise_ms": 1.92,
+     "peak": -0.5
+    },
+    "measured": {
+     "hard_db": 2.6,
+     "ring_x": 1.953
+    },
+    "bytes": 10417,
+    "credit": {
+     "title": "Face Punch, Body Impact, 4x",
+     "author": "Kinoton",
+     "page": "https://freesound.org/people/Kinoton/sounds/503277/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     1.954,
+     2.4
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "punch-body-8.npz",
+    "source": "freesound_e1/503277.mp3@0.287-0.720",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0902,
+    "dur_s": 0.433,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.97,
+     "centroid": 288,
+     "end_db": -107.1,
+     "tail_ms": 149.9,
+     "start_db": -129.3,
+     "rise_ms": 7.12,
+     "peak": -0.8
+    },
+    "measured": {
+     "hard_db": 5.69,
+     "ring_x": 1.696
+    },
+    "bytes": 10550,
+    "credit": {
+     "title": "Face Punch, Body Impact, 4x",
+     "author": "Kinoton",
+     "page": "https://freesound.org/people/Kinoton/sounds/503277/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.287,
+     0.72
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
    }
   ],
   "walk": [
+   5,
+   6,
+   7,
    3,
    4,
    0,
@@ -5376,15 +5523,16 @@
  {
   "id": "step/concrete",
   "says": [
-   "a footstep on concrete",
-   "a hard short scuff of a shoe"
+   "a hard shoe stepping on concrete",
+   "a short hard scuff of a heel on stone"
   ],
   "uses": [
    "footstep"
   ],
   "tags": [
    "concrete",
-   "stone"
+   "stone",
+   "shoe"
   ],
   "domains": [
    "game",
@@ -5406,11 +5554,11 @@
   "members": [
    {
     "file": "step-concrete-1.npz",
-    "source": "cuts/freesound_ov/208103_02.wav",
+    "source": "bigsoundbank/0606.wav@1.502-1.847",
     "origin": "corpus",
     "rating": null,
-    "onset_s": 0.0385,
-    "dur_s": 0.22,
+    "onset_s": 0.014,
+    "dur_s": 0.345,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -5423,183 +5571,226 @@
      "width"
     ],
     "quality": {
-     "span": 7.16,
-     "centroid": 428,
-     "end_db": -198.3,
-     "tail_ms": 122.1,
-     "start_db": -102.5,
-     "rise_ms": 0.44,
-     "peak": 0.0
-    },
-    "measured": {
-     "hard_db": 3.11,
-     "ring_x": 1.688
-    },
-    "bytes": 7445,
-    "credit": {
-     "title": "Stone Steps (by Phil25)",
-     "author": "Phil25",
-     "page": "https://freesound.org/people/Phil25/sounds/208103",
-     "licence": "CC0 1.0 (Openverse API license field \"cc0\" 1.0 for the Freesound page; preview MP3)",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "class": "game/step/concrete",
-    "taste": {
-     "pred": 1.33,
-     "flags": [
-      "short"
-     ]
-    },
-    "rating_final": 2
-   },
-   {
-    "file": "step-concrete-2.npz",
-    "source": "freesound_ov/166508.mp3",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0015,
-    "dur_s": 0.49,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "ring",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 4.31,
-     "centroid": 440,
-     "end_db": -62.9,
-     "tail_ms": 201.3,
-     "start_db": -31.1,
-     "rise_ms": 0.77,
-     "peak": -1.5
-    },
-    "measured": {
-     "hard_db": 0.45,
-     "ring_x": 1.304
-    },
-    "bytes": 21427,
-    "credit": {
-     "title": "concrete footstep 2 (by Yoyodaman234)",
-     "author": "Yoyodaman234",
-     "page": "https://freesound.org/people/Yoyodaman234/sounds/166508",
-     "licence": "CC0 1.0 (Openverse API license field \"cc0\" 1.0 for the Freesound page; preview MP3)",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "class": "game/step/concrete",
-    "taste": {
-     "pred": 1.29,
-     "flags": [
-      "quiet"
-     ]
-    },
-    "rating_final": 3
-   },
-   {
-    "file": "step-concrete-3.npz",
-    "source": "cuts/freesound_ov/208103_04.wav",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0328,
-    "dur_s": 0.28,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 7.4,
-     "centroid": 561,
-     "end_db": -196.0,
-     "tail_ms": 187.9,
-     "start_db": -110.5,
-     "rise_ms": 3.4,
-     "peak": -0.0
-    },
-    "measured": {
-     "hard_db": 0.69,
-     "ring_x": 1.001
-    },
-    "bytes": 9448,
-    "credit": {
-     "title": "Stone Steps (by Phil25)",
-     "author": "Phil25",
-     "page": "https://freesound.org/people/Phil25/sounds/208103",
-     "licence": "CC0 1.0 (Openverse API license field \"cc0\" 1.0 for the Freesound page; preview MP3)",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "class": "game/step/concrete",
-    "taste": {
-     "pred": 1.39,
-     "flags": [
-      "short"
-     ]
-    },
-    "rating_final": 3
-   },
-   {
-    "file": "step-concrete-4.npz",
-    "source": "bigsoundbank/0514.wav",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.1013,
-    "dur_s": 1.965,
-    "stereo": false,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "hard",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 6.23,
-     "centroid": 300,
-     "end_db": -61.0,
-     "tail_ms": 12.3,
-     "start_db": -110.8,
-     "rise_ms": 2.06,
+     "span": 4.44,
+     "centroid": 602,
+     "end_db": -98.6,
+     "tail_ms": 203.8,
+     "start_db": -124.1,
+     "rise_ms": 3.02,
      "peak": -8.9
     },
     "measured": {
-     "hard_db": 5.1,
-     "ring_x": 1.037
+     "hard_db": 3.91,
+     "ring_x": 1.901
     },
-    "bytes": 56898,
+    "bytes": 8714,
     "credit": {
-     "title": "Footsteps, Shoe on Concrete",
+     "title": "Step, Shoe on Stone Staircase",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html",
+     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "class": "game/step/concrete",
+    "class": "game/step/stone",
     "excerpt_s": [
-     2.765,
-     4.73
+     1.502,
+     1.847
     ],
-    "events": 4,
-    "pace": 1.66,
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-concrete-2.npz",
+    "source": "bigsoundbank/0606.wav@11.162-11.447",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0155,
+    "dur_s": 0.285,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.25,
+     "centroid": 764,
+     "end_db": -82.7,
+     "tail_ms": 147.6,
+     "start_db": -137.6,
+     "rise_ms": 2.54,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": 2.13,
+     "ring_x": 1.003
+    },
+    "bytes": 11915,
+    "credit": {
+     "title": "Step, Shoe on Stone Staircase",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/stone",
+    "excerpt_s": [
+     11.162,
+     11.447
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-concrete-3.npz",
+    "source": "bigsoundbank/0606.wav@15.817-16.191",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0135,
+    "dur_s": 0.374,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.71,
+     "centroid": 891,
+     "end_db": -94.9,
+     "tail_ms": 205.4,
+     "start_db": -131.1,
+     "rise_ms": 3.19,
+     "peak": -11.5
+    },
+    "measured": {
+     "hard_db": -1.56,
+     "ring_x": 1.002
+    },
+    "bytes": 17946,
+    "credit": {
+     "title": "Step, Shoe on Stone Staircase",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/stone",
+    "excerpt_s": [
+     15.817,
+     16.191
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-concrete-4.npz",
+    "source": "bigsoundbank/0606.wav@15.041-15.421",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0138,
+    "dur_s": 0.38,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.07,
+     "centroid": 741,
+     "end_db": -90.6,
+     "tail_ms": 201.8,
+     "start_db": -134.5,
+     "rise_ms": 3.96,
+     "peak": -11.6
+    },
+    "measured": {
+     "hard_db": -0.04,
+     "ring_x": 1.262
+    },
+    "bytes": 14773,
+    "credit": {
+     "title": "Step, Shoe on Stone Staircase",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/stone",
+    "excerpt_s": [
+     15.041,
+     15.421
+    ],
+    "events": 1,
+    "pace": null,
     "allows": [
      "stacked"
     ]
+   },
+   {
+    "file": "step-concrete-5.npz",
+    "source": "bigsoundbank/0606.wav@9.815-9.960",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0138,
+    "dur_s": 0.145,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.11,
+     "centroid": 656,
+     "end_db": -61.9,
+     "tail_ms": 20.2,
+     "start_db": -125.7,
+     "rise_ms": 1.35,
+     "peak": -11.8
+    },
+    "measured": {
+     "hard_db": 1.76,
+     "ring_x": 1.074
+    },
+    "bytes": 10795,
+    "credit": {
+     "title": "Step, Shoe on Stone Staircase",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/stone",
+    "excerpt_s": [
+     9.815,
+     9.96
+    ],
+    "events": 1,
+    "pace": null
    }
   ],
   "walk": [
-   3,
+   0,
    1,
    2,
-   0
+   3,
+   4
   ],
   "allows": [
    "stacked"
@@ -5609,6 +5800,10 @@
    "events": [
     6,
     8
+   ],
+   "feet": [
+    0,
+    3
    ]
   }
  },
@@ -5695,6 +5890,10 @@
    "events": [
     6,
     8
+   ],
+   "feet": [
+    0,
+    0
    ]
   }
  },
@@ -5723,6 +5922,7 @@
    "energy",
    "size",
    "bright",
+   "hard",
    "space",
    "width"
   ],
@@ -5971,6 +6171,189 @@
     "allows": [
      "pre_swell"
     ]
+   },
+   {
+    "file": "step-pebbles-6.npz",
+    "source": "bigsoundbank/0510.wav@7.550-8.010",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.09,
+    "dur_s": 0.46,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.66,
+     "centroid": 1512,
+     "end_db": -86.7,
+     "tail_ms": 69.6,
+     "start_db": -116.3,
+     "rise_ms": 0.9,
+     "peak": -4.8
+    },
+    "measured": {
+     "hard_db": 1.33,
+     "ring_x": 1.0
+    },
+    "bytes": 31050,
+    "credit": {
+     "title": "Footsteps on gravels #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-on-gravels-s0510.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/gravel",
+    "excerpt_s": [
+     7.55,
+     8.01
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-pebbles-7.npz",
+    "source": "bigsoundbank/0510.wav@9.333-9.640",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.054,
+    "dur_s": 0.307,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.06,
+     "centroid": 1822,
+     "end_db": -74.7,
+     "tail_ms": 43.0,
+     "start_db": -123.6,
+     "rise_ms": 0.81,
+     "peak": -4.5
+    },
+    "measured": {
+     "hard_db": 3.58,
+     "ring_x": 1.001
+    },
+    "bytes": 26005,
+    "credit": {
+     "title": "Footsteps on gravels #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-on-gravels-s0510.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/gravel",
+    "excerpt_s": [
+     9.333,
+     9.64
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-pebbles-8.npz",
+    "source": "bigsoundbank/0510.wav@0.391-0.925",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0115,
+    "dur_s": 0.534,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.83,
+     "centroid": 1666,
+     "end_db": -89.2,
+     "tail_ms": 134.5,
+     "start_db": -96.5,
+     "rise_ms": 3.9,
+     "peak": -6.9
+    },
+    "measured": {
+     "hard_db": 5.29,
+     "ring_x": 0.913
+    },
+    "bytes": 31994,
+    "credit": {
+     "title": "Footsteps on gravels #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-on-gravels-s0510.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/gravel",
+    "excerpt_s": [
+     0.391,
+     0.925
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-pebbles-9.npz",
+    "source": "bigsoundbank/0510.wav@1.170-1.495",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.04,
+    "dur_s": 0.325,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.87,
+     "centroid": 3388,
+     "end_db": -83.8,
+     "tail_ms": 49.3,
+     "start_db": -144.4,
+     "rise_ms": 2.88,
+     "peak": -7.8
+    },
+    "measured": {
+     "hard_db": 2.85,
+     "ring_x": 1.014
+    },
+    "bytes": 27818,
+    "credit": {
+     "title": "Footsteps on gravels #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/steps-on-gravels-s0510.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/gravel",
+    "excerpt_s": [
+     1.17,
+     1.495
+    ],
+    "events": 1,
+    "pace": null
    }
   ],
   "allows": [
@@ -5981,6 +6364,10 @@
   "walk": [
    3,
    4,
+   5,
+   6,
+   7,
+   8,
    2,
    1,
    0
@@ -5990,7 +6377,12 @@
    "events": [
     6,
     8
-   ]
+   ],
+   "feet": [
+    5,
+    7
+   ],
+   "far": -1.0
   }
  },
  {
@@ -6176,6 +6568,10 @@
    "events": [
     6,
     8
+   ],
+   "feet": [
+    1,
+    0
    ]
   }
  },
@@ -6351,21 +6747,26 @@
    "events": [
     6,
     8
+   ],
+   "feet": [
+    1,
+    1
    ]
   }
  },
  {
   "id": "step/tile",
   "says": [
-   "a slipper stepping on tiles",
-   "a soft flat shuffle on stone"
+   "hard shoes stepping on a tiled floor",
+   "a clacking heel on tiles in a tiled room"
   ],
   "uses": [
    "footstep"
   ],
   "tags": [
    "tile",
-   "slipper"
+   "shoe",
+   "hard"
   ],
   "domains": [
    "game",
@@ -6379,6 +6780,7 @@
    "energy",
    "size",
    "bright",
+   "hard",
    "ring",
    "space",
    "width"
@@ -6386,151 +6788,264 @@
   "members": [
    {
     "file": "step-tile-1.npz",
-    "source": "cuts/bigsoundbank/0179_00.wav",
+    "source": "freesound_e1/480592.mp3@8.400-12.000",
     "origin": "corpus",
     "rating": null,
-    "onset_s": 0.0605,
-    "dur_s": 0.534,
-    "stereo": false,
-    "dry": true,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "ring",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 5.07,
-     "centroid": 900,
-     "end_db": -92.4,
-     "tail_ms": 178.3,
-     "start_db": -98.9,
-     "rise_ms": 0.92,
-     "peak": -1.5
-    },
-    "measured": {
-     "hard_db": -1.58,
-     "ring_x": 1.387
-    },
-    "bytes": 17545,
-    "credit": {
-     "title": "Steps (slipper on tiling)",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/steps-slipper-on-tiling-s0179.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "class": "game/step/tile",
-    "taste": {
-     "pred": 1.51,
-     "flags": [
-      "quiet"
-     ]
-    }
-   },
-   {
-    "file": "step-tile-2.npz",
-    "source": "cuts/bigsoundbank/0179_02.wav",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.045,
-    "dur_s": 0.489,
-    "stereo": false,
-    "dry": true,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 5.35,
-     "centroid": 975,
-     "end_db": -94.0,
-     "tail_ms": 114.2,
-     "start_db": -128.3,
-     "rise_ms": 0.35,
-     "peak": -4.2
-    },
-    "measured": {
-     "hard_db": -1.84,
-     "ring_x": 1.076
-    },
-    "bytes": 21515,
-    "credit": {
-     "title": "Steps (slipper on tiling)",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/steps-slipper-on-tiling-s0179.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "class": "game/step/tile",
-    "taste": {
-     "pred": 1.57,
-     "flags": [
-      "quiet"
-     ]
-    },
-    "rating_final": 1
-   },
-   {
-    "file": "step-tile-3.npz",
-    "source": "bigsoundbank/0179.wav",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.086,
-    "dur_s": 3.502,
+    "onset_s": 0.061,
+    "dur_s": 3.6,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 5.54,
-     "centroid": 726,
-     "end_db": -132.4,
-     "tail_ms": 398.5,
-     "start_db": -183.4,
-     "rise_ms": 0.42,
-     "peak": -4.9
+     "span": 4.39,
+     "centroid": 1161,
+     "end_db": -80.9,
+     "tail_ms": 47.2,
+     "start_db": -123.9,
+     "rise_ms": 1.56,
+     "peak": -2.3
     },
     "measured": {
-     "hard_db": 1.5,
-     "ring_x": 1.01
+     "hard_db": 4.89,
+     "ring_x": 1.0
     },
-    "bytes": 54248,
+    "bytes": 78945,
     "credit": {
-     "title": "Steps (slipper on tiling)",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/steps-slipper-on-tiling-s0179.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
+     "author": "craigsmith",
+     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
+     "licence": "CC0 1.0 (public domain)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "class": "game/step/tile",
+    "class": null,
     "excerpt_s": [
-     7.154,
-     10.656
+     8.4,
+     12.0
     ],
-    "events": 3,
-    "pace": 0.67
+    "events": 5,
+    "pace": 1.13,
+    "lossy": true,
+    "allows": [
+     "clicks"
+    ]
+   },
+   {
+    "file": "step-tile-2.npz",
+    "source": "freesound_e1/480592.mp3@9.907-10.428",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0037,
+    "dur_s": 0.521,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.27,
+     "centroid": 1969,
+     "end_db": -77.4,
+     "tail_ms": 65.9,
+     "start_db": -106.6,
+     "rise_ms": 1.27,
+     "peak": -2.4
+    },
+    "measured": {
+     "hard_db": 4.66,
+     "ring_x": 1.683
+    },
+    "bytes": 16231,
+    "credit": {
+     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
+     "author": "craigsmith",
+     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     9.907,
+     10.428
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "step-tile-3.npz",
+    "source": "freesound_e1/480592.mp3@9.195-9.664",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0045,
+    "dur_s": 0.469,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.19,
+     "centroid": 1520,
+     "end_db": -79.6,
+     "tail_ms": 50.9,
+     "start_db": -105.1,
+     "rise_ms": 1.56,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 2.5,
+     "ring_x": 1.093
+    },
+    "bytes": 15838,
+    "credit": {
+     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
+     "author": "craigsmith",
+     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     9.195,
+     9.664
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "step-tile-4.npz",
+    "source": "freesound_e1/480592.mp3@10.637-11.161",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0035,
+    "dur_s": 0.524,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.5,
+     "centroid": 1139,
+     "end_db": -66.9,
+     "tail_ms": 56.5,
+     "start_db": -100.3,
+     "rise_ms": 1.35,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 2.69,
+     "ring_x": 1.058
+    },
+    "bytes": 18610,
+    "credit": {
+     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
+     "author": "craigsmith",
+     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     10.637,
+     11.161
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "step-tile-5.npz",
+    "source": "freesound_e1/480592.mp3@8.448-9.009",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0035,
+    "dur_s": 0.561,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.22,
+     "centroid": 1621,
+     "end_db": -78.9,
+     "tail_ms": 66.9,
+     "start_db": -110.7,
+     "rise_ms": 2.38,
+     "peak": -2.3
+    },
+    "measured": {
+     "hard_db": 2.67,
+     "ring_x": 1.566
+    },
+    "bytes": 18768,
+    "credit": {
+     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
+     "author": "craigsmith",
+     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     8.448,
+     9.009
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
    }
   ],
   "walk": [
+   0,
+   1,
    2,
-   0
+   3,
+   4
+  ],
+  "allows": [
+   "clicks"
   ],
   "pattern": {
    "name": "walk",
    "events": [
     6,
     8
+   ],
+   "feet": [
+    2,
+    4
    ]
   }
  },
@@ -6727,6 +7242,10 @@
    "events": [
     6,
     8
+   ],
+   "feet": [
+    1,
+    0
    ]
   }
  },
@@ -6902,10 +7421,198 @@
     "allows": [
      "pre_swell"
     ]
+   },
+   {
+    "file": "step-floorboard-4.npz",
+    "source": "bigsoundbank/0165.wav@1.038-1.633",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.051,
+    "dur_s": 0.595,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.65,
+     "centroid": 206,
+     "end_db": -91.0,
+     "tail_ms": 346.7,
+     "start_db": -138.3,
+     "rise_ms": 1.23,
+     "peak": -12.2
+    },
+    "measured": {
+     "hard_db": 3.61,
+     "ring_x": 1.467
+    },
+    "bytes": 11365,
+    "credit": {
+     "title": "Man Footsteps on the Wooden Floor",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-footsteps-on-the-wooden-floor-s0165.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/wood",
+    "excerpt_s": [
+     1.038,
+     1.633
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-floorboard-5.npz",
+    "source": "bigsoundbank/0165.wav@1.634-2.155",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.08,
+    "dur_s": 0.521,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.94,
+     "centroid": 206,
+     "end_db": -92.2,
+     "tail_ms": 148.3,
+     "start_db": -120.2,
+     "rise_ms": 1.33,
+     "peak": -12.8
+    },
+    "measured": {
+     "hard_db": 4.0,
+     "ring_x": 1.0
+    },
+    "bytes": 13148,
+    "credit": {
+     "title": "Man Footsteps on the Wooden Floor",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-footsteps-on-the-wooden-floor-s0165.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/wood",
+    "excerpt_s": [
+     1.634,
+     2.155
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-floorboard-6.npz",
+    "source": "bigsoundbank/0165.wav@2.930-3.437",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.005,
+    "dur_s": 0.507,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.09,
+     "centroid": 250,
+     "end_db": -101.6,
+     "tail_ms": 289.6,
+     "start_db": -122.7,
+     "rise_ms": 2.52,
+     "peak": -11.8
+    },
+    "measured": {
+     "hard_db": 0.3,
+     "ring_x": 1.002
+    },
+    "bytes": 12283,
+    "credit": {
+     "title": "Man Footsteps on the Wooden Floor",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-footsteps-on-the-wooden-floor-s0165.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/wood",
+    "excerpt_s": [
+     2.93,
+     3.437
+    ],
+    "events": 1,
+    "pace": null
+   },
+   {
+    "file": "step-floorboard-7.npz",
+    "source": "bigsoundbank/0165.wav@4.092-4.776",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1003,
+    "dur_s": 0.684,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.0,
+     "centroid": 201,
+     "end_db": -89.5,
+     "tail_ms": 386.3,
+     "start_db": -107.4,
+     "rise_ms": 4.35,
+     "peak": -12.3
+    },
+    "measured": {
+     "hard_db": 1.41,
+     "ring_x": 1.303
+    },
+    "bytes": 12096,
+    "credit": {
+     "title": "Man Footsteps on the Wooden Floor",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/man-footsteps-on-the-wooden-floor-s0165.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": "game/step/wood",
+    "excerpt_s": [
+     4.092,
+     4.776
+    ],
+    "events": 1,
+    "pace": null
    }
   ],
   "walk": [
    2,
+   3,
+   4,
+   5,
+   6,
    1,
    0
   ],
@@ -6917,6 +7624,10 @@
    "events": [
     6,
     8
+   ],
+   "feet": [
+    4,
+    6
    ]
   }
  },
@@ -7616,10 +8327,108 @@
      "pre_swell",
      "stacked"
     ]
+   },
+   {
+    "file": "door-knock-3.npz",
+    "source": "freesound_e1/413270.mp3@1.262-1.503",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0132,
+    "dur_s": 0.241,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.08,
+     "centroid": 234,
+     "end_db": -72.6,
+     "tail_ms": 76.3,
+     "start_db": -110.1,
+     "rise_ms": 2.58,
+     "peak": -17.5
+    },
+    "measured": {
+     "hard_db": 3.35,
+     "ring_x": 2.095
+    },
+    "bytes": 6862,
+    "credit": {
+     "title": "Door Knock",
+     "author": "Timmeh515",
+     "page": "https://freesound.org/people/Timmeh515/sounds/413270/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     1.262,
+     1.503
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "door-knock-4.npz",
+    "source": "freesound_e1/413270.mp3@1.040-1.265",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0132,
+    "dur_s": 0.225,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 5.15,
+     "centroid": 173,
+     "end_db": -64.6,
+     "tail_ms": 20.1,
+     "start_db": -117.3,
+     "rise_ms": 0.48,
+     "peak": -16.4
+    },
+    "measured": {
+     "hard_db": 2.11,
+     "ring_x": 1.833
+    },
+    "bytes": 8669,
+    "credit": {
+     "title": "Door Knock",
+     "author": "Timmeh515",
+     "page": "https://freesound.org/people/Timmeh515/sounds/413270/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     1.04,
+     1.265
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
    }
   ],
   "walk": [
    1,
+   2,
+   3,
    0
   ],
   "allows": [
@@ -9182,12 +9991,109 @@
     "events": 1,
     "pace": null,
     "lossy": true
+   },
+   {
+    "file": "book-shut-4.npz",
+    "source": "freesound_e1/573198.mp3@0.170-0.500",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.014,
+    "dur_s": 0.33,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.7,
+     "centroid": 582,
+     "end_db": -107.4,
+     "tail_ms": 280.0,
+     "start_db": -128.9,
+     "rise_ms": 1.04,
+     "peak": 0.0
+    },
+    "measured": {
+     "hard_db": -0.88,
+     "ring_x": 1.304
+    },
+    "bytes": 9312,
+    "credit": {
+     "title": "book_snap_shut.wav",
+     "author": "j1987",
+     "page": "https://freesound.org/people/j1987/sounds/573198/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.17,
+     0.5
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "book-shut-5.npz",
+    "source": "freesound_e1/319809.mp3@0.000-0.385",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.007,
+    "dur_s": 0.385,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.04,
+     "centroid": 559,
+     "end_db": -121.3,
+     "tail_ms": 293.6,
+     "start_db": -146.2,
+     "rise_ms": 1.65,
+     "peak": -0.9
+    },
+    "measured": {
+     "hard_db": 4.32,
+     "ring_x": 1.929
+    },
+    "bytes": 8117,
+    "credit": {
+     "title": "Book slamming shut 1",
+     "author": "zmobie",
+     "page": "https://freesound.org/people/zmobie/sounds/319809/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.0,
+     0.385
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
    }
   ],
   "allows": [
    "pre_swell"
   ],
   "walk": [
+   3,
+   4,
    2,
    1,
    0
@@ -16589,9 +17495,205 @@
      "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     }
+   },
+   {
+    "file": "switch-wall-3.npz",
+    "source": "freesound_e1/119925.mp3@0.763-0.986",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0138,
+    "dur_s": 0.223,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 7.05,
+     "centroid": 3090,
+     "end_db": -74.8,
+     "tail_ms": 155.8,
+     "start_db": -127.7,
+     "rise_ms": 0.96,
+     "peak": -4.8
+    },
+    "measured": {
+     "hard_db": 9.79,
+     "ring_x": 1.71
+    },
+    "bytes": 6334,
+    "credit": {
+     "title": "Light Switch on Wall.aif",
+     "author": "ftpalad",
+     "page": "https://freesound.org/people/ftpalad/sounds/119925/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.763,
+     0.986
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "switch-wall-4.npz",
+    "source": "freesound_e1/423512.mp3@2.499-2.744",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0995,
+    "dur_s": 0.245,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.57,
+     "centroid": 2208,
+     "end_db": -107.0,
+     "tail_ms": 107.5,
+     "start_db": -239.6,
+     "rise_ms": 1.21,
+     "peak": -0.4
+    },
+    "measured": {
+     "hard_db": 7.72,
+     "ring_x": 1.261
+    },
+    "bytes": 6134,
+    "credit": {
+     "title": "Light Switch Click On and Off",
+     "author": "SomeoneCool15",
+     "page": "https://freesound.org/people/SomeoneCool15/sounds/423512/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     2.499,
+     2.744
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "switch-wall-5.npz",
+    "source": "freesound_e1/423512.mp3@3.187-3.327",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0145,
+    "dur_s": 0.14,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.81,
+     "centroid": 1699,
+     "end_db": -106.8,
+     "tail_ms": 87.5,
+     "start_db": -122.9,
+     "rise_ms": 1.15,
+     "peak": -1.2
+    },
+    "measured": {
+     "hard_db": 7.76,
+     "ring_x": 1.625
+    },
+    "bytes": 5531,
+    "credit": {
+     "title": "Light Switch Click On and Off",
+     "author": "SomeoneCool15",
+     "page": "https://freesound.org/people/SomeoneCool15/sounds/423512/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     3.187,
+     3.327
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "switch-wall-6.npz",
+    "source": "freesound_e1/423512.mp3@1.421-1.566",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0138,
+    "dur_s": 0.145,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 6.03,
+     "centroid": 1769,
+     "end_db": -102.5,
+     "tail_ms": 85.7,
+     "start_db": -115.1,
+     "rise_ms": 0.81,
+     "peak": -0.4
+    },
+    "measured": {
+     "hard_db": 7.63,
+     "ring_x": 1.575
+    },
+    "bytes": 6022,
+    "credit": {
+     "title": "Light Switch Click On and Off",
+     "author": "SomeoneCool15",
+     "page": "https://freesound.org/people/SomeoneCool15/sounds/423512/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     1.421,
+     1.566
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
    }
   ],
   "walk": [
+   2,
+   3,
+   4,
+   5,
    1,
    0
   ],
@@ -23730,9 +24832,105 @@
     ],
     "events": 16,
     "pace": 4.34
+   },
+   {
+    "file": "keys-bunch-3.npz",
+    "source": "freesound_e1/390324.mp3@0.000-2.400",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.2045,
+    "dur_s": 2.4,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 0.78,
+     "centroid": 14721,
+     "end_db": -91.0,
+     "tail_ms": 84.4,
+     "start_db": -141.8,
+     "rise_ms": 0.48,
+     "peak": -8.1
+    },
+    "measured": {
+     "hard_db": 9.64,
+     "ring_x": 1.02
+    },
+    "bytes": 47787,
+    "credit": {
+     "title": "Keys jingling",
+     "author": "Lightnessko",
+     "page": "https://freesound.org/people/Lightnessko/sounds/390324/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.0,
+     2.4
+    ],
+    "events": 9,
+    "pace": 3.76,
+    "lossy": true
+   },
+   {
+    "file": "keys-bunch-4.npz",
+    "source": "freesound_e1/485117.mp3@0.000-2.674",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.1575,
+    "dur_s": 2.674,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 1.19,
+     "centroid": 11186,
+     "end_db": -178.2,
+     "tail_ms": 370.7,
+     "start_db": -185.8,
+     "rise_ms": 5.33,
+     "peak": -10.0
+    },
+    "measured": {
+     "hard_db": 2.08,
+     "ring_x": 1.011
+    },
+    "bytes": 39899,
+    "credit": {
+     "title": "Keys Jingling 2_1",
+     "author": "Joao_Janz",
+     "page": "https://freesound.org/people/Joao_Janz/sounds/485117/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.0,
+     2.674
+    ],
+    "events": 10,
+    "pace": 4.26,
+    "lossy": true
    }
   ],
   "walk": [
+   2,
+   3,
    0,
    1
   ]
@@ -24123,6 +25321,536 @@
   "walk": [
    0,
    1
+  ]
+ },
+ {
+  "id": "knock/table",
+  "says": [
+   "knuckles knocking on a wooden table",
+   "a short dry wooden knock on a tabletop"
+  ],
+  "uses": [
+   "knock",
+   "table knock"
+  ],
+  "tags": [
+   "wood",
+   "table",
+   "knuckle",
+   "dry"
+  ],
+  "domains": [
+   "game",
+   "ui"
+  ],
+  "kind": "hit",
+  "tonal": false,
+  "default": false,
+  "dur_s": 0.25,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "hard",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "knock-table-1.npz",
+    "source": "freesound_e1/425780.mp3@5.500-6.250",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0703,
+    "dur_s": 0.75,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.46,
+     "centroid": 693,
+     "end_db": -92.9,
+     "tail_ms": 71.6,
+     "start_db": -118.1,
+     "rise_ms": 1.27,
+     "peak": -14.8
+    },
+    "measured": {
+     "hard_db": 5.47,
+     "ring_x": 1.175
+    },
+    "bytes": 16154,
+    "credit": {
+     "title": "Knock on Wood.wav",
+     "author": "thatkellytrna",
+     "page": "https://freesound.org/people/thatkellytrna/sounds/425780/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     5.5,
+     6.25
+    ],
+    "events": 3,
+    "pace": 4.08,
+    "lossy": true,
+    "allows": [
+     "stacked"
+    ]
+   },
+   {
+    "file": "knock-table-2.npz",
+    "source": "freesound_e1/425780.mp3@8.920-9.700",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0622,
+    "dur_s": 0.78,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.02,
+     "centroid": 864,
+     "end_db": -99.3,
+     "tail_ms": 106.6,
+     "start_db": -119.7,
+     "rise_ms": 1.88,
+     "peak": -12.2
+    },
+    "measured": {
+     "hard_db": 6.73,
+     "ring_x": 1.174
+    },
+    "bytes": 16502,
+    "credit": {
+     "title": "Knock on Wood.wav",
+     "author": "thatkellytrna",
+     "page": "https://freesound.org/people/thatkellytrna/sounds/425780/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     8.92,
+     9.7
+    ],
+    "events": 3,
+    "pace": 3.88,
+    "lossy": true,
+    "allows": [
+     "stacked"
+    ]
+   },
+   {
+    "file": "knock-table-3.npz",
+    "source": "freesound_e1/425780.mp3@2.200-2.450",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0145,
+    "dur_s": 0.25,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.47,
+     "centroid": 481,
+     "end_db": -73.7,
+     "tail_ms": 117.6,
+     "start_db": -114.1,
+     "rise_ms": 6.27,
+     "peak": -13.7
+    },
+    "measured": {
+     "hard_db": 5.21,
+     "ring_x": 1.949
+    },
+    "bytes": 7442,
+    "credit": {
+     "title": "Knock on Wood.wav",
+     "author": "thatkellytrna",
+     "page": "https://freesound.org/people/thatkellytrna/sounds/425780/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     2.2,
+     2.45
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "knock-table-4.npz",
+    "source": "freesound_e1/425780.mp3@8.968-9.139",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0143,
+    "dur_s": 0.171,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.03,
+     "centroid": 696,
+     "end_db": -66.4,
+     "tail_ms": 61.9,
+     "start_db": -124.2,
+     "rise_ms": 1.88,
+     "peak": -12.8
+    },
+    "measured": {
+     "hard_db": 6.73,
+     "ring_x": 1.783
+    },
+    "bytes": 6183,
+    "credit": {
+     "title": "Knock on Wood.wav",
+     "author": "thatkellytrna",
+     "page": "https://freesound.org/people/thatkellytrna/sounds/425780/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     8.968,
+     9.139
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "knock-table-5.npz",
+    "source": "freesound_e1/425780.mp3@11.914-12.155",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.015,
+    "dur_s": 0.241,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 4.03,
+     "centroid": 645,
+     "end_db": -74.8,
+     "tail_ms": 123.9,
+     "start_db": -125.6,
+     "rise_ms": 7.1,
+     "peak": -17.6
+    },
+    "measured": {
+     "hard_db": 5.82,
+     "ring_x": 1.819
+    },
+    "bytes": 6793,
+    "credit": {
+     "title": "Knock on Wood.wav",
+     "author": "thatkellytrna",
+     "page": "https://freesound.org/people/thatkellytrna/sounds/425780/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     11.914,
+     12.155
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "allows": [
+   "stacked"
+  ],
+  "pattern": {
+   "name": "knock",
+   "events": [
+    3,
+    4
+   ],
+   "nouns": [
+    "knock"
+   ]
+  }
+ },
+ {
+  "id": "tap/fingertip",
+  "says": [
+   "a fingertip tapping on a wooden table",
+   "a soft dull tap of a finger on a surface"
+  ],
+  "uses": [
+   "tap",
+   "drumming"
+  ],
+  "tags": [
+   "finger",
+   "wood",
+   "table",
+   "soft"
+  ],
+  "domains": [
+   "game",
+   "ui"
+  ],
+  "kind": "tap",
+  "tonal": false,
+  "default": true,
+  "dur_s": 0.386,
+  "axes": [
+   "energy",
+   "size",
+   "bright",
+   "ring",
+   "space",
+   "width"
+  ],
+  "members": [
+   {
+    "file": "tap-fingertip-1.npz",
+    "source": "freesound_e1/563818.mp3@2.571-2.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0045,
+    "dur_s": 0.379,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.51,
+     "centroid": 185,
+     "end_db": -93.1,
+     "tail_ms": 301.9,
+     "start_db": -117.2,
+     "rise_ms": 7.15,
+     "peak": -4.2
+    },
+    "measured": {
+     "hard_db": 1.12,
+     "ring_x": 1.894
+    },
+    "bytes": 9729,
+    "credit": {
+     "title": "dedotoca mesa / fingers touching table .wav",
+     "author": "Churrumaki",
+     "page": "https://freesound.org/people/Churrumaki/sounds/563818/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     2.571,
+     2.95
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "tap-fingertip-2.npz",
+    "source": "freesound_e1/563818.mp3@0.566-0.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.014,
+    "dur_s": 0.384,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.64,
+     "centroid": 180,
+     "end_db": -91.7,
+     "tail_ms": 306.3,
+     "start_db": -115.0,
+     "rise_ms": 1.46,
+     "peak": -3.1
+    },
+    "measured": {
+     "hard_db": 1.36,
+     "ring_x": 1.595
+    },
+    "bytes": 8563,
+    "credit": {
+     "title": "dedotoca mesa / fingers touching table .wav",
+     "author": "Churrumaki",
+     "page": "https://freesound.org/people/Churrumaki/sounds/563818/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     0.566,
+     0.95
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true,
+    "polarity": -1
+   },
+   {
+    "file": "tap-fingertip-3.npz",
+    "source": "freesound_e1/563818.mp3@3.563-3.950",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.014,
+    "dur_s": 0.387,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 3.12,
+     "centroid": 244,
+     "end_db": -84.2,
+     "tail_ms": 309.2,
+     "start_db": -115.4,
+     "rise_ms": 7.17,
+     "peak": -4.0
+    },
+    "measured": {
+     "hard_db": 1.48,
+     "ring_x": 1.853
+    },
+    "bytes": 9782,
+    "credit": {
+     "title": "dedotoca mesa / fingers touching table .wav",
+     "author": "Churrumaki",
+     "page": "https://freesound.org/people/Churrumaki/sounds/563818/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     3.563,
+     3.95
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   },
+   {
+    "file": "tap-fingertip-4.npz",
+    "source": "freesound_e1/563818.mp3@1.512-1.900",
+    "origin": "corpus",
+    "rating": null,
+    "onset_s": 0.0043,
+    "dur_s": 0.388,
+    "stereo": true,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "ring",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.2,
+     "centroid": 156,
+     "end_db": -91.9,
+     "tail_ms": 299.6,
+     "start_db": -136.1,
+     "rise_ms": 1.62,
+     "peak": -3.5
+    },
+    "measured": {
+     "hard_db": 1.71,
+     "ring_x": 1.799
+    },
+    "bytes": 9137,
+    "credit": {
+     "title": "dedotoca mesa / fingers touching table .wav",
+     "author": "Churrumaki",
+     "page": "https://freesound.org/people/Churrumaki/sounds/563818/",
+     "licence": "CC0 1.0 (public domain)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "class": null,
+    "excerpt_s": [
+     1.512,
+     1.9
+    ],
+    "events": 1,
+    "pace": null,
+    "lossy": true
+   }
+  ],
+  "walk": [
+   0,
+   1,
+   2,
+   3
   ]
  }
 ]

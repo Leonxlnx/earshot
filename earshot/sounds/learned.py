@@ -34,7 +34,10 @@ A thing a person does several times in a row (footsteps, a knock, typing, coins,
 can also be played as that action (`perform`): a recording of the whole action where the store has one (a member
 with `events` over 1), else its single recordings sequenced in the thing's `pattern` by earshot.synth.perform (walk,
 knock, type, scatter, shake, pair). A plain take never plays a whole-action member of a thing that also has single
-ones; the request decides between the two (earshot.brief.performance, make's `events`).
+ones; the request decides between the two (earshot.brief.performance, make's `events`). A walk alternates the two
+single steps its pattern names as its `feet` (one session, alike in loudness, brightness and length: one walker,
+not a limp) and is heard from standing height where the pattern says how far (`far`: a gravel walk recorded at
+the feet loses a little of its closest crunch).
 
     from earshot.sounds import registry
     y, meta = registry.render('step/pebbles', seed=1)            # meta['member']: which recording was played
@@ -216,6 +219,15 @@ def image(y, w, m):
     return st + w * np.stack([side, -side], axis=1)
 
 
+def feet(e):
+    """the recordings a walk alternates (member positions): the pattern's `feet`, the two single steps of one session
+    most alike in loudness, brightness and length (one walker in one pair of shoes: the feet then differ only as a
+    left and a right do, by each take's own variation and the trailing foot's lighter landing); one recording twice
+    when no step of the thing is alike to its first (every step a new take of it). Without `feet`, the first two
+    of the walk"""
+    return [int(k) for k in ((e.get('pattern') or {}).get('feet') or list(order(e['id']))[:2])]
+
+
 def wholes(e):
     """the members of e that are recordings of the whole action (`events` over 1), best first"""
     return [k for k in order(e['id'], True) if e['members'][k].get('events', 1) > 1]
@@ -287,6 +299,8 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     c.seed = int(seed)
     r = dsp.rng(registry.seed_of(sid, seed) ^ 0x5EED)
     pat = e.get('pattern') or {}
+    # a walk is heard from standing height: the pattern's `far` tilts every step (dB per octave around 1 kHz)
+    far = {'bright': float(pat['far'])} if pat.get('name') == 'walk' and pat.get('far') else None
     whole = wholes(e)
     walk = order(sid)
     play, p, cut, long = None, {}, None, False
@@ -305,7 +319,7 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
                 m = e['members'][k]
                 c = registry.Controls(d, **{a: v for a, v in request.items() if a != 'dur'})
                 c.seed = int(seed)
-            y = take(e, c, r, k=k)
+            y = take(e, c, r, k=k, nudge=far)
             long = bool(cut) and len(y) > dsp.n_of(cut)
             if long:
                 y = stretch(y, cut)
@@ -314,7 +328,7 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
                     'pace': m.get('pace')}
     if play is None:
         name = pat.get('name', 'pair')
-        keys = [(e, k) for k in walk]
+        keys = [(e, k) for k in (dict.fromkeys(feet(e)) if name == 'walk' else walk)]
         deep, spread = None, 1.0
         if name == 'type' and len(walk) < KEYS:
             keys, deep = borrow(e, keys)
@@ -327,6 +341,8 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
             ek, k = keys[i]
             m = ek['members'][k]
             size = SIZE[1] ** nudge['size'] if nudge['size'] >= 0 else SIZE[0] ** -nudge['size']
+            if far:
+                nudge = {**nudge, 'bright': nudge['bright'] + far['bright']}
             z = take(ek, c, dsp.rng(int(r.integers(2 ** 32))), k=k, room=False, nudge=nudge)
             if ek is e:
                 own.append(np.abs(z).max())
