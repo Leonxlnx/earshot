@@ -2,10 +2,11 @@
 
 Every file in this folder is numbers (earshot.synth.resyn models), analysed from a recording in the public domain (CC0); no audio is shipped. BigSoundBank states for every sound used: "CC0 (public domain): Free and royalty-free" (https://bigsoundbank.com/licenses.html); attribution is not required and is kept here.
 
-- `beach` (waves/sand): "Small waves and beach #1" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/small-waves-and-beach-1-s1446.html, CC0 1.0 (public domain); 28.7 s from 2.1 s of the corpus excerpt (bigsoundbank/1446.wav)
 - `brook` (stream/brook): "Small Stream" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/small-stream-s0823.html, CC0 1.0 (public domain); 12.0 s from 18.0 s of the corpus excerpt (cuts/bigsoundbank/0823_tex.wav)
-- `campfire` (fire/camp): "Big Branching Fire #1" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/big-branching-fire-1-s0987.html, CC0 1.0 (public domain); 24.0 s from 5.0 s of the corpus excerpt (bigsoundbank/0987.wav)
+- `campfire` (fire/camp): "Big Branching Fire #1" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/big-branching-fire-1-s0987.html, CC0 1.0 (public domain); 35.0 s from 2.0 s of the recording (bigsoundbank/0987.wav)
+- `cornfield` (wind/trees): "Wind in a cornfield" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/wind-in-a-cornfield-s1097.html, CC0 1.0 (public domain); 24.0 s from 8.0 s of the recording (bigsoundbank/1097.wav)
 - `crickets` (night/crickets): "Campaign at Night #4" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/campaign-at-night-4-s1880.html, CC0 1.0 (public domain); 12.0 s from 1.0 s of the corpus excerpt (cuts/bigsoundbank/1880_tex.wav)
+- `froth` (waves/sand): "Small Waves, Froth and Beach" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/small-waves-froth-and-beach-s1447.html, CC0 1.0 (public domain); 34.0 s from 0.0 s of the recording (bigsoundbank/1447.wav)
 - `pebbles` (waves/pebbles): "Sea of the beach of Dellec #3" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/sea-of-the-beach-of-dellec-3-s2566.html, CC0 1.0 (public domain); 30.0 s from 13.4 s of the corpus excerpt (bigsoundbank/2566.wav)
 - `restaurant` (cafe/busy): "Restaurant" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/restaurant-s0624.html, CC0 1.0 (public domain); 16.0 s from 2.0 s of the corpus excerpt (cuts/bigsoundbank/0624_tex.wav)
 - `rocks` (waves/rocks): "Sea of the beach of Dellec #4" by Joseph Sardin (BigSoundBank.com), https://bigsoundbank.com/sea-of-the-beach-of-dellec-4-s2567.html, CC0 1.0 (public domain); 26.5 s from 4.6 s of the corpus excerpt (bigsoundbank/2567.wav)

@@ -7,7 +7,7 @@ import pytest
 from scipy import signal
 
 from earshot.forge import dsp
-from earshot.synth import quilt
+from earshot.synth import quilt, resyn
 
 SR = dsp.SR
 
@@ -113,6 +113,23 @@ def test_waves_join_in_their_troughs_and_fill_the_length():
     lv = np.sqrt(np.mean(y ** 2, axis=1))
     level = np.array([lv[max(0, j - 2400):j + 2400].mean() for j, _, _ in info['joints']])
     assert level.max() < 0.5 * lv.mean()                                       # joints sit in the quiet troughs
+
+
+def test_a_pair_of_takes_shares_its_crackles_and_not_its_noise():
+    r = dsp.rng(9)
+    n = SR // 2
+    x = 0.01 * r.standard_normal(n)
+    for c in r.integers(SR // 20, n - SR // 20, 12):                    # a few sharp cracks over a soft noise
+        x[c:c + 96] += 0.6 * r.standard_normal(96) * np.exp(-np.arange(96) / 24.0)
+    m = resyn.analyze(x)
+    (tk,) = quilt.takes([m], 0.1, dsp.rng(3), vary=0.4, pair=True)[:1]
+    y = tk['y']
+    assert y.ndim == 2 and y.shape[1] == 2 and np.isfinite(y).all()
+    hi = signal.sosfilt(signal.butter(4, 2000.0, 'high', fs=SR, output='sos'), y, axis=0)
+    e = np.sqrt(np.convolve(hi[:, 0] ** 2, np.ones(48) / 48, 'same')), np.sqrt(
+        np.convolve(hi[:, 1] ** 2, np.ones(48) / 48, 'same'))
+    assert np.corrcoef(e)[0, 1] > 0.8                                    # the cracks come at the same moments
+    assert np.corrcoef(y.T)[0, 1] < 0.98                                 # two renders, not two copies
 
 
 def test_played_once_it_fades_in_and_out():

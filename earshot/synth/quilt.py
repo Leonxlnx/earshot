@@ -43,6 +43,7 @@ WINDOW = 15                                  # frames each side of a cut whose b
 MEMORY = 20.0                                # s within which a piece of the model is not played again if avoidable
 FADE = (0.08, 0.15)                          # s: the crossfades
 PIECE = (1.0, 3.0)                           # s: the pieces of a texture that is not periodic
+EDGE = 0.4                                   # s of a wave's chunk before its first trough and after its last
 
 
 # ------------------------------------------------------------------------------------------------ measures
@@ -113,13 +114,18 @@ def _jumps(F, at, gap):
 
 
 # ------------------------------------------------------------------------------------------------ takes
-def takes(models, dur, r, vary=0.4, periods=None, energy=0.0, **transform):
+def takes(models, dur, r, vary=0.4, periods=None, energy=0.0, pair=False, **transform):
     """renders of a texture's chunk models (resyn.render with fresh noise, `vary` and `transform`) for a bed of
     `dur` s, each chunk rendered once before any twice. Not periodic: about 1.4 dur + 3 s of material, at least
     two takes (the more material, the better the joints match). Periodic (`periods`: each chunk's length from
     trough to trough, s): one take per wave, none of the last few waves again, the louder waves more often with
-    `energy` above 0 and the quieter below, all warped by one factor so the waves fill `dur`. A list of
-    {'y', 'chunk'}"""
+    `energy` above 0 and the quieter below, all warped by one factor so the waves fill `dur`. pair: a model of a
+    mono recording heard as a spaced pair of microphones would hear it: left and right are two renders with the
+    same pace and size and their own noise, so every crackle comes at the same moment on both sides while the
+    noise between them differs (`vary` is then 0: it would move the two sides apart). A list of {'y', 'chunk'}, a
+    wave's with 'troughs': the samples of its first and its last trough"""
+    if pair:
+        vary = 0.0
     out, order = [], []
     if periods is not None:
         periods = np.asarray(periods, np.float64) * transform.get('size', 1.0)     # a bigger sea: slower waves
@@ -141,27 +147,35 @@ def takes(models, dur, r, vary=0.4, periods=None, energy=0.0, **transform):
                 best = (miss, seq)
         seq = best[1]
         stretch = float(np.clip(dur / periods[seq].sum(), 0.8, 1.25))
+        size = transform.get('size', 1.0)
         for c in seq:
-            out.append({'y': _take(models[c], r, vary, dict(transform, length=stretch), 0.04), 'chunk': c})
+            y = _take(models[c], r, vary, dict(transform, length=stretch), 0.04, pair)
+            a = int(round(len(y) * EDGE * size / (periods[c] + 2 * EDGE * size)))
+            out.append({'y': y, 'chunk': c, 'troughs': (a, len(y) - a)})
         return out
     need, total = 1.4 * dur + 3.0, 0.0
     while total < need or len(out) < 2:
         if not order:
             order = [int(i) for i in r.permutation(len(models))]
         c = order.pop(0)
-        out.append({'y': _take(models[c], r, vary, transform, 0.1), 'chunk': c})
+        out.append({'y': _take(models[c], r, vary, transform, 0.1, pair), 'chunk': c})
         total += len(out[-1]['y']) / SR
     return out
 
 
-def _take(model, r, vary, transform, spread):
+def _take(model, r, vary, transform, spread, pair=False):
     """one render with its own small differences of pace (time between events, `spread` in log units) and of
     source size (3 %: a little lower and slower or higher and quicker), so a stretch of the model heard twice
-    is not the same stretch twice"""
+    is not the same stretch twice; pair: two renders of the same pace and size, one per side"""
     tr = dict(transform)
     tr['length'] = tr.get('length', 1.0) * float(np.exp(spread * r.standard_normal()))
     tr['size'] = tr.get('size', 1.0) * float(np.exp(0.03 * r.standard_normal()))
-    return resyn.render(model, dsp.rng(int(r.integers(2 ** 31))), vary=vary, **tr)
+    y = resyn.render(model, dsp.rng(int(r.integers(2 ** 31))), vary=vary, **tr)
+    if pair:
+        z = resyn.render(model, dsp.rng(int(r.integers(2 ** 31))), vary=vary, **tr)
+        k = min(len(y), len(z))
+        y = np.stack([y[:k, 0], z[:k, 1]], axis=1)
+    return y
 
 
 def _prep(tk):
@@ -174,12 +188,17 @@ def _prep(tk):
     ok[:m], ok[-m - 1:] = False, False
     busy = ndimage.uniform_filter1d(o, 200, mode='nearest') + 0.05 * ndimage.uniform_filter1d(
         _level(F), 200, mode='nearest')
-    return dict(F=F, S=_states(F), ok=ok, ev=ev, busy=busy, n=len(tk['y']), chunk=tk['chunk'])
+    return dict(F=F, S=_states(F), ok=ok, ev=ev, busy=busy, n=len(tk['y']), chunk=tk['chunk'],
+                troughs=tk.get('troughs'))
 
 
 def _troughs(p):
-    """the cut frames of one wave take: the quietest moments (level smoothed over 300 ms) in its first and its
-    last 40 %"""
+    """the cut frames of one wave take: where its chunk was cut from the recording, trough to trough (EDGE s from
+    each end, as warped), or, for a take that does not say, the quietest moments (level smoothed over 300 ms) in its
+    first and its last 40 %. A wave is played whole: a quiet moment inside the wash would cut a third of it away,
+    and the bed would then be resampled by as much to fill its length, every sound in it that much lower"""
+    if p.get('troughs'):
+        return tuple(int(round(v / HOP)) for v in p['troughs'])
     L = ndimage.uniform_filter1d(_level(p['F']), 31, mode='nearest')
     k = len(L)
     m = int(np.ceil((MARGIN + FADE[1] / 2) * SR / HOP)) + 1
@@ -312,7 +331,7 @@ def _wave_plan(preps, n, loop):
         if j == 0 and k > 1:
             s = np.array([starts[0]])                  # the first wave's start is already joined to the one before
         D = np.sqrt(np.mean((pa['S'][live][:, e][:, :, None] - pb['S'][live][:, s][:, None, :]) ** 2, axis=0))
-        D += 5.0 * np.abs((e[:, None] - ends[i]) - (s[None, :] - starts[j])) * HOP / SR / max(1, k)
+        D += 20.0 * np.abs((e[:, None] - ends[i]) - (s[None, :] - starts[j])) * HOP / SR / max(1, k)
         if loop and j == 0:                            # the closing joint also brings the total towards n
             D += 3.0 * np.abs(nominal + (e[:, None] - ends[i] - (s[None, :] - starts[j])) * HOP - n) / SR
         x, y = np.unravel_index(int(np.argmin(D)), D.shape)

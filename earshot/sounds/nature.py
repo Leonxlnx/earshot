@@ -1,11 +1,13 @@
 """Ambience: real textures learned from public-domain recordings (`fire/camp`, `waves/sand`, `night/crickets`,
-`stream/brook`, `cafe/busy`, `city/street` ...) and the scenes of earshot.synth.texture that are invented from
-physics and kept where they sound right or nothing real stands in for them (`rain/window`,
-`forest/morning`, `wind/trees`, `thunder/clap` ...).
+`stream/brook`, `cafe/busy`, `city/street`, `wind/trees` ...) and the scenes of earshot.synth.texture that are
+invented from physics and kept where they sound right or nothing real stands in for them (`rain/window`,
+`forest/morning`, `thunder/clap` ...).
 
-A learned bed is a texture stored as numbers (earshot/data/textures: resyn models of 12-16 s of one recording, a
-few hundred kB, credits in CREDITS.md there) played endlessly by earshot.synth.quilt: fresh takes of the models,
-cut into pieces of 1-3 s (whole waves for the sea) and stitched where the texture is in a similar state. A
+A learned bed is a texture stored as numbers (earshot/data/textures: resyn models of 12-37 s of one recording, a
+few hundred kB to 1.5 MB, credits in CREDITS.md there) played endlessly by earshot.synth.quilt: fresh takes of the
+models, cut into pieces of 1-3 s (2.5-5 s for a fire and for leaves in gusts, whole waves for the sea) and stitched
+where the texture is in a similar state. The index says per texture how much of the grain a take redraws (`vary`:
+less for foam and leaves, whose detail is that grain) and whether a mono recording plays as a pair of takes. A
 resyn take is heard as the recording itself; an invented fire, sea or night scores 2-3 of 5 in listening tests.
 
 A bed is a seamless loop by default: the file can repeat for as long as the scene lasts (a game level, a landing
@@ -27,6 +29,7 @@ import os
 from functools import lru_cache
 
 import numpy as np
+from scipy import ndimage
 
 from ..forge import dsp, fx
 from ..synth import quilt, resyn, space as rooms, texture
@@ -60,12 +63,6 @@ SCENES = {
     'wind/mountain': ('wind', dict(place='mountain'), ('high wind on a mountain', 'a cold gale over rock',
                                                        'wind roaring at altitude'),
                       ('wind', 'mountain', 'gale', 'summit', 'blizzard')),
-    # invented, as the rain is: broadband air shaped by slow gusts and a leaf rustle that swells with them, no
-    # Aeolian tones. The one public-domain recording of trees in wind holds a thin rustle around 5 kHz that does
-    # not follow the gusts and little air under it: faithfully resynthesised it reads as trickling water
-    'wind/trees': ('wind', dict(place='trees', howl=0.0), ('wind in the trees', 'leaves rustling in gusts of wind',
-                                                           'a breeze through foliage'),
-                   ('wind', 'trees', 'leaves', 'forest wind', 'breeze')),
     'fire/small': ('fire', dict(size=-0.7), ('a small fire crackling quietly', 'a little fireplace',
                                              'gentle fire crackle'),
                    ('fire', 'fireplace', 'candle', 'hearth')),
@@ -103,9 +100,14 @@ LEARNED = {
     'fire/camp': ('campfire', ('a crackling campfire of branches', 'wood burning with sharp cracks and a soft roar',
                                'a real fire crackling outdoors'),
                   ('fire', 'campfire', 'fireplace', 'cozy', 'camping', 'bonfire')),
-    'waves/sand': ('beach', ('small waves breaking on a sandy beach', 'surf washing up the shore and drawing back',
+    'waves/sand': ('froth', ('small waves breaking on a sandy beach', 'surf washing up the shore and drawing back',
                              'the sea at a beach'),
                    ('waves', 'ocean', 'beach', 'sea', 'surf', 'water', 'lake shore', 'lapping water', 'calm water')),
+    # the dry leaves of a field of maize in rising wind, close: a dense rustle of 2-10 kHz that swells with every
+    # gust over a soft low air. The recording of a forest's crowns holds a thin hiss around 5 kHz that does not
+    # follow the gusts (heard as trickling water), and noise shaped by gusts reads as a filter moving
+    'wind/trees': ('cornfield', ('wind in the trees', 'leaves rustling in gusts of wind', 'a breeze through foliage'),
+                   ('wind', 'trees', 'leaves', 'forest wind', 'breeze')),
     'waves/pebbles': ('pebbles', ('waves breaking on a pebble beach', 'surf dragging over shingle',
                                   'the sea rolling stones'),
                       ('waves', 'pebble beach', 'shingle', 'shore', 'coast', 'water')),
@@ -192,12 +194,30 @@ def _circular(fn, y, loop):
     return fn(np.concatenate([y, y]))[len(y):2 * len(y)]
 
 
-def place(y, c, mono, loop, away=0.0):
+def spread(y, gain=3.0, cut=800.0):
+    """the image of a pair of takes (quilt.takes pair=True) as a spaced pair of microphones has it: the side
+    above `cut` raised `gain` times. The two takes share every event, so a crackle stays one crackle in the middle
+    while the noise between the events opens to the sides: a close stereo recording of a fire measures a coherence
+    of about 0.95 under 1 kHz and 0.2-0.4 above, two takes alone 0.75-0.9 above. Zero-phase (a gain per frequency
+    over the whole bed, which a loop takes round its seam) and without delays: an all-pass decorrelator would ring
+    after every crackle"""
+    side = 0.5 * (y[:, 0] - y[:, 1])
+    f = np.fft.rfftfreq(len(side), 1.0 / dsp.SR)
+    s = np.clip(np.log2(np.maximum(f, 1.0) / cut) + 0.5, 0.0, 1.0)                 # half an octave each side
+    side = np.fft.irfft(np.fft.rfft(side) * (1.0 + (gain - 1.0) * np.sin(0.5 * np.pi * s) ** 2), len(side))
+    mid = 0.5 * (y[:, 0] + y[:, 1])
+    return np.stack([mid + side, mid - side], axis=1)
+
+
+def place(y, c, mono, loop, away=0.0, pair=False):
     """the image and the distance of a learned bed. width: a stereo recording's side scaled 0.4-1.6 times; a mono
-    one opened by decorrelation (fx.decorrelate, 0.25-0.75). space > 0: farther, the air taking the top (a low-pass
-    from 18 kHz to 3.5 kHz) and a diffuse hall joining; space < 0: nearer, up to 3 dB more presence at 3 kHz"""
+    one opened by decorrelation (fx.decorrelate, 0.25-0.75), or, as a pair of takes, by spread(). space > 0:
+    farther, the air taking the top (a low-pass from 18 kHz to 3.5 kHz) and a diffuse hall joining; space < 0:
+    nearer, up to 3 dB more presence at 3 kHz"""
     w, far = c.width, float(np.clip(c.space + away, -1.0, 1.0))
-    if mono:
+    if pair:
+        y = spread(y, 3.0 * 1.6 ** w)
+    elif mono:
         y = _circular(lambda z: fx.decorrelate(z.mean(axis=1), 0.5 + 0.25 * w), y, loop)
     elif w:
         y = fx.width(y, 1.0 + 0.6 * w)
@@ -214,11 +234,25 @@ def _learned(name, away=0.0):
         tex = store()[name]
         periods = [ch['period'] for ch in tex['chunks']] if tex['periodic'] else None
         dur = max(c.seconds(), 2.0 * max(periods) if periods else 4.0)      # the sea: at least two whole waves
-        tk = quilt.takes(models(name), dur, r, periods=periods, energy=c.energy,
-                         size=c.lerp('size', 0.8, 1.25, 1.0, log=True), bright=1.5 * c.bright)
-        y, _ = quilt.stitch(tk, dur, r, loop=c.loop, periodic=tex['periodic'], energy=c.energy)
-        return place(y, c, tex['channels'] == 1, c.loop, away)
+        pair = bool(tex.get('pair', False))
+        tk = quilt.takes(models(name), dur, r, vary=tex.get('vary', 0.4), periods=periods, energy=c.energy,
+                         pair=pair, size=c.lerp('size', 0.8, 1.25, 1.0, log=True), bright=1.5 * c.bright)
+        y, _ = quilt.stitch(tk, dur, r, loop=c.loop, periodic=tex['periodic'], energy=c.energy,
+                            piece=tuple(tex.get('piece', quilt.PIECE)))
+        if tex['periodic'] and c.loop:
+            y = _into_wave(y)
+        return place(y, c, tex['channels'] == 1, c.loop, away, pair)
     return fn
+
+
+def _into_wave(y, lead=0.3):
+    """a loop of waves turned round so that it starts `lead` s before the first wave rises to the bed's median
+    level: stitched waves start in a trough, and a bed (or a cut of it) that starts there sounds faded in"""
+    p = ndimage.uniform_filter1d(np.mean(y ** 2, axis=1), int(0.3 * dsp.SR), mode='wrap')[::480]
+    L = 10 * np.log10(p + 1e-20)
+    up = np.nonzero(L >= np.median(L))[0]
+    k = max(0, int(up[0] * 480 - lead * dsp.SR)) if len(up) else 0
+    return np.roll(y, -k, axis=0)
 
 
 for _id, (_scene, _fixed, _says, _uses) in SCENES.items():

@@ -435,8 +435,10 @@ SURFACES = {
     # ping of its many modes, damped by the battens), and the roof hides most of the far rain (wash_db)
     'roof': dict(tick=(4200, 1.2, 0.5, 1.0, 0.4), body=(110, 330, 2.5, 1.4, 5.0), modes=(36, 500, 4800, 20.0, 1.0),
                  bubble=0.0, wash=(1900, 3.0, 5.0), near=(1.2, 5.0), drips=2, indoors=True, wash_db=-9.0),
+    # behind a pane the drip of a gutter is its tick alone: its bubble, a pure 1-2 kHz ring every second or two,
+    # stood out of the rain as the one tonal and regular sound in it (puddle=False)
     'window': dict(tick=(6500, 2.0, 0.35, 1.0, 1.0), body=(170, 520, 2.0, 0.6, 2.5), modes=(10, 1700, 6200, 16.0, 0.35),
-                   bubble=0.0, wash=(1100, 3.0, 6.5), near=(0.8, 2.5), drips=1, indoors=True),
+                   bubble=0.0, wash=(1100, 3.0, 6.5), near=(0.8, 2.5), drips=1, indoors=True, puddle=False),
     'street': dict(tick=(5000, 0.9, 0.9, 0.8, 1.0), body=(450, 1100, 2.0, 0.4, 1.2), modes=None, bubble=0.3,
                    wash=(3000, 3.5, 5.0), near=(0.8, 5.0), drips=1, indoors=False),
     'water': dict(tick=(6000, 1.0, 0.5, 0.8, 0.45), body=None, modes=None, bubble=0.55,
@@ -530,7 +532,9 @@ def _rain(n, r, c):
             bursts(near, t, g, pan, r.uniform(260, 520) * np.exp(0.08 * r.standard_normal(len(t))), 2.0, 0.004, r, 0.6)
             bursts(near, t, 0.7 * g, pan, 2600.0, 1.0, 0.0025, r, 0.4)
         else:                                                 # a gutter dripping into a puddle
-            _bubbles(near, t + 0.003, g, pan, size * np.exp(0.06 * r.standard_normal(len(t))), 0.12)
+            bub = size * np.exp(0.06 * r.standard_normal(len(t)))
+            if surf.get('puddle', True):
+                _bubbles(near, t + 0.003, g, pan, bub, 0.12)
             bursts(near, t, 0.6 * g, pan, 4500.0, 1.0, 0.0006, r)
     centres = _bands(90.0, 14000.0, 8)
     env = _levels(centres, *surf['wash'])[:, None] * envelopes(dur, r, 8, 0.12, 0.3, 0.1, 4.0)

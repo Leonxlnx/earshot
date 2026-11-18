@@ -1,60 +1,6 @@
 {
  "about": "learned ambience textures (earshot.synth.quilt, earshot.sounds.nature): resyn models of public-domain recordings, numbers only; see CREDITS.md",
  "textures": {
-  "beach": {
-   "ids": [
-    "waves/sand"
-   ],
-   "title": "Small waves and beach #1",
-   "author": "Joseph Sardin (BigSoundBank.com)",
-   "page": "https://bigsoundbank.com/small-waves-and-beach-1-s1446.html",
-   "licence": "CC0 1.0 (public domain)",
-   "excerpt_s": [
-    2.1,
-    28.7
-   ],
-   "channels": 2,
-   "periodic": true,
-   "seconds": 29.3,
-   "bytes": 470580,
-   "chunks": [
-    {
-     "file": "beach-0.npz",
-     "seconds": 4.1,
-     "period": 3.3
-    },
-    {
-     "file": "beach-1.npz",
-     "seconds": 7.2,
-     "period": 6.4
-    },
-    {
-     "file": "beach-2.npz",
-     "seconds": 8.0,
-     "period": 7.2
-    },
-    {
-     "file": "beach-3.npz",
-     "seconds": 4.7,
-     "period": 3.9
-    },
-    {
-     "file": "beach-4.npz",
-     "seconds": 5.3,
-     "period": 4.5
-    }
-   ],
-   "fidelity": {
-    "env_db": 2.37,
-    "shape_db": 0.72,
-    "mod_db": 1.29
-   },
-   "take_vs_take": {
-    "env_db": 2.51,
-    "shape_db": 0.76,
-    "mod_db": 0.94
-   }
-  },
   "brook": {
    "ids": [
     "stream/brook"
@@ -103,45 +49,105 @@
    "page": "https://bigsoundbank.com/big-branching-fire-1-s0987.html",
    "licence": "CC0 1.0 (public domain)",
    "excerpt_s": [
-    5.0,
-    24.0
+    2.0,
+    35.0
    ],
    "channels": 1,
    "periodic": false,
-   "seconds": 24.9,
-   "bytes": 501154,
+   "seconds": 36.5,
+   "bytes": 1447991,
    "chunks": [
     {
      "file": "campfire-0.npz",
-     "seconds": 6.54,
+     "seconds": 6.33,
      "period": null
     },
     {
      "file": "campfire-1.npz",
-     "seconds": 5.79,
+     "seconds": 5.81,
      "period": null
     },
     {
      "file": "campfire-2.npz",
-     "seconds": 6.78,
+     "seconds": 5.69,
      "period": null
     },
     {
      "file": "campfire-3.npz",
-     "seconds": 5.79,
+     "seconds": 6.37,
+     "period": null
+    },
+    {
+     "file": "campfire-4.npz",
+     "seconds": 6.76,
+     "period": null
+    },
+    {
+     "file": "campfire-5.npz",
+     "seconds": 5.54,
      "period": null
     }
    ],
    "fidelity": {
-    "env_db": 3.12,
-    "shape_db": 1.2,
-    "mod_db": 1.04
+    "env_db": 2.01,
+    "shape_db": 0.77,
+    "mod_db": 0.78
    },
-   "take_vs_take": {
-    "env_db": 3.17,
-    "shape_db": 1.11,
-    "mod_db": 0.63
-   }
+   "vary": 0.0,
+   "piece": [
+    2.5,
+    5.0
+   ],
+   "pair": true
+  },
+  "cornfield": {
+   "ids": [
+    "wind/trees"
+   ],
+   "title": "Wind in a cornfield",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/wind-in-a-cornfield-s1097.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    8.0,
+    24.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 24.9,
+   "bytes": 458155,
+   "chunks": [
+    {
+     "file": "cornfield-0.npz",
+     "seconds": 5.81,
+     "period": null
+    },
+    {
+     "file": "cornfield-1.npz",
+     "seconds": 6.31,
+     "period": null
+    },
+    {
+     "file": "cornfield-2.npz",
+     "seconds": 7.12,
+     "period": null
+    },
+    {
+     "file": "cornfield-3.npz",
+     "seconds": 5.66,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.56,
+    "shape_db": 0.75,
+    "mod_db": 0.98
+   },
+   "vary": 0.1,
+   "piece": [
+    2.5,
+    5.0
+   ]
   },
   "crickets": {
    "ids": [
@@ -181,6 +187,71 @@
     "shape_db": 0.46,
     "mod_db": 0.49
    }
+  },
+  "froth": {
+   "ids": [
+    "waves/sand"
+   ],
+   "title": "Small Waves, Froth and Beach",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/small-waves-froth-and-beach-s1447.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    0.0,
+    34.0
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 36.7,
+   "bytes": 604957,
+   "chunks": [
+    {
+     "file": "froth-0.npz",
+     "seconds": 3.4,
+     "period": 2.6
+    },
+    {
+     "file": "froth-1.npz",
+     "seconds": 7.7,
+     "period": 6.9
+    },
+    {
+     "file": "froth-2.npz",
+     "seconds": 5.9,
+     "period": 5.1
+    },
+    {
+     "file": "froth-3.npz",
+     "seconds": 4.0,
+     "period": 3.2
+    },
+    {
+     "file": "froth-4.npz",
+     "seconds": 3.4,
+     "period": 2.6
+    },
+    {
+     "file": "froth-5.npz",
+     "seconds": 4.4,
+     "period": 3.6
+    },
+    {
+     "file": "froth-6.npz",
+     "seconds": 4.5,
+     "period": 3.7
+    },
+    {
+     "file": "froth-7.npz",
+     "seconds": 3.4,
+     "period": 2.6
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.47,
+    "shape_db": 0.77,
+    "mod_db": 1.43
+   },
+   "vary": 0.0
   },
   "pebbles": {
    "ids": [
