@@ -12,7 +12,7 @@ from earshot.sounds import nature, registry
 from earshot.synth import quilt, resyn
 
 SR = dsp.SR
-BUDGET = 6_000_000
+BUDGET = 6_700_000
 
 
 def test_the_store_is_numbers_with_credits_and_under_budget():
@@ -24,7 +24,8 @@ def test_the_store_is_numbers_with_credits_and_under_budget():
     for name, t in tex.items():
         assert 'CC0' in t['licence'] and t['author'] and t['page'].startswith('https://')
         assert f'`{name}`' in credits and t['page'] in credits
-        assert 10.0 <= t['seconds'] <= (40.0 if t['periodic'] or name in ('campfire', 'cornfield') else 17.5)
+        assert 10.0 <= t['seconds'] <= (40.0 if t['periodic'] or name in ('campfire', 'cornfield', 'deck', 'tinroof',
+                                                                               'umbrella') else 17.5)
         assert set(t['ids']) <= set(nature.LEARNED) | set(nature.SCENES)    # or answered by an invented scene
         assert not t['periodic'] or len(t['chunks']) >= 4 or t['seconds'] < 17.5     # the sea: four waves or more
         for c in t['chunks']:

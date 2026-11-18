@@ -188,6 +188,46 @@
     "mod_db": 0.49
    }
   },
+  "deck": {
+   "ids": [
+    "rain/wood"
+   ],
+   "title": "Rain On Wood Deck (Extreme Quality)",
+   "author": "cocaine",
+   "page": "https://freesound.org/people/cocaine/sounds/611421/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    30.0,
+    20.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 20.6,
+   "bytes": 375881,
+   "chunks": [
+    {
+     "file": "deck-0.npz",
+     "seconds": 6.91,
+     "period": null
+    },
+    {
+     "file": "deck-1.npz",
+     "seconds": 7.2,
+     "period": null
+    },
+    {
+     "file": "deck-2.npz",
+     "seconds": 6.49,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.76,
+    "shape_db": 0.86,
+    "mod_db": 0.98
+   },
+   "vary": 0.4
+  },
   "froth": {
    "ids": [
     "waves/sand"
@@ -251,7 +291,7 @@
     "shape_db": 0.77,
     "mod_db": 1.43
    },
-   "vary": 0.0
+   "vary": 0.1
   },
   "pebbles": {
    "ids": [
@@ -527,6 +567,86 @@
     "shape_db": 0.78,
     "mod_db": 0.69
    }
+  },
+  "tinroof": {
+   "ids": [
+    "rain/tin_roof"
+   ],
+   "title": "rain medium on metal roof ext like porch.flac",
+   "author": "kyles",
+   "page": "https://freesound.org/people/kyles/sounds/454142/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    10.0,
+    20.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 20.6,
+   "bytes": 391349,
+   "chunks": [
+    {
+     "file": "tinroof-0.npz",
+     "seconds": 6.82,
+     "period": null
+    },
+    {
+     "file": "tinroof-1.npz",
+     "seconds": 7.34,
+     "period": null
+    },
+    {
+     "file": "tinroof-2.npz",
+     "seconds": 6.44,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.56,
+    "shape_db": 0.75,
+    "mod_db": 1.26
+   },
+   "vary": 0.4
+  },
+  "umbrella": {
+   "ids": [
+    "rain/umbrella"
+   ],
+   "title": "Rain Under an Umbrella",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/rain-under-an-umbrella-s2679.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    5.0,
+    20.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 20.6,
+   "bytes": 433752,
+   "chunks": [
+    {
+     "file": "umbrella-0.npz",
+     "seconds": 6.91,
+     "period": null
+    },
+    {
+     "file": "umbrella-1.npz",
+     "seconds": 6.6,
+     "period": null
+    },
+    {
+     "file": "umbrella-2.npz",
+     "seconds": 7.09,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.77,
+    "shape_db": 0.87,
+    "mod_db": 1.17
+   },
+   "vary": 0.4
   },
   "underwater": {
    "ids": [
