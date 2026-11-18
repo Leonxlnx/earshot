@@ -12,19 +12,20 @@ game audio teams work from; a product rarely needs more than a dozen distinct so
 event making noise.
 """
 SETS = {
-    # every role is a real thing a hand does (earshot.sounds.interface, made of learned recordings): a key, a switch,
-    # a page, knocks, a pop, a stick through the air, a stapler, paper. A row of pitched notes on a marimba or a bell
-    # reads as a toy or a ringtone on a website, so the figures (earshot.sounds.ui) play only when a theme is named:
-    # `themed` is the set then. tap is the fullest mechanical key (keyboard/mechanical, first in its walk); the pairs
-    # are one thing done two ways (the switch on smaller and brighter, off bigger and duller; the page forward, back
-    # darker and shorter; open a click and air leaving, close air drawn in and a latch)
+    # every role is a real thing a hand does (earshot.sounds.interface, made of learned recordings): a key, a page,
+    # a drawer, a cork, knocks, a camera's shutter, scissors, a stick through the air. A row of pitched notes on a
+    # marimba or a bell reads as a toy or a ringtone on a website, so the figures (earshot.sounds.ui) play only when a
+    # theme is named: `themed` is the set then. tap is the fullest mechanical key (keyboard/mechanical, first in its
+    # walk); the pairs are two actions of one thing (the key going down and coming up for the toggles; the page
+    # forward, and back darker and the other way; a drawer pulled open and pushed shut)
     'ui': dict(says='a product interface: app, website, dashboard', theme=None, seeds={'tap': 0},
                quiet=('hover',), sounds=(
-        ('tap', 'keyboard/mechanical'), ('hover', 'hover/fingertip'), ('toggle_on', 'toggle/rocker_on'),
-        ('toggle_off', 'toggle/rocker_off'), ('type', 'type/key'), ('back', 'back/page'), ('next', 'next/page'),
-        ('open', 'open/air'), ('close', 'close/air'), ('send', 'send/swoosh'), ('receive', 'receive/pop'),
-        ('notify', 'notify/knock'), ('success', 'success/click'), ('complete', 'complete/stamp'),
-        ('warning', 'warning/knock'), ('error', 'error/thud'), ('delete', 'delete/crumple')),
+        ('tap', 'keyboard/mechanical'), ('hover', 'hover/fingertip'), ('toggle_on', 'toggle/key_down'),
+        ('toggle_off', 'toggle/key_up'), ('type', 'type/mechanical'), ('back', 'back/turn'),
+        ('next', 'next/page'), ('open', 'open/drawer'), ('close', 'close/drawer'), ('send', 'send/swoosh'),
+        ('receive', 'receive/cork'), ('notify', 'notify/knock'), ('success', 'success/shutter'),
+        ('complete', 'complete/shutter'), ('warning', 'warning/knock'), ('error', 'error/knock'),
+        ('delete', 'delete/snip')),
                themed=(
         ('tap', 'tap/tone'), ('hover', 'hover/tone'), ('toggle_on', 'toggle/up'), ('toggle_off', 'toggle/down'),
         ('type', 'tap/tone'), ('back', 'back/step'), ('next', 'next/step'), ('open', 'open/lift'),

@@ -64,19 +64,32 @@ def test_renders_clean_short_and_varied(sid):
 
 
 def test_the_ui_set_plays_the_defaults_and_a_theme_the_figures():
-    assert {UI[n] for n in UI if n != 'tap'} <= set(interface.DEFAULTS)
+    assert {UI[n] for n in UI if n != 'tap'} == set(interface.DEFAULTS)
+    assert (UI['open'], UI['receive'], UI['success']) == ('open/drawer', 'receive/cork', 'success/shutter')
     themed = dict(sets.get('ui', theme='glass')['sounds'])
     assert set(themed) == set(UI) and themed['success'] == 'success/rise'
     assert sets.get('ui') is sets.SETS['ui']
 
 
+def test_the_ui_set_is_struck_pressed_turned_or_cut():
+    """no role of the set is a breath of air, a soft bag dropped, a crumpled sheet or a pop of the lips; the one
+    pass of air is the stick swung for a send. Each lasts 0.15 to 0.9 s"""
+    parts = {p for sid in UI.values() for p in interface.PARTS.get(sid, (sid,))}
+    assert not parts & {'whoosh/airy', 'bag/drop', 'paper/ball', 'swish/fast', 'swipe/hand', 'pop/mouth', 'pen/cap'}
+    for name, sid in UI.items():
+        assert 0.15 <= registry.render(sid, seed=0)[1]['dur_s'] <= 0.9, name
+
+
 def test_pairs_are_told_apart():
-    """on brighter and shorter than off; next brighter and longer than back; error's second strike lower than its
-    first (it falls), success's second brighter (it rises)"""
+    """a pair is two actions: the key coming up is brighter than the key going down; the page forward brighter
+    than the page turned back; error's second strike lower than its first (it falls), the pen click's second
+    brighter (it rises)"""
     take = {n: registry.render(UI[n], seed=0)[0] for n in ('toggle_on', 'toggle_off', 'next', 'back')}
-    assert _centroid(take['toggle_on']) > 1.8 * _centroid(take['toggle_off'])
-    assert _centroid(take['next']) > 1.2 * _centroid(take['back']) and len(take['next']) > len(take['back'])
-    for sid, up in (('error/thud', False), ('success/click', True)):
+    assert _centroid(take['toggle_off']) > 1.2 * _centroid(take['toggle_on'])
+    assert _centroid(take['next']) > 1.2 * _centroid(take['back'])
+    opens, shuts = (registry.render(f'toggle/shutter_{k}', seed=0)[0] for k in ('open', 'shut'))
+    assert _centroid(opens) > 1.2 * _centroid(shuts) and len(shuts) > len(opens)
+    for sid, up in (('error/knock', False), ('success/click', True)):
         y, _ = registry.render(sid, seed=0)
         on = int(0.06 * SR)
         e = np.convolve(_mono(y) ** 2, np.ones(on) / on, 'same')

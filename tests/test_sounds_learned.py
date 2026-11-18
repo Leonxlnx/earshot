@@ -277,9 +277,9 @@ def test_seeds_of_one_recording_are_performances(sid):
 
 
 def test_back_and_next_are_one_page_turned_two_ways():
-    """next and back are the same page: back the darker and shorter flick"""
+    """next and back are the same page: back the darker and shorter flick, played the other way"""
     ui = dict(sets.SETS['ui']['sounds'])
-    assert ui['next'] == 'next/page' and ui['back'] == 'back/page'
+    assert ui['next'] == 'next/page' and ui['back'] == 'back/turn'
     nxt, back = (registry.render(ui[n], seed=0)[0] for n in ('next', 'back'))
     assert _centroid(back) < 0.85 * _centroid(nxt) and len(back) < len(nxt)
 
