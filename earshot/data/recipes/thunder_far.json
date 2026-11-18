@@ -3,12 +3,11 @@
  "says": "thunder rolling far away",
  "things": ["thunder rolling far away", "thunder far away", "far thunder", "thunder in the distance"],
  "sketch": true,
- "built": "Two rolls of thunder lower and dull, the second later and duller, low rumble dying away under them, in a hall.",
- "space": "hall",
+ "built": "Two rolls of thunder, the second later, lower and duller, with rain on leaves far under them.",
  "dur": 9,
  "layers": [
-  {"sound": "thunder/roll", "pitch": -4, "lowpass": 700, "gain": 0, "fade_in": 0.3},
-  {"sound": "thunder/roll", "seed": 1, "pitch": -7, "at": 1.4, "lowpass": 400, "gain": -5, "fade_in": 0.3},
-  {"source": "noise", "color": "brown", "dur": 5, "lowpass": [140, 60], "gain": -14, "swell": 0.8, "decay": 3.5}
+  {"sound": "thunder/roll", "lowpass": 2500, "gain": 0, "fade_in": 0.4},
+  {"sound": "thunder/roll", "seed": 1, "pitch": -3, "at": 2.5, "lowpass": 1200, "gain": -6, "fade_in": 0.5},
+  {"sound": "rain/leaves", "dur": 9, "gain": -20}
  ]
 }

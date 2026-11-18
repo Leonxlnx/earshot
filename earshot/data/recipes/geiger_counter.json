@@ -3,10 +3,9 @@
  "says": "a geiger counter clicking",
  "things": ["geiger counter", "geiger"],
  "sketch": true,
- "built": "A dial's click thinned and a mouse click higher, each many times as they come, getting denser, over a quiet room.",
+ "built": "A dial's click an octave higher and cut to its first 40 ms, fifty times as they come and getting denser, over a faint hiss.",
  "layers": [
-  {"sound": "dial/click", "highpass": 1200, "gain": 0, "events": {"count": 36, "gap": 0.11, "loose": 1.0, "faster": 0.985}},
-  {"sound": "click/mouse", "pitch": 5, "highpass": 2000, "at": 0.3, "gain": -5, "events": {"count": 22, "gap": 0.16, "loose": 1.0, "faster": 0.97}},
-  {"sound": "room_tone/quiet", "dur": 4, "gain": -26}
+  {"sound": "dial/click", "pitch": 12, "cut": [0, 0.04], "decay": 0.02, "highpass": 3000, "gain": 0, "events": {"count": 50, "gap": 0.08, "loose": 1.0, "faster": 0.98}},
+  {"source": "noise", "color": "white", "dur": 4.2, "highpass": 6000, "gain": -30}
  ]
 }
