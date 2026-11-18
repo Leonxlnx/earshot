@@ -45,7 +45,7 @@ sound is, then its character.
 
 | group | designs | how it is made | examples |
 |---|---|---|---|
-| learned things | 201 | learned from 517 recorded events in the public domain (animals, people without words, street, house and devices among them) | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
+| learned things | 227 | learned from 557 recorded events in the public domain (animals, people without words, street, house and devices among them) | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
 | interface | 26 | things a hand does, built from learned recordings: a key, a rocker switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper; no note | `keyboard/mechanical`, `toggle/rocker_on`, `next/page`, `notify/knock`, `success/click`, `error/thud` |
 | interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba); for interfaces only when the words ask for music or a theme is named | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 31 | 13 learned from 12 real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
@@ -89,13 +89,13 @@ one request in three or four of the held-out kind needs a second call, which is 
 
 ### Learned sounds: what they are
 
-The 201 learned designs, 13 ambience beds, the recorded drums, the instrument notes and the film sounds layered
+The 227 learned designs, 13 ambience beds, the recorded drums, the instrument notes and the film sounds layered
 from them are not invented. Each comes from recordings in
 the public domain: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound, all CC0 or an
 explicit public-domain dedication. earshot keeps each recording as numbers, not audio: the level of 56 bands on a
 2 ms grid (0.25 ms around an onset), how tonal each band is and at which frequency, and the stereo image
-(`earshot/synth/resyn.py`). The store is 11.05 MB for 517 recorded events (`earshot/data/resyn/`; a few are several
-events cut from one recording, 23 are recordings of a whole action such as a walk), 5.40 MB for 12 textures
+(`earshot/synth/resyn.py`). The store is 12.15 MB for 557 recorded events (`earshot/data/resyn/`; a few are several
+events cut from one recording, 26 are recordings of a whole action such as a walk), 5.40 MB for 12 textures
 (`earshot/data/textures/`), 1.31 MB for 130 drum strokes (`earshot/data/drums/`) and 0.83 MB for 97 single notes
 of four instruments (`earshot/data/notes/`), with a credits file in each. No audio file is shipped or played back. A render draws fresh
 noise and applies the request's controls (size, brightness, attack, ring, length within 0.6-1.8 times the natural
@@ -466,24 +466,57 @@ page that plays them private. In Python: `from earshot.gallery import gallery`.
 
 ## Install
 
-Needs [uv](https://docs.astral.sh/uv/getting-started/installation/) and ffmpeg / ffprobe on PATH (`make` writes wav
-and flac without ffmpeg; ogg, mp3, m4a and webm need it). CPU only; no GPU is used.
+Python 3.10 or newer, CPU only; no GPU is used. ffmpeg on PATH is needed only to write ogg, mp3, m4a and webm (wav and
+flac are written without it) and to read video.
+
+The base install makes sounds: `make`, `make_set`, `sounds`, the sound bank and film kits, and `pack`, on the command
+line, in Python and as MCP tools. It brings numpy, scipy, soundfile, soxr and numba (about 350 MB installed) and no
+model; nothing is downloaded when a sound is made.
+
+```bash
+pip install "earshot @ git+https://github.com/Leonxlnx/earshot"
+earshot make "a soft success sound" -o success.wav
+```
+
+The first sound of a fresh install takes longer: numba compiles the synthesis loops once and keeps them on disk, so
+later calls and later processes start at once.
+
+The other tools listen to sound files, measure them or draw them, and come with extras, named in the brackets
+(several at once: `earshot[listen,mcp]`):
+
+| extra | brings | for |
+|---|---|---|
+| `mcp` | the MCP SDK | `earshot mcp`, the MCP server and the plugin |
+| `listen` | torch, transformers, librosa; the two listening models (~1.1 GB) download on first use | `describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `critique`, `profile`, `make --listen` |
+| `measure` | librosa | `measure` and `find` without the models |
+| `images` | matplotlib, pillow | `sheet`, `gallery`, frames of a video, plots |
+| `llm` | requests | the optional Gemini critique (`earshot llm`, your own API key) |
+| `all` | every extra above | |
+
+A call that needs an extra that is not installed stops with one sentence that says which package is missing and the
+`pip install` command that adds it; `earshot doctor` lists what is installed. torch from the default index is large
+on Linux (it brings CUDA); the CPU build is smaller:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu    # before the listen extra, optional
+pip install "earshot[listen,mcp] @ git+https://github.com/Leonxlnx/earshot"
+earshot doctor --fetch     # downloads the two listening models now (~1.1 GB) instead of on first use
+```
+
+As a uv tool, with the extras in the brackets (uv takes torch from the CPU index); update with `uv tool upgrade
+earshot`:
 
 ```bash
 uv tool install "earshot[mcp] @ git+https://github.com/Leonxlnx/earshot"
-earshot doctor --fetch     # downloads the two listening models now (~1.1 GB); make, sounds and pack need none
 ```
 
-Update with `uv tool upgrade earshot`. For the optional Gemini critique (`earshot llm`, needs your own Gemini API
-key), install `"earshot[mcp,llm] @ git+https://github.com/Leonxlnx/earshot"` instead.
-
-To work on earshot itself, install from a clone (Python 3.10+):
+To work on earshot itself, install from a clone:
 
 ```bash
 git clone https://github.com/Leonxlnx/earshot && cd earshot
 python -m venv .venv
 .venv/bin/python -m pip install torch --index-url https://download.pytorch.org/whl/cpu   # Windows: .venv/Scripts/python
-.venv/bin/python -m pip install -e ".[mcp,llm,dev]"
+.venv/bin/python -m pip install -e ".[all,dev]"
 .venv/bin/python -m earshot doctor --load
 ```
 
@@ -514,6 +547,9 @@ precision).
 
 ### MCP server for Claude Code
 
+The server needs the `mcp` extra; its making tools (`make`, `make_set`, `sounds`, the bank) need nothing more, the
+listening tools the `listen` extra (they answer with the install command until it is there).
+
 ```bash
 claude mcp add earshot --scope user -e EARSHOT_THREADS=3 -- earshot mcp     # uv install
 claude mcp add earshot --scope user -e EARSHOT_THREADS=3 -- /path/to/earshot/.venv/bin/python -m earshot mcp   # clone
@@ -537,8 +573,8 @@ reads `GEMINI_API_KEY` from the environment; never write a literal key into a fi
 
 ### Claude Code plugin
 
-The repository is also a Claude Code plugin and its own marketplace. Install the tool first (above): the plugin
-starts the `earshot` on your PATH and installs nothing itself. Then, in Claude Code:
+The repository is also a Claude Code plugin and its own marketplace. Install the tool first, with the `mcp` extra
+(above): the plugin starts the `earshot` on your PATH and installs nothing itself. Then, in Claude Code:
 
 ```
 /plugin marketplace add Leonxlnx/earshot

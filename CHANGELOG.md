@@ -22,13 +22,13 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   design could not keep) and words `not understood`; a loop written as mp3 or m4a is warned about. `--n` takes,
   `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`, the eight axes, `--lufs`,
   `--mono`, `--no-loop`. A one-shot takes about a second on one thread.
-- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 201 designs of
-  everyday, interface, game and film sounds learned from 517 recorded events in the public domain (the sources of all
+- **Learned sounds** (`earshot/synth/resyn.py`, `earshot/sounds/learned.py`, `earshot/data/resyn/`): 227 designs of
+  everyday, interface, game and film sounds learned from 557 recorded events in the public domain (the sources of all
   learned material, beds, drums and instrument notes included: BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and
   CC0 uploads on Freesound, all CC0 or an explicit public-domain dedication; credits in the `CREDITS.md` of
   `earshot/data/resyn/`, `textures/`, `drums/` and `notes/`). Each recording is analysed at the
   resolution of hearing (56 bands, 2 ms envelopes, 0.25 ms around onsets, measured carriers, the stereo image) and
-  stored as numbers: 11.05 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
+  stored as numbers: 12.15 MB in all, no audio. Every render draws fresh noise, so every take is new, but it is a
   take of that recording, not a sound invented from nothing. A design is one thing and its recordings are its
   variations: seeds walk through them (three seeds of `step/pebbles`, three real footsteps), `meta['member']` names
   the recording. The controls are transforms of the model: size 0.7-1.4, a tilt of up to 2 dB per octave, strikes
@@ -37,6 +37,7 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   recording and its renders the same rating on all 24 rows of his test, and rated sounds invented from formulas for
   real things 1-2 of 5.
 - Animals, people without words, street, house, desk and sport sounds are recordings now (44 designs: a dog barking).
+- More everyday things are recordings now (26 designs: a scream, a sneeze, a sheep, a duck, a glass breaking).
 - **Learned ambience beds** (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`): 13
   beds from 12 BigSoundBank textures (5.40 MB): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`,
   `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`,
@@ -193,6 +194,22 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 
 ### Changed
 
+- **A light install**: the base install is numpy, scipy, soundfile, soxr and numba, all that making sounds needs;
+  torch, transformers and librosa moved to the `listen` extra, librosa also to `measure`, matplotlib and pillow to
+  `images`, and `all` brings every extra.
+- pyloudnorm and scikit-learn are no longer dependencies: nothing in earshot imports them.
+- A command, MCP tool or Python function that needs a missing extra stops with one sentence that names the package
+  and the `pip install` command (`earshot.extras`); importing earshot and making sounds never load torch or librosa.
+- `earshot doctor` reports which extras are installed and does not count a missing extra as a problem.
+- `make` refuses a length over 120 s, a length of 0 or less, a count of takes outside 1 to 12, events outside 1 to 64,
+  a seed that is not a whole number and an unknown option, each with one plain sentence (a seed given as "3" is 3).
+- A request of only spaces is treated as an empty one.
+- `make_set` with an unknown set name names the sets that exist (it looked for a file of that name), and checks each
+  sound's length, takes and seed in the same way as `make`.
+- A sound of a set takes `events` and `loop` as `make` does, and a thing done in a row ("three knocks, 2 seconds",
+  footsteps) is played as the action in a set too, with a `played:` line.
+- `make` no longer reports a material it read from another word ("a chair": wood) as not followed, nor "short" when
+  the length asked in the same request was kept, and an interface press gets no hint about events.
 - **The README** puts making first and listening second; the 0.4 and 0.3 notes moved to a short history.
 - **Package metadata**: version 1.0.0, development status Beta, a description and keywords for both halves; the
   learned models, textures and their credits ship as package data.
@@ -273,6 +290,12 @@ The changes of the last two days, in the order they were built:
 - The reader understands more requests that describe the moment instead of naming the job ("a title lands", "the
   camera pushes in", "a swoosh as the message goes out", "grab a card to drag it", "the logo locks up", "the numbers
   count up"); a thud for a film or a title is never a drum of the kit unless the words name one.
+- Requests written for a real job are read as what they name: a low thump is a thump and no sub drop, a card or a
+  panel that settles lands softly, "careful" before a thing says how it is done, one enemy defeated is a blow and no
+  fanfare, what follows "each time" is where the sound plays, toast that is bitten is no notification, and the
+  seconds asked of footsteps no longer choose the surface. The skill and `docs/MAKE.md` say when a page, a game, a
+  film or a clip needs a sound and when none, what a set does with your own list, how long and how loud sounds come
+  out and where a file's loudest moment lies.
 
 ### Fixed
 
