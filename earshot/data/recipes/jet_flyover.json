@@ -1,0 +1,13 @@
+{
+ "name": "jet_flyover",
+ "says": "a jet flying overhead",
+ "things": ["jet flying over", "jet flyover", "jet overhead", "plane flying over"],
+ "built": "A jet passing, a low whoosh lower with it, and thunder lower and dull as the roar that rolls away, with rumble that swells and falls.",
+ "dur": 7.5,
+ "layers": [
+  {"sound": "pass/jet", "gain": 0},
+  {"sound": "whoosh/low", "pitch": -5, "at": 0.4, "gain": -8},
+  {"sound": "thunder/roll", "pitch": -3, "at": 1.2, "gain": -11, "lowpass": 500},
+  {"source": "noise", "color": "brown", "dur": 5, "lowpass": [400, 90], "gain": -15, "swell": 1.5, "decay": 2.5}
+ ]
+}

@@ -791,7 +791,7 @@ CONCEPT_DIR = {'riser': 1, 'downlifter': -1, 'power_up': 1, 'power_down': -1, 'l
                'receive': -1, 'success': 1, 'error': -1, 'win': 1, 'lose': -1, 'jump': 1, 'land': -1,
                'startup': 1, 'shutdown': -1}
 # words the stemmer would send to the wrong concept ('waving' is not 'waves', 'beating' eggs is no beat of music)
-NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating', 'dice'))
+NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating', 'dice', 'scratch', 'scratching'))   # no 'scratched'
 # function words of German, French, Spanish, Italian and Dutch that are no English words: a request that says one, or
 # a word with a letter outside a to z that the lexicon does not know ("für"), is not written in English. In such a
 # request these words and their English look-alikes (FOREIGN_ALIKE: German "die" is no death, French "pour" no
@@ -897,3 +897,113 @@ STOP = frozenset('a an the of for to in on at by with and or as is are be been b
                  'feedback single "you\'d" "it\'s" "that\'s" "what\'s" "i\'d" let lets bit tell tells take takes '
                  'took look looks see way ones yeah hey oh ok-ish ish style styled themed generic realistic real '
                  'natural actual proper basic standard typical famous'.replace('"', '').split())
+
+# kinds of sound no design is, by the word a request says for them: {word: the nearest design}. The word stays one
+# the reader does not know, so the answer says "earshot makes no ..."; the table only chooses the nearest (a roar is
+# a long low rumble, booing a crowd, a hiss a spray of air); brief.rank
+SOUND_KINDS = {
+    'roar': 'rumble/quake', 'roaring': 'rumble/quake', 'growl': 'rumble/quake', 'growling': 'rumble/quake',
+    'snarl': 'rumble/quake', 'avalanche': 'rumble/quake', 'landslide': 'rumble/quake',
+    'launch': 'explosion/far', 'liftoff': 'explosion/far', 'lift-off': 'explosion/far', 'blastoff': 'explosion/far',
+    'takeoff': 'pass/jet', 'hiss': 'spray_can/spray', 'hissing': 'spray_can/spray', 'fizz': 'spray_can/spray',
+    'fizzing': 'spray_can/spray', 'steam': 'spray_can/spray', 'squeak': 'door/creak', 'squeaking': 'door/creak',
+    'squeaky': 'door/creak', 'squeal': 'tyres/screech', 'squealing': 'tyres/screech',
+    'boo': 'crowd/cheer', 'booing': 'crowd/cheer', 'jeer': 'crowd/cheer', 'jeering': 'crowd/cheer',
+    'moan': 'sigh/person', 'moaning': 'sigh/person', 'groan': 'sigh/person', 'groaning': 'sigh/person',
+    'whisper': 'sigh/person', 'whispering': 'sigh/person', 'grunt': 'cough/person', 'hiccup': 'burp/person',
+    'gulp': 'burp/person', 'slurp': 'straw/bubbles', 'gurgle': 'straw/bubbles', 'gurgling': 'straw/bubbles',
+    'squawk': 'crow/caw', 'screeching': 'tyres/screech', 'flutter': 'wings/flap', 'fluttering': 'wings/flap',
+    'whir': 'drill/electric', 'whirr': 'drill/electric', 'whirring': 'drill/electric', 'idling': 'car_engine/start',
+    'mower': 'car_engine/start', 'chainsaw': 'saw/wood', 'sanding': 'broom/sweep', 'scrubbing': 'broom/sweep',
+    'scraping': 'broom/sweep', 'brushing': 'broom/sweep', 'lightsaber': 'laser/beam', 'humming': 'space_hum/ship',
+    'pecking': 'knock/wood', 'chattering': 'dice/roll', 'trumpeting': 'train/horn', 'shredder': 'paper/rip',
+    'printer': 'paper/page', 'curtain': 'cloth/rustle', 'ladder': 'metal/drop', 'wrench': 'metal/drop'}
+# the designs tried in this order when no word of a request found anything: a request always gets a nearest sound,
+# said to be only that (brief.rank, make.doubt)
+NEAREST_ANY = ('thump/soft', 'tap/soft', 'click/soft')
+# a surface, a ground or a place the catalogue has no design on, and the surfaces that sound nearest to it, nearest
+# first ("rain on an umbrella" is rain on a tent, "rain on wood" rain on a roof, "footsteps in mud" steps on grass);
+# brief.read adds them as words where the request says the surface after "on", "in", "against" or "into"
+SURFACE_KIN = {
+    'wood': ('floorboard', 'roof'), 'wooden': ('wood', 'floorboard', 'roof'), 'deck': ('wood', 'floorboard', 'roof'),
+    'planks': ('wood', 'floorboard', 'roof'), 'porch': ('wood', 'floorboard', 'roof'), 'shed': ('roof',),
+    'jetty': ('wood', 'floorboard'), 'pier': ('wood', 'floorboard'), 'boardwalk': ('wood', 'floorboard'),
+    'umbrella': ('tent',), 'parasol': ('umbrella', 'tent'), 'tarp': ('tent',), 'tarpaulin': ('tent',),
+    'canvas': ('tent',), 'awning': ('tent',), 'raincoat': ('umbrella', 'tent'), 'hood': ('umbrella', 'tent'),
+    'mud': ('grass', 'dirt'), 'muddy': ('grass', 'dirt'),
+    'swamp': ('grass', 'dirt'), 'moss': ('grass',), 'meadow': ('grass',), 'field': ('grass',),
+    'asphalt': ('concrete', 'street'), 'pavement': ('concrete', 'street'), 'sidewalk': ('concrete', 'street'),
+    'road': ('street', 'concrete'), 'tarmac': ('concrete', 'street'), 'cement': ('concrete',),
+    'marble': ('tile', 'stone'), 'tiles': ('tile',), 'cobblestones': ('stone',), 'cobbles': ('stone',),
+    'rock': ('stone', 'rocks'), 'sand': ('gravel',), 'beach': ('sand', 'gravel'), 'pebble': ('pebbles', 'gravel'),
+    'parquet': ('floorboard', 'wood'), 'stairs': ('floorboard', 'wood'), 'staircase': ('floorboard', 'wood'),
+    'ice': ('snow',), 'frost': ('snow',), 'pond': ('water',), 'lake': ('water',), 'sea': ('water',),
+    'river': ('water',), 'pool': ('water',), 'puddle': ('water',), 'puddles': ('water',), 'bucket': ('water',),
+    'car': ('tin', 'roof'), 'tin': ('roof',), 'gutter': ('tin', 'roof'), 'skylight': ('window',),
+    'windshield': ('window',), 'windscreen': ('window',), 'pane': ('window',), 'windowpane': ('window',), 'trees': ('leaves',),
+    'bushes': ('leaves',), 'foliage': ('leaves',), 'canopy': ('leaves',), 'grating': ('metal',), 'grate': ('metal',),
+    'catwalk': ('metal',), 'pipe': ('metal',), 'steel': ('metal',), 'iron': ('metal',)}
+# German words for the things, actions, materials and places the lexicon knows in English, lower case: a request
+# that is not written in English is read through this table word by word ("Regen auf Holz": rain on wood;
+# "Schritte auf Kies": footsteps on gravel), an inflected or compound word by its parts (brief.german)
+GERMAN = {
+    'regen': 'rain', 'regnet': 'rain', 'holz': 'wood', 'hölzern': 'wooden', 'holzboden': 'wooden floor',
+    'schritt': 'footstep', 'schritte': 'footsteps', 'fußschritte': 'footsteps', 'laufen': 'footsteps',
+    'gehen': 'footsteps', 'tür': 'door', 'türe': 'door', 'fenster': 'window', 'kies': 'gravel',
+    'schotter': 'gravel', 'wind': 'wind', 'sturm': 'wind', 'feuer': 'fire', 'lagerfeuer': 'campfire',
+    'wasser': 'water', 'glas': 'glass', 'gläser': 'glasses', 'metall': 'metal', 'blech': 'tin', 'stein': 'stone',
+    'beton': 'concrete', 'schnee': 'snow', 'gras': 'grass', 'wiese': 'grass', 'laub': 'leaves',
+    'blätter': 'leaves', 'dach': 'roof', 'zelt': 'tent', 'boden': 'floor', 'tisch': 'table',
+    'schreibtisch': 'desk', 'klopfen': 'knock', 'klopft': 'knocking', 'anklopfen': 'knock', 'klick': 'click',
+    'klicken': 'click', 'klickt': 'click', 'mausklick': 'mouse click', 'hund': 'dog', 'bellen': 'bark',
+    'bellt': 'barking', 'gebell': 'bark', 'katze': 'cat', 'miauen': 'meow', 'miaut': 'meow',
+    'schnurren': 'purr', 'schnurrt': 'purr', 'auto': 'car', 'motor': 'engine', 'hupe': 'car horn',
+    'hupen': 'car horn', 'autotür': 'car door', 'schlüssel': 'keys', 'schlüsselbund': 'keys',
+    'papier': 'paper', 'münze': 'coin', 'münzen': 'coins', 'erfolg': 'success', 'erfolgreich': 'success',
+    'fehler': 'error', 'fehlermeldung': 'error', 'benachrichtigung': 'notification', 'nachricht': 'message',
+    'warnung': 'warning', 'ton': 'sound', 'geräusch': 'sound', 'klang': 'sound', 'glocke': 'bell',
+    'klingel': 'doorbell', 'türklingel': 'doorbell', 'klingeln': 'ring', 'klingelt': 'ringing',
+    'telefon': 'telephone', 'handy': 'phone', 'tastatur': 'keyboard', 'tippen': 'typing', 'taste': 'key',
+    'knopf': 'button', 'schalter': 'switch', 'lichtschalter': 'light switch', 'öffnen': 'open',
+    'öffnet': 'opening', 'auf': 'on', 'schließen': 'close', 'schließt': 'closing', 'zu': 'shut',
+    'zuschlagen': 'slam', 'knallt': 'slams', 'knallen': 'slam', 'knall': 'bang', 'schlag': 'hit',
+    'schlagen': 'hit', 'schlägt': 'hitting', 'hammer': 'hammer', 'nagel': 'nail', 'säge': 'saw',
+    'sägen': 'saw', 'bohrer': 'drill', 'bohrmaschine': 'drill', 'donner': 'thunder', 'gewitter': 'thunder',
+    'welle': 'wave', 'wellen': 'waves', 'meer': 'waves', 'bach': 'stream', 'fluss': 'river', 'tropfen': 'drop',
+    'tropft': 'dripping', 'wassertropfen': 'water drop', 'platschen': 'splash', 'spritzer': 'splash',
+    'vogel': 'bird', 'vögel': 'birds', 'vogelgezwitscher': 'birds chirping', 'wald': 'forest',
+    'nacht': 'night', 'grillen': 'crickets', 'frosch': 'frog', 'kuh': 'cow', 'pferd': 'horse', 'huhn': 'chicken',
+    'hahn': 'rooster', 'schaf': 'sheep', 'schwein': 'pig', 'ente': 'duck', 'eule': 'owl', 'wolf': 'wolf',
+    'herzschlag': 'heartbeat', 'herz': 'heartbeat', 'atmen': 'breath', 'husten': 'cough', 'niesen': 'sneeze',
+    'lachen': 'laugh', 'gelächter': 'laughter', 'applaus': 'applause', 'klatschen': 'clapping',
+    'menge': 'crowd', 'jubel': 'crowd cheering', 'kuss': 'kiss', 'schnarchen': 'snoring', 'gähnen': 'yawn',
+    'schrei': 'scream', 'buch': 'book', 'seite': 'page', 'umblättern': 'page turn', 'stift': 'pen',
+    'bleistift': 'pencil', 'schere': 'scissors', 'tasse': 'cup', 'teller': 'plate', 'besteck': 'cutlery',
+    'flasche': 'bottle', 'korken': 'cork', 'messer': 'knife', 'topf': 'pot', 'pfanne': 'pan', 'löffel': 'spoon',
+    'kühlschrank': 'fridge', 'uhr': 'clock', 'ticken': 'ticking', 'tickt': 'ticking', 'wecker': 'alarm',
+    'kamera': 'camera', 'auslöser': 'shutter', 'schublade': 'drawer', 'reißverschluss': 'zipper',
+    'zug': 'train', 'fahrrad': 'bicycle', 'fahrradklingel': 'bicycle bell', 'motorrad': 'motorcycle',
+    'hubschrauber': 'helicopter', 'sirene': 'siren', 'schwert': 'sword', 'pfeil': 'arrow', 'schuss': 'gunshot',
+    'explosion': 'explosion', 'laser': 'laser', 'zauber': 'magic spell', 'sprung': 'jump', 'springen': 'jump',
+    'landen': 'land', 'gewonnen': 'win', 'verloren': 'lose', 'ball': 'ball', 'würfel': 'dice',
+    'karten': 'cards', 'pfeife': 'whistle', 'eis': 'ice', 'eiswürfel': 'ice cubes', 'stoff': 'cloth',
+    'leise': 'quiet', 'laut': 'loud', 'weich': 'soft', 'hart': 'hard', 'kurz': 'short', 'lang': 'long',
+    'tief': 'deep', 'hell': 'bright', 'dunkel': 'dark', 'schnell': 'fast', 'langsam': 'slow', 'klein': 'small',
+    'groß': 'big', 'schwer': 'heavy', 'leicht': 'light', 'warm': 'warm', 'sanft': 'gentle', 'weit': 'far',
+    'entfernt': 'far away', 'nah': 'close', 'dreimal': 'three times', 'zweimal': 'twice', 'einmal': 'once',
+    'sekunden': 'seconds', 'sekunde': 'second', 'fällt': 'falling', 'fallen': 'falling', 'fallend': 'falling',
+    'rollen': 'rolling', 'bricht': 'breaking', 'zerbricht': 'breaking', 'zerbrechen': 'break',
+    'gießen': 'pour', 'einschenken': 'pour', 'kochen': 'boiling', 'kocht': 'boiling', 'brutzeln': 'sizzle',
+    'mit': 'with', 'und': 'and', 'für': 'for', 'gegen': 'against', 'im': 'in the', 'am': 'on the',
+    'aus': 'from', 'hinter': 'behind', 'unter': 'under', 'über': 'over', 'durch': 'through', 'beim': 'when',
+    'wenn': 'when', 'ohne': 'without', 'nicht': 'not', 'kein': 'no', 'keine': 'no', 'sehr': 'very',
+    'ein': 'a', 'eine': 'a', 'einen': 'a', 'einem': 'a', 'einer': 'a', 'der': 'the', 'die': 'the', 'das': 'the',
+    'den': 'the', 'dem': 'the', 'des': 'the', 'vom': 'from the', 'zum': 'to the', 'zur': 'to the', 'in': 'in',
+    'von': 'of', 'wird': 'being', 'geöffnet': 'opened', 'geschlossen': 'closed', 'app': 'app', 'spiel': 'game'}
+# a word of GERMAN that is English too and means something else there: it does not by itself mark a request as German
+GERMAN_ALIKE = frozenset(('wind', 'hammer', 'laser', 'explosion', 'ball', 'wolf', 'auto', 'motor', 'in', 'warm',
+                          'app', 'regen', 'ton', 'hell', 'lang', 'die', 'des', 'den', 'am', 'im', 'hart', 'glas',
+                          'handy', 'taste', 'menge', 'bach', 'zug', 'stift', 'herz', 'aus', 'von', 'laut', 'weit',
+                          'boden', 'kies', 'gras', 'spiel', 'tief', 'nah', 'zu', 'auf', 'mit', 'und', 'ein', 'der',
+                          'fallen', 'teller', 'sprung', 'donner', 'klang', 'stein', 'blech', 'spritzer', 'klick',
+                          'hinter', 'unter', 'das', 'dem', 'eis', 'uhr', 'buch', 'kurz', 'ente', 'eule', 'kuh'))

@@ -46,7 +46,7 @@ sound is, then its character.
 | group | designs | how it is made | examples |
 |---|---|---|---|
 | learned things | 235 | learned from 571 recorded events in the public domain (animals, people without words, street, house and devices among them) | `keyboard/desktop`, `switch/lamp`, `step/pebbles`, `door/shut`, `bag/drop`, `cork/bottle`, `camera/shutter`, `sword/draw`, `explosion/near`, `page/turn` |
-| interface | 26 | things a hand does, built from learned recordings: a key, a rocker switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper; no note | `keyboard/mechanical`, `toggle/rocker_on`, `next/page`, `notify/knock`, `success/click`, `error/thud` |
+| interface | 42 | things a hand does, built from learned recordings: a key going down and coming up, a page, a drawer, a cork, knocks, a camera shutter, scissors; no note | `keyboard/mechanical`, `toggle/key_down`, `next/page`, `notify/knock`, `success/shutter`, `error/knock` |
 | interface and game figures | 45 (and 3 ticks) | notes in time, played by a voice (by default a real marimba); for interfaces only when the words ask for music or a theme is named | `success/rise`, `error/fall`, `notify/pair`, `send/lift`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 31 | 13 learned from 12 real textures, 18 from rules | `fire/camp`, `waves/sand`, `night/crickets`, `cafe/busy`, `city/street`; `rain/window`, `forest/morning` |
 | chip | 24 | the channels of 8-bit consoles, band-limited | `coin/chip`, `jump/chip`, `laser/chip`, `explosion/chip` |
@@ -138,10 +138,11 @@ sounds), `game` (22: menus, rewards, jingles, actions), `arcade` (16 chip sounds
 Every one-shot of a set is as loud as it is made alone and only turned down so that none lies more than 2.5 dB over
 the quietest (by its loudest 50 ms; `hover` in `ui` sits just under); loops and beds are levelled by kind. Every
 role of `ui` is a normal sound, a thing a hand does: tap a mechanical key, hover a fingertip barely touching wood,
-the toggles a rocker switch (on smaller and brighter, off bigger and duller), type a desktop key, next and back a
-page flicked forward and dropped back, open and close a pen cap with air let out or drawn in, send a stick swung
-through the air, receive a pop of the lips, notify two light knocks, success a pen clicked in two parts, complete
-a stapler, warning two firm knocks on a door, error two dull thuds of a bag, delete paper crumpled. A plain
+the toggles that key going down and coming up (on bigger and darker, off smaller and brighter), type the same key
+pressed softly, next and back a page flicked forward and turned back darker, open and close a wooden drawer pulled
+out and pushed shut, send a stick swung through the air, receive a cork pulled from a bottle, notify two light
+knocks, success a camera shutter, complete a bigger, slower shutter, warning two firm knocks on a door, error two
+heavier knocks that fall, delete one cut of a pair of scissors. A plain
 interface request in words ("a success sound", "toggle dark mode") gets the same; the tonal figures play only when
 the words ask for music or a theme is named. A JSON spec adds to a set or describes your own (`earshot make --spec
 sounds.json`, MCP `make_set`).
@@ -150,12 +151,12 @@ sounds.json`, MCP `make_set`).
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
 17 sounds in public/sounds (webm, mp3), manifest.json
 tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
-hover.{webm,mp3}: hover/fingertip (0.34 s, -23 LUFS, clean) [named]
-toggle_on.{webm,mp3}: toggle/rocker_on (0.22 s, -19 LUFS, clean) [named]
+hover.{webm,mp3}: hover/fingertip (0.34 s, -22 LUFS, clean) [named]
+toggle_on.{webm,mp3}: toggle/key_down (0.24 s, -19 LUFS, clean) [named]
 ...
-success.{webm,mp3}: success/click (0.31 s, -17 LUFS, clean) [named]
-error.{webm,mp3}: error/thud (0.49 s, -18 LUFS, clean) [named]
-17 sounds in public/sounds\sprite.webm + sprite.mp3 (10.5 s, 92 kB, 165 kB), map sprite.json
+success.{webm,mp3}: success/shutter (0.36 s, -15 LUFS, clean) [named]
+error.{webm,mp3}: error/knock (0.58 s, -18 LUFS, clean) [named]
+17 sounds in public/sounds\sprite.webm + sprite.mp3 (11.7 s, 101 kB, 183 kB), map sprite.json
 ```
 
 ### Sprites, loops, formats

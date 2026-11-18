@@ -43,7 +43,8 @@ Then:
 |---|---|---|
 | `not in this sound: ...` | sounds or jobs the request named that the chosen design does not cover | ask for them in a second call, or pick from `also` |
 | `also: ...` | up to three alternatives, always: the next ranked designs, then the nearest of the same family, kind or domain | take one with `--sound ID` if the pick does not fit the job |
-| `also (the pick is a guess: ...): id (a few words), ... Name one with sound=<id>` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high; the alternatives then come from other families first, each with the start of its description | name one with `--sound ID`, or re-ask naming the sound or the job |
+| `also (the pick is a guess: ...): id (a few words), ... Name one with sound=<id>` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high, or the thing or what it does is a word earshot does not know (`earshot makes no curtain being pulled; cloth/rustle is only the nearest sound it has`); the alternatives then come from other families first, each with the start of its description | name one with `--sound ID`, or describe the sound by what it is made of ("a long rustle of heavy fabric") instead of by its name, or tell the user that this thing is missing |
+| `no rain on a tarp: rain/tent is the nearest surface; also: ...` | the sound exists, but not on the surface, ground or place said after "on", "in", "against" or "into"; the pick is the same sound on the nearest surface it has, the alternatives its other surfaces | leave it, or name another surface with `--sound ID` |
 | `not followed: "slow"; this sound has no control of its speed ...` | a control the request asked for (in words or as an argument) that this design does not have; the line says what it does instead. A word that named the design ("fast" in "a fast whoosh") is never listed | leave it, or ask for a design that has that control |
 | `0.43 s, not the 2 s asked: a single struck sound rings as long as it rings` | a length a one-shot cannot keep | leave it, or ask for a whoosh, a figure or a bed |
 | `a cut of 4 s, not a loop: the shortest seamless loop of this sound is 8.00 s` | an ambience asked shorter than its shortest loop: the length asked, cut from the bed with a 30 ms fade in and a fade out (10 % of it, at most 0.5 s) | say "a seamless loop of ..." if it must repeat |
@@ -98,12 +99,9 @@ silent end trimmed and faded, the level below) and audited by `forge.sfx.check` 
 comb ring, a pitch that climbs more than 4 semitones, a hit with stacked attacks or a build before it; findings a
 design declares as its own, such as a power-up's rising pitch, are notes). A take that fails is rendered again on
 seed + 101, + 202, + 303; if all four fail the first is written and its line names the warnings. A request that
-matches nothing is an error that says what to ask for:
-
-```
-$ earshot make "a frobnicating zorp" -o x.wav
-earshot make: error: ValueError: no sound in the catalogue answers 'a frobnicating zorp': `earshot sounds` lists what there is; name the sound itself (a chime, a click, a whoosh, rain) or the job it plays (success, coin, logo)
-```
+matches nothing is no error: it gets the nearest sound there is, and the guess line says that it is only that
+(`earshot make "a frobnicating zorp" -o x.wav` writes `thump/soft` and says `also (the pick is a guess: earshot
+makes no frobnicating zorp; thump/soft is only the nearest sound it has): ...`).
 
 **`--listen` and the sound atlas.** `earshot/data/sounds_atlas.npz` (numbers only) holds a CLAP embedding of every
 design's default render and of its own descriptions. With `--listen`, the request's CLAP text embedding is scored
@@ -290,23 +288,23 @@ earshot make --spec sounds.json [-o FOLDER] [--theme NAME] [--format ...] [--spr
 $ earshot make --set ui -o public/sounds --format webm,mp3 --sprite sprite
 17 sounds in public/sounds (webm, mp3), manifest.json
 tap.{webm,mp3}: keyboard/mechanical (0.32 s, -18 LUFS, clean) [named]
-hover.{webm,mp3}: hover/fingertip (0.34 s, -23 LUFS, clean) [named]
-toggle_on.{webm,mp3}: toggle/rocker_on (0.22 s, -19 LUFS, clean) [named]
-toggle_off.{webm,mp3}: toggle/rocker_off (0.25 s, -20 LUFS, clean) [named]
-type.{webm,mp3}: type/key (0.27 s, -19 LUFS, clean) [named]
-back.{webm,mp3}: back/page (0.41 s, -17 LUFS, clean) [named]
-next.{webm,mp3}: next/page (0.54 s, -16 LUFS, clean) [named]
-open.{webm,mp3}: open/air (0.36 s, -18 LUFS, clean) [named]
-close.{webm,mp3}: close/air (0.47 s, -17 LUFS, clean) [named]
-send.{webm,mp3}: send/swoosh (0.33 s, -22 LUFS, clean) [named]
-receive.{webm,mp3}: receive/pop (0.38 s, -20 LUFS, clean) [named]
-notify.{webm,mp3}: notify/knock (0.40 s, -19 LUFS, clean) [named]
-success.{webm,mp3}: success/click (0.31 s, -17 LUFS, clean) [named]
-complete.{webm,mp3}: complete/stamp (0.29 s, -20 LUFS, clean) [named]
-warning.{webm,mp3}: warning/knock (0.48 s, -20 LUFS, clean) [named]
-error.{webm,mp3}: error/thud (0.49 s, -18 LUFS, clean) [named]
-delete.{webm,mp3}: delete/crumple (0.61 s, -14 LUFS, clean) [named]
-17 sounds in public/sounds\sprite.webm + sprite.mp3 (10.5 s, 92 kB, 165 kB), map sprite.json
+hover.{webm,mp3}: hover/fingertip (0.34 s, -22 LUFS, clean) [named]
+toggle_on.{webm,mp3}: toggle/key_down (0.24 s, -19 LUFS, clean) [named]
+toggle_off.{webm,mp3}: toggle/key_up (0.21 s, -18 LUFS, clean) [named]
+type.{webm,mp3}: type/mechanical (0.30 s, -19 LUFS, clean) [named]
+back.{webm,mp3}: back/turn (0.51 s, -14 LUFS, clean) [named]
+next.{webm,mp3}: next/page (0.54 s, -15 LUFS, clean) [named]
+open.{webm,mp3}: open/drawer (0.68 s, -14 LUFS, clean) [named]
+close.{webm,mp3}: close/drawer (0.73 s, -17 LUFS, clean) [named]
+send.{webm,mp3}: send/swoosh (0.33 s, -21 LUFS, clean) [named]
+receive.{webm,mp3}: receive/cork (0.41 s, -19 LUFS, clean) [named]
+notify.{webm,mp3}: notify/knock (0.40 s, -18 LUFS, clean) [named]
+success.{webm,mp3}: success/shutter (0.36 s, -15 LUFS, clean) [named]
+complete.{webm,mp3}: complete/shutter (0.59 s, -14 LUFS, clean) [named]
+warning.{webm,mp3}: warning/knock (0.48 s, -19 LUFS, clean) [named]
+error.{webm,mp3}: error/knock (0.58 s, -18 LUFS, clean) [named]
+delete.{webm,mp3}: delete/snip (0.66 s, -14 LUFS, clean) [named]
+17 sounds in public/sounds\sprite.webm + sprite.mp3 (11.7 s, 101 kB, 183 kB), map sprite.json
 ```
 
 Every sound of the `ui` set is a normal sound, a thing a hand does with an object, built from learned recordings
@@ -317,24 +315,28 @@ reads as a toy or a ringtone. The seventeen roles:
 |---|---|---|
 | tap | `keyboard/mechanical` | the fullest key of a mechanical keyboard |
 | hover | `hover/fingertip` | a fingertip touching a wooden table very lightly, no click (the quietest of the set) |
-| toggle_on, toggle_off | `toggle/rocker_on`, `toggle/rocker_off` | a rocker switch: on smaller and brighter, off bigger and duller |
-| type | `type/key` | one full key of a desktop keyboard |
-| next, back | `next/page`, `back/page` | a page flicked forward; dropped back darker and shorter |
-| open, close | `open/air`, `close/air` | a pen cap pulled and air let out; air drawn in ending on the cap snapped on |
+| toggle_on, toggle_off | `toggle/key_down`, `toggle/key_up` | the tap's key going down (bigger, darker) and coming back up (smaller, brighter): the two halves of one keystroke |
+| type | `type/mechanical` | the tap's mechanical key pressed more softly |
+| next, back | `next/page`, `back/turn` | a page flicked forward; the same turn darker and played the other way |
+| open, close | `open/drawer`, `close/drawer` | a wooden drawer pulled out; another pushed shut, the end of its slide and the knock |
 | send | `send/swoosh` | a thin stick swung fast through the air |
-| receive | `receive/pop` | a soft round pop of the lips |
+| receive | `receive/cork` | a small cork pulled out of a bottle, a short hollow plop |
 | notify | `notify/knock` | two light knuckle knocks on hollow wood |
-| success | `success/click` | a ballpoint pen clicked in two parts, the second brighter |
-| complete | `complete/stamp` | a stapler pressed down firmly with a dull thump under it |
+| success | `success/shutter` | a camera shutter fired, a quick two-part mechanical click |
+| complete | `complete/shutter` | a bigger camera's shutter, a fuller and slower clack |
 | warning | `warning/knock` | two firm, dull knocks on a door |
-| error | `error/thud` | two low, dull thuds of a soft bag, the second bigger and lower |
-| delete | `delete/crumple` | a sheet of paper crumpled fast |
+| error | `error/knock` | two heavy knocks on a door that fall: lower than the warning's, the second lower than the first |
+| delete | `delete/snip` | one cut of a pair of scissors, the blades sliding shut and their snip |
 
-A pair is one thing done two ways, so a listener tells them apart without seeing the name; a signal of two strikes
-keeps them 90 to 160 ms apart, the second of a positive one brighter, of a negative one lower. Each design plays
-fixed recordings of the learned store, so a set always sounds like the same objects. Other candidates per role are
-in the catalogue (`hover/pad`, `next/swipe`, `back/swipe`, `open/drawer`, `receive/cork`, `notify/pop`,
-`success/shutter`, `complete/latch`, `delete/swish`) and take a role by name in a spec. A request for one interface
+A pair is two actions of one thing, so a listener tells them apart without seeing the name; a signal of two strikes
+keeps them 90 to 180 ms apart, the second of a positive one brighter, of a negative one lower. Each design plays
+fixed recordings of the learned store, so a set always sounds like the same objects. One other candidate per
+rebuilt role takes it by name in a spec: `toggle/shutter_open` and `toggle/shutter_shut` (a film camera's shutter
+opening and closing), `type/light`, `back/leaf` (a heavier page falling back), `close/door`, `complete/chop` (one
+chop of a knife on a board), `error/chop`, `delete/sweep` (a stroke of a broom), `notify/pop`, `success/click`,
+`toggle/rocker_on` and `toggle/rocker_off`; the first designs of these jobs (`open/air`, `close/air`, `type/key`,
+`back/page`, `receive/pop`, `complete/stamp`, `error/thud`, `delete/crumple` and five more) are still in the
+catalogue under their names. A request for one interface
 job in words ("a success sound", "a notification", "toggle dark mode") gets the same design, and a like ("like
 button tapped") gets `like/pop`, a small bright pop of the lips over a fingertip; a figure on an
 instrument answers only when the words ask for music (an instrument, a chime, a jingle, a melody) or for chip sound,
@@ -510,6 +512,118 @@ again leaving out sprites. `make --set ... --sprite` packs what it rendered, not
 Python: `from earshot.pack import pack; pack('assets/arcade', 'assets/arcade_all.webm')`, or a list of outputs
 (`['sprite.webm', 'sprite.mp3']`) for the same sprite in several formats.
 
+## When earshot has no such sound: build it
+
+The catalogue cannot hold everything. For a thing no design is, `make` answers with the nearest design and says so
+(`earshot makes no rocket launch; ... is only the nearest sound it has`), and adds `build it from parts: earshot
+recipe --example`. A recipe is that: a sound built from the catalogue's own parts, written as a small JSON form.
+Whoever asks designs it; earshot renders it and checks it like every other sound. No model is loaded.
+
+```
+earshot recipe --example                        # the form in a few lines and three recipes to start from
+earshot recipe --list                           # the cookbook: the recipes that ship with earshot
+earshot recipe dragon_roar                      # one of them, as JSON, to change
+earshot recipe --check roar.json                # check a recipe without rendering it
+earshot make --recipe roar.json -o roar.wav     # render it; --recipe - reads it from standard input
+earshot make "a dragon roaring" --recipe roar.json -o roar.wav --listen     # and say how well it matches the words
+```
+
+```python
+from earshot.make import make
+make(recipe={'name': 'dragon_roar', 'says': 'a dragon roaring', 'space': 'hall', 'layers': [
+    {'sound': 'horse/neigh', 'pitch': -12, 'lowpass': 4000},
+    {'sound': 'cow/moo', 'pitch': -9, 'at': 0.15, 'gain': -3},
+    {'sound': 'fire/whoosh', 'pitch': -5, 'at': 0.6, 'gain': -9},
+    {'source': 'noise', 'color': 'brown', 'dur': 3.0, 'lowpass': [70, 150], 'gain': -16, 'swell': 0.6,
+     'decay': 1.5}]}, out='roar.wav')
+```
+
+The method: say what physically makes the sound (the source, what it hits or moves through, its size, how far away
+it is); find two to four real parts with `earshot sounds --search <word>`; write the layers; render; read the result
+line and, with the listening extra, how well the sound matches the words; change one thing and render again. Real
+recordings first: the designs learned from recordings are the best material. Noise is for air and rumble only, the
+sine for weight under a hit; a tone that sounds like a synthesiser belongs only in a thing that is one.
+
+### The form
+
+The whole:
+
+| field | what it is |
+|---|---|
+| `name` | the sound's name: lower-case letters, digits and `_`; it names the file when `-o` is not given |
+| `says` | what the sound is, in words; `--listen` matches the sound against it |
+| `layers` | 1 to 8 layers |
+| `dur` | seconds: the file is cut there with a fade (a length the layers do not reach is said in a note) |
+| `space` | `dry` (default), `booth`, `room`, `studio`, `hall`, `plate`, `cathedral` |
+| `kind` | `event` (default), or `ambience`: levelled like a bed and faded in and out |
+| `things`, `built`, `sketch` | cookbook fields: the requests the recipe answers, one sentence on what it is built from, and `true` for a recipe that is only a start (below) |
+
+A layer is a catalogue design (`"sound": "door/slam"`) or a plain source (`"source": "noise"` or `"sine"`):
+
+| field | what it does |
+|---|---|
+| `seed` | another take of the design; of a learned design, its next recording |
+| `size`, `bright`, `hard`, `energy`, `ring`, `motion`, `width` | the design's own axes, -1 to 1, where it has them; one it lacks is said in a note |
+| `dur` | the length asked of the design itself: an ambience any length, a whoosh, a recording within 0.6 to 1.8 times its own; of a source, its length (required) |
+| `pitch` | semitones, -24 to 12, as a tape does it: lower is also slower and bigger |
+| `reverse` | played backwards: a decay becomes a swell that ends on its strike |
+| `cut` | `[from, to]` in seconds: the part of the take that is used |
+| `halt` | seconds, 0.05 to 10: the take runs down to a stop, as a motor does when its power is cut |
+| `lowpass`, `highpass` | Hz, 20 to 20000; two numbers `[from, to]` move the cutoff over the layer |
+| `pan` | -1 (left) to 1 (right) |
+| `gain` | dB, -40 to 12, against the other layers: every layer is first brought to the same peak |
+| `at` | seconds: where the layer starts |
+| `fade_in`, `fade_out` | seconds: fades at its ends; when not said, an ambience gets 0.1 and 0.3 s and a source 0.01 and 0.02 s |
+| `swell`, `decay` | seconds: a slow rise from 30 dB down at its start, a slow fall to nothing at its end |
+| `events` | `{"count", "gap", "faster", "softer", "loose"}`: the layer 2 to 64 times, each a new take, `gap` seconds apart; each gap `faster` times the one before (under 1: faster and faster); each event `softer` dB against the one before; `loose` 0 to 1 moves each up to half its gap early or late |
+| `color` | of noise: `white`, `pink` (default) or `brown` |
+| `hz`, `to` | of a sine: 20 to 150 Hz, gliding to `to` |
+
+Every mistake is answered in one sentence that names the field and what it takes: `layers[0].sound 'lion/raor' is
+not in the catalogue; the nearest ids: ...`, `layers[1].pitch is a number of semitones from -24 to 12, not 40`,
+`unknown field 'loud' in layers[0]: a layer takes sound, source, seed, ...`.
+
+The result has the fields of every `make` result (`summary`, `files`, `takes` with `checks`, `dur_s`, `lufs_max`,
+`peak_s`, `onset_s`) and `source: "recipe"`, `sound: "recipe/<name>"` and `parts` (what it is built from). `--n 3`
+writes three takes: the seeds give other takes of every layer and new noise; one seed always gives the same
+samples. A recipe is rendered as written: the request's controls (`--pitch`, the axes, `--theme`) do not apply to
+it, `--dur` cuts it. In a set, a recipe is one of its sounds: `{"name": "roar", "recipe": {...}}` (or the name of a
+cookbook recipe), with `seed`, `lufs` and `dur`; it is levelled with the set.
+
+One sound as the body of another ("the hits of X ringing through the resonance of Y") is not in the form: the
+engine has no way to take a resonance from a design that holds for any pair of designs.
+
+### Ten worked recipes
+
+Each is in the cookbook (`earshot recipe <name>` prints it whole). The last column is the line `earshot make
+--recipe <name> -o <name>.wav` printed for it; `clean` means the audit found no click, no cut tail, no silence
+inside and no clipping, not that the sound was judged by ear.
+
+| the thing | the thought | the layers | the result |
+|---|---|---|---|
+| a dragon's roar, `dragon_roar` | a huge animal's voice with fire in it, in a cave | `horse/neigh` -12 semitones, `cow/moo` -9, `pig/oink` -15, `fire/whoosh` -5 as the breath, brown noise under 70 to 150 Hz, space hall | 5.26 s, peak at 2.66 s, -14 LUFS, clean |
+| a rocket launch, `rocket_launch` | an ignition, a bang, a roar that swells and stays | `gas_stove/ignite`, `explosion/near` -5, `pass/jet` -7 and `fire/camp` -5 with a swell, brown noise under 90 to 240 Hz | 6.46 s, peak at 0.30 s, -14 LUFS, clean |
+| a monster's growl, `monster_growl` | a wet, slow breath in a big throat | `snore/person` -10 and `cat/purr` -12, both cut to 2.8 s, `pig/oink` -15, brown noise under 120 Hz, space room | 2.63 s, peak at 1.64 s, -14 LUFS, clean |
+| a spaceship door, `spaceship_door` | air released, a motor that runs and stops, a panel, a stop | `spray_can/spray` over 800 Hz, `drill/electric` -9 with `halt` 0.7, `door/slide`, `lock/latch` -5, space studio | 1.67 s, peak at 0.46 s, -14 LUFS, clean |
+| a robot powering down, `robot_power_down` | a switch, motors that lose speed, the body settling | `switch/industrial`, `drill/electric` -5 with `halt` 1.6, `vacuum/cleaner` -7 with `halt` 1.8, `spray_can/spray`, `dumbbell/place` -3 | 2.91 s, peak at 0.25 s, -14 LUFS, clean |
+| a sword on a shield, `sword_on_shield` | the clang, the wood, the boss and the weight at one moment, the swing before | `sword/swing`, then at 0.2 s `clash/sword`, `knock/hollow` -7, `saucepan/hit` -7 under 3000 Hz, `punch/body` | 0.90 s, peak at 0.27 s, -14 LUFS, clean |
+| a campfire in the wind, `campfire_wind` | two real beds and what happens in them | `fire/camp`, `wind/trees` with a swell, pink noise under 500 to 1400 Hz as a gust, `twigs/snap` five times with `loose` 0.9, kind ambience | 7.65 s, peak at 0.54 s, -22 LUFS, clean |
+| a bowling strike, `bowling_strike` | a ball rolling nearer, one hit, pins that scatter | brown noise under 180 to 420 Hz with a swell, `land/wood` -5, `dice/throw` -10, `knock/hollow` -3 six times, each softer and later, space studio | 3.07 s, peak at 1.25 s, -16 LUFS, clean |
+| a heartbeat getting faster, `heartbeat_faster` | one beat cut out of the steady run, the gaps shrinking | `heart/beat` cut to its first 0.6 s, nine times, each gap 0.9 of the one before | 5.99 s, peak at 5.44 s, -16 LUFS, clean |
+| a giant's footsteps, `giant_footsteps` | weight, slowness, the ground answering | `heavy_drop/floor` -9, `land/dirt` -12, brown noise under 90 Hz, `twigs/snap` -5, each four times, 1.15 s apart, space hall | 4.80 s, peak at 2.66 s, -14 LUFS, clean |
+
+### The cookbook
+
+`earshot/data/recipes` holds recipes for things people ask for and no design is. A request that names one of them
+(`"a dragon roar"`, `"a giant's footsteps"`) is answered by its recipe unless the catalogue's own first design was
+found by those very words; the answer says `built from parts by the cookbook recipe dragon_roar` and names the
+nearest designs, which `--sound <id>` still gives. `earshot recipe --list` prints each recipe with its parts.
+
+A recipe with `"sketch": true` is one that earshot's listening model does not hear as its thing yet (a geiger
+counter, a whale call, footsteps in mud, a subway arriving, a magic portal, thunder far away). It is never given as
+the answer: the catalogue answers as before, and one more line names the sketch as a start (`a start from parts:
+earshot make --recipe geiger_counter`).
+
 ## The request language
 
 `earshot.brief.read` turns words into a brief without any model, from the tables in `earshot/sounds/lexicon.py`.
@@ -583,8 +697,20 @@ What is recognised:
   hit", "a logo reveal", "a transition") gets the film group's hits, thumps, ticks and whooshes. Neither gets a
   design made of notes unless the words ask for music (an instrument, a chime, a jingle, a melody, a motif, a pad)
   or for chip sound, or the request is for a game.
-- **Things earshot does not make.** A request whose thing is in no design is an error that says so: `no sound in
-  the catalogue answers '...' (earshot makes no THING): ...`, never a stand-in.
+- **Things earshot does not make.** A request always gets a sound. When the thing that makes it, or what the thing
+  does, is a word neither the lexicon nor any design's name or job knows ("a curtain being pulled", "a paper
+  shredder", "a stomach growl"), the answer is the nearest design and says so: `also (the pick is a guess: earshot
+  makes no curtain being pulled; cloth/rustle is only the nearest sound it has): ...`. The nearest is chosen by
+  the kind of sound the word names (a growl is a low rumble, a hiss a spray of air, a whisper a sigh:
+  `lexicon.SOUND_KINDS`), else by the words of the request that are known, never passed off as the thing.
+- **On, in, against, into.** What follows these words after the sound is its surface, ground, material or place,
+  not a second sound: "rain on wood" is rain and no forest, "a ball bouncing on wood" the ball. The surface picks
+  among the sound's own designs ("footsteps on gravel"), a surface none of them has picks the nearest one and says
+  so ("rain on a tarp": `no rain on a tarp: rain/tent is the nearest surface`; `lexicon.SURFACE_KIN`).
+- **German.** A request in German is read word by word through a table of about 250 sound words
+  (`lexicon.GERMAN`): "Regen auf Holz" is read as "rain on wood", "Schritte auf Kies" as "footsteps on gravel".
+  A request with a word the table lacks, or in another language, is still answered as a guess that says "write it
+  in English".
 - **Direction.** "rising", "falling", "going up" ... prefer designs whose gesture moves that way.
 - **Loop or not.** "loop", "seamless", "looping", "endless" ask for a loop; "no loop", "one-shot" for the scene
   once.
@@ -705,7 +831,7 @@ sound is or does, the name its character.
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
 | learned (`sounds/learned.py`) | 235 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
-| interface (`sounds/interface.py`) | 26 | `hover/fingertip`, `toggle/rocker_on`, `toggle/rocker_off`, `type/key`, `next/page`, `back/page`, `open/air`, `close/air`, `send/swoosh`, `receive/pop`, `notify/knock`, `success/click`, `complete/stamp`, `warning/knock`, `error/thud`, `delete/crumple`; other candidates `hover/pad`, `next/swipe`, `back/swipe`, `open/drawer`, `receive/cork`, `notify/pop`, `success/shutter`, `complete/latch`, `delete/swish` | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
+| interface (`sounds/interface.py`) | 42 | `hover/fingertip`, `toggle/key_down`, `toggle/key_up`, `type/mechanical`, `next/page`, `back/turn`, `open/drawer`, `close/drawer`, `send/swoosh`, `receive/cork`, `notify/knock`, `success/shutter`, `complete/shutter`, `warning/knock`, `error/knock`, `delete/snip`; other candidates `toggle/shutter_open`, `toggle/shutter_shut`, `toggle/rocker_on`, `toggle/rocker_off`, `type/light`, `back/leaf`, `close/door`, `complete/chop`, `error/chop`, `delete/sweep`, `notify/pop`, `success/click`, and the first designs of these jobs (`open/air`, `error/thud`, `receive/pop` ...) | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
 | interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation, when the words ask for music or a theme is named | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |

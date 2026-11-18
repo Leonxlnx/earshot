@@ -36,7 +36,7 @@ from .sounds import lexicon as L
 from .report import emit, read_json
 
 SET_FIELDS = ('name', 'want', 'sound', 'pitch', 'dur', 'voice', 'material', 'seed', 'n', 'axes', 'lufs', 'events',
-              'loop')
+              'loop', 'recipe')
 TRIES = 4
 GUESS_Z, GUESS_HAIR = 2.0, 0.06     # `guess`: semantic support, and how close another family may come (share)
 # formats whose encoder pads the start and end of a file and records it only in a note some players ignore (the LAME
@@ -144,9 +144,12 @@ def doubt(b, cands):
     if not cands or cands[0]['score'] is None:
         return None
     top = cands[0]
-    absent = brief.not_made(b)
-    if absent:                          # "a dog barking": no design is one; the pick is only the nearest
+    absent = brief.not_made(b, top['why'])
+    if absent:                          # "a dog barking", "a rocket launch": no design is one; only the nearest
         return f'earshot makes no {absent}; {top["id"]} is only the nearest sound it has'
+    other = surface(b, top['id'])
+    if other:                           # "rain on an umbrella": the rain exists, on another surface
+        return other
     fam = top['id'].split('/')[0]
     # an invented twin of the pick, or the kit's cymbal under the film's, is the same thing (lexicon.TWINS,
     # FILM_CYMBAL), not another kind of sound; a learned pick
@@ -159,12 +162,39 @@ def doubt(b, cands):
     close = bool(others) and top['score'] - others[0]['score'] <= GUESS_HAIR * abs(top['score'])
     # a request in another language is read only for the English words it holds: the pick is a guess that says
     # how to ask
+    # (a German request read whole through the reader's table is read as its English: nothing to say)
     english = 'the request does not read as English, write it in English'
+    foreign = b.get('foreign') and not b.get('read_as')
     if (named or heard) and not close:
-        return english if b.get('foreign') else None
+        return english if foreign else None
     why = 'another kind of sound fits almost as well' if close else 'no job or sound word matched' + (
         ' and it does not clearly sound like the request' if b.get('listened') else '')
-    return f'{why}; {english}' if b.get('foreign') else why
+    return f'{why}; {english}' if foreign else why
+
+
+def surface(b, sid):
+    """the plain note when the request says what its sound happens on or in (brief.read's `surface`: "rain on an
+    umbrella", "footsteps in mud") and the design picked is of that sound on another surface: 'no rain on an
+    umbrella: rain/tent is the nearest surface'; None when the design's own name, jobs or descriptions say a word
+    of the surface, or its family is not one of a sound on several surfaces (at least two designs named for a
+    surface or a ground of lexicon.SURFACE_KIN: rain, steps, landings, waves)"""
+    from .sounds import registry
+    sur = b.get('surface')
+    if not sur or not sur.get('words') or not sur.get('of'):
+        return None
+    row = registry.get(sid).row()
+    fam = sid.split('/')[0]
+    grounds = {brief.stem(v) for vs in L.SURFACE_KIN.values() for v in vs}
+    names = [{brief.stem(p) for p in r['id'].split('/')[1].split('_')} for r in registry.rows()
+             if r['id'].split('/')[0] == fam]
+    if sum(bool(n & grounds) for n in names) < 2:
+        return None
+    own = ' '.join([sid.replace('/', ' ').replace('_', ' ')] + [str(s) for k in ('says', 'uses', 'tags')
+                                                                 for s in row.get(k) or ()])
+    have = {brief.stem(w) for w in brief.WORD.findall(own.lower())}
+    if any(brief.stem(w) in have for w in sur['words']):
+        return None
+    return f"no {sur['of']} {sur['prep']} {' '.join(sur.get('said') or sur['words'])}: {sid} is the nearest surface"
 
 
 def alternatives(b, cands, pick, k=3, others_first=False):
@@ -215,6 +245,11 @@ def guess(b, cands, also=None):
         also = [c['id'] for c in cands[1:] if c['id'].split('/')[0] != fam]
         also = (also + [c['id'] for c in cands[1:] if c['id'] not in also])[:3]
     alts = ', '.join(f'{a} ({gist(a)})' if gist(a) else a for a in also)
+    if why == surface(b, cands[0]['id']):       # the sound exists, on another surface: no guess, its other surfaces
+        fam = cands[0]['id'].split('/')[0]
+        same = [c['id'] for c in cands[1:] if c['id'].split('/')[0] == fam][:3]
+        alts = ', '.join(f'{a} ({gist(a)})' if gist(a) else a for a in same) or alts
+        return f'{why}; also: {alts}. Name one with sound=<id>'
     return f'also (the pick is a guess: {why}): {alts}. Name one with sound=<id>'
 
 
@@ -532,7 +567,8 @@ def _heard(path, queries):
 
 
 def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False, fmt=None, mono=False, lufs=None,
-         sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, loop=None, events=None, **axes):
+         sr=48000, bits=24, pitch=None, dur=None, voice=None, material=None, loop=None, events=None, recipe=None,
+         **axes):
     """make the sound a request asks for and write it: {'summary', 'sound', 'files', 'why', 'also', 'not_in_sound',
     'unknown', 'takes': [meta ...]} (+ 'heard' with listen); `not_in_sound`: the sounds or jobs the request named
     that the chosen design was not picked for, as written ("water drop"), `also`: up to three alternatives. want:
@@ -547,15 +583,26 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     in a row ("four knocks on the table", "three claps", "a countdown 3 2 1") or events of 2 or more as one file of
     that many events (`row`), while a count of separate things ("five coin pickups") is that many files; a length
     asked with an action ("three knocks, 2 seconds") is the file's and the events are spread over it; a take's
-    meta['performance'] says what was played"""
+    meta['performance'] says what was played. recipe: a sound built from the catalogue's parts instead of a
+    request (earshot.recipe: a dict, JSON text, the path of a JSON file, "-" for standard input or the name of a
+    cookbook recipe), rendered and written the same way (`from_recipe`); a request that names a thing the cookbook
+    builds and no design is ("a dragon roar") is answered by that recipe, and the result says so"""
     from .sounds import registry
     from .synth import master
+    if recipe is not None:
+        if sound or axes or any(v is not None for v in (theme, pitch, voice, material, loop, events)):
+            raise ValueError('a recipe is rendered as it is written: with recipe= make takes out, n, seed, fmt, '
+                             'mono, lufs, sr, bits, dur (a length to cut it at), listen and want (what it is, in '
+                             'words, for listening); change the sound in the recipe itself')
+        return from_recipe(recipe, out, n=_whole(n, 'n (takes)', 1, MAX_TAKES),
+                           seed=_whole(seed, 'seed', -2 ** 31, 2 ** 31 - 1), fmt=fmt, mono=mono, lufs=lufs, sr=sr,
+                           bits=bits, listen=listen, want=want, dur=_length(dur))
     if not ((want and str(want).strip()) or sound):
         raise ValueError('say what sound you want (want=...) or name one (sound=...)')
     bad = [a for a in axes if a not in registry.AXES]
     if bad:
         raise ValueError(f'unknown option {", ".join(bad)}: make takes want, out, sound, n, seed, theme, listen, fmt, '
-                         f'mono, lufs, sr, bits, pitch, dur, voice, material, loop, events and the axes '
+                         f'mono, lufs, sr, bits, pitch, dur, voice, material, loop, events, recipe and the axes '
                          f'{", ".join(registry.AXES)} (-1 to 1)')
     for a, v in axes.items():
         if v is not None and not isinstance(v, (int, float)) or isinstance(v, bool):
@@ -571,6 +618,14 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         b['dur'] = _length(b['dur'], 'the length asked for')
     if loop is False:
         b['loop'] = False
+    if not sound:       # a thing the cookbook builds from parts and no design of the catalogue was found by
+        from . import recipe as R
+        cooked = R.answer(b, cands[0]['why'] if cands else ())
+        if cooked:
+            given = [k for k, v in (('theme', theme), ('pitch', pitch), ('voice', voice), ('material', material),
+                                    ('events', events)) if v is not None] + [a for a, v in axes.items() if v]
+            return from_recipe(cooked, out, n=n, seed=seed, fmt=fmt, mono=mono, lufs=lufs, sr=sr, bits=bits,
+                               listen=listen, want=want, dur=b.get('dur'), cands=cands, given=given)
     if not cands:
         absent = brief.not_made(b)
         raise ValueError(f'no sound in the catalogue answers {want!r}'
@@ -617,8 +672,14 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     also = [] if sound else alternatives(b, cands, pick['id'], others_first=reason is not None)
     if reason:
         lines.append(guess(b, cands, also))
+        if reason.startswith('earshot makes no '):      # no design is this thing: it can be built (earshot.recipe)
+            lines.append('build it from parts: earshot recipe --example')
     elif also:
         lines.append('also: ' + ', '.join(also))
+    start = None if sound else R.answer(b, cands[0]['why'], sketch=True)
+    if start:           # a cookbook recipe of this thing that is a sketch: named as a start, not given as the answer
+        lines.append(f'a start from parts: earshot make --recipe {start["name"]} (a sketch of {start["says"]}; '
+                     f'`earshot recipe {start["name"]}` prints it to change)')
     if b.get('listen_note'):
         lines.append(b['listen_note'])
     if heard:
@@ -652,6 +713,70 @@ def _tmp_wav(sound, seed, req):
     return master.write(os.path.join(tempfile.mkdtemp(), 'heard.wav'), y)
 
 
+def from_recipe(recipe, out=None, n=1, seed=0, fmt=None, mono=False, lufs=None, sr=48000, bits=24, listen=False,
+                want=None, dur=None, cands=None, given=()):
+    """a recipe (earshot.recipe: a dict, JSON text, the path of a JSON file, "-" or a cookbook name) rendered and
+    written as `make` writes a sound: the same result ('summary', 'sound': "recipe/<name>", 'files', 'takes' with
+    the audit, level, length and peak_s of each) plus 'source': "recipe" and 'parts' (what it is built from). n
+    takes are the seeds seed .. seed + n - 1: other takes of every layer. dur: a length to cut the sound at. With
+    listen, `heard` says how well the first take matches `want` (else the recipe's `says`). cands: the catalogue's
+    ranking of the request, when the cookbook answered it; the result then says so and names the nearest designs;
+    given: the controls the caller set with that request, which a recipe does not follow, said in one line"""
+    import tempfile
+    from . import recipe as R
+    from .synth import master
+    if listen:
+        from . import extras
+        extras.need(*extras.LISTEN, what='make with listen')
+    rc = R.load(recipe)
+    paths = _paths(out or f'{rc["name"]}.{fmt or "wav"}', n, fmt)
+    takes, first = [], None
+    for i, p in enumerate(paths):
+        y, meta = R.render(rc, seed=seed + i, lufs=lufs, dur=dur)
+        first = y if first is None else first
+        master.write(p, y, sr=sr, mono=mono, bits=bits)
+        takes.append({**meta, 'file': p})
+    lines = [_line(t, t['file'], 'recipe' if i == 0 else '') for i, t in enumerate(takes)]
+    lines.append('built from: ' + '; '.join(takes[0]['parts']))
+    also = [c['id'] for c in (cands or [])[:3]]
+    if cands is not None:
+        lines.append(f'built from parts by the cookbook recipe {rc["name"]}: no design of the catalogue is this '
+                     f'sound; `earshot recipe {rc["name"]}` prints the recipe to change'
+                     + (f'; the nearest designs: {", ".join(also)} (sound=<id>)' if also else ''))
+    if given:
+        lines.append(f'not followed: {", ".join(given)}; a recipe plays as it is written')
+    lines += list(dict.fromkeys(note for t in takes for note in t.get('notes', ())))
+    res = {'summary': '', 'sound': takes[0]['id'], 'files': paths, 'why': [], 'also': also, 'not_in_sound': [],
+           'unknown': [], 'takes': takes, 'source': 'recipe', 'recipe': rc['name'], 'parts': takes[0]['parts']}
+    says = (want if want and str(want).strip() else None) or rc.get('says')
+    if listen and says:
+        with tempfile.TemporaryDirectory() as tmp:
+            res['heard'] = _heard(master.write(os.path.join(tmp, 'heard.wav'), first), [says])
+        lines.append(f"heard as: {res['heard']['query']!r} (z {res['heard']['z']:+.1f}, {res['heard']['verdict']})")
+    res['summary'] = '\n'.join(lines)
+    return res
+
+
+def _set_recipe(it, seed, top, out, fmt):
+    """a set's entry that is a recipe ({"name", "recipe", + seed, lufs, dur}) as a row the set levels and writes
+    with its other sounds: an event as it is made alone, an ambience by loudness under the set's loudest"""
+    from types import SimpleNamespace
+    from . import recipe as R
+    extra = [k for k in it if k not in ('name', 'recipe', 'seed', 'lufs', 'dur')]
+    if extra:
+        raise ValueError(f'{it["name"]}: {extra[0]}: a recipe of a set takes name, recipe, seed, lufs and dur; '
+                         'change the sound in the recipe itself')
+    rc = R.load(it['recipe'])
+    bed = rc.get('kind') == 'ambience'
+    alone = it.get('lufs') is None and top is None and not bed
+    level = None if alone else it.get('lufs', (TOP if top is None else top) + WEIGHT['bed' if bed else 'object'])
+    own = _whole(it['seed'], f'{it["name"]}: seed', -2 ** 31, 2 ** 31 - 1) if it.get('seed') is not None else seed
+    y, meta = R.render(rc, seed=own, lufs=level, dur=_length(it.get('dur'), f'{it["name"]}: dur'))
+    return {'p': os.path.join(out, f'{it["name"]}.{fmt}'), 'y': y, 'meta': meta, 'alone': alone, 'name': it['name'],
+            'd': SimpleNamespace(id=meta['id'], kind=meta['kind'], loop=False),
+            'why': 'recipe: ' + '; '.join(meta['parts'])}
+
+
 def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None, sprite=None):
     """a whole set of sounds from one spec, as one family: {'summary', 'files', 'manifest', 'sounds': [...]}.
     spec: a dict, the path of a JSON file, or the name of a ready-made set (earshot.sounds.sets: ui, game, arcade,
@@ -662,7 +787,8 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
                     {"name": "success", "want": "a quick success sound", "axes": {"bright": 0.2}}]}
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
     takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
-    seed, n, axes, lufs, events (a thing done in a row, as in `make`) and loop (false: once). Every sound shares the
+    seed, n, axes, lufs, events (a thing done in a row, as in `make`) and loop (false: once); or name and recipe (a
+    sound built from parts: earshot.recipe, with seed, lufs and dur). Every sound shares the
     theme (one voice, key and room). A name's take is its `seed` when
     given, else the next take of its design (the first name of a learned design gets its best recording). Level:
     every one-shot is made as it is made alone (true peak -1 dBFS) and the set is balanced by the loudest 50 ms
@@ -716,6 +842,11 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     top = lufs if lufs is not None else spec.get('lufs')
     rows, lines, ys, alts, missed, first, played, pending, takes = [], [], [], {}, {}, {}, {}, [], {}
     for it in items:
+        if it.get('recipe') is not None:        # a sound built from parts (earshot.recipe), levelled with the set
+            lines.append(None)
+            pending.append({**_set_recipe(it, seed, top, out, fmts[0]), 'line': len(lines) - 1})
+            lines += [f'  {note}' for note in pending[-1]['meta'].get('notes', ())]
+            continue
         if not ((it.get('want') and str(it['want']).strip()) or it.get('sound')):
             raise ValueError(f'{it["name"]}: say what sound you want ("want") or name one ("sound")')
         it = {**it, 'dur': _length(it.get('dur'), f'{it["name"]}: dur')}
@@ -891,6 +1022,9 @@ def add_cli(sub):
                                     'padding leaves a gap at the seam)')
     p.add_argument('--sprite', help='with --spec / --set: also pack the set into this one file with a map')
     p.add_argument('--sound', help='a design id from `earshot sounds` instead of (or on top of) the words')
+    p.add_argument('--recipe', help='a sound built from the catalogue\'s parts: a JSON file of a recipe, - to read '
+                                    'it from standard input, or the name of a cookbook recipe (`earshot recipe '
+                                    '--example` shows the form); the words, if given, say what it is for --listen')
     p.add_argument('--n', type=int, default=1, help='how many takes (file_1 .. file_n)')
     p.add_argument('--seed', type=int, default=0)
     p.add_argument('--theme', help='a theme preset (soft, glass, wood, felt, tine, metal, electric, digital, retro): '
@@ -949,4 +1083,4 @@ def _run_make(args):
     return _emit(make(args.want, args.output, sound=args.sound, n=args.n, seed=args.seed, theme=args.theme,
                       listen=args.listen, mono=args.mono, lufs=args.lufs, pitch=args.pitch, dur=args.dur,
                       voice=args.voice, material=args.material, loop=False if args.no_loop else None,
-                      events=args.events, **_axes(args)), args)
+                      events=args.events, recipe=args.recipe, **_axes(args)), args)

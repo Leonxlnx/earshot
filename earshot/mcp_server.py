@@ -682,6 +682,26 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                         "blended into the choice of words, and report what the "
                                                         "written sound is heard as (loads the model: 20-40 s the "
                                                         "first time, then it stays warm)")] = False,
+              recipe: Annotated[dict | str | None, Field(description='instead of ranking the words: a sound you '
+                                                                     'build from the catalogue\'s parts, as an '
+                                                                     'object (or the name of a cookbook recipe), '
+                                                                     'e.g. {"name": "dragon_roar", "says": "a dragon '
+                                                                     'roaring", "layers": [{"sound": "lion/roar", '
+                                                                     '"pitch": -7}, {"source": "noise", "dur": 2.5, '
+                                                                     '"lowpass": [70, 160], "gain": -14, "swell": '
+                                                                     '0.6}], "space": "hall"}. A layer is "sound" '
+                                                                     '(a design id from `sounds`) or "source" '
+                                                                     '("noise" with dur and color, "sine" with dur '
+                                                                     'and hz 20-150), with seed, dur, pitch '
+                                                                     '(semitones -24..12, lower is slower), reverse, '
+                                                                     'cut [from, to], lowpass / highpass (Hz or '
+                                                                     '[from, to]), pan, gain (dB), at (s), fade_in, '
+                                                                     'fade_out, swell, decay, the design\'s axes '
+                                                                     '(-1..1) and events {"count", "gap", "faster", '
+                                                                     '"softer"}; the whole takes name, says, layers, '
+                                                                     'dur, space (dry, booth, room, studio, hall, '
+                                                                     'plate, cathedral), kind (event, ambience). '
+                                                                     '`want` then says what the sound is')] = None,
               full: Full = False) -> str:
     """Make a sound in code from a request in words and write it to a file (no models, about a second; nothing is
     downloaded). Every sound is computed at request time: the realistic ones (everyday things, footsteps, doors,
@@ -703,13 +723,18 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
     files. The answer names the design chosen and why, what else would fit (`also`), and any words that were not
     understood, so one call is usually enough; a thing in no design is an error that says "earshot makes no ...";
     call again with
-    `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. Use it
+    `sound`, `theme`, `pitch`, `dur` or adjectives ("softer", "bigger", "longer", "drier") to steer. When the
+    catalogue has no such sound (the answer says "earshot makes no ..."), build it from parts with `recipe`: say
+    what physically makes the sound, find two to four real parts with `sounds`, layer them (a recording moved in
+    pitch, reversed, filtered, repeated as events; noise only for air and rumble), render, read the result line
+    and change one thing at a time; a request that names a thing of the cookbook (a dragon roar, a rocket launch)
+    is answered by its recipe, and the answer says what it is built from. Use it
     whenever a product, a game or a film needs a sound and no recording is at hand; use make_set when it needs
     several that belong together. Everything made is free to use in any product."""
     from . import make as M
     return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
                              dur=dur, voice=voice, material=material, loop=loop, events=events, seed=seed,
-                             listen=listen), full, _summary_only(M.make))
+                             listen=listen, recipe=recipe), full, _summary_only(M.make))
 
 
 def set_help():
@@ -731,7 +756,8 @@ def tool_make_set(out: Annotated[str, Field(description='absolute path of the fo
                                                                          '"success/triad", "dur": 0.5}]; fields: '
                                                                          'name, want, sound, pitch, dur, voice, '
                                                                          'material, seed, n, axes, lufs, events, '
-                                                                         'loop')] = None,
+                                                                         'loop; or name and recipe (a sound built '
+                                                                         'from parts, as in make)')] = None,
                   theme: Annotated[str | None, Field(description='one voice, key and room for the whole set: soft, '
                                                                  'glass, wood, felt, tine, metal, electric, '
                                                                  'digital, retro')] = None,

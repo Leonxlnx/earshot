@@ -1,0 +1,15 @@
+{
+ "name": "whale_call",
+ "says": "a whale calling under water",
+ "things": ["whale call", "whale song", "whale calling", "whale singing"],
+ "sketch": true,
+ "built": "A wolf's howl an octave lower and dull as the call, a cow's moo lower and backwards as its answer, a door's creak an octave lower as the clicks, deep water under it, in a cathedral.",
+ "space": "cathedral",
+ "dur": 8,
+ "layers": [
+  {"sound": "wolf/howl", "pitch": -12, "lowpass": 900, "gain": 0, "swell": 0.6},
+  {"sound": "cow/moo", "pitch": -7, "reverse": true, "at": 3.0, "lowpass": 700, "gain": -6},
+  {"sound": "door/creak", "pitch": -12, "at": 1.2, "gain": -13, "lowpass": 1500},
+  {"sound": "underwater/deep", "dur": 8, "gain": -14}
+ ]
+}

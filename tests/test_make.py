@@ -83,8 +83,6 @@ def test_make_default_file_name(tmp_path, monkeypatch):
 
 
 def test_make_nothing_answers(tmp_path):
-    with pytest.raises(ValueError, match='earshot sounds'):
-        make('a frobnicating zorp', str(tmp_path / 'x.wav'))
     with pytest.raises(ValueError, match='say what sound'):
         make(None, str(tmp_path / 'x.wav'))
     with pytest.raises(ValueError, match='unknown sound'):
@@ -450,11 +448,52 @@ def test_cli_make_sounds_and_pack(tmp_path, capsys, monkeypatch):
 
 def test_cli_bad_request_is_one_line_and_exit_1(tmp_path, capsys, monkeypatch):
     monkeypatch.delenv('EARSHOT_DEBUG', raising=False)
-    assert cli.main(['make', 'a frobnicating zorp', '-o', str(tmp_path / 'x.wav')]) == 1
+    assert cli.main(['make', 'a click', '--sound', 'no/such', '-o', str(tmp_path / 'x.wav')]) == 1
     cap = capsys.readouterr()
     lines = cap.err.strip().splitlines()
-    assert len(lines) == 1 and lines[0].startswith('earshot make: error: ValueError: no sound in the catalogue')
+    assert len(lines) == 1 and lines[0].startswith('earshot make: error: ')
     assert cap.out == '' and not os.path.exists(tmp_path / 'x.wav')
+
+
+def test_a_request_nothing_knows_gets_the_nearest_and_says_so(tmp_path):
+    """no request comes back without a sound: words nothing knows get a nearest design, said to be only that, with
+    alternatives on the same line"""
+    res = make('a frobnicating zorp', out=str(tmp_path / 'x.wav'))
+    assert os.path.isfile(tmp_path / 'x.wav')
+    line = next(x for x in res['summary'].splitlines() if x.startswith('also (the pick is a guess: '))
+    assert f"earshot makes no frobnicating zorp; {res['sound']} is only the nearest sound it has" in line
+    assert 'Name one with sound=<id>' in line and res['also']
+
+
+@pytest.mark.parametrize('text,start', [
+    ('a lightsaber', 'earshot makes no lightsaber; laser/beam is only the nearest'),
+    ('a stomach growl', 'earshot makes no stomach growl; rumble/quake is only the nearest'),
+    ('a paper shredder', 'earshot makes no paper shredder; paper/rip is only the nearest'),
+    ('rain on a tarp', 'no rain on a tarp: rain/tent is the nearest surface'),
+    ('footsteps in mud', 'no footsteps in mud: step/grass is the nearest surface'),
+])
+def test_a_missing_thing_and_a_missing_surface_are_said_with_alternatives(text, start):
+    """the thing or what it does is unknown: the nearest kind of sound, said to be only that; the sound exists but
+    not on that surface: the nearest surface, with the sound's other surfaces as alternatives"""
+    from earshot import brief
+    from earshot.make import doubt, guess
+    b = brief.read(text)
+    cands = brief.rank(b, top=8)
+    assert doubt(b, cands).startswith(start), doubt(b, cands)
+    line = guess(b, cands)
+    assert line.endswith('Name one with sound=<id>') and start in line
+    if start.startswith('no '):
+        fam = cands[0]['id'].split('/')[0]
+        assert line.startswith(start + '; also: ' + fam + '/'), line
+
+
+@pytest.mark.parametrize('text', ['rain on a tin roof', 'footsteps on snow', 'a ball bouncing on wood',
+                                  'a dog barking', 'a heartbeat getting faster', 'a typewriter', 'a slap'])
+def test_what_exists_is_answered_without_a_note(text):
+    from earshot import brief
+    from earshot.make import doubt
+    b = brief.read(text)
+    assert doubt(b, brief.rank(b, top=8)) is None
 
 
 TITLED = ('a laptop keyboard key', 'a light switch', 'three knocks on a door', 'footsteps on gravel', 'a cap gun shot')

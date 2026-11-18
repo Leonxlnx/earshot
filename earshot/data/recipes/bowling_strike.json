@@ -1,0 +1,13 @@
+{
+ "name": "bowling_strike",
+ "says": "a bowling ball rolling and striking the pins",
+ "things": ["bowling strike", "bowling pins", "bowling ball"],
+ "built": "Low noise that swells as the ball rolling, then a landing on wood lower as the hit, thrown dice far lower and hollow knocks that scatter as the pins.",
+ "space": "studio",
+ "layers": [
+  {"source": "noise", "color": "brown", "dur": 1.6, "lowpass": [180, 420], "gain": -10, "swell": 1.2, "fade_out": 0.05},
+  {"sound": "land/wood", "pitch": -5, "at": 1.5, "gain": -3},
+  {"sound": "dice/throw", "pitch": -10, "at": 1.55, "gain": 0},
+  {"sound": "knock/hollow", "pitch": -3, "at": 1.52, "gain": -6, "decay": 0.15, "events": {"count": 6, "gap": 0.08, "faster": 1.3, "softer": -2.5, "loose": 0.6}}
+ ]
+}

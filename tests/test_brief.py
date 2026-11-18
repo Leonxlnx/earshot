@@ -1207,8 +1207,90 @@ def test_a_request_in_another_language_is_no_chance_match(idx):
     b = brief.read('Erfolgston für die App')
     assert b['foreign'] and 'lose' not in b['concepts']
     assert brief.rank(b, idx=idx, top=1)[0]['id'] == 'success/click'
-    assert brief.rank(brief.read('le son pour le bouton'), idx=idx, top=1) == []
+    b = brief.read('le son pour le bouton')         # no word found anything: a nearest sound, said to be a guess
+    cands = brief.rank(b, idx=idx, top=1)
+    assert [c['id'] for c in cands] == [L.NEAREST_ANY[0]] and cands[0]['why'] == []
+    from earshot.make import doubt
+    assert doubt(b, cands) == 'no job or sound word matched; the request does not read as English, write it in English'
     assert brief.read('Türklopfen, dreimal')['concepts'] == ['door', 'knock']
     b = brief.read('a sound when the player dies')
     assert not b['foreign'] and 'lose' in b['concepts']
     assert 'lose' in brief.read('die sound for a platformer')['concepts']
+
+
+@pytest.mark.parametrize('text,absent,nearest', [
+    ('a lightsaber', 'lightsaber', 'laser/beam'), ('a stomach growl', 'stomach growl', 'rumble/quake'),
+    ('a tractor idling', 'tractor idling', 'car_engine/start'), ('a paper shredder', 'paper shredder', 'paper/rip'),
+    ('a cursed whisper', 'cursed whisper', 'sigh/person'), ('a hiccup', 'hiccup', 'burp/person'),
+    ('a curtain being pulled', 'curtain being pulled', 'cloth/rustle'),
+    ('an old modem dialing', 'old modem dialing', 'dial/click'),
+    ('a forklift', 'forklift', L.NEAREST_ANY[0]), ('a whale song', 'whale song', L.NEAREST_ANY[0]),
+])
+def test_an_unknown_thing_or_action_gets_the_nearest_and_says_so(idx, text, absent, nearest):
+    """the thing that makes the sound, or what it does, is a word neither the lexicon nor a design's name or job
+    knows: the request is answered with the nearest kind of sound (lexicon.SOUND_KINDS), else by its known words,
+    else with the first of lexicon.NEAREST_ANY, and the doubt says it is only the nearest"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=4)
+    assert b['absent'] == absent and cands[0]['id'] == nearest, (b['absent'], cands[:1])
+    assert doubt(b, cands) == f'earshot makes no {absent}; {nearest} is only the nearest sound it has'
+
+
+@pytest.mark.parametrize('text,want', [
+    ('a ball bouncing on wood', 'ball/bounce'), ('a duck quacking on a lake', 'duck/quack'),
+    ('snow crunching under boots', 'step/snow'), ('a man snoring loudly', 'snore/person'),
+    ('a heartbeat getting faster', 'heart/beat'), ('a sword being drawn', 'sword/draw'),
+    ('a camera shutter, three times', 'camera/shutter'), ('not a voice, a soft click', None),
+    ("a little 'never mind' sound", None),
+    ('a loud hollow cork pop followed by fizz', 'cork/'), ('when the user saves, a soft thwip', None),
+])
+def test_a_known_thing_is_not_said_to_be_missing(idx, text, want):
+    """a thing a design is named for, a word that only describes or says whose it is, a caption in quotes, a
+    negation and the event before the sound do not make a request one for a thing earshot lacks"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=4)
+    assert want is None or cands[0]['id'].startswith(want), cands[:1]
+    assert not (doubt(b, cands) or '').startswith('earshot makes no'), doubt(b, cands)
+
+
+@pytest.mark.parametrize('text,want,material', [
+    ('rain on wood', 'rain/', 'wood'), ('a ball bouncing on wood', 'ball/bounce', 'wood'),
+    ('water dripping on metal', 'water/drop', 'metal'), ('footsteps in mud', 'step/grass', None),
+    ('rain on a tarp', 'rain/tent', None), ('footsteps on snow', 'step/', None),
+])
+def test_what_follows_on_or_in_is_the_surface_not_another_thing(idx, text, want, material):
+    """wood is no forest and metal no sizzling: the surface picks among the designs of the sound named before it,
+    and a surface none of them has picks the nearest one (lexicon.SURFACE_KIN)"""
+    b = brief.read(text)
+    assert b['surface'] and b['material'] == material and 'forest' not in b['concepts'] + b['context']
+    got = brief.rank(b, idx=idx, top=1)[0]['id']
+    assert got.startswith(want), (text, got)
+
+
+@pytest.mark.parametrize('text', ['a click on the submit button', 'a pop on hover', 'a chime on a piano',
+                                  'sound for landing a jab in a 2D fighting game', 'toggle the lights on'])
+def test_a_job_an_instrument_and_a_place_of_a_product_are_no_surface(text):
+    assert brief.read(text)['surface'] is None
+
+
+@pytest.mark.parametrize('text,english,want', [
+    ('Regen auf Holz', 'rain on wood', 'rain/'), ('Schritte auf Kies', 'footsteps on gravel', 'step/'),
+    ('ein Hund bellt', 'a dog barking', 'dog/bark'),
+    ('Münzen fallen auf den Boden', 'coins falling on the floor', 'coins/floor'),
+])
+def test_a_german_request_is_read_through_the_table(idx, text, english, want):
+    """lexicon.GERMAN: the request is read as its English words, said to be foreign, and answered without a doubt"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    assert b['foreign'] and b['read_as'] == english == b['text'] and b['said'] == text
+    cands = brief.rank(b, idx=idx, top=3)
+    assert cands[0]['id'].startswith(want) and doubt(b, cands) is None, (cands[:1], doubt(b, cands))
+
+
+def test_english_is_not_read_as_german():
+    for text in ('a fallen tree hitting the ground', 'wind in the trees', 'a hammer on an anvil', 'a warm pad',
+                 'die sound for a platformer', 'a laser blast'):
+        assert brief.german(text) is None and not brief.read(text)['foreign'], text
+    assert brief.german('Regen auf einem Blechdach, 10 Sekunden') == 'rain on a tin roof, 10 seconds'

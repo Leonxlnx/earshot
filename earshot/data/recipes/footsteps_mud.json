@@ -1,0 +1,12 @@
+{
+ "name": "footsteps_mud",
+ "says": "footsteps in mud",
+ "things": ["footsteps in mud", "walking in mud", "steps in mud", "muddy footsteps"],
+ "sketch": true,
+ "built": "Landings on dirt a little lower as the steps, a plop of water lower as the wet, and a kiss far lower as the suck when the boot lifts.",
+ "layers": [
+  {"sound": "land/dirt", "pitch": -3, "gain": 0, "events": {"count": 4, "gap": 0.62, "loose": 0.15}},
+  {"sound": "water/plop", "pitch": -6, "cut": [0, 0.45], "decay": 0.2, "at": 0.03, "gain": -7, "events": {"count": 4, "gap": 0.62, "loose": 0.15}},
+  {"sound": "kiss/lips", "pitch": -9, "at": 0.3, "gain": -8, "events": {"count": 4, "gap": 0.62, "loose": 0.15}}
+ ]
+}

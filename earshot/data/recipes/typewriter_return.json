@@ -1,0 +1,12 @@
+{
+ "name": "typewriter_return",
+ "says": "a typewriter: a few keys and the carriage return",
+ "things": ["typewriter carriage return", "carriage return", "typewriter return"],
+ "built": "Four typewriter keys, then a jacket zipper lower as the carriage ratcheting back, a wooden drawer as its slide, and a latch as the stop.",
+ "layers": [
+  {"sound": "typewriter/key", "gain": -3, "events": {"count": 4, "gap": 0.14, "loose": 0.4}},
+  {"sound": "zipper/jacket", "pitch": -6, "cut": [0, 1.0], "at": 0.8, "gain": 0},
+  {"sound": "drawer/wood", "pitch": 3, "cut": [0, 0.6], "at": 0.8, "gain": -7, "decay": 0.2},
+  {"sound": "lock/latch", "pitch": -2, "at": 1.75, "gain": -1}
+ ]
+}

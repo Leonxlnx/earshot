@@ -34,8 +34,8 @@ paper, books, glass, ice, water, metal, swings, punches, falls, explosions, anim
 people without words such as applause, laughter and a cough, a car horn, a siren, a phone ringing or vibrating
 ...) and 13 ambience beds learned from
 real textures (fire, three shores, crickets, a brook, a cafe, a street, distant city, room tone, underwater, rain on
-a terrace, wind in dry leaves). The interface sounds are things a hand does, from those recordings: a key, a rocker
-switch, a page, a pen cap and air, knocks, a pop, a pen click, a stapler, crumpled paper. The film and motion
+a terrace, wind in dry leaves). The interface sounds are things a hand does, from those recordings: a key going
+down and coming up, a page, a drawer, a cork, knocks, a camera shutter, scissors. The film and motion
 effects are short, dry hits, thumps, ticks and whooshes of air built from recordings. The acoustic drum kit and hand
 percussion are learned too (130 recorded strokes; seeds walk through a drum's strokes, `energy` picks softer or
 harder ones), and so are the instruments that play the tonal figures when music is asked for: a marimba (the
@@ -84,13 +84,14 @@ owner: prefer a learned thing when one fits.
    (hundreds of lines).
 
 **The ready-made sets.** `ui` (17), every role a normal sound, no instrument: tap a mechanical key
-(keyboard/mechanical), hover a fingertip barely touching wood (hover/fingertip), toggle_on and toggle_off a rocker
-switch (toggle/rocker_on smaller and brighter, toggle/rocker_off bigger and duller), type a desktop key (type/key),
-next and back a page flicked forward and dropped back (next/page, back/page), open a pen cap pulled and air let out
-(open/air), close air drawn in onto the cap (close/air), send a stick swung through the air (send/swoosh), receive a
-pop of the lips (receive/pop), notify two light knocks (notify/knock), success a pen clicked in two parts
-(success/click), complete a stapler pressed down (complete/stamp), warning two firm knocks on a door
-(warning/knock), error two dull thuds of a bag (error/thud), delete paper crumpled (delete/crumple). A request for
+(keyboard/mechanical), hover a fingertip barely touching wood (hover/fingertip), toggle_on and toggle_off that key
+going down and coming up (toggle/key_down bigger and darker, toggle/key_up smaller and brighter), type the same key
+pressed softly (type/mechanical), next and back a page flicked forward and turned back darker (next/page,
+back/turn), open and close a wooden drawer pulled out and pushed shut (open/drawer, close/drawer), send a stick
+swung through the air (send/swoosh), receive a cork pulled from a bottle (receive/cork), notify two light knocks
+(notify/knock), success a camera shutter (success/shutter), complete a bigger, slower shutter (complete/shutter),
+warning two firm knocks on a door (warning/knock), error two heavier knocks that fall (error/knock), delete one cut
+of a pair of scissors (delete/snip). A request for
 one of these jobs in words gets the same design. With a theme named, `ui` plays the tonal figures in that theme's
 voice instead.
 `game` (22: menus, rewards, jingles, and invented action sounds: replace jump, land, hit, explosion, door with
@@ -142,6 +143,12 @@ of different recordings differ in length and level. `--json` gives the number of
 - `also: a, b, c`: alternatives. If the chosen id does not fit the job, call again with `--sound ID`.
 - `also (the pick is a guess: ...): id (a few words), ...`: treat the pick as unverified; choose an alternative
   by its words and call again with `--sound ID`, or re-ask naming the sound or the job.
+- `also (the pick is a guess: earshot makes no THING; ID is only the nearest sound it has): ...`: earshot does not
+  know the thing or what it does, and the file is a stand-in. Pick one of the alternatives by its id (`--sound
+  ID`), or ask again describing the sound by what it is made of instead of by its name, or tell the user that
+  this thing is missing. "a curtain being pulled" answered `cloth/rustle` with `earshot makes no curtain being
+  pulled; cloth/rustle is only the nearest sound it has`: keep `cloth/rustle` or take another id from that line,
+  ask for "a long rustle of heavy fabric" instead, or say that earshot has no curtain.
 - `same design as NAME: ... (the nearest: ID)` (sets): two names got one sound; give the second `"sound": ID` in
   your spec. `another recording of ID than NAME: ...` is not a problem: the two play different recordings of one
   learned design.
@@ -157,8 +164,11 @@ of different recordings differ in length and level. `--json` gives the number of
 - `3 knocks 1.5 s apart: 3.25 s, not the 10 s asked (...)`: a counted action could not fill the length at a pace a
   person keeps (or a countdown at one a second); the file is as long as the line says.
 - `not understood: WORDS`: those words did nothing; rephrase plainly if they mattered.
-- an error `no sound in the catalogue answers '...' (earshot makes no THING): ...`: there is no such thing; say so
-  and offer the nearest thing `earshot sounds --search` finds, never a stand-in passed off as the thing.
+- `no THING on SURFACE: ID is the nearest surface; also: ...`: the sound exists, but not on that surface, ground or
+  place ("rain on a tarp" answered `no rain on a tarp: rain/tent is the nearest surface`); the alternatives are
+  its other surfaces.
+- There is no error for an unknown thing: every request gets a file, and the guess line is the only sign that it
+  is a stand-in. Never pass a stand-in off as the thing.
 - `recording 2 of 3` (in `--json` `member`, a performance and the manifest): which of a learned design's recordings
   played; the recording's own title is only in the store's `CREDITS.md`.
 - `... a loop in mp3 has a gap at its seam ...`: rewrite that loop as ogg, webm, wav or flac.
@@ -201,8 +211,11 @@ renders in about 1-2 s per second of sound: a 30 s bed takes up to a minute.
 (20-40 s). Use it only when a describe-the-sound request came back as a guess.
 
 **What not to expect.** No music beyond three short loops (`bed/warm`, `bed/playful`, `bed/8bit`): earshot is for
-sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded: the answer is an
-error that says so (often "earshot makes no X"). The film and motion sounds (whooshes, hits, thumps, ticks,
+sound effects. No speech. No sound for a thing that is neither in the catalogue nor recorded: the answer is the
+nearest design with a guess line that says so ("earshot makes no X; ID is only the nearest sound it has"). A
+request in German is read through a table of common sound words ("Regen auf Holz" as "rain on wood"); any other
+language, or a word the table lacks, gets "write it in English".
+The film and motion sounds (whooshes, hits, thumps, ticks,
 risers, the braam) are built from learned recordings; the owner rated the fast whoosh 4 of 5 and the deep whoosh
 and the braam 3 to 3.5; the hits, thumps, risers, the tape stop and the suck-in impact were rebuilt after his
 ratings and are not rated yet; so are the interface sounds without instruments, the relearned ambiences and the
@@ -294,6 +307,128 @@ timer"` prints each design's words), and leave a moment silent or record it rath
 Everything earshot renders is free to use in any product, commercial too, without credit. The learned material
 comes from CC0 recordings credited in `earshot/data/resyn/CREDITS.md`, `earshot/data/textures/CREDITS.md`,
 `earshot/data/drums/CREDITS.md` and `earshot/data/notes/CREDITS.md`.
+
+## When earshot has no such sound: build it
+
+The catalogue cannot hold everything. When the answer says `earshot makes no rocket launch; ... is only the nearest
+sound it has`, do not put the stand-in under the picture: build the sound from the catalogue's own parts with a
+recipe. You design it, earshot renders it and checks it like every other sound. No model is loaded and nothing is
+downloaded. A recipe takes longer than a catalogue sound, because every layer and every event is a take of its
+own: a few seconds for a hit, up to half a minute for a long ambience of many layers on one slow core.
+
+The method, in this order:
+
+1. Say what physically makes the sound: the source, what it hits or moves through, how big it is and how far away.
+   A dragon's roar is the voice of a very large animal, low and slow, with breath and fire in it, in a big space.
+2. Find two to four real parts in the catalogue: `earshot sounds --search roar`, `--search fire`. The designs
+   learned from recordings are the best material because they are real. `earshot recipe --list` shows what the
+   cookbook built from which parts.
+3. Write the recipe as JSON (`earshot recipe --example` prints the form and three recipes to start from).
+4. Render it: `earshot make --recipe roar.json -o roar.wav`.
+5. Read the result line: the length, where the peak is, the level, and `clean` or what the audit found. With the
+   listening extra installed, add the words and `--listen`: `heard as` says how well the sound matches them.
+6. Change one thing and render again.
+
+What works: a recording moved down in pitch is also slower and bigger, as on a tape (`"pitch": -12` turns a horse
+into a beast and a door's creak into a ship's timber); `reverse` turns a decay into a swell that ends on its strike;
+`events` repeats a layer as new takes (steps, cracks, clicks), `loose` lets them come as they come and `faster`
+speeds them up or slows them down; `halt` lets a motor run down. Real recordings first. Noise is only for air and
+rumble, and the low sine only for weight under a hit. Never use a tone that sounds like a synthesiser unless the
+thing is one (a lightsaber, a laser), and no bell for a thing that is not a bell. Every layer is brought to the same
+peak before its gain, so `gain` says how loud it sits: the body at 0, what supports it at -4 to -10, air and rumble
+at -12 to -18. Keep the low end under the body, not in front of it.
+
+A recipe:
+
+    {"name": "dragon_roar", "says": "a dragon roaring", "space": "hall",
+     "layers": [
+      {"sound": "horse/neigh", "pitch": -12, "lowpass": 4000},
+      {"sound": "cow/moo", "pitch": -9, "at": 0.15, "gain": -3},
+      {"sound": "fire/whoosh", "pitch": -5, "at": 0.6, "gain": -9},
+      {"source": "noise", "color": "brown", "dur": 3.0, "lowpass": [70, 150], "gain": -16, "swell": 0.6,
+       "decay": 1.5}]}
+
+A layer names a design (`"sound"`) or a plain source (`"source": "noise"` with `dur` and `color`, or `"sine"` with
+`dur` and `hz` from 20 to 150). On a layer: `seed` (another take), `dur` (the length asked of the design itself),
+`pitch` (semitones, -24 to 12), `reverse`, `cut` ([from, to] in seconds), `halt`, `lowpass` and `highpass` (Hz, or
+[from, to] to move the cutoff), `pan`, `gain` (dB), `at` (its start in seconds), `fade_in`, `fade_out`, `swell`,
+`decay`, the design's own axes (`size`, `bright`, `hard`, `energy`, `ring`, `motion`, `width`, -1 to 1, where it has
+them) and `events` (`count`, `gap`, `faster`, `softer`, `loose`). The whole takes `name`, `says`, `layers` (1 to 8),
+`dur`, `space` (dry, booth, room, studio, hall, plate, cathedral) and `kind` (`event`, or `ambience` for a bed). A
+mistake is answered in one sentence that names the field and what it takes
+(`layers[1].pitch is a number of semitones from -24 to 12, not 40`). The same recipe goes into Python
+(`make(recipe={...}, out=...)`), into the MCP `make` tool (`recipe`), and into a set as `{"name": "roar",
+"recipe": {...}}`.
+
+Ten worked recipes from the cookbook, each with the thought behind it, its layers and the line earshot printed
+for it (`earshot recipe <name>` prints the whole recipe):
+
+1. A dragon's roar (`dragon_roar`). A huge animal's voice with fire in it. Animal voices an octave down are the
+   body, a burst of flame the breath, a little rumble the size, a hall the cave.
+   `horse/neigh` pitch -12 lowpass 4000; `cow/moo` pitch -9 at 0.15 gain -3; `pig/oink` pitch -15 gain -5;
+   `fire/whoosh` pitch -5 at 0.6 gain -9; brown noise 3 s lowpass [70, 150] gain -16 swell 0.6 decay 1.5; space hall.
+   `dragon_roar.wav: recipe/dragon_roar (5.26 s, peak at 2.66 s, -14 LUFS, clean) [recipe]`
+2. A rocket launch (`rocket_launch`). An ignition, a bang, then a roar that swells and stays. A burner and a
+   near explosion start it; a jet pass and a campfire, both slowed, are the roar.
+   `gas_stove/ignite` gain -8; `explosion/near` pitch -5 at 0.25 gain -3 lowpass 3500; `pass/jet` pitch -7 at 0.3
+   gain -2 swell 0.8; `fire/camp` dur 6 pitch -5 at 0.3 gain -9 swell 0.6 decay 3; brown noise 6 s at 0.3 lowpass
+   [90, 240] gain -12 swell 1 decay 3; dur 6.5.
+   `rocket_launch.wav: recipe/rocket_launch (6.46 s, peak at 0.30 s, -14 LUFS, clean) [recipe]`
+3. A monster's growl (`monster_growl`). A wet, slow breath in a big throat. A snore and a purr an octave down,
+   cut to under three seconds, a pig's grunt lower still.
+   `snore/person` pitch -10 cut [0, 2.8] lowpass 3000 decay 0.5; `cat/purr` pitch -12 cut [0, 2.8] gain -6 decay
+   0.6; `pig/oink` pitch -15 at 0.35 gain -4; brown noise 2.5 s lowpass 120 gain -18 swell 0.4 decay 1.2; space room.
+   `monster_growl.wav: recipe/monster_growl (2.63 s, peak at 1.64 s, -14 LUFS, clean) [recipe]`
+4. A spaceship door (`spaceship_door`). Air released, a motor that runs and stops, a panel that slides, a stop.
+   `spray_can/spray` cut [0, 0.5] highpass 800 gain -9; `drill/electric` pitch -9 cut [0.5, 1.3] at 0.15 gain -7
+   lowpass 3000 fade_in 0.1 halt 0.7; `door/slide` at 0.15 gain -2; `lock/latch` pitch -5 at 1.25 gain -3; space
+   studio.
+   `spaceship_door.wav: recipe/spaceship_door (1.67 s, peak at 0.46 s, -14 LUFS, clean) [recipe]`
+5. A robot powering down (`robot_power_down`). A switch, motors that lose speed, the body settling. `halt` is the
+   whole idea: a real motor recording read slower and slower.
+   `switch/industrial` gain -3; `drill/electric` pitch -5 cut [0.5, 1.5] at 0.08 halt 1.6 lowpass 5000;
+   `vacuum/cleaner` pitch -7 cut [2, 3] at 0.08 gain -8 halt 1.8; `spray_can/spray` cut [0, 0.4] at 1.7 gain -15
+   decay 0.3; `dumbbell/place` pitch -3 at 2.0 gain -7.
+   `robot_power_down.wav: recipe/robot_power_down (2.91 s, peak at 0.25 s, -14 LUFS, clean) [recipe]`
+6. A sword on a shield (`sword_on_shield`). Four things at one moment: the blade's clang, the wood of the shield,
+   its metal boss, the weight behind the blow; the swing before them.
+   `sword/swing` cut [0, 0.25] gain -9; then all at 0.2: `clash/sword`; `knock/hollow` pitch -7 gain -3;
+   `saucepan/hit` pitch -7 gain -10 lowpass 3000 decay 0.3; `punch/body` gain -6.
+   `sword_on_shield.wav: recipe/sword_on_shield (0.90 s, peak at 0.27 s, -14 LUFS, clean) [recipe]`
+7. A campfire in the wind (`campfire_wind`). An ambience is two real beds and what happens in them: the fire, the
+   wind coming up, a gust, twigs that snap when they snap (`loose`). `kind` ambience levels it as a bed.
+   `fire/camp` dur 8; `wind/trees` dur 8 gain -5 swell 2; pink noise 6 s at 1 lowpass [500, 1400] highpass 150
+   gain -16 swell 2.5 decay 3; `twigs/snap` cut [0, 0.5] decay 0.15 at 0.7 gain -10, events count 5 gap 1.4 loose
+   0.9; kind ambience, dur 8.
+   `campfire_wind.wav: recipe/campfire_wind (7.65 s, peak at 0.54 s, -22 LUFS, clean) [recipe]`
+8. A bowling strike (`bowling_strike`). A ball rolling nearer, one hit, pins that scatter. Noise is the roll
+   (no recording of it is in the catalogue); the pins are wood: dice far lower and hollow knocks, each softer and
+   later than the one before, loosely.
+   brown noise 1.6 s lowpass [180, 420] gain -10 swell 1.2 fade_out 0.05; `land/wood` pitch -5 at 1.5 gain -3;
+   `dice/throw` pitch -10 at 1.55; `knock/hollow` pitch -3 at 1.52 gain -6 decay 0.15, events count 6 gap 0.08
+   faster 1.3 softer -2.5 loose 0.6; space studio.
+   `bowling_strike.wav: recipe/bowling_strike (3.07 s, peak at 1.25 s, -16 LUFS, clean) [recipe]`
+9. A heartbeat getting faster (`heartbeat_faster`). The catalogue's heartbeat is a steady run; one beat cut out
+   of it and repeated with shrinking gaps is the request.
+   `heart/beat` cut [0, 0.6] decay 0.12, events count 9 gap 0.95 faster 0.9.
+   `heartbeat_faster.wav: recipe/heartbeat_faster (5.99 s, peak at 5.44 s, -16 LUFS, clean) [recipe]`
+10. A giant's footsteps (`giant_footsteps`). Weight, slowness, the ground answering. Heavy drops far lower, four
+    times, each with a short rumble and something small breaking after it, in a hall.
+    `heavy_drop/floor` pitch -9; `land/dirt` pitch -12 at 0.02 gain -4; brown noise 0.9 s lowpass 90 at 0.02 gain
+    -11 decay 0.8; `twigs/snap` pitch -5 cut [0, 0.6] decay 0.2 at 0.25 gain -13; each with events count 4 gap
+    1.15; space hall.
+    `giant_footsteps.wav: recipe/giant_footsteps (4.80 s, peak at 2.66 s, -14 LUFS, clean) [recipe]`
+
+The cookbook (`earshot/data/recipes`, `earshot recipe --list`) holds recipes for things people ask for and no
+design is: a rocket launch, a dragon roar, a monster growl, a spaceship door, a giant's footsteps and more. A
+request that names one of them is answered by its recipe, and the answer says `built from parts by the cookbook
+recipe ...` and what the parts are; `earshot recipe dragon_roar` prints the recipe to change it. A recipe marked
+`sketch` (in `earshot recipe --list`: a geiger counter, a whale call, footsteps in mud) is one that earshot's
+listening model does not hear as its thing yet. The catalogue answers such a request as before, and one line
+names the sketch as a start: `a start from parts: earshot make --recipe geiger_counter`. Improve it before use.
+
+You cannot hear the result. `clean` says the file has no clicks, no cut tail and no clipping; it does not say the
+sound is a dragon. Say what it is built from when you hand it over, and say that a person should listen once.
 
 The rest of this file is about listening: judging, choosing and checking sound you cannot hear.
 

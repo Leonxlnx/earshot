@@ -13,6 +13,8 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
 
 ### Added
 
+- Rain on wood, on a tin roof and on an umbrella are learned beds from public-domain recordings (`rain/wood`,
+  `rain/tin_roof`, `rain/umbrella`).
 - **`earshot make "WORDS" -o FILE`** (`earshot/make.py`, MCP `make`, `api.make`): the request is read, the catalogue
   ranked, the best design rendered with the request's controls, audited (clicks, cut tails, clipping, DC, comb ring,
   rising glides, stacked attacks; a failed take is re-rendered on up to three more seeds) and written as wav, flac,
@@ -32,6 +34,23 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   is as long as that makes it.
 - A request that does not read as English is answered as a guess that says so ("write it in English"); a job word
   it still holds ("Erfolgston für die App") keeps its pick.
+- Every request gets a sound: when no word of it finds a design ("a frobnicating zorp"), the answer is a nearest
+  one that says it is only that, with alternatives, where it was an error before.
+- A request whose thing, or what the thing does, is a word earshot does not know ("a mouse squeak", "a curtain
+  being pulled") is answered "earshot makes no X; ID is only the nearest sound it has"; the nearest is chosen by
+  the kind of sound the word names (a roar is a low rumble, a hiss a spray of air), then by the known words.
+- **Recipes** (`earshot/recipe.py`, `earshot make --recipe FILE`, `earshot recipe --example`, MCP `make` with
+  `recipe`, a set's `{"name", "recipe"}`): a sound no design is can be built from the catalogue's parts as a small
+  JSON form (layers of designs moved in pitch, reversed, cut, filtered, repeated as events, with noise for air and
+  rumble), rendered and audited like every sound; a cookbook of such recipes (`earshot/data/recipes`) answers the
+  requests that name its things ("a dragon roar"), and the answer says what it is built from.
+- What follows "on", "in", "against" or "into" after the sound is its surface, not a second sound: "rain on wood"
+  is no forest, "a ball bouncing on wood" is the ball, "water dripping on metal" no sizzling pan.
+- A surface the sound has no design on picks the nearest one and says so ("rain on a tarp": `no rain on a tarp:
+  rain/tent is the nearest surface`, with the other surfaces as alternatives).
+- A request in German is read through a table of about 250 sound words: "Regen auf Holz" as "rain on wood",
+  "Schritte auf Kies" as "footsteps on gravel"; a word the table lacks still gets "write it in English".
+- "a scratch" is no injury ("scratched" still is): "a vinyl scratch" no longer plays a hurt sound.
 - `knock/double` is two strikes by design: the audit no longer marks its two attacks as stacked layers.
 - A length within 0.1 s of the one asked prints no note; a length word that is not followed ("a short soft whoosh")
   says to give the length in seconds.
@@ -61,10 +80,10 @@ Fixes from the community, thanks to @Bortlesboat, @anascherif and @liugedragon. 
   `forest/morning` and the other scenes are made from rules.
 - **Interface sounds without instruments** (`earshot/sounds/interface.py`): the seventeen roles of `make --set ui`
   are things a hand does, built from learned recordings: tap a mechanical key, hover a fingertip on wood, the
-  toggles a rocker switch (on smaller and brighter, off bigger and duller), type a desktop key, next and back a
-  page flicked forward and dropped back, open and close a pen cap with air, send a stick through the air, receive
-  a pop of the lips, notify two light knocks, success a pen click in two parts, complete a stapler, warning two
-  firm knocks, error two dull thuds of a bag, delete crumpled paper; nine more candidates by name, and a like
+  toggles that key going down and coming up, type the same key pressed softly, next and back a page flicked
+  forward and turned back darker, open and close a wooden drawer, send a stick through the air, receive a cork,
+  notify two light knocks, success a camera shutter, complete a bigger, slower shutter, warning two firm knocks,
+  error two heavier knocks that fall, delete a cut of scissors; one more candidate per role by name, and a like
   (`like/pop`, a small bright pop of the lips over a fingertip) outside the set. A request for an
   interface job gets the same; the tonal figures answer only when the words ask for music or a theme is named.
 - **The best recording plays first** (`earshot/sounds/learned.py`, `walk` in `earshot/data/resyn/index.json`): a

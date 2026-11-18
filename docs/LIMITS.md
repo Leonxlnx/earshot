@@ -77,7 +77,8 @@ not a measure of how good a made sound is; a `heard as` line says what a model h
 family and the learned beds were built after his last ratings: each learned take matched its source in his ears on
 24 recordings, but the store as a whole has not been rated. The sounds added or rebuilt last (the interface
 sounds without instruments, the motion and film hits, the ambiences relearned from other recordings, the everyday
-sounds from other recordings, and the animals, people, street, house, desk and sport sounds) were measured against
+sounds from other recordings, the animals, people, street, house, desk and sport sounds, and rain on wood, on a tin
+roof and on an umbrella) were measured against
 their recordings and against references, and checked by models, but no listener has rated them yet.
 
 **What it cannot do.**

@@ -1,0 +1,14 @@
+{
+ "name": "dragon_roar",
+ "says": "a dragon roaring",
+ "things": ["dragon roar", "dragon roaring", "dragon growl"],
+ "built": "A horse's neigh an octave lower and a cow's moo a sixth lower as the voice, a pig's grunt far lower as its growl, a burst of flame as its breath, low rumble under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "horse/neigh", "pitch": -12, "gain": 0, "lowpass": 4000},
+  {"sound": "cow/moo", "pitch": -9, "at": 0.15, "gain": -3},
+  {"sound": "pig/oink", "pitch": -15, "gain": -5},
+  {"sound": "fire/whoosh", "pitch": -5, "at": 0.6, "gain": -9},
+  {"source": "noise", "color": "brown", "dur": 3.0, "lowpass": [70, 150], "gain": -16, "swell": 0.6, "decay": 1.5}
+ ]
+}
