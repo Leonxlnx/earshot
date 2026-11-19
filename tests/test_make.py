@@ -463,6 +463,7 @@ def test_a_request_nothing_knows_gets_the_nearest_and_says_so(tmp_path):
     line = next(x for x in res['summary'].splitlines() if x.startswith('also (the pick is a guess: '))
     assert f"earshot makes no frobnicating zorp; {res['sound']} is only the nearest sound it has" in line
     assert 'Name one with sound=<id>' in line and res['also']
+    assert 'or let earshot draft, hear and tune it: earshot build "a frobnicating zorp"' in res['summary']
 
 
 @pytest.mark.parametrize('text,start', [

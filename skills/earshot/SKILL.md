@@ -209,6 +209,23 @@ balance: "steady rain on a terrace, 8 seconds, no loop" (rain/street), "the heav
 before it goes under a picture: "a kitchen timer ringing" answers `timer/done`, the catalogue's timer, which is an
 app's timer figure on a marimba, not a wind-up bell. Leave a moment silent, record it, or build it, rather than use a stand-in.
 
+### When earshot does not have the sound: build it
+
+When the answer says `earshot makes no X`, build it on earshot's workbench: `earshot build "X" -o x.wav` (MCP `build`).
+
+1. It drafts recipes from the words (recorded parts, a structure by the kind of sound), renders, hears and tunes them,
+   and writes `x.wav` and `x.recipe.json`.
+2. Read `fit:` (the z for the words beside the design `make` has nearest: "sounds like it" or "a sketch") and
+   `heard as:`.
+3. Read `still off:`: each line names the field of the recipe to change.
+4. Change one thing in `x.recipe.json`, then `earshot build "X" --recipe x.recipe.json` hears it again (add
+   `--rounds 20` to tune its numbers again).
+5. Hand it over as what `fit` says: a sketch is a sketch, and a person should listen once.
+
+`--without ID_OR_FAMILY` keeps parts out. It loads the listening model (the listen extra) and takes about a minute;
+without the extra it drafts, renders, audits and measures, and says that it did not hear. `docs/BUILD.md` has the
+loop and worked examples.
+
 ### Building what is missing: recipes
 
 When the answer says `earshot makes no X`, build the sound from the catalogue's own parts with a recipe: you design

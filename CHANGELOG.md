@@ -47,6 +47,13 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   a plasma shot, a robot arm, a zombie horde and more); 41 are sketches that an answer names as a starting point. A
   recording of the thing itself answers before a recipe, and a recipe whose thing has been recorded since is gone. A
   length, far away, up close, soft and a count asked of a cookbook sound are followed, or the answer says they are not.
+- `earshot build "WORDS" -o FILE` (`earshot/build.py`, MCP `build`) builds a sound the catalogue lacks with earshot as
+  the ears: it drafts one to three recipes from the words (a structure by the kind of sound, the recorded designs
+  nearest the words as parts), renders and hears them with the listening model, tunes their numbers in a seeded
+  search and writes the sound and its recipe. The answer gives the fit to the words beside the design `make` would
+  hand over, what it is heard as and what is still off, each with the recipe field to change; `--recipe` hears an
+  edited recipe again. Without the listen extra it drafts, renders, audits and measures. `make` names it for a thing
+  it has nothing of. `docs/BUILD.md`.
 
 **The catalogue**
 

@@ -699,8 +699,14 @@ def tool_make(want: Annotated[str, Field(description='the sound in words: what i
                                                                      'highpass (Hz or [from, to]), pan, gain (dB), at '
                                                                      '(s), fade_in, fade_out, swell, decay, the '
                                                                      'design\'s axes (-1..1), events {"count", "gap", '
-                                                                     '"faster", "softer", "loose"} and follow '
-                                                                     '{"layer", "amount", "smooth"}; the whole takes '
+                                                                     '"faster", "softer", "loose"}, follow '
+                                                                     '{"layer", "amount", "smooth"}, scatter {"rate", '
+                                                                     '"rate_to", "dur", "pitch", "gain", "pan", '
+                                                                     '"grain"} (many at random moments: rain from '
+                                                                     'drops), stretch, level [[s, dB], ...], bend '
+                                                                     '[[s, semitones], ...], pass {"at", "speed"}, '
+                                                                     'spin {"rate", "depth", "shape"}; a layer may '
+                                                                     'be "recipe": a cookbook name; the whole takes '
                                                                      'name, says, layers, '
                                                                      'dur, space (dry, booth, room, studio, hall, '
                                                                      'plate, cathedral), kind (event, ambience). '
@@ -806,7 +812,40 @@ def tool_sounds(search: Annotated[str | None, Field(description='words to rank t
     return _run('sounds', dict(search=search, domain=domain, family=family), full, _summary_only(M.sounds))
 
 
-TOOLS += [(tool_make, False, False), (tool_make_set, False, False), (tool_sounds, True, False)]
+def tool_build(want: Annotated[str, Field(description='the sound in words: the thing, what it does, on what, where, '
+                                                      'how many, how long, e.g. "hail on a tin roof" or "a whale '
+                                                      'singing"')],
+               out: Annotated[str, Field(description='absolute path of the file to write; the recipe is written '
+                                                     'beside it as <name>.recipe.json')],
+               recipe: Annotated[dict | str | None, Field(description='your own recipe instead of a draft (an '
+                                                                      'object as `make` takes it, the path of a '
+                                                                      'JSON file such as the .recipe.json a build '
+                                                                      'wrote, or a cookbook name): rendered and '
+                                                                      'heard; tuned only when rounds is given')]
+               = None,
+               rounds: Annotated[int | None, Field(description='tuning rounds, a render and a hearing each (default '
+                                                               '20; 0: no tuning)', ge=0, le=200)] = None,
+               without: Annotated[list[str] | None, Field(description='design ids ("rain/tin_roof") or families '
+                                                                      '("rain") the build must not use')] = None,
+               seed: Annotated[int, Field(description='the seed of the takes and of the tuning search')] = 0,
+               full: Full = False) -> str:
+    """Build a sound the catalogue lacks from its recorded parts, with earshot as the ears: it drafts one to three
+    recipes from the words (a structure by the kind of sound: one event, a row, very many small events, something
+    that runs, passes, a creature's voice, something made up, a place; the parts are the recorded designs nearest
+    the words, never an instrument or a synth), renders them, hears them, tunes the numbers of the best in a seeded
+    search and writes the sound and its recipe. The answer says what it is built from, what it is heard as, its fit
+    to the words as a z beside the design `make` would hand over ("sounds like it" when clean, z >= 3 and 1 over
+    it; else "a sketch"), whether it is heard as recorded, and what is still off, each with the recipe field to
+    change. Then edit the recipe and call build again with `recipe`. Without the listen extra it drafts, renders,
+    audits and measures, and says so. Use it when make answers "earshot makes no X", or for any sound the catalogue
+    has nothing of; it takes a model load and about a minute on a laptop CPU."""
+    from . import build as B
+    return _run('build', dict(words=want, out=_out_path(out, 'out'), recipe=recipe, rounds=rounds, without=without,
+                              seed=seed), full, _summary_only(B.build))
+
+
+TOOLS += [(tool_make, False, False), (tool_make_set, False, False), (tool_sounds, True, False),
+          (tool_build, False, False)]
 
 
 def _sdk():

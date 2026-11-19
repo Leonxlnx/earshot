@@ -785,6 +785,7 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         lines.append(guess(b, cands, also))
         if reason.startswith('earshot makes no '):      # no design is this thing: it can be built (earshot.recipe)
             lines.append('build it from parts: earshot recipe --example')
+            lines.append('or let earshot draft, hear and tune it: earshot build "%s"' % str(want).replace('"', "'"))
     elif also:
         lines.append('also: ' + ', '.join(also))
     start = None if sound else R.answer(b, found_by(cands[0]['why'], cands[0]['id']), sketch=True)

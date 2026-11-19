@@ -219,6 +219,18 @@ said in the answer. An agent writes its own recipes for what the cookbook lacks 
 the form) and renders them with `earshot make --recipe roar.json -o roar.wav`. The method and every field:
 [docs/MAKE.md](docs/MAKE.md#when-earshot-has-no-such-sound-build-it).
 
+### Building a sound with earshot as the ears: build
+
+`earshot build "hail on a tin roof" -o hail.wav` is the workbench for a sound the catalogue lacks. It drafts recipes
+from the words alone (recorded parts nearest the words, a structure by the kind of sound: one event, a row, very many
+small events, something that runs or passes, a creature's voice, something made up, a place), renders them, hears
+them with the listening model, tunes the numbers of the best one in a seeded search and writes `hail.wav` and
+`hail.recipe.json`. The answer says what it is built from, what it is heard as, its fit to the words beside the design
+`make` would hand over ("sounds like it" or "a sketch"), and what is still off, each with the recipe field to change;
+`earshot build "..." --recipe hail.recipe.json` hears an edited recipe again. No model generates audio: the listening
+model only judges. Without the listen extra it drafts, renders, audits and measures, and says that it did not hear.
+The loop, examples and what it cannot do: [docs/BUILD.md](docs/BUILD.md).
+
 ### Sets and themes
 
 A ready-made set makes the sounds a kind of product needs in one call, with a `manifest.json`: `ui` (17 interface
