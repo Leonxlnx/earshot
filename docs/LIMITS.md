@@ -157,6 +157,10 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
   shores the joints differ by about 1.5 times the texture's own variation, more than in the other beds.
 - **Takes of a learned design differ in length and level**, because they are different recordings. Make
   pick-at-random takes as a set, where none lies more than 2.5 dB over the quietest.
+- **Some learned things still rest on a thin recording** (a bare strike, or a lossy file with a noisy floor): a
+  scream, a yawn, a fly, a frog, a pot lid or a plate set down, a leather grab, an airy whoosh, a dial, a latch, a
+  stopwatch, a mouse click, a flame whoosh. For a book shut, a glass breaking and a punch the fuller recording is a
+  later take (another `seed`), not the first.
 - **Performances.** Only the learned things whose index names a pattern or holds a recording of the whole action
   (walks, knocks, typing, coins, keys, clinking glasses ...) can be played as the action; the reader decides from
   the words (a plural, an action word, a count or a length), and `events` overrides it. A walk or a typing run made

@@ -176,22 +176,21 @@ Measured on 39 reference motion-design videos (`docs/motion-sfx-study.md`); [mea
 - Music carries the film. 34 of the 35 videos with sound are music-led [measured]; where effects stand out of the
   music at all, a video has 1 to 4 of them. Pick the two to five moments that matter (a reveal, the logo, a key UI
   action, a title change); most cuts get no sound, because editors cut the picture on the music's accents.
-- What to ask for:
+- What to ask for (`earshot make --set film` makes these as one family; one alone with
+  `earshot make "WORDS" --sound ID`):
   - a stop before a reveal [measured: the most used move]: cut the music for 0.15 to 0.5 s, then come back on a hit.
-    It is an edit of the bed; the hit is "an impact after silence" (hit/drop).
-  - something appears or a card flips: a short low thump, about 50 ms [measured]: "a pop when an element appears"
-    (thump/appear); "a soft thump" (thump/soft) for something landing. In a run, make it once and place it once per
-    element.
-  - a UI click or a word highlighted: a bright dry tick [measured]: "a cursor click" (tick/soft). "a mouse click"
-    (click/mouse) is the whole mouse button.
-  - a title change: "a title hit" (slam/title, about a third of a second).
-  - the logo end card: "a logo hit" (boom/short, about 0.3 s) on the logo frame; "a logo reveal" (sting/reveal)
-    swells into the same hit; "a deep boom" (boom/deep) is darker.
-  - a move across the screen: "a whoosh for a transition" (whoosh/soft; it holds a length asked, "a short whoosh,
-    0.3 seconds") or "a fast whoosh" (whoosh/fast); "a quick swish" (flick/thin) for a small fast move.
-  - text breaking apart: "a glitch transition" (glitch/short). A reveal after a build: "a reverse swell into a cut"
-    (rise/reverse, ends at its peak) or "a riser before the drop" (rise/air). A sparkle: "sparkle on the product
-    reveal" (shine/air, bright air with no note).
+    It is an edit of the bed; the hit is drop/sack (a heavy bag dropped) or hit/drop.
+  - something appears or a card flips: a short low thump, about 50 ms [measured]: thump/door (a door falling shut,
+    cut short and low; the set's `pop`). In a run, make it once and place it once per element.
+  - a UI click or a word highlighted: a bright dry tick [measured]: tick/key (the top of a mechanical key);
+    click/cursor is a whole mouse button.
+  - a title change: title/bag (a swish and a breath of air into a heavy bag dropped, about a third of a second).
+  - the logo end card: logo/bag (a heavy bag dropped, low, about a quarter second) on the logo frame; sting/reveal
+    swells longer into a hit; impact/car is heavier.
+  - a move across the screen: whoosh/fast (a stick swung) for a fast move, whoosh/sweep (a broom's stroke) for a
+    soft one, slide/paper for a card sliding in; "a quick swish" (flick/thin) for a small fast move.
+  - text breaking apart: "a glitch transition" (glitch/short). A reveal after a build: rise/breath (a breath of air
+    growing to the cut) or rise/hit (a slam played backwards). A shine: shine/blade (a sword drawn, only its edge).
 - Never as an effect in a motion video: marimba, bells, chimes, piano or synth notes, unless the video is about music
   or is a game [measured: none in 35 videos]. Braams, explosions, tape stops and long risers were not used in any
   of them either: use them only when the picture shows that thing.

@@ -1189,17 +1189,17 @@
    "size",
    "bright",
    "hard",
+   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "knife-swish-1.npz",
-    "source": "freesound_ov/344408.mp3",
+    "source": "bigsoundbank/0128.wav@0.000-0.463",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.3523,
-    "dur_s": 0.918,
+    "onset_s": 0.1025,
+    "dur_s": 0.463,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -1207,28 +1207,29 @@
      "size",
      "bright",
      "hard",
+     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 1.9,
-     "centroid": 70,
-     "end_db": -107.3,
-     "tail_ms": 516.1,
-     "start_db": -104.4,
-     "rise_ms": 2.62,
-     "peak": -16.9
+     "span": 2.45,
+     "centroid": 1105,
+     "end_db": -193.0,
+     "tail_ms": 154.8,
+     "start_db": -129.5,
+     "rise_ms": 15.21,
+     "peak": -2.2
     },
     "measured": {
-     "hard_db": 5.0,
-     "ring_x": 1.094
+     "hard_db": 3.96,
+     "ring_x": 1.534
     },
-    "bytes": 9572,
+    "bytes": 12237,
     "credit": {
-     "title": "Knife Swish 2.wav (by jawbutch)",
-     "author": "jawbutch",
-     "page": "https://freesound.org/people/jawbutch/sounds/344408",
-     "licence": "CC0 1.0 (Openverse API license field \"cc0\" 1.0 for the Freesound page; preview MP3)",
+     "title": "Sword Through the Air",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/sword-through-the-air-s0128.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "film/swish/fast",
@@ -1238,7 +1239,17 @@
       "short",
       "dull"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.463
+    ],
+    "fidelity": {
+     "env_db": 3.87,
+     "shape_db": 1.32
+    },
+    "was": "freesound_ov/344408.mp3"
    },
    {
     "file": "knife-swish-2.npz",
@@ -1455,41 +1466,38 @@
    },
    {
     "file": "golf-swing-2.npz",
-    "source": "cuts/bigsoundbank/0455_00.wav",
+    "source": "freesound_s5/540142.mp3@0.000-0.663",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0243,
-    "dur_s": 0.25,
-    "stereo": false,
+    "onset_s": 0.1303,
+    "dur_s": 0.663,
+    "stereo": true,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 3.28,
-     "centroid": 3642,
-     "end_db": -135.1,
-     "tail_ms": 198.9,
-     "start_db": -138.5,
-     "rise_ms": 1.0,
-     "peak": -0.0
+     "span": 5.66,
+     "centroid": 617,
+     "end_db": -94.0,
+     "tail_ms": 24.3,
+     "start_db": -125.5,
+     "rise_ms": 21.08,
+     "peak": -26.3
     },
     "measured": {
-     "hard_db": 8.75,
-     "ring_x": 1.356
+     "hard_db": -1.23,
+     "ring_x": 1.005
     },
-    "bytes": 4715,
+    "bytes": 25723,
     "credit": {
-     "title": "Golf swing, with a wooden club",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/golf-swing-with-a-wooden-club-s0455.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "title": "Golf Swing Swoosh.wav",
+     "author": "aidansamuel",
+     "page": "https://freesound.org/people/aidansamuel/sounds/540142",
+     "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "film/whoosh/swing",
@@ -1499,12 +1507,23 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.663
+    ],
+    "fidelity": {
+     "env_db": 3.0,
+     "shape_db": 1.22
+    },
+    "was": "cuts/bigsoundbank/0455_00.wav",
+    "lossy": true
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ]
  },
  {
@@ -2474,11 +2493,10 @@
    },
    {
     "file": "punch-body-4.npz",
-    "source": "cuts/bigsoundbank/0806_01.wav",
+    "source": "bigsoundbank/2461.wav@0.000-0.876",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0235,
-    "dur_s": 0.635,
+    "onset_s": 0.0693,
+    "dur_s": 0.876,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -2491,33 +2509,38 @@
      "width"
     ],
     "quality": {
-     "span": 4.48,
-     "centroid": 619,
-     "end_db": -131.9,
-     "tail_ms": 559.6,
-     "start_db": -178.8,
-     "rise_ms": 3.62,
-     "peak": -4.2
+     "span": 2.8,
+     "centroid": 3218,
+     "end_db": -156.6,
+     "tail_ms": 619.0,
+     "start_db": -237.9,
+     "rise_ms": 1.21,
+     "peak": -2.1
     },
     "measured": {
-     "hard_db": 3.37,
-     "ring_x": 1.832
+     "hard_db": 6.75,
+     "ring_x": 1.596
     },
-    "bytes": 7986,
+    "bytes": 13022,
     "credit": {
-     "title": "Punch #3",
+     "title": "Punch #6",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/punches-3-s0806.html",
+     "page": "https://bigsoundbank.com/punch-6-s2461.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/punch/hit",
+    "events": 1,
+    "rating": null,
     "excerpt_s": [
      0.0,
-     0.635
+     0.876
     ],
-    "events": 1,
-    "pace": null
+    "fidelity": {
+     "env_db": 3.14,
+     "shape_db": 0.85
+    },
+    "was": "cuts/bigsoundbank/0806_01.wav"
    },
    {
     "file": "punch-body-5.npz",
@@ -3475,39 +3498,38 @@
   "members": [
    {
     "file": "whip-crack-1.npz",
-    "source": "cuts/bigsoundbank/2949_00.wav",
+    "source": "bigsoundbank/2952.wav@0.050-1.050",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0165,
-    "dur_s": 1.24,
+    "onset_s": 0.2732,
+    "dur_s": 1.0,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "ring",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 5.15,
-     "centroid": 1405,
-     "end_db": -127.9,
-     "tail_ms": 1179.0,
-     "start_db": -92.4,
-     "rise_ms": 0.83,
-     "peak": -0.6
+     "span": 5.01,
+     "centroid": 3714,
+     "end_db": -94.5,
+     "tail_ms": 345.9,
+     "start_db": -148.2,
+     "rise_ms": 0.81,
+     "peak": -2.4
     },
     "measured": {
-     "hard_db": -3.75,
-     "ring_x": 1.358
+     "hard_db": 7.24,
+     "ring_x": 1.0
     },
-    "bytes": 11161,
+    "bytes": 24089,
     "credit": {
-     "title": "Whip crack #1",
+     "title": "Whip crack #4",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/whip-crack-1-s2949.html",
+     "page": "https://bigsoundbank.com/whip-crack-4-s2952.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -3518,7 +3540,20 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.05,
+     1.05
+    ],
+    "fidelity": {
+     "env_db": 2.99,
+     "shape_db": 0.88
+    },
+    "was": "cuts/bigsoundbank/2949_00.wav",
+    "allows": [
+     "pre_swell"
+    ]
    },
    {
     "file": "whip-crack-2.npz",
@@ -3570,8 +3605,11 @@
    }
   ],
   "walk": [
-   1,
-   0
+   0,
+   1
+  ],
+  "allows": [
+   "pre_swell"
   ]
  },
  {
@@ -5554,11 +5592,10 @@
   "members": [
    {
     "file": "step-concrete-1.npz",
-    "source": "bigsoundbank/0606.wav@1.502-1.847",
+    "source": "bigsoundbank/0514.wav@3.170-3.970",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.014,
-    "dur_s": 0.345,
+    "onset_s": 0.0403,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -5566,38 +5603,45 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.44,
-     "centroid": 602,
-     "end_db": -98.6,
-     "tail_ms": 203.8,
-     "start_db": -124.1,
-     "rise_ms": 3.02,
+     "span": 6.24,
+     "centroid": 297,
+     "end_db": -71.6,
+     "tail_ms": 25.9,
+     "start_db": -108.8,
+     "rise_ms": 2.06,
      "peak": -8.9
     },
     "measured": {
-     "hard_db": 3.91,
-     "ring_x": 1.901
+     "hard_db": 3.47,
+     "ring_x": 1.01
     },
-    "bytes": 8714,
+    "bytes": 38948,
     "credit": {
-     "title": "Step, Shoe on Stone Staircase",
+     "title": "Footsteps, Shoe on Concrete",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "page": "https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/step/stone",
-    "excerpt_s": [
-     1.502,
-     1.847
-    ],
     "events": 1,
-    "pace": null
+    "rating": null,
+    "excerpt_s": [
+     3.17,
+     3.97
+    ],
+    "fidelity": {
+     "env_db": 3.02,
+     "shape_db": 0.95
+    },
+    "was": "bigsoundbank/0606.wav@1.502-1.847",
+    "allows": [
+     "stacked"
+    ]
    },
    {
     "file": "step-concrete-2.npz",
@@ -5647,11 +5691,10 @@
    },
    {
     "file": "step-concrete-3.npz",
-    "source": "bigsoundbank/0606.wav@15.817-16.191",
+    "source": "bigsoundbank/0514.wav@8.840-9.640",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0135,
-    "dur_s": 0.374,
+    "onset_s": 0.1405,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -5662,33 +5705,42 @@
      "width"
     ],
     "quality": {
-     "span": 4.71,
-     "centroid": 891,
-     "end_db": -94.9,
-     "tail_ms": 205.4,
-     "start_db": -131.1,
-     "rise_ms": 3.19,
-     "peak": -11.5
+     "span": 6.45,
+     "centroid": 349,
+     "end_db": -72.5,
+     "tail_ms": 42.4,
+     "start_db": -102.0,
+     "rise_ms": 3.88,
+     "peak": -7.3
     },
     "measured": {
-     "hard_db": -1.56,
-     "ring_x": 1.002
+     "hard_db": 0.01,
+     "ring_x": 1.199
     },
-    "bytes": 17946,
+    "bytes": 32150,
     "credit": {
-     "title": "Step, Shoe on Stone Staircase",
+     "title": "Footsteps, Shoe on Concrete",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "page": "https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/step/stone",
-    "excerpt_s": [
-     15.817,
-     16.191
-    ],
     "events": 1,
-    "pace": null
+    "rating": null,
+    "excerpt_s": [
+     8.84,
+     9.64
+    ],
+    "fidelity": {
+     "env_db": 2.99,
+     "shape_db": 1.04
+    },
+    "was": "bigsoundbank/0606.wav@15.817-16.191",
+    "allows": [
+     "pre_swell",
+     "stacked"
+    ]
    },
    {
     "file": "step-concrete-4.npz",
@@ -5741,58 +5793,68 @@
    },
    {
     "file": "step-concrete-5.npz",
-    "source": "bigsoundbank/0606.wav@9.815-9.960",
+    "source": "bigsoundbank/0514.wav@6.650-7.450",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0138,
-    "dur_s": 0.145,
+    "onset_s": 0.143,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.11,
-     "centroid": 656,
-     "end_db": -61.9,
-     "tail_ms": 20.2,
-     "start_db": -125.7,
-     "rise_ms": 1.35,
-     "peak": -11.8
+     "span": 6.3,
+     "centroid": 277,
+     "end_db": -67.7,
+     "tail_ms": 42.9,
+     "start_db": -106.0,
+     "rise_ms": 0.35,
+     "peak": -3.1
     },
     "measured": {
-     "hard_db": 1.76,
-     "ring_x": 1.074
+     "hard_db": 2.63,
+     "ring_x": 1.064
     },
-    "bytes": 10795,
+    "bytes": 30651,
     "credit": {
-     "title": "Step, Shoe on Stone Staircase",
+     "title": "Footsteps, Shoe on Concrete",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/step-shoe-on-stone-staircase-s0606.html",
+     "page": "https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/step/stone",
-    "excerpt_s": [
-     9.815,
-     9.96
-    ],
     "events": 1,
-    "pace": null
+    "rating": null,
+    "excerpt_s": [
+     6.65,
+     7.45
+    ],
+    "fidelity": {
+     "env_db": 3.07,
+     "shape_db": 1.05
+    },
+    "was": "bigsoundbank/0606.wav@9.815-9.960",
+    "allows": [
+     "pre_swell",
+     "stacked"
+    ]
    }
   ],
   "walk": [
-   1,
    0,
+   1,
    2,
    3,
    4
   ],
   "allows": [
+   "pre_swell",
    "stacked"
   ],
   "pattern": {
@@ -5803,7 +5865,7 @@
    ],
    "feet": [
     0,
-    3
+    2
    ]
   }
  },
@@ -6599,45 +6661,46 @@
    "energy",
    "size",
    "bright",
+   "hard",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "step-powder-1.npz",
-    "source": "kenney/impact-sounds/Audio/footstep_snow_004.ogg",
+    "source": "bigsoundbank_s5/2890.wav@6.080-6.880",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0165,
-    "dur_s": 0.374,
+    "onset_s": 0.2047,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.75,
-     "centroid": 235,
-     "end_db": -46.8,
-     "tail_ms": 209.2,
-     "start_db": -48.9,
-     "rise_ms": 0.77,
-     "peak": -1.1
+     "span": 3.09,
+     "centroid": 4922,
+     "end_db": -84.4,
+     "tail_ms": 51.6,
+     "start_db": -116.3,
+     "rise_ms": 51.44,
+     "peak": -10.0
     },
     "measured": {
-     "hard_db": 1.66,
-     "ring_x": 1.059
+     "hard_db": 6.76,
+     "ring_x": 1.0
     },
-    "bytes": 17478,
+    "bytes": 41075,
     "credit": {
-     "title": "impact-sounds/footstep_snow_004",
-     "author": "Kenney (kenney.nl)",
-     "page": "https://kenney.nl/assets/impact-sounds",
-     "licence": "CC0 1.0 (kenney.nl asset page and the pack License.txt)",
+     "title": "Footstep in the Snow #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/footstep-in-the-snow-2-s2890.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/step/snow",
@@ -6646,43 +6709,56 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     6.08,
+     6.88
+    ],
+    "fidelity": {
+     "env_db": 2.59,
+     "shape_db": 0.68
+    },
+    "was": "kenney/impact-sounds/Audio/footstep_snow_004.ogg",
+    "allows": [
+     "pre_swell"
+    ]
    },
    {
     "file": "step-powder-2.npz",
-    "source": "kenney/impact-sounds/Audio/footstep_snow_001.ogg",
+    "source": "bigsoundbank_s5/2890.wav@7.230-8.030",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0025,
-    "dur_s": 0.374,
+    "onset_s": 0.228,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 3.7,
-     "centroid": 285,
-     "end_db": -50.3,
-     "tail_ms": 208.9,
-     "start_db": -53.5,
-     "rise_ms": 1.96,
-     "peak": -1.0
+     "span": 3.07,
+     "centroid": 4615,
+     "end_db": -88.3,
+     "tail_ms": 87.1,
+     "start_db": -114.1,
+     "rise_ms": 79.81,
+     "peak": -8.9
     },
     "measured": {
-     "hard_db": -0.68,
-     "ring_x": 1.191
+     "hard_db": 5.53,
+     "ring_x": 1.0
     },
-    "bytes": 19511,
+    "bytes": 40340,
     "credit": {
-     "title": "impact-sounds/footstep_snow_001",
-     "author": "Kenney (kenney.nl)",
-     "page": "https://kenney.nl/assets/impact-sounds",
-     "licence": "CC0 1.0 (kenney.nl asset page and the pack License.txt)",
+     "title": "Footstep in the Snow #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/footstep-in-the-snow-2-s2890.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/step/snow",
@@ -6691,56 +6767,82 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     7.23,
+     8.03
+    ],
+    "fidelity": {
+     "env_db": 2.6,
+     "shape_db": 0.69
+    },
+    "was": "kenney/impact-sounds/Audio/footstep_snow_001.ogg",
+    "allows": [
+     "pre_swell"
+    ]
    },
    {
     "file": "step-powder-3.npz",
-    "source": "kenney/impact-sounds/Audio/footstep_snow_000.ogg",
+    "source": "bigsoundbank_s5/2890.wav@2.510-3.310",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0018,
-    "dur_s": 0.374,
+    "onset_s": 0.2177,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.01,
-     "centroid": 458,
-     "end_db": -47.6,
-     "tail_ms": 211.7,
-     "start_db": -54.3,
-     "rise_ms": 1.12,
-     "peak": -0.8
+     "span": 3.24,
+     "centroid": 4808,
+     "end_db": -85.9,
+     "tail_ms": 60.9,
+     "start_db": -110.6,
+     "rise_ms": 154.92,
+     "peak": -8.3
     },
     "measured": {
-     "hard_db": 1.2,
-     "ring_x": 1.072
+     "hard_db": 9.45,
+     "ring_x": 1.0
     },
-    "bytes": 19602,
+    "bytes": 38096,
     "credit": {
-     "title": "impact-sounds/footstep_snow_000",
-     "author": "Kenney (kenney.nl)",
-     "page": "https://kenney.nl/assets/impact-sounds",
-     "licence": "CC0 1.0 (kenney.nl asset page and the pack License.txt)",
+     "title": "Footstep in the Snow #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/footstep-in-the-snow-2-s2890.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "game/step/snow",
     "taste": {
      "pred": 1.79,
      "flags": []
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     2.51,
+     3.31
+    ],
+    "fidelity": {
+     "env_db": 2.7,
+     "shape_db": 0.73
+    },
+    "was": "kenney/impact-sounds/Audio/footstep_snow_000.ogg",
+    "allows": [
+     "pre_swell"
+    ]
    }
   ],
   "walk": [
+   0,
    1,
-   2,
-   0
+   2
   ],
   "pattern": {
    "name": "walk",
@@ -6749,10 +6851,13 @@
     8
    ],
    "feet": [
-    1,
-    1
+    0,
+    2
    ]
-  }
+  },
+  "allows": [
+   "pre_swell"
+  ]
  },
  {
   "id": "step/tile",
@@ -6886,49 +6991,52 @@
    },
    {
     "file": "step-tile-3.npz",
-    "source": "freesound_e1/480592.mp3@9.195-9.664",
+    "source": "freesound_s5/170506.mp3@8.770-9.570",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0045,
-    "dur_s": 0.469,
+    "onset_s": 0.0135,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 5.19,
-     "centroid": 1520,
-     "end_db": -79.6,
-     "tail_ms": 50.9,
-     "start_db": -105.1,
-     "rise_ms": 1.56,
-     "peak": -2.3
+     "span": 3.87,
+     "centroid": 744,
+     "end_db": -86.0,
+     "tail_ms": 72.6,
+     "start_db": -127.3,
+     "rise_ms": 1.06,
+     "peak": -21.2
     },
     "measured": {
-     "hard_db": 2.5,
-     "ring_x": 1.093
+     "hard_db": 1.85,
+     "ring_x": 1.043
     },
-    "bytes": 15838,
+    "bytes": 24526,
     "credit": {
-     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
-     "author": "craigsmith",
-     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Footsteps, Tile, Male Sneakers, Slow Pace.wav",
+     "author": "SpliceSound",
+     "page": "https://freesound.org/people/SpliceSound/sounds/170506",
+     "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     9.195,
-     9.664
-    ],
     "events": 1,
-    "pace": null,
+    "rating": null,
+    "excerpt_s": [
+     8.77,
+     9.57
+    ],
+    "fidelity": {
+     "env_db": 3.52,
+     "shape_db": 1.38
+    },
+    "was": "freesound_e1/480592.mp3@9.195-9.664",
     "lossy": true
    },
    {
@@ -6980,11 +7088,10 @@
    },
    {
     "file": "step-tile-5.npz",
-    "source": "freesound_e1/480592.mp3@8.448-9.009",
+    "source": "freesound_s5/170506.mp3@4.920-5.720",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0035,
-    "dur_s": 0.561,
+    "onset_s": 0.0235,
+    "dur_s": 0.8,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -6992,46 +7099,50 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 5.22,
-     "centroid": 1621,
-     "end_db": -78.9,
-     "tail_ms": 66.9,
-     "start_db": -110.7,
-     "rise_ms": 2.38,
-     "peak": -2.3
+     "span": 4.65,
+     "centroid": 949,
+     "end_db": -85.7,
+     "tail_ms": 54.8,
+     "start_db": -132.5,
+     "rise_ms": 1.42,
+     "peak": -21.9
     },
     "measured": {
-     "hard_db": 2.67,
-     "ring_x": 1.566
+     "hard_db": 2.27,
+     "ring_x": 1.021
     },
-    "bytes": 18768,
+    "bytes": 22965,
     "credit": {
-     "title": "R10-05-Footsteps on Hard Tile Floor.wav",
-     "author": "craigsmith",
-     "page": "https://freesound.org/people/craigsmith/sounds/480592/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Footsteps, Tile, Male Sneakers, Slow Pace.wav",
+     "author": "SpliceSound",
+     "page": "https://freesound.org/people/SpliceSound/sounds/170506",
+     "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     8.448,
-     9.009
-    ],
     "events": 1,
-    "pace": null,
+    "rating": null,
+    "excerpt_s": [
+     4.92,
+     5.72
+    ],
+    "fidelity": {
+     "env_db": 3.22,
+     "shape_db": 1.02
+    },
+    "was": "freesound_e1/480592.mp3@8.448-9.009",
     "lossy": true
    }
   ],
   "walk": [
    0,
+   2,
    4,
    1,
-   2,
    3
   ],
   "allows": [
@@ -7045,7 +7156,7 @@
    ],
    "feet": [
     2,
-    4
+    2
    ]
   }
  },
@@ -9967,50 +10078,56 @@
    },
    {
     "file": "book-shut-3.npz",
-    "source": "cuts/freesound_ov/389757_01.wav",
+    "source": "freesound_s5/256472.mp3@2.030-2.990",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0217,
-    "dur_s": 0.495,
+    "onset_s": 0.547,
+    "dur_s": 0.96,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.68,
-     "centroid": 1166,
-     "end_db": -125.1,
-     "tail_ms": 295.6,
-     "start_db": -181.4,
-     "rise_ms": 2.96,
-     "peak": -6.2
+     "span": 5.99,
+     "centroid": 701,
+     "end_db": -123.8,
+     "tail_ms": 166.1,
+     "start_db": -150.3,
+     "rise_ms": 2.94,
+     "peak": -8.5
     },
     "measured": {
-     "hard_db": -0.07,
-     "ring_x": 1.33
+     "hard_db": -1.47,
+     "ring_x": 1.082
     },
-    "bytes": 15654,
+    "bytes": 34160,
     "credit": {
-     "title": "book hits floor.wav (by buzbe20)",
-     "author": "buzbe20",
-     "page": "https://freesound.org/people/buzbe20/sounds/389757",
-     "licence": "CC0 1.0 (Openverse API license field \"cc0\" 1.0 for the Freesound page; preview MP3)",
+     "title": "Closing a Book",
+     "author": "Kodack",
+     "page": "https://freesound.org/people/Kodack/sounds/256472",
+     "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "obj/book/drop",
-    "excerpt_s": [
-     0.0,
-     0.495
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     2.03,
+     2.99
+    ],
+    "fidelity": {
+     "env_db": 2.89,
+     "shape_db": 0.91
+    },
+    "was": "cuts/freesound_ov/389757_01.wav",
+    "lossy": true,
+    "allows": [
+     "pre_swell"
+    ]
    },
    {
     "file": "book-shut-4.npz",
@@ -10282,12 +10399,11 @@
   "members": [
    {
     "file": "book-open-1.npz",
-    "source": "kenney/rpg-audio/Audio/bookOpen.ogg",
+    "source": "freesound_s5/638379.mp3@0.000-1.467",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.019,
-    "dur_s": 0.154,
-    "stereo": true,
+    "onset_s": 0.3613,
+    "dur_s": 1.467,
+    "stereo": false,
     "dry": false,
     "axes": [
      "energy",
@@ -10298,24 +10414,24 @@
      "width"
     ],
     "quality": {
-     "span": 7.38,
-     "centroid": 955,
-     "end_db": -49.7,
-     "tail_ms": 55.7,
-     "start_db": -46.2,
-     "rise_ms": 11.96,
-     "peak": -11.5
+     "span": 3.01,
+     "centroid": 1563,
+     "end_db": -161.8,
+     "tail_ms": 591.6,
+     "start_db": -91.5,
+     "rise_ms": 0.5,
+     "peak": -28.0
     },
     "measured": {
-     "hard_db": 4.54,
-     "ring_x": 0.997
+     "hard_db": 2.13,
+     "ring_x": 1.0
     },
-    "bytes": 11924,
+    "bytes": 41952,
     "credit": {
-     "title": "rpg-audio/bookOpen",
-     "author": "Kenney (kenney.nl)",
-     "page": "https://kenney.nl/assets/rpg-audio",
-     "licence": "CC0 1.0 (kenney.nl asset page and the pack License.txt)",
+     "title": "Soft Cover Book Open 4.wav",
+     "author": "yossirafa100",
+     "page": "https://freesound.org/people/yossirafa100/sounds/638379",
+     "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "obj/book/open",
@@ -10325,7 +10441,18 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     1.467
+    ],
+    "fidelity": {
+     "env_db": 2.94,
+     "shape_db": 0.86
+    },
+    "was": "kenney/rpg-audio/Audio/bookOpen.ogg",
+    "lossy": true
    }
   ],
   "walk": [
@@ -10797,18 +10924,16 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "plate-ceramic-1.npz",
-    "source": "kenney/impact-sounds/Audio/impactPlate_light_002.ogg",
+    "source": "bigsoundbank/1194.wav@10.110-11.510",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.001,
-    "dur_s": 0.489,
+    "onset_s": 0.059,
+    "dur_s": 1.4,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -10816,29 +10941,28 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.49,
-     "centroid": 164,
-     "end_db": -51.3,
-     "tail_ms": 261.4,
-     "start_db": -30.3,
-     "rise_ms": 3.02,
-     "peak": -1.0
+     "span": 2.65,
+     "centroid": 5363,
+     "end_db": -101.0,
+     "tail_ms": 307.9,
+     "start_db": -157.3,
+     "rise_ms": 1.9,
+     "peak": -4.3
     },
     "measured": {
-     "hard_db": 4.06,
-     "ring_x": 1.76
+     "hard_db": 8.42,
+     "ring_x": 1.0
     },
-    "bytes": 12911,
+    "bytes": 38799,
     "credit": {
-     "title": "impact-sounds/impactPlate_light_002",
-     "author": "Kenney (kenney.nl)",
-     "page": "https://kenney.nl/assets/impact-sounds",
-     "licence": "CC0 1.0 (kenney.nl asset page and the pack License.txt)",
+     "title": "Teaspoon, placed on a plate",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/teaspoon-placed-on-a-plate-s1194.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "hz": 25.8,
@@ -10848,11 +10972,27 @@
      "flags": [
       "short"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     10.11,
+     11.51
+    ],
+    "fidelity": {
+     "env_db": 3.0,
+     "shape_db": 1.03
+    },
+    "was": "kenney/impact-sounds/Audio/impactPlate_light_002.ogg",
+    "allows": [
+     "stacked"
+    ]
    }
   ],
   "walk": [
    0
+  ],
+  "allows": [
+   "stacked"
   ]
  },
  {
@@ -12164,18 +12304,16 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "pen-cap-1.npz",
-    "source": "cuts/bigsoundbank/0054_00.wav",
+    "source": "freesound_s5/669920.mp3@0.000-0.700",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.023,
-    "dur_s": 0.259,
+    "onset_s": 0.0975,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": true,
     "axes": [
@@ -12183,29 +12321,28 @@
      "size",
      "bright",
      "hard",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 2.12,
-     "centroid": 7934,
-     "end_db": -76.3,
-     "tail_ms": 178.9,
-     "start_db": -107.8,
-     "rise_ms": 0.42,
-     "peak": -8.4
+     "span": 5.06,
+     "centroid": 5817,
+     "end_db": -85.0,
+     "tail_ms": 286.5,
+     "start_db": -156.1,
+     "rise_ms": 1.04,
+     "peak": -10.3
     },
     "measured": {
-     "hard_db": 6.51,
-     "ring_x": 1.494
+     "hard_db": 3.42,
+     "ring_x": 1.0
     },
-    "bytes": 5404,
+    "bytes": 18336,
     "credit": {
-     "title": "Pen cap",
-     "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/pen-cap-s0054.html",
-     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "title": "Sharpie Marker Cap Open and Shut",
+     "author": "el_boss",
+     "page": "https://freesound.org/people/el_boss/sounds/669920",
+     "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": "ui/pen/cap",
@@ -12216,7 +12353,18 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.7
+    ],
+    "fidelity": {
+     "env_db": 2.31,
+     "shape_db": 0.95
+    },
+    "was": "cuts/bigsoundbank/0054_00.wav",
+    "lossy": true
    }
   ],
   "walk": [
@@ -13647,40 +13795,38 @@
   "members": [
    {
     "file": "glass-cheers-1.npz",
-    "source": "cuts/bigsoundbank/1323_00.wav",
+    "source": "bigsoundbank/1335.wav@0.000-0.828",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0222,
-    "dur_s": 0.415,
+    "onset_s": 0.0377,
+    "dur_s": 0.828,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
      "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 2.82,
-     "centroid": 4429,
-     "end_db": -113.8,
-     "tail_ms": 348.6,
-     "start_db": -112.9,
-     "rise_ms": 1.21,
-     "peak": 0.0
+     "span": 2.17,
+     "centroid": 5727,
+     "end_db": -150.1,
+     "tail_ms": 483.6,
+     "start_db": -151.0,
+     "rise_ms": 1.81,
+     "peak": -1.0
     },
     "measured": {
-     "hard_db": 3.85,
-     "ring_x": 1.38
+     "hard_db": 1.24,
+     "ring_x": 1.647
     },
-    "bytes": 6517,
+    "bytes": 13315,
     "credit": {
-     "title": "Cheers, table glass #1",
+     "title": "Cheers, Champagne Flute #1",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/cheers-table-glass-1-s1323.html",
+     "page": "https://bigsoundbank.com/cheers-champagne-flute-1-s1335.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -13694,7 +13840,16 @@
       "thin"
      ]
     },
-    "rating_final": 2
+    "rating": null,
+    "excerpt_s": [
+     0.0,
+     0.828
+    ],
+    "fidelity": {
+     "env_db": 2.84,
+     "shape_db": 0.87
+    },
+    "was": "cuts/bigsoundbank/1323_00.wav"
    },
    {
     "file": "glass-cheers-2.npz",
@@ -13894,9 +14049,9 @@
   "walk": [
    3,
    4,
+   0,
    2,
-   1,
-   0
+   1
   ],
   "pattern": {
    "name": "pair",
@@ -17550,11 +17705,10 @@
    },
    {
     "file": "switch-wall-3.npz",
-    "source": "freesound_e1/119925.mp3@0.763-0.986",
+    "source": "bigsoundbank_s5/0540.wav@13.980-14.680",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0138,
-    "dur_s": 0.223,
+    "onset_s": 0.1235,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -17567,34 +17721,38 @@
      "width"
     ],
     "quality": {
-     "span": 7.05,
-     "centroid": 3090,
-     "end_db": -74.8,
-     "tail_ms": 155.8,
-     "start_db": -127.7,
-     "rise_ms": 0.96,
-     "peak": -4.8
+     "span": 6.65,
+     "centroid": 5869,
+     "end_db": -118.6,
+     "tail_ms": 511.1,
+     "start_db": -231.9,
+     "rise_ms": 0.5,
+     "peak": -8.1
     },
     "measured": {
-     "hard_db": 9.79,
-     "ring_x": 1.71
+     "hard_db": 9.04,
+     "ring_x": 1.295
     },
-    "bytes": 6334,
+    "bytes": 12333,
     "credit": {
-     "title": "Light Switch on Wall.aif",
-     "author": "ftpalad",
-     "page": "https://freesound.org/people/ftpalad/sounds/119925/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Old switch",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/old-switch-s0540.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     0.763,
-     0.986
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     13.98,
+     14.68
+    ],
+    "fidelity": {
+     "env_db": 3.11,
+     "shape_db": 1.26
+    },
+    "was": "freesound_e1/119925.mp3@0.763-0.986"
    },
    {
     "file": "switch-wall-4.npz",
@@ -17698,11 +17856,10 @@
    },
    {
     "file": "switch-wall-6.npz",
-    "source": "freesound_e1/423512.mp3@1.421-1.566",
+    "source": "bigsoundbank/0052.wav@1.020-1.720",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0138,
-    "dur_s": 0.145,
+    "onset_s": 0.2545,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -17715,42 +17872,46 @@
      "width"
     ],
     "quality": {
-     "span": 6.03,
-     "centroid": 1769,
-     "end_db": -102.5,
-     "tail_ms": 85.7,
-     "start_db": -115.1,
-     "rise_ms": 0.81,
-     "peak": -0.4
+     "span": 2.89,
+     "centroid": 4305,
+     "end_db": -106.1,
+     "tail_ms": 348.5,
+     "start_db": -130.9,
+     "rise_ms": 1.65,
+     "peak": -14.3
     },
     "measured": {
-     "hard_db": 7.63,
-     "ring_x": 1.575
+     "hard_db": 9.8,
+     "ring_x": 1.255
     },
-    "bytes": 6022,
+    "bytes": 11406,
     "credit": {
-     "title": "Light Switch Click On and Off",
-     "author": "SomeoneCool15",
-     "page": "https://freesound.org/people/SomeoneCool15/sounds/423512/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Electric switch #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/electric-switch-2-s0052.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     1.421,
-     1.566
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     1.02,
+     1.72
+    ],
+    "fidelity": {
+     "env_db": 3.6,
+     "shape_db": 1.19
+    },
+    "was": "freesound_e1/423512.mp3@1.421-1.566"
    }
   ],
   "walk": [
+   5,
    1,
    2,
    3,
    4,
-   5,
    0
   ],
   "pattern": {
@@ -19847,6 +20008,7 @@
    "energy",
    "size",
    "bright",
+   "hard",
    "ring",
    "space",
    "width"
@@ -19902,43 +20064,51 @@
    },
    {
     "file": "camera-shutter-2.npz",
-    "source": "freesound-338219",
-    "origin": "library",
-    "rating": null,
-    "onset_s": 0.0057,
-    "dur_s": 0.173,
+    "source": "bigsoundbank_s5/0011.wav@3.400-4.100",
+    "origin": "corpus",
+    "onset_s": 0.0808,
+    "dur_s": 0.7,
     "stereo": false,
     "dry": true,
     "axes": [
      "energy",
      "size",
      "bright",
-     "ring",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 2.68,
-     "centroid": 6345,
-     "end_db": -60.2,
-     "tail_ms": 67.0,
-     "start_db": -43.8,
-     "rise_ms": 1.77,
-     "peak": -3.9
+     "span": 2.79,
+     "centroid": 3872,
+     "end_db": -108.6,
+     "tail_ms": 296.8,
+     "start_db": -154.1,
+     "rise_ms": 5.48,
+     "peak": -12.9
     },
     "measured": {
-     "hard_db": 1.27,
-     "ring_x": 1.424
+     "hard_db": 4.57,
+     "ring_x": 1.019
     },
-    "bytes": 8169,
+    "bytes": 31903,
     "credit": {
-     "title": "Camera shutter analogue film SLR 1/4 02",
-     "author": "cabled_mess",
-     "page": "https://freesound.org/people/cabled_mess/sounds/338219",
-     "licence": "CC0 1.0 (public domain dedication)",
+     "title": "Camera",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/camera-s0011.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "rating_final": 2
+    "rating": null,
+    "excerpt_s": [
+     3.4,
+     4.1
+    ],
+    "fidelity": {
+     "env_db": 2.46,
+     "shape_db": 0.78
+    },
+    "was": "freesound-338219"
    },
    {
     "file": "camera-shutter-3.npz",
@@ -25750,6 +25920,7 @@
    "energy",
    "size",
    "bright",
+   "hard",
    "ring",
    "space",
    "width"
@@ -25804,98 +25975,103 @@
    },
    {
     "file": "tap-fingertip-2.npz",
-    "source": "freesound_e1/563818.mp3@0.566-0.950",
+    "source": "bigsoundbank/1427.wav@13.380-14.080",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.014,
-    "dur_s": 0.384,
-    "stereo": true,
+    "onset_s": 0.0333,
+    "dur_s": 0.7,
+    "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
+     "hard",
      "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 3.64,
-     "centroid": 180,
-     "end_db": -91.7,
-     "tail_ms": 306.3,
-     "start_db": -115.0,
-     "rise_ms": 1.46,
-     "peak": -3.1
+     "span": 3.17,
+     "centroid": 493,
+     "end_db": -96.6,
+     "tail_ms": 331.7,
+     "start_db": -127.4,
+     "rise_ms": 0.67,
+     "peak": -0.6
     },
     "measured": {
-     "hard_db": 1.36,
-     "ring_x": 1.595
+     "hard_db": 3.13,
+     "ring_x": 1.252
     },
-    "bytes": 8563,
+    "bytes": 21060,
     "credit": {
-     "title": "dedotoca mesa / fingers touching table .wav",
-     "author": "Churrumaki",
-     "page": "https://freesound.org/people/Churrumaki/sounds/563818/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Impatient finger tapping #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/impatient-finger-tapping-1-s1427.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     0.566,
-     0.95
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true,
-    "polarity": -1
+    "rating": null,
+    "excerpt_s": [
+     13.38,
+     14.08
+    ],
+    "fidelity": {
+     "env_db": 3.18,
+     "shape_db": 1.17
+    },
+    "was": "freesound_e1/563818.mp3@0.566-0.950"
    },
    {
     "file": "tap-fingertip-3.npz",
-    "source": "freesound_e1/563818.mp3@3.563-3.950",
+    "source": "bigsoundbank/1427.wav@3.930-4.630",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.014,
-    "dur_s": 0.387,
-    "stereo": true,
+    "onset_s": 0.0405,
+    "dur_s": 0.7,
+    "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "ring",
      "space",
      "width"
     ],
     "quality": {
-     "span": 3.12,
-     "centroid": 244,
-     "end_db": -84.2,
-     "tail_ms": 309.2,
-     "start_db": -115.4,
-     "rise_ms": 7.17,
-     "peak": -4.0
+     "span": 2.6,
+     "centroid": 520,
+     "end_db": -98.4,
+     "tail_ms": 340.7,
+     "start_db": -127.6,
+     "rise_ms": 0.71,
+     "peak": -1.4
     },
     "measured": {
-     "hard_db": 1.48,
-     "ring_x": 1.853
+     "hard_db": -1.33,
+     "ring_x": 1.011
     },
-    "bytes": 9782,
+    "bytes": 19919,
     "credit": {
-     "title": "dedotoca mesa / fingers touching table .wav",
-     "author": "Churrumaki",
-     "page": "https://freesound.org/people/Churrumaki/sounds/563818/",
-     "licence": "CC0 1.0 (public domain)",
+     "title": "Impatient finger tapping #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/impatient-finger-tapping-1-s1427.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     "class": null,
-    "excerpt_s": [
-     3.563,
-     3.95
-    ],
     "events": 1,
-    "pace": null,
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     3.93,
+     4.63
+    ],
+    "fidelity": {
+     "env_db": 2.95,
+     "shape_db": 1.02
+    },
+    "was": "freesound_e1/563818.mp3@3.563-3.950"
    },
    {
     "file": "tap-fingertip-4.npz",
@@ -25946,8 +26122,8 @@
    }
   ],
   "walk": [
-   0,
    1,
+   0,
    2,
    3
   ]
@@ -34123,18 +34299,16 @@
    "size",
    "bright",
    "hard",
-   "ring",
    "space",
    "width"
   ],
   "members": [
    {
     "file": "apple-bite-1.npz",
-    "source": "bigsoundbank/1114.wav@0.400-1.450",
+    "source": "bigsoundbank_s5/0407.wav@9.550-10.110",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.1948,
-    "dur_s": 1.05,
+    "onset_s": 0.0892,
+    "dur_s": 0.56,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -34146,90 +34320,97 @@
      "width"
     ],
     "quality": {
-     "span": 5.94,
-     "centroid": 2704,
-     "end_db": -84.8,
-     "tail_ms": 705.7,
-     "start_db": -105.9,
-     "rise_ms": 1.12,
-     "peak": -0.0
+     "span": 4.1,
+     "centroid": 7712,
+     "end_db": -97.7,
+     "tail_ms": 157.8,
+     "start_db": -156.5,
+     "rise_ms": 1.94,
+     "peak": 0.4
     },
     "measured": {
-     "hard_db": 3.0,
-     "ring_x": 1.063
+     "hard_db": 2.9,
+     "ring_x": 1.0
     },
-    "bytes": 32689,
+    "bytes": 32595,
     "credit": {
-     "title": "Apple crunched #2",
+     "title": "Eat a Rusk",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/apple-crunched-2-s1114.html",
+     "page": "https://bigsoundbank.com/eat-a-rusk-s0407.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "excerpt_s": [
-     0.4,
-     1.45
-    ],
     "events": 1,
-    "late": 1,
     "fidelity": {
-     "env_db": 2.33,
-     "shape_db": 0.63
-    }
+     "env_db": 2.2,
+     "shape_db": 0.77
+    },
+    "rating": null,
+    "excerpt_s": [
+     9.55,
+     10.11
+    ],
+    "was": "bigsoundbank/1114.wav@0.400-1.450",
+    "allows": [
+     "clicks"
+    ]
    },
    {
     "file": "apple-bite-2.npz",
-    "source": "bigsoundbank/1594.wav@0.220-0.750",
+    "source": "bigsoundbank_s5/0407.wav@0.210-1.210",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.035,
-    "dur_s": 0.53,
+    "onset_s": 0.046,
+    "dur_s": 1.0,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "ring",
+     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 4.83,
-     "centroid": 4394,
-     "end_db": -99.9,
-     "tail_ms": 369.2,
-     "start_db": -117.7,
-     "rise_ms": 1.79,
-     "peak": -1.7
+     "span": 3.16,
+     "centroid": 10958,
+     "end_db": -115.0,
+     "tail_ms": 689.7,
+     "start_db": -129.8,
+     "rise_ms": 3.46,
+     "peak": 3.5
     },
     "measured": {
-     "hard_db": 0.33,
-     "ring_x": 1.259
+     "hard_db": 5.98,
+     "ring_x": 1.001
     },
-    "bytes": 13844,
+    "bytes": 32351,
     "credit": {
-     "title": "Raw carrot crunched #1",
+     "title": "Eat a Rusk",
      "author": "BigSoundBank (bigsoundbank.com)",
-     "page": "https://bigsoundbank.com/raw-carrot-crunched-1-s1594.html",
+     "page": "https://bigsoundbank.com/eat-a-rusk-s0407.html",
      "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "excerpt_s": [
-     0.22,
-     0.75
-    ],
     "events": 1,
-    "late": 1,
     "fidelity": {
-     "env_db": 2.39,
-     "shape_db": 0.69
-    }
+     "env_db": 2.26,
+     "shape_db": 0.68
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.21,
+     1.21
+    ],
+    "was": "bigsoundbank/1594.wav@0.220-0.750"
    }
   ],
   "walk": [
-   1,
-   0
+   0,
+   1
+  ],
+  "allows": [
+   "clicks"
   ]
  },
  {
@@ -36126,53 +36307,54 @@
   "members": [
    {
     "file": "glass-break-2.npz",
-    "source": "freesound_s1/369987.mp3@3.180-4.050",
+    "source": "bigsoundbank_s5/0771.wav@1.740-2.740",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.0565,
-    "dur_s": 0.87,
+    "onset_s": 0.2288,
+    "dur_s": 1.0,
     "stereo": false,
     "dry": false,
     "axes": [
      "energy",
      "size",
      "bright",
-     "hard",
      "space",
      "width"
     ],
     "quality": {
-     "span": 8.99,
-     "centroid": 5738,
-     "end_db": -76.6,
-     "tail_ms": 270.1,
-     "start_db": -146.3,
-     "rise_ms": 0.83,
-     "peak": -0.1
+     "span": 2.84,
+     "centroid": 5405,
+     "end_db": -124.6,
+     "tail_ms": 341.0,
+     "start_db": -235.0,
+     "rise_ms": 0.35,
+     "peak": -5.0
     },
     "measured": {
-     "hard_db": 9.86,
-     "ring_x": 1.0
+     "hard_db": -1.41,
+     "ring_x": 1.132
     },
-    "bytes": 15953,
+    "bytes": 22052,
     "credit": {
-     "title": "Glass breaking_northern87",
-     "author": "northern87",
-     "page": "https://freesound.org/people/northern87/sounds/369987/",
-     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "title": "Broken glass",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/broken-glass-s0771.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "excerpt_s": [
-     3.18,
-     4.05
-    ],
     "events": 1,
-    "late": 1,
     "fidelity": {
-     "env_db": 2.09,
-     "shape_db": 0.75
+     "env_db": 2.39,
+     "shape_db": 0.72
     },
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     1.74,
+     2.74
+    ],
+    "was": "freesound_s1/369987.mp3@3.180-4.050",
+    "allows": [
+     "stacked"
+    ]
    },
    {
     "file": "glass-break-1.npz",
@@ -36228,6 +36410,9 @@
   "walk": [
    1,
    0
+  ],
+  "allows": [
+   "stacked"
   ]
  },
  {
@@ -36266,65 +36451,10 @@
   "members": [
    {
     "file": "plate-break-2.npz",
-    "source": "freesound_s1/565642.mp3@0.000-1.400",
+    "source": "bigsoundbank_s5/1644.wav@0.030-1.110",
     "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.028,
-    "dur_s": 1.4,
-    "stereo": true,
-    "dry": false,
-    "axes": [
-     "energy",
-     "size",
-     "bright",
-     "hard",
-     "space",
-     "width"
-    ],
-    "quality": {
-     "span": 1.98,
-     "centroid": 3357,
-     "end_db": -114.3,
-     "tail_ms": 540.7,
-     "start_db": -145.6,
-     "rise_ms": 0.56,
-     "peak": -0.9
-    },
-    "measured": {
-     "hard_db": 5.6,
-     "ring_x": 1.225
-    },
-    "bytes": 33162,
-    "credit": {
-     "title": "Plate Break 1.wav",
-     "author": "jc.sg",
-     "page": "https://freesound.org/people/jc.sg/sounds/565642/",
-     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
-     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    "excerpt_s": [
-     0.0,
-     1.4
-    ],
-    "events": 1,
-    "late": 1,
-    "fidelity": {
-     "env_db": 2.81,
-     "shape_db": 0.88
-    },
-    "lossy": true,
-    "allows": [
-     "ring",
-     "stacked"
-    ]
-   },
-   {
-    "file": "plate-break-1.npz",
-    "source": "freesound_s1/511764.mp3@0.300-1.800",
-    "origin": "corpus",
-    "rating": null,
-    "onset_s": 0.1278,
-    "dur_s": 1.5,
+    "onset_s": 0.0648,
+    "dur_s": 1.08,
     "stereo": false,
     "dry": false,
     "axes": [
@@ -36336,42 +36466,91 @@
      "width"
     ],
     "quality": {
-     "span": 4.27,
-     "centroid": 4673,
-     "end_db": -89.7,
-     "tail_ms": 280.6,
-     "start_db": -141.5,
-     "rise_ms": 3.81,
-     "peak": -5.5
+     "span": 2.14,
+     "centroid": 4973,
+     "end_db": -115.1,
+     "tail_ms": 185.8,
+     "start_db": -146.5,
+     "rise_ms": 10.56,
+     "peak": -0.0
     },
     "measured": {
-     "hard_db": 5.21,
-     "ring_x": 1.0
+     "hard_db": 8.65,
+     "ring_x": 1.001
     },
-    "bytes": 45664,
+    "bytes": 29281,
     "credit": {
-     "title": "plate_breaking.wav",
-     "author": "jerry.berumen",
-     "page": "https://freesound.org/people/jerry.berumen/sounds/511764/",
-     "licence": "CC0 1.0 (Freesound page: \"Creative Commons 0\")",
+     "title": "Broken plate #2",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/broken-plate-2-s1644.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "excerpt_s": [
-     0.3,
-     1.8
-    ],
     "events": 1,
-    "late": 1,
     "fidelity": {
-     "env_db": 2.92,
-     "shape_db": 0.85
+     "env_db": 2.55,
+     "shape_db": 0.65
     },
-    "lossy": true
+    "rating": null,
+    "excerpt_s": [
+     0.03,
+     1.11
+    ],
+    "was": "freesound_s1/565642.mp3@0.000-1.400"
+   },
+   {
+    "file": "plate-break-1.npz",
+    "source": "bigsoundbank_s5/1643.wav@0.010-1.340",
+    "origin": "corpus",
+    "onset_s": 0.068,
+    "dur_s": 1.33,
+    "stereo": false,
+    "dry": false,
+    "axes": [
+     "energy",
+     "size",
+     "bright",
+     "hard",
+     "space",
+     "width"
+    ],
+    "quality": {
+     "span": 2.52,
+     "centroid": 4627,
+     "end_db": -118.1,
+     "tail_ms": 187.2,
+     "start_db": -143.8,
+     "rise_ms": 5.44,
+     "peak": -0.0
+    },
+    "measured": {
+     "hard_db": 2.41,
+     "ring_x": 1.0
+    },
+    "bytes": 36291,
+    "credit": {
+     "title": "Broken Plate #1",
+     "author": "BigSoundBank (bigsoundbank.com)",
+     "page": "https://bigsoundbank.com/broken-plate-1-s1643.html",
+     "licence": "CC0 1.0 (bigsoundbank.com/licenses.html; sound page: \"CC0 (public domain): Free and royalty-free\")",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "events": 1,
+    "fidelity": {
+     "env_db": 2.65,
+     "shape_db": 0.67
+    },
+    "rating": null,
+    "excerpt_s": [
+     0.01,
+     1.34
+    ],
+    "was": "freesound_s1/511764.mp3@0.300-1.800"
    }
   ],
   "walk": [
-   0,
-   1
+   1,
+   0
   ],
   "allows": [
    "ring",

@@ -63,10 +63,13 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   designs): a mechanical key going down and coming up, a page, a drawer, a cork, knocks, a camera shutter, a cut of
   scissors. A plain request for an interface job gets the design the `ui` set plays, and a thing of the world named
   in words ("a door closing") gets its own recording.
-- 46 film and motion designs (`earshot/sounds/motion.py`, `earshot/synth/design.py`). 32 are built from learned
+- 69 film and motion designs (`earshot/sounds/motion.py`, `earshot/synth/design.py`). 55 are built from learned
   recordings the way motion films use them (short dry hits, a 50 ms thump, a bright tick, whooshes and risers of
   air, a tape stop, a braam of real brass), following measurements of 39 professional motion videos; 14 small ones
   are invented. A motion request gets no instrument note unless its words ask for music.
+- The `film` set plays small real actions cut to those measurements, each naming its recordings by file: a door
+  falling shut when something appears, a mechanical key's tick, a page sliding, a stick and a broom through the air,
+  a heavy bag dropped under a title and a logo, a car door for an impact, a breath of air rising, a sword drawn.
 - 40 drum designs (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are
   played from 130 recorded strokes in the public domain; the drum-machine voices, a brush snare, a finger snap and a
   stick count are invented.
@@ -121,6 +124,10 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   models, textures, drum strokes, instrument notes, recipes and their credits ship as package data, and the source
   archive carries the changelog, the docs, the plugin's files and the tests' own files.
 - Picture-only timelines and frame differences use far less memory (#31; thanks, @liugedragon).
+- Eighteen learned things got better recordings (close, mostly lossless, the whole small action instead of a bare
+  strike): a wall switch, a book shut and opened, a glass and a plate breaking, a bite, a punch, a camera shutter,
+  steps on tile, concrete and snow, two glasses clinking, a knife swish, a golf swing, a pen cap, fingertips on a
+  table, a spoon on a plate and a whip.
 - The licence of rendered audio is stated (answers #21): everything earshot renders (`make`, `sfx`, `kit`, `forge`)
   belongs to whoever rendered it, free for any use, commercial too, without credit. The code stays MIT.
 
