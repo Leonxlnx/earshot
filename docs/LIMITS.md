@@ -88,7 +88,7 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
   other families, and a pointer to building it as a recipe. A cookbook recipe answers on its own only for 32 things;
   the 42 sketches are starting points, and a recipe is judged by a model and the audit, not by ear.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
-  the recording in the public domain; the store has 249 things. For other real things the catalogue has designs
+  the recording in the public domain; the store has 309 things. For other real things the catalogue has designs
   invented from physics (`action`, `object`), which sound clearly less real.
 - Pan. A request cannot place or move a sound in the stereo field: "from left to right" is said not followed. Only a
   layer of a recipe can be set to the left or the right.
@@ -109,15 +109,27 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
   the kitchen one knife chop on a board, a pot boiling, a pot lid set down, a gas stove lit, a spoon stirring in a
   mug, a plate set on a table, a toaster popping, a blender, an egg cracked, a whisk beating in a bowl; a crowd
   booing, a cat hissing, a lion roaring, an elephant trumpeting, a bee, a rocket launch, a record scratch, a squeaky
-  toy, an elevator's arrival ding; steps in mud, through puddles and in dry leaves.
+  toy, an elevator's arrival ding; steps in mud, through puddles and in dry leaves; machines started, run and
+  stopped (a chainsaw, a lawn mower, a tractor, an angle grinder, a jackhammer, a paper shredder, a coffee machine,
+  an electric kettle, a microwave, a hard drive, a fax), a kettle whistling, a truck reversing, a ship's horn, a
+  steam engine, a metro arriving, wipers, a turn signal, a garage door, a motorboat; a monkey, a parrot, a donkey,
+  a bear, geese, a puppy, a mouse, a rattlesnake, a mosquito; knuckles, teeth chattering, a hiccup, a whistle,
+  panting, hands rubbed, a puff of breath, sitting down on a sofa; a skateboard, ping pong, pinball, darts, a
+  crossbow, ice skates; a screwdriver, a ratchet, a trap, a binder clip, a party popper, a curtain, an office
+  chair, a bed, a window, a swing, an envelope, a crisp packet, a drain, a garden hose, a sprinkler, a bicycle
+  freewheeling, a tree falling; beds of hail on a roof and on a car, a dishwasher, a washing machine, a fridge, a
+  shower, a jungle at night, a factory workshop and a gale.
   Instruments play single notes, chords of a pad and short figures, no melody. To a request for speech, a voice
   that says or sings words, a shout or a yell, sobbing, a violin, a cello, a viola, a saxophone, a flute, a
   clarinet, an oboe, bagpipes, a trumpet, an electric guitar, a guitar or drum solo, an air horn or a ringtone,
   `make` answers "earshot makes no ...". Crying is a baby's: asked of another person it is not made. Other everyday
   things have no recording yet and get the nearest design (a few of them a cookbook recipe): a gulp, chewing, a
-  mosquito, a seagull, a pigeon, a monkey, a snake's hiss, a padlock, a kettle whistling, a pan set on a stove, a
-  fridge door, a quick row of chops (one chop is made), a printer, a shopping cart, a dishwasher, a bus, an airplane passing close, a tennis
-  or basketball hit; steps on sand, on carpet and on metal stairs.
+  seagull, a pigeon, a snake's hiss, a whale's song, a dial-up modem, a padlock, a pan set on a stove, a fridge
+  door, a quick row of chops (one chop is made), a printer, a shopping cart, a bus, an airplane passing close, a
+  tennis or basketball hit, a clockwork, a car alarm, a hole punch, a throat cleared; steps on sand, on carpet and
+  on metal stairs. No public-domain recording of a real snake hissing or of a whale was found (the ones offered are
+  voices or made sounds); a modem's tones and a clockwork's ticks were learned and smeared (a take further from the
+  recording than two takes from each other), so they were left out.
 - Make two sounds in one call. A request that names two ("a water drop and a coin") makes one of them and says
   `not in this sound: ...` for the other; ask again for it, or make a set.
 - Follow every word. Words that matched nothing come back as `not understood`; controls a design does not read, or
@@ -161,6 +173,13 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
   scream, a yawn, a fly, a frog, a pot lid or a plate set down, a leather grab, an airy whoosh, a dial, a latch, a
   stopwatch, a mouse click, a flame whoosh. For a book shut, a glass breaking and a punch the fuller recording is a
   later take (another `seed`), not the first.
+- **The newest learned things are measured, not heard.** The 60 things and 9 beds learned last (a chainsaw to a
+  tree falling, hail to a gale) are clean at their first seed and their takes stay as close to their recordings
+  as two takes to each other, but no one has judged them by ear; 36 of the 60 rest only on Freesound's MP3
+  previews, whose floor is higher than a lossless recording's. Machines are whole actions of 4 to 10 s (started,
+  run, stopped), not loops; hail, a dishwasher, a washing machine, a fridge and a shower are beds. A tornado or a
+  hurricane gets the gale of a village, the strongest real wind in the store; the washing machine is a washer-dryer
+  turning, not a spin cycle at full speed.
 - **Performances.** Only the learned things whose index names a pattern or holds a recording of the whole action
   (walks, knocks, typing, coins, keys, clinking glasses ...) can be played as the action; the reader decides from
   the words (a plural, an action word, a count or a length), and `events` overrides it. A walk or a typing run made
@@ -198,7 +217,7 @@ its files and `manifest.json` but does not delete the files of names removed fro
 **Engineering.** No models and no network at render time; the base install is numpy, scipy, soundfile, soxr and
 numba, and the listening stack (torch, transformers) comes only with the `listen` extra. ogg, mp3, m4a and webm need
 ffmpeg on PATH. A learned bed renders in 1.0-1.7 s of CPU per second of sound; a recipe of many layers takes up to
-half a minute on one core. The learned store adds 13.85 MB, the textures 6.61 MB, the drums 1.31 MB and the
+half a minute on one core. The learned store adds 17.93 MB, the textures 9.46 MB, the drums 1.31 MB and the
 instrument notes 0.83 MB to the package. The recordings, the listening pages, the request sets and the tool that
 builds the learned store are not in the repository: the store can be used and credited, not rebuilt, from the
 repository alone, and the request numbers cannot be re-run from it.

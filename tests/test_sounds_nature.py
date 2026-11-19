@@ -12,7 +12,7 @@ from earshot.sounds import nature, registry
 from earshot.synth import quilt, resyn
 
 SR = dsp.SR
-BUDGET = 6_700_000
+BUDGET = 9_500_000
 
 
 def test_the_store_is_numbers_with_credits_and_under_budget():

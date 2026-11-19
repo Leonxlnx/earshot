@@ -228,6 +228,86 @@
    },
    "vary": 0.4
   },
+  "dishwasher": {
+   "ids": [
+    "dishwasher/run"
+   ],
+   "title": "Dishwasher",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/dishwasher-s1002.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    25.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 291276,
+   "chunks": [
+    {
+     "file": "dishwasher-0.npz",
+     "seconds": 5.9,
+     "period": null
+    },
+    {
+     "file": "dishwasher-1.npz",
+     "seconds": 5.53,
+     "period": null
+    },
+    {
+     "file": "dishwasher-2.npz",
+     "seconds": 5.17,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.86,
+    "shape_db": 0.87,
+    "mod_db": 1.23
+   },
+   "vary": 0.2
+  },
+  "fridge": {
+   "ids": [
+    "fridge/hum"
+   ],
+   "title": "Fridge",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/fridge-s1157.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    5.0,
+    16.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 242918,
+   "chunks": [
+    {
+     "file": "fridge-0.npz",
+     "seconds": 5.39,
+     "period": null
+    },
+    {
+     "file": "fridge-1.npz",
+     "seconds": 5.68,
+     "period": null
+    },
+    {
+     "file": "fridge-2.npz",
+     "seconds": 5.53,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 4.0,
+    "shape_db": 1.39,
+    "mod_db": 2.66
+   },
+   "vary": 0.1
+  },
   "froth": {
    "ids": [
     "waves/sand"
@@ -292,6 +372,165 @@
     "mod_db": 1.43
    },
    "vary": 0.1
+  },
+  "gale": {
+   "ids": [
+    "wind/gale"
+   ],
+   "title": "Strong Wind in a Village",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/strong-wind-in-a-village-s0625.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    24.0,
+    14.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 14.3,
+   "bytes": 288068,
+   "chunks": [
+    {
+     "file": "gale-0.npz",
+     "seconds": 6.72,
+     "period": null
+    },
+    {
+     "file": "gale-1.npz",
+     "seconds": 7.58,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.51,
+    "shape_db": 1.08,
+    "mod_db": 1.07
+   },
+   "vary": 0.2,
+   "piece": [
+    2.5,
+    5.0
+   ]
+  },
+  "hailcar": {
+   "ids": [
+    "hail/car"
+   ],
+   "title": "hail on car windshield windows recorded from inside.flac",
+   "author": "kyles",
+   "page": "https://freesound.org/people/kyles/sounds/635571/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    45.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 341629,
+   "chunks": [
+    {
+     "file": "hailcar-0.npz",
+     "seconds": 5.7,
+     "period": null
+    },
+    {
+     "file": "hailcar-1.npz",
+     "seconds": 5.64,
+     "period": null
+    },
+    {
+     "file": "hailcar-2.npz",
+     "seconds": 5.26,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.65,
+    "shape_db": 0.8,
+    "mod_db": 1.2
+   },
+   "vary": 0.4
+  },
+  "hailroof": {
+   "ids": [
+    "hail/roof"
+   ],
+   "title": "Hail on roof",
+   "author": "zachrau",
+   "page": "https://freesound.org/people/zachrau/sounds/232288/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    0.5,
+    16.5
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 17.1,
+   "bytes": 358625,
+   "chunks": [
+    {
+     "file": "hailroof-0.npz",
+     "seconds": 5.64,
+     "period": null
+    },
+    {
+     "file": "hailroof-1.npz",
+     "seconds": 6.25,
+     "period": null
+    },
+    {
+     "file": "hailroof-2.npz",
+     "seconds": 5.21,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.32,
+    "shape_db": 1.0,
+    "mod_db": 1.0
+   },
+   "vary": 0.4
+  },
+  "jungle": {
+   "ids": [
+    "jungle/night"
+   ],
+   "title": "Jungle nighttime",
+   "author": "SarahAGGross",
+   "page": "https://freesound.org/people/SarahAGGross/sounds/737477/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    20.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 330916,
+   "chunks": [
+    {
+     "file": "jungle-0.npz",
+     "seconds": 5.51,
+     "period": null
+    },
+    {
+     "file": "jungle-1.npz",
+     "seconds": 5.39,
+     "period": null
+    },
+    {
+     "file": "jungle-2.npz",
+     "seconds": 5.7,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.57,
+    "shape_db": 1.15,
+    "mod_db": 1.06
+   },
+   "vary": 0.3
   },
   "pebbles": {
    "ids": [
@@ -483,6 +722,46 @@
     "shape_db": 0.71,
     "mod_db": 0.83
    }
+  },
+  "shower": {
+   "ids": [
+    "shower/run"
+   ],
+   "title": "Woman Takes a Shower",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/woman-takes-a-shower-s0171.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    10.0,
+    16.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 350924,
+   "chunks": [
+    {
+     "file": "shower-0.npz",
+     "seconds": 5.06,
+     "period": null
+    },
+    {
+     "file": "shower-1.npz",
+     "seconds": 6.34,
+     "period": null
+    },
+    {
+     "file": "shower-2.npz",
+     "seconds": 5.2,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.16,
+    "shape_db": 0.9,
+    "mod_db": 0.99
+   },
+   "vary": 0.3
   },
   "street": {
    "ids": [
@@ -686,6 +965,86 @@
     "shape_db": 1.06,
     "mod_db": 0.87
    }
+  },
+  "washer": {
+   "ids": [
+    "washing_machine/spin"
+   ],
+   "title": "Washing machine in drying mode",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/washing-machine-in-drying-mode-s0106.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    28.0,
+    16.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 386684,
+   "chunks": [
+    {
+     "file": "washer-0.npz",
+     "seconds": 5.52,
+     "period": null
+    },
+    {
+     "file": "washer-1.npz",
+     "seconds": 5.35,
+     "period": null
+    },
+    {
+     "file": "washer-2.npz",
+     "seconds": 5.73,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.32,
+    "shape_db": 1.04,
+    "mod_db": 1.24
+   },
+   "vary": 0.2
+  },
+  "workshop": {
+   "ids": [
+    "factory/workshop"
+   ],
+   "title": "Industry Workshop",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/industry-workshop-s0503.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    10.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 263728,
+   "chunks": [
+    {
+     "file": "workshop-0.npz",
+     "seconds": 5.02,
+     "period": null
+    },
+    {
+     "file": "workshop-1.npz",
+     "seconds": 5.8,
+     "period": null
+    },
+    {
+     "file": "workshop-2.npz",
+     "seconds": 5.78,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.79,
+    "shape_db": 0.83,
+    "mod_db": 2.07
+   },
+   "vary": 0.3
   }
  }
 }

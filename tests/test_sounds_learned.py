@@ -17,7 +17,7 @@ from earshot.synth import resyn
 SR = dsp.SR
 INDEX = learned.index()
 IDS = list(INDEX)
-LIMIT = 15_150_000                  # bytes the whole store may weigh
+LIMIT = 19_000_000                  # bytes the whole store may weigh
 # three interface designs (sets 'ui') and a footstep: rendered in the fast tier (every member: --slow)
 FAST = ('keyboard/mechanical', 'switch/lamp', 'leather/grab', 'step/pebbles')
 # the character suffixes of the first pass's automatic names, and engine words: never in a name ('light' is a verb

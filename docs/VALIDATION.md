@@ -159,11 +159,11 @@ was used only to order the recordings of a learned design, never to admit or dro
   a click's rise within 1 ms; a model is 3.6-35 kB (median 9.1 kB); a render takes 0.26-0.33 s per second of sound.
   Weak: soft onsets smear (a bag drop's rise went from 61 to 99 ms); a fast swipe; impacts whose mid band is partly
   carried as noise (takes differ by about 3 dB there).
-- **The store**: 249 designs, 604 recorded members, 13.85 MB (some designs are material of the film sounds, below;
+- **The store**: 309 designs, 692 recorded members, 17.93 MB (some designs are material of the film sounds, below;
   30 members hold several events, such as a whole walk or a knock, and 21 designs have such members). No duplicates,
   nothing judged poor by ear. Seed 0 plays the fullest clean member. Admission rules of the build: no chopped start
   or end, a full band, a natural tail, not faint, a clear onset; the build tool is not in the repository.
-- **Ambience textures** (`earshot/synth/quilt.py`, 15 textures, 6.61 MB; `wind/trees` is learned from
+- **Ambience textures** (`earshot/synth/quilt.py`, 24 textures, 9.46 MB; `wind/trees` is learned from
   wind through a field of dry leaves (maize), whose leaf band carries two thirds of the power and is dry, after no
   recording of trees passed that check; the fire is learned with an onset at every crackle and its two sides are two
   takes sharing the crackles; the waves from a recording at the water's edge, joined where they were cut; the rain
