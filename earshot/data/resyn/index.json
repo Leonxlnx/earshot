@@ -706,7 +706,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "tail": [
+     0.28,
+     -72.2
+    ]
    }
   ],
   "walk": [
@@ -962,7 +966,11 @@
       "short",
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -36.2,
+     0.03
+    ]
    },
    {
     "file": "sword-swing-2.npz",
@@ -1861,7 +1869,11 @@
       "quiet",
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -16.2,
+     0.03
+    ]
    },
    {
     "file": "cloth-flag-3.npz",
@@ -2037,7 +2049,11 @@
     "taste": {
      "pred": 2.37,
      "flags": []
-    }
+    },
+    "lead": [
+     -13.0,
+     0.093
+    ]
    },
    {
     "file": "cloth-rustle-3.npz",
@@ -2083,7 +2099,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "tail": [
+     0.52,
+     -112.7
+    ]
    }
   ],
   "walk": [
@@ -2169,7 +2189,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "tail": [
+     0.93,
+     -203.5
+    ]
    }
   ],
   "allows": [
@@ -2257,7 +2281,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -25.8,
+     0.03
+    ]
    },
    {
     "file": "person-fall-2.npz",
@@ -2587,7 +2615,11 @@
      1.06
     ],
     "events": 1,
-    "pace": null
+    "pace": null,
+    "lead": [
+     -11.0,
+     0.03
+    ]
    },
    {
     "file": "punch-body-6.npz",
@@ -2683,7 +2715,11 @@
     ],
     "events": 1,
     "pace": null,
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     0.23,
+     -86.7
+    ]
    },
    {
     "file": "punch-body-8.npz",
@@ -2823,7 +2859,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -90.0,
+     0.03
+    ]
    },
    {
     "file": "arrow-hit-2.npz",
@@ -3271,7 +3311,11 @@
     "taste": {
      "pred": 1.64,
      "flags": []
-    }
+    },
+    "lead": [
+     -16.3,
+     0.03
+    ]
    }
   ],
   "allows": [
@@ -3686,7 +3730,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -37.6,
+     0.1
+    ]
    },
    {
     "file": "explosion-far-2.npz",
@@ -3734,7 +3782,11 @@
       "dull"
      ]
     },
-    "rating_final": 3
+    "rating_final": 3,
+    "lead": [
+     -14.4,
+     0.03
+    ]
    },
    {
     "file": "explosion-far-3.npz",
@@ -4186,7 +4238,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "tail": [
+     0.3,
+     -304.9
+    ]
    },
    {
     "file": "lighter-flick-2.npz",
@@ -4321,7 +4377,11 @@
       "quiet"
      ]
     },
-    "rating_final": 2
+    "rating_final": 2,
+    "lead": [
+     -17.9,
+     0.047
+    ]
    }
   ],
   "walk": [
@@ -4448,7 +4508,11 @@
       "short",
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -12.0,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -4659,7 +4723,11 @@
      "flags": [
       "short"
      ]
-    }
+    },
+    "lead": [
+     -41.3,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -4742,7 +4810,11 @@
       "short",
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -13.7,
+     0.03
+    ]
    },
    {
     "file": "land-wood-2.npz",
@@ -5008,7 +5080,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -15.9,
+     0.03
+    ]
    },
    {
     "file": "leather-grab-2.npz",
@@ -5053,7 +5129,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "tail": [
+     0.25,
+     -449.4
+    ]
    }
   ],
   "walk": [
@@ -5188,7 +5268,11 @@
      "flags": [
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -20.8,
+     0.03
+    ]
    }
   ],
   "allows": [
@@ -5283,7 +5367,15 @@
       "thin"
      ]
     },
-    "rating_final": 3
+    "rating_final": 3,
+    "tail": [
+     0.66,
+     -379.8
+    ],
+    "lead": [
+     -61.0,
+     0.03
+    ]
    },
    {
     "file": "coins-floor-2.npz",
@@ -5329,7 +5421,11 @@
      1.936
     ],
     "events": 11,
-    "pace": 5.93
+    "pace": 5.93,
+    "lead": [
+     -59.3,
+     0.03
+    ]
    },
    {
     "file": "coins-floor-3.npz",
@@ -5375,7 +5471,15 @@
      1.756
     ],
     "events": 7,
-    "pace": 4.4
+    "pace": 4.4,
+    "tail": [
+     1.62,
+     -496.4
+    ],
+    "lead": [
+     -58.1,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -5687,7 +5791,11 @@
      11.447
     ],
     "events": 1,
-    "pace": null
+    "pace": null,
+    "lead": [
+     -10.2,
+     0.03
+    ]
    },
    {
     "file": "step-concrete-3.npz",
@@ -6617,7 +6725,11 @@
      4.131
     ],
     "events": 6,
-    "pace": 1.36
+    "pace": 1.36,
+    "lead": [
+     -30.8,
+     0.064
+    ]
    }
   ],
   "walk": [
@@ -6939,6 +7051,10 @@
     "lossy": true,
     "allows": [
      "clicks"
+    ],
+    "lead": [
+     -24.0,
+     0.03
     ]
    },
    {
@@ -7037,7 +7153,11 @@
      "shape_db": 1.38
     },
     "was": "freesound_e1/480592.mp3@9.195-9.664",
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -26.9,
+     0.03
+    ]
    },
    {
     "file": "step-tile-4.npz",
@@ -7135,7 +7255,11 @@
      "shape_db": 1.02
     },
     "was": "freesound_e1/480592.mp3@8.448-9.009",
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     0.75,
+     -322.5
+    ]
    }
   ],
   "walk": [
@@ -7435,7 +7559,11 @@
       "dull"
      ]
     },
-    "rating_final": 2
+    "rating_final": 2,
+    "lead": [
+     -21.6,
+     0.056
+    ]
    },
    {
     "file": "step-floorboard-2.npz",
@@ -7531,6 +7659,10 @@
     "pace": 1.59,
     "allows": [
      "pre_swell"
+    ],
+    "lead": [
+     -24.2,
+     0.03
     ]
    },
    {
@@ -7578,7 +7710,11 @@
      1.633
     ],
     "events": 1,
-    "pace": null
+    "pace": null,
+    "lead": [
+     -24.9,
+     0.051
+    ]
    },
    {
     "file": "step-floorboard-5.npz",
@@ -7624,7 +7760,15 @@
      2.155
     ],
     "events": 1,
-    "pace": null
+    "pace": null,
+    "tail": [
+     0.37,
+     -199.6
+    ],
+    "lead": [
+     -31.2,
+     0.03
+    ]
    },
    {
     "file": "step-floorboard-6.npz",
@@ -7819,7 +7963,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -18.4,
+     0.03
+    ]
    },
    {
     "file": "door-shut-2.npz",
@@ -7869,7 +8017,11 @@
       "quiet"
      ]
     },
-    "rating_final": 4
+    "rating_final": 4,
+    "lead": [
+     -16.8,
+     0.03
+    ]
    }
   ],
   "allows": [
@@ -8298,7 +8450,11 @@
      "flags": [
       "thin"
      ]
-    }
+    },
+    "tail": [
+     0.7,
+     -247.8
+    ]
    }
   ],
   "walk": [
@@ -8437,6 +8593,10 @@
     "allows": [
      "pre_swell",
      "stacked"
+    ],
+    "lead": [
+     -57.8,
+     0.073
     ]
    },
    {
@@ -8485,7 +8645,11 @@
     ],
     "events": 1,
     "pace": null,
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -21.9,
+     0.03
+    ]
    },
    {
     "file": "door-knock-4.npz",
@@ -9098,7 +9262,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "tail": [
+     0.49,
+     -80.5
+    ]
    }
   ],
   "allows": [
@@ -9183,7 +9351,11 @@
     "taste": {
      "pred": 2.62,
      "flags": []
-    }
+    },
+    "lead": [
+     -26.9,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -9387,7 +9559,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -19.7,
+     0.03
+    ]
    },
    {
     "file": "bin-lid-3.npz",
@@ -10174,7 +10350,11 @@
     ],
     "events": 1,
     "pace": null,
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -38.3,
+     0.03
+    ]
    },
    {
     "file": "book-shut-5.npz",
@@ -10356,7 +10536,11 @@
     "taste": {
      "pred": 1.87,
      "flags": []
-    }
+    },
+    "lead": [
+     -24.3,
+     0.036
+    ]
    }
   ],
   "walk": [
@@ -11070,7 +11254,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -32.8,
+     0.03
+    ]
    },
    {
     "file": "dice-throw-2.npz",
@@ -11898,7 +12086,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -46.1,
+     0.03
+    ]
    },
    {
     "file": "zip-tie-pull-3.npz",
@@ -12269,7 +12461,11 @@
      "env_db": 2.55,
      "shape_db": 1.21
     },
-    "was": "cuts/bigsoundbank/0613_11.wav"
+    "was": "cuts/bigsoundbank/0613_11.wav",
+    "tail": [
+     0.29,
+     -54.4
+    ]
    }
   ],
   "walk": [
@@ -12448,7 +12644,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "tail": [
+     0.11,
+     -227.1
+    ]
    },
    {
     "file": "bubblewrap-pop-2.npz",
@@ -12629,7 +12829,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -34.7,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -12713,7 +12917,11 @@
       "short",
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -17.2,
+     0.03
+    ]
    },
    {
     "file": "ball-kick-2.npz",
@@ -12759,7 +12967,11 @@
      "flags": [
       "short"
      ]
-    }
+    },
+    "lead": [
+     -90.0,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -13188,7 +13400,11 @@
     "taste": {
      "pred": 2.52,
      "flags": []
-    }
+    },
+    "lead": [
+     -39.9,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -13658,7 +13874,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -89.7,
+     0.03
+    ]
    },
    {
     "file": "bulb-burst-2.npz",
@@ -13705,7 +13925,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -90.0,
+     0.03
+    ]
    },
    {
     "file": "bulb-burst-3.npz",
@@ -13753,7 +13977,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -37.4,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -13849,7 +14077,11 @@
      "env_db": 2.84,
      "shape_db": 0.87
     },
-    "was": "cuts/bigsoundbank/1323_00.wav"
+    "was": "cuts/bigsoundbank/1323_00.wav",
+    "lead": [
+     -57.1,
+     0.038
+    ]
    },
    {
     "file": "glass-cheers-2.npz",
@@ -13897,7 +14129,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -61.2,
+     0.03
+    ]
    },
    {
     "file": "glass-cheers-3.npz",
@@ -14193,7 +14429,11 @@
     "taste": {
      "pred": 2.95,
      "flags": []
-    }
+    },
+    "lead": [
+     -19.6,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -14899,7 +15139,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -37.8,
+     0.03
+    ]
    },
    {
     "file": "water-plop-2.npz",
@@ -14947,7 +15191,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -28.6,
+     0.03
+    ]
    },
    {
     "file": "water-plop-3.npz",
@@ -14993,7 +15241,11 @@
     "taste": {
      "pred": 2.68,
      "flags": []
-    }
+    },
+    "lead": [
+     -12.4,
+     0.03
+    ]
    }
   ],
   "allows": [
@@ -15424,7 +15676,11 @@
      "flags": [
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -26.4,
+     0.03
+    ]
    },
    {
     "file": "brake-drum-hit-2.npz",
@@ -15520,7 +15776,11 @@
      "flags": [
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -12.0,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -16004,7 +16264,11 @@
     "taste": {
      "pred": 1.67,
      "flags": []
-    }
+    },
+    "lead": [
+     -15.2,
+     0.044
+    ]
    }
   ],
   "walk": [
@@ -16086,7 +16350,11 @@
      "flags": [
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -53.8,
+     0.03
+    ]
    }
   ],
   "allows": [
@@ -16305,7 +16573,11 @@
       "quiet",
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -35.1,
+     0.03
+    ]
    }
   ],
   "allows": [
@@ -16937,7 +17209,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -37.3,
+     0.03
+    ]
    },
    {
     "file": "twigs-snap-2.npz",
@@ -16984,7 +17260,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -61.8,
+     0.03
+    ]
    },
    {
     "file": "twigs-snap-3.npz",
@@ -17251,7 +17531,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -26.0,
+     0.03
+    ]
    },
    {
     "file": "crutch-tap-2.npz",
@@ -17377,7 +17661,11 @@
      "page": "https://freesound.org/people/Gee-Jay/sounds/172503",
      "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    }
+    },
+    "lead": [
+     -21.6,
+     0.03
+    ]
    },
    {
     "file": "click-mouse-2.npz",
@@ -17701,7 +17989,11 @@
      "page": "https://freesound.org/people/deleted_user_4772965/sounds/256840",
      "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    }
+    },
+    "lead": [
+     -27.3,
+     0.03
+    ]
    },
    {
     "file": "switch-wall-3.npz",
@@ -18112,7 +18404,11 @@
       "quiet"
      ]
     },
-    "rating_final": 2
+    "rating_final": 2,
+    "lead": [
+     -17.1,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -18215,7 +18511,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "tail": [
+     0.13,
+     -80.3
+    ]
    }
   ],
   "walk": [
@@ -18352,7 +18652,11 @@
      "env_db": 2.08,
      "shape_db": 0.7
     },
-    "was": "cuts/bigsoundbank/0025_01.wav"
+    "was": "cuts/bigsoundbank/0025_01.wav",
+    "tail": [
+     0.36,
+     -189.9
+    ]
    }
   ],
   "walk": [
@@ -18437,7 +18741,11 @@
     "taste": {
      "pred": 2.56,
      "flags": []
-    }
+    },
+    "tail": [
+     0.77,
+     -14.9
+    ]
    },
    {
     "file": "switch-industrial-2.npz",
@@ -18750,7 +19058,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -16.1,
+     0.077
+    ]
    },
    {
     "file": "switch-small-2.npz",
@@ -19441,7 +19753,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -32.7,
+     0.03
+    ]
    },
    {
     "file": "keyboard-desktop-3.npz",
@@ -19497,7 +19813,11 @@
      "env_db": 2.57,
      "shape_db": 0.88
     },
-    "was": "cuts/bigsoundbank/1733_05.wav"
+    "was": "cuts/bigsoundbank/1733_05.wav",
+    "tail": [
+     0.31,
+     -254.6
+    ]
    },
    {
     "file": "keyboard-desktop-4.npz",
@@ -19593,7 +19913,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "lead": [
+     -49.1,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -20060,7 +20384,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "lead": [
+     -12.0,
+     0.03
+    ]
    },
    {
     "file": "camera-shutter-2.npz",
@@ -20321,7 +20649,11 @@
      "page": "https://freesound.org/people/deoking/sounds/411695",
      "licence": "CC0 1.0 (public domain dedication)",
      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    }
+    },
+    "lead": [
+     -17.6,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -21570,7 +21902,11 @@
       "short",
       "quiet"
      ]
-    }
+    },
+    "tail": [
+     0.06,
+     -392.8
+    ]
    },
    {
     "file": "heavy-drop-floor-3.npz",
@@ -22172,7 +22508,11 @@
       "dull",
       "sustained tone"
      ]
-    }
+    },
+    "tail": [
+     6.5,
+     -10.9
+    ]
    },
    {
     "file": "thunder-roll-2.npz",
@@ -22231,7 +22571,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -10.7,
+     0.167
+    ]
    }
   ],
   "allows": [
@@ -22434,7 +22778,11 @@
     "taste": {
      "pred": 3.1,
      "flags": []
-    }
+    },
+    "tail": [
+     0.76,
+     -135.9
+    ]
    },
    {
     "file": "whoosh-low-4.npz",
@@ -22487,7 +22835,11 @@
      "flags": [
       "dull"
      ]
-    }
+    },
+    "lead": [
+     -10.8,
+     0.644
+    ]
    }
   ],
   "allows": [
@@ -22687,7 +23039,11 @@
     "taste": {
      "pred": 3.0,
      "flags": []
-    }
+    },
+    "lead": [
+     -16.8,
+     0.044
+    ]
    },
    {
     "file": "whoosh-airy-4.npz",
@@ -22738,7 +23094,11 @@
     "taste": {
      "pred": 3.06,
      "flags": []
-    }
+    },
+    "lead": [
+     -22.6,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -22832,7 +23192,11 @@
     "taste": {
      "pred": 3.01,
      "flags": []
-    }
+    },
+    "lead": [
+     -10.4,
+     0.03
+    ]
    },
    {
     "file": "swish-fast-2.npz",
@@ -24091,7 +24455,11 @@
       "quiet",
       "thin"
      ]
-    }
+    },
+    "tail": [
+     0.66,
+     -721.8
+    ]
    }
   ],
   "allows": [
@@ -24767,7 +25135,11 @@
       "dull",
       "sustained tone"
      ]
-    }
+    },
+    "tail": [
+     2.9,
+     -248.8
+    ]
    }
   ],
   "allows": [
@@ -25054,7 +25426,11 @@
      4.21
     ],
     "events": 18,
-    "pace": 4.47
+    "pace": 4.47,
+    "lead": [
+     -22.0,
+     0.03
+    ]
    },
    {
     "file": "keys-bunch-2.npz",
@@ -25281,6 +25657,10 @@
     "excerpt_s": [
      0.29,
      0.95
+    ],
+    "lead": [
+     -32.4,
+     0.03
     ]
    },
    {
@@ -25325,6 +25705,10 @@
     "excerpt_s": [
      4.39,
      5.05
+    ],
+    "lead": [
+     -17.6,
+     0.03
     ]
    },
    {
@@ -25369,6 +25753,10 @@
     "excerpt_s": [
      12.65,
      13.3
+    ],
+    "lead": [
+     -36.8,
+     0.03
     ]
    },
    {
@@ -25456,6 +25844,10 @@
     "excerpt_s": [
      3.3,
      3.83
+    ],
+    "lead": [
+     -15.1,
+     0.03
     ]
    }
   ],
@@ -25674,6 +26066,14 @@
     "lossy": true,
     "allows": [
      "stacked"
+    ],
+    "tail": [
+     0.68,
+     -477.4
+    ],
+    "lead": [
+     -35.9,
+     0.03
     ]
    },
    {
@@ -26022,7 +26422,11 @@
      "env_db": 3.18,
      "shape_db": 1.17
     },
-    "was": "freesound_e1/563818.mp3@0.566-0.950"
+    "was": "freesound_e1/563818.mp3@0.566-0.950",
+    "lead": [
+     -31.7,
+     0.033
+    ]
    },
    {
     "file": "tap-fingertip-3.npz",
@@ -26071,7 +26475,11 @@
      "env_db": 2.95,
      "shape_db": 1.02
     },
-    "was": "freesound_e1/563818.mp3@3.563-3.950"
+    "was": "freesound_e1/563818.mp3@3.563-3.950",
+    "lead": [
+     -33.0,
+     0.041
+    ]
    },
    {
     "file": "tap-fingertip-4.npz",
@@ -26313,6 +26721,10 @@
     },
     "allows": [
      "rising_glide"
+    ],
+    "tail": [
+     0.24,
+     -100.0
     ]
    },
    {
@@ -26837,7 +27249,11 @@
      "env_db": 3.33,
      "shape_db": 1.02
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -14.4,
+     0.063
+    ]
    }
   ],
   "walk": [
@@ -27056,6 +27472,10 @@
     },
     "allows": [
      "ring"
+    ],
+    "tail": [
+     1.89,
+     -310.6
     ]
    },
    {
@@ -27810,7 +28230,11 @@
     "fidelity": {
      "env_db": 3.34,
      "shape_db": 1.44
-    }
+    },
+    "lead": [
+     -16.3,
+     0.03
+    ]
    },
    {
     "file": "horse-trot-1.npz",
@@ -29399,7 +29823,11 @@
     "fidelity": {
      "env_db": 3.23,
      "shape_db": 1.73
-    }
+    },
+    "lead": [
+     -71.1,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -29491,6 +29919,10 @@
     "pace": 0.74,
     "allows": [
      "stacked"
+    ],
+    "lead": [
+     -35.7,
+     0.03
     ]
    }
   ],
@@ -29586,7 +30018,11 @@
      "env_db": 3.24,
      "shape_db": 0.98
     },
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     3.36,
+     -420.3
+    ]
    },
    {
     "file": "baby-cry-3.npz",
@@ -33133,6 +33569,10 @@
     },
     "allows": [
      "ring"
+    ],
+    "lead": [
+     -42.8,
+     0.302
     ]
    }
   ],
@@ -33225,7 +33665,11 @@
     "fidelity": {
      "env_db": 3.67,
      "shape_db": 1.1
-    }
+    },
+    "lead": [
+     -13.3,
+     0.197
+    ]
    },
    {
     "file": "car-engine-start-2.npz",
@@ -33275,7 +33719,11 @@
     "fidelity": {
      "env_db": 3.86,
      "shape_db": 1.18
-    }
+    },
+    "lead": [
+     -24.9,
+     0.063
+    ]
    },
    {
     "file": "car-engine-start-3.npz",
@@ -33324,7 +33772,11 @@
     "fidelity": {
      "env_db": 3.6,
      "shape_db": 1.12
-    }
+    },
+    "lead": [
+     -24.8,
+     0.312
+    ]
    }
   ],
   "walk": [
@@ -33848,7 +34300,11 @@
     "fidelity": {
      "env_db": 3.07,
      "shape_db": 0.8
-    }
+    },
+    "lead": [
+     -35.8,
+     0.049
+    ]
    }
   ],
   "walk": [
@@ -34774,7 +35230,11 @@
      "env_db": 3.49,
      "shape_db": 1.37
     },
-    "pace": 4.68
+    "pace": 4.68,
+    "lead": [
+     -38.1,
+     0.036
+    ]
    },
    {
     "file": "chicken-cluck-2.npz",
@@ -34914,6 +35374,10 @@
     },
     "allows": [
      "rising_glide"
+    ],
+    "lead": [
+     -10.9,
+     0.03
     ]
    }
   ],
@@ -35381,6 +35845,10 @@
     },
     "allows": [
      "clicks"
+    ],
+    "lead": [
+     -19.9,
+     0.06
     ]
    }
   ],
@@ -35475,7 +35943,11 @@
     "fidelity": {
      "env_db": 3.19,
      "shape_db": 0.95
-    }
+    },
+    "tail": [
+     0.48,
+     -319.4
+    ]
    },
    {
     "file": "cutlery-plate-1.npz",
@@ -35613,7 +36085,11 @@
     "fidelity": {
      "env_db": 3.47,
      "shape_db": 1.03
-    }
+    },
+    "lead": [
+     -13.8,
+     0.041
+    ]
    }
   ],
   "walk": [
@@ -36404,7 +36880,11 @@
      "env_db": 2.36,
      "shape_db": 0.73
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -39.9,
+     0.064
+    ]
    }
   ],
   "walk": [
@@ -36789,7 +37269,11 @@
     "fidelity": {
      "env_db": 3.01,
      "shape_db": 0.86
-    }
+    },
+    "lead": [
+     -23.6,
+     0.043
+    ]
    }
   ],
   "walk": [
@@ -36929,7 +37413,11 @@
     "fidelity": {
      "env_db": 4.37,
      "shape_db": 1.7
-    }
+    },
+    "tail": [
+     3.4,
+     -172.7
+    ]
    }
   ],
   "walk": [
@@ -37308,6 +37796,10 @@
     "allows": [
      "clicks",
      "ring"
+    ],
+    "lead": [
+     -36.5,
+     0.03
     ]
    }
   ],
@@ -37561,7 +38053,11 @@
      "env_db": 3.66,
      "shape_db": 1.05
     },
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     3.89,
+     -167.0
+    ]
    },
    {
     "file": "crowd-boo-1.npz",
@@ -38198,6 +38694,10 @@
     "lossy": true,
     "allows": [
      "clicks"
+    ],
+    "lead": [
+     -32.4,
+     0.05
     ]
    }
   ],
@@ -38349,7 +38849,15 @@
      "env_db": 3.72,
      "shape_db": 1.17
     },
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     0.37,
+     -294.4
+    ],
+    "lead": [
+     -15.1,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -38442,7 +38950,11 @@
      "env_db": 1.0,
      "shape_db": 0.45
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -42.6,
+     0.03
+    ]
    },
    {
     "file": "elevator-ding-1.npz",
@@ -38878,7 +39390,11 @@
      "env_db": 3.07,
      "shape_db": 0.96
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -18.6,
+     0.058
+    ]
    },
    {
     "file": "toaster-pop-2.npz",
@@ -39269,6 +39785,10 @@
     "lossy": true,
     "allows": [
      "ring"
+    ],
+    "lead": [
+     -32.8,
+     0.03
     ]
    },
    {
@@ -39547,7 +40067,11 @@
      3.95
     ],
     "events": 1,
-    "pace": null
+    "pace": null,
+    "lead": [
+     -19.4,
+     0.044
+    ]
    }
   ],
   "walk": [
@@ -39649,6 +40173,10 @@
     "pace": 1.08,
     "allows": [
      "clicks"
+    ],
+    "lead": [
+     -10.8,
+     0.084
     ]
    },
    {
@@ -39694,7 +40222,11 @@
      2.45
     ],
     "events": 1,
-    "pace": null
+    "pace": null,
+    "lead": [
+     -24.9,
+     0.048
+    ]
    },
    {
     "file": "step-puddle-3.npz",
@@ -40324,7 +40856,11 @@
     "fidelity": {
      "env_db": 4.55,
      "shape_db": 1.83
-    }
+    },
+    "tail": [
+     6.34,
+     -224.2
+    ]
    }
   ],
   "walk": [
@@ -40845,7 +41381,11 @@
      "env_db": 3.82,
      "shape_db": 1.3
     },
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     6.36,
+     -164.8
+    ]
    },
    {
     "file": "shredder-paper-2.npz",
@@ -40895,7 +41435,11 @@
      "env_db": 4.09,
      "shape_db": 1.41
     },
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     6.38,
+     -180.5
+    ]
    }
   ],
   "walk": [
@@ -41186,7 +41730,11 @@
      "shape_db": 0.77
     },
     "pace": 2.67,
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -20.4,
+     0.061
+    ]
    }
   ],
   "walk": [
@@ -41533,7 +42081,11 @@
      "shape_db": 0.95
     },
     "pace": 0.96,
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -16.5,
+     0.148
+    ]
    },
    {
     "file": "screwdriver-screw-2.npz",
@@ -41726,7 +42278,11 @@
      "env_db": 4.53,
      "shape_db": 1.58
     },
-    "lossy": true
+    "lossy": true,
+    "tail": [
+     6.56,
+     -99.9
+    ]
    }
   ],
   "walk": [
@@ -42195,7 +42751,11 @@
      "shape_db": 1.23
     },
     "pace": 1.05,
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -14.1,
+     0.368
+    ]
    },
    {
     "file": "dart-hit-2.npz",
@@ -42816,7 +43376,11 @@
      "env_db": 3.8,
      "shape_db": 1.51
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -69.3,
+     0.266
+    ]
    }
   ],
   "walk": [
@@ -42907,7 +43471,11 @@
      "env_db": 3.39,
      "shape_db": 1.39
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -21.6,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -43385,7 +43953,11 @@
      "env_db": 3.29,
      "shape_db": 1.03
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -26.5,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -44097,7 +44669,11 @@
      "env_db": 2.38,
      "shape_db": 1.02
     },
-    "lossy": true
+    "lossy": true,
+    "lead": [
+     -29.2,
+     0.03
+    ]
    }
   ],
   "walk": [
@@ -44433,7 +45009,11 @@
     "fidelity": {
      "env_db": 4.57,
      "shape_db": 1.8
-    }
+    },
+    "tail": [
+     6.19,
+     -71.4
+    ]
    },
    {
     "file": "drain-gurgle-1.npz",
@@ -45596,7 +46176,11 @@
     "fidelity": {
      "env_db": 3.9,
      "shape_db": 1.71
-    }
+    },
+    "lead": [
+     -12.4,
+     0.289
+    ]
    }
   ],
   "walk": [

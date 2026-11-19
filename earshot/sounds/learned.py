@@ -88,6 +88,13 @@ CREST, CUT = 14.0, 8.0       # dB: present() (a sound of 0.5 s and more, peaks o
 # chosen so), ms of the bell that restores it
 ATTACK, ATTACK_MS = None, 3.0
 ATTACK_MAX = 2.0              # dB the bell raises the strike at most (more is heard as a click of its own)
+# what the stored envelope cannot hold, taken out of a take by gain (resyn.tidy), from two numbers per member that
+# the build measured on its recording: TAIL, the member's `tail` (the take's faint floor of noise fades with the
+# recording's own decay, where the envelope stops some 40 to 60 dB down); LEAD, the member's `lead` (what is smeared
+# into the few milliseconds before the main strike held as low as the recording has it there). A member carries the
+# numbers only where they were measured to bring its takes closer to its recording and change nothing else (the
+# loudness, the length, the audit, the sound between the strike and the tail). False: off for every member
+TAIL, LEAD = True, True
 DEFAULT_OFF = 0.6           # prior factor of a design the index marks as not a default (`default`: false)
 RETAKE = 101                # make.take's step between the seeds it tries: seeds this far apart play one member
 # how far (a share of its length) a length asked of a performance may lie from a whole-action recording's own for
@@ -176,8 +183,10 @@ def take(e, c, r, k=None, room=True, nudge=None):
         pitch = float(np.clip(12.0 * np.log2(c.hz(m['hz']) / m['hz']), -PITCH, PITCH))
     want = c.length() if room else None
     length = 1.0 if want is None else float(np.clip(want / (m['dur_s'] * size), *LENGTH))
+    tail = tuple(m['tail']) if TAIL and m.get('tail') else None
+    lead = (m['onset_s'],) + tuple(m['lead']) if LEAD and m.get('lead') else None
     y = resyn.render(model(m['file']), r, length=length, pitch=pitch, size=size, bright=bright, hard=hard, ring=ring,
-                     vary=VARY * c.vary)
+                     vary=VARY * c.vary, tail=tail, lead=lead)
     at = dsp.n_of(max(m.get('onset_s', 0.0) * size - 0.002, 0.0))
     strike = crest(y, at)
     if dry(e, m):

@@ -569,8 +569,61 @@ def _warp(model, grid, stretch, ring):
     return gu, gs
 
 
+def _avg(p, k):
+    """the moving mean of p over k samples, centred, same length (shorter windows at the ends)"""
+    c = np.concatenate([[0.0], np.cumsum(p)])
+    i = np.arange(len(p))
+    a, b = np.clip(i - k // 2, 0, len(p)), np.clip(i - k // 2 + k, 0, len(p))
+    return (c[b] - c[a]) / np.maximum(b - a, 1)
+
+
+TAIL_FROM = 30.0                 # dB under the loudest 10 ms where a tail's decay line starts (tidy())
+# dB under the take's peak under which tidy() leaves the tail (50 ms level) and the lead-in (2 ms level) as they are:
+# a finished file is trimmed where it falls under -66 dB and starts where it first passes -50 dB (master.finish),
+# so the take keeps its length and its start; and the most tidy() takes away anywhere
+TAIL_LOW, LEAD_LOW, DEPTH = -90.0, -48.0, 40.0
+
+
+def tidy(y, take_s, model_s, tail=None, lead=None):
+    """a take with what the stored envelope cannot hold taken out, by gain only (never raised, never brightened).
+    The envelope is kept to about 40 to 60 dB under its loudest cell, so a take's tail stays on a faint floor of
+    noise where the recording kept falling, and what leads into a strike is smeared a few milliseconds early.
+    tail = (s, dB per s): from s (the recording's time, where it last stood TAIL_FROM dB under its loudest 10 ms) a
+    line falling at that rate that the recording never rises above, starting at the take's own level there (or
+    TAIL_FROM dB under its loudest 10 ms, if higher); the take's level over 50 ms is held under it, so the floor
+    fades with the sound's own decay and a later sound under the line is left as it is. lead = (onset s, dB, s):
+    for that long before the main onset (to 2 ms before it) the take's level (2 ms) is held at most that far under
+    its strike (its loudest 10 ms in the 50 ms after the onset). take_s / model_s map the recording's seconds to the
+    take's and back (a time-warp, size and pitch move them). The gain is smoothed over 1 ms."""
+    p = np.mean(np.asarray(y, np.float64) ** 2, axis=1)
+    n = len(p)
+    if n < dsp.n_of(0.02):
+        return y
+    g = np.zeros(n)
+    top = 10 * np.log10(_avg(p, dsp.n_of(0.01)).max() + 1e-20)
+    peak = 20 * np.log10(np.abs(y).max() + 1e-20)
+    if tail is not None:
+        a = int(round(take_s(tail[0]) * SR))
+        if 0 <= a < n:
+            lev = 10 * np.log10(_avg(p, dsp.n_of(0.05))[a:] + 1e-20)
+            line = max(top - TAIL_FROM, lev[0]) + tail[1] * (model_s(np.arange(a, n) / SR) - tail[0])
+            g[a:] = np.minimum(np.maximum(line, peak + TAIL_LOW) - lev, 0.0)
+    if lead is not None:
+        o = take_s(lead[0])
+        i0, i1 = int(o * SR), int((o + 0.05) * SR)
+        a, b = max(int(round((o - lead[2]) * SR)), 0), int(round((o - 0.002) * SR))
+        if b > a and i0 < n:
+            hit = 10 * np.log10(_avg(p, dsp.n_of(0.01))[i0:i1].max() + 1e-20)
+            lev = 10 * np.log10(_avg(p, dsp.n_of(0.002))[a:b] + 1e-20)
+            g[a:b] = np.minimum(g[a:b], np.minimum(max(hit + lead[1], peak + LEAD_LOW) - lev, 0.0))
+    if not g.any():
+        return y
+    g = _avg(np.maximum(g, -DEPTH), dsp.n_of(0.001))
+    return y * (10 ** (g / 20.0))[:, None]
+
+
 def render(model, r, length=1.0, pitch=0.0, size=1.0, bright=0.0, hard=0.0, ring=1.0, weight=0.0, vary=0.0,
-           full=False, exact=None):
+           full=False, exact=None, tail=None, lead=None):
     """a take of a model: stereo (n, 2) float64 at the level of the recording (turned down if it would pass full
     scale). r = dsp.rng(seed): the same model, seed and arguments give the same samples, another seed another take.
     length: duration factor (the time between onsets is warped, onsets stay as sharp); pitch: semitones; size: a
@@ -581,7 +634,7 @@ def render(model, r, length=1.0, pitch=0.0, size=1.0, bright=0.0, hard=0.0, ring
     played 500 times); full: the finish() of a library sound; exact: how many times the take's own band envelopes
     are measured and corrected towards the model's (bands overlap, and what leaks from random neighbours moves an
     envelope by several dB; one pass removes most of that): 1, or 2 for a model made by morph() or member(), whose
-    bands were not measured together."""
+    bands were not measured together. tail, lead: what the stored envelope cannot hold, taken out (tidy())."""
     if exact is None:
         exact = 2 if 'tg' in model else 1
     ripple = np.zeros(NB)
@@ -707,6 +760,10 @@ def render(model, r, length=1.0, pitch=0.0, size=1.0, bright=0.0, hard=0.0, ring
         y = np.repeat(y, 2, axis=1)
     if abs(q - 1.0) > 1e-6:
         y = signal.resample(y, max(16, int(round(len(y) / q))), axis=0)
+    if tail is not None or lead is not None:
+        gx = gs if rings.any() else gu
+        y = tidy(y, lambda s: np.interp(s * FS, grid, gx) / (FS * q),
+                 lambda s: np.interp(s * FS * q, gx, grid) / FS, tail=tail, lead=lead)
     y = dsp.fade(y, 0.0001, 0.004)          # five samples: a recording cut at its onset keeps its onset
     peak = np.abs(y).max()
     if peak > 0.98:                         # a transform or a generated model may ask for more than full scale

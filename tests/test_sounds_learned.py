@@ -415,6 +415,66 @@ def test_a_gravel_walk_asked_close_keeps_its_closeness(monkeypatch):
     assert not np.array_equal(plain, plain_flat)
 
 
+# ---- what the stored envelope cannot hold, taken out (learned.TAIL, learned.LEAD, resyn.tidy)
+
+def _member(file):
+    return next((sid, k, m) for sid, e in INDEX.items() for k, m in enumerate(e['members']) if m['file'] == file)
+
+
+def _db(y, ms):
+    return 10 * np.log10(resyn._avg(np.mean(y ** 2, axis=1), dsp.n_of(ms / 1000)) + 1e-20)
+
+
+def test_the_tail_and_lead_repairs_switch_off(monkeypatch):
+    sid, k, m = _member('door-knock-2.npz')
+    assert m.get('lead') and learned.TAIL and learned.LEAD
+
+    def take():
+        c = registry.Controls(registry.get(sid))
+        c.seed = 0
+        return learned.take(INDEX[sid], c, dsp.rng(3), k=k)
+    on = take()
+    monkeypatch.setattr(learned, 'TAIL', False)
+    monkeypatch.setattr(learned, 'LEAD', False)
+    off = take()
+    monkeypatch.undo()
+    monkeypatch.setitem(m, 'lead', None)
+    assert not np.array_equal(on, off) and on.shape == off.shape
+    assert np.array_equal(off, take())                           # off is the take of a member without the numbers
+
+
+@pytest.mark.parametrize('file', ['knock-table-1.npz', 'step-floorboard-5.npz', 'cutlery-plate-2.npz'])
+def test_the_tail_falls_with_the_recordings_decay(file):
+    """after the point where the recording last stood 30 dB under its loudest 10 ms the take is held under the
+    recording's decay line: its end is quieter than the plain take's, everything before it and the strike untouched"""
+    _, _, m = _member(file)
+    a = resyn.render(learned.model(file), dsp.rng(4))
+    b = resyn.render(learned.model(file), dsp.rng(4), tail=tuple(m['tail']))
+    i = dsp.n_of(m['tail'][0]) - dsp.n_of(0.002)
+    assert a.shape == b.shape and np.array_equal(a[:i], b[:i])
+    assert np.abs(_db(a, 10).max() - _db(b, 10).max()) < 0.05
+    end = slice(i + (len(a) - i) // 2, None)
+    assert np.mean(_db(b, 50)[end]) < np.mean(_db(a, 50)[end]) - 0.5
+    assert np.all(_db(b, 50)[i:] <= _db(a, 50)[i:] + 0.01)
+
+
+@pytest.mark.parametrize('file', ['door-knock-2.npz', 'door-shut-2.npz', 'cork-bottle-3.npz'])
+def test_nothing_is_smeared_into_the_moment_before_the_strike(file):
+    """in the stretch before the main onset (to 2 ms before it) the take stands no higher under its strike than
+    the recording did (or 48 dB under its peak), and lower than the plain take; outside that stretch it is the same"""
+    _, _, m = _member(file)
+    on, cap, span = m['onset_s'], m['lead'][0], m['lead'][1]
+    a = resyn.render(learned.model(file), dsp.rng(4))
+    b = resyn.render(learned.model(file), dsp.rng(4), lead=(on, cap, span))
+    lo, hi = max(dsp.n_of(on - span) - dsp.n_of(0.001), 0), dsp.n_of(on - 0.002) + dsp.n_of(0.001)
+    assert a.shape == b.shape and np.array_equal(a[:lo], b[:lo]) and np.array_equal(a[hi:], b[hi:])
+    hit = _db(b, 10)[dsp.n_of(on):dsp.n_of(on + 0.05)].max()
+    floor = 20 * np.log10(np.abs(b).max()) + resyn.LEAD_LOW
+    w = slice(max(dsp.n_of(on - span), 0) + dsp.n_of(0.002), dsp.n_of(on - 0.002) - dsp.n_of(0.002))
+    assert _db(b, 2)[w].max() <= max(hit + cap, floor) + 2.0     # (the gain is smoothed over 1 ms)
+    assert np.sum(b[lo:hi] ** 2) < np.sum(a[lo:hi] ** 2)
+
+
 def test_a_member_the_engine_plays_with_a_fault_comes_last():
     """the second drum roll clicks where the engine sets an onset at a window edge: it plays after the other"""
     e = INDEX['roll/drum']

@@ -148,6 +148,10 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   strike): a wall switch, a book shut and opened, a glass and a plate breaking, a bite, a punch, a camera shutter,
   steps on tile, concrete and snow, two glasses clinking, a knife swish, a golf swing, a pen cap, fingertips on a
   table, a spoon on a plate and a whip.
+- Learned sounds are cleaner at their edges: the faint hiss some takes left after the sound now fades with the
+  sound as its recording did (36 recordings), and nothing is smeared into the moment before the strike any more
+  (110 recordings, knocks, switches, keys, doors, a cork among them). Each was measured closer to its recording
+  with its loudness, length and audit unchanged; `learned.TAIL` and `learned.LEAD` turn it off.
 - The licence of rendered audio is stated (answers #21): everything earshot renders (`make`, `sfx`, `kit`, `forge`)
   belongs to whoever rendered it, free for any use, commercial too, without credit. The code stays MIT.
 
