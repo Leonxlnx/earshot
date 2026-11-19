@@ -50,6 +50,7 @@ def test_digital_silence_counts_all_channels_at_each_sample(tmp_path, case, kind
 
 
 def test_profile_measurement_cache_does_not_reuse_old_silence_semantics(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot import audio, profile
 
     path = str(tmp_path / 'antiphase.wav')

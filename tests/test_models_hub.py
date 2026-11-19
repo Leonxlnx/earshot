@@ -329,6 +329,7 @@ def test_pinned_ids_are_never_read_as_folders(cache, tmp_path, monkeypatch):
 def test_local_folder_embedding_caches_stay_inside_the_cache_root(cache, tmp_path, monkeypatch):
     """a folder path (with a drive letter on Windows) must become one path component, or os.path.join would leave
     EMB_CACHE; new weights in the same folder get a fresh cache. The pinned models keep their old names"""
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot import vocab
     from earshot.forge import critic
     d = model_folder(tmp_path / 'clap ft')
@@ -388,6 +389,7 @@ def test_doctor_reports_revisions_and_cache_state(cache):
 
 
 def test_doctor_names_the_offline_flag_when_models_are_missing(cache, monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     monkeypatch.setenv('TRANSFORMERS_OFFLINE', '1')
     r = doctor.check()
     assert r['offline'] == 'TRANSFORMERS_OFFLINE' and r['models_cached'] == {CLAP_ID: False, AST_ID: False}
@@ -395,6 +397,7 @@ def test_doctor_names_the_offline_flag_when_models_are_missing(cache, monkeypatc
 
 
 def test_doctor_load_reports_instead_of_failing(cache, monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     monkeypatch.setenv('EARSHOT_OFFLINE', '1')
     monkeypatch.setattr(doctor, '_load', lambda r: pytest.fail('loaded a model that is not cached while offline'))
     r = doctor.check(load=True)

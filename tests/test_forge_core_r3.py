@@ -117,6 +117,7 @@ def test_polish_targets_stand_in_for_missing_refs():
 
 # ------------------------------------------------------------------------------------------------ critic fallback
 def test_study_targets_measures_and_penalties():
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge.critic import STUDY_TARGETS, study_measures, study_penalties, widen_targets
     t = t_(1.0)
     sub = np.sin(2 * np.pi * 50 * t) * np.minimum(1, t / 0.3) * np.exp(-np.maximum(t - 0.3, 0) / 0.2)
@@ -135,6 +136,7 @@ def test_study_targets_measures_and_penalties():
 
 
 def test_critic_study_fallback_fills_tone_env_polish_for_thin_ref_sets():
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge.critic import Critic
     c = Critic.__new__(Critic)                                                   # no models: the fallback alone
     c.refs, c.study, c._ref_sm = [], {'sh150': (-1.0, 0.0), 'length': (0.8, 1.6), 'corr': (0.8, 1.0)}, None
@@ -154,6 +156,7 @@ def test_critic_study_fallback_fills_tone_env_polish_for_thin_ref_sets():
 
 
 def test_holdout_key_is_content_based():
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge.critic import holdout_key
     x = np.random.default_rng(2).standard_normal(4800).astype(np.float32)
     assert holdout_key(x) == holdout_key(x.copy()) == holdout_key(np.stack([x, x], 1).mean(1))
@@ -209,6 +212,7 @@ def test_palette_keeps_every_member_and_matches_loudness(tmp_path):
 
 
 def test_forge_families_runs_one_search_per_member(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge import forge
     from test_forge import FakeCritic, toy
     fam = {'ping': {'f': 1000.0, 'tau': 0.03, 'shape': 'hard', 'n': 1},
@@ -224,6 +228,7 @@ def test_forge_families_runs_one_search_per_member(tmp_path):
 
 
 def test_prescreen_counts_the_study_fallback_without_refs():
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge.search import Prescreen
     t = t_(0.3)
     hiss = np.random.default_rng(1).standard_normal(len(t)) * np.exp(-t / 0.05)
@@ -233,6 +238,7 @@ def test_prescreen_counts_the_study_fallback_without_refs():
 
 
 def test_score_refs_is_memoised_per_critic(monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge import critic as C
     c = C.Critic.__new__(C.Critic)
     c.refs, c.W, c.mode, c.version, c.extra = ['a.wav', 'b.wav'], dict(C.W2), 'real', 2, None

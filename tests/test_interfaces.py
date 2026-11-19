@@ -356,6 +356,7 @@ def test_mcp_module_that_fails_to_import_is_reported(monkeypatch):
 
 
 def test_mcp_tool_exception_becomes_readable_failure(wav):
+    pytest.importorskip('torch')            # needs the listen extra
     def boom(path):
         raise ValueError('decoder exploded')
     with pytest.raises(mcp_server.ToolFailure, match='describe failed: ValueError: decoder exploded'):
@@ -404,6 +405,7 @@ def test_mcp_sheet_returns_png_path_and_image(wav, tmp_path, monkeypatch):
 
 
 def test_mcp_realness_folder_rows_and_missing_model(wav, tmp_path, monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     import types
     a, b = wav(_bursts(), 'a.wav'), wav(_bursts(2.0), 'b.wav')
     seen = {}

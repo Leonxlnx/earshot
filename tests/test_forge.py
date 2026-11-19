@@ -142,6 +142,7 @@ def test_robust_re_renders_on_new_seeds():
 
 
 def test_forge_end_to_end_with_a_prebuilt_critic(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     rep = forge(toy(), budget=48, pop=16, keep=2, seed=4, out=str(tmp_path), log=None, critic=FakeCritic(), robust=3)
     assert rep['target'] == 'a 1 kHz ping' and len(rep['picks']) == 2
     for p in rep['picks']:

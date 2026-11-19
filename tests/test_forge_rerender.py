@@ -74,6 +74,7 @@ def test_fill_completes_params_only_when_bit_identical():
 
 # ------------------------------------------------------------------------------------------------ writers
 def test_forge_and_palette_picks_rerender_from_report(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge import forge, palette
     rep = forge(ty, critic=Crit(), budget=2, pop=2, keep=2, log=None, holdout=False, outputs=False,
                 out=str(tmp_path / 'f'))
@@ -92,6 +93,7 @@ def test_forge_and_palette_picks_rerender_from_report(tmp_path):
 
 
 def test_variant_recipe_picks_name_their_member(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge import forge, variant_recipe
     members = [{**ty.DEFAULTS, 'ridge': 7000.0}, {**ty.DEFAULTS, 'ridge': 11000.0}, {**ty.DEFAULTS, 'tink_db': 0.0}]
     F = variant_recipe(ty.render, members, names=['low', 'high', 'tink'], TARGET='a tick', ALTS=[])
@@ -105,6 +107,7 @@ def test_variant_recipe_picks_name_their_member(tmp_path):
 
 
 def test_a_lambda_stand_in_gets_no_block_and_no_schema_claim():
+    pytest.importorskip('torch')            # needs the listen extra
     import types
     from earshot.forge import forge
     F = types.SimpleNamespace(__name__='earshot.forge.recipes.typing', SPACE={'v': [0, 1]}, DEFAULTS={'v': 0},

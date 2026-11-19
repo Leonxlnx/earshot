@@ -86,6 +86,7 @@ def test_es_starts_are_scored_exactly_as_given_including_keys_outside_the_space(
 
 
 def test_forge_report_carries_the_fill_warnings(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot.forge import forge
     mod, seen = _module('earshot_test_r5_recipe_d', SPACE, {'f': 500.0, 'shape': 0, 'n': 3})
     mod.TARGET, mod.ALTS = 'a ping', []
