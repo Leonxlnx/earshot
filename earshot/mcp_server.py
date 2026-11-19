@@ -35,6 +35,7 @@ import inspect
 import io
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -633,9 +634,15 @@ TOOLS += [(tool_sfx_list, True, False), (tool_sfx_render, False, False), (tool_k
 def _summary_only(fn):
     def run(**kw):
         r = fn(**{k: v for k, v in kw.items() if v is not None})
+        r['summary'] = _BUILD_OFFER.sub(r'\1call the tool build with want="\2" (and parts: what it is made of)',
+                                        r['summary'])
         r.update(text=r['summary'], brief=True)
         return r
     return run
+
+
+# the line of make's answer that offers a build: over MCP it names the tool, not the shell command
+_BUILD_OFFER = re.compile(r'^(or let earshot draft, hear and tune it: )earshot build "(.*)"$', re.M)
 
 
 def tool_make(want: Annotated[str, Field(description='the sound in words: what it is or the job it plays, how it '

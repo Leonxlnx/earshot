@@ -8,7 +8,7 @@ description: Make sounds with earshot whenever a product, game, page, animation 
 ## Making sounds
 
 earshot turns a request in words into a sound file: it picks a design from its catalogue and renders a new take. No
-model is loaded and nothing is downloaded; a one-shot takes about a second. When the catalogue lacks the thing, the
+model is loaded and nothing is downloaded; a one-shot takes a few seconds. When the catalogue lacks the thing, the
 answer says so, and you build it from recorded parts with `earshot build` (below). If the `earshot` command is
 missing, see Setup at the end.
 
@@ -249,12 +249,14 @@ next: edit stampede.recipe.json, then: earshot build "a stampede of horses" --re
 without the extra it drafts, renders, audits and measures, and says that it did not hear. `docs/BUILD.md` has the
 loop and worked examples.
 
-What builds well, measured by the listening model: textures of many similar events and pulsing (applause, a swarm,
-a campfire, a purr). What does not: rain or hail on a surface the catalogue has
-no recording of, a vehicle passing built from another motor, voices (a whale is an owl and a wolf moved down), pure
-tones. A part is found by its words and can come back as the wrong recording: read the `part N` lines, and if a
-better recording exists (`earshot sounds --search WORDS`), swap it with `sound=<id>`. `fit` is a
-listening model's judgement and the second ear also objects to some real recordings: neither is a person's ear.
+What builds well, measured by the listening model: textures of many similar events and pulsing (a swarm, a
+campfire, a purr). Applause is a sketch: `earshot build applause` fits the words (z +4.69) but not 1.0 over the
+catalogue's own applause (z +4.50), so it prints "a sketch: not clearly it yet". What does not: rain or hail on a
+surface the catalogue has no recording of, a vehicle passing built from another motor, voices (a whale is an owl
+and a wolf moved down), pure tones. A part is found by its words and can come back as the wrong recording: read
+the `part N` lines, and if a better recording exists (`earshot sounds --search WORDS`), swap it with `sound=<id>`.
+`fit` is a listening model's judgement and the second ear also objects to some real recordings: neither is a
+person's ear.
 
 ### Recipes by hand
 
@@ -522,7 +524,8 @@ pip install "earshot[listen,mcp] @ git+https://github.com/Leonxlnx/earshot"     
 earshot doctor                           # packages, ffmpeg, models (pinned revision, cache state); --load times them
 ```
 Making sounds needs only the first line; ffmpeg on PATH is needed for ogg, webm, mp3 and m4a. Listening downloads two
-open models (~1.1 GB) on first use. In a clone of the repo, `pip install -e ".[all]"` does the same from the folder.
+open models (about 1.1 GB to download, about 2.2 GB on disk) on first use. In a clone of the repo,
+`pip install -e ".[all]"` does the same from the folder.
 - **CLI**: `earshot <command> ... [--json] [--out result.json]`. Text output starts with a plain summary; times are
   m:ss.ss in text and seconds in JSON. Errors are one line on stderr: `earshot <command>: error: ...`, exit 1.
 - **MCP** (models stay loaded between calls): `claude mcp add earshot --scope user -e EARSHOT_THREADS=3 --

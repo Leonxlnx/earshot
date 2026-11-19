@@ -85,7 +85,7 @@ def test_a_missing_extra_is_one_plain_sentence(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(clap, '_inst', None)
     with pytest.raises(extras.MissingExtra, match=r'needs torch, which the base install of earshot leaves out: '
                                                   r'pip install "torch>=2\.6" "transformers>=4\.40" "librosa>=0\.10" '
-                                                  r'\(the listen extra\)'):
+                                                  r'\(the listen extra; or: pip install '):
         clap.Clap()
     with pytest.raises(extras.MissingExtra):
         ast_mod.AST()
@@ -103,7 +103,7 @@ def test_a_missing_extra_is_one_plain_sentence(monkeypatch, tmp_path, capsys):
     err = capsys.readouterr().err.strip().splitlines()
     assert err == ['earshot describe: error: earshot describe needs torch, transformers, which the base install of '
                    'earshot leaves out: pip install "torch>=2.6" "transformers>=4.40" "librosa>=0.10" (the listen '
-                   'extra)']
+                   'extra; or: pip install "earshot[listen] @ git+https://github.com/Leonxlnx/earshot")']
     with pytest.raises(mcp_server.ToolFailure, match='^earshot describe needs torch'):
         mcp_server._result('describe', dict(path=str(wav)))
     import earshot
@@ -136,3 +136,16 @@ def test_doctor_says_making_works_without_the_listening_extra(monkeypatch):
     assert r['extras']['listen'] is False
     assert not [p for p in r['problems'] if 'torch' in p or 'librosa' in p]
     assert any('Making sounds works' in n for n in r['notes'])
+
+
+def test_every_hint_of_the_listen_extra_is_one_line(monkeypatch):
+    _without(monkeypatch, 'torch', 'transformers')
+    line = extras.command('listen')
+    assert line.startswith('pip install "torch>=2.6" "transformers>=4.40" "librosa>=0.10" (the listen extra; or: ')
+    assert line.endswith('pip install "earshot[listen] @ git+https://github.com/Leonxlnx/earshot")')
+    from earshot import build
+    ears, why = build.ears_for('rain on a tin roof')
+    assert ears is None and why.startswith('no ears: ') and why.endswith(line)
+    with pytest.raises(extras.MissingExtra) as e:
+        extras.check('describe')
+    assert str(e.value).endswith(line)

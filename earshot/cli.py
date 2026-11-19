@@ -49,7 +49,13 @@ def _parser():
                                  'measure (the listening commands need the listen extra).')
     ap.add_argument('--threads', type=int, help='CPU threads for torch and BLAS (default: EARSHOT_THREADS or '
                                                 'min(4, cores/2))')
+    ap.add_argument('--version', action='version', version=_version())
     return ap
+
+
+def _version():
+    from . import __version__
+    return f'earshot {__version__}'
 
 
 def _hold_blas(argv):
@@ -75,7 +81,10 @@ def _hold_blas(argv):
     os.environ['OPENBLAS_NUM_THREADS'] = str(n)
 
 
-def _register(sub, modules):
+def _register(sub, modules, absent=None):
+    """add the commands of `modules`; return {module: why} for a module that is broken. A module that only lacks an
+    extra (a base install) is no fault: its commands are listed with a note and, when called, say what to install;
+    `absent` collects {module: the plain sentence}"""
     failed = {}
     done = set()
     for mod in modules:
@@ -85,9 +94,36 @@ def _register(sub, modules):
         try:
             importlib.import_module(f'earshot.{mod}').add_cli(sub)
         except Exception as e:  # a broken module must not break the others
-            from .extras import plain
-            failed[mod] = plain(e) or f'{type(e).__name__}: {e}'
+            from . import extras
+            said = extras.plain(e)
+            if said is None:
+                failed[mod] = f'{type(e).__name__}: {e}'
+                continue
+            if absent is not None:
+                absent[mod] = said
+            for name in (c for c, m in COMMANDS.items() if m == mod and c not in sub.choices):
+                extra = extras.NEEDS.get(name) or extras.EXTRA.get(getattr(e, 'name', None) or '', ('listen',))[0]
+                p = sub.add_parser(name, help=f'(needs the {extra} extra)', add_help=False)
+                p.add_argument('rest', nargs='*', help=argparse.SUPPRESS)
+                p.set_defaults(func=lambda a, said=said: _absent(said))
     return failed
+
+
+def _absent(said):
+    from .extras import MissingExtra
+    raise MissingExtra(said)
+
+
+def _missing_line(cmd, said):
+    """the one-line error of a command whose module needs an extra that is not installed"""
+    from . import extras
+    from .report import error_line
+    try:
+        extras.check(cmd)
+    except extras.MissingExtra as m:
+        said = str(m)
+    error_line(cmd, said)
+    return 1
 
 
 def main(argv=None):
@@ -96,11 +132,17 @@ def main(argv=None):
     ap = _parser()
     sub = ap.add_subparsers(dest='command', metavar='<command>')
     cmd = next((a for a in argv if not a.startswith('-')), None)
+    if '--version' in (argv[:argv.index(cmd)] if cmd in argv else argv):   # no command module needs to load
+        print(_version())
+        return 0
     if cmd in COMMANDS:
-        failed = _register(sub, [COMMANDS[cmd]])
+        absent = {}
+        failed = _register(sub, [COMMANDS[cmd]], absent)
         if failed:
             print(f'earshot: the "{cmd}" command is unavailable: {failed[COMMANDS[cmd]]}', file=sys.stderr)
             return 2
+        if absent:
+            return _missing_line(cmd, absent[COMMANDS[cmd]])
     else:
         failed = _register(sub, list(COMMANDS.values()))
         for m, e in failed.items():

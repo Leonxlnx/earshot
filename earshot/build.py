@@ -51,7 +51,6 @@ ROUNDS = 20             # tuning rounds of a default build: a render and one emb
 SEED = 0
 GOOD_Z = 3.0            # the fit a sound needs to be heard as its words (match.VERDICTS 'strong')
 OVER = 1.0              # and its lead over the design `make` would hand over
-LISTEN_INSTALL = 'pip install "earshot[listen] @ git+https://github.com/Leonxlnx/earshot"'
 PLAYED = {'synth', 'instrument', 'tonal', 'chip', '8-bit', 'arcade', 'retro', 'glitch', 'drums', 'kit', 'music'}
 PLAYED_KINDS = {'note', 'chime', 'figure', 'music', 'pad', 'stinger'}
 PLAYED_FAMILIES = {'braam', 'brass', 'strings', 'piano', 'guitar', 'organ', 'choir'}     # played, whatever the tags say
@@ -1075,8 +1074,8 @@ def ears_for(words, listen=None):
     if gone:
         if listen:
             extras.need(*extras.LISTEN, what='build with ears')
-        return None, (f'no ears: it was drafted, rendered, audited and measured, not heard; {LISTEN_INSTALL} '
-                      'gives it ears')
+        return None, ('no ears: it was drafted, rendered, audited and measured, not heard; the listen extra gives it '
+                      f"ears: {extras.command('listen')}")
     try:
         return Ears(words), None
     except Exception as e:      # noqa: BLE001  (a model that is not in the cache: build without ears)

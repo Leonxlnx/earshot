@@ -16,7 +16,7 @@ before: numba is the one new requirement, and the listening stack moved to an ex
 - `earshot make "WORDS" -o FILE` (`earshot/make.py`, MCP `make`, `api.make`) reads the request, ranks the catalogue,
   renders the best design with the request's controls, checks the take (clicks, cut tails, clipping, DC, comb ring,
   rising glides, stacked attacks; a failed take is rendered again on up to three more seeds) and writes wav, flac,
-  ogg, mp3, m4a or webm. A one-shot takes about a second on one thread.
+  ogg, mp3, m4a or webm. A one-shot takes a few seconds from the command line on one thread.
 - The answer is a few plain lines: the design, its length, where its loudest moment is (`peak at`), its loudness,
   `clean` or what the check found, and the words that chose it; three alternatives (`also`); and what the sound does
   not cover, does not follow or did not understand. Every take also carries `peak_s`, `onset_s` and, for a row of
@@ -160,6 +160,8 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   `make`, sets, recipes, `build` and `pack`; the long renders and the tests that load CLAP run with `--slow`.
 - CI (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
+- `earshot --version`, and earshot's version on the first line of `earshot doctor`; a base install starts without a
+  word about the listen extra, and the first listening call says in one line what it downloads, how large and where.
 
 ### Changed
 

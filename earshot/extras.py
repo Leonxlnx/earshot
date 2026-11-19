@@ -40,9 +40,16 @@ class MissingExtra(ImportError):
     """a call needs a package the base install leaves out; str(e) is one plain sentence with the install command"""
 
 
+SOURCE = 'git+https://github.com/Leonxlnx/earshot'   # where earshot installs from
+
+
 def command(extra):
-    """the pip command that adds an extra's packages to the environment earshot runs in"""
-    return 'pip install ' + ' '.join(f'"{p}"' for p in PACKAGES[extra]) + f' (the {extra} extra)'
+    """the pip command that adds an extra's packages to the environment earshot runs in; for the listen extra also
+    the install of earshot with it (the one line every hint of the listen extra prints)"""
+    line = 'pip install ' + ' '.join(f'"{p}"' for p in PACKAGES[extra])
+    if extra == 'listen':
+        return line + f' (the listen extra; or: pip install "earshot[listen] @ {SOURCE}")'
+    return line + f' (the {extra} extra)'
 
 
 def sentence(module, what=None):

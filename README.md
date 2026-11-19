@@ -79,7 +79,7 @@ Listening, measuring and drawing come with extras, named in the brackets (severa
 | extra | brings | for |
 |---|---|---|
 | `mcp` | the MCP SDK | `earshot mcp`, the MCP server and the plugin |
-| `listen` | torch, transformers, librosa; the two listening models (~1.1 GB) download on first use | `describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `critique`, `profile`, `make --listen`, the ears of `build` |
+| `listen` | torch, transformers, librosa; the two listening models (about 1.1 GB to download, about 2.2 GB on disk) download on first use | `describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `critique`, `profile`, `make --listen`, the ears of `build` |
 | `measure` | librosa | `measure` and `find` without the models |
 | `images` | matplotlib, pillow | `sheet`, `gallery`, frames of a video, plots |
 | `llm` | requests | the optional Gemini critique (`earshot llm`, your own API key) |
@@ -92,7 +92,7 @@ on Linux (it brings CUDA); the CPU build is smaller:
 ```bash
 pip install torch --index-url https://download.pytorch.org/whl/cpu    # before the listen extra, optional
 pip install "earshot[listen,mcp] @ git+https://github.com/Leonxlnx/earshot"
-earshot doctor --fetch     # downloads the two listening models now (~1.1 GB) instead of on first use
+earshot doctor --fetch     # downloads the listening models now (about 1.1 GB; 2.2 GB on disk), not on first use
 ```
 
 As a uv tool, with the extras in the brackets (uv takes torch from the CPU index); update with `uv tool upgrade
@@ -112,13 +112,13 @@ python -m venv .venv
 .venv/bin/python -m earshot doctor --load
 ```
 
-**The listening models.** The first listening call downloads two open models (~1.1 GB) into `.cache/hf` inside a
-clone, `~/.cache/earshot/hf` otherwise (or `EARSHOT_HOME`), each at a pinned revision with safetensors weights: CLAP
-`laion/larger_clap_general` @ `16c8cc3` (text-audio embeddings) and the AudioSet tagger
-`MIT/ast-finetuned-audioset-10-10-0.4593` @ `f826b80`. After that earshot loads them from that cache only and never
-contacts the Hub; a damaged cache is an error that names the folder, not a silent new download. A cache made before
-0.2.1 holds CLAP's revision `ada0c23` as a pickle; earshot still loads it, never downloads it, and `earshot doctor
---fetch` replaces it with the pinned safetensors (776 MB).
+**The listening models.** The first listening call downloads two open models (about 1.1 GB to download, about 2.2 GB
+on disk) into `.cache/hf` inside a clone, `~/.cache/earshot/hf` otherwise (or `EARSHOT_HOME`), each at a pinned
+revision with safetensors weights: CLAP `laion/larger_clap_general` @ `16c8cc3` (text-audio embeddings) and the
+AudioSet tagger `MIT/ast-finetuned-audioset-10-10-0.4593` @ `f826b80`. After that earshot loads them from that
+cache only and never contacts the Hub; a damaged cache is an error that names the folder, not a silent new
+download. A cache made before 0.2.1 holds CLAP's revision `ada0c23` as a pickle; earshot still loads it, never
+downloads it, and `earshot doctor --fetch` replaces it with the pinned safetensors (776 MB).
 
 **Offline.** `EARSHOT_OFFLINE=1`, `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` all mean the same to earshot: it
 never downloads, and a model missing from the cache is an error that says so. earshot never sets or clears them.
@@ -134,7 +134,7 @@ what the cache holds; `--load` also what loads.
 ## Make sounds
 
 `earshot make` reads a request, ranks the catalogue, renders a new take of the best design, checks it without models
-(clicks, cut tails, clipping, DC) and writes the file. It loads no model and takes about a second for a one-shot.
+(clicks, cut tails, clipping, DC) and writes the file. It loads no model and takes a few seconds for a one-shot.
 
 ```
 $ earshot make "a soft success sound for a finance app" -o success.ogg
@@ -475,7 +475,9 @@ Every number below comes with its method in [docs/VALIDATION.md](docs/VALIDATION
   measured but not yet judged by anyone.
 - **Builds**, judged by the listening model, not by a person: rebuilt from other recordings, things the catalogue has
   came out near their real design for textures of many similar events and for pulsing (a purr, a swarm, a boiling
-  pot, a campfire, applause); rain and hail on a new surface and a vehicle passing built from another motor did not.
+  pot, a campfire); `earshot build applause` prints "a sketch: not clearly it yet" (z +4.69 against +4.50 for the
+  catalogue's applause, 1.0 more is asked); rain and hail on a new surface and a vehicle passing built from another
+  motor did not.
   For 30 things the catalogue lacks, 29 builds fit the words better than what `make` hands over
   ([docs/BUILD.md](docs/BUILD.md#how-well-it-does)).
 - **Understanding requests.** On five development sets the first pick is right for 91.8 to 96.8 % of the requests
@@ -497,9 +499,9 @@ Every number below comes with its method in [docs/VALIDATION.md](docs/VALIDATION
 instruments only as single notes and short figures; realistic sounds exist only for things someone recorded and put
 in the public domain. A request that describes a mood is understood less well than one that names the sound, and a
 pick without a guess line can still be wrong. `build` is not a way to any sound: it works for textures of many
-similar events and for pulsing (applause, a swarm, a campfire, a purr), not for rain or hail on a new surface, a
-vehicle passing built from another motor, voices or pure tones; its fit comes from a listening model, not a
-person's ear, and the second ear also objects to some real recordings. earshot hears through two
+similar events and for pulsing (a swarm, a campfire, a purr; applause stays a sketch), not for rain or hail on a
+new surface, a vehicle passing built from another motor, voices or pure tones; its fit comes from a listening
+model, not a person's ear, and the second ear also objects to some real recordings. earshot hears through two
 open models and a set of measurements: loudness, timing and "is this the kind of sound I asked for" on single sounds
 are trustworthy; tags inside a busy mix, genre and mood are hints; taste, emotion, licences and speech content it
 cannot judge. Everything it does not make and cannot judge: [docs/LIMITS.md](docs/LIMITS.md).

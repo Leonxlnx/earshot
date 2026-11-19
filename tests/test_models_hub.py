@@ -449,3 +449,16 @@ def test_cached_models_load_without_network(tmp_path):
     assert not any('load failed' in x for x in r['problems']), r['problems']
     assert (r['clap_revision'], r['ast_revision']) == (s[0].sha, s[1].sha)
     assert (r['clap_weights'], r['ast_weights']) == (s[0].weights, s[1].weights)
+
+
+def test_a_download_is_announced_in_one_line_and_a_cached_model_is_not(cache, downloads, capsys, monkeypatch):
+    hub.ensure(CLAP_ID)
+    err = capsys.readouterr().err.strip().splitlines()
+    assert len(err) == 1 and f'downloading the listening model {CLAP_ID}@16c8cc3 (about 776 MB, once)' in err[0]
+    assert config.HF_CACHE in err[0] and '`earshot doctor --fetch` downloads the models ahead of time' in err[0]
+    hub.ensure(CLAP_ID)
+    assert capsys.readouterr().err == '' and len(downloads.calls) == 1
+    monkeypatch.setenv('EARSHOT_OFFLINE', '1')          # offline: its own error, no announcement
+    with pytest.raises(RuntimeError):
+        hub.ensure(AST_ID)
+    assert 'downloading' not in capsys.readouterr().err

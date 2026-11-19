@@ -652,3 +652,56 @@ def test_the_api_says_the_plain_sentence_for_a_missing_extra(monkeypatch):
     with pytest.raises(extras.MissingExtra) as e:
         api.describe('x.wav')
     assert 'pip install' in str(e.value) and 'torch' in str(e.value)
+
+
+def test_version_flag_and_doctor_name_earshot_itself(capsys):
+    import earshot
+    from earshot import doctor
+    assert cli.main(['--version']) == 0
+    assert capsys.readouterr().out == f'earshot {earshot.__version__}\n'
+    r = doctor.check()
+    assert r['earshot'] == earshot.__version__ and r['summary'].startswith(f'earshot {earshot.__version__}. ')
+
+
+def test_a_base_install_starts_quietly_and_a_listening_command_says_what_to_install(monkeypatch, capsys):
+    """as on a base install: the module of critique cannot import without torch. Nothing is said until critique is
+    called; a module broken for another reason is still reported"""
+    import importlib
+    from earshot import extras
+    real_missing, real_import = extras.missing, importlib.import_module
+    monkeypatch.setattr(extras, 'missing', lambda *m: [x for x in m if x in ('torch', 'transformers')]
+                        + real_missing(*[x for x in m if x not in ('torch', 'transformers')]))
+
+    def imports(name, *a, **k):
+        if name == 'earshot.critique':
+            raise extras.MissingExtra(extras.sentence('torch', 'earshot profile'), name='torch')
+        return real_import(name, *a, **k)
+    monkeypatch.setattr(importlib, 'import_module', imports)
+    monkeypatch.delenv('EARSHOT_DEBUG', raising=False)
+    assert cli.main([]) == 0
+    got = capsys.readouterr()
+    assert got.err == ''
+    assert re.search(r'critique\s+\(needs the listen extra\)', got.out) and 'describe' in got.out
+    assert cli.main(['critique', 'film.mp4', '--json']) == 1
+    err = capsys.readouterr().err.strip().splitlines()
+    assert err == ['earshot critique: error: earshot critique needs torch, transformers, which the base install of '
+                   f"earshot leaves out: {extras.command('listen')}"]
+
+    def broken(name, *a, **k):
+        if name == 'earshot.critique':
+            raise RuntimeError('a broken module')
+        return real_import(name, *a, **k)
+    monkeypatch.setattr(importlib, 'import_module', broken)
+    assert cli.main([]) == 0
+    assert capsys.readouterr().err.strip() == '(earshot: module critique unavailable: RuntimeError: a broken module)'
+    assert cli.main(['critique', 'film.mp4']) == 2
+    assert 'a broken module' in capsys.readouterr().err
+
+
+def test_make_over_mcp_offers_the_build_tool_not_the_shell_command(tmp_path):
+    from earshot import make as M
+    r = mcp_server._summary_only(M.make)(want='a whale singing', out=str(tmp_path / 'w.wav'))
+    assert 'call the tool build with want="a whale singing" (and parts: what it is made of)' in r['text']
+    assert 'earshot build' not in r['text'] and r['text'] == r['summary']
+    said = M.make('a whale singing', str(tmp_path / 'w2.wav'))['summary']   # the command line keeps its line
+    assert 'or let earshot draft, hear and tune it: earshot build "a whale singing"' in said

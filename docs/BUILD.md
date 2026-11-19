@@ -247,9 +247,10 @@ thing: see below.
   to start from (z 1.5); "a force field humming" found no hum of its kind (z 2.1).
 - **Rain, hail and things going by.** Rebuilt from other recordings, textures of many similar events and pulsing
   came out near their real designs (a purr, a swarm of bees, a boiling pot, a campfire, a helicopter first among the
-  922; applause and a brook among the nearest three), but scattered close drops never became the dense far wash of
-  rain or hail on a roof or a window (the real design at places 17 to 124), and `pass` on another motor did not make
-  a car, a motorcycle or a jet going by (places 17, 52 and 192).
+  922; applause and a brook among the nearest three; with the catalogue's applause in reach, `earshot build applause`
+  prints "a sketch: not clearly it yet", z +4.69 against +4.50, where 1.0 more is asked), but scattered close drops
+  never became the dense far wash of rain or hail on a roof or a window (the real design at places 17 to 124), and
+  `pass` on another motor did not make a car, a motorcycle or a jet going by (places 17, 52 and 192).
 - **A voice is a stand-in.** A whale is an owl and a wolf an octave down; a baby's cry from a laugh moved up stays a
   sketch. earshot makes no speech and no singing.
 - **A tone is a recorded beeper.** A car alarm, a modem or a robot's beeps are built from a reverse alarm, a phone

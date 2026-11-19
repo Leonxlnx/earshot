@@ -54,7 +54,7 @@ def fetch():
             out[mid] = 'already cached' if not s.folder else 'a local folder (nothing to download)'
             continue
         try:
-            out[mid] = 'downloaded ' + hub.fetch(s).sha[:7]
+            out[mid] = 'downloaded ' + hub.fetch(s, ahead=True).sha[:7]
         except RuntimeError as e:
             out[mid] = f'failed: {e}'
     return out
@@ -106,7 +106,9 @@ def _load(r):
 
 
 def check(load=False, fetch_missing=False):
-    r = {'python': sys.version.split()[0], 'earshot_home': config.HOME, 'threads': config.threads(),
+    from . import __version__
+    r = {'earshot': __version__, 'python': sys.version.split()[0], 'earshot_home': config.HOME,
+         'threads': config.threads(),
          'precision': config.PRECISION, 'clap_model': config.CLAP_MODEL, 'ast_model': config.AST_MODEL}
     pk = {}
     for name, dist in PACKAGES:  # installed versions from package metadata: no import (torch alone takes ~10-20 s)
@@ -171,7 +173,7 @@ def check(load=False, fetch_missing=False):
             _load(r)
         except (RuntimeError, ImportError) as e:   # a model that cannot load (offline and not cached, a damaged
             problems.append(f'model load failed: {extras.plain(e) or e}')     # cache, no torch): say why
-    b, head = r['bank'], []
+    b, head = r['bank'], [f'earshot {__version__}.']
     if not b.get('error'):
         ty = b['types']
         head.append(f"Sound bank {b['version']}: {b['sounds']} sounds ({ty.get('forge', 0) - b['pluck']} forge, "
