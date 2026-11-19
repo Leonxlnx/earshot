@@ -1,7 +1,8 @@
 """earshot.sounds.motion: the film vocabulary renders clean, repeats per seed, varies between seeds, keeps the length
 and the shape it is asked for and answers to its controls (model-free). The film designs are built from learned real
-recordings (REAL); the fast tier renders the invented designs and four cheap film designs, --slow every film design
-(a boom of three layers of real drums and a tam-tam takes several seconds to render)."""
+recordings (REAL); the film set's designs name their recordings by file, so they do not follow the store's order.
+The fast tier renders the invented designs and the cheap film designs, --slow every film design (a boom of three
+layers of real drums and a tam-tam takes several seconds to render)."""
 import functools
 
 import numpy as np
@@ -15,10 +16,11 @@ registry.load()
 IDS = sorted(d for d, v in registry._designs.items() if v.fn.__module__ == motion.__name__)
 REAL = sorted(d for d in IDS if 'real' in registry.get(d).tags)
 INVENTED = sorted(set(IDS) - set(REAL))
-FAST = ['whoosh/fast', 'flick/thin', 'swoosh/out', 'thump/appear', 'tick/soft']
+FAST = ['whoosh/fast', 'flick/thin', 'swoosh/out', 'thump/appear', 'tick/soft', 'thump/door', 'tick/key',
+        'click/cursor', 'slide/paper', 'whoosh/sweep', 'logo/bag']
 AIR = ['whoosh/soft', 'whoosh/fast', 'whoosh/deep', 'whoosh/long', 'swoosh/in', 'swoosh/out', 'flick/paper',
        'flick/thin', 'slide/panel', 'pass/air', 'fall/air']
-BUILDS = ['rise/air', 'rise/tension', 'rise/reverse', 'suck/in']
+BUILDS = ['rise/air', 'rise/tension', 'rise/reverse', 'suck/in', 'rise/breath', 'rise/hit']
 
 
 @functools.lru_cache(maxsize=None)
@@ -70,8 +72,8 @@ def _peak_share(y, window=0.15):
 
 
 def test_catalogue_entries():
-    assert len(IDS) == 46 and len(REAL) == 32
-    assert len({i.split('/')[0] for i in IDS}) == 26
+    assert len(IDS) == 69 and len(REAL) == 55
+    assert len({i.split('/')[0] for i in IDS}) == 30
     for sid in IDS:
         d = registry.get(sid)
         assert d.domains[0] == 'motion', sid
@@ -142,7 +144,8 @@ def test_size_lowers_centroid(sid):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize('sid', ['whoosh/soft', 'boom/short', 'slam/title', 'pass/air', 'braam/brass', 'rise/tension'])
+@pytest.mark.parametrize('sid', ['whoosh/soft', 'boom/short', 'slam/title', 'pass/air', 'braam/brass', 'rise/tension',
+                                 'title/bag', 'whoosh/sweep'])
 def test_size_lowers_centroid_of_the_film_designs(sid):
     assert _centroid(_raw(sid, 2, size=0.8)) < _centroid(_raw(sid, 2, size=-0.8))
 
@@ -159,7 +162,8 @@ def test_energy_and_bright_act(sid):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize('sid', ['whoosh/soft', 'boom/short', 'slam/title', 'suck/in', 'rise/reverse'])
+@pytest.mark.parametrize('sid', ['whoosh/soft', 'boom/short', 'slam/title', 'suck/in', 'rise/reverse', 'title/bag',
+                                 'whoosh/sweep'])
 def test_energy_and_bright_act_on_the_film_designs(sid):
     test_energy_and_bright_act(sid)
 
@@ -397,3 +401,61 @@ def test_shimmer_sweeps_from_one_side_to_the_other():
 def test_the_soft_sting_takes_a_voice_and_a_pitch():
     _, meta = _take('sting/soft', 1, pitch='A3')
     assert meta['voice'] == 'felt_piano' and meta['pitch'] == 'A3'
+
+
+# ---- the film set: named recordings shaped to the roles motion films use
+def test_the_named_recordings_are_in_the_store():
+    """every recording a film design names by its file is one the store has (otherwise it plays the thing's first)"""
+    import inspect
+    import re
+    from earshot.sounds import learned
+    files = set(re.findall(r"'([a-z0-9_-]+-[0-9]+\.npz)'", inspect.getsource(motion)))
+    have = {m['file'] for e in learned.index().values() for m in e['members']}
+    assert len(files) >= 25 and files <= have, sorted(files - have)
+
+
+def test_a_named_take_does_not_follow_the_order_of_the_store(monkeypatch):
+    """the film set sounds the same when the store's order of a thing's recordings changes"""
+    from earshot.sounds import learned
+
+    def take(sid):
+        d = registry.get(sid)
+        c = registry.Controls(d)
+        return np.asarray(d.fn(c, dsp.rng(registry.seed_of(sid, 0))))
+    before = {sid: take(sid) for sid in ('whoosh/fast', 'thump/door', 'title/bag')}
+
+    def backwards(sid, whole=False):
+        return tuple(range(len(learned.index()[sid]['members'])))[::-1]
+    monkeypatch.setattr(learned, 'order', backwards)
+    monkeypatch.setattr(learned, 'pick', lambda sid, seed, bright=0.0: backwards(sid)[int(seed) % len(backwards(sid))])
+    for sid, y in before.items():
+        assert np.array_equal(take(sid), y), sid
+
+
+@pytest.mark.parametrize('seed', [1, 2])
+def test_the_film_set_thump_tick_and_click_are_short(seed):
+    y, meta = _take('thump/door', seed)
+    assert _span20(y)[0] <= 0.1 and meta['dur_s'] < 0.25 and _share(y, 0, 300) > 0.7      # a low body of about 60 ms
+    for sid in ('tick/key', 'click/cursor'):
+        y, meta = _take(sid, seed)
+        assert _span20(y)[0] <= 0.05 and _share(y, 0, 1000) < 0.25 and _centroid(y) > 3000.0, sid   # bright and dry
+
+
+@pytest.mark.parametrize('seed', [1, 2])
+def test_the_film_set_slides_and_soft_whooshes_are_air(seed):
+    for sid in ('whoosh/sweep', 'slide/paper'):
+        y, _ = _take(sid, seed)
+        length, _ = _span20(y)
+        assert _peaky(y) < 0.5 and 0.2 <= length <= 0.4 and _peak_share(y, 0.1) > 0.45, sid   # swells, then gone
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize('seed', [1, 2])
+def test_the_film_set_hits_are_short_low_and_swell_in(seed):
+    title, logo, impact = (_take(sid, seed)[0] for sid in ('title/bag', 'logo/bag', 'impact/car'))
+    for y in (title, logo):
+        length, attack = _span20(y)
+        assert 0.12 <= length <= 0.45 and attack >= 0.08 and len(y) / dsp.SR < 0.6, (length, attack)
+    assert 0.2 < _share(title, 0, 100) < 0.7 and _peaky(title) < 0.9           # half low, a hit and not a tone
+    assert _share(logo, 0, 300) > 0.7 and _share(impact, 0, 300) > 0.7          # the logo and the impact nearly all low
+    assert _span20(impact)[0] <= 0.3

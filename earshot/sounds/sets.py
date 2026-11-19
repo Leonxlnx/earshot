@@ -47,13 +47,15 @@ SETS = {
         ('power_down', 'power_down/chip'), ('one_up', 'one_up/chip'), ('level_up', 'level_up/chip'),
         ('win', 'win/chip'), ('lose', 'lose/chip'), ('text', 'text/chip'))),
     # the kinds of effect professional motion films use (docs/motion-sfx-study.md): passes of air, short low hits,
-    # thumps, ticks and clicks, made of real things; no note, bell or synthesised tone (the film's music has those)
+    # thumps, ticks and clicks, each a small real action cut to the role (earshot.sounds.motion, "named recordings":
+    # a door falling shut, a mechanical key, a page sliding, a stick and a broom through the air, a heavy bag dropped,
+    # a car door, a breath of air, a sword drawn); no note, bell or synthesised tone (the film's music has those)
     'film': dict(says='a product film or motion-design piece: moves, arrivals, hits and a logo', theme=None, sounds=(
-        ('whoosh', 'whoosh/fast'), ('whoosh_soft', 'whoosh/soft'), ('slide', 'slide/panel'),
-        ('pop', 'thump/appear'), ('tick', 'tick/soft'), ('click', 'click/mouse'), ('type', 'typing_key/light'),
-        ('shutter', 'shutter/dslr'), ('hit', 'slam/title'), ('impact', 'boom/deep'), ('drop', 'fall/sub'),
-        ('riser', 'rise/air'), ('swell', 'rise/reverse'), ('glint', 'shine/air'), ('success', 'success/click'),
-        ('sting', 'sting/reveal'), ('logo', 'boom/short'))),
+        ('whoosh', 'whoosh/fast'), ('whoosh_soft', 'whoosh/sweep'), ('slide', 'slide/paper'),
+        ('pop', 'thump/door'), ('tick', 'tick/key'), ('click', 'click/cursor'), ('type', 'type/mechanical'),
+        ('shutter', 'success/shutter'), ('hit', 'title/bag'), ('impact', 'impact/car'), ('drop', 'drop/sack'),
+        ('riser', 'rise/breath'), ('swell', 'rise/hit'), ('glint', 'shine/blade'), ('success', 'success/click'),
+        ('sting', 'sting/reveal'), ('logo', 'logo/bag'))),
 }
 
 

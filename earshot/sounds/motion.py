@@ -13,7 +13,9 @@ learned things of earshot.sounds.learned and the close-miked strokes of earshot.
 slammed shut, explosions, orchestral bass drums, timpani, tam-tams, swells of air, breaths and flames, drum rolls,
 low brass, whooshes, clicks, soft kicks and congas for the smallest thumps) reshaped with earshot.synth.design
 (reverse, layer, stretch, contour, opening, halt, fade) and glued by one room ("real material" below); a take of a
-recording is heard as real where invented booms, slams and risers were heard as unrealistic. The rest is invented,
+recording is heard as real where invented booms, slams and risers were heard as unrealistic. The designs the film
+set plays (`thump/door`, `tick/key`, `title/bag`, `logo/bag`, ...) are small real actions that name their recordings
+by file ("named recordings" below), so they do not change when the store's order does. The rest is invented,
 shaped after class statistics of licensed film effects (the film study in
 docs/motion-sfx-study.md and docs/launch-video-sound.md, and a library of effects filed by film action that was
 measured). Medians over a class, never one recording:
@@ -486,13 +488,15 @@ def _whoosh(c, r, sid, share=1.0, size=1.0, bright=0.0, hard=0.0, main=True, k=0
         dur=0.35, axes=REAL_AIR, prior=1.03, allows=GLIDE)
 def whoosh_fast(c, r):
     """a fast move as a motion designer cuts it, a short clean pass of air: a real stick swung through the air
-    (whoosh/stick), as recorded: close and dry (no room at space 0), at its own length (a length asked for
-    stretches it within design.LENGTH), nothing layered over it. A second layer or a room makes it longer and
-    farther, and that is what turns a crisp swoosh into a film effect"""
+    (whoosh/stick: the recordings STICK names, fullest first), as recorded: close and dry (no room at space 0), at
+    its own length (a length asked for stretches it within design.LENGTH), nothing layered over it. A second layer
+    or a room makes it longer and farther, and that is what turns a crisp swoosh into a film effect"""
     tr = _tr(c)
     if c.length():
-        tr['length'] = _fit(c, _natural('whoosh/stick', c), 1.0, tr['size'])
-    y = ops.fade(_real(c, r, 'whoosh/stick', main=True, **tr), 0.0, 0.06, 'db')     # the take's end faded, not cut
+        f = STICK[c.seed % len(STICK)]
+        own = [m['dur_s'] for m in _learned().index()['whoosh/stick']['members'] if m['file'] == f]
+        tr['length'] = _fit(c, own[0] if own else 0.3, 1.0, tr['size'])
+    y = ops.fade(_named(c, r, 'whoosh/stick', STICK, main=True, **tr), 0.0, 0.06, 'db')   # its end faded, not cut
     return _place(c, r, y, 'booth', dry=True)
 
 
@@ -1207,7 +1211,7 @@ def shine_air(c, r):
 @design('shine/glint', kind='chime',
         says=('a short bright glint', 'a quick high metallic shimmer ping', 'a small bright shing'),
         uses=('shimmer', 'glint', 'highlight', 'shine', 'lens flare'), domains=DOM, dur=0.7, pitch='A6', axes=RING,
-        prior=0.95)
+        prior=0.85)
 def shine_glint(c, r):
     """light catching an edge: one clear high partial on the pitch and five inharmonic ones far above it (2.9 to
     6.9 times: over 5 kHz, clear of the band where a ring turns harsh), each a beating pair spread across the
@@ -1269,7 +1273,7 @@ def shine_sweep(c, r):
 @design('sparkle/burst', kind='chime',
         says=('a small burst of bright sparkles', 'a quick scatter of tiny high chimes', 'a short twinkling flurry'),
         uses=('sparkle', 'shimmer', 'twinkle', 'burst', 'magic'), domains=DOM, dur=0.6, pitch='C7', axes=RING,
-        prior=0.95)
+        prior=0.85)
 def sparkle_burst(c, r):
     """a handful of bright grains thrown at once: about 25 small struck bars (more with energy) whose arrivals thin
     out exponentially after the first and largest one, power-law sizes (a big grain is lower and rings longer), on
@@ -1488,3 +1492,401 @@ def sting_soft(c, r):
                         bright=c.bright, hard=c.hard)
     y = _mix([(_soft_thump(r, k, g), 0, -3 + k.lo / 2), (_norm(chord), 0.006, 3.0 * k.e)])
     return _out(c, r, y, room='hall', tilt=-3.0 * c.size)
+
+
+# ------------------------------------------------------------------------------------------------ named recordings
+# The film set's sounds: small real actions (a door falling shut, a heavy bag dropped, a stick and a sword swung, a
+# broom's stroke, a page sliding, a mechanical key, a mouse button, a breath of air, a car door, a sword drawn, a
+# zip), each cut and layered to the length and shape motion films use (the targets in the module doc). Each
+# names the recordings it plays by their file in the store (`_named`), best first: seed 0 plays the first, the next
+# seeds the others, so the set sounds the same when the store's order of a thing's recordings changes. Their prior
+# is low (0.85): a request that names the thing itself ("a bag drop", "a door shut") gets the thing's own recording.
+def _named(c, r, sid, files, k=0, main=False, **tr):
+    """a take (stereo) of a recording of the learned thing sid named by its file in the store: files[(seed + k) %
+    len(files)] (a file the store no longer has: the thing's first recording); main: the take meta names"""
+    L = _learned()
+    e = L.index()[sid]
+    names = [m['file'] for m in e['members']]
+    i = (c.seed + k) % len(files)
+    m = e['members'][names.index(files[i]) if files[i] in names else L.order(sid)[0]]
+    y = ops.take(L.model(m['file']), r, **tr)
+    if m.get('polarity', 1) < 0:
+        y[:, 1] = -y[:, 1]
+    if main:
+        c.member = member(i + 1, len(files))
+    return y
+
+
+def _around(y, before, after, fin=None, fout=None, shape='db', at=None):
+    """the part of a take from `before` s ahead of its strike (or of `at` s) to `after` s past it, faded in along a
+    quarter sine (fin, default half of before) and out along `shape` (fout, default 70 % of after; db: as a decay)"""
+    t = ops.onset(y) if at is None else at
+    z = ops.span(y, max(0.0, t - before), t + after, fin=0.0, fout=0.0)
+    z = ops.fade(z, max(0.002, 0.5 * before) if fin is None else fin, 0.0, 'power')
+    return ops.fade(z, 0.0, 0.7 * after if fout is None else fout, shape)
+
+
+def _lp(y, hz):
+    return dsp.butter(y, 'low', hz, order=2)
+
+
+def _hp(y, hz):
+    return dsp.butter(y, 'high', hz, order=2)
+
+
+STICK = ('whoosh-stick-5.npz', 'whoosh-stick-3.npz', 'whoosh-stick-2.npz')     # whoosh/stick, fullest first
+DOOR = ('door-shut-2.npz', 'door-shut-1.npz')                                   # door/shut: an apartment door
+BAG = ('bag-drop-2.npz',)                                                        # bag/drop: a heavy canvas bag
+SLAM = ('door-slam-2.npz', 'door-slam-3.npz')                                    # door/slam: a wooden door slammed
+
+
+def _swing(c, r, T, size=1.0, bright=0.0):
+    """the last T s of the stick's swing up to its loudest moment: the swish that leads into a hit"""
+    y = _named(c, r, 'whoosh/stick', STICK[:1], **_tr(c, size=size, bright=bright))
+    p = ops.peak(y, 20.0)
+    return ops.span(y, max(0.0, p - T), p + 0.01, fin=0.5 * T, fout=0.01)
+
+
+def _breath(c, r, T):
+    """the last T s of the build of a real breath of air (swell/air), nothing over 3 kHz, faded in along a straight
+    line: the swell of air into a hit"""
+    y = ops.rise(_named(c, r, 'swell/air', ('swell-air-3.npz',), **_tr(c, bright=-0.5)))
+    y = _lp(_hp(ops.span(y, max(0.0, ops.end(y) - T)), 80.0), 3000.0)
+    return ops.fade(y, T, 0.0, 'lin')
+
+
+def _door_low(c, r, keep=0.25, top=500.0):
+    """the body of a door falling shut under `top` Hz, from its strike, kept `keep` s: the weight under a hit"""
+    y = _named(c, r, 'door/shut', DOOR[:1], **_tr(c, size=1.35, bright=-2.0))
+    return _around(_lp(y, top), 0.005, keep)
+
+
+# ---- a thing appears, a small step, a click
+@design('thump/door', kind='thud',
+        says=('a door falling shut, deep and short, with a breath of air before', 'a short low wooden thump',
+              'a soft deep thud, over at once'),
+        uses=('appear', 'element appears', 'pop in', 'card appears', 'thump', 'something appears'), tags=('real',),
+        domains=('motion', 'ui'), dur=0.2, axes=REAL_AIR, prior=0.85)
+def thump_door(c, r):
+    """something appearing on screen: an apartment door falling shut (door/shut) taken a third bigger and darker,
+    nothing over 900 Hz (no latch), from 25 ms before its strike to 0.18 s after it: a low body of about 60 ms at
+    200-300 Hz with the door's own settle after it, near mono, dry"""
+    y = _named(c, r, 'door/shut', DOOR, main=True, **_tr(c, size=1.3, bright=-1.5))
+    return _dry(_around(_lp(y, 900.0), 0.025, 0.18, fin=0.02, fout=0.16), c, r, 0.3)
+
+
+@design('thump/book', kind='thud',
+        says=('a heavy book closed, short and low', 'a dull low thump of a book shut', 'a short soft thud'),
+        uses=('appear', 'thump', 'card lands', 'element lands', 'land'), tags=('real',), domains=('motion', 'ui'),
+        dur=0.16, axes=REAL_AIR, prior=0.85)
+def thump_book(c, r):
+    """an element landing: a heavy book shut (book/shut) taken a third bigger and darker, nothing over 1.2 kHz,
+    kept 0.18 s after its strike"""
+    y = _named(c, r, 'book/shut', ('book-shut-1.npz',), main=True, **_tr(c, size=1.3, bright=-1.0))
+    return _dry(_around(_lp(y, 1200.0), 0.01, 0.18, fout=0.16), c, r, 0.3)
+
+
+@design('tick/key', kind='tick',
+        says=('the bright top of a mechanical key pressed', 'a tiny bright dry tick', 'a short light plastic tick'),
+        uses=('tick', 'small step', 'step', 'counter', 'ui tick', 'count'), tags=('real',), domains=('motion', 'ui'),
+        dur=0.07, axes=REAL_AIR, prior=0.85)
+def tick_key(c, r):
+    """a small step in a product film: a mechanical key pressed (keyboard/mechanical) taken smaller and brighter,
+    nothing under 2.5 kHz (the plastic, not the desk): a bright dry tick of 20-30 ms and its faint settle, mono"""
+    y = _named(c, r, 'keyboard/mechanical', ('keyboard-mechanical-2.npz', 'keyboard-mechanical-1.npz'), main=True,
+               **_tr(c, size=0.8, bright=1.0))
+    return _dry(_around(_hp(y, 2500.0), 0.002, 0.1, fout=0.085), c, r, 0.0)
+
+
+@design('tick/switch', kind='tick',
+        says=('the bright top of a lamp switch clicked', 'a small bright switch tick', 'a quick dry click'),
+        uses=('tick', 'small step', 'step', 'counter', 'switch tick'), tags=('real',), domains=('motion', 'ui'),
+        dur=0.08, axes=REAL_AIR, prior=0.85)
+def tick_switch(c, r):
+    """a small step: a lamp's switch clicked (switch/lamp) taken smaller, nothing under 2.5 kHz, mono and dry"""
+    y = _named(c, r, 'switch/lamp', ('switch-lamp-2.npz', 'switch-lamp-1.npz'), main=True, **_tr(c, size=0.8))
+    return _dry(_around(_hp(y, 2500.0), 0.002, 0.1, fout=0.085), c, r, 0.0)
+
+
+@design('click/cursor', kind='click',
+        says=('a mouse button clicked, close and dry', 'a short bright cursor click', 'a click of a computer mouse'),
+        uses=('click', 'cursor', 'cursor click', 'mouse click', 'button press', 'press'), tags=('real',),
+        domains=('motion', 'ui'), dur=0.12, axes=REAL_AIR, prior=0.85)
+def click_cursor(c, r):
+    """a cursor clicking in a product demo: a mouse button (click/mouse), nothing under 300 Hz, kept 0.16 s after
+    its strike: a bright click of 20-30 ms with the button's settle after it, near mono, dry"""
+    y = _named(c, r, 'click/mouse', ('click-mouse-2.npz',), main=True, **_tr(c))
+    return _dry(_around(_hp(y, 300.0), 0.004, 0.16, fout=0.13), c, r, 0.1)
+
+
+# ---- moves: a card slides, a fast and a soft whoosh
+@design('slide/paper', kind='whoosh',
+        says=('a sheet of paper sliding across a desk, short and soft', 'a quick papery slide',
+              'a card sliding into place'),
+        uses=('slide', 'card slide', 'panel slide', 'slide in', 'swipe', 'card'), tags=('real',),
+        domains=('motion', 'ui'), dur=0.32, axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def slide_paper(c, r):
+    """a card or a panel sliding: a page turned (page/turn) taken a little bigger and darker, its rustle from 0.24 s
+    before its loudest moment to 80 ms after it, nothing under 150 Hz or over 5 kHz: a soft slide of about 0.3 s
+    that stops, near mono, dry"""
+    y = _named(c, r, 'page/turn', ('page-turn-3.npz',), main=True, **_tr(c, size=1.15, bright=-2.0))
+    y = _around(y, 0.24, 0.08, fin=0.12, fout=0.06, at=ops.peak(y, 30.0))
+    return _dry(_lp(_hp(y, 150.0), 5000.0), c, r, 0.2)
+
+
+@design('slide/sweep', kind='whoosh',
+        says=('one short stroke of a broom, dark and dry: a soft slide', 'a soft brushy slide', 'a dry short swipe'),
+        uses=('slide', 'swipe', 'panel slide', 'wipe', 'slide out'), tags=('real',), domains=('motion', 'ui'),
+        dur=0.32, axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def slide_sweep(c, r):
+    """a panel sliding: one stroke of a straw broom (broom/sweep) taken bigger and darker, 0.22 s before its loudest
+    moment to 0.1 s after it, nothing under 150 Hz or over 5 kHz"""
+    y = _named(c, r, 'broom/sweep', ('broom-sweep-1.npz',), main=True, **_tr(c, size=1.2, bright=-2.0))
+    y = _around(y, 0.22, 0.1, fin=0.12, fout=0.08, at=ops.peak(y, 30.0))
+    return _dry(_lp(_hp(y, 150.0), 5000.0), c, r, 0.2)
+
+
+@design('whoosh/blade', kind='whoosh',
+        says=('a sword swung fast through the air', 'a quick sharp blade swish', 'a short fast swish'),
+        uses=('whoosh', 'fast whoosh', 'swish', 'whip pan', 'fast transition', 'sword swing'), tags=('real',),
+        domains=DOM, dur=0.38, axes=REAL_AIR, prior=0.85, allows=GLIDE)
+def whoosh_blade(c, r):
+    """a fast move: a sword swung through the air (sword/swing) as recorded, nothing under 80 Hz, its end faded,
+    close and dry"""
+    y = _named(c, r, 'sword/swing', ('sword-swing-4.npz', 'sword-swing-5.npz'), main=True, **_tr(c))
+    return _place(c, r, ops.fade(_hp(y, 80.0), 0.0, 0.08, 'db'), 'booth', dry=True)
+
+
+@design('whoosh/sweep', kind='whoosh',
+        says=('a straw broom swept once, soft and dark: a gentle swish of air', 'a soft brushy whoosh',
+              'a quiet sweep of air'),
+        uses=('whoosh', 'soft whoosh', 'transition', 'element move', 'gentle whoosh', 'soft swish'), tags=('real',),
+        domains=DOM, dur=0.42, axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def whoosh_sweep(c, r):
+    """a soft move: one stroke of a straw broom (broom/sweep) taken a quarter bigger and much darker, 0.3 s before
+    its loudest moment to 0.14 s after it, nothing under 100 Hz or over 4 kHz: a swish of noise, not a whistle,
+    that is gone soon after its peak; near mono, dry"""
+    y = _named(c, r, 'broom/sweep', ('broom-sweep-1.npz',), main=True, **_tr(c, size=1.25, bright=-2.5))
+    y = _around(y, 0.3, 0.14, fin=0.2, fout=0.12, at=ops.peak(y, 60.0))
+    return _dry(_lp(_hp(y, 100.0), 4000.0), c, r, 0.2)
+
+
+@design('whoosh/cloth', kind='whoosh',
+        says=('a flag of cloth flapping once in the wind', 'a soft fluttering whoosh of fabric',
+              'a gentle swish of cloth'),
+        uses=('whoosh', 'soft whoosh', 'flutter', 'transition', 'cloth'), tags=('real',), domains=DOM, dur=0.42,
+        axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated', 'ring'))     # a cloth's flutter: a comb
+def whoosh_cloth(c, r):
+    """a soft move: a flag flapping once (cloth/flag), 0.3 s before its loudest moment to 0.15 s after it, nothing
+    under 90 Hz or over 7 kHz"""
+    y = _named(c, r, 'cloth/flag', ('cloth-flag-2.npz',), main=True, **_tr(c))
+    y = _around(y, 0.3, 0.15, fin=0.15, fout=0.12, at=ops.peak(y, 30.0))
+    return _dry(_lp(_hp(y, 90.0), 7000.0), c, r, 0.2)
+
+
+# ---- hits: a title, a heavier impact, a logo, the drop at the end of a build
+@design('title/bag', kind='hit',
+        says=('a stick swung into a heavy bag dropped on the floor, a breath of air before it',
+              'a short low hit with a swell of air into it', 'a title hit of real things'),
+        uses=('title', 'title hit', 'title card', 'text slam', 'title slam', 'stamp', 'hit'), tags=('real',),
+        domains=('motion', 'ui'), dur=0.46, axes=REAL_AIR, prior=0.85, allows=('pre_swell', 'stacked', 'truncated'))
+def title_bag(c, r):
+    """a title landing: 0.15 s of a stick's swing (whoosh/stick) and of a breath of air (swell/air) swell into a
+    heavy canvas bag dropped on a floor (bag/drop) with the low body of a door falling shut under it (door/shut
+    under 500 Hz), kept 0.26 s after the strike: a third of a second, half of it low, near mono, dry"""
+    sw, air = _swing(c, r, 0.15, size=1.15), _breath(c, r, 0.15)
+    hit = _named(c, r, 'bag/drop', BAG, main=True, **_tr(c, size=1.15))
+    y, t0 = ops.layer([(_lv(hit), 0.0, 0.0), (_lv(_door_low(c, r, keep=0.3)), -1.0, 0.0),
+                       (_lv(sw), -3.0 + 2.0 * c.energy, -0.008, ops.end(sw)),
+                       (_lv(air), -6.0 + 2.0 * c.energy, -0.008, ops.end(air))])
+    return _dry(ops.span(y, 0.0, t0 + 0.26, fout=0.18, shape='db'), c, r, 0.2)
+
+
+@design('title/door', kind='hit',
+        says=('a stick swung into a door falling shut, a breath of air before it',
+              'a short wooden hit with a swell of air into it', 'a title hit of a door'),
+        uses=('title', 'title hit', 'title card', 'door hit', 'hit'), tags=('real',), domains=('motion', 'ui'),
+        dur=0.46, axes=REAL_AIR, prior=0.85, allows=('pre_swell', 'stacked', 'truncated'))
+def title_door(c, r):
+    """a title landing on a door: the swell of title/bag into an apartment door falling shut (door/shut, nothing
+    over 2.5 kHz: no latch) with the bag's low body under it, kept 0.26 s"""
+    sw, air = _swing(c, r, 0.15, size=1.15), _breath(c, r, 0.15)
+    hit = _around(_lp(_named(c, r, 'door/shut', DOOR[:1], main=True, **_tr(c, size=1.2, bright=-1.0)), 2500.0),
+                  0.005, 0.3)
+    low = _named(c, r, 'bag/drop', BAG, **_tr(c, size=1.25))
+    y, t0 = ops.layer([(_lv(hit), 0.0, 0.0), (_lv(_lp(low, 600.0)), -1.0, 0.0),
+                       (_lv(sw), -3.0 + 2.0 * c.energy, -0.008, ops.end(sw)),
+                       (_lv(air), -6.0 + 2.0 * c.energy, -0.008, ops.end(air))])
+    return _dry(ops.span(y, 0.0, t0 + 0.26, fout=0.18, shape='db'), c, r, 0.2)
+
+
+@design('impact/car', kind='hit',
+        says=('a car door slammed with a heavy bag dropped under it', 'a short heavy solid impact',
+              'a low slam that stops'),
+        uses=('impact', 'heavy impact', 'heavy hit', 'slam', 'hit', 'crash'), tags=('real',), domains=('motion',),
+        dur=0.45, axes=REAL_AIR, prior=0.85, allows=('pre_swell', 'stacked', 'truncated'))
+def impact_car(c, r):
+    """a heavier impact: a car door slammed (car_door/slam, nothing over 2.5 kHz) and a heavy bag dropped (bag/drop)
+    1 dB under it, the low body of a door falling shut under them, kept 0.36 s after the strike"""
+    a = _named(c, r, 'car_door/slam', ('car-door-slam-3.npz', 'car-door-slam-1.npz'), main=True, **_tr(c, size=1.1))
+    b = _named(c, r, 'bag/drop', BAG, **_tr(c, size=1.2))
+    y, t0 = ops.layer([(_lv(_lp(a, 2500.0)), 0.0, 0.0), (_lv(b), -1.0, 0.0),
+                       (_lv(_door_low(c, r, keep=0.35)), -1.0, 0.0)])
+    return _dry(ops.span(y, 0.0, t0 + 0.36, fout=0.25, shape='db'), c, r, 0.3)
+
+
+@design('impact/slam', kind='hit',
+        says=('a wooden door slammed hard, dark and heavy', 'a heavy dull slam with weight under it',
+              'a big wooden impact'),
+        uses=('impact', 'heavy impact', 'slam', 'door slam', 'hit'), tags=('real',), domains=('motion',), dur=0.45,
+        axes=REAL_AIR, prior=0.85, allows=('pre_swell', 'stacked', 'truncated'))
+def impact_slam(c, r):
+    """a heavier impact: a wooden door slammed (door/slam) taken bigger and much darker, nothing over 1.2 kHz, a heavy
+    bag dropped and the low body of a door falling shut 2 dB under it, kept 0.38 s after the strike"""
+    y = _named(c, r, 'door/slam', SLAM, main=True, **_tr(c, size=1.35, bright=-2.0))
+    b = _named(c, r, 'bag/drop', BAG, **_tr(c, size=1.2))
+    z, t0 = ops.layer([(_lv(_around(_lp(y, 1200.0), 0.005, 0.4)), 0.0, 0.0), (_lv(b), -2.0, 0.0),
+                       (_lv(_door_low(c, r, keep=0.35)), -2.0, 0.0)])
+    return _dry(ops.span(z, 0.0, t0 + 0.38, fout=0.26, shape='db'), c, r, 0.3)
+
+
+@design('logo/bag', kind='boom',
+        says=('a heavy bag dropped, low and short, a dark swish before it', 'a short low hit under a logo',
+              'a soft heavy thud with a swell into it'),
+        uses=('logo', 'logo hit', 'logo reveal', 'end card', 'low hit', 'accent'), tags=('real',),
+        domains=('motion',), dur=0.47, axes=REAL_AIR, prior=0.85, allows=('pre_swell', 'stacked', 'truncated'))
+def logo_bag(c, r):
+    """the low hit under a logo: 0.1 s of a stick's swing taken bigger and darker (whoosh/stick, nothing over
+    3 kHz) 10 dB under a heavy bag dropped (bag/drop) taken a third bigger, nothing over 900 Hz, kept 0.2 s after
+    the strike: a quarter second, its body at 250-300 Hz, near mono, dry"""
+    sw = _swing(c, r, 0.1, size=1.3, bright=-1.5)
+    hit = _named(c, r, 'bag/drop', BAG, main=True, **_tr(c, size=1.3, bright=-1.0))
+    y, t0 = ops.layer([(_lv(_lp(hit, 900.0)), 0.0, 0.0),
+                       (_lv(_lp(sw, 3000.0)), -10.0 + 2.0 * c.energy, -0.008, ops.end(sw))])
+    return _dry(ops.span(y, 0.0, t0 + 0.2, fout=0.14, shape='db'), c, r, 0.3)
+
+
+@design('logo/door', kind='boom',
+        says=('a door falling shut, deep and short, with a breath of air before it', 'a low wooden thud under a logo',
+              'a short deep door hit'),
+        uses=('logo', 'logo hit', 'logo reveal', 'end card', 'low hit'), tags=('real',), domains=('motion',),
+        dur=0.35, axes=REAL_AIR, prior=0.85, allows=('pre_swell', 'stacked', 'truncated'))
+def logo_door(c, r):
+    """the low hit under a logo: an apartment door falling shut (door/shut) taken a third bigger and much darker,
+    nothing over 800 Hz, kept 0.2 s after its strike, led in by 0.15 s of a stick's swing 6 dB under it and of a
+    breath of air (nothing over 1.5 kHz) 8 dB under it"""
+    y = _around(_lp(_named(c, r, 'door/shut', DOOR[:1], main=True, **_tr(c, size=1.35, bright=-2.0)), 800.0), 0.005,
+                0.2, fout=0.14)
+    sw, air = _swing(c, r, 0.15, size=1.3, bright=-1.5), _breath(c, r, 0.15)
+    z, _ = ops.layer([(_lv(y), 0.0, 0.0), (_lv(_lp(sw, 3000.0)), -6.0 + 2.0 * c.energy, -0.006, ops.end(sw)),
+                      (_lv(_lp(air, 1500.0)), -8.0 + 2.0 * c.energy, -0.006, ops.end(air))])
+    return _dry(z, c, r, 0.3)
+
+
+@design('drop/sack', kind='hit',
+        says=('a heavy bag dropped on a floor with a deep thud under it', 'the hit that lands after a build',
+              'a short heavy drop'),
+        uses=('drop', 'the drop', 'drop hit', 'land', 'after the build', 'hit after a stop'), tags=('real',),
+        domains=('motion',), dur=0.3, axes=REAL_AIR, prior=0.85, allows=('stacked', 'truncated'))
+def drop_sack(c, r):
+    """what lands at the end of a build: a heavy bag dropped (bag/drop) with the low body of a door falling shut
+    4 dB under it, kept 0.3 s after the strike"""
+    y = _around(_named(c, r, 'bag/drop', BAG, main=True, **_tr(c, size=1.15)), 0.03, 0.4)
+    z, t0 = ops.layer([(_lv(y), 0.0, 0.0), (_lv(_door_low(c, r, keep=0.3)), -4.0, 0.0)])
+    return _dry(ops.span(z, 0.0, t0 + 0.3, fout=0.2, shape='db'), c, r, 0.3)
+
+
+# ---- builds: a breath of air, a hit played backwards
+@design('rise/breath', kind='rise',
+        says=('a breath of air growing to an abrupt stop', 'a soft rush of air swelling into a cut',
+              'a plain swell of air'),
+        uses=('riser', 'build', 'swell', 'build up', 'lead in', 'riser before the drop'), tags=('real',),
+        domains=FILM, dur=1.5, axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def rise_breath(c, r):
+    """a riser that is no tone sweep: the build of a real breath of air (swell/air) up to its loudest moment, drawn
+    out (it is air) to the length asked for, nothing under 70 Hz, its level redrawn as a straight line in dB from
+    20 dB down (design.contour), ending on the cut; near mono, dry"""
+    T = c.length() or 1.5
+    files = ('swell-air-3.npz', 'swell-air-4.npz')
+    tr = _tr(c, bright=-0.5)
+    tr.pop('hard')
+    tr.pop('vary')
+    L = _learned()
+    names = [m['file'] for m in L.index()['swell/air']['members']]
+    f = files[c.seed % len(files)]
+    c.member = member(c.seed % len(files) + 1, len(files))
+    m = L.model(f if f in names else L.index()['swell/air']['members'][L.order('swell/air')[0]]['file'])
+    y = ops.rise(ops.take(m, r, **tr))
+    if ops.end(y) < T:
+        y = ops.rise(ops.stretch(m, r, min(ops.AIR, 1.05 * T / ops.end(y)), **tr))
+    y = ops.span(y, max(0.0, ops.end(y) - T), fin=0.05)
+    return _dry(ops.fade(ops.contour(_hp(y, 70.0), -20.0), 0.0, 0.02), c, r, 0.4)
+
+
+@design('rise/hit', kind='rise',
+        says=('a door slammed in a hall played backwards, swelling into a cut', 'a reversed slam growing to a stop',
+              'a room swelling backwards into a hit'),
+        uses=('riser', 'reverse', 'reverse swell', 'swell into a cut', 'build', 'lead in'), tags=('real',),
+        domains=FILM, dur=1.2, axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def rise_hit(c, r):
+    """a build of a real hit: a wooden door slammed (door/slam) in a hall, played backwards so the hall swells into
+    what was the slam, the length asked for, its level redrawn from 22 dB down (design.contour)"""
+    T = c.length() or 1.2
+    y = _named(c, r, 'door/slam', SLAM, main=True, **_tr(c, size=1.2, bright=-0.5))
+    y = space.room(_lp(y, 5000.0), 'hall', amount=0.6, r=r)
+    y = ops.reverse(ops.span(y, max(0.0, ops.onset(y) - 0.01)), 0.01)
+    return _dry(ops.contour(ops.span(y, max(0.0, ops.end(y) - T), fin=0.05), -22.0), c, r, 0.4)
+
+
+# ---- light, a stop, pops
+@design('shine/blade', kind='whoosh',
+        says=('a sword drawn from its sheath, only its bright edge', 'a short bright metallic swish',
+              'a light scrape of steel that shines'),
+        uses=('shine', 'glint', 'gleam', 'highlight', 'product shine', 'shimmer'), tags=('real',), domains=DOM,
+        dur=0.38, axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def shine_blade(c, r):
+    """light running over a product, with no bell and no glitter: a sword drawn (sword/draw), 0.25 s before its
+    loudest moment to 0.18 s after it, nothing under 2 kHz: a bright scrape of noise at 5-9 kHz"""
+    y = _named(c, r, 'sword/draw', ('sword-draw-1.npz',), main=True, **_tr(c, size=0.9, bright=0.5))
+    y = _around(y, 0.25, 0.18, fin=0.15, fout=0.15, at=ops.peak(y, 20.0))
+    return _dry(_hp(y, 2000.0), c, r, 0.3)
+
+
+@design('shine/match', kind='whoosh',
+        says=('a match struck, only its bright flare', 'a quick bright scratch and hiss', 'a short bright flare'),
+        uses=('shine', 'glint', 'flare', 'spark', 'highlight'), tags=('real',), domains=DOM, dur=0.31,
+        axes=REAL_AIR, prior=0.85, allows=GLIDE + ('truncated',))
+def shine_match(c, r):
+    """a flare: a match struck (match/light) from 80 ms before its loudest moment to 0.3 s after it, nothing under
+    1.5 kHz"""
+    y = _named(c, r, 'match/light', ('match-light-1.npz',), main=True, **_tr(c, size=0.9, bright=1.0))
+    y = _around(y, 0.08, 0.3, fin=0.04, fout=0.2, at=ops.peak(y, 20.0))
+    return _dry(_hp(y, 1500.0), c, r, 0.3)
+
+
+@design('stop/zip', kind='fall',
+        says=('a zip pulled and running down to a stop', 'a sound slowing in pitch and speed until it stops',
+              'a mechanical run winding down'),
+        uses=('tape stop', 'stop', 'slow down', 'wind down', 'record stop'), tags=('real',), domains=FILM, dur=1.2,
+        axes=REAL_AIR, prior=0.85, allows=('ring', 'truncated'))
+def stop_zip(c, r):
+    """a tape stop played on a real thing: a jacket's zip pulled (zipper/jacket), its busiest 0.9 s read at a
+    speed falling from 1 to 0 over the last two thirds of the length (design.halt), nothing under 40 Hz"""
+    T = c.length() or 1.2
+    y = _named(c, r, 'zipper/jacket', ('zipper-jacket-2.npz', 'zipper-jacket-1.npz'), main=True, **_tr(c))
+    y = ops.halt(_learned().stretch(y, 0.9), 0.67 * T)
+    return _dry(ops.fade(_hp(y, 40.0), 0.0, 0.06), c, r, 0.5)
+
+
+@design('stop/roll', kind='fall',
+        says=('a snare roll running down to a stop', 'a drum roll slowing until it stops',
+              'a roll winding down like a tape'),
+        uses=('tape stop', 'stop', 'record stop', 'slow down', 'turntable stop'), tags=('real',), domains=FILM,
+        dur=1.2, axes=REAL_AIR, prior=0.85, allows=('ring', 'truncated'))
+def stop_roll(c, r):
+    """a tape stop of a roll: a real snare roll (roll/drum), its busiest 0.9 s read at a speed falling from 1 to 0
+    over the last two thirds of the length (design.halt)"""
+    T = c.length() or 1.2
+    y = _named(c, r, 'roll/drum', ('roll-drum-2.npz',), main=True, **_tr(c))
+    y = ops.halt(_learned().stretch(y, 0.9), 0.67 * T)
+    return _dry(ops.fade(_hp(y, 40.0), 0.0, 0.06), c, r, 0.5)
