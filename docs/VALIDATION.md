@@ -101,8 +101,8 @@ quality there.
 ## 5. Interfaces
 `.venv/Scripts/python.exe -m pytest tests/test_interfaces.py -q` (+ `--slow`)
 
-- The server lists 19 tools: the 13 listening tools, the three of the sound bank and `make`, `make_set` and
-  `sounds`. The 13 listening tools were exercised over a real stdio connection on real files (silence, clicks, mono/stereo, ogg, mp3, the
+- The server lists 20 tools: the 13 listening tools, the three of the sound bank and `make`, `make_set`, `sounds`
+  and `build`. The 13 listening tools were exercised over a real stdio connection on real files (silence, clicks, mono/stereo, ogg, mp3, the
   60 s soundtrack, an mp4 film); bad input returns readable errors, never a crash; every JSON part valid.
 - Models stay loaded between MCP calls (the stdio handshake takes a few seconds; not benchmarked).
 - The Gemini critique has never been called live (no key on this machine, and a live call uploads audio): every path

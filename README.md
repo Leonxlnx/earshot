@@ -1,9 +1,15 @@
 # earshot
 
-earshot makes sound effects from a request in words, and it listens to sound files and describes them in words and
-numbers. It is made for coding agents such as Claude Code, which write the code of interfaces, games and films but
-cannot hear them, and for the people who work with those agents. It runs on your own computer's CPU as a command
-line, a Python package, an MCP server and a Claude Code plugin, and every sound it makes is yours to use.
+earshot makes sound effects for a coding agent, which cannot hear them. The agent asks in words; earshot answers from
+a catalogue of 922 designs, most of the realistic ones recorded things rebuilt in code, and renders a new take of the
+best one. When the catalogue has no such thing, the answer says so plainly, and `earshot build` makes it from
+recorded parts: the agent names the parts in words, earshot finds a recording for each, lays them out as a recipe and
+listens to the result with its own ears (a listening model) to say how well it fits and what is still off. earshot
+also listens to any sound file and describes it in words and numbers.
+
+It is made for agents such as Claude Code, which write the code of interfaces, games and films, and for the people
+who work with them. It runs on your own computer's CPU as a command line, a Python package, an MCP server and a
+Claude Code plugin, and every sound it makes is yours to use.
 
 ```
 $ earshot make "three variations of a footstep on gravel" -o step.ogg
@@ -15,7 +21,8 @@ also: step/gravel, step/floorboard, step/heels
 ```
 
 The three files are three different real footsteps: `step/pebbles` is learned from recordings of steps on gravel
-that are in the public domain, and each file is a new take rendered from them.
+that are in the public domain, and each file is a new take rendered from them. What the catalogue lacks, the agent
+builds with `earshot build`: [Build what is missing](#build-what-is-missing).
 
 ```bash
 npx skills add Leonxlnx/earshot                                   # the agent skills
@@ -29,17 +36,21 @@ What is in the box:
 - **Making sounds** (`earshot make`): a catalogue of 922 designs in 384 families holds interface sounds, everyday
   foley, ambience beds, game sounds, chip sound, drums, film and motion effects and three short music loops. 309 are
   learned from 692 recordings in the public domain; no audio file is in the repository, and every sound is rendered
-  by code when it is asked for. What the catalogue lacks can be built from its parts with a recipe.
+  by code when it is asked for. Ready-made sets give an app, a game or a film its sounds in one call.
+- **Building what is missing** (`earshot build`, recipes): a sound made of recorded parts, laid out as a small JSON
+  recipe (scattered, repeated, bent in pitch, passing by, pulsing, drawn longer), heard and tuned by the listening
+  model. A cookbook of 99 recipes ships with it.
 - **Listening** (an extra): what a file sounds like, how well it fits a description, the best moment in a long
   recording, whether it sounds recorded or synthesized, and a second-by-second account of a film's soundtrack.
 - **Tools for film sound**: a bank of 252 sound effects stored as code, film sound kits, a search that writes
   synthesis code by listening (`forge`), and `fit`, which turns a recording into code.
-- An MCP server, a Claude Code plugin with two commands, and two agent skills.
+- An MCP server with 20 tools, a Claude Code plugin with two commands, and two agent skills.
 
 ## Contents
 
 - [Install](#install)
-- [Make sounds](#make-sounds)
+- [Make sounds](#make-sounds): how to ask, what it can make, sets for an app, a game or a film, files
+- [Build what is missing](#build-what-is-missing): `earshot build`, parts in words, recipes
 - [Listen](#listen)
 - [Film sound: bank, kits, forge, fit](#film-sound-bank-kits-forge-fit)
 - [Use it from an agent](#use-it-from-an-agent): MCP server, Claude Code plugin, Python, skills
@@ -68,7 +79,7 @@ Listening, measuring and drawing come with extras, named in the brackets (severa
 | extra | brings | for |
 |---|---|---|
 | `mcp` | the MCP SDK | `earshot mcp`, the MCP server and the plugin |
-| `listen` | torch, transformers, librosa; the two listening models (~1.1 GB) download on first use | `describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `critique`, `profile`, `make --listen` |
+| `listen` | torch, transformers, librosa; the two listening models (~1.1 GB) download on first use | `describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `critique`, `profile`, `make --listen`, the ears of `build` |
 | `measure` | librosa | `measure` and `find` without the models |
 | `images` | matplotlib, pillow | `sheet`, `gallery`, frames of a video, plots |
 | `llm` | requests | the optional Gemini critique (`earshot llm`, your own API key) |
@@ -117,9 +128,8 @@ MCP server hold numpy and scipy's OpenBLAS to it too, unless `OPENBLAS_NUM_THREA
 cache root), `EARSHOT_PRECISION` (`bf16` by default, used only on CPUs with native bf16 such as AVX512-BF16 or AMX,
 fp32 everywhere else; `fp32` forces fp32), `EARSHOT_CLAP` / `EARSHOT_AST` (another Hub model id, or a local model
 folder with `config.json` and `model.safetensors`, loaded from disk as it is) and `EARSHOT_CLAP_REVISION` /
-`EARSHOT_AST_REVISION` (another Hub revision; safetensors weights only). A custom Hub model downloads its top-level
-config, tokenizer and safetensors files by name, never a repo's subfolders or weight variants. `earshot doctor`
-reports the revisions and what the cache holds; `--load` also what loads.
+`EARSHOT_AST_REVISION` (another Hub revision; safetensors weights only). `earshot doctor` reports the revisions and
+what the cache holds; `--load` also what loads.
 
 ## Make sounds
 
@@ -130,7 +140,6 @@ reports the revisions and what the cache holds; `--load` also what loads.
 $ earshot make "a soft success sound for a finance app" -o success.ogg
 success.ogg: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [success]
 also: complete/shutter, success/click, complete/chop
-not followed: "soft"; this sound has no control of its hardness and plays as designed
 
 $ earshot make "a campfire" -o fire.ogg --dur 24
 fire.ogg: fire/camp (24.00 s, peak at 19.96 s, -22 LUFS, seamless loop, clean) [campfire]
@@ -140,8 +149,10 @@ also: fire/large, fire/small, fire/whoosh
 The first line of each file is the result: the design chosen, the length, where the loudest moment is (`peak at`),
 the loudness, `seamless loop` for a loop, `clean` or what the check found, and the words that decided. `also` gives
 three alternatives, to be taken with `--sound ID`. A request that names something the catalogue does not have still
-gets a file, and the answer says so: `earshot makes no fire alarm; timer/done is only the nearest sound it has`. Lines such as `not followed`, `not in this sound` and `not understood` name what the request asked that this
-sound does not do. Every line and option: [docs/MAKE.md](docs/MAKE.md).
+gets a file, and the answer says so: `earshot makes no fire alarm; timer/done is only the nearest sound it has`,
+with three starting points and the `earshot build` line that builds it. Lines such as `not followed`, `not in this
+sound` and `not understood` name what the request asked that this sound does not do. Every line and option:
+[docs/MAKE.md](docs/MAKE.md).
 
 ### How to ask
 
@@ -177,7 +188,7 @@ sound is, then its character.
 | interface | 29 | things a hand does, built from those recordings: a key going down and coming up, a page, a drawer, a cork, knocks, a camera shutter, scissors | `toggle/key_down`, `next/page`, `notify/knock`, `success/shutter`, `delete/snip` |
 | interface and game figures | 45 (and 3 ticks) | notes in time on a real instrument (a marimba by default); for interfaces only when the words ask for music or a theme is named | `success/rise`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
 | ambience | 43 | 25 learned from recordings of real places and textures, 18 from rules | `fire/camp`, `waves/sand`, `rain/tin_roof`, `cafe/busy`; `rain/window`, `forest/morning` |
-| film and motion | 46 | 32 built from learned recordings as motion films use them (short dry hits, thumps, ticks, whooshes and risers of air); 14 small ones invented | `slam/title`, `boom/short`, `thump/appear`, `whoosh/soft`, `rise/air` |
+| film and motion | 69 | 55 built from learned recordings as motion films use them (small real actions cut short: a door falling shut, a heavy bag dropped, a stick swung, a breath of air; hits, whooshes and risers); 14 small ones invented | `thump/door`, `title/bag`, `logo/bag`, `whoosh/sweep`, `rise/breath` |
 | drums | 40 | 33 played from recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented | `kick/soft`, `snare/tight`, `conga/muted`; `kick/electro` |
 | chip | 24 | the channels of 8-bit consoles; only when asked for | `coin/chip`, `jump/chip`, `laser/chip` |
 | action and objects | 83 | invented from physics | `jump/soft`, `hit/punch`, `coin/drop`, `bell/desk` |
@@ -191,52 +202,11 @@ invented one is still there by its id.
 
 **Learned sounds.** A learned design is not a recording that is played back. earshot keeps each recording as numbers
 (the level of 56 bands every 2 ms, how tonal each band is, the stereo image) and renders a new take from them with
-fresh noise and the request's controls, so every take is new but stays a take of that real sound. A design is one
-thing and its recordings are its variations: seeds 0, 1, 2 walk through them, the fullest clean one first. A thing a
-person does several times in a row (a walk, a knock, typing, coins, keys) is played as that action when the words ask
-for it, and a length asked with it ("footsteps, 5 seconds") is the file's length. A realistic sound exists only for
-things someone recorded and put in the public domain; the sources are BigSoundBank, Kenney, VCSL, VSCO-2 CE,
-Karoryfer and CC0 uploads on Freesound, each recording credited in a `CREDITS.md` next to its numbers.
+fresh noise and the request's controls. Seeds 0, 1, 2 walk through a design's recordings, the fullest clean one
+first. A thing a person does several times in a row (a walk, a knock, typing, coins) is played as that action when
+the words ask for it. Every recording is credited in a `CREDITS.md` next to its numbers ([Licence](#licence)).
 
-### When the catalogue has no such sound: recipes
-
-A recipe builds a sound from the catalogue's own parts: a few real recordings moved lower or higher, cut, filtered,
-repeated and layered, with noise for air and a low sine for weight, written as a small JSON form. earshot renders a
-recipe and checks it like every other sound. The cookbook that ships with earshot (`earshot recipe --list`) holds 95
-recipes: 54 answer a request for their thing on their own (a car crash, a cannon, a fireball spell, an energy shield
-going up, a plasma shot), and 41 are sketches that an answer names only as a starting point. When the catalogue has a
-recording of the thing itself, the recording answers.
-
-```
-$ earshot make "a car crash" -o crash.wav
-crash.wav: recipe/car_crash (3.11 s, peak at 1.58 s, -14 LUFS, clean) [recipe]
-built from: tyres/screech; car_door/slam (-7 semitones); metal/drop (-5 semitones); glass/break; can/drop (-3 semitones)
-built from parts by the cookbook recipe car_crash: no design of the catalogue is this sound; `earshot recipe car_crash` prints the recipe to change; the nearest designs: impact/car, hail/car, boom/door (sound=<id>)
-```
-
-A length, "far away", "up close", "soft" and a count are followed on a cookbook sound, and what a recipe cannot do is
-said in the answer. An agent writes its own recipes for what the cookbook lacks (`earshot recipe --example` prints
-the form) and renders them with `earshot make --recipe roar.json -o roar.wav`. The method and every field:
-[docs/MAKE.md](docs/MAKE.md#when-earshot-has-no-such-sound-build-it).
-
-### Building a sound with earshot as the ears: build
-
-`earshot build "hail on a tin roof" -o hail.wav` is the workbench for a sound the catalogue lacks. It drafts recipes
-from the words alone (recorded parts nearest the words, a structure by the kind of sound: one event, a row, very many
-small events, something that runs or passes, a creature's voice, something made up, a place), renders them, hears
-them with the listening model, tunes the numbers of the best one in a seeded search and writes `hail.wav` and
-`hail.recipe.json`. The answer says what it is built from, what it is heard as, its fit to the words beside the design
-`make` would hand over ("sounds like it" or "a sketch"), and what is still off, each with the recipe field to change;
-`earshot build "..." --recipe hail.recipe.json` hears an edited recipe again. An agent that knows what makes the sound
-names the parts in plain phrases (`--part "hundreds of hoofbeats on dirt, for 6 s, getting louder" --part "a low
-rumble under everything"`): earshot finds a recording for each, writes its layer from the words (how many, when, how
-long, motion, pitch, distance) and says which design each became and which words it did not understand. A second ear
-(the AudioSet tagger), which the tuner never sees, has to agree before a build is called "sounds like it". No model
-generates audio: the listening models only judge. Without the listen extra it drafts, renders, audits and measures,
-and says that it did not hear.
-The loop, examples and what it cannot do: [docs/BUILD.md](docs/BUILD.md).
-
-### Sets and themes
+### Sets for an app, a game or a film
 
 A ready-made set makes the sounds a kind of product needs in one call, with a `manifest.json`: `ui` (17 interface
 sounds), `game` (22: menus, rewards, jingles, actions), `arcade` (16 chip sounds) and `film` (17 motion-design
@@ -260,8 +230,14 @@ Every sound of `ui` is a thing a hand does, with no instrument: a mechanical key
 back, a drawer for open and close, a camera shutter for success, knocks for a notification, a warning and an error.
 A plain interface request ("a success sound", "a notification") gets the same design. A theme (`soft`, `glass`,
 `wood`, `felt`, `tine`, `metal`, `electric`, `digital`, `retro`, or a dict such as `{"base": "wood", "key": "D"}`)
-gives a family one voice, key and room; with a theme named, `ui` plays tonal figures in that voice instead. The
-table of roles and the spec: [docs/MAKE.md](docs/MAKE.md#a-whole-set).
+gives a family one voice, key and room; with a theme named, `ui` plays tonal figures in that voice instead.
+
+`film` is cut to measurements of professional motion videos and plays small real actions, no instrument: a door
+falling shut when something appears (`pop`, `thump/door`), the top of a mechanical key for a tick (`tick/key`), a
+heavy bag dropped under a title and a logo (`title/bag`, `logo/bag`), a stick and a broom through the air
+(`whoosh/fast`, `whoosh/sweep`), a page sliding (`slide/paper`), a car door for an impact (`impact/car`), a breath of
+air rising (`rise/breath`), a sword drawn for a glint (`shine/blade`). The table of roles and the spec:
+[docs/MAKE.md](docs/MAKE.md#a-whole-set).
 
 ### Files
 
@@ -278,6 +254,55 @@ table of roles and the spec: [docs/MAKE.md](docs/MAKE.md#a-whole-set).
 
 How each engine works (learned sounds, stitched beds, real instruments, performances, drums, chip, rooms):
 [docs/MAKE.md](docs/MAKE.md#the-engines).
+
+## Build what is missing
+
+`earshot build` makes a sound the catalogue lacks out of recorded parts, with earshot as the ears. An agent that knows
+what makes the sound names the parts in plain phrases; earshot finds a recording for each, writes its layer from the
+words (how many, when, how long, moving, getting louder, lower, far) and says which design each part became and which
+words it did not understand. Without `--part` it drafts the parts itself from the words. It renders the recipe, hears
+it with the listening model, tunes its numbers in a seeded search, and writes `x.wav` and `x.recipe.json`.
+
+```
+$ earshot build "a stampede of horses" -o stampede.wav --part "hundreds of hoofbeats, for 6 s, getting louder" --part "a low rumble under everything, soft" --part "a horse neighing, twice, far"
+stampede.wav: recipe/a_stampede_of_horses_parts (8.53 s, peak at 6.20 s, -14 LUFS, clean) [built]
+built from: horse/trot (scattered 26.2 a second over 6 s, its level drawn: -18, +0 dB); thunder/roll; horse/neigh (2 times, under 3915 Hz)
+part 1 'hundreds of hoofbeats, for 6 s, getting louder': horse/trot (scattered 26.2 a second over 6 s, its level drawn: -18, +0 dB); horse/trot names 'hoofbeats' in its own words (atlas and own words +3.4, a short take to repeat); next nearest: heart/beat, whisk/beat, step/floorboard
+part 2 'a low rumble under everything, soft': thunder/roll; thunder/roll names 'low rumble' in its own words (atlas and own words +3.2, a long take for a bed); next nearest: roll/drum, explosion/far, cat/purr
+part 3 'a horse neighing, twice, far': horse/neigh (2 times, under 3915 Hz); horse/neigh names 'horse neighing' in its own words (atlas and own words +6.6, a short take to repeat); next nearest: cow/moo, elephant/trumpet, bear/growl
+heard as: horse/neigh, wolf/howl, wind/window; words: 'a horse neighing' (z +4.1), 'a gust of wind rushing past' (z +3.2), 'a cow mooing' (z +3.1); second ear: Neigh, whinny 0.92, Horse 0.71, Animal 0.57, Clip-clop 0.25
+fit: z +3.72 for 'a stampede of horses' (the nearest design horse/neigh: z +2.61): sounds like it; recorded: p_real 0.97
+tuned in 20 rounds: layer 0 (horse/trot) scatter.rate 16.5 -> 26.2; layer 0 (horse/trot) scatter.pitch 2 -> 1.33; layer 0 (horse/trot) scatter.gain 6 -> 9.4; layer 1 (thunder/roll) dur 6 -> 5.04 ...; fit z +3.16 -> +3.72
+still off: nothing the measures find; a person should listen once
+next: edit stampede.recipe.json, then: earshot build "a stampede of horses" --recipe stampede.recipe.json
+```
+
+The first try had the rumble at its full level. It came back "a sketch" (z +3.56), and its `still off` line said that
+the thunder covered the rest and to lower its gain by about 6 dB; the word "soft" in the second part did that.
+
+`fit` is the listening model's z for the words beside the design `make` would hand over. "sounds like it" needs the
+sound clean, a z of at least 3.0 and 1.0 over that design, and no objection from a second ear (the AudioSet tagger),
+which the tuner never sees; otherwise it is "a sketch". `still off` names the recipe field to change, and `earshot
+build "..." --recipe x.recipe.json` hears an edited recipe again. A build takes about a minute; without the listen
+extra it drafts, renders, audits and measures, and says that it did not hear. No model generates audio: the
+listening models only judge. The loop, the phrase grammar and what it cannot do: [docs/BUILD.md](docs/BUILD.md).
+
+**Recipes.** A recipe is the small JSON form a build writes, and an agent can write one by hand: layers of the
+catalogue's recordings, moved in pitch, cut, filtered, repeated, scattered (one clap becomes applause), drawn over
+time in level and pitch, carried past the listener, pulsing or drawn longer, with noise for air and a low sine for
+weight (`earshot recipe --example` prints the form; `earshot make --recipe roar.json -o roar.wav` renders it). The
+cookbook (`earshot recipe --list`) holds 99 recipes: 59 answer a request for their thing on their own, and 40 are
+sketches that an answer names only as a starting point. When the catalogue has a recording of the thing itself, the
+recording answers.
+
+```
+$ earshot make "a car crash" -o crash.wav
+crash.wav: recipe/car_crash (3.11 s, peak at 1.58 s, -14 LUFS, clean) [recipe]
+built from: tyres/screech; car_door/slam (-7 semitones); metal/drop (-5 semitones); glass/break; can/drop (-3 semitones)
+built from parts by the cookbook recipe car_crash: no design of the catalogue is this sound; `earshot recipe car_crash` prints the recipe to change; the nearest designs: impact/car, boom/door, slam/door (sound=<id>)
+```
+
+Every field of a recipe: [docs/MAKE.md](docs/MAKE.md#when-earshot-has-no-such-sound-build-it).
 
 ## Listen
 
@@ -352,16 +377,9 @@ earshot gallery out/forge_v2 -o out/gallery/gallery.html     # <category>/final/
 The reference recordings are licensed and not in this repository: bring your own with `--refs DIR`. Without them the
 critic runs in designed mode.
 
-**Blind test (v1 recipes).** A key press, a UI click, a pop, a fast whoosh and an impact were made in code and played
-blind next to real recordings of the same kind of sound. The author picked the made one correctly 8 times out of 15,
-which is chance; only the impact was spotted (its tail dies too fast). One listener and 15 trials is a small test,
-not a proof.
-
-**Limits (Goodhart).** The search optimises earshot's own models, and those can be pleased without the sound getting
-better. After a search the made sounds pass every model check, so the model checks stop telling made from real; the
-model-free measurements still can. The realness model is easy to fool (a modal resonator with a room and a noise
-floor reads "real"). Judge a made sound by the measurements, spectrograms next to the references, re-renders on new
-seeds and a human blind test.
+In a blind test of five forge sounds next to real recordings, one listener picked the made one 8 times out of 15,
+which is chance. The search optimises earshot's own models, which can be pleased without the sound getting better:
+judge a forged sound by the model-free measurements, spectrograms next to the references and a human blind test.
 
 **fit: audio to code.** `earshot fit` fits a small synthesis model with readable parameters (ringing modes, tracked
 partials, a noise gesture, or layers of them) to a recording and writes it as a forge recipe module that renders new
@@ -392,10 +410,11 @@ Or in any client's `.mcp.json`:
   "env": {"EARSHOT_THREADS": "3"}}}}
 ```
 
-Tools: `make` (a request, or a design by id, or a recipe), `make_set` and `sounds` (no models); `measure`,
-`describe`, `match`, `rank`, `find`, `compare`, `ab`, `realness`, `timeline`, `sheet`, `critique`, `doctor` and
-`llm_critique`; and the bank, `sfx_list`, `sfx_render` and `kit_render`. Models load on the first listening call and
-stay loaded; once they are, `make` also ranks by how the designs sound. On a slow machine start Claude Code with
+The 20 tools: `make` (a request, or a design by id, or a recipe), `make_set` and `sounds` (no models); `build` (with
+`parts`; its ears need the `listen` extra); `measure`, `describe`, `match`, `rank`, `find`, `compare`, `ab`,
+`realness`, `timeline`, `sheet`, `critique`, `doctor` and `llm_critique`; and the bank, `sfx_list`, `sfx_render` and
+`kit_render`. Models load on the first listening call and stay loaded; once they are, `make` also ranks by how the
+designs sound and `build` does not load them again. On a slow machine start Claude Code with
 `MCP_TIMEOUT=60000`. The optional `llm_critique` tool reads `GEMINI_API_KEY` from the environment; never write a key
 into a file.
 
@@ -419,6 +438,8 @@ a whole set.
 from earshot.make import make, make_set
 make('a door shutting', 'door.wav')                                    # the same result as the CLI, as a dict
 make_set('ui', out='public/sounds', fmt='webm,mp3', sprite='sprite')
+from earshot.build import build
+build('a stampede of horses', out='stampede.wav', parts=['hundreds of hoofbeats, for 6 s, getting louder'])
 from earshot import sounds as catalogue
 y, meta = catalogue.render('step/heels', seed=1)    # stereo float64 at 48 kHz; meta['member']: which recording
 
@@ -450,8 +471,13 @@ Every number below comes with its method in [docs/VALIDATION.md](docs/VALIDATION
   figures, rain on a window and the forest bed passed. Sounds invented from formulas for real things (footsteps,
   punches, explosions, doors), most music beds, the drums invented from physics and bell or glass timbres for
   interface sounds failed, which is why realistic sounds are learned from recordings now. The sounds built last (the
-  interface set, the film and motion hits, the newer learned things and beds, the recipes) have been measured but
-  not yet judged by anyone.
+  interface set, the film and motion hits, the newer learned things and beds, the recipes and builds) have been
+  measured but not yet judged by anyone.
+- **Builds**, judged by the listening model, not by a person: rebuilt from other recordings, things the catalogue has
+  came out near their real design for textures of many similar events and for pulsing (a purr, a swarm, a boiling
+  pot, a campfire, applause); rain and hail on a new surface and a vehicle passing built from another motor did not.
+  For 30 things the catalogue lacks, 29 builds fit the words better than what `make` hands over
+  ([docs/BUILD.md](docs/BUILD.md#how-well-it-does)).
 - **Understanding requests.** On five development sets the first pick is right for 92.3 to 96.8 % of the requests
   and one of the top three for 96.1 to 99.1 %. On 220 held-out requests written by someone who never saw the
   catalogue, scored once on an earlier reader, 69.1 % and 76.4 %. Requests that name the thing or the job do far
@@ -467,17 +493,20 @@ Every number below comes with its method in [docs/VALIDATION.md](docs/VALIDATION
 
 ## Limits
 
-`make` chooses and shapes designs from a fixed catalogue and builds recipes from them. It does not pan, makes no
-speech, singing or melodies, and plays instruments only as single notes and short figures; realistic sounds exist
-only for things someone recorded and put in the public domain. A request that describes a mood is understood less
-well than one that names the sound, and a pick without a guess line can still be wrong. earshot hears through two
+`make` chooses and shapes designs from a fixed catalogue. It makes no speech, singing or melodies, and plays
+instruments only as single notes and short figures; realistic sounds exist only for things someone recorded and put
+in the public domain. A request that describes a mood is understood less well than one that names the sound, and a
+pick without a guess line can still be wrong. `build` is not a way to any sound: it works for textures of many
+similar events and for pulsing (applause, a swarm, a campfire, a purr), not for rain or hail on a new surface, a
+vehicle passing built from another motor, voices or pure tones; its fit comes from a listening model, not a
+person's ear, and the second ear also objects to some real recordings. earshot hears through two
 open models and a set of measurements: loudness, timing and "is this the kind of sound I asked for" on single sounds
 are trustworthy; tags inside a busy mix, genre and mood are hints; taste, emotion, licences and speech content it
 cannot judge. Everything it does not make and cannot judge: [docs/LIMITS.md](docs/LIMITS.md).
 
 ## History
 
-- **1.0** adds making sounds: `make`, `make --set`, `sounds`, recipes, `pack`, the catalogue learned from
+- **1.0** adds making sounds: `make`, `make --set`, `sounds`, `build`, recipes, `pack`, the catalogue learned from
   public-domain recordings, and the Claude Code plugin.
 - **0.4** added the sound of music-led launch films to the bank (51 sounds, the `launch` kit preset) and re-made `fit`
   against professional sound effects. [The 0.4 launch film](https://github.com/Leonxlnx/earshot/releases/tag/v0.4.0)
@@ -496,6 +525,7 @@ earshot/            the package: CLI, Python API, MCP server, CPU model wrappers
   make.py           earshot make / sounds: a request in words -> a design rendered and written; make_set for sets
   brief.py          reading a request: things, jobs, sounds, surfaces, feelings as axes, voice, numbers, key
   recipe.py         recipes: a sound built from the catalogue's parts
+  build.py          earshot build: parts in words -> a recipe, rendered, heard and tuned
   pack.py           earshot pack: many sounds in one file with a howler-style map
   sounds/           the catalogue: registry, themes, sets, the lexicon, the design modules
   synth/            the engines: learned sounds, stitched beds, real instruments, performances, struck and string
@@ -507,7 +537,7 @@ earshot/            the package: CLI, Python API, MCP server, CPU model wrappers
   gallery.py        the static listening page
 skills/earshot/     agent skill: how to make sounds and listen with earshot
 skills/real-sound/  agent skill: real-recordings soundtracks
-docs/               MAKE, VALIDATION, LIMITS, FORGE_V2, FIT, SFX, the motion-sound study, design notes
+docs/               MAKE, BUILD, VALIDATION, LIMITS, FORGE_V2, FIT, SFX, the motion-sound study, design notes
 .claude-plugin/     the Claude Code plugin and its marketplace; commands/: /earshot:make, /earshot:make-set
 eval/               evaluation scripts and results per area (see eval/README.md)
 tests/              pytest: fast by default, no models; --slow loads the models and renders the long designs

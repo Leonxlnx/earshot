@@ -1,7 +1,8 @@
 # What earshot can and cannot judge, and cannot make
 
 earshot gives an agent measured evidence about sound, not taste. Read this before trusting a verdict. What `make`
-cannot do and where it is weak is [at the end](#making-sounds-make).
+cannot do and where it is weak is [below](#making-sounds-make), and what `build` cannot do
+[at the end](#building-sounds-build).
 
 ## Trustworthy
 - **Measurements**: loudness (LUFS, true peak, LRA), timing (onsets, offsets to cuts and cue frames, to the
@@ -85,13 +86,15 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
 - Make a sound no design covers from a free description. `make` chooses one design and shapes it with the controls,
   or renders a recipe that layers designs. A request for a thing the catalogue lacks still gets a file: the nearest
   design, with a line that says `earshot makes no X; Y is only the nearest sound it has`, three starting points of
-  other families, and a pointer to building it as a recipe. A cookbook recipe answers on its own only for 32 things;
-  the 42 sketches are starting points, and a recipe is judged by a model and the audit, not by ear.
+  other families, and the `earshot build` line that builds it (see [Building sounds](#building-sounds-build)). A
+  cookbook recipe answers on its own for 59 things; the other 40 of the 99 are sketches that are starting points, and
+  a recipe is judged by a model and the audit, not by ear.
 - Realistic sounds for things nobody recorded. A learned sound exists only where someone recorded the thing and put
   the recording in the public domain; the store has 309 things. For other real things the catalogue has designs
   invented from physics (`action`, `object`), which sound clearly less real.
-- Pan. A request cannot place or move a sound in the stereo field: "from left to right" is said not followed. Only a
-  layer of a recipe can be set to the left or the right.
+- Pan a catalogue sound. A request to `make` cannot place or move a sound in the stereo field: "from left to right" is
+  said not followed. A layer of a recipe can be set to a side or moved across (`pan` [from, to]), and a part of a
+  build that says "from left to right" gets that move.
 - One sound ringing through the body of another ("rain on a tin can"). It was tried and came no nearer the real
   thing; where the catalogue has the real surface (`rain/wood`, `rain/tin_roof`, `step/floorboard`), that design is
   the answer.
@@ -147,13 +150,14 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
 
 **What is weak or unverified.**
 - **The rebuilt motion sounds are not judged by ear.** The motion and film sounds follow measurements of professional
-  motion videos: short, dry hits, thumps, ticks and whooshes of air, built from learned recordings (a heavy bag
-  dropped on a real explosion's low end for the title and logo hits, a soft kick and conga for the thump, a mouse
-  click for the tick, real whooshes, breaths and flames for the air). Of the earlier film sounds the fast whoosh was
-  judged good and the hits, booms, risers and the tape stop poor; the rebuilt ones have not been judged. The
-  measurements come from 39 videos and find effects only where they stand out of the music, so quieter effects under
-  the music are not counted. 14 of the 46 motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a
-  sliding panel, a soft knock, the soft sting) are still invented.
+  motion videos: short, dry hits, thumps, ticks and whooshes of air, built from learned recordings. The `film` set
+  plays small real actions cut to those measurements (a door falling shut for the thump, the top of a mechanical key
+  for the tick, a heavy bag dropped under the title and the logo, a stick and a broom through the air, a breath of
+  air rising, a sword drawn). Of the earlier film sounds the fast whoosh was judged good and the hits, booms, risers
+  and the tape stop poor; the rebuilt ones have not been judged. The measurements come from 39 videos and find
+  effects only where they stand out of the music, so quieter effects under the music are not counted. 14 of the 69
+  motion designs (pops, tocks, a blip, glints, a sparkle, key ticks, a sliding panel, a soft knock, the soft sting)
+  are still invented.
 - **The interface set is not judged by ear as a set.** The seventeen roles of `ui` are things a hand does, built from
   learned recordings. Which object a role uses is a choice of taste: the other candidates are in the catalogue by
   name.
@@ -164,7 +168,10 @@ a measure of how good a made sound is; a `heard as` line says what a model hears
   recording covers.
 - **One carrier per band.** The learned model keeps one tone per band: two crickets in one band lose their beating
   against each other (the cricket bed's take differs from its recording by 4.4 dB against 2.2 for two takes).
-- **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms).
+- **Soft onsets smear a little**: a slow rise gets slower (a bag drop's rise went from 61 to 99 ms). What the
+  rebuild smeared into the moments before a strike is held as low as the recording has it there on 110 recordings
+  (`learned.LEAD`, on), each measured closer to its recording. The same repair for the faint hiss after a sound
+  (`learned.TAIL`) is built and off: it did not hold on a second take of each recording.
 - **Sea joints.** A stitched bed joins pieces where the texture is in a similar state; on the pebble and rock
   shores the joints differ by about 1.5 times the texture's own variation, more than in the other beds.
 - **Takes of a learned design differ in length and level**, because they are different recordings. Make
@@ -229,3 +236,30 @@ was taken from its source (the sound's page, the pack's licence file, or Openver
 page) and is written next to it in the four credits files (`earshot/data/resyn/`, `textures/`, `drums/` and
 `notes/`);
 earshot cannot prove that an uploader had the right to give a recording away.
+
+## Building sounds (`build`)
+
+`earshot build` makes a sound from recorded parts; it is not a way to any sound. What the measurements found, with
+the listening model as the judge ([BUILD.md](BUILD.md#how-well-it-does)):
+- **It works for textures of many similar events and for pulsing.** Rebuilt from other recordings, a purr, a swarm
+  of bees, a boiling pot, a campfire and a helicopter came out nearest their own real design among the 922;
+  applause and a brook among the nearest three.
+- **It does not work for rain or hail on a new surface.** Close single drops scattered never became the dense far
+  wash of real rain: the real designs of rain on a tin roof, on a window, heavy rain and hail came out far down the
+  list (places 17 to 124).
+- **Nor for a vehicle passing built from another motor.** `pass` carries a recording by and bends its pitch, but the
+  material is not the vehicle: a car, a motorcycle and a jet built so were far from their real designs.
+- **Nor for voices or pure tones.** There is no voice material: a whale is an owl and a wolf moved down, a whisper
+  has nothing to start from. A beep or an alarm is a recorded beeper or horn, never a synthesized tone.
+- **A part is found by its words** and can come back as the wrong recording; the `part N` lines say which design each
+  part became and the next nearest, and `sound=<id>` swaps it.
+- **The fit is a listening model, not a person's ear.** The tuner raises that model's fit, and a sound tuned to it
+  can please it more than a person: builds fit their words as well as real recordings do. The second ear (the
+  AudioSet tagger), which the tuner never sees, takes some "sounds like it" verdicts back, but it also objected to 6
+  of 27 real recordings (a kettle heard as a train), hears only up to 8 kHz and has no class for most made-up things.
+  An objection is a reason to listen, and "sounds like it" is not a verdict by ear.
+- **Naming the parts is not always better.** On twelve missing things the parts an agent named fit no better on
+  average than the automatic draft: they won where the structure was known and the material existed, and lost where
+  a part was found by the wrong word or no material existed.
+- **Time.** A build takes about a minute after the listening model has loaded (20 to 60 s once per process); a build
+  of several named parts with long beds one to two minutes.

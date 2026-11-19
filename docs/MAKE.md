@@ -28,12 +28,11 @@ earshot make "WORDS" [-o FILE] [--n N] [--seed S] [--theme NAME] [--sound ID] [-
 $ earshot make "a soft success sound for a finance app" -o success.ogg
 success.ogg: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [success]
 also: complete/shutter, success/click, complete/chop
-not followed: "soft"; this sound has no control of its hardness and plays as designed
 
 $ earshot make "a mouse click" -o click.wav --n 2
 click_1.wav: click/mouse (0.19 s, peak at 0.01 s, -20 LUFS, clean) [mouse click]
 click_2.wav: click/mouse (0.36 s, peak at 0.14 s, -19 LUFS, clean)
-also: click/soft, pen/click, switch/small
+also (the pick is a guess: another kind of sound fits almost as well): mouse/squeak (a mouse squeaking), pen/click (a ballpoint pen clicked), switch/small (a small switch flipped). Name one with sound=<id>
 ```
 
 The answer is the whole result. Each file gets one line: the design chosen, its length, where its loudest moment
@@ -530,9 +529,11 @@ Python: `from earshot.pack import pack; pack('assets/arcade', 'assets/arcade_all
 ## When earshot has no such sound: build it
 
 The catalogue cannot hold everything. For a thing no design is, `make` answers with the nearest design and says so
-(`earshot makes no whale call; wolf/howl is only the nearest sound it has`), and adds `build it from parts: earshot
-recipe --example`. A recipe is that: a sound built from the catalogue's own parts, written as a small JSON form.
-Whoever asks designs it; earshot renders it and checks it like every other sound. No model is loaded.
+(`earshot makes no fire alarm; timer/done is only the nearest sound it has`), and adds `build it from parts: earshot
+recipe --example` and `or let earshot draft, hear and tune it: earshot build "a fire alarm"`. A recipe is a sound
+built from the catalogue's own parts, written as a small JSON form. Whoever asks designs it, or `earshot build`
+drafts it from parts named in words and tunes it by listening ([BUILD.md](BUILD.md)); earshot renders it and checks
+it like every other sound. Rendering a recipe loads no model.
 
 ```
 earshot recipe --example                        # the form in a few lines and three recipes to start from
@@ -948,7 +949,7 @@ each seed is another progression and voicing with the same instruments.
 ```
 $ earshot make "a warm music bed" -o bed.ogg --dur 16
 bed.ogg: bed/warm (17.14 s, peak at 0.73 s, F3, electric_piano, -16 LUFS, seamless loop, clean) [music bed]
-also: bed/playful, bed/8bit, note/singing_bowl
+also: bed/playful, bed/creak, bed/8bit
 17.14 s: a music loop is whole bars, and these are the nearest to the 16 s asked
 ```
 
@@ -976,22 +977,25 @@ tape stop), small arrivals (a tick, pops, key presses), light (a shine of air, a
 stingers.
 
 They follow measurements of professional motion videos ([motion-sfx-study.md](motion-sfx-study.md)): such films
-are led by music and add few effects, and those are short, dry, near mono and either low or very bright. A thing
-appearing gets a low thump of about 50 ms (`thump/appear`), a click a bright tick of 20-40 ms at 5-10 kHz
-(`tick/soft`), a title a hit of about a third of a second with a short swell of air into it (`slam/title`), the
-logo a low hit of about a quarter second (`boom/short`), the moment after the music stops a short heavy hit
-(`hit/drop`: "a drop" in a film or video), a transition a whoosh of plain air that is gone right after its peak and
-holds the length asked for (`whoosh/soft`). None of them uses an instrument note, a bell or a synthesised tone, and
-a motion request gets no design made of notes unless its words ask for music (an instrument, a melody, a chord) or
-for a game.
+are led by music and add few effects, and those are short, dry, near mono and either low or very bright. The `film`
+set and a plain film request play small real actions cut to those shapes, each naming its recordings by file: a
+thing appearing gets a door falling shut, deep and short (`thump/door`), a click the bright top of a mechanical key
+(`tick/key`) or a whole mouse button (`click/cursor`), a title a stick swung into a heavy bag dropped (`title/bag`),
+the logo a heavy bag dropped, low and short (`logo/bag`), the moment after the music stops a heavy bag on a deep thud
+(`drop/sack`), an impact a car door with the bag under it (`impact/car`), a move a stick swung (`whoosh/fast`) or a
+broom's stroke (`whoosh/sweep`), a card sliding in a sheet of paper (`slide/paper`), a reveal a breath of air
+growing to a cut (`rise/breath`) or a slam played backwards (`rise/hit`), a glint a sword drawn, only its edge
+(`shine/blade`). None of them uses an instrument note, a bell or a synthesised tone, and a motion request gets no
+design made of notes unless its words ask for music (an instrument, a melody, a chord) or for a game.
 
-32 of the 46 designs of `earshot/sounds/motion.py` are built from real material, the way a sound designer builds
-them: takes of learned recordings (25 learned things of the store: car doors and a bag slammed and dropped, explosions,
-whooshes, swells of air, flames, rolls, low brass, thunder, a gong and cymbals, a mouse click and switches, and
-the close-miked strokes of the drum store) reshaped by `earshot/synth/design.py` (reverse, layer at a moment,
-stretch, contour, carry past the listener, halt, fade) within the range where a take stays natural, and glued by
-one room. The seed is a performance: it picks the recordings and every take draws fresh noise; `meta['member']`
-names the main recording.
+55 of the 69 designs of `earshot/sounds/motion.py` are built from real material, the way a sound designer builds
+them: 23 named small actions (those above and a book shut, a lamp switch, a sword swung, a cloth flapping, a match
+struck, a zip and a snare roll running down), and the 32 designs below, made of takes of learned recordings (car
+doors and a bag slammed and dropped, explosions, whooshes, swells of air, flames, rolls, low brass, thunder, a gong
+and cymbals, a mouse click and switches, and the close-miked strokes of the drum store) reshaped by
+`earshot/synth/design.py` (reverse, layer at a moment, stretch, contour, carry past the listener, halt, fade) within
+the range where a take stays natural, and glued by one room. The seed is a performance: it picks the recordings and
+every take draws fresh noise; `meta['member']` names the main recording.
 
 | family | designs | made of |
 |---|---|---|
@@ -1043,8 +1047,8 @@ crash cymbal (`cymbal/orchestral`); with a word of the drum kit ("fill", "kit", 
 
 ```
 $ earshot make "a fast whoosh as the title flies in" -o whoosh.wav
-whoosh.wav: whoosh/fast (0.30 s, peak at 0.04 s, -19 LUFS, clean) [whoosh]
-also: whoosh/soft, whoosh/deep, whoosh/long
+whoosh.wav: whoosh/fast (0.30 s, peak at 0.04 s, -19 LUFS, clean) [whoosh, fast]
+also: whoosh/blade, whoosh/soft, whoosh/deep
 not understood: flies
 $ earshot make "a deep cinematic boom for the logo" -o boom.wav
 boom.wav: boom/deep (0.37 s, peak at 0.13 s, -16 LUFS, clean) [cinematic boom]
@@ -1231,7 +1235,7 @@ open.wav: open/drawer (0.68 s, peak at 0.39 s, -14 LUFS, clean) [opening]
 toast.wav: notify/knock (0.40 s, peak at 0.01 s, -18 LUFS, clean) [toast notification]
 error.wav: error/knock (0.58 s, peak at 0.19 s, -18 LUFS, clean) [error]
   not understood: address
-card.wav: thump/soft (0.09 s, peak at 0.03 s, -24 LUFS, clean) [thump, card, settles]
+card.wav: thump/soft (0.09 s, peak at 0.03 s, -24 LUFS, clean) [thump, card, settles, soft]
   not understood: pricing
 paid.wav: success/shutter (0.36 s, peak at 0.10 s, -15 LUFS, clean) [payment success]
 ```
@@ -1274,23 +1278,22 @@ also: fire/large, fire/small, fire/whoosh
 
 ```
 $ earshot make "a logo reveal" -o logo2.wav
-logo2.wav: sting/reveal (0.81 s, peak at 0.65 s, -14 LUFS, clean) [logo reveal]
-also: boom/short, kick/soft, kick/deep
+logo2.wav: logo/bag (0.47 s, peak at 0.30 s, -14 LUFS, clean) [logo reveal]
+also: logo/door, sting/reveal, boom/short
 
 $ earshot make "logo reveal" --voice felt_piano --pitch D4 -o logo.wav
 logo.wav: logo/bloom (3.97 s, peak at 0.29 s, D4, felt_piano, -14 LUFS, clean) [logo reveal]
-also: logo/duo, logo/motif, logo_sting/reverse_bloom
+also: logo/duo, logo/motif, logo/bag
 
 $ earshot make "a forest at night" -o night.wav --no-loop --dur 10
-night.wav: night/crickets (9.87 s, peak at 5.43 s, -22 LUFS, clean) [night, forest]
-also: forest/morning, rain/wood, rain/leaves
-9.87 s, shorter than the 10 s asked
+night.wav: jungle/night (9.96 s, peak at 7.11 s, -22 LUFS, clean) [night, forest]
+also: night/crickets, forest/morning, rain/wood
 ```
 
-The night is a learned bed (a BigSoundBank recording of a field at night), rendered once with a fade in and out.
+The night is a learned bed (a recording of a jungle at night), rendered once with a fade in and out.
 For the film's moves and hits see [Film and motion](#film-and-motion). A logo with notes is asked for in words that
 name music (a voice, "a sonic logo", "a motif"); "a logo hit" or "a logo reveal" without them gets a short low hit
-or a swell of air into one (`sting/reveal`, `boom/short`).
+or a swell of air into one (`logo/bag`, `sting/reveal`).
 
 - **Few effects**: motion films are led by music; give two to five moments a sound (a stop and the hit after it,
   something appearing, a click, the title, the logo) and leave the rest to the music. The skill's "Scoring a motion
@@ -1321,7 +1324,6 @@ $ earshot make --spec scene.json -o scene
 rain.wav: rain/street (7.93 s, peak at 4.12 s, -30 LUFS, clean) [terrace, rain]
   7.93 s, shorter than the 8 s asked: the longest this sound is made
 door.wav: door/shut (2.54 s, peak at 1.27 s, -20 LUFS, clean) [door, shut]
-  also: door/close, door/creak, door/open
 keys.wav: keys/bunch (4.21 s, peak at 1.57 s, -15 LUFS, clean) [keys jingling]
   played: 18 events (a recording of the whole action)
 phone.wav: phone/vibrate (1.64 s, peak at 0.38 s, -15 LUFS, clean) [phone, table, vibrating]

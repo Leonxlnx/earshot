@@ -80,7 +80,12 @@ the near ones). `sound=<id>` names the design instead.
 
 Gains are set against the first part. Everything else stays with the thing ("a low rumble", "hoofbeats on dirt").
 A word neither the grammar, the reader nor the catalogue knows is answered with `not understood in part N: ...`; a
-thing the catalogue has no recording of with `part N: earshot has no X; Y is only the nearest it has`. The first
+thing the catalogue has no recording of with `part N: earshot has no X; Y is only the nearest it has`. The thing is
+looked up in the designs' own words too (ids, tags, uses, descriptions, as `earshot sounds --search` reads them): a
+recording whose own words name it comes before one the reader reached by a single loose word, one that names both
+words of a thing ("train whistle") before one that names one, and a word that only describes ("low", "big") never
+chooses. A sound word ("a rumble", "a hiss") is looked up the same way. A synthesized design is taken only when no
+recording names the thing, and the line says so: `no recording of 'X'; Y is synthesized`. The first
 layer may say "falling" as an action ("books falling") without a bend: only a lone "falling" between commas bends.
 
 ## What each step does
@@ -172,16 +177,17 @@ is the last judge.
 
 ```
 $ earshot build "a stampede of horses" -o stampede.wav --part "hundreds of hoofbeats on dirt, for 6 s, getting louder" --part "a low rumble under everything" --part "a horse neighing, twice, far"
-part 1 'hundreds of hoofbeats on dirt, for 6 s, getting louder': step/concrete (scattered 48.7 a second over 6 s, its level drawn: -18, +0 dB); step/concrete nearest to 'hoofbeats on dirt' (atlas +3.1, a short take to repeat)
-part 1: earshot has no hoofbeats; step/concrete is only the nearest it has (swap it: sound=<id> in the part, or edit layer 0's `sound`)
-not understood in part 1: hoofbeats
-part 3 'a horse neighing, twice, far': horse/neigh (2 times, under 2500 Hz); horse/neigh nearest to 'horse neighing' (atlas +7.0)
-fit: z +3.40 for 'a stampede of horses' (the nearest design horse/neigh: z +2.61): a sketch: not clearly it yet
+part 1 'hundreds of hoofbeats on dirt, for 6 s, getting louder': horse/trot (scattered 16.5 a second over 6 s, its level drawn: -18, +0 dB); horse/trot names 'hoofbeats' in its own words (atlas and own words +3.5, a short take to repeat); next nearest: heart/beat, whisk/beat, step/concrete
+part 2 'a low rumble under everything': thunder/roll; thunder/roll names 'low rumble' in its own words (atlas and own words +3.2, a long take for a bed); next nearest: roll/drum, explosion/far, cat/purr
+part 3 'a horse neighing, twice, far': horse/neigh (2 times, under 2500 Hz); horse/neigh names 'horse neighing' in its own words (atlas and own words +6.6, a short take to repeat); next nearest: cow/moo, elephant/trumpet, bear/growl
+fit: z +3.56 for 'a stampede of horses' (the nearest design horse/neigh: z +2.61): a sketch: not clearly it yet; recorded: p_real 0.96
+still off: layer 1 (thunder/roll) covers the rest: the fit rises to z +3.88 without it; lower its `gain` by about 6 dB or leave it out
 ```
 
-`earshot sounds --search hooves` finds horse/trot; the part becomes `"many hoofbeats on dirt sound=horse/trot, for 6 s,
-getting louder"`, and the build is heard as a horse by both ears (second ear: Neigh, Horse, Clip-clop) at z +3.97:
-"sounds like it".
+"hoofbeats" is not a word of the reader, but horse/trot's own words have hooves: the part finds it as `earshot sounds
+--search hooves` does. The second ear hears Neigh, Horse and Clip-clop; the thunder under it is the part to turn down.
+With the rumble said "soft" (6 dB lower) and the hoofbeats without "on dirt", the same build is "sounds like it" at
+z +3.72, the second ear hearing Neigh, Horse and Clip-clop (the run is pasted in full in the README).
 
 **Without the listen extra.** The words ask for many small events on a surface, so the draft is a scatter; the reader
 found hail on a roof and rain on a tin roof. Nothing is heard, and it says so:
@@ -233,12 +239,17 @@ thing: see below.
   takes some of these verdicts back, but it hears only up to 8 kHz, knows 527 classes, and has no class for most made-up
   things. Only listening tells a good build from a lucky one.
 - **The words are read as they are written.** The head of a compound now leads ("a fire alarm" is an alarm), but a
-  part is still found by its words: "a lion growling" can come back as a snore, "a car on a wet street" as a street
-  bed, "a train chugging" as a train horn. Read the `part N` lines and swap with `sound=<id>` (the next nearest are
+  part is still found by its words: "a lion growling" can come back as a snore, "a wooden shelf crashing" as a tree
+  falling, "a train chugging" as a train horn. Read the `part N` lines and swap with `sound=<id>` (the next nearest are
   printed) before handing a sound over.
 - **No material, no sound.** A build is as good as the nearest recordings. With every wind recording left out, "a
   strong wind" came from a jet and thunder and stayed a sketch (z 1.9); "someone whispering" has no whisper or voice
   to start from (z 1.5); "a force field humming" found no hum of its kind (z 2.1).
+- **Rain, hail and things going by.** Rebuilt from other recordings, textures of many similar events and pulsing
+  came out near their real designs (a purr, a swarm of bees, a boiling pot, a campfire, a helicopter first among the
+  922; applause and a brook among the nearest three), but scattered close drops never became the dense far wash of
+  rain or hail on a roof or a window (the real design at places 17 to 124), and `pass` on another motor did not make
+  a car, a motorcycle or a jet going by (places 17, 52 and 192).
 - **A voice is a stand-in.** A whale is an owl and a wolf an octave down; a baby's cry from a laugh moved up stays a
   sketch. earshot makes no speech and no singing.
 - **A tone is a recorded beeper.** A car alarm, a modem or a robot's beeps are built from a reverse alarm, a phone

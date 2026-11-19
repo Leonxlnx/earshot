@@ -22,7 +22,7 @@ Make this sound with earshot: $ARGUMENTS
    action), any `not understood` / `not followed` line, and a line about the length (a cut, the shortest loop, whole
    bars, a counted action that could not fill it). A take that is not `clean` is not usable: make it again with
    another `seed`. If the answer says "earshot makes no ...", the file is only the nearest sound: say so plainly,
-   name the starting points it offers, and do not present it as the thing; it can be built from parts with a recipe
-   (`earshot recipe --example`). Do not say how it sounds beyond what the answer says. If the design is a learned
-   one (a real thing such as a footstep, a switch, a door or a drum), say it is a new take of a public-domain
-   recording, computed from a model of it (no audio file is shipped or played back).
+   name the starting points it offers, and do not present it as the thing; it can be built from recorded parts with
+   `earshot build "REQUEST" -o PATH` (the earshot skill has the loop). Do not say how it sounds beyond what the
+   answer says. If the design is a learned one (a real thing such as a footstep, a switch, a door or a drum), say it
+   is a new take of a public-domain recording, computed from a model of it (no audio file is shipped or played back).

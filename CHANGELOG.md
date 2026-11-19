@@ -3,21 +3,16 @@
 ## 1.0.0 - unreleased
 
 earshot now makes sounds as well as listening to them. An agent asks for a sound in words and earshot renders a new
-take of a design from its catalogue, with no model and no network, or builds the sound from the catalogue's parts
-with a recipe. Realistic sounds are learned from recordings in the public domain and kept as numbers, not audio.
+take of a design from its catalogue, with no model and no network. When the catalogue lacks the thing, the answer
+says so, and `earshot build` makes it from recorded parts named in words, heard and tuned by earshot's listening
+model. Realistic sounds are learned from recordings in the public domain and kept as numbers, not audio.
 Fixes from the community: thanks to @Bortlesboat, @anascherif and @liugedragon. The base install is lighter than
 before: numba is the one new requirement, and the listening stack moved to an extra.
 
 ### Added
 
-**Making sounds**
+**Asking for a sound**
 
-- Recipes build new sounds from real recordings, not only lay them over each other: `scatter` (one take many times at
-  random moments, up to 400 a second, each higher or lower, softer, to a side, or in small pieces: rain from drops,
-  applause from claps), `level`, `bend` (pitch over time), a moving `pan`, `pass` (a thing going by, its pitch falling
-  as it passes), `spin` (rotor, wings, purring), `stretch` (longer at the same pitch, 0.5 to 2), up to 12 layers and
-  a cookbook recipe as a layer. Five new or lifted recipes answer on their own: marbles pouring, toy blocks falling,
-  rocks tumbling down, logs tumbling, a tornado (99 recipes, 59 answer).
 - `earshot make "WORDS" -o FILE` (`earshot/make.py`, MCP `make`, `api.make`) reads the request, ranks the catalogue,
   renders the best design with the request's controls, checks the take (clicks, cut tails, clipping, DC, comb ring,
   rising glides, stacked attacks; a failed take is rendered again on up to three more seeds) and writes wav, flac,
@@ -27,41 +22,72 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   not cover, does not follow or did not understand. Every take also carries `peak_s`, `onset_s` and, for a row of
   events, `events_s`.
 - Every request gets a sound. When the catalogue lacks the thing, the answer says "earshot makes no X; Y is only the
-  nearest sound it has", offers three starting points from other families and points to building it as a recipe.
+  nearest sound it has", offers three starting points from other families and names the `earshot build` call that
+  builds it.
 - The options of `make`: `--n`, `--seed`, `--sound ID`, `--theme`, `--pitch`, `--dur`, `--voice`, `--material`,
   `--events`, the eight axes, `--lufs`, `--mono`, `--no-loop`, `--listen` and `--recipe`. Out-of-range values are
   refused with one plain sentence.
-- `earshot make --set ui|game|arcade|film` and `--spec FILE` (MCP `make_set`) make a family of sounds in one call with
-  a `manifest.json`, in several formats at once (`--format webm,mp3`) and with a sprite (`--sprite`). One-shots are
-  as loud as they are made alone and within 2.5 dB of each other; loops and beds are levelled by kind; a loop is
-  written as flac in place of mp3 or m4a, whose padding leaves a gap at the seam.
-- `earshot sounds` (MCP `sounds`) lists and searches the catalogue. `earshot pack` lays many sounds in one file with
-  a map in the format howler.js reads.
-- Recipes (`earshot/recipe.py`; `earshot make --recipe FILE`; `earshot recipe --example`, `--list`, `NAME` and
-  `--check`; MCP `make` with `recipe`; a spec entry's `recipe`) build a sound from the catalogue's parts as a small
-  JSON form: layers of designs, noise or a low sine, with pitch, glide, reverse, cut, halt, filters, pan, gain, fades,
-  swell, decay, repeated events, and one layer's loudness following another's. A recipe is rendered and checked like
-  every sound.
-- A cookbook of 95 recipes (`earshot/data/recipes`). 54 answer a request for their thing on their own (a car crash,
-  a cannon, a woodpecker, a werewolf howl, and what no recording holds: a fireball spell, an energy shield going up,
-  a plasma shot, a robot arm, a zombie horde and more); 41 are sketches that an answer names as a starting point. A
-  recording of the thing itself answers before a recipe, and a recipe whose thing has been recorded since is gone. A
-  length, far away, up close, soft and a count asked of a cookbook sound are followed, or the answer says they are not.
-- `earshot build "WORDS" -o FILE` (`earshot/build.py`, MCP `build`) builds a sound the catalogue lacks with earshot as
+- `earshot sounds` (MCP `sounds`) lists and searches the catalogue.
+- The reader (`earshot/brief.py`, `earshot/sounds/lexicon.py`) needs no model. It reads the thing, the job and the
+  sound; feelings as offsets on eight axes (bright, hard, ring, size, space, width, energy, motion); negation and
+  comparison; voices and materials; lengths, gaps, counts, pitches and keys; loop or one-shot; the moment a sound
+  plays ("when the pricing card settles"); and words for the product or the place, which choose nothing.
+- What follows "on" or "in" is the sound's surface or place ("rain on wood"). A surface the sound has no design on
+  gets the nearest one and says so ("rain on a tarp": `rain/tent is the nearest surface`).
+- A request in German is read through a table of about 400 sound words ("Regen auf Holz"), with inflected
+  adjectives and participles ("ein leiser Klick", "schwere Schritte", "eine knarrende Tür") and requests whose every
+  word is English too ("ein lauter Donner"); a request in another language gets "write it in English".
+- A request for a thing earshot lacks says so in more wordings: an unknown thing doing a known thing ("a zeppelin
+  arriving at the station", "a flock of geese flying over"), a thing named in -ey, -way or -ory ("a monkey", "a
+  subway", "a factory"), a word only another design lists as a job ("a trap springing shut") and a name made of an
+  unknown word and a known one ("a conveyor belt"); a known thing doing something unknown ("plates clattering", "a
+  siren getting closer") is answered without that doubt.
+- The nearest of a thing the cookbook only sketches is a part its sketch is built on, and the sketch's other parts
+  are the first starting points; when no word of a request found anything the starting points are a knock, a drill
+  and a whoosh; a synthesized sound or an instrument's note is never a starting point for a thing of the world.
+- A plain film request in a few words ("a title hit", "a logo reveal", "a riser", "an impact", "a glint") gets the
+  film set's sound of real things first; a request that names a design word for word keeps that design.
+- A recording answers the words of its own thing only: not the place in its name ("a car on gravel" is no hail on a
+  car), its family's word said as what something else does ("air blowing", "darting forward"), a thing the sound is
+  only compared with ("BRAAM, like a giant ship horn") or the window a product's job is done to ("putting a window
+  away"); things recorded since ("a foghorn", "a refrigerator hum", "mice squeaking") are no longer called missing.
+- A request that asks for a change as the sound plays ("getting louder"), for a sound heard through something
+  ("behind a closed door"), for a sound that moves from left to right, or for a length the design does not keep,
+  says so in the answer.
+
+**Building what the catalogue lacks**
+
+- `earshot build "WORDS" -o FILE` (`earshot/build.py`, MCP `build`, `docs/BUILD.md`) builds a sound with earshot as
   the ears: it drafts one to three recipes from the words (a structure by the kind of sound, the recorded designs
   nearest the words as parts), renders and hears them with the listening model, tunes their numbers in a seeded
   search and writes the sound and its recipe. The answer gives the fit to the words beside the design `make` would
   hand over, what it is heard as and what is still off, each with the recipe field to change; `--recipe` hears an
-  edited recipe again. Without the listen extra it drafts, renders, audits and measures. `make` names it for a thing
-  it has nothing of. `docs/BUILD.md`. An agent names the parts in plain phrases (`--part "hundreds of hoofbeats on
-  dirt, for 6 s, getting louder"`, MCP `parts`): a small grammar turns how many, when, how long, motion, pitch,
-  distance and force into the layer's fields, the rest of the phrase is grounded in a recorded design, and the answer
-  says which design each part became, the next nearest, what the catalogue has no recording of and every word it did
-  not understand. The automatic draft scatters many of one thing ("a stampede of horses", "applause"), lets the head
-  of the words lead ("a fire alarm" is an alarm), names only operations its recipe has, and always tries the plain
-  design `make` would hand over, saying so when that wins. A second ear (the AudioSet tagger), which the tuner never
-  sees, must not contradict a "sounds like it"; a remark that compares with another design is made only when that
-  design is of the same thing and following it does not lower the fit.
+  edited recipe again. Without the listen extra it drafts, renders, audits and measures.
+- Parts in words: an agent names what the sound is made of (`--part "hundreds of hoofbeats on dirt, for 6 s, getting
+  louder"`, MCP `parts`). A small grammar turns how many, when, how long, motion, pitch, distance and force into the
+  layer's fields, the rest of the phrase is grounded in a recorded design, and the answer says which design each
+  part became, the next nearest, what the catalogue has no recording of and every word it did not understand.
+- A part's thing is also looked up in the designs' own words: "hoofbeats" finds the horse's hooves, "a low rumble" a
+  rumble and not whatever is low, "a train whistle" a design with both words; a synthesized design only when no
+  recording names the thing, and then the line says it is synthesized.
+- The automatic draft scatters many of one thing ("a stampede of horses", "applause"), lets the head of the words
+  lead ("a fire alarm" is an alarm), and always tries the plain design `make` would hand over, saying so when that
+  wins. A second ear (the AudioSet tagger), which the tuner never sees, must not contradict a "sounds like it"; a
+  remark that compares with another design is made only when that design is of the same thing and following it does
+  not lower the fit.
+- Recipes (`earshot/recipe.py`; `earshot make --recipe FILE`; `earshot recipe --example`, `--list`, `NAME` and
+  `--check`; MCP `make` with `recipe`; a spec entry's `recipe`) build a sound from recordings as a small JSON form of
+  up to 12 layers: designs, noise or a low sine, with pitch, glide, reverse, cut, halt, filters, gain, fades, swell,
+  decay, repeated events and one layer's loudness following another's; `scatter` (one take many times at random
+  moments, up to 400 a second: rain from drops, applause from claps), `level` and `bend` (loudness and pitch drawn
+  over time), `pan` to a side or across, `pass` (a thing going by, its pitch falling as it passes), `spin` (rotor,
+  wings, purring), `stretch` (longer at the same pitch, 0.5 to 2) and a cookbook recipe as a layer. A recipe is
+  rendered and checked like every sound.
+- A cookbook of 99 recipes (`earshot/data/recipes`). 59 answer a request for their thing on their own (a car crash,
+  a cannon, a woodpecker, marbles pouring, rocks tumbling, a tornado, and what no recording holds: a fireball spell,
+  an energy shield going up, a plasma shot, a robot arm and more); 40 are sketches that an answer names as a starting
+  point. A recording of the thing itself answers before a recipe. A length, far away, up close, soft and a count
+  asked of a cookbook sound are followed, or the answer says they are not.
 
 **The catalogue**
 
@@ -93,9 +119,6 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   recordings the way motion films use them (short dry hits, a 50 ms thump, a bright tick, whooshes and risers of
   air, a tape stop, a braam of real brass), following measurements of 39 professional motion videos; 14 small ones
   are invented. A motion request gets no instrument note unless its words ask for music.
-- The `film` set plays small real actions cut to those measurements, each naming its recordings by file: a door
-  falling shut when something appears, a mechanical key's tick, a page sliding, a stick and a broom through the air,
-  a heavy bag dropped under a title and a logo, a car door for an impact, a breath of air rising, a sword drawn.
 - 40 drum designs (`earshot/sounds/drums.py`, `earshot/data/drums/`): the acoustic kit and hand percussion are
   played from 130 recorded strokes in the public domain; the drum-machine voices, a brush snare, a finger snap and a
   stick count are invented.
@@ -104,50 +127,37 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   97 notes). They answer an interface request only when its words ask for music or a theme is named.
 - 51 notes of other voices, 14 synthesizer sounds, 24 chip sounds (only when asked for), 83 sounds of actions and
   objects invented from physics, three short music loops, and the 209 named members of the sound bank.
-- Themes and sets (`earshot/sounds/theme.py`, `sets.py`): nine theme presets give a family one voice, key, room and
-  axis offsets; four ready-made sets (`ui` 17, `game` 22, `arcade` 16, `film` 17).
+
+**Sets**
+
+- `earshot make --set ui|game|arcade|film` and `--spec FILE` (MCP `make_set`) make a family of sounds in one call with
+  a `manifest.json`, in several formats at once (`--format webm,mp3`) and with a sprite (`--sprite`). One-shots are
+  as loud as they are made alone and within 2.5 dB of each other; loops and beds are levelled by kind; a loop is
+  written as flac in place of mp3 or m4a, whose padding leaves a gap at the seam.
+- Four ready-made sets (`earshot/sounds/sets.py`: `ui` 17, `game` 22, `arcade` 16, `film` 17) and nine theme presets
+  (`theme.py`) that give a family one voice, key, room and axis offsets.
+- The `film` set plays small real actions cut to the measurements of motion videos, each naming its recordings by
+  file: a door falling shut when something appears, a mechanical key's tick, a page sliding, a stick and a broom
+  through the air, a heavy bag dropped under a title and a logo, a car door for an impact, a breath of air rising, a
+  sword drawn.
+- `earshot pack` lays many sounds in one file with a map in the format howler.js reads.
+
+**Listening**
+
 - The sound atlas (`earshot/sounds/atlas.py`, `earshot/data/sounds_atlas.npz`, numbers only): a CLAP embedding of
-  every design. `--listen` blends how the designs sound into the ranking and says what the result is heard as.
+  every design. `make --listen` blends how the designs sound into the ranking and says what the result is heard as;
+  `build` hears with it and with the AudioSet tagger.
 
-**Reading requests**
-
-- The reader (`earshot/brief.py`, `earshot/sounds/lexicon.py`) needs no model. It reads the thing, the job and the
-  sound; feelings as offsets on eight axes (bright, hard, ring, size, space, width, energy, motion); negation and
-  comparison; voices and materials; lengths, gaps, counts, pitches and keys; loop or one-shot; the moment a sound
-  plays ("when the pricing card settles"); and words for the product or the place, which choose nothing.
-- What follows "on" or "in" is the sound's surface or place ("rain on wood"). A surface the sound has no design on
-  gets the nearest one and says so ("rain on a tarp": `rain/tent is the nearest surface`).
-- A request in German is read through a table of about 400 sound words ("Regen auf Holz"), with inflected
-  adjectives and participles ("ein leiser Klick", "schwere Schritte", "eine knarrende Tür") and requests whose every
-  word is English too ("ein lauter Donner"); a request in another language gets "write it in English".
-- A request for a thing earshot lacks says so in more wordings: an unknown thing doing a known thing ("a zeppelin
-  arriving at the station", "a flock of geese flying over"), a thing named in -ey, -way or -ory ("a monkey", "a
-  subway", "a factory"), a word only another design lists as a job ("a trap springing shut") and a name made of an
-  unknown word and a known one ("a conveyor belt"); a known thing doing something unknown ("plates clattering", "a
-  siren getting closer") is answered without that doubt.
-- The nearest of a thing the cookbook only sketches is a part its sketch is built on, and the sketch's other parts
-  are the first starting points; when no word of a request found anything the starting points are a knock, a drill
-  and a whoosh; a synthesized sound or an instrument's note is never a starting point for a thing of the world.
-- A plain film request in a few words ("a title hit", "a logo reveal", "a riser", "an impact", "a glint") gets the
-  film set's sound of real things first; a request that names a design word for word keeps that design.
-- A recording answers the words of its own thing only: not the place in its name ("a car on gravel" is no hail on a
-  car), its family's word said as what something else does ("air blowing", "darting forward"), a thing the sound is
-  only compared with ("BRAAM, like a giant ship horn") or the window a product's job is done to ("putting a window
-  away"); things recorded since ("a foghorn", "a refrigerator hum", "mice squeaking") are no longer called missing.
-- A request that asks for a change as the sound plays ("getting louder"), for a sound heard through something
-  ("behind a closed door"), for a sound that moves from left to right, or for a length the design does not keep,
-  says so in the answer.
-
-**Around it**
+**Install and around it**
 
 - The Claude Code plugin (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `commands/`): the
   repository is a plugin and its own marketplace (`/plugin marketplace add Leonxlnx/earshot`, `/plugin install
   earshot@earshot`) with the two skills, the MCP server of the installed `earshot`, and the commands `/earshot:make`
   and `/earshot:make-set`.
-- The earshot skill opens with a complete part on making sounds. `docs/MAKE.md` is the reference of making;
-  `docs/VALIDATION.md` and `docs/LIMITS.md` cover the made sounds.
+- The earshot skill opens with a complete part on making and building sounds. `docs/MAKE.md` is the reference of
+  making, `docs/BUILD.md` of building; `docs/VALIDATION.md` and `docs/LIMITS.md` cover the made and built sounds.
 - Tests for the catalogue contract, the learned sounds and their engines, the beds, drums, music loops, the reader,
-  `make`, sets, recipes and `pack`; the long renders and the tests that load CLAP run with `--slow`.
+  `make`, sets, recipes, `build` and `pack`; the long renders and the tests that load CLAP run with `--slow`.
 - CI (#32; thanks, @liugedragon): a Linux job runs the fast tests without the models
   (`.github/workflows/fast-tests.yml`, `docs/TESTING.md`).
 
