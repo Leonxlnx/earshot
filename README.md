@@ -227,8 +227,13 @@ small events, something that runs or passes, a creature's voice, something made 
 them with the listening model, tunes the numbers of the best one in a seeded search and writes `hail.wav` and
 `hail.recipe.json`. The answer says what it is built from, what it is heard as, its fit to the words beside the design
 `make` would hand over ("sounds like it" or "a sketch"), and what is still off, each with the recipe field to change;
-`earshot build "..." --recipe hail.recipe.json` hears an edited recipe again. No model generates audio: the listening
-model only judges. Without the listen extra it drafts, renders, audits and measures, and says that it did not hear.
+`earshot build "..." --recipe hail.recipe.json` hears an edited recipe again. An agent that knows what makes the sound
+names the parts in plain phrases (`--part "hundreds of hoofbeats on dirt, for 6 s, getting louder" --part "a low
+rumble under everything"`): earshot finds a recording for each, writes its layer from the words (how many, when, how
+long, motion, pitch, distance) and says which design each became and which words it did not understand. A second ear
+(the AudioSet tagger), which the tuner never sees, has to agree before a build is called "sounds like it". No model
+generates audio: the listening models only judge. Without the listen extra it drafts, renders, audits and measures,
+and says that it did not hear.
 The loop, examples and what it cannot do: [docs/BUILD.md](docs/BUILD.md).
 
 ### Sets and themes

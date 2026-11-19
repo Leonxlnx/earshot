@@ -53,7 +53,15 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   search and writes the sound and its recipe. The answer gives the fit to the words beside the design `make` would
   hand over, what it is heard as and what is still off, each with the recipe field to change; `--recipe` hears an
   edited recipe again. Without the listen extra it drafts, renders, audits and measures. `make` names it for a thing
-  it has nothing of. `docs/BUILD.md`.
+  it has nothing of. `docs/BUILD.md`. An agent names the parts in plain phrases (`--part "hundreds of hoofbeats on
+  dirt, for 6 s, getting louder"`, MCP `parts`): a small grammar turns how many, when, how long, motion, pitch,
+  distance and force into the layer's fields, the rest of the phrase is grounded in a recorded design, and the answer
+  says which design each part became, the next nearest, what the catalogue has no recording of and every word it did
+  not understand. The automatic draft scatters many of one thing ("a stampede of horses", "applause"), lets the head
+  of the words lead ("a fire alarm" is an alarm), names only operations its recipe has, and always tries the plain
+  design `make` would hand over, saying so when that wins. A second ear (the AudioSet tagger), which the tuner never
+  sees, must not contradict a "sounds like it"; a remark that compares with another design is made only when that
+  design is of the same thing and following it does not lower the fit.
 
 **The catalogue**
 

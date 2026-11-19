@@ -211,15 +211,24 @@ app's timer figure on a marimba, not a wind-up bell. Leave a moment silent, reco
 
 ### When earshot does not have the sound: build it
 
-When the answer says `earshot makes no X`, build it on earshot's workbench: `earshot build "X" -o x.wav` (MCP `build`).
+When the answer says `earshot makes no X`, build it on earshot's workbench (MCP `build`, `parts`). You know what
+physically makes the sound; say it, one part a thing, and earshot finds a recording for each and writes the recipe:
 
-1. It drafts recipes from the words (recorded parts, a structure by the kind of sound), renders, hears and tunes them,
-   and writes `x.wav` and `x.recipe.json`.
-2. Read `fit:` (the z for the words beside the design `make` has nearest: "sounds like it" or "a sketch") and
-   `heard as:`.
-3. Read `still off:`: each line names the field of the recipe to change.
-4. Change one thing in `x.recipe.json`, then `earshot build "X" --recipe x.recipe.json` hears it again (add
-   `--rounds 20` to tune its numbers again).
+```
+earshot build "a stampede of horses" -o stampede.wav \
+  --part "hundreds of hoofbeats on dirt, for 6 s, getting louder" \
+  --part "a low rumble under everything" --part "a horse neighing, twice, far"
+```
+
+1. A phrase says the thing and how: how many (twice, a few, hundreds of), when (at 2 s, at the end, under
+   everything), how long (for 4 s), motion (passing, from left to right, getting louder, fading), pitch (lower,
+   rising), distance and force (far, close, soft, muffled), reversed, pulsing at N a second. The table is in
+   `docs/BUILD.md`. Without `--part` it drafts the parts itself.
+2. Read the `part N` lines: the design each part became, the next nearest, `earshot has no ...` and `not understood
+   in part N`. Swap a part with `sound=<id>` in its phrase.
+3. Read `fit:` ("sounds like it" needs the fit and no contradiction from the second ear) and `heard as:`.
+4. Read `still off:`: each line names the field of `x.recipe.json` to change; then `earshot build "X" --recipe
+   x.recipe.json` hears it again (`--rounds 20` tunes it again).
 5. Hand it over as what `fit` says: a sketch is a sketch, and a person should listen once.
 
 `--without ID_OR_FAMILY` keeps parts out. It loads the listening model (the listen extra) and takes about a minute;

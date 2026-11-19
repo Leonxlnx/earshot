@@ -828,6 +828,14 @@ def tool_build(want: Annotated[str, Field(description='the sound in words: the t
                without: Annotated[list[str] | None, Field(description='design ids ("rain/tin_roof") or families '
                                                                       '("rain") the build must not use')] = None,
                seed: Annotated[int, Field(description='the seed of the takes and of the tuning search')] = 0,
+               parts: Annotated[list[str] | None, Field(description='what the sound is made of, one plain phrase a '
+                                                                    'part: the thing and how many, when, how long, '
+                                                                    'how it moves, its pitch, distance and force '
+                                                                    '("hundreds of hoofbeats on dirt, for 6 s, getting '
+                                                                    'louder", "a low rumble under everything", "a '
+                                                                    'horse neighing, twice, far"; sound=<id> names '
+                                                                    'the design): each is grounded in a recording '
+                                                                    'and becomes a layer')] = None,
                full: Full = False) -> str:
     """Build a sound the catalogue lacks from its recorded parts, with earshot as the ears: it drafts one to three
     recipes from the words (a structure by the kind of sound: one event, a row, very many small events, something
@@ -836,12 +844,14 @@ def tool_build(want: Annotated[str, Field(description='the sound in words: the t
     search and writes the sound and its recipe. The answer says what it is built from, what it is heard as, its fit
     to the words as a z beside the design `make` would hand over ("sounds like it" when clean, z >= 3 and 1 over
     it; else "a sketch"), whether it is heard as recorded, and what is still off, each with the recipe field to
-    change. Then edit the recipe and call build again with `recipe`. Without the listen extra it drafts, renders,
+    change. Name the parts yourself with `parts` (what physically makes the sound, a phrase each): earshot finds a
+    recording for each, writes its layer and says which design each became and why, and which words it did not
+    understand. Then edit the recipe and call build again with `recipe`. Without the listen extra it drafts, renders,
     audits and measures, and says so. Use it when make answers "earshot makes no X", or for any sound the catalogue
     has nothing of; it takes a model load and about a minute on a laptop CPU."""
     from . import build as B
     return _run('build', dict(words=want, out=_out_path(out, 'out'), recipe=recipe, rounds=rounds, without=without,
-                              seed=seed), full, _summary_only(B.build))
+                              seed=seed, parts=parts), full, _summary_only(B.build))
 
 
 TOOLS += [(tool_make, False, False), (tool_make_set, False, False), (tool_sounds, True, False),
