@@ -38,16 +38,47 @@ def centroid(y):
     ([], 'a recipe is an object'),
     ({'layers': [TAP]}, 'name is the sound\'s name'),
     ({'name': 'two words', 'layers': [TAP]}, 'name is the sound\'s name'),
-    ({'name': 'x'}, 'layers is a list of 1 to 8 layers'),
-    ({'name': 'x', 'layers': []}, 'layers is a list of 1 to 8 layers'),
-    ({'name': 'x', 'layers': [TAP] * 9}, 'layers is a list of 1 to 8 layers'),
+    ({'name': 'x'}, 'layers is a list of 1 to 12 layers'),
+    ({'name': 'x', 'layers': []}, 'layers is a list of 1 to 12 layers'),
+    ({'name': 'x', 'layers': [TAP] * 13}, 'layers is a list of 1 to 12 layers'),
     (rec(TAP, colour='red'), "unknown field 'colour' in the recipe: a recipe takes name, says, layers"),
     (rec(space='cave'), "space is one of dry, booth, room, studio, hall, plate, cathedral, not 'cave'"),
     (rec(kind='loop'), "kind is one of event, ambience, not 'loop'"),
     (rec(dur=0), 'dur is the length of the sound in seconds from 0.02 to 120, not 0'),
     (rec(says=''), 'says is what the sound is, in words'),
     (rec('door/slam'), 'layers[0] is an object such as'),
-    (rec({}), 'layers[0] names either a catalogue design ("sound": "door/slam") or a plain source'),
+    (rec({}), 'layers[0] names either a catalogue design ("sound": "door/slam"), a plain source'),
+    (rec({'sound': 'switch/power_strip', 'recipe': 'thunder_far'}), 'layers[0] names either a catalogue design'),
+    (rec({'recipe': 'thunder_fat'}), "layers[0].recipe 'thunder_fat' is not in the cookbook; the nearest: "
+                                     "thunder_far"),
+    (rec({'recipe': 'thunder_far', 'size': 1}), 'layers[0].size does not belong to a recipe layer'),
+    (rec({**TAP, 'scatter': 40}), 'layers[0].scatter is an object such as {"rate": 40, "dur": 6'),
+    (rec({**TAP, 'scatter': {'rate': 40}}), 'layers[0].scatter.dur is missing'),
+    (rec({**TAP, 'scatter': {'rate': 900, 'dur': 2}}), 'layers[0].scatter.rate is a number of events a second '
+                                                        'from 0.5 to 400, not 900'),
+    (rec({**TAP, 'scatter': {'rate': 9, 'dur': 2, 'grain': 0}}), 'layers[0].scatter.grain is a length in seconds '
+                                                                  'from 0.005 to 2, not 0'),
+    (rec({**TAP, 'scatter': {'rate': 9, 'dur': 2, 'spread': 1}}), "unknown field 'spread' in layers[0].scatter: "
+                                                                   "scatter takes rate, rate_to, dur"),
+    (rec({**TAP, 'scatter': {'rate': 9, 'dur': 2}, 'events': {'count': 2, 'gap': 1}}), 'layers[0] takes events '
+                                                                                        '(a row of up to 64) or '
+                                                                                        'scatter'),
+    (rec({**TAP, 'level': -6}), 'layers[0].level is a list of two or more points [time s, dB] such as'),
+    (rec({**TAP, 'level': [[0, 0]]}), 'layers[0].level is a list of two or more points'),
+    (rec({**TAP, 'level': [[1, 0], [0.5, -6]]}), 'layers[0].level[1][0] is 0.5 s, before the point ahead of it'),
+    (rec({**TAP, 'level': [[0, 0], [1, -90]]}), 'layers[0].level[1][1] is a level in dB from -60 to 12, not -90'),
+    (rec({**TAP, 'bend': [[0, 0], [1, 30]]}), 'layers[0].bend[1][1] is a number of semitones from -24 to 12'),
+    (rec({**TAP, 'pan': [-1, 0, 1]}), 'layers[0].pan is a position from -1 to 1 or two of them [from, to]'),
+    (rec({**TAP, 'pan': [-1, 3]}), 'layers[0].pan[1] is a position from -1 to 1, not 3'),
+    (rec({**TAP, 'pass': 2}), 'layers[0].pass is an object such as {"at": 2.0, "speed": 25}'),
+    (rec({**TAP, 'pass': {'speed': 20}}), 'layers[0].pass.at is missing'),
+    (rec({**TAP, 'pass': {'at': 1, 'speed': 400}}), 'layers[0].pass.speed is a speed in metres a second from 1 to '
+                                                    '100, not 400'),
+    (rec({**TAP, 'spin': {'depth': 1}}), 'layers[0].spin.rate is missing'),
+    (rec({**TAP, 'spin': {'rate': 200}}), 'layers[0].spin.rate is a rate in Hz from 0.5 to 60, not 200'),
+    (rec({**TAP, 'spin': {'rate': 9, 'shape': 'saw'}}), "layers[0].spin.shape is one of smooth, chop, not 'saw'"),
+    (rec({**TAP, 'stretch': 10}), 'layers[0].stretch is a factor from 0.5 to 2, not 10: further than that a real '
+                                  'take rings like a comb'),
     (rec({'sound': 'switch/power_strip', 'source': 'noise'}), 'layers[0] names either a catalogue design'),
     (rec({'sound': 'switch/power_stripe'}), "layers[0].sound 'switch/power_stripe' is not in the catalogue; the "
                                             "nearest ids: switch/power_strip"),
@@ -59,7 +90,7 @@ def centroid(y):
     (rec({**TAP, 'cut': 0.2}), 'layers[0].cut is two times in seconds [from, to], not 0.2'),
     (rec({**TAP, 'lowpass': 5}), 'layers[0].lowpass is a frequency in Hz from 20 to 20000, not 5'),
     (rec({**TAP, 'highpass': [100, 200, 300]}), 'layers[0].highpass is a frequency in Hz or two of them'),
-    (rec({**TAP, 'loud': 1}), "unknown field 'loud' in layers[0]: a layer takes sound, source, seed"),
+    (rec({**TAP, 'loud': 1}), "unknown field 'loud' in layers[0]: a layer takes sound, source, recipe, seed"),
     (rec({**TAP, 'hz': 60}), 'layers[0].hz belongs to a source'),
     (rec({**TAP, 'events': 3}), 'layers[0].events is an object such as {"count": 4, "gap": 0.5}'),
     (rec({**TAP, 'events': {'count': 3}}), 'layers[0].events.gap is missing'),
@@ -221,6 +252,129 @@ def test_follow_gives_a_layer_the_loudness_of_another_or_makes_it_give_way():
     assert m['parts'][1].startswith('white noise (giving way to layer 0') and between(gave) > 5 * between(followed)
 
 
+def env(y, step=0.05):
+    """the level of y in steps of `step` s (RMS)"""
+    k = dsp.n_of(step)
+    m = len(y) // k
+    return np.sqrt((y[:m * k] ** 2).mean(axis=1).reshape(m, k).mean(axis=1))
+
+
+def test_scatter_lays_a_take_many_times_at_random_moments():
+    lay = R.check(rec({**TAP, 'scatter': {'rate': 40, 'dur': 3.0, 'pitch': 3, 'gain': 9, 'pan': 0.8}}))['layers'][0]
+    y = R._scatter(lay, 0, 0, [])
+    assert abs(np.abs(y).max() - R.PEAK) < 1e-9 and 3.0 <= len(y) / dsp.SR < 4.0
+    e = env(y)[:58]
+    assert (e > 0.02 * e.max()).mean() > 0.9                         # 40 a second: something sounds in every 50 ms
+    assert abs(np.corrcoef(y[:, 0], y[:, 1])[0, 1]) < 0.9              # spread over the sides
+    assert np.array_equal(y, R._scatter(lay, 0, 0, [])) and not np.array_equal(y, R._scatter(lay, 1, 0, []))
+    sparse = R._scatter({**lay, 'scatter': {'rate': 2, 'dur': 3.0}}, 0, 0, [])
+    assert (env(sparse) > 0.02 * env(sparse).max()).mean() < 0.6
+    # a rate that moves: few events at the start, many at the end
+    grow = R._scatter({**lay, 'scatter': {'rate': 1, 'rate_to': 200, 'dur': 4.0}}, 0, 0, [])
+    q = env(grow)
+    assert q[:20].mean() < 0.3 * q[60:80].mean()
+    # pieces of a texture: grains of 20 ms from a crackle
+    fine = R._scatter(R.check(rec({'sound': 'fire/small', 'scatter': {'rate': 300, 'dur': 2.0, 'grain': 0.02}}))[
+        'layers'][0], 0, 0, [])
+    assert abs(len(fine) / dsp.SR - 2.02) < 0.01
+    y, m = R.render(rec({**TAP, 'scatter': {'rate': 40, 'dur': 3.0}, 'pan': 0.5}))
+    assert m['checks']['ok'] and m['parts'] == ['switch/power_strip (scattered 40 a second over 3 s)']
+
+
+def test_scatter_stays_fast_with_thousands_of_events():
+    import time
+    r = rec({'sound': 'water/drop', 'scatter': {'rate': 200, 'dur': 10.0, 'pitch': 3, 'gain': 10, 'pan': 0.7}},
+            dur=10)
+    R.render(r)
+    t = time.time()
+    y, m = R.render(r, seed=1)
+    assert time.time() - t < 3.0 and m['checks']['ok'] and abs(m['dur_s'] - 10.0) < 0.05
+
+
+def test_level_draws_the_loudness_over_time_without_a_click():
+    noise = {'source': 'noise', 'dur': 2.0, 'color': 'white'}
+    plain = env(one(noise))
+    y, _ = R.render(rec({**noise, 'level': [[0, 0], [1, 0], [1, -20], [2, -20]]}))
+    e = env(y)
+    assert 15 < 20 * np.log10(e[5:18].mean() / e[22:38].mean()) < 25
+    jump = np.abs(np.diff(y[:, 0]))
+    assert jump[dsp.n_of(0.99):dsp.n_of(1.01)].max() < 4 * np.percentile(jump, 99.9)
+    assert plain.std() / plain.mean() < 0.2
+
+
+def test_bend_moves_the_pitch_over_time_as_a_tape_does():
+    tone = {'source': 'sine', 'dur': 1.0, 'hz': 100}
+
+    def hz(y):
+        s = np.abs(np.fft.rfft(y[:, 0] * np.hanning(len(y)), 8 * len(y)))
+        return float(np.fft.rfftfreq(8 * len(y), 1 / dsp.SR)[int(np.argmax(s))])
+    y, m = R.render(rec({**tone, 'bend': [[0, 0], [0.5, 0], [0.6, -12], [3, -12]]}))
+    k = dsp.n_of(0.1)
+    assert 95 < hz(y[k:4 * k]) < 105 and 47 < hz(y[-5 * k:-2 * k]) < 53
+    assert 1.4 < m['dur_s'] < 1.5                            # 0.5 s at speed 1, the rest at half speed
+    assert m['parts'] == ['a 100 Hz sine (bent through +0, +0, -12, -12 semitones)']
+
+
+def test_pan_moves_across_and_pass_goes_by_with_its_pitch_falling():
+    noise = {'source': 'noise', 'dur': 2.0, 'color': 'pink'}
+    y, _ = R.render(rec({**noise, 'pan': [-1, 1]}))
+    q = len(y) // 5
+    assert np.abs(y[:q, 0]).mean() > 3 * np.abs(y[:q, 1]).mean()
+    assert np.abs(y[-q:, 1]).mean() > 3 * np.abs(y[-q:, 0]).mean()
+    tone = {'source': 'sine', 'dur': 4.0, 'hz': 120}
+    lay = R.check(rec({**tone, 'pass': {'at': 2.0, 'speed': 40}}))['layers'][0]
+    z = R._moved(one(tone), lay)
+
+    def hz(y):
+        s = np.abs(np.fft.rfft(y.mean(axis=1) * np.hanning(len(y)), 8 * len(y)))
+        return float(np.fft.rfftfreq(8 * len(y), 1 / dsp.SR)[int(np.argmax(s))])
+    k = dsp.n_of(0.5)
+    before, after = hz(z[:k]), hz(z[-2 * k:-k])
+    assert 2.0 < 12 * np.log2(before / after) < 5.0                 # 40 m/s: about 3.5 semitones from near to far
+    e = env(z)
+    assert np.argmax(e) * 0.05 == pytest.approx(2.0, abs=0.15) and e.max() > 8 * e[:5].mean()
+    assert np.abs(z[:k, 0]).mean() > np.abs(z[:k, 1]).mean() and np.abs(z[-k:, 1]).mean() > np.abs(z[-k:, 0]).mean()
+
+
+def test_spin_pulses_the_loudness_smooth_or_chopped():
+    noise = {'source': 'noise', 'dur': 2.0, 'color': 'white'}
+    for shape in R.SHAPES:
+        y, _ = R.render(rec({**noise, 'spin': {'rate': 10, 'depth': 1.0, 'shape': shape}}))
+        e = env(y, 0.005)[40:360]
+        spec = np.abs(np.fft.rfft(e - e.mean()))
+        assert abs(np.fft.rfftfreq(len(e), 0.005)[int(np.argmax(spec))] - 10) < 1.0
+        assert e.min() < 0.1 * e.max()
+    half, _ = R.render(rec({**noise, 'spin': {'rate': 10, 'depth': 0.5}}))
+    e = env(half, 0.005)[40:360]
+    assert 0.3 < e.min() / e.max() < 0.7
+
+
+def test_stretch_makes_a_take_longer_at_the_same_pitch_and_keeps_its_hit():
+    tone = {'source': 'sine', 'dur': 1.0, 'hz': 110}
+
+    def hz(y):
+        s = np.abs(np.fft.rfft(y[:, 0] * np.hanning(len(y)), 8 * len(y)))
+        return float(np.fft.rfftfreq(8 * len(y), 1 / dsp.SR)[int(np.argmax(s))])
+    long = one({**tone, 'stretch': 2.0})
+    assert abs(len(long) / dsp.SR - 2.0) < 0.1 and abs(hz(long) - 110) < 3     # (its first 55 ms kept as they are)
+    short = one({**tone, 'stretch': 0.5})
+    assert abs(len(short) / dsp.SR - 0.5) < 0.06 and abs(hz(short) - 110) < 5
+    hit = one(TAP)
+    held = one({**TAP, 'stretch': 2.0})
+    k = dsp.n_of(0.005)
+    a, b = np.argmax(np.abs(hit).max(axis=1)), np.argmax(np.abs(held).max(axis=1))
+    assert a == b and np.allclose(hit[:a + k], held[:a + k], atol=1e-6)        # the hit itself is kept as it was
+    assert R.render(rec({**TAP, 'stretch': 2}))[1]['parts'] == ['switch/power_strip (stretched 2 times)']
+
+
+def test_a_layer_may_be_a_cookbook_recipe():
+    y, m = R.render(rec({'recipe': 'thunder_far', 'gain': 0}, {**TAP, 'at': 0.2}))
+    alone, _ = R.render(R.cookbook()['thunder_far'])
+    assert m['checks']['ok'] and m['parts'][0] == 'the recipe thunder_far' and len(y) >= len(alone) - dsp.n_of(0.1)
+    short, _ = R.render(rec({'recipe': 'thunder_far', 'dur': 1.0}))
+    assert abs(len(short) / dsp.SR - 1.0) < 0.05
+
+
 # ------------------------------------------------------------------------------------------------------ the whole
 def test_a_seed_gives_the_same_samples_and_another_seed_another_take():
     hiss = {'source': 'noise', 'dur': 0.6, 'lowpass': [200, 2000], 'gain': -10, 'follow': {'layer': 0, 'amount': 0.5}}
@@ -314,6 +468,9 @@ def test_the_recipe_command_prints_the_form_three_examples_and_the_cookbook(caps
     assert 'earshot make --recipe file.json -o out.wav' in said
     shown = [json.loads(part) for part in said.split('\n\n')[1:]]
     assert len(shown) == 3
+    assert any('scatter' in lay for r in shown for lay in r['layers'])          # many of one, and motion
+    assert any('pass' in lay or 'bend' in lay for r in shown for lay in r['layers'])
+    assert '"scatter"' not in said.split('\n\n')[0] and 'scatter {' in said.split('\n\n')[0]
     for r in shown:
         assert R.check(r)['name'] in R.cookbook()
     assert cli.main(['recipe', '--list']) == 0

@@ -588,7 +588,7 @@ cookbook recipe (`"recipe": "thunder_far"`, one level deep: a storm can hold a b
 | `halt` | seconds, 0.05 to 10: the take runs down to a stop, as a motor does when its power is cut |
 | `lowpass`, `highpass` | Hz, 20 to 20000; two numbers `[from, to]` move the cutoff over the layer |
 | `pan` | -1 (left) to 1 (right); two numbers `[from, to]` move the layer across |
-| `stretch` | a factor, 0.25 to 4: the take longer or shorter at the same pitch (a creak drawn long, a hiss held); its first 30 ms after the attack stay as they are, so a hit is not smeared. Over 4 even real takes turn metallic |
+| `stretch` | a factor, 0.5 to 2: the take longer or shorter at the same pitch (a creak drawn long, a growl held); its first 30 ms after the attack stay as they are, so a hit is not smeared. Further than that real takes (creaks, a moo, a snore) ring like a comb, so the form stops there |
 | `gain` | dB, -40 to 12, against the other layers: every layer is first brought to the same peak |
 | `at` | seconds: where the layer starts |
 | `fade_in`, `fade_out` | seconds: fades at its ends; when not said, an ambience gets 0.1 and 0.3 s and a source 0.01 and 0.02 s |
@@ -628,6 +628,28 @@ The same field with an amount under 0 makes a bed give way to a hit (rain that d
 `"follow": {"layer": 1, "amount": -0.7, "smooth": 0.25}` on the rain), and with a short `smooth` a rattle comes and
 goes with a motor.
 
+Recordings are the material and the recipe gives them a structure. `scatter` makes many of one: a drop on metal,
+scattered 90 times a second over eight seconds, each a little higher or lower, softer and to a side, is rain on a tin
+roof; one clap is applause; with `grain` a crackle becomes a fine sizzle. Eight takes of the design are rendered once
+and placed as copies, so 200 events a second over ten seconds render in about two seconds. `level`, `bend`, `pass`
+and `spin` work on the layer as a whole once its events are laid, with times from the layer's start: a moo bent
+an octave down and back is a whale's song, a running motor that `pass`es at 22 m/s is a car going by (its pitch falls
+as it passes, it grows loud and bright and crosses from one side to the other), wind chopped 11 times a second is a
+rotor. `stretch` draws a take longer at its own pitch, its attack kept:
+
+```json
+{"name": "tin_roof_rain", "says": "rain on a tin roof", "kind": "ambience", "dur": 8, "layers": [
+  {"sound": "tick/metal", "scatter": {"rate": 90, "dur": 8.5, "pitch": 5, "gain": 14, "pan": 0.9}},
+  {"sound": "water/drop", "scatter": {"rate": 40, "dur": 8.5, "pitch": 4, "pan": 0.9}, "gain": -5}]}
+```
+
+```json
+{"name": "car_passing", "says": "a car passing by", "dur": 6, "layers": [
+  {"sound": "tractor/idle", "pitch": 4, "cut": [0, 6.5], "pass": {"at": 3.0, "speed": 22}}]}
+```
+
+A layer may also be a cookbook recipe (`{"recipe": "thunder_far", "at": 2}` in a storm), one level deep.
+
 One sound as the body of another ("rain on a tin can": the hits of one thing ringing through another) is not in the
 form. It was built and measured: plain rain driven through the partials and colour of a struck design (a knock on a
 table, a dropped tin can) comes no nearer the real recordings of rain on wood and on a tin roof for the listening
@@ -656,9 +678,9 @@ inside and no clipping, not that the sound was judged by ear.
 
 ### The cookbook
 
-`earshot/data/recipes` holds 95 recipes for things people ask for and no design is. 54 of them answer a request
+`earshot/data/recipes` holds 99 recipes for things people ask for and no design is. 59 of them answer a request
 that names their thing (`"a car crash"`, `"a werewolf howl"`, `"a welding torch"`, `"a woodpecker"`, `"a cannon
-firing"`, and for what no recording can hold, `"a fireball spell"`, `"an energy shield going up"`, `"a plasma
+firing"`, `"marbles pouring"`, `"rocks tumbling down"`, `"a tornado"`, and for what no recording can hold, `"a fireball spell"`, `"an energy shield going up"`, `"a plasma
 shot"`, `"a robot arm moving"`, `"a zombie horde"`); the answer says `built from parts by the cookbook recipe
 car_crash` and names the nearest designs, which `--sound <id>` still gives. `earshot recipe --list` prints each
 recipe with its parts. Fewer layers often sound more real: a champagne bottle is a cork and a pour, nothing more.

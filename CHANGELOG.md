@@ -12,6 +12,12 @@ before: numba is the one new requirement, and the listening stack moved to an ex
 
 **Making sounds**
 
+- Recipes build new sounds from real recordings, not only lay them over each other: `scatter` (one take many times at
+  random moments, up to 400 a second, each higher or lower, softer, to a side, or in small pieces: rain from drops,
+  applause from claps), `level`, `bend` (pitch over time), a moving `pan`, `pass` (a thing going by, its pitch falling
+  as it passes), `spin` (rotor, wings, purring), `stretch` (longer at the same pitch, 0.5 to 2), up to 12 layers and
+  a cookbook recipe as a layer. Five new or lifted recipes answer on their own: marbles pouring, toy blocks falling,
+  rocks tumbling down, logs tumbling, a tornado (99 recipes, 59 answer).
 - `earshot make "WORDS" -o FILE` (`earshot/make.py`, MCP `make`, `api.make`) reads the request, ranks the catalogue,
   renders the best design with the request's controls, checks the take (clicks, cut tails, clipping, DC, comb ring,
   rising glides, stacked attacks; a failed take is rendered again on up to three more seeds) and writes wav, flac,
@@ -148,10 +154,11 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   strike): a wall switch, a book shut and opened, a glass and a plate breaking, a bite, a punch, a camera shutter,
   steps on tile, concrete and snow, two glasses clinking, a knife swish, a golf swing, a pen cap, fingertips on a
   table, a spoon on a plate and a whip.
-- Learned sounds are cleaner at their edges: the faint hiss some takes left after the sound now fades with the
-  sound as its recording did (36 recordings), and nothing is smeared into the moment before the strike any more
-  (110 recordings, knocks, switches, keys, doors, a cork among them). Each was measured closer to its recording
-  with its loudness, length and audit unchanged; `learned.TAIL` and `learned.LEAD` turn it off.
+- Learned sounds are cleaner before their strike: what the rebuild smeared into the few milliseconds before a hit
+  is held as low as the recording has it there (110 recordings, knocks, switches, keys, doors, a cork among them).
+  Each was measured closer to its recording with its loudness, length and audit unchanged; `learned.LEAD` turns it
+  off. The same repair for the faint hiss after a sound (`learned.TAIL`) is built and off: it did not hold on
+  every take.
 - The licence of rendered audio is stated (answers #21): everything earshot renders (`make`, `sfx`, `kit`, `forge`)
   belongs to whoever rendered it, free for any use, commercial too, without credit. The code stays MIT.
 
