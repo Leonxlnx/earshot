@@ -36,29 +36,34 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   JSON form: layers of designs, noise or a low sine, with pitch, glide, reverse, cut, halt, filters, pan, gain, fades,
   swell, decay, repeated events, and one layer's loudness following another's. A recipe is rendered and checked like
   every sound.
-- A cookbook of 74 recipes (`earshot/data/recipes`). 32 answer a request for their thing on their own (a car crash,
-  a cannon, a welding torch, a woodpecker, a werewolf howl and more); 42 are sketches that an answer names as a
-  starting point. A recording of the thing itself answers before a recipe. A length, far away, up close, soft and a
-  count asked of a cookbook sound are followed, or the answer says they are not.
+- A cookbook of 95 recipes (`earshot/data/recipes`). 54 answer a request for their thing on their own (a car crash,
+  a cannon, a woodpecker, a werewolf howl, and what no recording holds: a fireball spell, an energy shield going up,
+  a plasma shot, a robot arm, a zombie horde and more); 41 are sketches that an answer names as a starting point. A
+  recording of the thing itself answers before a recipe, and a recipe whose thing has been recorded since is gone. A
+  length, far away, up close, soft and a count asked of a cookbook sound are followed, or the answer says they are not.
 
 **The catalogue**
 
-- 830 designs in 320 families (`earshot/sounds/`; the `@design` contract in `registry.py`).
-- 249 learned designs (`earshot/sounds/learned.py`, `earshot/synth/resyn.py`, `earshot/data/resyn/`) of everyday,
-  interface, game and film sounds, animals, people without words, street, house and kitchen sounds, learned from 604
+- 922 designs in 384 families (`earshot/sounds/`; the `@design` contract in `registry.py`).
+- 309 learned designs (`earshot/sounds/learned.py`, `earshot/synth/resyn.py`, `earshot/data/resyn/`) of everyday,
+  interface, game and film sounds, animals, people without words, street, house and kitchen sounds, learned from 692
   recordings in the public domain (BigSoundBank, Kenney, VCSL, VSCO-2 CE, Karoryfer and CC0 uploads on Freesound;
   each credited in a `CREDITS.md`). Each recording is kept as numbers (56 bands, 2 ms envelopes, 0.25 ms around
-  onsets, tonal carriers, the stereo image; 13.85 MB in all, no audio), and every render is a new take of it. Seeds
+  onsets, tonal carriers, the stereo image; 17.93 MB in all, no audio), and every render is a new take of it. Seeds
   walk through a design's recordings, the fullest clean one first; `meta['member']` names the recording by number.
   A learned design answers only a request that names its thing, and wins over an invented design of the same thing.
 - Performances (`earshot/synth/perform.py`, `--events`): a thing a person does several times in a row (a walk, a
   knock, typing, coins, keys, clinking glasses) is played as the action when the words ask for it, from a recording
   of the whole action or from single recordings in a pattern a person plays. A length or a gap asked with it sets
   the file's length or the time between events.
-- 16 learned ambience beds (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`),
-  stitched from pieces of 15 recordings so that they play for any length without a loop point: a campfire, three
+- 25 learned ambience beds (`earshot/synth/quilt.py`, `earshot/data/textures/`, `earshot/sounds/nature.py`),
+  stitched from pieces of 24 recordings so that they play for any length without a loop point: a campfire, three
   shores, crickets, a brook, a cafe, a street, rain on wood, on a tin roof and on an umbrella and more. 18 more
   ambience scenes are made from rules.
+- 60 things and 9 beds that requests asked for and the catalogue lacked are learned from public-domain recordings: a
+  chainsaw, a lawn mower, a tractor, a truck reversing, a ship's horn, a monkey, a parrot, knuckles, a hiccup, ping
+  pong, pinball, darts, a ratchet, an angle grinder, a coffee machine, a kettle boiling and whistling and more; hail, a
+  dishwasher, a washing machine, a fridge, a shower, a jungle at night, a factory and a gale as beds.
 - The interface sounds are things a hand does, built from learned recordings (`earshot/sounds/interface.py`, 29
   designs): a mechanical key going down and coming up, a page, a drawer, a cork, knocks, a camera shutter, a cut of
   scissors. A plain request for an interface job gets the design the `ui` set plays, and a thing of the world named
@@ -91,8 +96,19 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   plays ("when the pricing card settles"); and words for the product or the place, which choose nothing.
 - What follows "on" or "in" is the sound's surface or place ("rain on wood"). A surface the sound has no design on
   gets the nearest one and says so ("rain on a tarp": `rain/tent is the nearest surface`).
-- A request in German is read through a table of about 250 sound words ("Regen auf Holz"); a request in another
-  language gets "write it in English".
+- A request in German is read through a table of about 400 sound words ("Regen auf Holz"), with inflected
+  adjectives and participles ("ein leiser Klick", "schwere Schritte", "eine knarrende Tür") and requests whose every
+  word is English too ("ein lauter Donner"); a request in another language gets "write it in English".
+- A request for a thing earshot lacks says so in more wordings: an unknown thing doing a known thing ("a zeppelin
+  arriving at the station", "a flock of geese flying over"), a thing named in -ey, -way or -ory ("a monkey", "a
+  subway", "a factory"), a word only another design lists as a job ("a trap springing shut") and a name made of an
+  unknown word and a known one ("a conveyor belt"); a known thing doing something unknown ("plates clattering", "a
+  siren getting closer") is answered without that doubt.
+- The nearest of a thing the cookbook only sketches is a part its sketch is built on, and the sketch's other parts
+  are the first starting points; when no word of a request found anything the starting points are a knock, a drill
+  and a whoosh; a synthesized sound or an instrument's note is never a starting point for a thing of the world.
+- A plain film request in a few words ("a title hit", "a logo reveal", "a riser", "an impact", "a glint") gets the
+  film set's sound of real things first; a request that names a design word for word keeps that design.
 - A request that asks for a change as the sound plays ("getting louder"), for a sound heard through something
   ("behind a closed door"), for a sound that moves from left to right, or for a length the design does not keep,
   says so in the answer.

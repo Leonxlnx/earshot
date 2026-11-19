@@ -467,10 +467,10 @@ def test_a_request_nothing_knows_gets_the_nearest_and_says_so(tmp_path):
 
 @pytest.mark.parametrize('text,start', [
     ('a lightsaber', 'earshot makes no lightsaber; laser/beam is only the nearest'),
-    ('a stomach growl', 'earshot makes no stomach growl; rumble/quake is only the nearest'),
-    ('a paper shredder', 'earshot makes no paper shredder; paper/rip is only the nearest'),
+    ('a zorp squealing', 'earshot makes no zorp squealing; tyres/screech is only the nearest'),
+    ('a blorb fizzing', 'earshot makes no blorb fizzing; spray_can/spray is only the nearest'),
     ('rain on a tarp', 'no rain on a tarp: rain/tent is the nearest surface'),
-    ('a garage door rolling up', 'earshot makes no garage door; door/creak is only the nearest'),
+    ('a zorp door rolling up', 'earshot makes no zorp door'),
 ])
 def test_a_missing_thing_and_a_missing_surface_are_said_with_alternatives(text, start):
     """the thing or what it does is unknown: the nearest kind of sound, said to be only that; the sound exists but
@@ -487,7 +487,7 @@ def test_a_missing_thing_and_a_missing_surface_are_said_with_alternatives(text, 
         assert line.startswith(start + '; also: ' + fam + '/'), line
 
 
-@pytest.mark.parametrize('text', ['a trumpet', 'a fax machine', 'a lawn mower', 'a whale song', 'a seagull cry'])
+@pytest.mark.parametrize('text', ['a trumpet', 'a zorp machine', 'a frobnicator', 'a blorb fizzing', 'a zorp squealing'])
 def test_the_starts_for_a_missing_thing_are_of_other_families(text):
     """the three alternatives offered for a thing no design is are three starting points of three other families,
     not three members of one"""
@@ -498,6 +498,29 @@ def test_the_starts_for_a_missing_thing_are_of_other_families(text):
     assert doubt(b, cands).startswith('earshot makes no ')
     fams = [s.split('/')[0] for s in starts(b, cands)]
     assert len(fams) == 3 and len(set(fams)) == 3 and cands[0]['id'].split('/')[0] not in fams, fams
+
+
+def test_the_starts_of_a_missing_thing_are_of_its_kind():
+    """a thing no word found offers three kinds of sound of the world, not three thuds; a thing the cookbook
+    sketches offers the other parts its sketch is built on first"""
+    from earshot import brief, recipe
+    from earshot.make import doubt, starts
+    from earshot.sounds import lexicon as L
+    b = brief.read('a frobnicator')
+    cands = brief.rank(b, top=8)
+    assert cands[0]['id'] == L.NEAREST_ANY[0] and starts(b, cands) == list(L.STARTS_ANY), starts(b, cands)
+    for name, rc in recipe.cookbook().items():
+        b = brief.read(rc['things'][0])
+        cands = brief.rank(b, top=8)
+        if not rc.get('sketch') or not (doubt(b, cands) or '').startswith('earshot makes no '):
+            continue
+        want, fams = [], {cands[0]['id'].split('/')[0]}
+        for s in brief.sketched(b):          # one part of each family, as the starts take them
+            if s.split('/')[0] not in fams and 'synth' not in registry.get(s).tags and s.split('/')[0] != 'note':
+                fams.add(s.split('/')[0])
+                want.append(s)
+        got = starts(b, cands)
+        assert got[:len(want[:3])] == want[:3], (name, got, want)
 
 
 def test_a_pan_asked_for_is_said_not_followed():

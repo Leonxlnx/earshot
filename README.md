@@ -26,9 +26,9 @@ Install from GitHub: the name `earshot` on PyPI belongs to another project.
 
 What is in the box:
 
-- **Making sounds** (`earshot make`): a catalogue of 830 designs in 320 families holds interface sounds, everyday
-  foley, ambience beds, game sounds, chip sound, drums, film and motion effects and three short music loops. 249 are
-  learned from 604 recordings in the public domain; no audio file is in the repository, and every sound is rendered
+- **Making sounds** (`earshot make`): a catalogue of 922 designs in 384 families holds interface sounds, everyday
+  foley, ambience beds, game sounds, chip sound, drums, film and motion effects and three short music loops. 309 are
+  learned from 692 recordings in the public domain; no audio file is in the repository, and every sound is rendered
   by code when it is asked for. What the catalogue lacks can be built from its parts with a recipe.
 - **Listening** (an extra): what a file sounds like, how well it fits a description, the best moment in a long
   recording, whether it sounds recorded or synthesized, and a second-by-second account of a film's soundtrack.
@@ -140,7 +140,7 @@ also: fire/large, fire/small, fire/whoosh
 The first line of each file is the result: the design chosen, the length, where the loudest moment is (`peak at`),
 the loudness, `seamless loop` for a loop, `clean` or what the check found, and the words that decided. `also` gives
 three alternatives, to be taken with `--sound ID`. A request that names something the catalogue does not have still
-gets a file, and the answer says so: `earshot makes no kettle; whistle/referee is only the nearest sound it has`. Lines such as `not followed`, `not in this sound` and `not understood` name what the request asked that this
+gets a file, and the answer says so: `earshot makes no fire alarm; timer/done is only the nearest sound it has`. Lines such as `not followed`, `not in this sound` and `not understood` name what the request asked that this
 sound does not do. Every line and option: [docs/MAKE.md](docs/MAKE.md).
 
 ### How to ask
@@ -173,10 +173,10 @@ sound is, then its character.
 
 | group | designs | how it is made | examples |
 |---|---|---|---|
-| learned things | 249 | learned from 604 recordings in the public domain: footsteps, doors, switches, keyboards, glass, water, animals, people without words, street, house and kitchen sounds | `step/pebbles`, `door/shut`, `switch/lamp`, `camera/shutter`, `dog/bark`, `rocket/launch` |
+| learned things | 309 | learned from 692 recordings in the public domain: footsteps, doors, switches, keyboards, glass, water, animals, people without words, street, house and kitchen sounds | `step/pebbles`, `door/shut`, `switch/lamp`, `camera/shutter`, `dog/bark`, `rocket/launch` |
 | interface | 29 | things a hand does, built from those recordings: a key going down and coming up, a page, a drawer, a cork, knocks, a camera shutter, scissors | `toggle/key_down`, `next/page`, `notify/knock`, `success/shutter`, `delete/snip` |
 | interface and game figures | 45 (and 3 ticks) | notes in time on a real instrument (a marimba by default); for interfaces only when the words ask for music or a theme is named | `success/rise`, `coin/bright`, `level_up/fanfare`, `logo/bloom` |
-| ambience | 34 | 16 learned from recordings of real places and textures, 18 from rules | `fire/camp`, `waves/sand`, `rain/tin_roof`, `cafe/busy`; `rain/window`, `forest/morning` |
+| ambience | 43 | 25 learned from recordings of real places and textures, 18 from rules | `fire/camp`, `waves/sand`, `rain/tin_roof`, `cafe/busy`; `rain/window`, `forest/morning` |
 | film and motion | 46 | 32 built from learned recordings as motion films use them (short dry hits, thumps, ticks, whooshes and risers of air); 14 small ones invented | `slam/title`, `boom/short`, `thump/appear`, `whoosh/soft`, `rise/air` |
 | drums | 40 | 33 played from recorded strokes in the public domain (the acoustic kit and hand percussion); 7 invented | `kick/soft`, `snare/tight`, `conga/muted`; `kick/electro` |
 | chip | 24 | the channels of 8-bit consoles; only when asked for | `coin/chip`, `jump/chip`, `laser/chip` |
@@ -202,15 +202,16 @@ Karoryfer and CC0 uploads on Freesound, each recording credited in a `CREDITS.md
 
 A recipe builds a sound from the catalogue's own parts: a few real recordings moved lower or higher, cut, filtered,
 repeated and layered, with noise for air and a low sine for weight, written as a small JSON form. earshot renders a
-recipe and checks it like every other sound. The cookbook that ships with earshot (`earshot recipe --list`) holds 74
-recipes: 32 answer a request for their thing on their own, and 42 are sketches that an answer names only as a
-starting point. When the catalogue has a recording of the thing itself, the recording answers.
+recipe and checks it like every other sound. The cookbook that ships with earshot (`earshot recipe --list`) holds 95
+recipes: 54 answer a request for their thing on their own (a car crash, a cannon, a fireball spell, an energy shield
+going up, a plasma shot), and 41 are sketches that an answer names only as a starting point. When the catalogue has a
+recording of the thing itself, the recording answers.
 
 ```
 $ earshot make "a car crash" -o crash.wav
 crash.wav: recipe/car_crash (3.11 s, peak at 1.58 s, -14 LUFS, clean) [recipe]
 built from: tyres/screech; car_door/slam (-7 semitones); metal/drop (-5 semitones); glass/break; can/drop (-3 semitones)
-built from parts by the cookbook recipe car_crash: no design of the catalogue is this sound; `earshot recipe car_crash` prints the recipe to change; the nearest designs: boom/door, slam/door, boom/wide (sound=<id>)
+built from parts by the cookbook recipe car_crash: no design of the catalogue is this sound; `earshot recipe car_crash` prints the recipe to change; the nearest designs: impact/car, hail/car, boom/door (sound=<id>)
 ```
 
 A length, "far away", "up close", "soft" and a count are followed on a cookbook sound, and what a recipe cannot do is

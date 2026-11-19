@@ -144,7 +144,7 @@ def doubt(b, cands):
     if not cands or cands[0]['score'] is None:
         return None
     top = cands[0]
-    absent = brief.not_made(b, top['why'])
+    absent = brief.not_made(b, top['why'], top['id'])
     absent = absent or brief.owner_unknown(b, top['id'], top['why'])
     if absent:                          # "a dog barking", "a rocket launch": no design is one; only the nearest
         return f'earshot makes no {absent}; {top["id"]} is only the nearest sound it has'   # "a fax machine" too
@@ -243,21 +243,33 @@ STRONG = 0.7          # a ranked design scoring this share of the nearest one is
 
 def starts(b, cands, k=3):
     """k starting points besides the nearest design for a thing no design is ("a trumpet", "a fax machine"): each of
-    another family; first the ranked designs that score near the nearest one (STRONG) and the design of its kind of
-    sound (brief.read's `kind`), then the designs described most like the nearest one and the request (recordings
-    and the same kind of sound first; no interface sound for a thing of the world), the third not of the same size
-    as the other two when another size is near"""
+    another family; first the parts of the cookbook's sketch of the thing (brief.sketched), three kinds of sound of
+    the world when no word found anything (lexicon.STARTS_ANY), the ranked designs that score near the nearest one
+    (STRONG) and the design of its kind of sound (brief.read's `kind`), then the designs described most like the
+    nearest one and the request (recordings and the same kind of sound first; no interface sound for a thing of the
+    world), the third not of the same size as the other two when another size is near; a synthesized design or an
+    instrument's note only when the nearest is one"""
     from .sounds import registry
     pick = cands[0]['id']
     d = registry.get(pick)
     seen, out = {pick.split('/')[0]}, []
+    tonal = 'synth' in d.tags or pick.startswith('note/')
 
     def add(sid):
         f = sid.split('/')[0]
-        if len(out) < k and f not in seen and sid != pick:
+        try:
+            played = 'synth' in registry.get(sid).tags or f == 'note'     # no synth or note for a thing of the world
+        except ValueError:
+            return
+        if len(out) < k and f not in seen and sid != pick and (tonal or not played):
             seen.add(f)
             out.append(sid)
 
+    for sid in brief.sketched(b):       # "a dishwasher": the other parts the cookbook's sketch of it is built on
+        add(sid)
+    if not cands[0]['why'] and not cands[0]['score'] and not b.get('kind'):
+        for sid in L.STARTS_ANY:        # no word found anything ("an escalator"): three kinds of sound to try
+            add(sid)
     best = cands[0]['score'] or 0.0
     for c in cands[1:]:
         if c['score'] is not None and best > 0 and c['score'] >= STRONG * best:

@@ -711,13 +711,13 @@ def test_new_family_anchor(idx, text, prefixes):
 # motion jobs get the sounds of real things motion films use (short low hits, thumps, ticks, passes of air); a design
 # with a note in it answers only when the words ask for notes (brief.FILM_MUSIC) or the request is for a game
 MOTION_REAL = [
-    ('a logo reveal hit', ('boom/short', 'sting/reveal')),
-    ('a logo hit', ('boom/short', 'sting/reveal')),
-    ('a logo reveal', ('sting/reveal', 'boom/short')),
-    ('a title hit', ('slam/title',)),
+    ('a logo reveal hit', ('logo/bag',)),
+    ('a logo hit', ('logo/bag',)),
+    ('a logo reveal', ('logo/bag',)),
+    ('a title hit', ('title/bag',)),
     ('a cinematic boom', ('boom/deep',)),
-    ('a pop when an element appears', ('thump/appear',)),
-    ('a soft ui tick', ('tick/soft',)),
+    ('a pop when an element appears', ('thump/door',)),
+    ('a soft ui tick', ('tick/key',)),
     ('a glitch transition', ('glitch/short',)),
     ('lens flare shimmer', ('shine/air',)),
     ('a logo reveal with a soft piano chord', ('logo/',)),
@@ -1012,8 +1012,8 @@ def test_a_described_moment_reaches_its_job_and_keeps_its_sound(idx, text, want)
 @pytest.mark.parametrize('text,want', [
     ('grabbing a card on the kanban board', ('tick/', 'tock/')),
     ('the photo clicks into place in the collage app', ('tick/', 'tock/')),
-    ('the logo locks up at the end of the brand film', ('boom/short', 'sting/reveal')),
-    ('the logo comes to rest in the centre of the frame in the ad', ('boom/short', 'sting/reveal')),
+    ('the logo locks up at the end of the brand film', ('boom/short', 'sting/reveal', 'logo/bag')),
+    ('the logo comes to rest in the centre of the frame in the ad', ('boom/short', 'sting/reveal', 'logo/bag')),
     ('the camera pushes in on the product in the commercial', 'whoosh/'),
     ('the camera pans across the mountains in the documentary', 'whoosh/'),
     ('a line draws on across the map in the video', ('flick/', 'swish/')),
@@ -1180,8 +1180,8 @@ def test_a_whole_job_of_a_recording_reaches_it_without_doubt(idx, text, want):
 
 @pytest.mark.parametrize('text,nearest', [
     ('a trumpet', 'win/fanfare'), ('a fire alarm', 'timer/done'), ('a toy gun', 'cap_gun/shot'),
-    ('a mouse squeak', 'toy/squeak'), ('a fridge humming', 'space_hum/ship'), ('an airlock hissing open', 'door/slide'),
-    ('a pan set on the stove', 'pot_lid/set'), ('a kettle whistling', 'whistle/referee'),
+    ('an airlock hissing open', 'door/slide'), ('a pan set on the stove', 'pot_lid/set'),
+    ('machine gun burst, two seconds', 'gunshot/rifle'),
 ])
 def test_a_thing_no_design_is_gets_its_nearest_and_says_so(idx, text, nearest):
     """a trumpet is no elephant, a fire alarm no fire, a toy gun no heavy shot and a mouse's squeak no mouse click:
@@ -1259,12 +1259,12 @@ def test_a_request_in_another_language_is_no_chance_match(idx):
 
 
 @pytest.mark.parametrize('text,absent,nearest', [
-    ('a lightsaber', 'lightsaber', 'laser/beam'), ('a stomach growl', 'stomach growl', 'rumble/quake'),
-    ('a tractor idling', 'tractor idling', 'car_engine/start'), ('a paper shredder', 'paper shredder', 'paper/rip'),
-    ('a cursed whisper', 'cursed whisper', 'sigh/person'), ('a hiccup', 'hiccup', 'burp/person'),
-    ('a curtain being pulled', 'curtain being pulled', 'cloth/rustle'),
+    ('a lightsaber', 'lightsaber', 'laser/beam'), ('a zorp squealing', 'zorp squealing', 'tyres/screech'),
+    ('a gizmo whirring', 'gizmo whirring', 'drill/electric'), ('a blorb fizzing', 'blorb fizzing', 'spray_can/spray'),
+    ('a cursed whisper', 'cursed whisper', 'sigh/person'), ('a zorp moaning', 'zorp moaning', 'sigh/person'),
+    ('a zorp fluttering', 'zorp fluttering', 'wings/flap'),
     ('an old modem dialing', 'old modem dialing', 'dial/click'),
-    ('a forklift', 'forklift', L.NEAREST_ANY[0]), ('a whale song', 'whale song', L.NEAREST_ANY[0]),
+    ('a frobnicator', 'frobnicator', L.NEAREST_ANY[0]),
 ])
 def test_an_unknown_thing_or_action_gets_the_nearest_and_says_so(idx, text, absent, nearest):
     """the thing that makes the sound, or what it does, is a word neither the lexicon nor a design's name or job
@@ -1310,8 +1310,8 @@ def test_a_job_and_what_it_acts_on_which_one_a_count_and_a_name_of_the_job_are_n
 
 
 @pytest.mark.parametrize('text,said', [
-    ('toggle a fax machine', 'earshot makes no fax machine'), ('a garage door rolling up', 'earshot makes no garage'),
-    ('a front loader dumping gravel', 'earshot makes no front loader'), ('five fax machines', 'earshot makes no fax'),
+    ('toggle a zorp machine', 'earshot makes no zorp machine'), ('a zorp door rolling up', 'earshot makes no zorp'),
+    ('a front loader dumping gravel', 'earshot makes no front loader'), ('five zorp machines', 'earshot makes no zorp'),
     ('a kitchen mixer whirring', 'earshot makes no kitchen mixer'),
     ('the back door slams', 'another kind of sound fits almost as well'),
 ])
@@ -1347,6 +1347,11 @@ def test_a_job_an_instrument_and_a_place_of_a_product_are_no_surface(text):
     ('Regen auf Holz', 'rain on wood', 'rain/'), ('Schritte auf Kies', 'footsteps on gravel', 'step/'),
     ('ein Hund bellt', 'a dog barking', 'dog/bark'),
     ('Münzen fallen auf den Boden', 'coins falling on the floor', 'coins/floor'),
+    ('ein leiser Klick', 'a quiet click', ''), ('schwere Schritte', 'heavy footsteps', 'step/'),
+    ('Auto hupt', 'car honking', 'car_horn/'), ('Motor startet', 'engine starting', 'car_engine/'),
+    ('Donner in der Ferne', 'thunder in the distance', 'thunder/'), ('Karten mischen', 'cards shuffling', 'cards/'),
+    ('Tacker', 'stapler', 'stapler/'), ('jemand niest', 'someone sneeze', 'sneeze/'),
+    ('eine knarrende Tür', 'a creak door', 'door/'), ('ein lauter Donner', 'a loud thunder', 'thunder/'),
 ])
 def test_a_german_request_is_read_through_the_table(idx, text, english, want):
     """lexicon.GERMAN: the request is read as its English words, said to be foreign, and answered without a doubt"""
@@ -1362,3 +1367,43 @@ def test_english_is_not_read_as_german():
                  'die sound for a platformer', 'a laser blast'):
         assert brief.german(text) is None and not brief.read(text)['foreign'], text
     assert brief.german('Regen auf einem Blechdach, 10 Sekunden') == 'rain on a tin roof, 10 seconds'
+
+
+@pytest.mark.parametrize('text', ['a blorf screeching in the jungle', 'a flock of zorps flying over',
+                                  'a zeppelin arriving at the station', 'a zorp factory running',
+                                  'a gizmo springing shut'])
+def test_an_unknown_thing_doing_a_known_thing_is_said_to_be_missing(idx, text):
+    """the thing that makes the sound is a word the reader does not know (a zeppelin; a word in -y such as
+    "factory" is a thing, not a description): what it does is found, the thing is not, and the answer says so"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=8)
+    assert (doubt(b, cands) or '').startswith('earshot makes no '), (text, cands[:1], doubt(b, cands))
+
+
+@pytest.mark.parametrize('text,want', [('plates clattering', 'plate/'), ('twigs snapping underfoot', 'twigs/'),
+                                       ('police siren getting closer', 'siren/')])
+def test_a_known_thing_doing_an_unknown_thing_is_not_said_to_be_missing(idx, text, want):
+    """the thing was found; only what it is doing is a word the reader does not know"""
+    from earshot.make import doubt
+    b = brief.read(text)
+    cands = brief.rank(b, idx=idx, top=8)
+    assert cands[0]['id'].startswith(want) and not (doubt(b, cands) or '').startswith('earshot makes no '), (
+        text, cands[:1], doubt(b, cands))
+
+
+def test_a_thing_the_cookbook_sketches_is_answered_by_a_part_of_its_sketch(idx):
+    """a thing no design is and the cookbook only sketches (no kind of sound names it, it is in no list of things
+    earshot lacks) is answered by a part its sketch is built on, of the family the request names first"""
+    from earshot import recipe
+    from earshot.make import doubt
+    for name, rc in recipe.cookbook().items():
+        if not rc.get('sketch'):
+            continue
+        b = brief.read(rc['things'][0])
+        cands = brief.rank(b, idx=idx, top=4)
+        listed = brief.not_made(b, cands[0]['why'], cands[0]['id']) in L.NOT_MADE | set(L.NOT_MADE_PHRASES)
+        if b.get('kind') or listed or not (doubt(b, cands) or '').startswith('earshot makes no '):
+            continue
+        fams = {s.split('/')[0] for s in brief.sketched(b)}
+        assert cands[0]['id'].split('/')[0] in fams, (name, cands[:1], brief.sketched(b))

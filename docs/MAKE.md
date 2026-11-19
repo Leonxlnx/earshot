@@ -68,7 +68,7 @@ A guess, as `make` writes it (the alternatives without a guess stay bare ids):
 ```
 $ earshot make "a frobnicating zorp" -o x.wav
 x.wav: thump/soft (0.09 s, peak at 0.02 s, -19 LUFS, clean)
-also (the pick is a guess: earshot makes no frobnicating zorp; thump/soft is only the nearest sound it has): land/soft (a soft low thump of feet landing on the ...), hurt/thud (a dull muffled thud), bag/drop (a bag dropped on the floor). Name one with sound=<id>
+also (the pick is a guess: earshot makes no frobnicating zorp; thump/soft is only the nearest sound it has): knock/wood (a knock on a wooden block), drill/electric (an electric drill whirring), whoosh/soft (a soft short whoosh). Name one with sound=<id>
 build it from parts: earshot recipe --example
 not understood: frobnicating, zorp
 ```
@@ -155,12 +155,12 @@ as a dict (`summary`, `sound`, `files`, `why`, `also`, `not_in_sound`, `unknown`
 Every take (`takes` in Python, `--json`, the MCP result) also says where things happen, in seconds from the start
 of the file: `peak_s` (the loudest moment), `onset_s` (where the sound starts to be heard) and, for a row of events
 (footsteps, knocks, `--events N`), `events_s` (each event's start); the plain line shows the peak. The hit goes on
-the frame at t: start the file at t minus `peak_s`. "a whoosh for a transition" answered `whoosh/soft (0.39 s, peak
-at 0.24 s, ...)`: for its loudest moment on 12.000 s, start it at 11.76 s.
+the frame at t: start the file at t minus `peak_s`. "a whoosh for a transition" answered `whoosh/sweep (0.42 s, peak
+at 0.30 s, ...)`: for its loudest moment on 12.000 s, start it at 11.70 s.
 
 ## Learned sounds
 
-249 designs of everyday, interface, game and film sounds, animals, people, street, house and kitchen sounds, 16
+309 designs of everyday, interface, game and film sounds, animals, people, street, house and kitchen sounds, 25
 ambience beds, 33 drum and percussion designs and the notes of four instruments are learned from recordings whose authors put them in the public domain. They are not
 invented and they are not the recordings: each recording is kept
 as a few kilobytes of numbers (`earshot/synth/resyn.py`: 56 bands from 40 Hz to 20 kHz, each band's level every
@@ -170,9 +170,9 @@ sound made from nothing, and it exists only because someone recorded the thing a
 
 | | one-shots | ambience beds | drums | instrument notes |
 |---|---|---|---|---|
-| designs | 249 (`earshot/sounds/learned.py`) | 16 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
-| recordings | 604 recorded members (30 hold several events, such as a whole walk) | 15 textures | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
-| store | `earshot/data/resyn/`: 13.85 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 6.61 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
+| designs | 309 (`earshot/sounds/learned.py`) | 25 (`earshot/sounds/nature.py`) | 33 (`earshot/sounds/drums.py`) | the voices `marimba`, `harp`, `pizzicato`, `felt_piano` (`earshot/synth/played.py`) |
+| recordings | 692 recorded members (44 hold several events, such as a whole walk) | 24 textures | 130 strokes | 97 single notes (marimba 14, harp 24, pizzicato 45, upright piano 14) |
+| store | `earshot/data/resyn/`: 17.93 MB, `index.json`, `CREDITS.md` | `earshot/data/textures/`: 9.46 MB, `index.json`, `CREDITS.md` | `earshot/data/drums/`: 1.31 MB, `index.json`, `CREDITS.md` | `earshot/data/notes/`: 0.83 MB, `index.json`, `CREDITS.md` |
 | sources | BigSoundBank, Kenney, VCSL, VSCO-2 CE, Freesound | BigSoundBank, Freesound | VCSL, Karoryfer, Freesound (the hand claps) | VSCO-2 CE, VCSL |
 | a take | the member the seed picks, fresh noise, the request's controls | takes stitched endlessly (`earshot/synth/quilt.py`) | the stroke the seed picks near the velocity `energy` asks for | the note nearest the pitch and dynamic asked for, moved to the pitch |
 
@@ -438,7 +438,7 @@ without a seam from the sprite's webm, and may not from its mp3.
 Without `set`, only the listed sounds are made (a landing page's or a scene's own handful: the recipes below). An
 entry's `events` and `loop` are the single call's `--events` and `--no-loop`: `{"name": "steps", "want":
 "footsteps on wet pavement", "events": 4}` is played as `make("footsteps on wet pavement", events=4)` plays it:
-`step/concrete (2.15 s, peak at 1.18 s, -21 LUFS, clean) [footsteps]`, `played: 4 events as a walk`, and `no
+`step/concrete (2.55 s, peak at 2.20 s, -18 LUFS, clean) [footsteps]`, `played: 4 events as a walk`, and `no
 footsteps on wet pavement: step/concrete is the nearest surface`. `"loop": false` makes a bed once, with a fade in
 and out. A count, a length and "no loop" said in the `want` do the same as in a single `make`.
 
@@ -454,7 +454,7 @@ earshot sounds [--search WORDS] [--domain ui|game|motion|ambience|music] [--kind
 
 ```
 $ earshot sounds
-830 sounds in 320 families
+922 sounds in 384 families
 success/rise                0.73 s  three quick rising notes, a short soft confirmation
 success/fifth               0.69 s  two notes a fifth apart rising, an open clear signal
 ...
@@ -530,7 +530,7 @@ Python: `from earshot.pack import pack; pack('assets/arcade', 'assets/arcade_all
 ## When earshot has no such sound: build it
 
 The catalogue cannot hold everything. For a thing no design is, `make` answers with the nearest design and says so
-(`earshot makes no fax machine; ... is only the nearest sound it has`), and adds `build it from parts: earshot
+(`earshot makes no whale call; wolf/howl is only the nearest sound it has`), and adds `build it from parts: earshot
 recipe --example`. A recipe is that: a sound built from the catalogue's own parts, written as a small JSON form.
 Whoever asks designs it; earshot renders it and checks it like every other sound. No model is loaded.
 
@@ -645,24 +645,27 @@ inside and no clipping, not that the sound was judged by ear.
 | a campfire in the wind, `campfire_wind` | two real beds and what happens in them | `fire/camp`, `wind/trees` with a swell, pink noise under 500 to 1400 Hz as a gust, `twigs/snap` five times with `loose` 0.9, kind ambience | 7.65 s, peak at 0.54 s, -22 LUFS, clean |
 | a bowling strike, `bowling_strike` | a ball rolling nearer, one hit, pins that scatter | brown noise under 180 to 420 Hz with a swell, `land/wood` -5, `dice/throw` -10, `knock/hollow` -3 six times, each softer and later, space studio | 3.07 s, peak at 1.25 s, -16 LUFS, clean |
 | a woodpecker, `woodpecker` | a hard beak on a hollow trunk, very fast, twice, in a forest | `knock/hollow` +4 twelve times 0.045 s apart, again ten times at 1.4 s, `forest/morning` at -20 | 3.01 s, peak at 0.05 s, -14 LUFS, clean |
-| a giant's footsteps, `giant_footsteps` (a sketch) | weight, slowness, the ground answering | `step/floorboard` -12, `heavy_drop/floor` -7, brown noise under 100 Hz, each four times, 1.1 s apart, space hall | 4.75 s, peak at 2.26 s, -15 LUFS, clean |
+| a giant's footsteps, `giant_footsteps` | weight, slowness, the ground answering | `step/concrete` -12, `heavy_drop/floor` -7, `rumble/quake` -3 cut to 0.9 s, each four times, 1.1 s apart, space hall | 4.68 s, peak at 3.34 s, -14 LUFS, clean |
 
 ### The cookbook
 
-`earshot/data/recipes` holds 74 recipes for things people ask for and no design is. 32 of them answer a request
+`earshot/data/recipes` holds 95 recipes for things people ask for and no design is. 54 of them answer a request
 that names their thing (`"a car crash"`, `"a werewolf howl"`, `"a welding torch"`, `"a woodpecker"`, `"a cannon
-firing"`); the answer says `built from parts by the cookbook recipe car_crash` and names the nearest designs, which
-`--sound <id>` still gives. `earshot recipe --list` prints each recipe with its parts.
+firing"`, and for what no recording can hold, `"a fireball spell"`, `"an energy shield going up"`, `"a plasma
+shot"`, `"a robot arm moving"`, `"a zombie horde"`); the answer says `built from parts by the cookbook recipe
+car_crash` and names the nearest designs, which `--sound <id>` still gives. `earshot recipe --list` prints each
+recipe with its parts. Fewer layers often sound more real: a champagne bottle is a cork and a pour, nothing more.
 
 The catalogue comes first. When the design the words found is the thing itself (its id or its description holds
 every word of the thing), the design answers and the recipe does not: `"a rocket launch"` is the recording
 `rocket/launch`, `"footsteps in mud"` the walk `step/mud`. A recording only listed for a thing it is not stays its
-nearest, and the cookbook's recipe answers if it is not a sketch.
+nearest, and the cookbook's recipe answers if it is not a sketch. When a recording of a thing joins the catalogue,
+its recipe leaves the cookbook (a chainsaw, a hiccup, a fax machine and a dishwasher are recordings now).
 
 A recipe answers on its own only when earshot's listening model hears it as its thing (a match of z 3.0 or more)
-and clearly better than the catalogue's nearest design (by 1.0 or more), and the audit finds it clean. The other 42
-carry `"sketch": true` (a dragon roar, a fax machine, a ship's horn, a washing machine, a wolf pack, a helicopter
-landing, a heartbeat getting faster, a giant's footsteps, a chainsaw and more). The dragon is one: built on a
+and clearly better than the catalogue's nearest design (by 1.0 or more), and the audit finds it clean. The other 41
+carry `"sketch": true` (a dragon roar, a wolf pack, a helicopter landing, a heartbeat getting faster, a time travel
+whoosh, a giant stone door, a cryo pod opening and more). The dragon is one: built on a
 lion's roar a fourth lower, it matches "a dragon roar" no better than the lion's roar alone (`lion/roar`, which
 answers). A sketch is never given as the answer: the
 catalogue answers as before, and one more line names the sketch as a start (`a start from parts: earshot make
@@ -887,13 +890,13 @@ sound is or does, the name its character.
 
 | group | designs | ids | for | controls |
 |---|---|---|---|---|
-| learned (`sounds/learned.py`) | 249 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
+| learned (`sounds/learned.py`) | 309 | air and swings: `whoosh/stick`, `whoosh/rope`, `swipe/hand`, `sword/swing`, `whip/swish`, `wings/flap`, `cloth/flag`; action: `punch/body`, `person/fall`, `sword/draw`, `whip/crack`, `explosion/far`, `explosion/near`, `match/light`; steps: `step/concrete`, `step/pebbles`, `step/heels`, `step/tile`, `step/floorboard` ...; doors and furniture: `door/shut`, `door/creak`, `drawer/wood`, `lock/key`, `floor/creak`; objects: `bag/drop`, `book/shut`, `page/turn`, `cork/bottle`, `dice/throw`, `zipper/jacket`, `scissors/cut`, `stapler/desk`; glass and water: `glass/cheers`, `ice/cubes`, `water/plop`, `splash/plunge`; metal: `anvil/strike`, `pot/clang`, `chain/rattle`, `can/drop`; interface: `click/mouse`, `switch/lamp`, `switch/wall`, `switch/small`, `dial/click`, `keyboard/laptop`, `keyboard/desktop`, `keyboard/mechanical`, `keyboard/space`, `typewriter/key`, `camera/shutter`, `buzzer/deny` | foley for games, 3D, video and interfaces | size, bright, hard, ring, energy, space, width; dur within 0.6-1.8x; pitch on tonal ones |
 | interface (`sounds/interface.py`) | 29 | `hover/fingertip`, `toggle/key_down`, `toggle/key_up`, `type/mechanical`, `next/page`, `back/turn`, `open/drawer`, `close/drawer`, `send/swoosh`, `receive/cork`, `notify/knock`, `success/shutter`, `complete/shutter`, `warning/knock`, `error/knock`, `delete/snip`; other candidates `toggle/shutter_open`, `toggle/shutter_shut`, `toggle/rocker_on`, `toggle/rocker_off`, `type/light`, `back/leaf`, `close/door`, `complete/chop`, `error/chop`, `delete/sweep`, `notify/pop`, `success/click`, `like/pop` | the `ui` set and interface jobs asked in words: things a hand does, from learned recordings | the axes of the recordings they play |
 | interface figures (`sounds/ui.py` on `figure.py`) | 25 | `success/rise`, `error/fall`, `notify/pair`, `open/lift`, `send/lift`, `warning/pulse`, `delete/drop`, `purchase/chime` ... | confirmations, errors, warnings, notifications, navigation, when the words ask for music or a theme is named | all 8 axes, pitch (the root), voice or material, dur |
 | game figures (`sounds/game.py`) | 15 | `coin/bright`, `pickup/blip`, `gem/sparkle`, `power_up/rise`, `level_up/fanfare`, `win/fanfare`, `lose/descend`, `menu/select` ... | rewards, signals, jingles, menus | all 8 axes, pitch, voice or material, dur |
 | brand figures (`sounds/brand.py`) | 5 | `logo/bloom`, `logo/duo`, `logo/motif`, `startup/rise`, `shutdown/fall` | sonic logos, openings, endings | all 8 axes, pitch, voice or material, dur |
 | material ticks (`sounds/ui.py`) | 3 | `tick/wood`, `tick/glass`, `tick/metal` | taps and detents that should not be a note | 7 axes (not motion), pitch |
-| ambience (`sounds/nature.py`) | 34 in 15 families | learned from real textures (16): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`, `rain/wood`, `rain/tin_roof`, `rain/umbrella`, `wind/trees`; from rules (18): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
+| ambience (`sounds/nature.py`) | 43 in 22 families | learned from real textures (25): `fire/camp`, `waves/sand`, `waves/pebbles`, `waves/rocks`, `night/crickets`, `stream/brook`, `room_tone/quiet`, `city/street`, `city/distant`, `cafe/busy`, `underwater/deep`, `rain/street`, `rain/wood`, `rain/tin_roof`, `rain/umbrella`, `wind/trees`; from rules (18): `rain/window`, `rain/leaves`, `rain/roof`, `rain/tent`, `rain/water`, `wind/open`, `wind/window`, `wind/mountain`, `fire/small`, `fire/large`, `stream/trickle`, `stream/river`, `forest/morning`, `space_hum/ship`, `crackle/vinyl`, `sparkle/magic`, `thunder/clap`, `thunder/distant` | beds for games, pages, timers and films | learned: energy (calmer or busier moments), size, space, bright, width; rules: energy, size, space, bright, width; dur = loop length; `--no-loop` |
 | drums (`sounds/drums.py`) | 40 in 21 families | from recorded strokes (33): `kick/soft`, `kick/punch`, `kick/deep`, `snare/tight`, `snare/fat`, `rim/click`, `rim/shot`, `tom/high`, `tom/mid`, `tom/floor`, `hat/closed`, `hat/open`, `hat/pedal`, `crash/bright`, `crash/dark`, `ride/ping`, `clap/hands`, `clap/group`, `shaker/tick`, `tambourine/hit`, `tambourine/shake`, `conga/open`, `conga/muted`, `bongo/high`, `bongo/low`, `cajon/bass`, `darbuka/hit`, `frame_drum/deep`, `clave/click`, `cabasa/hit`, `slapstick/crack`, `drum/roll`, `shaker/roll`; invented (7): `kick/electro`, `snare/electro`, `hat/electro`, `clap/electro`, `snare/brush`, `snap/finger`, `sticks/count` | music loops, motion design, games | energy (velocity: softer or harder strokes), size, bright, hard, ring, space, width; pitch on tuned drums |
 | film and motion (`sounds/motion.py`) | see below | | product films, title sequences, interface animation | |
 | action (`sounds/action.py`) | 47 in 23 families | `jump/*`, `land/*`, `step/grass` .. `step/metal` (6 surfaces), `swing/*`, `hit/punch` ..., `explosion/*`, `shot/*`, `door/*`, `break/*`, `splash/*`, `teleport/*`, `magic/*`, `countdown/*`, `laser/beam` and `rumble/quake` (loops) | games and animation; invented from physics | energy, size, bright, hard, ring, space, width; pitch for the tonal ones; dur for loops |
@@ -1297,12 +1300,12 @@ thunder.wav: thunder/distant (7.70 s, peak at 3.22 s, -21 LUFS, clean) [thunder,
 ```
 
 The door is the right recording: a word that says which one or in which room ("front", "kitchen") leaves the thing
-known, while one that names another thing ("a garage door") is answered as a guess that says so.
+known, while one that names another thing ("a vault door") is answered as a guess that says so.
 
 The entries asked for "steady rain on a terrace, 8 seconds, no loop", "the heavy wooden front door falls shut",
 "keys jingling", "a phone vibrating on a table" and "distant thunder". A thing the catalogue has no recording of
-comes back as a guess that says so: "a kettle whistling" answered `also (the pick is a guess: earshot makes no
-kettle; whistle/referee is only the nearest sound it has)`. Leave such a moment silent or record it; a stand-in
+comes back as a guess that says so: "a fire alarm" answered `also (the pick is a guess: earshot makes no fire
+alarm; timer/done is only the nearest sound it has)`. Leave such a moment silent or record it; a stand-in
 is heard as one. A designed sound (a whoosh between cuts, a pop for a caption) belongs on the few cuts or captions
 the edit wants felt, not on each.
 

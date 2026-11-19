@@ -113,6 +113,20 @@ HEAD_END = frozenset(CONTEXT_WORDS + PLACE_WORDS + (
 # endings of a word that describes or says what was done: an unknown word with one at the end of the phrase is no
 # thing ("something squishy", "a cork pop followed by fizz"); what a thing is doing keeps its -ing ("a cat hissing")
 DESCRIBING = ('y', 'ed', 'ish', 'ful', 'ous', 'al', 'ic', 'ive', 'less', 'able', 'ible', 'ly', 'est')
+THING_ENDS = ('ey', 'way', 'ory')       # endings in -y of things: "a monkey", "a subway", "a factory"
+# German articles that are no English words: with one of them, a request whose every word is in lexicon.GERMAN is
+# German even when each word is English too ("ein lauter Donner"; brief.german)
+GERMAN_ARTICLES = frozenset(('ein', 'eine', 'einen', 'einem', 'einer', 'der', 'das', 'dem', 'des', 'im', 'vom',
+                             'zum', 'zur', 'und'))
+PARTICLES = frozenset(('over', 'by', 'past', 'away', 'off', 'up', 'down', 'in', 'out', 'around'))   # "flying OVER"
+
+
+def describes(w):
+    """True when a word ends as one that describes (DESCRIBING: "squeaky", "windy") and not as a thing does
+    (THING_ENDS)"""
+    return w.endswith(DESCRIBING) and not w.endswith(THING_ENDS)
+
+
 QUOTED = re.compile(r"(?:^|[\s(])['\"‘“](.+?)['\"’”](?=[\s,.!?)]|$)")   # words said as a caption: 'you did it!'
 # weights of the query's parts and of the fields of a design
 HEAD_WEIGHT, CONCEPT_WEIGHT, PART_WEIGHT, CONTEXT_WEIGHT, BROADER_WEIGHT, REF_WEIGHT = 1.0, 0.8, 0.6, 0.5, 0.4, 0.25
@@ -656,9 +670,13 @@ def german(text):
             return table[w], w not in alike
         if _known(w) or len(_joined(w)) > 1:
             return None
-        for end in ('en', 'es', 'er', 'e', 'n', 's'):
+        for end in ('en', 'es', 'er', 'em', 'e', 'n', 's', 'r', 'm'):     # "leiser", "schweren": "leise", "schwer"
             base = w[:len(w) - len(end)]
             if w.endswith(end) and len(base) > 2 and base in table:
+                return table[base], base not in alike
+        for end in ('ende', 'enden', 'ender', 'endes', 'endem', 'end'):     # "knarrende", "brummender": the verb's
+            base = w[:len(w) - len(end)] + 'en'
+            if w.endswith(end) and len(base) > 4 and base in table:
                 return table[base], base not in alike
         for k in range(len(w) - 3, 2, -1):
             a, c = w[:k], w[k:]
@@ -669,7 +687,9 @@ def german(text):
 
     parts = re.findall(r'[a-zäöüß]+|[^a-zäöüß]+', text.lower())
     read_ = [one(p) if p[0].isalpha() else None for p in parts]
-    if not any(r and r[1] for r in read_):
+    said = [(p, r) for p, r in zip(parts, read_) if p[0].isalpha()]
+    articles = {p for p, _ in said} & GERMAN_ARTICLES      # "ein lauter Donner": every word is German too
+    if not any(r and r[1] for r in read_) and not (articles and len(said) > 1 and all(r for _, r in said)):
         return None
     _cache['german_whole'] = all(r or not p[0].isalpha() or _known(p) or len(_joined(p)) > 1 or p in L.FOREIGN_WORDS
                                  for p, r in zip(parts, read_))     # every word was read
@@ -1095,6 +1115,31 @@ def _made_words(ids=False):
     return _cache['made_families' if ids == 'families' else 'made_ids' if ids else 'made']
 
 
+def _id_words():
+    """the stems of each design's id, one set a design ('mouse/squeak': {mouse, squeak})"""
+    from .sounds import registry
+    key = len(registry.load())
+    if _cache.get('id_words_key') != key:
+        _cache['id_words_key'] = key
+        _cache['id_words'] = {frozenset(stem(w) for w in WORD.findall(r['id'].replace('_', ' ').replace('/', ' ')))
+                              for r in registry.rows()}
+    return _cache['id_words']
+
+
+def _listed_by(w):
+    """the stems of the family words of the designs that list a word among their jobs ('soda': can, for can/open)"""
+    from .sounds import registry
+    key = len(registry.load())
+    if _cache.get('listed_key') != key:
+        by = {}
+        for r in registry.rows():
+            for s in r['uses']:
+                for x in WORD.findall(str(s).replace('_', ' ').lower()):
+                    by.setdefault(stem(x), set()).update(_family_words(r['id']))
+        _cache['listed_key'], _cache['listed'] = key, by
+    return _cache['listed'].get(stem(w), set())
+
+
 def _surface_next(toks, i):
     """True when the words from token i + 1 to the end of their phrase can be a surface, a ground or a material of
     the real world said after the preposition at i: one to three materials or words the lexicon has no job,
@@ -1142,6 +1187,7 @@ def _head_unknown(b, toks):
     if job in L.INTERFACE_JOBS or L.BROADER.get(job) in L.INTERFACE_JOBS:
         return                             # "toggle dark mode", "open settings": a job, and what it acts on
     made, seq, i = _made_words(), [], 0
+    listed = set()                         # words only a design's jobs hold, no design's name ("a TRAP springing")
     while i < len(toks):
         t = toks[i]
         if t in L.NEGATIONS:
@@ -1157,30 +1203,42 @@ def _head_unknown(b, toks):
             i = j
             continue
         plain = (t in unknown and t not in L.PERSON_WORDS and t not in L.MATERIALS and not _domain(t)
-                 and len(t) > 2 and not t.endswith(DESCRIBING) and t not in L.SOUND_NOUNS)
+                 and len(t) > 2 and not describes(t) and t not in L.SOUND_NOUNS)
+        if (plain and stem(t) in made and not t.endswith('ing') and stem(t) not in _made_words(True)
+                and not _listed_by(t) & {stem(x) for x in toks}):      # "SODA can opening": can/open lists it
+            listed.add(len(seq))
         seq.append((t, 'k' if t in L.SOUND_KINDS else '-' if not plain else 'c' if stem(t) in made else 'u'))
         i += 1
     # a kind of sound no design is named for ("hissing"; "launch", also a job of an app, after the thing launched) is
     # the unknown thing where the phrase ends on it
     last = max([n for n, (_, k) in enumerate(seq) if k != '-'] or [0])
     named_, first = _made_words(True), min([n for n, (_, k) in enumerate(seq) if k != '-'] or [0])
-    seq = [(w, k if k != 'k' else 'c' if stem(w) in named_ or (stem(w) in made and not first < n == last)
+    # (a kind said in -ing that only a design's jobs hold is what the thing does, unknown: "a man GRUNTING in pain")
+    seq = [(w, k if k != 'k' else 'c' if stem(w) in named_ or (stem(w) in made and not first < n == last
+                                                                and not w.endswith('ing'))
             else 'u' if n == last or w in unknown else '-') for n, (w, k) in enumerate(seq)]
     kinds = [k for _, k in seq]
     solid = [n for n, k in enumerate(kinds) if k != '-']
-    if 'u' not in kinds or (seq[solid[0]][0].endswith('ing') and kinds[solid[0]] == 'c'):
+    if 'u' not in kinds and not listed:
+        return
+    done_to = 'u' in kinds[solid[0] + 1:] and _world(b) and not b['context']   # "paddling a CANOE": a thing
+    if seq[solid[0]][0].endswith('ing') and kinds[solid[0]] == 'c' and not done_to:
         return                             # "flicking a feature on": what is done is known, whatever it is done to
     gone = []
     if kinds[solid[-1]] == 'u':
         gone = [n for n in solid if kinds[n] == 'u']
     else:
         for n, (w, k) in enumerate(seq):
-            if not (w == 'being' or (k != '-' and ' ' not in w and w.endswith('ing') and len(w) > 5
-                                     and w not in STEM_KEEP)):
+            v, *rest = w.split()            # "geese FLYING over": a verb with its particle too
+            if rest and not set(rest) <= PARTICLES:
+                continue
+            if not (w == 'being' or (k != '-' and v.endswith('ing') and len(v) > 5 and v not in STEM_KEEP)):
                 continue                   # ("ding", "ping", "sting" are no verbs)
             before = [m for m in solid if m < n]
-            if before and (kinds[before[-1]] == 'u' or k == 'u'):
-                gone = [m for m in (before[-1], n) if kinds[m] == 'u']
+            # the thing that does it may be a word a design only lists among its jobs ("a TRAP springing shut"):
+            # unknown here, and not_made lets it go when the design picked was found by it
+            if before and (kinds[before[-1]] == 'u' or before[-1] in listed or k == 'u'):
+                gone = [m for m in (before[-1], n) if kinds[m] == 'u' or m in listed]
             if before:
                 break
     if not gone:
@@ -1204,6 +1262,16 @@ def _dropped_things():
         _cache['dropped'] = frozenset(w for i in ids if 'drop' in i.replace('/', '_').split('_')
                                       for w in i.split('/')[0].split('_') if w not in ('drop', 'hit'))
     return _cache['dropped']
+
+
+LEAD_SHARE = 1.5     # a plain request's lead (lexicon.PLAIN_LEADS) scores this share of the design it goes before
+
+
+def _plain_leads():
+    """{phrase_key of a plain request: the design that leads it} (lexicon.PLAIN_LEADS), read once"""
+    if 'plain_leads' not in _cache:
+        _cache['plain_leads'] = {phrase_key(words(k)): v for k, v in L.PLAIN_LEADS.items()}
+    return _cache['plain_leads']
 
 
 def phrase_key(words_):
@@ -1481,11 +1549,19 @@ OWNED_HEADS = frozenset(stem(w) for w in (
 def owner_unknown(b, sid, why):
     """the words of the request's own sound (as written) when its head is one whose sound depends on what it belongs
     to (OWNED_HEADS: "a fax MACHINE", "a seagull CRY", "an elevator DING") and the design picked (`sid`, decided by
-    rank's `why`) answers neither that head nor the word before it that names its owner; None otherwise. A word that
+    rank's `why`) answers neither that head nor the word before it that names its owner, or when the request begins
+    with a word no design knows before the word the pick was found by ("a conveyor belt"); None otherwise. A word that
     describes, a material, a person or an article before the head is no owner ("a soft click", "a metal door")"""
     from .sounds import registry
     toks = [t for t in tokens(b.get('text') or '') if t not in ARTICLES]
     ctx = set(b.get('context_words', ()))
+    first, head = (toks + [None, None])[:2]
+    if (first in b.get('unknown', ()) and head and stem(head) in {stem(w) for w in why} and first.isalpha()
+            and head not in L.GENERIC and head not in L.SOUND_NOUNS     # "bridge ambience", "a laser ping"
+            and len(first) > 2 and stem(first) not in _made_words() and not describes(first)
+            and not first.endswith('ing') and first not in L.PERSON_WORDS and first not in L.MATERIALS
+            and not _domain(first) and _world(b)):
+        return f'{first} {head}'          # "a conveyor belt", "a hole punch": a thing of another kind, by its name
     for i, t in enumerate(toks):
         if t in PUNCT or t in HEAD_END or t in L.NEGATIONS:
             return None
@@ -1501,9 +1577,9 @@ def owner_unknown(b, sid, why):
         prev = toks[i - 1] if i else None
         hit = _match(toks, i - 1)[1] if prev else {}
         owner = (prev and prev not in L.STOP and prev not in L.MATERIALS and prev not in L.PERSON_WORDS
-                 and prev not in L.WHICH_ONE and len(prev) > 2 and prev.isalpha() and not prev.endswith(DESCRIBING)
+                 and prev not in L.WHICH_ONE and len(prev) > 2 and prev.isalpha() and not describes(prev)
                  and (not hit or 'c' in hit or 'v' in hit))
-        said = toks[i - 1:i + 1] if prev and (owner or prev.endswith(DESCRIBING)) else [t]
+        said = toks[i - 1:i + 1] if prev and (owner or describes(prev)) else [t]
         if (owner and stem(prev) not in have and (hit or {}).get('c') not in have
                 and (prev in b['unknown'] or stem(prev) not in _made_words())):
             return ' '.join(said)         # "a fax machine": an owner no design is made of
@@ -1516,14 +1592,16 @@ def owner_unknown(b, sid, why):
     return None
 
 
-def not_made(b, why=None):
+def not_made(b, why=None, sid=None):
     """the first sound the request asks for that the catalogue has nothing of (lexicon.NOT_MADE: a dog's bark, a
     scream, a violin, a car horn), as written, or None. Only what the request says of its own sound counts: not a
     negation or comparison ("not a voice", "like a dog's bark"), nor where it plays ("for a dog-walking app"); a
     single word only when the reader did not understand it otherwise ("saying yes" is a success). Last, the
     request's own sound when the reader does not know its thing or what it does (b['absent']: "a rocket launch", "a
     cat hissing"), unless the words a design was picked for (`why`, rank's) hold every such word: "snow crunching"
-    found the steps in snow by "crunch", which is then no unknown word"""
+    found the steps in snow by "crunch", which is then no unknown word; nor when the design was found by the thing
+    and only what it is doing is unknown ("plates clattering", "a siren getting closer"; with the design's id `sid`,
+    only a thing its name or family says)"""
     ctx = set(b.get('context_words', ()))
     toks = [t for t in tokens(b.get('text') or '') if t not in PUNCT]
     said = set(_said_words(b.get('text')).values())
@@ -1532,6 +1610,8 @@ def not_made(b, why=None):
         if any(p in L.CONCEPTS.get(c, ()) for c in why or ()):
             continue                   # "a kitchen timer ringing": a name of the job the design was picked for
         if f' {p} ' in f' {text} ' and not set(p.split()) & ctx and set(p.split()) <= said:
+            if any(ids <= {stem(w) for w in p.split()} for ids in _id_words()):
+                continue               # "a mouse squeak" once mouse/squeak is made: the design is the thing
             return p
     whole = {w for p in why or () if p.startswith('ph:') for w in p[3:].split()}
     for t in toks:
@@ -1543,7 +1623,17 @@ def not_made(b, why=None):
         person = next((t for t in toks if t in L.PERSON_WORDS and t in said and t not in ctx), None)
         if c in b.get('concepts', ()) and person and not set(toks) & whose and c in b.get('written', {}):
             return f"{person} {b['written'][c]}"
-    if b.get('absent') and not (why is not None and {stem(w) for w in b.get('absent_words', ())} <= set(why)):
+    found = set(why or ()) | {stem(w) for p in why or () for w in WORD.findall(str(p).split(':')[-1])}
+    if b.get('absent') and not (why is not None and {stem(w) for w in b.get('absent_words', ())} <= found):
+        said_ = WORD.findall(b['absent'])
+        seq = [stem(w) for w in said_]
+        own = (_name_words(sid) | _family_words(sid)) if sid else None
+        at = next((n for n, w in enumerate(seq) if w in found and (own is None or w in own)), None) if why else None
+        ing = next((n for n, w in enumerate(said_) if w.endswith('ing') and len(w) > 5), None)
+        gone = {stem(w) for w in b.get('absent_words', ())}
+        if (None not in (at, ing) and at < ing and all(n >= ing for n, w in enumerate(seq) if w in gone)
+                and not sketched(b)):  # ("ice skating" is a thing the cookbook sketches)
+            return None               # "plates clattering", "twigs snapping underfoot": the thing was found
         return b['absent']
     return None
 
@@ -1762,13 +1852,28 @@ def _world(b, thing=False):
     return b.get('domain') != 'ui' and not said & (JOB_NOUNS | L.INTERFACE_PLACES)
 
 
+def sketched(b):
+    """the designs a cookbook recipe offered only as a start (earshot.recipe: `sketch`) is built of, when the request
+    names its thing ("a dishwasher": the tap, the rain, the blender it is built on): a part whose family the request
+    says first ("a vending machine dropping a can": the can), then the others in the recipe's order; () when none"""
+    from . import recipe
+    rc = recipe.answer(b, (), sketch=True)
+    if not rc:
+        return ()
+    ids = list(dict.fromkeys(lay['sound'] for lay in rc.get('layers', ()) if lay.get('sound')))
+    said = set(_said_words(b.get('text')))
+    return tuple(sorted(ids, key=lambda i: not _family_words(i) & said))
+
+
 def _nearest(b, out, idx):
     """a ranking that is never empty and says the nearest where the catalogue lacks what was asked: for a request
     whose thing or action the reader does not know (b['absent'], and the first design was not found by that word) the
-    design of that kind of sound goes first (b['kind']: a roar is a low rumble, booing a crowd); for a surface no
+    design of that kind of sound goes first (b['kind']: a roar is a low rumble, booing a crowd), else for a thing
+    the cookbook sketches the part its sketch is built on (`sketched`: a dishwasher, the tap); for a surface no
     member of the first design's family is named for, the member on the nearest surface (lexicon.SURFACE_KIN: rain
     on an umbrella is rain on a tent); and when no word found anything, the first design of lexicon.NEAREST_ANY
-    that the hard filters allow. make.doubt says of each that it is only the nearest"""
+    that the hard filters allow. make.doubt says of each that it is only the nearest. Last, a plain request in the
+    words of lexicon.PLAIN_LEADS gets the design that leads it"""
     rows, terms = idx[0], idx[1]
     if _cache.get('pos_key') != id(idx):
         _cache['pos_key'], _cache['pos'] = id(idx), {r['id']: k for k, r in enumerate(rows)}
@@ -1783,12 +1888,19 @@ def _nearest(b, out, idx):
         return [best] + [r for r in out if r['id'] != sid]
 
     kind = b.get('kind')
-    if kind and free(kind) and b.get('absent') and (not out or not_made(b, out[0]['why']) == b['absent']):
+    if kind and free(kind) and b.get('absent') and (not out or not_made(b, out[0]['why'], out[0]['id'])
+                                                    == b['absent']):
         out = first(kind, [])
-    gone = not_made(b, out[0]['why']) if out else None
+    gone = not_made(b, out[0]['why'], out[0]['id']) if out else None
     near = L.SOUND_KINDS.get(gone) if gone in L.NOT_MADE or gone in L.NOT_MADE_PHRASES else None
-    if near and free(near) and out[0]['id'] != near:
-        out = first(near, [])         # "a fire alarm", "a trumpet": the nearest of a thing no design is
+    if near and free(near):
+        if out[0]['id'] != near:
+            out = first(near, [])     # "a fire alarm", "a trumpet": the nearest of a thing no design is
+    elif not (kind and free(kind)) and (gone or owner_unknown(b, out[0]['id'], out[0]['why']) if out
+                                        else b.get('absent')):
+        sid = next((i for i in sketched(b) if free(i)), None)
+        if sid and (not out or out[0]['id'] != sid):
+            out = first(sid, [])      # "a dishwasher", "a fax machine": the part the cookbook's sketch is built on
     sur = b.get('surface')
     if sur and out and not b.get('absent'):
         fam = out[0]['id'].split('/')[0]
@@ -1828,6 +1940,19 @@ def _nearest(b, out, idx):
                     and free(r['id'])), None)
         if sid and sid != out[0]['id']:
             out = first(sid, [])
+    # a plain request of a film in the words of lexicon.PLAIN_LEADS ("a title hit", "a soft whoosh"): the film set's
+    # sound of real things leads it, found by the whole request
+    key = phrase_key(words(b.get('text') or ''))
+    lead = _plain_leads().get(key)
+    if _cache.get('names_key') != id(idx):     # a design named word for word ("a tape stop": stop/tape) stays
+        _cache['names_key'] = id(idx)
+        _cache['names'] = {phrase_key(words(r['id'].replace('/', ' ').replace('_', ' '))) for r in rows}
+    if (lead and free(lead) and key not in _cache['names'] and not b.get('voice')
+            and not set(b.get('context_words', ())) & MUSIC_STEMS):
+        old = next((r for r in out if r['id'] == lead), {'id': lead})
+        top_ = out[0]['score'] if out and out[0]['score'] else 1.0
+        why_ = list(dict.fromkeys([f'ph:{key}'] + list(old.get('why', ()))))
+        out = [dict(old, score=round(top_ * LEAD_SHARE, 3), why=why_)] + [r for r in out if r['id'] != lead]
     return out
 
 

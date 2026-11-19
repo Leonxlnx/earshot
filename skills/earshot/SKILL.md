@@ -11,9 +11,9 @@ earshot turns a request in words into a sound file: it picks a design from its c
 model is loaded and nothing is downloaded; a one-shot takes about a second. This part is complete on its own. If the
 `earshot` command is missing, see Setup at the end.
 
-The catalogue holds 830 designs. Realistic things are learned from recordings in the public domain (249 things:
+The catalogue holds 922 designs. Realistic things are learned from recordings in the public domain (309 things:
 footsteps on many surfaces, doors, drawers, switches, keyboards, cloth, paper, glass, water, metal, punches, falls,
-explosions, animals, people without words, street, house and kitchen sounds) and so are 16 ambience beds (fire,
+explosions, animals, people without words, street, house and kitchen sounds) and so are 25 ambience beds (fire,
 shores, crickets, a brook, a cafe, a street, rain on wood, on a tin roof and on an umbrella), the acoustic drums and
 the four real instruments that play tonal figures (marimba, harp, pizzicato strings, upright piano). The interface
 sounds and the film and motion effects are built from those recordings. Written in code: the tonal figures (success,
@@ -162,11 +162,11 @@ The answer is the whole result; ask for `--json` (MCP `full=true`) only for meas
 - **Where the hit is.** Every file starts when its sound does (within 2 ms), but its loudest moment is often later:
   the line says `peak at`, and `--json` gives `peak_s`, `onset_s` and, for a row, `events_s` (each event's start), in
   seconds from the start of the file. To put the hit on the frame at t, start the file at t minus `peak_s`: "a
-  whoosh for a transition" answered `whoosh/soft (0.39 s, peak at 0.24 s, ...)`, so for its peak on 12.000 s start it
-  at 11.76 s. A riser ends on its peak, so it starts its own length before the reveal. earshot does not place files
+  whoosh for a transition" answered `whoosh/sweep (0.42 s, peak at 0.30 s, ...)`, so for its peak on 12.000 s start
+  it at 11.70 s. A riser ends on its peak, so it starts its own length before the reveal. earshot does not place files
   on a timeline: the editor, ffmpeg or the page's code does.
-- **A row in one file**: `earshot make "a soft ui tick" -o count.wav --events 8 --dur 1.5` answered `tick/soft (1.50
-  s, peak at 0.17 s, -15 LUFS, clean)` and `played: 8 events as a row at 6.2 a second`: a number counting up.
+- **A row in one file**: `earshot make "a soft ui tick" -o count.wav --events 8 --dur 1.5` answered `tick/key (1.50
+  s, peak at 0.81 s, -16 LUFS, clean)` and `played: 8 events as a row at 6.2 a second`: a number counting up.
 
 ### Scoring a motion video
 
@@ -250,7 +250,8 @@ cathedral) and `kind` (`event`, or `ambience` for a bed). A mistake is answered 
 The same recipe goes into Python (`make(recipe={...}, out=...)`), the MCP `make` tool (`recipe`) and a spec entry
 (`{"name": "roar", "recipe": {...}}`). Every field: `docs/MAKE.md`.
 
-What works: real recordings first; a recording moved down is bigger (`"pitch": -12` turns a horse into a beast);
+What works: real recordings first, and few of them: two that belong together (a cork and a pour for champagne) sound
+more real than five; a recording moved down is bigger (`"pitch": -12` turns a horse into a beast);
 `events` with `loose` for things that come as they come (twigs, cracks, steps); `halt` or `glide` for motors.
 Noise only for air and rumble, the low sine only for weight under a hit; no tone that sounds like a synthesiser
 unless the thing is one, and no bell for a thing that is not a bell. Every layer is brought to the same peak before
@@ -258,8 +259,9 @@ its gain: the body at 0, what supports it at -4 to -10, air and rumble at -12 to
 body of another ("rain on a tin can") is not in the form: where the catalogue has the real surface (`rain/wood`,
 `rain/tin_roof`, `step/floorboard`), use that design.
 
-The cookbook (`earshot recipe --list`) holds 74 recipes. 32 answer a request that names their thing (a car crash, a
-cannon, a welding torch, a woodpecker, a werewolf howl and more). The other 42 are sketches that earshot's listening
+The cookbook (`earshot recipe --list`) holds 95 recipes. 54 answer a request that names their thing (a car crash, a
+cannon, a woodpecker, a werewolf howl, a fireball spell, an energy shield going up, a plasma shot, a robot arm moving
+and more). The other 41 are sketches that earshot's listening
 model does not hear clearly as their thing; the catalogue answers such a request and one line names the sketch as a
 start. When the catalogue has a recording of the thing itself, the recording answers ("a rocket launch" is
 `rocket/launch`). A cookbook sound follows a length, "far away", "up close", "soft" and a count ("three times"),
