@@ -159,8 +159,12 @@ def doubt(b, cands):
     sense = L.FAMILY_SENSE.get(fam, fam)    # rise/* and riser/* are both the riser (lexicon.FAMILY_SENSE)
     same |= {c['id'].split('/')[0] for c in cands
              if L.FAMILY_SENSE.get(c['id'].split('/')[0], c['id'].split('/')[0]) == sense}
+    # designs found by nothing but the interface job the request asks for ("putting a window away": a close) are each
+    # that job: which real thing plays it is no doubt about what was asked
+    job = (top['why'][0] if top['why'] and list(top['why']) == list(b.get('concepts') or ())[:1]
+           and top['why'][0] in L.INTERFACE_JOBS else None)
     others = [c for c in cands[1:] if c['id'].split('/')[0] not in same and L.TWINS.get(c['id']) != top['id']
-              and L.FILM_CYMBAL.get(c['id'].split('/')[0]) != top['id']]
+              and L.FILM_CYMBAL.get(c['id'].split('/')[0]) != top['id'] and not (job and list(c['why']) == [job])]
     named = (brief.named(top['why']) or brief.thing_named(top['id'], top['why'])
              or brief.use_said(b, top['id']))      # "a bumblebee", "booing and jeering": a whole job of the recording
     heard = top.get('z') is not None and top['z'] >= GUESS_Z

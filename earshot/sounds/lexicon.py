@@ -270,7 +270,7 @@ CONCEPTS = {
                  'low end drop', 'sub bass drop', 'deep drop', 'low drop', 'bass thump', 'feel more than hear',
                  'chest thump', 'sub thump'),
     'braam': ('bwaaam', 'bwaam', 'braaam', 'horn blast', 'brass blast', 'trailer horn', 'inception horn', 'horn hit',
-              'foghorn', 'fog horn', 'brass hit'),
+              'brass hit'),
     'logo': ('logo reveal', 'logo sting', 'brand', 'branding', 'sonic logo', 'audio logo', 'sound logo', 'mnemonic',
              'ident', 'signature', 'sonic identity', 'brand sound', 'company logo', 'audio branding'),
     'sting': ('stinger', 'music sting', 'musical sting', 'stab sting'),
@@ -437,13 +437,10 @@ NOT_MADE = frozenset((
     'singing', 'sings', 'singer', 'vocal', 'vocals', 'choir', 'spoken', 'saying', 'narrator', 'narration',
     'voiceover', 'voice-over',
     'violin', 'violins', 'cello', 'viola', 'saxophone', 'sax', 'flute', 'clarinet', 'oboe', 'bagpipes',
-    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'kettle', 'fridge', 'refrigerator', 'freezer', 'airlock',
-    # insects other than the recorded fly and bee: the fly's buzz is the nearest (it lists them: brief.learned_ok)
-    'mosquito', 'mosquitoes'))
+    'trumpet', 'chew', 'chewing', 'munch', 'munching', 'airlock'))
 NOT_MADE_PHRASES = ('air horn', 'electric guitar', 'guitar solo', 'drum solo', 'ringtone', 'kitchen timer',
                     'egg timer', 'fire alarm', 'smoke alarm', 'car alarm', 'burglar alarm', 'toy gun', 'water gun',
-                    'nerf gun', 'mouse squeak', 'mouse squeaks', 'mouse squeaking', 'mice squeaking',
-                    'fridge hum', 'fridge humming', 'refrigerator hum', 'refrigerator humming', 'measuring tape',
+                    'nerf gun', 'measuring tape',
                     'tape measure', 'pan set', 'machine gun',
                     'pan placed', 'pan put down', 'saucepan set', 'saucepan placed', 'saucepan put down')
 # a voice the catalogue has of one kind of person only (the recording's): said of another person it is not made ("a
@@ -595,7 +592,10 @@ PLAIN_LEADS = {
     'a logo reveal hit': 'logo/bag', 'an end card hit': 'logo/bag', 'a logo reveal': 'logo/bag', 'a riser': 'rise/breath',
     'a riser before the drop': 'rise/breath', 'a build up': 'rise/breath', 'the drop': 'drop/sack',
     'a hit after the build': 'drop/sack', 'a shine': 'shine/blade', 'a glint': 'shine/blade',
-    'a product shine': 'shine/blade', 'a tape stop': 'stop/zip', 'a pop': 'pop/mouth'}
+    'a product shine': 'shine/blade', 'a tape stop': 'stop/zip', 'a pop': 'pop/mouth',
+    # plain requests for a thing several recordings are of: the one heard most plainly
+    'a hailstorm': 'hail/roof', 'hail': 'hail/roof', 'a reversing alarm': 'truck/reverse',
+    'a reversing beep': 'truck/reverse', 'blowing': 'blow/puff'}
 # where an interface job happens, not what it is: "open a menu" is an opening (brief.rank)
 INTERFACE_PLACES = frozenset(('menu',))
 # words that say which one of a thing or in which room it is, never what it belongs to: "the front door", "a kitchen
@@ -819,7 +819,8 @@ CONCEPT_DIR = {'riser': 1, 'downlifter': -1, 'power_up': 1, 'power_down': -1, 'l
                'receive': -1, 'success': 1, 'error': -1, 'win': 1, 'lose': -1, 'jump': 1, 'land': -1,
                'startup': 1, 'shutdown': -1}
 # words the stemmer would send to the wrong concept ('waving' is not 'waves', 'beating' eggs is no beat of music)
-NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating', 'dice', 'scratch', 'scratching'))   # no 'scratched'
+NOT_CONCEPT = frozenset(('waving', 'key', 'leaves', 'beating', 'dice', 'scratch', 'scratching',   # no 'scratched'
+                         'dart', 'darts', 'blow'))    # the thing, a dart or a blow of breath; 'darting' is a dash
 # function words of German, French, Spanish, Italian and Dutch that are no English words: a request that says one, or
 # a word with a letter outside a to z that the lexicon does not know ("für"), is not written in English. In such a
 # request these words and their English look-alikes (FOREIGN_ALIKE: German "die" is no death, French "pour" no
@@ -906,7 +907,9 @@ DOMAIN_WORDS = {'ui': 'ui', 'app': 'ui', 'website': 'ui', 'site': 'ui', 'web': '
 DOMAIN_PHRASES = {'title card': 'motion', 'end card': 'motion', 'lower third': 'motion', 'product shot': 'motion',
                   'hero shot': 'motion', 'title screen': 'game', 'home screen': 'ui', 'lock screen': 'ui',
                   'landing page': 'ui', 'hero section': 'ui', 'cut scene': 'game', 'cutscene': 'game',
-                  'next shot': 'motion', 'two shots': 'motion', 'between shots': 'motion'}
+                  'next shot': 'motion', 'two shots': 'motion', 'between shots': 'motion',
+                  # a corner of the screen is where a product shows something
+                  'bottom right': 'ui', 'bottom left': 'ui', 'top right': 'ui', 'top left': 'ui'}
 # an enemy beaten is a moment of a game: the phrase says the domain as well as the blow
 DOMAIN_PHRASES.update({p: 'game' for p in CONCEPTS['hit'] if 'enemy' in p.split()})
 DOMAIN_STRONG = frozenset(('game', 'gaming', 'platformer', 'rpg', 'shooter', 'trailer', 'video', 'film', 'movie',
@@ -938,29 +941,25 @@ SOUND_KINDS = {
     'squeaking': 'door/creak', 'squeaky': 'door/creak', 'squeal': 'tyres/screech', 'squealing': 'tyres/screech',
     'boo': 'crowd/boo', 'booing': 'crowd/boo', 'jeer': 'crowd/boo', 'jeering': 'crowd/boo',
     # a thing of lexicon.NOT_MADE or NOT_MADE_PHRASES and the design nearest to it (brief._nearest)
-    'trumpet': 'win/fanfare', 'kettle': 'pot/boil', 'airlock': 'door/slide', 'fire alarm': 'timer/done',
+    'trumpet': 'win/fanfare', 'airlock': 'door/slide', 'fire alarm': 'timer/done',
     'smoke alarm': 'timer/done', 'car alarm': 'siren/pass', 'burglar alarm': 'siren/pass', 'toy gun': 'cap_gun/shot',
-    'water gun': 'spray_can/spray', 'nerf gun': 'cap_gun/shot', 'mouse squeak': 'toy/squeak',
-    'mouse squeaks': 'toy/squeak', 'mouse squeaking': 'toy/squeak', 'mice squeaking': 'toy/squeak',
-    'fridge hum': 'space_hum/ship', 'fridge humming': 'space_hum/ship', 'refrigerator hum': 'space_hum/ship',
-    'refrigerator humming': 'space_hum/ship', 'dart': 'arrow/hit', 'pong': 'ball/bounce',
+    'water gun': 'spray_can/spray', 'nerf gun': 'cap_gun/shot',
     'measuring tape': 'zip_tie/pull', 'tape measure': 'zip_tie/pull', 'pan set': 'pot_lid/set',
     'pan placed': 'pot_lid/set',
     'pan put down': 'pot_lid/set', 'saucepan set': 'pot_lid/set', 'saucepan placed': 'pot_lid/set',
     'saucepan put down': 'pot_lid/set',
     'moan': 'sigh/person', 'moaning': 'sigh/person', 'groan': 'sigh/person', 'groaning': 'sigh/person',
-    'whisper': 'sigh/person', 'whispering': 'sigh/person', 'grunt': 'cough/person', 'hiccup': 'burp/person',
-    'gulp': 'burp/person', 'slurp': 'straw/bubbles', 'gurgle': 'straw/bubbles', 'gurgling': 'straw/bubbles',
-    'squawk': 'crow/caw', 'screeching': 'tyres/screech', 'flutter': 'wings/flap', 'fluttering': 'wings/flap',
-    'whir': 'drill/electric', 'whirr': 'drill/electric', 'whirring': 'drill/electric', 'idling': 'car_engine/start',
-    'mower': 'car_engine/start', 'chainsaw': 'saw/wood', 'sanding': 'broom/sweep', 'scrubbing': 'broom/sweep',
+    'whisper': 'sigh/person', 'whispering': 'sigh/person', 'grunt': 'cough/person',
+    'gulp': 'burp/person', 'slurp': 'straw/bubbles',
+    'screeching': 'tyres/screech', 'flutter': 'wings/flap', 'fluttering': 'wings/flap',
+    'whir': 'drill/electric', 'whirr': 'drill/electric', 'whirring': 'drill/electric',
+    'sanding': 'broom/sweep', 'scrubbing': 'broom/sweep',
     'scraping': 'broom/sweep', 'brushing': 'broom/sweep', 'lightsaber': 'laser/beam', 'humming': 'space_hum/ship',
-    'pecking': 'knock/wood', 'chattering': 'dice/roll', 'trumpeting': 'elephant/trumpet', 'shredder': 'paper/rip',
-    'printer': 'paper/page', 'curtain': 'cloth/rustle', 'ladder': 'metal/drop', 'wrench': 'metal/drop',
-    'machine gun': 'gunshot/rifle', 'breathing': 'gasp/breath', 'panting': 'gasp/breath',
-    'grunting': 'cough/person', 'tornado': 'wind/mountain', 'hurricane': 'wind/mountain', 'gears': 'clock/mechanical',
-    'clockwork': 'clock/mechanical', 'jackhammer': 'drill/electric', 'hose': 'faucet/run', 'sprinkler': 'faucet/run',
-    'popper': 'cork/pop', 'confetti': 'cork/pop', 'canoe': 'splash/small', 'paddling': 'splash/small'}
+    'pecking': 'knock/wood', 'trumpeting': 'elephant/trumpet',
+    'printer': 'paper/page', 'ladder': 'metal/drop',
+    'machine gun': 'gunshot/rifle',
+    'grunting': 'cough/person', 'gears': 'clock/mechanical',
+    'clockwork': 'clock/mechanical', 'canoe': 'splash/small', 'paddling': 'splash/small'}
 # the designs tried in this order when no word of a request found anything: a request always gets a nearest sound,
 # said to be only that (brief.rank, make.doubt)
 NEAREST_ANY = ('thump/soft', 'tap/soft', 'click/soft')
@@ -1047,6 +1046,7 @@ GERMAN = {
     'von': 'of', 'wird': 'being', 'geöffnet': 'opened', 'geschlossen': 'closed', 'app': 'app', 'spiel': 'game',
     'hupt': 'honking', 'startet': 'starting', 'starten': 'start', 'fährt': 'goes', 'vorbei': 'passing',
     'ferne': 'distance', 'zauberspruch': 'magic spell', 'spruch': 'spell', 'wasserkocher': 'kettle',
+    'spülmaschine': 'dishwasher', 'geschirrspüler': 'dishwasher',
     'kocher': 'kettle', 'kaffeemaschine': 'coffee machine', 'kaffee': 'coffee', 'maschine': 'machine',
     'tacker': 'stapler', 'hefter': 'stapler', 'niest': 'sneeze', 'jemand': 'someone', 'weinen': 'crying',
     'weint': 'crying', 'baby': 'baby', 'pfiff': 'whistle', 'schiedsrichter': 'referee', 'mischen': 'shuffling',

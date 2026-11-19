@@ -46,7 +46,7 @@ Then:
 |---|---|---|
 | `not in this sound: ...` | sounds or jobs the request named that the chosen design does not cover | ask for them in a second call, or pick from `also` |
 | `also: ...` | up to three alternatives, always: the next ranked designs, then the nearest of the same family, kind or domain | take one with `--sound ID` if the pick does not fit the job |
-| `also (the pick is a guess: ...): id (a few words), ... Name one with sound=<id>` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high, or the thing or what it does is a word earshot does not know (`earshot makes no curtain being pulled; cloth/rustle is only the nearest sound it has`); the alternatives then come from other families first, each with the start of its description | name one with `--sound ID`, or describe the sound by what it is made of ("a long rustle of heavy fabric") instead of by its name, or tell the user that this thing is missing |
+| `also (the pick is a guess: ...): id (a few words), ... Name one with sound=<id>` | no job or sound word matched (and, when listening, the request does not clearly sound like the pick), or another kind of sound scored almost as high, or the thing or what it does is a word earshot does not know (`earshot makes no dial up modem; dial/click is only the nearest sound it has`); the alternatives then come from other families first, each with the start of its description | name one with `--sound ID`, or describe the sound by what it is made of ("a screeching run of electronic tones and static") instead of by its name, or tell the user that this thing is missing |
 | `no rain on a tarp: rain/tent is the nearest surface; also: ...` | the sound exists, but not on the surface, ground or place said after "on", "in", "against" or "into"; the pick is the same sound on the nearest surface it has, the alternatives its other surfaces | leave it, or name another surface with `--sound ID` |
 | `not followed: "slow"; this sound has no control of its speed ...` | a control the request asked for (in words or as an argument) that this design does not have; the line says what it does instead. A word that named the design ("fast" in "a fast whoosh") is never listed | leave it, or ask for a design that has that control |
 | `0.43 s, not the 2 s asked: a single struck sound rings as long as it rings` | a length a one-shot cannot keep | leave it, or ask for a whoosh, a figure or a bed |
@@ -567,13 +567,14 @@ The whole:
 |---|---|
 | `name` | the sound's name: lower-case letters, digits and `_`; it names the file when `-o` is not given |
 | `says` | what the sound is, in words; `--listen` matches the sound against it |
-| `layers` | 1 to 8 layers |
+| `layers` | 1 to 12 layers |
 | `dur` | seconds: the file is cut there with a fade (a length the layers do not reach is said in a note) |
 | `space` | `dry` (default), `booth`, `room`, `studio`, `hall`, `plate`, `cathedral` |
 | `kind` | `event` (default), or `ambience`: levelled like a bed and faded in and out |
 | `things`, `built`, `sketch` | cookbook fields: the requests the recipe answers, one sentence on what it is built from, and `true` for a recipe that is only a start (below) |
 
-A layer is a catalogue design (`"sound": "door/slam"`) or a plain source (`"source": "noise"` or `"sine"`):
+A layer is a catalogue design (`"sound": "door/slam"`), a plain source (`"source": "noise"` or `"sine"`) or a
+cookbook recipe (`"recipe": "thunder_far"`, one level deep: a storm can hold a built thunder):
 
 | field | what it does |
 |---|---|
@@ -586,12 +587,18 @@ A layer is a catalogue design (`"sound": "door/slam"`) or a plain source (`"sour
 | `cut` | `[from, to]` in seconds: the part of the take that is used |
 | `halt` | seconds, 0.05 to 10: the take runs down to a stop, as a motor does when its power is cut |
 | `lowpass`, `highpass` | Hz, 20 to 20000; two numbers `[from, to]` move the cutoff over the layer |
-| `pan` | -1 (left) to 1 (right) |
+| `pan` | -1 (left) to 1 (right); two numbers `[from, to]` move the layer across |
+| `stretch` | a factor, 0.25 to 4: the take longer or shorter at the same pitch (a creak drawn long, a hiss held); its first 30 ms after the attack stay as they are, so a hit is not smeared. Over 4 even real takes turn metallic |
 | `gain` | dB, -40 to 12, against the other layers: every layer is first brought to the same peak |
 | `at` | seconds: where the layer starts |
 | `fade_in`, `fade_out` | seconds: fades at its ends; when not said, an ambience gets 0.1 and 0.3 s and a source 0.01 and 0.02 s |
 | `swell`, `decay` | seconds: a slow rise from 30 dB down at its start, a slow fall to nothing at its end |
 | `events` | `{"count", "gap", "faster", "softer", "loose"}`: the layer 2 to 64 times, each a new take, `gap` seconds apart; each gap `faster` times the one before (under 1: faster and faster); each event `softer` dB against the one before; `loose` 0 to 1 moves each up to half its gap early or late |
+| `scatter` | `{"rate", "rate_to", "dur", "pitch", "gain", "pan", "grain"}`: the layer many times at random moments, `rate` events a second (0.5 to 400) moving to `rate_to` by the end, over `dur` seconds; each event up to `pitch` semitones (0 to 12) higher or lower, up to `gain` dB (0 to 40) softer, up to `pan` (0 to 1) to either side; with `grain` (0.005 to 2 s) each event is a random piece of that length of the take. Every event another take where the design has several recordings. Rain from drops, applause from claps, hail, gravel, a crowd, a swarm |
+| `level` | `[[time, dB], ...]`: the layer's loudness over time, from its start, straight in dB between the points (-60 to 12) |
+| `bend` | `[[time, semitones], ...]`: the layer's pitch over the heard time as a tape does it (-24 to 12): a moo bent into a whale's song |
+| `pass` | `{"at", "speed"}`: the layer passes the listener, closest at `at` seconds, at `speed` m/s (1 to 100): its pitch falls through that moment (the Doppler effect), it grows loud and bright as it nears and dull and soft as it goes, and it crosses from one side to the other |
+| `spin` | `{"rate", "depth", "shape"}`: its loudness pulses `rate` times a second (0.5 to 60, or `[from, to]`) by `depth` (0 to 1, default 0.8), `"smooth"` or `"chop"`: rotor blades, wings, a fan, a motor's chug, purring |
 | `follow` | `{"layer", "amount", "smooth"}`: the layer's loudness follows another layer's, named by its index from 0 (`"follow": 0` is the short form). The other layer's level is measured over `smooth` seconds (0.005 to 2, default 0.05) as a share of its loudest moment; `amount` 1 (the default) makes this layer exactly that loud, 0.5 half of the way, and an amount under 0 makes it give way where the other is loud (-1: silent at the other's loudest moment) |
 | `color` | of noise: `white`, `pink` (default) or `brown` |
 | `hz`, `to` | of a sine: 20 to 150 Hz, gliding to `to` |
@@ -766,9 +773,9 @@ What is recognised:
   design made of notes unless the words ask for music (an instrument, a chime, a jingle, a melody, a motif, a pad)
   or for chip sound, or the request is for a game.
 - **Things earshot does not make.** A request always gets a sound. When the thing that makes it, or what the thing
-  does, is a word neither the lexicon nor any design's name or job knows ("a curtain being pulled", "a paper
-  shredder", "a stomach growl"), the answer is the nearest design and says so: `also (the pick is a guess: earshot
-  makes no curtain being pulled; cloth/rustle is only the nearest sound it has): ...`. The nearest is chosen by
+  does, is a word neither the lexicon nor any design's name or job knows ("a dial-up modem", "a vault door"), the
+  answer is the nearest design and says so: `also (the pick is a guess: earshot makes no dial up modem; dial/click
+  is only the nearest sound it has): ...`. The nearest is chosen by
   the kind of sound the word names (a growl is a low rumble, a hiss a spray of air, a whisper a sigh:
   `lexicon.SOUND_KINDS`), else by the words of the request that are known, never passed off as the thing.
 - **On, in, against, into.** What follows these words after the sound is its surface, ground, material or place,

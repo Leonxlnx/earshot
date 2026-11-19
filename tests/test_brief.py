@@ -1407,3 +1407,26 @@ def test_a_thing_the_cookbook_sketches_is_answered_by_a_part_of_its_sketch(idx):
             continue
         fams = {s.split('/')[0] for s in brief.sketched(b)}
         assert cands[0]['id'].split('/')[0] in fams, (name, cands[:1], brief.sketched(b))
+
+
+@pytest.mark.parametrize('text,want,not_', [
+    ('a car on gravel', 'step/gravel', 'hail/'),                       # 'car' names where the hail was heard
+    ('a warm floaty background sound, just a calm hum of notes', 'pad/', 'fridge/'),
+    ('hail on a car roof', 'hail/car', None), ('a refrigerator hum', 'fridge/hum', None),
+    ('a zippy speed-burst noise for darting forward', 'dash/', 'dart/'),   # 'darting' is a dash, 'darts' the thing
+    ('throwing darts', 'dart/hit', None),
+    ('air blowing through a field, not stormy, just breezy', 'wind/', 'blow/'),
+    ('blowing out birthday candles', 'blow/puff', None),
+    ('that scary movie-trailer BRAAM, like a giant ship horn', 'braam/', 'ship_horn/'),
+    ('a foghorn', 'ship_horn/', None),
+    ('when you shut a popup window, sort of a gentle folding-away noise', None, 'window/'),
+    ('putting a window away, kind of a soft tuck-in, nothing dramatic', None, 'window/'),
+    ('opening a window', 'window/open', None), ('mice squeaking', 'mouse/squeak', None),
+    ('watering the garden', 'hose/spray', None),
+])
+def test_a_thing_is_answered_by_its_own_words_not_by_a_word_it_shares(idx, text, want, not_):
+    """a recording answers the words of its own thing: not a member name that is where it was heard ('hail/car'),
+    a job only its name holds ('fridge/hum'), its family's word said as what something else does ("darting", "air
+    blowing"), a comparison ("like a ship horn") or what a product's job is done to ("putting a window away")"""
+    top = brief.rank(brief.read(text), idx=idx, top=3)[0]['id']
+    assert (want is None or top.startswith(want)) and (not_ is None or not top.startswith(not_)), (text, top)

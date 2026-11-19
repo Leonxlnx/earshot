@@ -109,6 +109,10 @@ before: numba is the one new requirement, and the listening stack moved to an ex
   and a whoosh; a synthesized sound or an instrument's note is never a starting point for a thing of the world.
 - A plain film request in a few words ("a title hit", "a logo reveal", "a riser", "an impact", "a glint") gets the
   film set's sound of real things first; a request that names a design word for word keeps that design.
+- A recording answers the words of its own thing only: not the place in its name ("a car on gravel" is no hail on a
+  car), its family's word said as what something else does ("air blowing", "darting forward"), a thing the sound is
+  only compared with ("BRAAM, like a giant ship horn") or the window a product's job is done to ("putting a window
+  away"); things recorded since ("a foghorn", "a refrigerator hum", "mice squeaking") are no longer called missing.
 - A request that asks for a change as the sound plays ("getting louder"), for a sound heard through something
   ("behind a closed door"), for a sound that moves from left to right, or for a length the design does not keep,
   says so in the answer.

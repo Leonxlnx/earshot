@@ -162,6 +162,9 @@ _rev = None
 _cache = {}
 
 
+IRREGULAR = {'mice': 'mouse', 'geese': 'goose'}     # plurals no ending rule reaches
+
+
 def stem(w):
     """a word without its plural or verb ending and a final e or doubled consonant (a crude stemmer: enough to
     match 'chimes', 'chiming', 'popped', 'rising' / 'rise')"""
@@ -170,6 +173,8 @@ def stem(w):
         w = w[:-2]
     if w in STEM_KEEP:
         return w
+    if w in IRREGULAR:
+        w = IRREGULAR[w]                  # 'mice' is a mouse, 'geese' a goose
     for end, keep in (('sses', 'ss'), ('ies', 'y'), ('ied', 'y'), ('ing', ''), ('ed', ''), ('es', ''), ('s', '')):
         if (w.endswith(end) and len(w) - len(end) >= 3 and not (end == 's' and w.endswith(('ss', 'us', 'is')))
                 and not (end == 'ed' and w.endswith('eed'))):
@@ -1311,9 +1316,10 @@ def _terms(row):
             c, rest, f, dd = _parse_plain(str(s).replace('_', ' '))
             t[field].update(c)
             content = [w for w in tokens(str(s).replace('_', ' ')) if w not in L.STOP and w not in PUNCT]
-            if field == 'uses' and len(content) > 1 and rest:
+            if field == 'uses' and len(content) > 1 and (rest or (len(set(c)) > 1 and row['id'] in _roles())):
                 t[field].add('ph:' + phrase_key(content))   # a job of several words counts as a whole: 'rainy
-                t['tags'].update(rest)                      # day'; "day" alone only as much as a tag
+                t['tags'].update(rest)                      # day'; "day" alone only as much as a tag; also one of
+                #                                             jobs only, for a recording: 'watering the garden'
             else:
                 t[field].update(rest)
             if field == 'uses' and len(c) == 1 and not rest and s != (row.get('voice') or '').replace('_', ' '):
@@ -1779,6 +1785,9 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     only_retro = mat == 'retro' and any(is_retro)
     on = (b.get('surface') or {}).get('words') or ()     # a bare material said as the surface: "dripping on metal"
     bare = {stem(w) for w in on} if on and all(w in L.MATERIALS for w in on) else None
+    # what a product's job is done to, said inside its phrasal verb ("putting a WINDOW away"): no recorded thing
+    toks = tokens(b.get('text') or '')
+    held = {stem(w) for i, (c, k) in _phrasal(toks).items() if c in L.INTERFACE_JOBS for w in toks[i + 1:k]}
     out = []
     for k, retro in zip(pool, is_retro):
         row, t, s = rows[k], terms[k], score[k]
@@ -1788,6 +1797,14 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
             if c in t['uses'] or c in t['name']:
                 s *= 0.5                                       # "not an error", "smooth, not clicky"
         s *= row.get('prior', 1.0)
+        if unsaid_thing(row, t, why.get(k, ()), said):
+            s *= WORLD        # "a car on gravel" is no hail on a car, "a calm hum of notes" no fridge
+        elif ((t['learned'] and 'interface' not in row.get('tags', ())
+               and ((dom == 'ui' and head in L.INTERFACE_JOBS) or _family_words(row['id']) & held)
+               and not _roles().get(row['id'], frozenset()) & set(b['concepts']))
+              or (held and why.get(k) and set(why[k]) <= held)):
+            s *= WORLD        # "shut a popup window" in a product, "putting a window away": the product's close,
+            #                   no window of a house, nor a sound found by the window alone
         if row['id'] in L.BY_NAME_ONLY and alone and not said & TONE_STEMS:
             s *= BY_NAME
         elif (ui_job or ui_dom) and not music and _pitched(row, t):
@@ -1829,6 +1846,14 @@ def rank(b, rows=None, top=8, idx=None, semantic=None):
     return _nearest(b, _named_member(b, out, idx), idx)[:top]
 
 
+def unsaid_thing(row, t, why, said):
+    """True for a recording of a thing no job is named for (a bed of hail, a fridge: no concept is its family) that a
+    request reached only by jobs, none of its own words: the job comes from the name of where it was heard or what it
+    does ('hail/car', 'fridge/hum'), and "a car on gravel" or "a calm hum of notes" asks for no hail and no fridge"""
+    return (not t['learned'] and not t['family'] and 'real' in row.get('tags', ()) and bool(why)
+            and all(w in L.CONCEPTS for w in why) and not _family_words(row['id']) & said)
+
+
 # interface jobs that are no action of a thing: a request that names one is about a product ("a knock for a
 # notification"); open, close, next, back and a switch are also what a door, a drawer or a page does
 JOB_NOUNS = frozenset(('notify', 'success', 'error', 'warning', 'receive', 'send', 'delete', 'like', 'hover'))
@@ -1845,7 +1870,8 @@ def _world(b, thing=False):
         written, toks = b.get('written') or {}, tokens(b.get('text') or '')
         fams = _all_family_words()
 
-        def acts(w):            # the job's word right after a recorded thing's: "a train ARRIVING"
+        def acts(w):            # the job's word right after a recorded thing's: "a train ARRIVING", "a fax COMING in"
+            w = w.split()[0] if w.strip() else w
             return w.endswith(('ing', 'ives', 'ves')) and any(
                 t == w and n and stem(toks[n - 1]) in fams for n, t in enumerate(toks))
         said = {c for c in said if not acts(str(written.get(c, '')))}
@@ -2014,7 +2040,7 @@ def learned_ok(b, sid, t, said):
     if 'absent' not in _cache:
         _cache['absent'] = frozenset(stem(w) for w in L.NOT_MADE)
     if {'sw:' + w for w in (said - set(b.get('context_words', ()))) & _cache['absent']} & t['uses']:
-        return True                     # "a mosquito": none exists; the recorded fly lists it alone as its nearest
+        return True                     # a thing none exists of, that a recording lists alone as its nearest
     if use_said(b, sid, t):
         return True                     # "a tiger roar", "the lift arrives": a whole job it is named for
     if (b.get('events') or 0) > 1 and any(v == sid and _family_words(k) & set(b.get('counted', ()))
@@ -2029,12 +2055,36 @@ def learned_ok(b, sid, t, said):
         asked -= framed
         own -= {stem(w) for c in framed for w in WORD.findall((b.get('written') or {}).get(c, '').lower())}
     fam = _family_words(sid)                             # "a drum hit" names no brake drum: every word of it
+    if sid.split('/')[0] not in L.SOUND_FAMILIES:
+        own = own - _done_by_other(b, fam, t)            # "air BLOWING through a field": the air blows, no breath
     by_family = (t['exact'] in asked or (any(L.SAME_THING.get(c, 0) == t['exact'] for c in asked)
                                          and bool(_name_words(sid) & own))    # "unlocking a door with a key"
                  or (fam <= own if len(fam) > 1 else bool(fam & own)))
     if sid.split('/')[0] in L.SOUND_FAMILIES:            # "a whoosh" names no recorded rope: "a rope whoosh" does
         return by_family and bool(_name_words(sid) & said)
     return by_family
+
+
+SUBJECT_PERSONS = frozenset(('someone', 'somebody', 'person', 'people', 'he', 'she', 'i', 'you', 'we', 'they'))
+
+
+def _done_by_other(b, fam, t):
+    """the words of a recorded thing's family that a request says only as what another thing does: an -ing form right
+    after a word of that other thing ("air BLOWING", "the wind BLOWING"), read by the lexicon as a job that is not
+    the family's own ("blowing" is wind; the blow of breath is no wind). A person doing it ("someone blowing") or
+    no subject before it ("blowing out the candles") leaves the word to the thing"""
+    toks = tokens(b.get('text') or '')
+    rev = _reverse()
+    out = set()
+    for w in fam:
+        forms = [(n, x) for n, x in enumerate(toks) if stem(x) == w]
+        if not forms or not all(x.endswith('ing') for _, x in forms):
+            continue
+        if all(n and toks[n - 1] not in PUNCT and toks[n - 1] not in L.STOP and toks[n - 1] not in SUBJECT_PERSONS
+               and toks[n - 1] not in L.PERSON_WORDS
+               and rev['c='].get(x, rev['c'].get(_key([x]))) not in (None, *t['family']) for n, x in forms):
+            out.add(w)
+    return out
 
 
 def use_said(b, sid, t=None):
@@ -2056,7 +2106,8 @@ def use_said(b, sid, t=None):
     ctx |= {stem(w) for w in ctx}
     lone = {stem(w) for w in b.get('unknown', ()) if w not in ctx and stem(w) not in ctx}
     have = set().union(*(t[f] for f in FIELD_WEIGHT)) | _family_words(sid) | _name_words(sid)
-    keys = [p for p in b.get('phrases', ()) if not set(p[3:].split()) & ctx]
+    own = set(_said_words(b.get('text')))     # not what the sound is only compared with: "BRAAM, like a ship horn"
+    keys = [p for p in b.get('phrases', ()) if not set(p[3:].split()) & ctx and set(p[3:].split()) <= own]
     if any(p in t['uses'] for p in keys):
         return True
     # one word: only where the design also holds every other unknown word and every family word the request says
