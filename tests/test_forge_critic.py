@@ -6,6 +6,8 @@ import numpy as np
 import pytest
 from scipy import signal
 
+pytest.importorskip('torch')            # these tests exercise the listening side: skipped without the listen extra
+pytest.importorskip('transformers')
 from earshot.forge import polish as P
 from earshot.forge.critic import W2, resolve_mode, total_v2
 from earshot.forge.tone import CEN, EnvRef, bandgram, env_dist

@@ -9,6 +9,8 @@ import sys
 import numpy as np
 import pytest
 
+pytest.importorskip('torch')            # these tests exercise the listening side: skipped without the listen extra
+pytest.importorskip('transformers')
 from earshot import audio, cli, critique, features, profile, report, search, sheet
 
 SR = 48000

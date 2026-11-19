@@ -5,6 +5,8 @@ import json
 import numpy as np
 import pytest
 
+pytest.importorskip('torch')            # these tests exercise the listening side: skipped without the listen extra
+pytest.importorskip('transformers')
 from earshot import compare, describe, features, match, search, vocab
 from earshot.report import to_json
 
