@@ -427,7 +427,7 @@ def _db(y, ms):
 
 def test_the_tail_and_lead_repairs_switch_off(monkeypatch):
     sid, k, m = _member('door-knock-2.npz')
-    assert m.get('lead') and learned.TAIL and learned.LEAD
+    assert m.get('lead') and learned.LEAD and not learned.TAIL
 
     def take():
         c = registry.Controls(registry.get(sid))

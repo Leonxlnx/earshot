@@ -93,8 +93,10 @@ ATTACK_MAX = 2.0              # dB the bell raises the strike at most (more is h
 # recording's own decay, where the envelope stops some 40 to 60 dB down); LEAD, the member's `lead` (what is smeared
 # into the few milliseconds before the main strike held as low as the recording has it there). A member carries the
 # numbers only where they were measured to bring its takes closer to its recording and change nothing else (the
-# loudness, the length, the audit, the sound between the strike and the tail). False: off for every member
-TAIL, LEAD = True, True
+# loudness, the length, the audit, the sound between the strike and the tail). False: off for every member. TAIL is
+# off: chosen on one take of each member it did not hold on the next (it moved some tails away from their
+# recording and changed lengths)
+TAIL, LEAD = False, True
 DEFAULT_OFF = 0.6           # prior factor of a design the index marks as not a default (`default`: false)
 RETAKE = 101                # make.take's step between the seeds it tries: seeds this far apart play one member
 # how far (a share of its length) a length asked of a performance may lie from a whole-action recording's own for
