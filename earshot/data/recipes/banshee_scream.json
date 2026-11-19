@@ -1,0 +1,13 @@
+{
+ "name": "banshee_scream",
+ "says": "a banshee's wailing scream",
+ "things": ["banshee scream", "banshee wail", "banshee screaming"],
+ "sketch": true,
+ "built": "A scream a little higher and duller, wind at a window under it, a second scream lower played backwards as the breath before, in a cathedral.",
+ "space": "cathedral",
+ "layers": [
+  {"sound": "scream/person", "pitch": 2, "gain": 0, "lowpass": 6000},
+  {"sound": "wind/window", "dur": 4, "gain": -8, "swell": 1.0},
+  {"sound": "scream/person", "seed": 1, "reverse": true, "pitch": -3, "gain": -10}
+ ]
+}

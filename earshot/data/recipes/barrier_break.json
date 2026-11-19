@@ -1,0 +1,12 @@
+{
+ "name": "barrier_break",
+ "says": "a magic barrier shattering",
+ "things": ["magic barrier breaking", "barrier breaking", "magic shield shattering", "barrier shattering"],
+ "built": "A fly's buzz far lower swelling as the barrier straining, a glass breaking lower as it shatters, a big low whoosh landing with a thump under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "fly/buzz", "pitch": -10, "cut": [0, 0.8], "gain": -6, "swell": 0.6},
+  {"sound": "glass/break", "pitch": -5, "at": 0.75, "gain": 0},
+  {"sound": "whoosh_big/thump", "at": 0.7, "gain": -4}
+ ]
+}

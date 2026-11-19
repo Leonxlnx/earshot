@@ -1,0 +1,12 @@
+{
+ "name": "shield_hit",
+ "says": "an energy shield taking a hit",
+ "things": ["energy shield hit", "energy shield being hit", "force field hit", "force field impact"],
+ "sketch": true,
+ "built": "A blow on a metal shield, water sizzling as the field flaring, a fly's buzz far lower dying away as the hum.",
+ "layers": [
+  {"sound": "shield/block", "gain": 0},
+  {"sound": "water/sizzle", "highpass": 2000, "at": 0.02, "gain": -4, "decay": 0.6},
+  {"sound": "fly/buzz", "pitch": -12, "cut": [0, 0.8], "decay": 0.5, "gain": -8}
+ ]
+}

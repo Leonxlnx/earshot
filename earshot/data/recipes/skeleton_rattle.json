@@ -1,0 +1,11 @@
+{
+ "name": "skeleton_rattle",
+ "says": "a skeleton rattling its bones",
+ "things": ["skeleton rattling", "skeleton rattle", "bones rattling", "rattling bones"],
+ "sketch": true,
+ "built": "Dice thrown far lower three times as the bones, small wooden ticks as they come in between.",
+ "layers": [
+  {"sound": "dice/throw", "pitch": -7, "gain": 0, "events": {"count": 3, "gap": 0.4, "loose": 0.3}},
+  {"sound": "tick/wood", "gain": -6, "events": {"count": 8, "gap": 0.08, "loose": 0.8}}
+ ]
+}

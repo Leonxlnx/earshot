@@ -1,0 +1,13 @@
+{
+ "name": "castle_gate",
+ "says": "a castle gate being raised",
+ "things": ["castle gate opening", "castle gate", "portcullis", "portcullis opening"],
+ "sketch": true,
+ "built": "A chain rattled far lower four times as the winch, a door's creak far lower, a metal gate far lower as the bars reaching the top, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "chain/rattle", "pitch": -7, "gain": -2, "events": {"count": 4, "gap": 0.6, "loose": 0.3}},
+  {"sound": "door/creak", "pitch": -9, "at": 0.3, "gain": -3},
+  {"sound": "gate/metal", "pitch": -7, "at": 2.6, "gain": 0}
+ ]
+}

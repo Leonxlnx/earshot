@@ -1,0 +1,13 @@
+{
+ "name": "dungeon_door",
+ "says": "a dungeon door unlocked and creaking open",
+ "things": ["dungeon door opening", "dungeon door", "cell door opening", "prison cell door"],
+ "sketch": true,
+ "built": "A key turned in a lock lower, a door's creak lower as the heavy door swinging, a chain rattled lower and soft, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "lock/key", "pitch": -5, "gain": -3},
+  {"sound": "door/creak", "pitch": -7, "at": 0.5, "gain": 0},
+  {"sound": "chain/rattle", "pitch": -7, "at": 0.4, "gain": -10}
+ ]
+}

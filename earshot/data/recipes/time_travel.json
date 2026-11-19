@@ -1,0 +1,13 @@
+{
+ "name": "time_travel",
+ "says": "a time travel whoosh",
+ "things": ["time travel whoosh", "time travel", "time warp"],
+ "sketch": true,
+ "built": "A big whoosh played backwards as the pull, a long whoosh sinking an octave as the jump, a clock ticking far under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "whoosh_big/reverse", "gain": -2},
+  {"sound": "whoosh/long", "glide": -12, "at": 0.9, "gain": 0},
+  {"sound": "clock/ticktock", "gain": -14, "lowpass": 3000}
+ ]
+}

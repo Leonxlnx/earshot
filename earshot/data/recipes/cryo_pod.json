@@ -1,0 +1,13 @@
+{
+ "name": "cryo_pod",
+ "says": "a cryo pod unlocking and opening with a rush of cold steam",
+ "things": ["cryo pod opening", "cryo pod", "cryogenic pod", "stasis pod opening"],
+ "sketch": true,
+ "built": "A latch, a spray can lower as the cold steam escaping, a sliding door lower as the lid, in a studio.",
+ "space": "studio",
+ "layers": [
+  {"sound": "lock/latch", "gain": -2},
+  {"sound": "spray_can/spray", "pitch": -5, "at": 0.12, "gain": 0},
+  {"sound": "door/slide", "pitch": -6, "at": 0.5, "gain": -2}
+ ]
+}

@@ -62,7 +62,7 @@ def test_a_thing_the_catalogue_has_a_recording_of_is_answered_by_the_recording(t
 
 def test_a_sketch_is_never_the_answer():
     assert {'wolf_pack', 'helicopter_landing', 'typewriter_return', 'heartbeat_faster', 'punch_whoosh',
-            'giant_footsteps', 'dragon_roar', 'rocket_launch'} <= set(SKETCHES)
+            'time_travel', 'dragon_roar', 'rocket_launch'} <= set(SKETCHES)
     for name in SKETCHES:
         for t in BOOK[name]['things']:
             assert answered(t) != name, (name, t)
@@ -117,6 +117,20 @@ def test_a_length_far_away_and_twice_through_make(tmp_path):
     assert two['sound'] == 'recipe/car_crash' and two['takes'][0]['checks']['ok']
     assert any(ln.startswith('as asked: 2 times, ') for ln in two['summary'].splitlines())
     assert two['takes'][0]['dur_s'] > 1.8 * make('a car crash', str(tmp_path / 'o.wav'))['takes'][0]['dur_s']
+
+
+def test_far_close_a_length_and_twice_on_things_built_from_parts(tmp_path):
+    far = make('a machine gun burst far away', str(tmp_path / 'g.wav'))
+    assert far['sound'] == 'recipe/machine_gun' and far['takes'][0]['checks']['ok']
+    assert 'as asked: far away (in a hall, duller and 6 dB softer)' in far['summary'].splitlines()
+    close = make('a dragon breathing fire up close', str(tmp_path / 'd.wav'))
+    assert close['sound'] == 'recipe/dragon_fire'
+    assert 'as asked: up close (no room around it)' in close['summary'].splitlines()
+    short = make('a fireball spell, 1.5 seconds', str(tmp_path / 'f.wav'))
+    assert short['sound'] == 'recipe/fireball_spell' and abs(short['takes'][0]['dur_s'] - 1.5) <= 0.1
+    two = make('a plasma shot twice', str(tmp_path / 'b.wav'))
+    assert two['sound'] == 'recipe/plasma_shot' and two['takes'][0]['checks']['ok']
+    assert any(ln.startswith('as asked: 2 times, ') for ln in two['summary'].splitlines())
 
 
 @pytest.mark.slow

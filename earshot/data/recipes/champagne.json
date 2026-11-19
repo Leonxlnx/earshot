@@ -2,10 +2,9 @@
  "name": "champagne",
  "says": "a champagne cork popping and the wine poured",
  "things": ["champagne", "champagne opening", "champagne pouring", "popping champagne"],
- "built": "A cork pulled from a bottle, then a drink poured and water fizzing high as the sparkling wine.",
+ "built": "A cork pulled from a bottle, then a drink poured into a glass.",
  "layers": [
   {"sound": "cork/bottle", "gain": 0},
-  {"sound": "drink/pour", "dur": 2.4, "at": 0.7, "gain": -3},
-  {"sound": "water/sizzle", "pitch": 5, "at": 1.0, "gain": -12, "highpass": 3000}
+  {"sound": "drink/pour", "dur": 2.4, "at": 0.7, "gain": -3}
  ]
 }

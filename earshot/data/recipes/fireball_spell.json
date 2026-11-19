@@ -1,0 +1,12 @@
+{
+ "name": "fireball_spell",
+ "says": "a fireball spell cast and bursting",
+ "things": ["fireball spell", "fireball", "casting a fireball", "fire spell"],
+ "built": "A match struck as the spark, a burst of flame lower as the fireball flying, a small explosion as it bursts, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "match/strike", "gain": -4},
+  {"sound": "fire/whoosh", "pitch": -3, "at": 0.15, "gain": 0},
+  {"sound": "explosion/near", "at": 0.9, "gain": -2}
+ ]
+}

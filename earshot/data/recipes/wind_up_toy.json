@@ -1,0 +1,10 @@
+{
+ "name": "wind_up_toy",
+ "says": "a wind-up toy wound and whirring off",
+ "things": ["wind-up toy", "wind up toy", "clockwork toy", "winding a toy"],
+ "built": "A zip tie pulled a little higher three times as the key winding, then an electric drill an octave higher, sinking as it runs, as the spring running down.",
+ "layers": [
+  {"sound": "zip_tie/pull", "pitch": 3, "gain": 0, "events": {"count": 3, "gap": 0.35}},
+  {"sound": "drill/electric", "pitch": 12, "cut": [0.3, 1.8], "at": 1.2, "glide": 8, "lowpass": 6000, "gain": -8}
+ ]
+}

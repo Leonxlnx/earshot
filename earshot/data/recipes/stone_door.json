@@ -1,0 +1,13 @@
+{
+ "name": "stone_door",
+ "says": "a giant stone door grinding open",
+ "things": ["stone door opening", "stone door", "giant stone door", "heavy stone door"],
+ "sketch": true,
+ "built": "A wooden drawer slid an octave lower as the slab grinding, a rock crumbling far lower three times, a heavy door slammed far lower as it comes to rest, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "drawer/wood", "pitch": -12, "gain": 0},
+  {"sound": "break/rock", "pitch": -12, "gain": -8, "events": {"count": 3, "gap": 0.7, "loose": 0.5}},
+  {"sound": "door/slam", "pitch": -10, "at": 2.6, "gain": -2}
+ ]
+}

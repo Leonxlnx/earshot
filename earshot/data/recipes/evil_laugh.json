@@ -1,0 +1,11 @@
+{
+ "name": "evil_laugh",
+ "says": "a villain's evil laugh echoing",
+ "things": ["evil laugh", "villain laugh", "evil laughter", "villain laughing"],
+ "built": "A person laughing lower, a second laugh far lower and duller inside it, in a cathedral.",
+ "space": "cathedral",
+ "layers": [
+  {"sound": "laugh/person", "pitch": -5, "gain": 0},
+  {"sound": "laugh/person", "seed": 1, "pitch": -9, "at": 0.05, "gain": -6, "lowpass": 2500}
+ ]
+}

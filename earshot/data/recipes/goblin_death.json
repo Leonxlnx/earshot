@@ -1,0 +1,10 @@
+{
+ "name": "goblin_death",
+ "says": "a goblin's dying shriek and its fall",
+ "things": ["goblin dying", "goblin death", "goblin death scream", "dying goblin"],
+ "built": "The first 0.9 s of a scream higher, fading, then a body landing on dirt.",
+ "layers": [
+  {"sound": "scream/person", "pitch": 5, "cut": [0, 0.9], "decay": 0.4, "gain": 0},
+  {"sound": "land/dirt", "at": 0.9, "gain": -4}
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "name": "zombie_horde",
+ "says": "a horde of zombies groaning",
+ "things": ["zombie horde", "horde of zombies", "zombie crowd", "crowd of zombies"],
+ "built": "Two sighs, a yawn and a snore, each far lower, one after the other across the room as the groans, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "sigh/person", "pitch": -7, "gain": 0, "pan": -0.5},
+  {"sound": "yawn/person", "pitch": -9, "at": 0.4, "gain": -2, "pan": 0.5},
+  {"sound": "snore/person", "pitch": -5, "at": 0.8, "gain": -4, "pan": 0.1},
+  {"sound": "sigh/person", "seed": 1, "pitch": -10, "at": 1.3, "gain": -4, "pan": 0.7}
+ ]
+}

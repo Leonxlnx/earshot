@@ -1,0 +1,12 @@
+{
+ "name": "wizard_staff",
+ "says": "a wizard's staff struck on a stone floor",
+ "things": ["wizard's staff hitting stone", "wizard staff", "staff hitting stone", "staff struck on stone"],
+ "sketch": true,
+ "built": "A judge's gavel struck lower as the wooden staff, a hard step on stone a little lower at the same moment, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "gavel/strike", "pitch": -5, "gain": 0},
+  {"sound": "step/stone", "pitch": -3, "gain": -3}
+ ]
+}

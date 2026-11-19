@@ -1,0 +1,14 @@
+{
+ "name": "tornado",
+ "says": "a tornado roaring",
+ "things": ["tornado", "twister", "tornado passing"],
+ "sketch": true,
+ "built": "Wind on a mountain a little lower, a train passing far lower and dull as the roar, an earthquake's rumble under it.",
+ "kind": "ambience",
+ "dur": 8,
+ "layers": [
+  {"sound": "wind/mountain", "dur": 8, "pitch": -3, "gain": 0},
+  {"sound": "train/pass", "pitch": -7, "lowpass": 1500, "gain": -6},
+  {"sound": "rumble/quake", "dur": 8, "gain": -8}
+ ]
+}

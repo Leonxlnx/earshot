@@ -2,13 +2,11 @@
  "name": "slot_machine",
  "says": "a slot machine: the lever, the reels and coins paying out",
  "things": ["slot machine", "one-armed bandit", "fruit machine"],
- "sketch": true,
- "built": "A latch lower as the lever, a stopwatch's ticks running and slowing as the reels, three dial clicks lower as they stop, then coins on a floor and in a cup as the payout.",
+ "built": "A latch lower as the lever, three dial clicks lower as the reels stopping, then a handful of coins and coins falling in a cup as the payout.",
  "layers": [
   {"sound": "lock/latch", "pitch": -4, "gain": -2},
-  {"sound": "stopwatch/tick", "at": 0.35, "gain": -7, "events": {"count": 22, "gap": 0.05, "faster": 1.06}},
-  {"sound": "dial/click", "pitch": -5, "at": 0.9, "gain": -3, "events": {"count": 3, "gap": 0.45}},
-  {"sound": "coins/floor", "at": 2.3, "gain": 0},
-  {"sound": "coin/cup", "at": 2.5, "gain": -4, "events": {"count": 4, "gap": 0.16, "loose": 0.7}}
+  {"sound": "dial/click", "pitch": -5, "at": 0.4, "gain": -3, "events": {"count": 3, "gap": 0.45}},
+  {"sound": "coins/handful", "at": 1.8, "gain": 0},
+  {"sound": "coin/cup", "at": 1.95, "gain": 0, "events": {"count": 14, "gap": 0.09, "loose": 0.7}}
  ]
 }

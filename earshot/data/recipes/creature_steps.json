@@ -1,0 +1,12 @@
+{
+ "name": "creature_steps",
+ "says": "the footsteps of a creature with claws",
+ "things": ["creature footsteps", "creature steps", "monster footsteps", "beast footsteps"],
+ "sketch": true,
+ "built": "A hard step on concrete far lower four times, a small wooden tick lower on each as the claws, a snore far lower as its breath.",
+ "layers": [
+  {"sound": "step/concrete", "pitch": -9, "gain": 0, "events": {"count": 4, "gap": 0.55, "loose": 0.2}},
+  {"sound": "tick/wood", "pitch": -5, "at": 0.03, "gain": -8, "events": {"count": 4, "gap": 0.55, "loose": 0.2}},
+  {"sound": "snore/person", "pitch": -7, "gain": -12}
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "name": "spell_impact",
+ "says": "a magic spell hitting its target",
+ "things": ["spell impact", "magic impact", "spell hitting", "magic blast"],
+ "sketch": true,
+ "built": "An airy spell's swell a little lower as the bolt, a small explosion lower as it strikes, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "magic/cast", "pitch": -3, "gain": 0},
+  {"sound": "explosion/near", "pitch": -3, "at": 1.0, "gain": -2}
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "name": "potion_drink",
+ "says": "a potion uncorked and drunk",
+ "things": ["drinking a potion", "potion drinking", "drinking potion", "potion"],
+ "sketch": true,
+ "built": "A cork pulled from a bottle, water poured a little higher, a sigh after it, the glass set down.",
+ "layers": [
+  {"sound": "cork/bottle", "gain": -4},
+  {"sound": "water/pour", "pitch": 3, "at": 0.5, "gain": -4},
+  {"sound": "sigh/person", "at": 2.2, "gain": -6},
+  {"sound": "glass/set", "at": 2.6, "gain": -6}
+ ]
+}

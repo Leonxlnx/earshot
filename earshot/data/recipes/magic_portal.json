@@ -3,13 +3,11 @@
  "says": "a magic portal opening",
  "things": ["magic portal", "portal opening", "portal opens"],
  "sketch": true,
- "built": "A swell of air and a burst of flame played backwards as the build, a spun rope slowed as the whirl, water sizzling as the sparks, a low tone rising under it, in a hall.",
+ "built": "An airy spell's swell lower as the opening, a boomerang's whirl far lower four times, faster each time, as the swirl, the ground rumbling under it, in a hall.",
  "space": "hall",
  "layers": [
-  {"sound": "swell/air", "gain": -4},
-  {"sound": "fire/whoosh", "reverse": true, "pitch": -4, "gain": -6},
-  {"sound": "whoosh/spin", "pitch": -7, "at": 0.5, "gain": -3, "events": {"count": 3, "gap": 0.45, "faster": 0.85}},
-  {"sound": "water/sizzle", "at": 1.0, "gain": -13, "highpass": 2000, "decay": 0.8},
-  {"source": "sine", "hz": 48, "to": 72, "dur": 2.4, "gain": -15, "swell": 1.4, "decay": 0.6}
+  {"sound": "magic/cast", "pitch": -7, "gain": 0},
+  {"sound": "whoosh/spin", "pitch": -9, "at": 0.2, "gain": -4, "events": {"count": 4, "gap": 0.45, "faster": 0.9}},
+  {"sound": "rumble/quake", "cut": [0, 2.5], "gain": -14, "swell": 1.0, "decay": 1.0}
  ]
 }

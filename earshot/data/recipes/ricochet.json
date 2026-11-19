@@ -1,0 +1,11 @@
+{
+ "name": "ricochet",
+ "says": "a bullet ricocheting",
+ "things": ["bullet ricochet", "ricochet", "ricocheting bullet"],
+ "sketch": true,
+ "built": "A pistol shot, then a metal pipe swung through the air far higher as the whine of the bullet glancing off.",
+ "layers": [
+  {"sound": "shot/pistol", "gain": -2},
+  {"sound": "whoosh/pipe", "pitch": 9, "at": 0.05, "gain": 0}
+ ]
+}

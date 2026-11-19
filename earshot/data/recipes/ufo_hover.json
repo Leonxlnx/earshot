@@ -1,0 +1,11 @@
+{
+ "name": "ufo_hover",
+ "says": "a ufo hovering",
+ "things": ["ufo hovering", "ufo", "flying saucer", "alien ship hovering"],
+ "sketch": true,
+ "built": "The middle of a vacuum cleaner lower and sinking further, swelling in, a fly's buzz far lower and dull under it.",
+ "layers": [
+  {"sound": "vacuum/cleaner", "pitch": -6, "glide": -9, "cut": [1.0, 4.0], "lowpass": 2500, "gain": 0, "swell": 0.6},
+  {"sound": "fly/buzz", "pitch": -14, "lowpass": 1500, "gain": -8}
+ ]
+}

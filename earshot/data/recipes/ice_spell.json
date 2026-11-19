@@ -1,0 +1,12 @@
+{
+ "name": "ice_spell",
+ "says": "an ice spell freezing its target",
+ "things": ["ice spell", "frost spell", "freezing spell", "ice magic"],
+ "built": "A wide breathy whoosh as the cold flying, ice cracking a little lower three times as it freezes, ice cubes falling lower as the shards.",
+ "space": "hall",
+ "layers": [
+  {"sound": "whoosh/airy", "gain": -2},
+  {"sound": "ice/crack", "pitch": -3, "at": 0.45, "gain": 0, "events": {"count": 3, "gap": 0.18, "loose": 0.4}},
+  {"sound": "ice/cubes", "pitch": -2, "at": 0.55, "gain": -10}
+ ]
+}

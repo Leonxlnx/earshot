@@ -1,0 +1,12 @@
+{
+ "name": "dragon_fire",
+ "says": "a dragon breathing fire",
+ "things": ["dragon breathing fire", "dragon fire", "dragon fire breath", "fire breathing dragon"],
+ "built": "A lion's roar far lower as the throat, a burst of flame lower as the breath, a large fire after it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "lion/roar", "pitch": -9, "gain": -3},
+  {"sound": "fire/whoosh", "pitch": -5, "at": 0.3, "gain": 0},
+  {"sound": "fire/large", "dur": 2.5, "at": 0.5, "gain": -6}
+ ]
+}

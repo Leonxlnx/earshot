@@ -1,0 +1,12 @@
+{
+ "name": "tractor_beam",
+ "says": "a tractor beam pulling something up",
+ "things": ["tractor beam", "tractor beam pulling", "abduction beam"],
+ "sketch": true,
+ "built": "A sustained energy beam lower and dull, the middle of a vacuum cleaner far lower swelling in, a swell of air lower as the pull.",
+ "layers": [
+  {"sound": "laser/beam", "pitch": -7, "lowpass": 2500, "gain": -2},
+  {"sound": "vacuum/cleaner", "pitch": -12, "lowpass": 1500, "cut": [1.0, 4.0], "gain": 0, "swell": 0.8},
+  {"sound": "swell/air", "pitch": -5, "at": 0.5, "gain": -6}
+ ]
+}
