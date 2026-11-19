@@ -112,8 +112,8 @@ def test_parts_become_layers_and_say_which_design_each_became():
 
 
 def test_a_part_the_catalogue_lacks_is_named_and_unread_words_are_said():
-    g = B.ground('hundreds of hoofbeats on dirt')
-    assert g['missing'] and 'hoofbeat' in g['missing']
+    g = B.ground('hundreds of armadillos on dirt')
+    assert g['missing'] and 'armadillo' in g['missing']
     lines = B.part_lines([g])
     assert any('earshot has no' in x and 'only the nearest' in x for x in lines)
     g = B.ground('a horse neighing, twice, frobnicated')
@@ -121,6 +121,33 @@ def test_a_part_the_catalogue_lacks_is_named_and_unread_words_are_said():
     assert any(x == 'not understood in part 1: frobnicated' for x in B.part_lines([g]))
     with pytest.raises(ValueError, match='not in the catalogue'):
         B.ground('a knock sound=knock/nothing_like_it')
+
+
+def test_a_part_finds_the_design_whose_own_words_name_its_thing():
+    # "hoofbeats" is not a word of the reader, but a horse's hooves are in the catalogue: no "has no hoofbeats"
+    g = B.ground('hundreds of hoofbeats on dirt')
+    assert g['id'] == 'horse/trot' and not g['missing'] and 'hoofbeats' not in g['unread']
+    assert not any('earshot has no' in x for x in B.part_lines([g]))
+    # a word that names a sound is looked up the same way; the describing word does not choose
+    g = B.ground('a low rumble under everything')
+    assert 'rumbl' in B._own_index()[0][g['id']], g['id']
+    # a thing of two words: the design that has both comes first
+    g = B.ground('a train whistle, far')
+    assert {'train', 'whistl'} <= set(B._own_index()[0][g['id']]), g['id']
+    g = B.ground('a car engine idling')
+    assert {'car', 'engin'} <= set(B._own_index()[0][g['id']]), g['id']
+    for phrase in ('hundreds of hoofbeats on dirt', 'a low rumble under everything', 'a train whistle, far'):
+        assert B._real(registry.get(B.ground(phrase)['id']).row())
+
+
+def test_a_synthesized_design_is_taken_only_without_a_recording_and_named_as_such():
+    g = B.ground('a spaceship humming')
+    assert not B._real(registry.get(g['id']).row())
+    line = B.part_lines([g])[0]
+    assert "no recording of 'spaceship humming'" in line and f"{g['id']} is synthesized" in line
+    assert B._real(registry.get(B.ground('a fridge humming')['id']).row())
+    with pytest.raises(ValueError, match='only describes'):
+        B.ground('something low and big')
 
 
 def test_parts_are_deterministic_and_named_designs_are_kept():

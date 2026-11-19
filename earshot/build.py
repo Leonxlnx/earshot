@@ -585,6 +585,161 @@ def _catalogue_words():
     return _WORDS_OF[0]
 
 
+# A part's thing is also looked up in the designs' own words (ids, tags, uses, descriptions), as `earshot sounds
+# --search` reads them: a design whose own words name the thing comes before one the reader reached by a loose word.
+# Words that only describe (low, big, soft) never choose a design; they add a little to one that names the thing.
+DESCRIBING = {'low', 'high', 'big', 'small', 'soft', 'loud', 'deep', 'heavy', 'light', 'long', 'short', 'little',
+              'tiny', 'huge', 'giant', 'strong', 'weak', 'quiet', 'gentle', 'hard', 'fast', 'slow', 'old', 'wet',
+              'dry', 'wooden', 'metallic', 'close', 'far', 'distant', 'sharp', 'dull', 'bright', 'dark', 'warm',
+              'cold', 'hot', 'thin', 'thick', 'full', 'rich', 'crisp', 'clean', 'sudden', 'massive', 'enormous',
+              'great', 'faint', 'rough', 'smooth', 'empty', 'busy', 'lower', 'higher', 'deeper', 'bigger', 'smaller'}
+# words that name a sound and not a thing: the thing named beside them counts more
+SOUND_WORDS = {'rumble', 'hiss', 'hum', 'roar', 'crackle', 'whoosh', 'thud', 'buzz', 'creak', 'rattle', 'splash',
+               'beat', 'bang', 'boom', 'crash', 'clank', 'clang', 'click', 'knock', 'tap', 'thump', 'whistle', 'whir',
+               'drone', 'squeak', 'screech', 'chirp', 'drip', 'patter', 'pop', 'snap', 'swish', 'rustle', 'growl',
+               'howl', 'chug', 'clatter', 'crunch', 'sizzle', 'whine', 'wail', 'clap', 'rumbling', 'noise', 'sound',
+               'scrape', 'squeal', 'chime', 'ring', 'step'}
+IRREGULAR = {'hooves': 'hoof', 'wolves': 'wolf', 'leaves': 'leaf', 'knives': 'knife', 'children': 'child',
+             'people': 'person', 'mice': 'mouse', 'feet': 'foot', 'teeth': 'tooth', 'geese': 'goose',
+             'shelves': 'shelf', 'wooden': 'wood', 'calves': 'calf', 'halves': 'half', 'men': 'man', 'women': 'woman'}
+OWN_GENERIC = {'real', 'foley', 'nature', 'ambience', 'loop', 'background', 'sfx', 'effect'}
+SETTING = {'on', 'in', 'into', 'onto', 'over', 'through', 'across', 'against', 'at', 'inside', 'along', 'from',
+           'under', 'beneath', 'off', 'by', 'near'}
+OWN_FIELD = {'id': 1.0, 'tags': 1.0, 'uses': 0.9, 'says': 0.6}
+SET_W = 0.05                    # what the thing is on or in only breaks ties ("a car on a wet street" is a car)
+_OWN = []
+
+
+def _norm(w):
+    w = w.lower()
+    return brief.stem(IRREGULAR.get(w, w))
+
+
+def _own_index():
+    """{id: {stem: weight}} of every design's own words, and the set of all their stems"""
+    if not _OWN:
+        from .sounds import registry
+        idx, vocab = {}, set()
+        for r in registry.rows():
+            ws = {}
+            fields = {'id': r['id'].replace('/', ' ').replace('_', ' '), 'tags': ' '.join(r.get('tags') or ()),
+                      'uses': ' '.join(r.get('uses') or ()), 'says': ' '.join(r.get('says') or ())}
+            for f, text in fields.items():
+                for w in brief.WORD.findall(text.lower()):
+                    if len(w) < 3 or w in brief.L.STOP or w in OWN_GENERIC:
+                        continue
+                    s = _norm(w)
+                    ws[s] = max(ws.get(s, 0.0), OWN_FIELD[f])
+            idx[r['id']] = ws
+            vocab |= set(ws)
+        _OWN.append((idx, vocab))
+    return _OWN[0]
+
+
+def _split(w, vocab):
+    """a compound the designs do not know whole ("hoofbeats") as the two words they know ("hoof", "beat"), or None"""
+    best = None
+    for i in range(3, len(w) - 2):
+        a, b = _norm(w[:i]), _norm(w[i:])
+        if a in vocab and b in vocab and (best is None or min(len(a), len(b)) > min(len(best[0]), len(best[1]))):
+            best = (a, b)
+    return best
+
+
+def _thing_words(thing):
+    """the words of a part's thing to look up in the designs' own words: [(stem, weight, said word)]. The thing
+    itself counts 1; a sound word or a doing word (-ing) beside a thing 0.5; what the thing is on or in 0.2; a
+    describing word 0 (it only adds to a design that names the thing)"""
+    _, vocab = _own_index()
+    sounds = SOUND_WORDS | {_norm(x) for x in SOUND_WORDS}
+    toks = [w for w in brief.WORD.findall((thing or '').lower()) if w not in FILLER]
+    out, setting = [], False
+    for j, w in enumerate(toks):
+        if w in SETTING:
+            setting = True
+            continue
+        if w in brief.L.STOP or len(w) < 3:
+            continue
+        s = _norm(w)
+        if w in DESCRIBING or s in DESCRIBING:
+            out.append((s, 0.0, w))
+            continue
+        pieces = [s] if s in vocab else list(_split(w, vocab) or [s])
+        nxt = toks[j + 1] if j + 1 < len(toks) else ''
+        # a noun before another noun or a sound word names what kind ("train whistle", "car engine"): it counts
+        # less than the head, but a design that has both comes first
+        modifier = (len(pieces) == 1 and nxt and nxt not in SETTING and nxt not in DESCRIBING and _norm(nxt) not in
+                    sounds and not nxt.endswith('ing') and nxt not in brief.L.STOP and len(nxt) > 2)
+        for p in pieces:
+            sound = p in sounds or (w.endswith('ing') and len(pieces) == 1)
+            out.append((p, SET_W if setting else 0.5 if sound else 0.6 if modifier else 1.0, w))
+    # a sound word or a doing word beside no head the designs know names the thing itself ("a low rumble",
+    # "a hydraulic hiss", "an air conditioner humming")
+    if not any(wt == 1.0 and s in vocab for s, wt, _ in out):
+        out = [(s, 1.0 if wt == 0.5 else wt, w) for s, wt, w in out]
+    return out
+
+
+def own_words(thing, without=(), real=True):
+    """the designs whose own words name a part's thing, best first: [(id, score, [the words it matched], whether
+    it names the thing itself and not only its sound)]; real:
+    recorded designs only, False: invented ones only (never played music). A design must match a word that names
+    the thing or a sound; every further word it matches raises it, so a thing of two words ("train whistle")
+    finds a design that has both before one that has one"""
+    from .sounds import registry
+    idx, _ = _own_index()
+    tw = _thing_words(thing)
+    if not any(wt > SET_W for _, wt, _ in tw):
+        return []
+    rows = {r['id']: r for r in registry.rows()}
+    without = _without(without)
+    out = []
+    for sid, ws in idx.items():
+        row = rows[sid]
+        if _forbidden(sid, without) or _real(row) != real:
+            continue
+        if not real and (set(row.get('tags') or ()) & PLAYED or row['kind'] in PLAYED_KINDS
+                         or _family(sid) in PLAYED_FAMILIES):
+            continue
+        hit = [(s, wt, w) for s, wt, w in tw if s in ws]
+        main = sum(wt * ws[s] for s, wt, _ in hit if wt > SET_W)
+        if main <= 0.0:
+            continue
+        both = len({s for s, wt, _ in hit if wt > SET_W}) - 1        # each further word of the thing it names
+        score = (main + 0.5 * both + sum(wt * ws[s] for s, wt, _ in hit if wt == SET_W)
+                 + 0.05 * sum(1 for _, wt, _ in hit if not wt))
+        out.append((sid, round(score, 3), sorted({w for _, _, w in hit}), any(wt >= 0.6 for _, wt, _ in hit)))
+    out.sort(key=lambda x: (-x[1], x[0]))
+    return out
+
+
+def _weighed(thing, cands, without, k=8):
+    """the reader's (or the atlas') candidates and the designs' own words weighed: [candidate rows], best first, one
+    a family. A design that names the thing by its own words comes first; the reader breaks ties among them"""
+    from .sounds import registry
+    own = own_words(thing, without)
+    if not own or own[0][1] < 0.5:
+        return cands, None
+    top = max([(c['score'] or 0.0) for c in cands] + [1e-9])
+    voice = {c['id']: max(0.0, (c['score'] or 0.0) / top) for c in cands}
+    rows = {r['id']: r for r in registry.rows()}
+    scored = {sid: 3.0 * s + 0.6 * voice.get(sid, 0.0) for sid, s, _, _ in own if s >= 0.5}
+    for c in cands:             # the reader's own answers stay, below every design that names the thing
+        scored.setdefault(c['id'], 0.6 * voice[c['id']])
+    words = {sid: w for sid, _, w, _ in own}
+    out, fams = [], set()
+    for sid, s in sorted(scored.items(), key=lambda kv: (-kv[1], kv[0])):
+        if _family(sid) in fams:
+            continue
+        fams.add(_family(sid))
+        r = rows[sid]
+        out.append({'id': sid, 'score': round(s, 2), 'for': ' '.join(words[sid]) if sid in words else thing,
+                    'kind': r['kind'], 'dur': r['dur_s'] or 0.5, 'loop': bool(r['loop']), 'own': sid in words})
+        if len(out) >= k:
+            break
+    return out, own
+
+
 def _pick(cands, role):
     """the candidate that fits a part's role, among those near the best: a short take for a scatter or a row, a
     long one or a loop for a bed or a pass"""
@@ -630,17 +785,39 @@ def ground(phrase, without=(), ears=None):
     b = brief.read(thing)
     known = _catalogue_words()
     res['unread'] = [w for w in b.get('unknown') or () if w not in FILLER and brief.stem(w) not in known]
-    cands = candidates(thing, without, ears, k=8)
+    tw = _thing_words(thing)
+    if tw and not any(wt > 0.0 for _, wt, _ in tw):
+        raise ValueError(f'the part {phrase!r} only describes ({thing!r}): say what makes the sound ("a low '
+                         'rumble", "a big drum") or name a design with sound=<id>')
+    res['unread'] = [w for w in res['unread'] if not any(x == w and s in _own_index()[1] for s, _, x in tw)]
+    # a thing said to pass is looked up as passing too ("a car passing": a car going by before a car's tyres)
+    cands, own = _weighed(('passing ' if role == 'pass' else '') + thing, candidates(thing, without, ears, k=8),
+                          without)
+    how = 'atlas' if ears is not None and ears.atlas is not None else 'reader'
+    made = None
+    if own is None or not own[0][3]:
+        # no recorded design names the thing (at most its sound): an invented design that names the thing itself
+        # is taken, and said to be one
+        made = own_words(thing, without, real=False)
+        made = made[0] if made and made[0][1] >= 1.0 and made[0][3] else None
+    if made:
+        row = registry.get(made[0]).row()
+        c = {'id': made[0], 'score': round(3.0 * made[1], 2), 'for': ' '.join(made[2]), 'kind': row['kind'],
+             'dur': row['dur_s'] or 0.5, 'loop': bool(row['loop'])}
+        res.update(id=c['id'], cand=c, others=[x['id'] for x in cands][:3],
+                   why=f"(no recording of {thing!r}; {c['id']} is synthesized, its own words name {c['for']!r})")
+        return res
     c = _pick(cands, role)
     if c is None:
         raise ValueError(f'no recorded part of the catalogue is near {thing!r} (part {phrase!r}): name one with '
                          'sound=<id> (`earshot sounds --search <word>`)')
     gone = b.get('absent')
-    if gone and gone not in c['id'].replace('/', ' ').replace('_', ' '):
+    found = {s for _, _, ws, _ in (own or ()) for s in ws}
+    if gone and gone not in c['id'].replace('/', ' ').replace('_', ' ') and not set(gone.split()) <= found:
         res['missing'] = gone
-    how = 'atlas' if ears is not None and ears.atlas is not None else 'reader'
     res.update(id=c['id'], cand=c, others=[x['id'] for x in cands if x is not c][:3],
-               why=f"nearest to {c['for']!r} ({how} {c['score']:+.1f}"
+               why=(f"names {c['for']!r} in its own words ({how} and own words {c['score']:+.1f}" if c.get('own')
+                    else f"nearest to {c['for']!r} ({how} {c['score']:+.1f}")
                    + (', a short take to repeat' if role == 'grain' else ', a long take for a bed'
                       if role == 'bed' else '') + ')')
     return res
