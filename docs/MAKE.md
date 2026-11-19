@@ -849,7 +849,7 @@ the three notes at their spacing, then the bars damped by the hand so the sound 
 the last note rings out for about 2.6 s). In D minor, `success/rise` (a major third up) rises a minor third.
 
 **How well requests are understood.** On five development sets of requests (A, B, D, E and G) the first
-pick is right for 92.3 to 96.8 % and one of the top three for 96.1 to 99.1 %. On 220 held-out requests written by
+pick is right for 91.8 to 96.8 % and one of the top three for 95.9 to 99.1 %. On 220 held-out requests written by
 someone who never saw the catalogue (half long descriptions of a sound that never name it, half casual requests),
 scored once on an earlier reader, the first pick was right for 69.1 % and one of the top three for 76.4 %.
 Development numbers are optimistic by construction. Requests that name the thing or the job do far better than

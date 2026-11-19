@@ -478,8 +478,8 @@ Every number below comes with its method in [docs/VALIDATION.md](docs/VALIDATION
   pot, a campfire, applause); rain and hail on a new surface and a vehicle passing built from another motor did not.
   For 30 things the catalogue lacks, 29 builds fit the words better than what `make` hands over
   ([docs/BUILD.md](docs/BUILD.md#how-well-it-does)).
-- **Understanding requests.** On five development sets the first pick is right for 92.3 to 96.8 % of the requests
-  and one of the top three for 96.1 to 99.1 %. On 220 held-out requests written by someone who never saw the
+- **Understanding requests.** On five development sets the first pick is right for 91.8 to 96.8 % of the requests
+  and one of the top three for 95.9 to 99.1 %. On 220 held-out requests written by someone who never saw the
   catalogue, scored once on an earlier reader, 69.1 % and 76.4 %. Requests that name the thing or the job do far
   better than descriptions of a mood.
 - **Matching descriptions** (125 held-out real recordings): a "strong" verdict is the right kind of sound 98 % of the

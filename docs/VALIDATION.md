@@ -119,7 +119,10 @@ decode cache, and `mix_report.json` byte-identical. (`--cache` must point to a w
 
 ## 7. Tests
 `.venv/Scripts/python.exe -m pytest -q` (fast; synthetic fixtures, no network) and `--slow` (loads the models / long
-end-to-end runs). What the tests of the made sounds check is in section 8.
+end-to-end runs). What the tests of the made sounds check is in section 8. On the released tree the fast run has
+4059 passed, 1685 skipped (the 1684 slow ones and one that needs renders a fresh clone lacks) and none failed;
+the slow tests alone (`--slow -m slow`) 1672 passed, 12 skipped (two known faults of the learning engine, ten real
+whooshes the pitch detector reads as gliding) and none failed.
 
 ## 8. Made sounds (1.0)
 
@@ -196,7 +199,7 @@ was used only to order the recordings of a learned design, never to admit or dro
   they replace.
 - **Recipes** (`earshot/recipe.py`, `earshot/data/recipes/`): a cookbook recipe answers a request on its own only when
   the listening model hears it as its thing (a match of z 3.0 or more), clearly better than the catalogue's nearest
-  design (by 1.0 or more), and the audit finds it clean: 32 of the 74 do. The other 42 are named only as starting
+  design (by 1.0 or more), and the audit finds it clean: 59 of the 99 do. The other 40 are named only as starting
   points. This is a model's judgement, not a listener's; no recipe has been judged by ear as a set. One sound
   ringing through the body of another ("rain on a tin can") was built and measured: it came no nearer the real
   recordings of rain on wood or on a tin roof than plain rain did, so it is not part of the recipe form.
@@ -211,17 +214,19 @@ are not in the repository.
 
 | set | what it is | first pick right | right among the top three |
 |---|---|---|---|
-| A (development) | 440 requests for 110 intents, in four styles | 92.3 % | 96.1 % |
+| A (development) | 440 requests for 110 intents, in four styles | 91.8 % | 95.9 % |
 | B (development) | 220 requests | 96.8 % | 99.1 % |
 | D (development) | 160 requests | 93.1 % | 96.2 % |
-| E (development) | 200 requests for the film, motion and newest sounds | 93.5 % | 98.0 % |
-| G (development) | 60 requests that also say where the sound plays ("for my running club app") | 93.3 % | 96.7 % |
+| E (development) | 200 requests for the film, motion and newest sounds | 93.0 % | 98.0 % |
+| G (development) | 60 requests that also say where the sound plays ("for my running club app") | 95.0 % | 96.7 % |
 | C (held out) | 220 requests: half long descriptions of a sound that never name it, half casual requests | 69.1 % | 76.4 % |
 
 C was scored once, on an earlier reader and catalogue than the one released; it has not been scored on the
 released reader. Its accept lists were written before the interface and motion answers became sounds of real
 things. When the learned recordings arrived, 68 answers were added to the accept lists of A and B by a written rule
-(a learned recording of the thing the request names is a right answer). About one held-out request in three or four
+(a learned recording of the thing the request names is a right answer). Three requests (two of A, one of B) are
+answered first by a design added for this release that is the thing they ask for, which their lists do not yet
+accept; counted right, A scores 92.3 % / 96.1 % and B 97.3 % / 99.5 %. About one held-out request in three or four
 (long descriptions and casual paraphrases) needs a second call, which is what `also`, the guess note and
 `sound=<id>` are for. `--listen` (the sound atlas) was not re-measured on the released catalogue.
 
