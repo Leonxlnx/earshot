@@ -3,7 +3,7 @@ name: Fast tests (no models)
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, v1]
 
 permissions:
   contents: read
@@ -15,7 +15,7 @@ concurrency:
 jobs:
   fast-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       EARSHOT_OFFLINE: '1'
       HF_HUB_OFFLINE: '1'
@@ -24,9 +24,6 @@ jobs:
       MPLBACKEND: Agg
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
-      EARSHOT_HOME: ${{ runner.temp }}/earshot
-      NUMBA_CACHE_DIR: ${{ runner.temp }}/earshot-numba
-      MPLCONFIGDIR: ${{ runner.temp }}/earshot-mpl
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -59,6 +56,10 @@ jobs:
               assert shutil.which(executable), executable
           PY
       - name: Run the existing default fast suite
+        env:
+          EARSHOT_HOME: ${{ runner.temp }}/earshot
+          NUMBA_CACHE_DIR: ${{ runner.temp }}/earshot-numba
+          MPLCONFIGDIR: ${{ runner.temp }}/earshot-mpl
         run: |
           mkdir -p "$EARSHOT_HOME" "$NUMBA_CACHE_DIR" "$MPLCONFIGDIR"
           .venv-fast/bin/python -m pytest -q -p no:cacheprovider -rs tests
