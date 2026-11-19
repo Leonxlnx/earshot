@@ -242,7 +242,8 @@ CONCEPTS = {
                'camera pulling out', 'camera pan', 'camera pans', 'camera panning', 'camera move', 'camera moves',
                'camera sweeps', 'push in on', 'pushes in on', 'pull back to reveal', 'pulls back to reveal'),
     # something carried past the listener (a whoosh too: BROADER)
-    'flyby': ('fly by', 'fly-by', 'flyover', 'fly over', 'flies past', 'flying past', 'fly past', 'whoosh by',
+    'flyby': ('fly by', 'fly-by', 'flyover', 'fly over', 'fly overhead', 'flying overhead', 'flies overhead',
+              'passing overhead', 'flies past', 'flying past', 'fly past', 'whoosh by',
               'pass by', 'passing by', 'pass', 'zoom by', 'zoom past', 'zooming past', 'streak past', 'drive by',
               'drive-by'),
     'swish': ('swoop', 'flick', 'whip', 'whippy', 'quick whoosh', 'fast pass', 'zing', 'swishy', 'fwip', 'fwoop',

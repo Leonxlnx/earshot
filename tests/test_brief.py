@@ -1284,6 +1284,7 @@ def test_an_unknown_thing_or_action_gets_the_nearest_and_says_so(idx, text, abse
     ('a camera shutter, three times', 'camera/shutter'), ('not a voice, a soft click', None),
     ("a little 'never mind' sound", None),
     ('a loud hollow cork pop followed by fizz', 'cork/'), ('when the user saves, a soft thwip', None),
+    ('a jet flying overhead', 'pass/jet'), ('a plane passing overhead', 'pass/jet'),
 ])
 def test_a_known_thing_is_not_said_to_be_missing(idx, text, want):
     """a thing a design is named for, a word that only describes or says whose it is, a caption in quotes, a
