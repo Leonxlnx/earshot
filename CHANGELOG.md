@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 - unreleased
+## 1.0.0 - 2026-11-20
 
 earshot now makes sounds as well as listening to them. An agent asks for a sound in words and earshot renders a new
 take of a design from its catalogue, with no model and no network. When the catalogue lacks the thing, the answer
