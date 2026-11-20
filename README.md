@@ -31,6 +31,8 @@ pip install "earshot @ git+https://github.com/Leonxlnx/earshot"   # the tool
 
 Install from GitHub: the name `earshot` on PyPI belongs to another project.
 
+[The earshot site](https://leonxlnx.github.io/earshot-site/) plays all 922 sounds in the browser.
+
 What is in the box:
 
 - **Making sounds** (`earshot make`): a catalogue of 922 designs in 384 families holds interface sounds, everyday
@@ -512,8 +514,7 @@ cannot judge. Everything it does not make and cannot judge: [docs/LIMITS.md](doc
   public-domain recordings, and the Claude Code plugin.
 - **0.4** added the sound of music-led launch films to the bank (51 sounds, the `launch` kit preset) and re-made `fit`
   against professional sound effects. [The 0.4 launch film](https://github.com/Leonxlnx/earshot/releases/tag/v0.4.0)
-  uses bank takes placed with the launch kit; [the earshot site](https://leonxlnx.github.io/earshot-site/) plays every
-  bank sound.
+  uses bank takes placed with the launch kit.
 - **0.3** added the bank of sound effects stored as code (`sfx`, `kit`).
 - **0.2** added forge v2 and `earshot fit`.
 - **0.1** was the listening tools, the first forge, the MCP server and the two agent skills.
