@@ -1,0 +1,12 @@
+{
+ "name": "ghost_passing",
+ "says": "a ghost passing by",
+ "things": ["ghost passing by", "ghost passing", "ghost flying past", "ghost whoosh"],
+ "built": "A yawn lower and sinking as the moan, a long whoosh lower as it passing, wind at a window under it, in a cathedral.",
+ "space": "cathedral",
+ "layers": [
+  {"sound": "yawn/person", "pitch": -5, "glide": -9, "gain": 0, "swell": 0.8},
+  {"sound": "whoosh/long", "pitch": -7, "at": 0.4, "gain": -4},
+  {"sound": "wind/window", "dur": 4, "gain": -10, "swell": 1.0}
+ ]
+}

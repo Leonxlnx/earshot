@@ -1,0 +1,11 @@
+{
+ "name": "machine_gun",
+ "says": "a machine gun firing a burst",
+ "things": ["machine gun burst", "machine gun", "machine gun firing", "automatic rifle"],
+ "built": "The first 0.2 s of a pistol shot ten times, 85 ms apart, and a rifle shot rolling away after them, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "shot/pistol", "cut": [0, 0.2], "decay": 0.08, "gain": 0, "events": {"count": 10, "gap": 0.085}},
+  {"sound": "gunshot/rifle", "at": 0.8, "gain": -8}
+ ]
+}

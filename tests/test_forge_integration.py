@@ -107,6 +107,7 @@ def _toy():
 
 
 def test_forge_report_carries_the_v2_components(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     refs = []
     for i in range(4):
         p = str(tmp_path / f'ref_{i}.wav')
@@ -173,6 +174,7 @@ def test_critic_typicality_needs_three_refs(tmp_path):
 
 def test_forge_without_refs_still_writes_every_output(tmp_path):
     """empty refsets (downlifter, glitch) give a critic without refs: designed mode, artifact-only pre-screen"""
+    pytest.importorskip('torch')            # needs the listen extra
     out = tmp_path / 'made'
     rep = forge(_toy(), budget=16, pop=8, keep=2, seed=1, out=str(out), log=None, critic=V2Critic(), prescreen=16)
     for f in ('report.md', 'report.json', 'compare.png', 'audition.wav'):

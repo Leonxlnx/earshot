@@ -17,6 +17,7 @@ network and no revision, and earshot never downloads into it (an incomplete fold
 import hashlib
 import os
 import re
+import sys
 from dataclasses import dataclass
 
 from .. import config
@@ -31,6 +32,7 @@ CUSTOM_PATTERNS = ('config.json', 'preprocessor_config.json', 'feature_extractor
                    'vocab.json', 'vocab.txt', 'merges.txt', 'tokenizer.model', 'spiece.model',
                    'sentencepiece.bpe.model', 'model.safetensors', 'model.safetensors.index.json',
                    'model-?????-of-?????.safetensors')
+SIZES = {'laion/larger_clap_general': '776 MB', 'MIT/ast-finetuned-audioset-10-10-0.4593': '346 MB'}  # downloads
 LOCAL = 'local'   # Spec.revision of a local model folder
 _SHA = re.compile(r'[0-9a-f]{40}')
 
@@ -180,10 +182,11 @@ def resolve(model_id, revision=None):
     return Spec(model_id, rev, state, None, weights[0], missing, pinned=bool(pin))
 
 
-def fetch(spec):
+def fetch(spec, ahead=False):
     """download the wanted revision of spec.model_id into the earshot cache and return the new, complete Spec. For a
     pinned model exactly its files (safetensors weights, never the pickle); for another model its top-level configs,
-    tokenizer and safetensors weights, by name. Refused while an offline flag is set, and always for a local folder"""
+    tokenizer and safetensors weights, by name. Refused while an offline flag is set, and always for a local folder.
+    One line on stderr says what is downloaded, how large and where to; ahead: called by `earshot doctor --fetch`"""
     if spec.folder:
         raise RuntimeError(f'{spec.label} lacks {" and ".join(spec.missing)}: earshot loads a local model folder as '
                            'it is and never downloads into it. Put config.json and model.safetensors (or the '
@@ -196,10 +199,16 @@ def fetch(spec):
         raise RuntimeError(f'{spec.label} is {where} and {flag} is set, so earshot will not download it. Run once '
                            f'without {flag} (`earshot doctor --fetch` downloads the models, ~1.1 GB), copy a cache '
                            'there, or point EARSHOT_HOME at one.')
+    from .. import extras
+    extras.need('huggingface_hub', what='downloading the listening models')
     from huggingface_hub import snapshot_download   # a dependency of transformers
     pin = config.PINS.get(spec.model_id) if spec.pinned else None
     patterns = [*pin['files'], pin['weights']] if pin else list(CUSTOM_PATTERNS)
     config.ensure_dirs()
+    size = f'about {SIZES[spec.model_id]}, ' if pin and spec.model_id in SIZES else ''
+    print(f'(earshot: downloading the listening model {spec.label} ({size}once) into {config.HF_CACHE}'
+          + ('' if ahead else '; `earshot doctor --fetch` downloads the models ahead of time') + ')',
+          file=sys.stderr, flush=True)
     try:
         snapshot_download(spec.model_id, revision=spec.revision, cache_dir=config.HF_CACHE, allow_patterns=patterns)
     except Exception as e:  # noqa: BLE001  (network, auth, unknown repo or revision: one readable error)

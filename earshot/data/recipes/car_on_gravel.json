@@ -1,0 +1,11 @@
+{
+ "name": "car_on_gravel",
+ "says": "a car driving slowly over gravel",
+ "things": ["car on gravel", "car driving on gravel", "tyres on gravel", "car pulling up on gravel"],
+ "sketch": true,
+ "built": "A car passing, dull and lower, with footsteps on gravel ten times as they come as the tyres crunching the stones.",
+ "layers": [
+  {"sound": "pass/car", "pitch": -3, "gain": -4, "lowpass": 2500},
+  {"sound": "step/pebbles", "pitch": -3, "gain": 0, "at": 0.4, "events": {"count": 10, "gap": 0.35, "loose": 0.5}}
+ ]
+}

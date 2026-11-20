@@ -1,0 +1,1050 @@
+{
+ "about": "learned ambience textures (earshot.synth.quilt, earshot.sounds.nature): resyn models of public-domain recordings, numbers only; see CREDITS.md",
+ "textures": {
+  "brook": {
+   "ids": [
+    "stream/brook"
+   ],
+   "title": "Small Stream",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/small-stream-s0823.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    18.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 269234,
+   "chunks": [
+    {
+     "file": "brook-0.npz",
+     "seconds": 6.34,
+     "period": null
+    },
+    {
+     "file": "brook-1.npz",
+     "seconds": 5.96,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.14,
+    "shape_db": 0.92,
+    "mod_db": 1.01
+   },
+   "take_vs_take": {
+    "env_db": 3.37,
+    "shape_db": 0.97,
+    "mod_db": 0.68
+   }
+  },
+  "campfire": {
+   "ids": [
+    "fire/camp"
+   ],
+   "title": "Big Branching Fire #1",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/big-branching-fire-1-s0987.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    2.0,
+    35.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 36.5,
+   "bytes": 1447991,
+   "chunks": [
+    {
+     "file": "campfire-0.npz",
+     "seconds": 6.33,
+     "period": null
+    },
+    {
+     "file": "campfire-1.npz",
+     "seconds": 5.81,
+     "period": null
+    },
+    {
+     "file": "campfire-2.npz",
+     "seconds": 5.69,
+     "period": null
+    },
+    {
+     "file": "campfire-3.npz",
+     "seconds": 6.37,
+     "period": null
+    },
+    {
+     "file": "campfire-4.npz",
+     "seconds": 6.76,
+     "period": null
+    },
+    {
+     "file": "campfire-5.npz",
+     "seconds": 5.54,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.01,
+    "shape_db": 0.77,
+    "mod_db": 0.78
+   },
+   "vary": 0.0,
+   "piece": [
+    2.5,
+    5.0
+   ],
+   "pair": true
+  },
+  "cornfield": {
+   "ids": [
+    "wind/trees"
+   ],
+   "title": "Wind in a cornfield",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/wind-in-a-cornfield-s1097.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    8.0,
+    24.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 24.9,
+   "bytes": 458155,
+   "chunks": [
+    {
+     "file": "cornfield-0.npz",
+     "seconds": 5.81,
+     "period": null
+    },
+    {
+     "file": "cornfield-1.npz",
+     "seconds": 6.31,
+     "period": null
+    },
+    {
+     "file": "cornfield-2.npz",
+     "seconds": 7.12,
+     "period": null
+    },
+    {
+     "file": "cornfield-3.npz",
+     "seconds": 5.66,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.56,
+    "shape_db": 0.75,
+    "mod_db": 0.98
+   },
+   "vary": 0.1,
+   "piece": [
+    2.5,
+    5.0
+   ]
+  },
+  "crickets": {
+   "ids": [
+    "night/crickets"
+   ],
+   "title": "Campaign at Night #4",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/campaign-at-night-4-s1880.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    1.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 187488,
+   "chunks": [
+    {
+     "file": "crickets-0.npz",
+     "seconds": 5.94,
+     "period": null
+    },
+    {
+     "file": "crickets-1.npz",
+     "seconds": 6.36,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 4.43,
+    "shape_db": 1.79,
+    "mod_db": 1.4
+   },
+   "take_vs_take": {
+    "env_db": 2.22,
+    "shape_db": 0.46,
+    "mod_db": 0.49
+   }
+  },
+  "deck": {
+   "ids": [
+    "rain/wood"
+   ],
+   "title": "Rain On Wood Deck (Extreme Quality)",
+   "author": "cocaine",
+   "page": "https://freesound.org/people/cocaine/sounds/611421/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    30.0,
+    20.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 20.6,
+   "bytes": 375881,
+   "chunks": [
+    {
+     "file": "deck-0.npz",
+     "seconds": 6.91,
+     "period": null
+    },
+    {
+     "file": "deck-1.npz",
+     "seconds": 7.2,
+     "period": null
+    },
+    {
+     "file": "deck-2.npz",
+     "seconds": 6.49,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.76,
+    "shape_db": 0.86,
+    "mod_db": 0.98
+   },
+   "vary": 0.4
+  },
+  "dishwasher": {
+   "ids": [
+    "dishwasher/run"
+   ],
+   "title": "Dishwasher",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/dishwasher-s1002.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    25.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 291276,
+   "chunks": [
+    {
+     "file": "dishwasher-0.npz",
+     "seconds": 5.9,
+     "period": null
+    },
+    {
+     "file": "dishwasher-1.npz",
+     "seconds": 5.53,
+     "period": null
+    },
+    {
+     "file": "dishwasher-2.npz",
+     "seconds": 5.17,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.86,
+    "shape_db": 0.87,
+    "mod_db": 1.23
+   },
+   "vary": 0.2
+  },
+  "fridge": {
+   "ids": [
+    "fridge/hum"
+   ],
+   "title": "Fridge",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/fridge-s1157.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    5.0,
+    16.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 242918,
+   "chunks": [
+    {
+     "file": "fridge-0.npz",
+     "seconds": 5.39,
+     "period": null
+    },
+    {
+     "file": "fridge-1.npz",
+     "seconds": 5.68,
+     "period": null
+    },
+    {
+     "file": "fridge-2.npz",
+     "seconds": 5.53,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 4.0,
+    "shape_db": 1.39,
+    "mod_db": 2.66
+   },
+   "vary": 0.1
+  },
+  "froth": {
+   "ids": [
+    "waves/sand"
+   ],
+   "title": "Small Waves, Froth and Beach",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/small-waves-froth-and-beach-s1447.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    0.0,
+    34.0
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 36.7,
+   "bytes": 604957,
+   "chunks": [
+    {
+     "file": "froth-0.npz",
+     "seconds": 3.4,
+     "period": 2.6
+    },
+    {
+     "file": "froth-1.npz",
+     "seconds": 7.7,
+     "period": 6.9
+    },
+    {
+     "file": "froth-2.npz",
+     "seconds": 5.9,
+     "period": 5.1
+    },
+    {
+     "file": "froth-3.npz",
+     "seconds": 4.0,
+     "period": 3.2
+    },
+    {
+     "file": "froth-4.npz",
+     "seconds": 3.4,
+     "period": 2.6
+    },
+    {
+     "file": "froth-5.npz",
+     "seconds": 4.4,
+     "period": 3.6
+    },
+    {
+     "file": "froth-6.npz",
+     "seconds": 4.5,
+     "period": 3.7
+    },
+    {
+     "file": "froth-7.npz",
+     "seconds": 3.4,
+     "period": 2.6
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.47,
+    "shape_db": 0.77,
+    "mod_db": 1.43
+   },
+   "vary": 0.1
+  },
+  "gale": {
+   "ids": [
+    "wind/gale"
+   ],
+   "title": "Strong Wind in a Village",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/strong-wind-in-a-village-s0625.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    24.0,
+    14.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 14.3,
+   "bytes": 288068,
+   "chunks": [
+    {
+     "file": "gale-0.npz",
+     "seconds": 6.72,
+     "period": null
+    },
+    {
+     "file": "gale-1.npz",
+     "seconds": 7.58,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.51,
+    "shape_db": 1.08,
+    "mod_db": 1.07
+   },
+   "vary": 0.2,
+   "piece": [
+    2.5,
+    5.0
+   ]
+  },
+  "hailcar": {
+   "ids": [
+    "hail/car"
+   ],
+   "title": "hail on car windshield windows recorded from inside.flac",
+   "author": "kyles",
+   "page": "https://freesound.org/people/kyles/sounds/635571/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    45.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 341629,
+   "chunks": [
+    {
+     "file": "hailcar-0.npz",
+     "seconds": 5.7,
+     "period": null
+    },
+    {
+     "file": "hailcar-1.npz",
+     "seconds": 5.64,
+     "period": null
+    },
+    {
+     "file": "hailcar-2.npz",
+     "seconds": 5.26,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.65,
+    "shape_db": 0.8,
+    "mod_db": 1.2
+   },
+   "vary": 0.4
+  },
+  "hailroof": {
+   "ids": [
+    "hail/roof"
+   ],
+   "title": "Hail on roof",
+   "author": "zachrau",
+   "page": "https://freesound.org/people/zachrau/sounds/232288/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    0.5,
+    16.5
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 17.1,
+   "bytes": 358625,
+   "chunks": [
+    {
+     "file": "hailroof-0.npz",
+     "seconds": 5.64,
+     "period": null
+    },
+    {
+     "file": "hailroof-1.npz",
+     "seconds": 6.25,
+     "period": null
+    },
+    {
+     "file": "hailroof-2.npz",
+     "seconds": 5.21,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.32,
+    "shape_db": 1.0,
+    "mod_db": 1.0
+   },
+   "vary": 0.4
+  },
+  "jungle": {
+   "ids": [
+    "jungle/night"
+   ],
+   "title": "Jungle nighttime",
+   "author": "SarahAGGross",
+   "page": "https://freesound.org/people/SarahAGGross/sounds/737477/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    20.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 330916,
+   "chunks": [
+    {
+     "file": "jungle-0.npz",
+     "seconds": 5.51,
+     "period": null
+    },
+    {
+     "file": "jungle-1.npz",
+     "seconds": 5.39,
+     "period": null
+    },
+    {
+     "file": "jungle-2.npz",
+     "seconds": 5.7,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.57,
+    "shape_db": 1.15,
+    "mod_db": 1.06
+   },
+   "vary": 0.3
+  },
+  "pebbles": {
+   "ids": [
+    "waves/pebbles"
+   ],
+   "title": "Sea of the beach of Dellec #3",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/sea-of-the-beach-of-dellec-3-s2566.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    13.4,
+    30.0
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 33.0,
+   "bytes": 590053,
+   "chunks": [
+    {
+     "file": "pebbles-0.npz",
+     "seconds": 7.3,
+     "period": 6.5
+    },
+    {
+     "file": "pebbles-1.npz",
+     "seconds": 7.3,
+     "period": 6.5
+    },
+    {
+     "file": "pebbles-2.npz",
+     "seconds": 6.0,
+     "period": 5.2
+    },
+    {
+     "file": "pebbles-3.npz",
+     "seconds": 7.1,
+     "period": 6.3
+    },
+    {
+     "file": "pebbles-4.npz",
+     "seconds": 5.3,
+     "period": 4.5
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.61,
+    "shape_db": 0.79,
+    "mod_db": 1.28
+   },
+   "take_vs_take": {
+    "env_db": 2.73,
+    "shape_db": 0.82,
+    "mod_db": 0.76
+   }
+  },
+  "restaurant": {
+   "ids": [
+    "cafe/busy"
+   ],
+   "title": "Restaurant",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/restaurant-s0624.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    2.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 264039,
+   "chunks": [
+    {
+     "file": "restaurant-0.npz",
+     "seconds": 5.4,
+     "period": null
+    },
+    {
+     "file": "restaurant-1.npz",
+     "seconds": 5.23,
+     "period": null
+    },
+    {
+     "file": "restaurant-2.npz",
+     "seconds": 5.97,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.11,
+    "shape_db": 0.98,
+    "mod_db": 1.11
+   },
+   "take_vs_take": {
+    "env_db": 3.41,
+    "shape_db": 1.06,
+    "mod_db": 0.94
+   }
+  },
+  "rocks": {
+   "ids": [
+    "waves/rocks"
+   ],
+   "title": "Sea of the beach of Dellec #4",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/sea-of-the-beach-of-dellec-4-s2567.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    4.6,
+    26.5
+   ],
+   "channels": 2,
+   "periodic": true,
+   "seconds": 29.5,
+   "bytes": 601647,
+   "chunks": [
+    {
+     "file": "rocks-0.npz",
+     "seconds": 4.7,
+     "period": 3.9
+    },
+    {
+     "file": "rocks-1.npz",
+     "seconds": 6.0,
+     "period": 5.2
+    },
+    {
+     "file": "rocks-2.npz",
+     "seconds": 6.9,
+     "period": 6.1
+    },
+    {
+     "file": "rocks-3.npz",
+     "seconds": 6.8,
+     "period": 6.0
+    },
+    {
+     "file": "rocks-4.npz",
+     "seconds": 5.1,
+     "period": 4.3
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.47,
+    "shape_db": 0.77,
+    "mod_db": 1.18
+   },
+   "take_vs_take": {
+    "env_db": 2.48,
+    "shape_db": 0.74,
+    "mod_db": 0.76
+   }
+  },
+  "room": {
+   "ids": [
+    "room_tone/quiet"
+   ],
+   "title": "Apartment Closed Window",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/apartment-closed-window-s2387.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    8.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 196971,
+   "chunks": [
+    {
+     "file": "room-0.npz",
+     "seconds": 5.99,
+     "period": null
+    },
+    {
+     "file": "room-1.npz",
+     "seconds": 6.31,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.22,
+    "shape_db": 0.69,
+    "mod_db": 1.41
+   },
+   "take_vs_take": {
+    "env_db": 2.37,
+    "shape_db": 0.71,
+    "mod_db": 0.83
+   }
+  },
+  "shower": {
+   "ids": [
+    "shower/run"
+   ],
+   "title": "Woman Takes a Shower",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/woman-takes-a-shower-s0171.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    10.0,
+    16.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 350924,
+   "chunks": [
+    {
+     "file": "shower-0.npz",
+     "seconds": 5.06,
+     "period": null
+    },
+    {
+     "file": "shower-1.npz",
+     "seconds": 6.34,
+     "period": null
+    },
+    {
+     "file": "shower-2.npz",
+     "seconds": 5.2,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.16,
+    "shape_db": 0.9,
+    "mod_db": 0.99
+   },
+   "vary": 0.3
+  },
+  "street": {
+   "ids": [
+    "city/street",
+    "city/distant"
+   ],
+   "title": "London Street",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/london-street-s0641.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    12.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 304760,
+   "chunks": [
+    {
+     "file": "street-0.npz",
+     "seconds": 5.41,
+     "period": null
+    },
+    {
+     "file": "street-1.npz",
+     "seconds": 5.45,
+     "period": null
+    },
+    {
+     "file": "street-2.npz",
+     "seconds": 5.74,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.79,
+    "shape_db": 0.84,
+    "mod_db": 1.09
+   },
+   "take_vs_take": {
+    "env_db": 3.05,
+    "shape_db": 0.92,
+    "mod_db": 0.81
+   }
+  },
+  "terrace": {
+   "ids": [
+    "rain/street"
+   ],
+   "title": "Summer Rain on Terrace",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/summer-rain-on-terrace-s1019.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    6.0,
+    12.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 250623,
+   "chunks": [
+    {
+     "file": "terrace-0.npz",
+     "seconds": 5.76,
+     "period": null
+    },
+    {
+     "file": "terrace-1.npz",
+     "seconds": 6.54,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.57,
+    "shape_db": 0.76,
+    "mod_db": 0.98
+   },
+   "take_vs_take": {
+    "env_db": 2.73,
+    "shape_db": 0.78,
+    "mod_db": 0.69
+   }
+  },
+  "tinroof": {
+   "ids": [
+    "rain/tin_roof"
+   ],
+   "title": "rain medium on metal roof ext like porch.flac",
+   "author": "kyles",
+   "page": "https://freesound.org/people/kyles/sounds/454142/",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    10.0,
+    20.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 20.6,
+   "bytes": 391349,
+   "chunks": [
+    {
+     "file": "tinroof-0.npz",
+     "seconds": 6.82,
+     "period": null
+    },
+    {
+     "file": "tinroof-1.npz",
+     "seconds": 7.34,
+     "period": null
+    },
+    {
+     "file": "tinroof-2.npz",
+     "seconds": 6.44,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.56,
+    "shape_db": 0.75,
+    "mod_db": 1.26
+   },
+   "vary": 0.4
+  },
+  "umbrella": {
+   "ids": [
+    "rain/umbrella"
+   ],
+   "title": "Rain Under an Umbrella",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/rain-under-an-umbrella-s2679.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    5.0,
+    20.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 20.6,
+   "bytes": 433752,
+   "chunks": [
+    {
+     "file": "umbrella-0.npz",
+     "seconds": 6.91,
+     "period": null
+    },
+    {
+     "file": "umbrella-1.npz",
+     "seconds": 6.6,
+     "period": null
+    },
+    {
+     "file": "umbrella-2.npz",
+     "seconds": 7.09,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.77,
+    "shape_db": 0.87,
+    "mod_db": 1.17
+   },
+   "vary": 0.4
+  },
+  "underwater": {
+   "ids": [
+    "underwater/deep"
+   ],
+   "title": "Underwater",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/underwater-s3430.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    1.0,
+    12.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 12.3,
+   "bytes": 229024,
+   "chunks": [
+    {
+     "file": "underwater-0.npz",
+     "seconds": 6.15,
+     "period": null
+    },
+    {
+     "file": "underwater-1.npz",
+     "seconds": 6.15,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.59,
+    "shape_db": 1.08,
+    "mod_db": 1.01
+   },
+   "take_vs_take": {
+    "env_db": 3.76,
+    "shape_db": 1.06,
+    "mod_db": 0.87
+   }
+  },
+  "washer": {
+   "ids": [
+    "washing_machine/spin"
+   ],
+   "title": "Washing machine in drying mode",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/washing-machine-in-drying-mode-s0106.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    28.0,
+    16.0
+   ],
+   "channels": 1,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 386684,
+   "chunks": [
+    {
+     "file": "washer-0.npz",
+     "seconds": 5.52,
+     "period": null
+    },
+    {
+     "file": "washer-1.npz",
+     "seconds": 5.35,
+     "period": null
+    },
+    {
+     "file": "washer-2.npz",
+     "seconds": 5.73,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 3.32,
+    "shape_db": 1.04,
+    "mod_db": 1.24
+   },
+   "vary": 0.2
+  },
+  "workshop": {
+   "ids": [
+    "factory/workshop"
+   ],
+   "title": "Industry Workshop",
+   "author": "Joseph Sardin (BigSoundBank.com)",
+   "page": "https://bigsoundbank.com/industry-workshop-s0503.html",
+   "licence": "CC0 1.0 (public domain)",
+   "excerpt_s": [
+    10.0,
+    16.0
+   ],
+   "channels": 2,
+   "periodic": false,
+   "seconds": 16.6,
+   "bytes": 263728,
+   "chunks": [
+    {
+     "file": "workshop-0.npz",
+     "seconds": 5.02,
+     "period": null
+    },
+    {
+     "file": "workshop-1.npz",
+     "seconds": 5.8,
+     "period": null
+    },
+    {
+     "file": "workshop-2.npz",
+     "seconds": 5.78,
+     "period": null
+    }
+   ],
+   "fidelity": {
+    "env_db": 2.79,
+    "shape_db": 0.83,
+    "mod_db": 2.07
+   },
+   "vary": 0.3
+  }
+ }
+}

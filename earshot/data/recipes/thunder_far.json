@@ -1,0 +1,13 @@
+{
+ "name": "thunder_far",
+ "says": "thunder rolling far away",
+ "things": ["thunder rolling far away", "thunder far away", "far thunder", "thunder in the distance"],
+ "sketch": true,
+ "built": "Two rolls of thunder, the second later, lower and duller, with rain on leaves under them that gives way when the first one rolls.",
+ "dur": 9,
+ "layers": [
+  {"sound": "thunder/roll", "lowpass": 2500, "gain": 0, "fade_in": 0.4},
+  {"sound": "thunder/roll", "seed": 1, "pitch": -3, "at": 2.5, "lowpass": 1200, "gain": -6, "fade_in": 0.5},
+  {"sound": "rain/leaves", "dur": 9, "gain": -16, "follow": {"layer": 0, "amount": -0.6, "smooth": 0.3}}
+ ]
+}

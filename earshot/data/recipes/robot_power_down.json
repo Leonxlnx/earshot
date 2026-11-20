@@ -1,0 +1,13 @@
+{
+ "name": "robot_power_down",
+ "says": "a robot powering down",
+ "things": ["robot powering down", "robot power down", "robot shutting down", "machine powering down"],
+ "built": "An industrial switch, then an electric drill and a vacuum cleaner lower that run down to a stop as the motors, a last hiss of air and a dumbbell set down as the body settling.",
+ "layers": [
+  {"sound": "switch/industrial", "gain": -3},
+  {"sound": "drill/electric", "pitch": -5, "cut": [0.5, 1.5], "at": 0.08, "gain": 0, "halt": 1.6, "lowpass": 5000},
+  {"sound": "vacuum/cleaner", "pitch": -7, "cut": [2.0, 3.0], "at": 0.08, "gain": -8, "halt": 1.8},
+  {"sound": "spray_can/spray", "at": 1.7, "gain": -15, "cut": [0, 0.4], "decay": 0.3},
+  {"sound": "dumbbell/place", "pitch": -3, "at": 2.0, "gain": -7}
+ ]
+}

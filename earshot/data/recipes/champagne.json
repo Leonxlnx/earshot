@@ -1,0 +1,10 @@
+{
+ "name": "champagne",
+ "says": "a champagne cork popping and the wine poured",
+ "things": ["champagne", "champagne opening", "champagne pouring", "popping champagne"],
+ "built": "A cork pulled from a bottle, then a drink poured into a glass.",
+ "layers": [
+  {"sound": "cork/bottle", "gain": 0},
+  {"sound": "drink/pour", "dur": 2.4, "at": 0.7, "gain": -3}
+ ]
+}

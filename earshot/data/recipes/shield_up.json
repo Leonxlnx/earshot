@@ -1,0 +1,12 @@
+{
+ "name": "shield_up",
+ "says": "an energy shield going up",
+ "things": ["energy shield going up", "energy shield powering up", "force field going up", "shield powering up"],
+ "built": "An electric drill far lower winding up as the generator, a swell of air as the field spreading, water sizzling as its edge, a door falling shut as it locks.",
+ "layers": [
+  {"sound": "drill/electric", "pitch": -16, "glide": -5, "cut": [0.2, 2.0], "lowpass": 2500, "gain": -2, "swell": 1.0},
+  {"sound": "swell/air", "gain": -4},
+  {"sound": "water/sizzle", "at": 1.4, "gain": -10, "highpass": 2500, "decay": 0.6},
+  {"sound": "thump/door", "at": 1.6, "gain": -6}
+ ]
+}

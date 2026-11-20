@@ -17,13 +17,13 @@ import shutil
 import sys
 import time
 
-from . import config
+from . import config, extras
 from .report import emit
 
 PACKAGES = [('numpy', 'numpy'), ('scipy', 'scipy'), ('soundfile', 'soundfile'), ('soxr', 'soxr'),
-            ('librosa', 'librosa'), ('pyloudnorm', 'pyloudnorm'), ('sklearn', 'scikit-learn'), ('PIL', 'pillow'),
-            ('matplotlib', 'matplotlib'), ('torch', 'torch'), ('transformers', 'transformers'), ('mcp', 'mcp'),
-            ('requests', 'requests')]
+            ('numba', 'numba'), ('librosa', 'librosa'), ('PIL', 'pillow'), ('matplotlib', 'matplotlib'),
+            ('torch', 'torch'), ('transformers', 'transformers'), ('mcp', 'mcp'), ('requests', 'requests')]
+BASE = ('numpy', 'scipy', 'soundfile', 'soxr', 'numba')     # what making sounds needs; the rest come with extras
 
 
 def _models():
@@ -54,7 +54,7 @@ def fetch():
             out[mid] = 'already cached' if not s.folder else 'a local folder (nothing to download)'
             continue
         try:
-            out[mid] = 'downloaded ' + hub.fetch(s).sha[:7]
+            out[mid] = 'downloaded ' + hub.fetch(s, ahead=True).sha[:7]
         except RuntimeError as e:
             out[mid] = f'failed: {e}'
     return out
@@ -106,7 +106,9 @@ def _load(r):
 
 
 def check(load=False, fetch_missing=False):
-    r = {'python': sys.version.split()[0], 'earshot_home': config.HOME, 'threads': config.threads(),
+    from . import __version__
+    r = {'earshot': __version__, 'python': sys.version.split()[0], 'earshot_home': config.HOME,
+         'threads': config.threads(),
          'precision': config.PRECISION, 'clap_model': config.CLAP_MODEL, 'ast_model': config.AST_MODEL}
     pk = {}
     for name, dist in PACKAGES:  # installed versions from package metadata: no import (torch alone takes ~10-20 s)
@@ -118,8 +120,11 @@ def check(load=False, fetch_missing=False):
             except importlib.metadata.PackageNotFoundError:
                 pk[name] = 'ok'
         except Exception as e:  # noqa: BLE001
-            pk[name] = f'MISSING ({type(e).__name__})'
+            pk[name] = (f'MISSING ({type(e).__name__})' if name in BASE else
+                        f'not installed ({extras.command(extras.EXTRA[name][0])})')
     r['packages'] = pk
+    r['extras'] = {x: not extras.missing(*[m for m, (e, _) in extras.EXTRA.items() if e == x])
+                   for x in ('listen', 'measure', 'images', 'mcp', 'llm')}
     r['ffmpeg'] = shutil.which('ffmpeg') or 'MISSING (install ffmpeg and put it on PATH)'
     r['ffprobe'] = shutil.which('ffprobe') or 'MISSING'
     r['torch_cuda_used'] = False
@@ -133,7 +138,7 @@ def check(load=False, fetch_missing=False):
             ('vocab.json', 'vocab_stats.json', 'realness_model.json', 'launch_profile.json')}
     r['data_files'] = data
     r['bank'] = bank_info()
-    problems = [f'{k}: {v}' for k, v in pk.items() if str(v).startswith('MISSING') and k not in ('mcp', 'requests')]
+    problems = [f'{k}: {v}' for k, v in pk.items() if str(v).startswith('MISSING')]
     if r['bank'].get('error'):
         problems.append(f"sound bank: {r['bank']['error']}")
     if 'MISSING' in str(r['ffmpeg']):
@@ -145,7 +150,8 @@ def check(load=False, fetch_missing=False):
     problems += [f"{m}: the local model folder lacks {' and '.join(r['models'][m]['missing'])} (earshot never "
                  'downloads into a folder)' for m in r['models']
                  if m in folders and not r['models_cached'][m] and m not in failed]
-    notes, todo = [], [m for m, ok in r['models_cached'].items() if not ok and m not in failed and m not in folders]
+    notes, todo = [], [m for m, ok in r['models_cached'].items() if not ok and m not in failed and m not in folders
+                       and r['extras']['listen']]       # without the listen extra the models are not used at all
     if todo and r['offline']:
         problems.append(f"{' and '.join(todo)} not in the cache ({config.HF_CACHE}) and {r['offline']} is set, so "
                         'earshot will not download them: run `earshot doctor --fetch` once without it, or copy a '
@@ -159,17 +165,29 @@ def check(load=False, fetch_missing=False):
             notes.append(f"{m} loads the pickle weights of a cache made before earshot 0.2.1 ({v['loads'][:7]}, "
                          f"{v['weights']}), from the cache only; `earshot doctor --fetch` downloads the pinned "
                          f"safetensors ({v['revision'][:7]}), used from then on.")
+    if not r['extras']['listen']:
+        notes.append('Making sounds works; listening to them (describe, match, compare, timeline, critique, make with '
+                     f"listen) needs the models' packages: {extras.command('listen')}.")
     if load and not (r['offline'] and not all(r['models_cached'].values())):   # (cannot load: a problem says why)
         try:
             _load(r)
-        except RuntimeError as e:   # a model that cannot load (offline and not cached, a damaged cache): say why
-            problems.append(f'model load failed: {e}')
-    b, head = r['bank'], []
+        except (RuntimeError, ImportError) as e:   # a model that cannot load (offline and not cached, a damaged
+            problems.append(f'model load failed: {extras.plain(e) or e}')     # cache, no torch): say why
+    b, head = r['bank'], [f'earshot {__version__}.']
     if not b.get('error'):
         ty = b['types']
         head.append(f"Sound bank {b['version']}: {b['sounds']} sounds ({ty.get('forge', 0) - b['pluck']} forge, "
                     f"{b['pluck']} plucks, {ty.get('fit', 0)} fitted from CC0 recordings"
                     + (f"; extra files from EARSHOT_BANK: {', '.join(b['extra'])}" if b['extra'] else '') + ').')
+    try:                # the cookbook: sounds built from the catalogue's parts (earshot.recipe)
+        from . import recipe
+        book = recipe.cookbook()
+        sk = sum(1 for x in book.values() if x.get('sketch'))
+        r['recipes'] = {'cookbook': len(book), 'sketches': sk}
+        head.append(f"Cookbook: {len(book)} recipes built from the catalogue's parts ({len(book) - sk} answer "
+                    f"requests, {sk} sketches; `earshot recipe --list`).")
+    except Exception as e:  # noqa: BLE001  (a broken recipe file: say so, keep checking the rest)
+        problems.append(f'cookbook: {type(e).__name__}: {e}')
     r['problems'], r['notes'] = problems, notes
     r['summary'] = ' '.join(head + ['earshot looks healthy.' if not problems else
                                     'Problems: ' + '; '.join(p.rstrip('.') for p in problems) + '.'] + notes)

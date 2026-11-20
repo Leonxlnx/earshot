@@ -6,6 +6,8 @@ import subprocess
 import numpy as np
 import pytest
 
+pytest.importorskip('torch')            # these tests exercise the listening side: skipped without the listen extra
+pytest.importorskip('transformers')
 from earshot import config, video
 from earshot import profile as P
 from earshot.critique import SPEC, critique, real_thresholds, scorecard

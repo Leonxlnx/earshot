@@ -1,6 +1,7 @@
 """Fast tests for forge search v2: CMA-ES with restarts, the model-free pre-screen, threaded rendering, envelope and
 artifact measurements, diverse picks by sound, the seed bank, forge() outputs (report.md, compare.png, audition.wav),
 render without search and the CLI. Toy recipes and fake critics only: no models are loaded."""
+import pytest
 import json
 import math
 import os
@@ -218,6 +219,7 @@ def test_seed_bank_round_trip_and_stays_small(tmp_path):
 
 # ---------------------------------------------------------------------------------------------- forge outputs
 def test_forge_writes_report_md_compare_png_and_audition(tmp_path):
+    pytest.importorskip('torch')            # needs the listen extra
     c = FakeCritic()
     c.refs = _refs(tmp_path)
     out = tmp_path / 'made'
@@ -242,6 +244,7 @@ def test_forge_writes_report_md_compare_png_and_audition(tmp_path):
 
 
 def test_report_md_without_refs():
+    pytest.importorskip('torch')            # needs the listen extra
     rep = forge(toy(), budget=16, pop=8, keep=1, seed=1, log=None, critic=FakeCritic())
     md = report_md(rep)
     assert md.startswith("# forge toy: 'a 1 kHz ping'") and '## Gap' not in md

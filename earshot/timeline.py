@@ -62,7 +62,7 @@ import numpy as np
 from scipy import ndimage, signal
 
 from . import audio, config, features
-from .report import emit, fmt_t, to_json
+from .report import emit, fmt_t, read_json, to_json
 
 SR = audio.SR
 SPAN_VERSION = 1               # bump when an excerpt / embedding definition changes (per-span model cache)
@@ -555,7 +555,7 @@ def read_cues(cues):
     if isinstance(cues, str):
         s = cues.strip()
         if os.path.exists(s):
-            cues = json.load(open(s, encoding='utf-8'))
+            cues = read_json(s)
         elif s[:1] in '[{':
             cues = json.loads(s)
         else:
@@ -1230,28 +1230,31 @@ def timeline(path, video=None, cues=None, start=None, end=None, detail='normal',
     return dict(r, cached=False)
 
 
-def _load_range(path, pr, start, end):
+def _load_range(path, pr, start, end, reuse=True):
     """(x_context, c0, t0, t1, file_duration): a zoom [start, end] is analysed inside +-CONTEXT_S of context, so
     verdicts near its edges and the accent threshold match the full analysis"""
     name = os.path.basename(path)
     if not pr.get('codec'):                                    # picture only: analyse silence of the same length
         fdur = float(pr.get('duration') or 0)
         t0, t1 = max(0.0, float(start or 0)), min(fdur, float(end)) if end is not None else fdur
+        if round(t1 * SR) <= round(t0 * SR):
+            raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
+                             f'{name} is {fdur:.2f} s long')
         return np.zeros((int(round(fdur * SR)), 2), np.float32), 0.0, t0, t1, fdur
     if start is None and end is None:
-        x = audio.load(path)
+        x = audio.load(path, cache=reuse)
         fdur = len(x) / SR
         if fdur < 0.1:
             raise ValueError(f'{name} is {fdur:.2f} s long: too short for a timeline (>= 0.1 s); for a one-shot use '
                              'earshot measure / describe')
         return x, 0.0, 0.0, fdur, fdur
-    fdur = float(pr.get('duration') or 0) or audio.duration(path)
+    fdur = float(pr.get('duration') or 0) or len(audio.load(path, mono=True, cache=reuse)) / SR
     t0, t1 = max(0.0, float(start or 0)), min(fdur, float(end)) if end is not None else fdur
     if t1 - t0 < 0.1:
         raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
                          f'{name} is {fdur:.2f} s long')
     c0, c1 = max(0.0, t0 - CONTEXT_S), min(fdur, t1 + CONTEXT_S)
-    return audio.load(path, start=c0, end=c1), c0, t0, t1, fdur
+    return audio.load(path, start=c0, end=c1, cache=reuse), c0, t0, t1, fdur
 
 
 def _analyse(path, pr, video, cue_list, cue_fps, start, end, cfg, reuse):
@@ -1261,7 +1264,7 @@ def _analyse(path, pr, video, cue_list, cue_fps, start, end, cfg, reuse):
         clock[name] = round(time.time() - t, 2)
         return time.time()
     t = time.time()
-    xc, c0, t0, t1, fdur = _load_range(path, pr, start, end)
+    xc, c0, t0, t1, fdur = _load_range(path, pr, start, end, reuse=reuse)
     wa, wb = t0 - c0, min(t1 - c0, len(xc) / SR)               # the window inside the context (context times)
     x = xc[int(round(wa * SR)): int(round(wb * SR))]
     dur = len(x) / SR
@@ -1270,15 +1273,17 @@ def _analyse(path, pr, video, cue_list, cue_fps, start, end, cfg, reuse):
     t = lap('loudness_s', t)
     silent = bool(loud['digital_silence'])
     ev_c = [] if silent else detect_events(xc, lead=c0 == 0)
-    lv = level_envs(xc)
+    # Picture-only context is known silence: there can be no level peak or beat grid.
+    lv = level_envs(xc) if pr.get('codec') else {}
     t = lap('events_s', t)
-    grid = music_grid(audio.to_mono(xc))
+    # For known zero input, retain music_grid's short/long silent notes without scanning the whole film.
+    grid = music_grid(audio.to_mono(xc if pr.get('codec') else xc[:5 * SR]))
     t = lap('beats_s', t)
     cuts, fps = [], None
     if video:
         from . import video as vid
         fps = vid.info(video).get('fps')
-        cuts = [round(c - c0, 3) for c in vid.cuts(video) if t0 + 0.05 < c < t0 + dur - 0.05]
+        cuts = [round(c - c0, 3) for c in vid.cuts(video, cache=reuse) if t0 + 0.05 < c < t0 + dur - 0.05]
     cues_w = [dict(c, t=round(c['t'] - c0, 4)) for c in cue_list if t0 - 1e-6 <= c['t'] <= t0 + dur + 1e-6]
     t = lap('cuts_s', t)
     events = [e for e in ev_c if wa - 1e-6 <= e['t'] < wb]

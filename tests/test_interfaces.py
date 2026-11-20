@@ -356,6 +356,7 @@ def test_mcp_module_that_fails_to_import_is_reported(monkeypatch):
 
 
 def test_mcp_tool_exception_becomes_readable_failure(wav):
+    pytest.importorskip('torch')            # needs the listen extra
     def boom(path):
         raise ValueError('decoder exploded')
     with pytest.raises(mcp_server.ToolFailure, match='describe failed: ValueError: decoder exploded'):
@@ -404,6 +405,7 @@ def test_mcp_sheet_returns_png_path_and_image(wav, tmp_path, monkeypatch):
 
 
 def test_mcp_realness_folder_rows_and_missing_model(wav, tmp_path, monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     import types
     a, b = wav(_bursts(), 'a.wav'), wav(_bursts(2.0), 'b.wav')
     seen = {}
@@ -442,7 +444,8 @@ def test_mcp_server_registers_all_tools():
     tools = anyio.run(srv.list_tools)
     names = {t.name for t in tools}
     assert names == {'measure', 'describe', 'match', 'rank', 'find', 'compare', 'ab', 'realness', 'timeline', 'sheet',
-                     'critique', 'doctor', 'llm_critique', 'sfx_list', 'sfx_render', 'kit_render'}
+                     'critique', 'doctor', 'llm_critique', 'sfx_list', 'sfx_render', 'kit_render', 'make', 'make_set',
+                     'sounds', 'build'}
     for t in tools:
         schema = getattr(t, 'input_schema', None) or t.inputSchema
         assert len(t.description) > 120 and 'Use ' in t.description
@@ -451,6 +454,47 @@ def test_mcp_server_registers_all_tools():
     ann = llm_tool.annotations.model_dump()   # snake_case in mcp 2.x
     assert ann.get('read_only_hint', ann.get('readOnlyHint')) is False
     assert ann.get('open_world_hint', ann.get('openWorldHint')) is True
+
+
+def test_mcp_make_tools_describe_listen_and_take_material_loop_and_formats(tmp_path):
+    """usability review: the make tool's `listen` described an old behaviour, `material` and `loop` were missing,
+    and make_set could write one format only"""
+    import anyio
+    tools = {t.name: t for t in anyio.run(mcp_server.build().list_tools)}
+    props = (getattr(tools['make'], 'input_schema', None) or tools['make'].inputSchema)['properties']
+    assert {'material', 'loop', 'listen', 'dur', 'events'} <= set(props)
+    assert 'footsteps' in props['events']['description']         # events as make takes it: one event or the action
+    listen = ' '.join(props['listen']['description'].split())
+    assert 'best three' not in listen and 'atlas' in listen and 'blended' in listen and 'heard as' in listen
+    assert 'once' in props['loop']['description'] and 'ignores dur' in props['dur']['description']
+    fmt = (getattr(tools['make_set'], 'input_schema', None) or tools['make_set'].inputSchema)['properties']['format']
+    assert all(w in fmt['description'] for w in ('Vorbis', 'Opus', 'AAC', 'webm,mp3'))
+    text = mcp_server.tool_make('rain on a tent', str(tmp_path / 'r.wav'), sound='rain/tent', dur=2.0, loop=False)
+    assert text.startswith('r.wav: rain/tent') and 'seamless loop' not in text
+    text = mcp_server.tool_make('a knock', str(tmp_path / 'k.wav'), sound='tick/wood', material='glass')
+    assert 'not followed: material glass; this sound has no material to set' in text
+    text = mcp_server.tool_make('footsteps on gravel', str(tmp_path / 's.wav'), sound='step/pebbles', events=1)
+    assert 'played: one event' in text
+    text = mcp_server.tool_make_set(str(tmp_path / 'set'), sounds=[{'name': 'tap', 'sound': 'tap/tone'}],
+                                    format='wav,flac')
+    assert text.splitlines()[0].endswith('(wav, flac), manifest.json')
+    assert (tmp_path / 'set' / 'tap.wav').is_file() and (tmp_path / 'set' / 'tap.flac').is_file()
+
+
+def test_mcp_make_texts_say_how_sounds_are_made_and_count_the_sets():
+    """the make tool said "no recorded audio is used" after the realistic sounds became learned from recordings, and
+    make_set said "ui (16 interface sounds)" when the set had 17"""
+    import anyio
+    from earshot.sounds import sets
+    tools = {t.name: t for t in anyio.run(mcp_server.build().list_tools)}
+    make = ' '.join(tools['make'].description.split())
+    assert 'no recorded audio' not in make and 'learned from public-domain recordings' in make
+    assert 'no audio file' in make
+    desc = (getattr(tools['make_set'], 'input_schema', None) or tools['make_set'].inputSchema)['properties']['set']
+    text = desc.get('description') or desc['anyOf'][0].get('description', '')
+    for name, s in sets.SETS.items():
+        assert f'"{name}" ({len(s["sounds"])}' in text, name
+    assert 'made in code' not in ' '.join(mcp_server.INSTRUCTIONS.split())
 
 
 # one person's taste written as a rule for every agent (issue #1); conditional, generic phrasing such as "when the user
@@ -540,7 +584,8 @@ def test_mcp_stdio_end_to_end(wav, tmp_path):
                 await s.call_tool('rank', {'paths': path + '.missing', 'query': 'a door'}),
                 await s.call_tool('llm_critique', {'path': path}))
     tools, meas, missing, rank, llm_res = anyio.run(_stdio_session, calls, str(tmp_path / 'server.log'))
-    assert len(tools.tools) == 16   # 13 listening tools + sfx_list, sfx_render, kit_render (the sound bank)
+    # 13 listening tools + sfx_list, sfx_render, kit_render (the sound bank) + make, make_set, sounds, build
+    assert len(tools.tools) == 20
     assert not _is_error(meas) and _text(meas).startswith('3.000 s, ') and 'dBTP' in _text(meas)
     assert _is_error(missing) and 'not found' in _text(missing)
     assert _is_error(rank) and 'no audio/video files found' in _text(rank)   # a plain string passes the schema
@@ -594,3 +639,69 @@ def test_mcp_stdio_warm_start_answers_and_preloads(wav, tmp_path):
         return meas, await s.call_tool('describe', {'path': path})
     meas, desc = anyio.run(_stdio_session, calls, str(log), 'earshot.mcp_server', '--warm')
     assert not _is_error(meas) and not _is_error(desc) and 'models warm' in log.read_text(encoding='utf-8')
+
+
+def test_the_api_says_the_plain_sentence_for_a_missing_extra(monkeypatch):
+    from earshot import api, extras
+
+    def gone(*a, **k):
+        raise ModuleNotFoundError("No module named 'torch'", name='torch')
+    monkeypatch.setitem(api._FUNCS, 'describe', ('make', '_gone_for_test'))
+    import earshot.make as M
+    monkeypatch.setattr(M, '_gone_for_test', gone, raising=False)
+    with pytest.raises(extras.MissingExtra) as e:
+        api.describe('x.wav')
+    assert 'pip install' in str(e.value) and 'torch' in str(e.value)
+
+
+def test_version_flag_and_doctor_name_earshot_itself(capsys):
+    import earshot
+    from earshot import doctor
+    assert cli.main(['--version']) == 0
+    assert capsys.readouterr().out == f'earshot {earshot.__version__}\n'
+    r = doctor.check()
+    assert r['earshot'] == earshot.__version__ and r['summary'].startswith(f'earshot {earshot.__version__}. ')
+
+
+def test_a_base_install_starts_quietly_and_a_listening_command_says_what_to_install(monkeypatch, capsys):
+    """as on a base install: the module of critique cannot import without torch. Nothing is said until critique is
+    called; a module broken for another reason is still reported"""
+    import importlib
+    from earshot import extras
+    real_missing, real_import = extras.missing, importlib.import_module
+    monkeypatch.setattr(extras, 'missing', lambda *m: [x for x in m if x in ('torch', 'transformers')]
+                        + real_missing(*[x for x in m if x not in ('torch', 'transformers')]))
+
+    def imports(name, *a, **k):
+        if name == 'earshot.critique':
+            raise extras.MissingExtra(extras.sentence('torch', 'earshot profile'), name='torch')
+        return real_import(name, *a, **k)
+    monkeypatch.setattr(importlib, 'import_module', imports)
+    monkeypatch.delenv('EARSHOT_DEBUG', raising=False)
+    assert cli.main([]) == 0
+    got = capsys.readouterr()
+    assert got.err == ''
+    assert re.search(r'critique\s+\(needs the listen extra\)', got.out) and 'describe' in got.out
+    assert cli.main(['critique', 'film.mp4', '--json']) == 1
+    err = capsys.readouterr().err.strip().splitlines()
+    assert err == ['earshot critique: error: earshot critique needs torch, transformers, which the base install of '
+                   f"earshot leaves out: {extras.command('listen')}"]
+
+    def broken(name, *a, **k):
+        if name == 'earshot.critique':
+            raise RuntimeError('a broken module')
+        return real_import(name, *a, **k)
+    monkeypatch.setattr(importlib, 'import_module', broken)
+    assert cli.main([]) == 0
+    assert capsys.readouterr().err.strip() == '(earshot: module critique unavailable: RuntimeError: a broken module)'
+    assert cli.main(['critique', 'film.mp4']) == 2
+    assert 'a broken module' in capsys.readouterr().err
+
+
+def test_make_over_mcp_offers_the_build_tool_not_the_shell_command(tmp_path):
+    from earshot import make as M
+    r = mcp_server._summary_only(M.make)(want='a whale singing', out=str(tmp_path / 'w.wav'))
+    assert 'call the tool build with want="a whale singing" (and parts: what it is made of)' in r['text']
+    assert 'earshot build' not in r['text'] and r['text'] == r['summary']
+    said = M.make('a whale singing', str(tmp_path / 'w2.wav'))['summary']   # the command line keeps its line
+    assert 'or let earshot draft, hear and tune it: earshot build "a whale singing"' in said

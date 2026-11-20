@@ -1,0 +1,13 @@
+{
+ "name": "fireworks",
+ "says": "fireworks bursting in the sky",
+ "things": ["fireworks", "firework", "fireworks exploding", "fireworks display"],
+ "sketch": true,
+ "built": "A small explosion four times as the bursts, a distant explosion higher under two of them, a campfire's crackle far higher after each as the sparks, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "explosion/small", "gain": 0, "events": {"count": 4, "gap": 0.8, "loose": 0.4}},
+  {"sound": "explosion/far", "pitch": 3, "at": 0.05, "gain": -6, "events": {"count": 2, "gap": 1.6}},
+  {"sound": "fire/camp", "dur": 1.0, "pitch": 9, "at": 0.15, "gain": -8, "highpass": 2500, "events": {"count": 4, "gap": 0.8, "loose": 0.4}}
+ ]
+}

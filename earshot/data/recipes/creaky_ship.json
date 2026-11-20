@@ -1,0 +1,14 @@
+{
+ "name": "creaky_ship",
+ "says": "a wooden ship creaking at sea",
+ "things": ["creaky ship", "ship creaking", "creaking ship", "wooden ship creaking"],
+ "built": "A door's creak and a floorboard's creak far lower as the timbers, waves on rocks under them.",
+ "kind": "ambience",
+ "dur": 9,
+ "space": "room",
+ "layers": [
+  {"sound": "door/creak", "pitch": -9, "gain": -2, "events": {"count": 3, "gap": 2.7, "loose": 0.5}},
+  {"sound": "floor/creak", "pitch": -6, "at": 1.2, "gain": -4, "pan": -0.4, "events": {"count": 3, "gap": 2.5, "loose": 0.6}},
+  {"sound": "waves/rocks", "dur": 9, "gain": -7, "lowpass": 2000}
+ ]
+}

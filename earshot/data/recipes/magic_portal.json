@@ -1,0 +1,13 @@
+{
+ "name": "magic_portal",
+ "says": "a magic portal opening",
+ "things": ["magic portal", "portal opening", "portal opens"],
+ "sketch": true,
+ "built": "An airy spell's swell lower as the opening, a boomerang's whirl far lower four times, faster each time, as the swirl, the ground rumbling under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "magic/cast", "pitch": -7, "gain": 0},
+  {"sound": "whoosh/spin", "pitch": -9, "at": 0.2, "gain": -4, "events": {"count": 4, "gap": 0.45, "faster": 0.9}},
+  {"sound": "rumble/quake", "cut": [0, 2.5], "gain": -14, "swell": 1.0, "decay": 1.0}
+ ]
+}

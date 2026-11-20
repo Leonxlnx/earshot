@@ -1,0 +1,11 @@
+{
+ "name": "geiger_counter",
+ "says": "a geiger counter clicking",
+ "things": ["geiger counter", "geiger", "geiger counter clicking"],
+ "sketch": true,
+ "built": "The bright top of a lamp switch higher, forty times as they come and getting denser, over a faint hiss.",
+ "layers": [
+  {"sound": "tick/switch", "pitch": 3, "gain": 0, "events": {"count": 40, "gap": 0.09, "loose": 1.0, "faster": 0.97}},
+  {"source": "noise", "color": "pink", "dur": 4.2, "highpass": 3000, "lowpass": 9000, "gain": -30}
+ ]
+}

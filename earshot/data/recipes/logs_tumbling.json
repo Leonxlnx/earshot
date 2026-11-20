@@ -1,0 +1,11 @@
+{
+ "name": "logs_tumbling",
+ "says": "a pile of logs tumbling down",
+ "things": ["logs tumbling", "logs falling", "firewood falling", "pile of logs falling"],
+ "built": "Wooden things landing and hollow knocks lower, scattered thick at first and thinning out as the pile settles, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "land/wood", "scatter": {"rate": 12, "rate_to": 2, "dur": 1.8, "pitch": 4, "gain": 8, "pan": 0.6}},
+  {"sound": "knock/hollow", "pitch": -5, "scatter": {"rate": 10, "rate_to": 1, "dur": 1.8, "pitch": 4, "gain": 10, "pan": 0.6}, "gain": -5}
+ ]
+}

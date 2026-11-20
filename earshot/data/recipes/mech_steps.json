@@ -1,0 +1,13 @@
+{
+ "name": "mech_steps",
+ "says": "a giant robot walking, steel feet and servos",
+ "things": ["giant robot walking", "mech walking", "giant robot footsteps", "mech footsteps"],
+ "built": "A boot on a metal floor far lower and a heavy thing dropped lower, three steps, half a second of a drill between them as the servos, a short hiss as the hydraulics, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "step/metal", "pitch": -9, "gain": 0, "events": {"count": 3, "gap": 1.1}},
+  {"sound": "heavy_drop/floor", "pitch": -7, "at": 0.01, "gain": -4, "events": {"count": 3, "gap": 1.1}},
+  {"sound": "drill/electric", "pitch": -3, "glide": 2, "cut": [0.3, 0.8], "at": 0.45, "gain": -10, "events": {"count": 3, "gap": 1.1}},
+  {"sound": "spray_can/spray", "pitch": -5, "cut": [0, 0.3], "decay": 0.2, "at": 0.3, "gain": -14, "events": {"count": 3, "gap": 1.1}}
+ ]
+}

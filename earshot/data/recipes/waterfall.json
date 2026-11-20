@@ -1,0 +1,14 @@
+{
+ "name": "waterfall",
+ "says": "a waterfall",
+ "things": ["waterfall", "waterfall roaring", "falling water"],
+ "built": "A brook lower and a running tap far lower as the falling water, broad noise as its roar, and plunges lower at its foot.",
+ "kind": "ambience",
+ "dur": 8,
+ "layers": [
+  {"sound": "stream/brook", "dur": 8, "pitch": -4, "gain": 0},
+  {"sound": "faucet/run", "pitch": -9, "gain": -5, "fade_in": 0.4, "fade_out": 0.6, "events": {"count": 3, "gap": 2.6}},
+  {"source": "noise", "color": "pink", "dur": 8, "lowpass": 5000, "highpass": 250, "gain": -10},
+  {"sound": "splash/plunge", "pitch": -5, "at": 0.8, "gain": -14, "events": {"count": 4, "gap": 1.8, "loose": 0.8}}
+ ]
+}

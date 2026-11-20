@@ -1,0 +1,10 @@
+{
+ "name": "basketball",
+ "says": "a basketball dribbled on a court",
+ "things": ["basketball", "basketball bouncing", "dribbling a basketball", "basketball dribble"],
+ "built": "A ball bouncing lower, six times at a dribble's pace, as the basketball on the court, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "ball/bounce", "pitch": -4, "gain": 0, "events": {"count": 6, "gap": 0.5, "loose": 0.05}}
+ ]
+}

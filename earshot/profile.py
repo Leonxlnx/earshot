@@ -56,7 +56,7 @@ from .report import emit, error_line
 from .video import diff_events, frame_diff
 
 VERSION = 2
-AUDIO_V = 'a3'
+AUDIO_V = 'a4'  # digital silence counts simultaneous silence across all channels
 PROFILE_PATH = os.path.join(config.DATA_DIR, 'launch_profile.json')
 AST_WIN = 5.0
 MUSIC_P = 0.3

@@ -1,0 +1,14 @@
+{
+ "name": "ice_cracking",
+ "says": "ice cracking on a frozen lake",
+ "things": ["ice cracking on a lake", "lake ice cracking", "frozen lake cracking", "ice cracking lake"],
+ "sketch": true,
+ "built": "Ice cracking far lower, more cracks lower still that follow and slow, a twig snapping lower as the split, a crack of thunder thinned as the run across the ice, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "ice/crack", "pitch": -9, "gain": 0},
+  {"sound": "ice/crack", "seed": 1, "pitch": -14, "at": 0.35, "gain": -3, "events": {"count": 3, "gap": 0.5, "faster": 1.4, "softer": -3, "loose": 0.6}},
+  {"sound": "twigs/snap", "pitch": -7, "at": 0.1, "gain": -6},
+  {"sound": "thunder/crack", "pitch": 2, "cut": [0, 1.4], "decay": 0.8, "at": 0.05, "gain": -12, "lowpass": 1500, "highpass": 150}
+ ]
+}

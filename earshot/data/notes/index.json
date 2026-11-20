@@ -1,0 +1,1982 @@
+[
+ {
+  "instrument": "marimba",
+  "says": "a rosewood concert marimba struck with yarn mallets, soft and medium strokes",
+  "dynamics": {
+   "soft": 0.5,
+   "med": 0.9
+  },
+  "notes": [
+   {
+    "file": "marimba/marimba-48-med-1.npz",
+    "midi": 48,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.0063,
+    "cents": 1.9,
+    "gain_db": 40.15,
+    "tilt": -1.28,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_C2_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_C2_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_C2_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-48-soft-1.npz",
+    "midi": 48,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.005,
+    "cents": 1.9,
+    "gain_db": 54.9,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_C2_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_C2_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_C2_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-55-med-1.npz",
+    "midi": 55,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.0063,
+    "cents": -0.2,
+    "gain_db": 50.84,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_G2_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_G2_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_G2_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-55-soft-1.npz",
+    "midi": 55,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.148,
+    "cents": 0.1,
+    "gain_db": 56.22,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_G2_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_G2_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_G2_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-59-med-1.npz",
+    "midi": 59,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.0053,
+    "cents": 2.7,
+    "gain_db": 47.18,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_B2_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_B2_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_B2_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-59-soft-1.npz",
+    "midi": 59,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.08,
+    "cents": 2.9,
+    "gain_db": 53.52,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_B2_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_B2_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_B2_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-65-med-1.npz",
+    "midi": 65,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.0083,
+    "cents": -0.2,
+    "gain_db": 39.04,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_F3_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_F3_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_F3_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-65-soft-1.npz",
+    "midi": 65,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 3.0,
+    "onset_s": 0.0025,
+    "cents": -0.1,
+    "gain_db": 44.46,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_F3_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_F3_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_F3_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-72-med-1.npz",
+    "midi": 72,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 2.222,
+    "onset_s": 0.0057,
+    "cents": 4.5,
+    "gain_db": 36.33,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_C4_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_C4_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_C4_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-72-soft-1.npz",
+    "midi": 72,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 2.037,
+    "onset_s": 0.0022,
+    "cents": 4.6,
+    "gain_db": 48.49,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_C4_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_C4_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_C4_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-79-med-1.npz",
+    "midi": 79,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 1.277,
+    "onset_s": 0.0055,
+    "cents": -2.3,
+    "gain_db": 39.83,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_G4_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_G4_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_G4_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-79-soft-1.npz",
+    "midi": 79,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 1.257,
+    "onset_s": 0.0032,
+    "cents": -2.3,
+    "gain_db": 49.42,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_G4_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_G4_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_G4_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-83-med-1.npz",
+    "midi": 83,
+    "dynamic": "med",
+    "take": 1,
+    "len_s": 1.106,
+    "onset_s": 0.0032,
+    "cents": 0.1,
+    "gain_db": 36.91,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_B4_med_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_B4_med_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_B4_med_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "marimba/marimba-83-soft-1.npz",
+    "midi": 83,
+    "dynamic": "soft",
+    "take": 1,
+    "len_s": 1.047,
+    "onset_s": 0.0032,
+    "cents": -0.0,
+    "gain_db": 53.7,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "Marimba_hit_Outrigger_B4_soft_01.wav",
+    "credit": {
+     "title": "Marimba_hit_Outrigger_B4_soft_01.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_B4_soft_01.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   }
+  ]
+ },
+ {
+  "instrument": "harp",
+  "says": "a concert harp, a string plucked by a finger, medium and strong",
+  "dynamics": {
+   "mf": 0.5,
+   "f": 0.9
+  },
+  "notes": [
+   {
+    "file": "harp/harp-48-f-2.npz",
+    "midi": 48,
+    "dynamic": "f",
+    "take": 2,
+    "len_s": 4.0,
+    "onset_s": 0.0568,
+    "cents": -1.7,
+    "gain_db": 24.01,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "KSHarp_C3_f2.wav",
+    "credit": {
+     "title": "KSHarp_C3_f2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_C3_f2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-48-mf-3.npz",
+    "midi": 48,
+    "dynamic": "mf",
+    "take": 3,
+    "len_s": 4.0,
+    "onset_s": 0.0022,
+    "cents": -2.6,
+    "gain_db": 35.03,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "KSHarp_C3_mf3.wav",
+    "credit": {
+     "title": "KSHarp_C3_mf3.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_C3_mf3.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-52-f-1.npz",
+    "midi": 52,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0563,
+    "cents": -3.3,
+    "gain_db": 28.54,
+    "tilt": -1.15,
+    "stereo": true,
+    "source": "KSHarp_E3_f1.wav",
+    "credit": {
+     "title": "KSHarp_E3_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_E3_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-52-mf-1.npz",
+    "midi": 52,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0493,
+    "cents": -5.5,
+    "gain_db": 36.07,
+    "tilt": -1.08,
+    "stereo": true,
+    "source": "KSHarp_E3_mf1.wav",
+    "credit": {
+     "title": "KSHarp_E3_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_E3_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-55-f-1.npz",
+    "midi": 55,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.042,
+    "cents": -8.8,
+    "gain_db": 22.76,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_G3_f1.wav",
+    "credit": {
+     "title": "KSHarp_G3_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_G3_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-55-mf-1.npz",
+    "midi": 55,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.065,
+    "cents": -9.6,
+    "gain_db": 30.82,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_G3_mf1.wav",
+    "credit": {
+     "title": "KSHarp_G3_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_G3_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-59-f-1.npz",
+    "midi": 59,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0243,
+    "cents": -11.9,
+    "gain_db": 31.74,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "KSHarp_B3_f1.wav",
+    "credit": {
+     "title": "KSHarp_B3_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_B3_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-59-mf-1.npz",
+    "midi": 59,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.036,
+    "cents": -13.3,
+    "gain_db": 36.93,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "KSHarp_B3_mf1.wav",
+    "credit": {
+     "title": "KSHarp_B3_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_B3_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-62-f-1.npz",
+    "midi": 62,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0192,
+    "cents": -14.7,
+    "gain_db": 21.04,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_D4_f1.wav",
+    "credit": {
+     "title": "KSHarp_D4_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_D4_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-62-mf-1.npz",
+    "midi": 62,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.027,
+    "cents": -12.7,
+    "gain_db": 29.26,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_D4_mf1.wav",
+    "credit": {
+     "title": "KSHarp_D4_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_D4_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-65-f-1.npz",
+    "midi": 65,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0208,
+    "cents": -1.1,
+    "gain_db": 25.93,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "KSHarp_F4_f1.wav",
+    "credit": {
+     "title": "KSHarp_F4_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_F4_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-65-mf-1.npz",
+    "midi": 65,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0147,
+    "cents": -1.2,
+    "gain_db": 31.43,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "KSHarp_F4_mf1.wav",
+    "credit": {
+     "title": "KSHarp_F4_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_F4_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-69-f-1.npz",
+    "midi": 69,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0222,
+    "cents": -7.8,
+    "gain_db": 16.82,
+    "tilt": -2.61,
+    "stereo": true,
+    "source": "KSHarp_A4_f1.wav",
+    "credit": {
+     "title": "KSHarp_A4_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_A4_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-69-mf-1.npz",
+    "midi": 69,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0227,
+    "cents": -8.0,
+    "gain_db": 25.98,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_A4_mf1.wav",
+    "credit": {
+     "title": "KSHarp_A4_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_A4_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-72-f-1.npz",
+    "midi": 72,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.021,
+    "cents": -12.0,
+    "gain_db": 20.13,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_C5_f1.wav",
+    "credit": {
+     "title": "KSHarp_C5_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_C5_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-72-mf-1.npz",
+    "midi": 72,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.021,
+    "cents": -11.3,
+    "gain_db": 29.46,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "KSHarp_C5_mf1.wav",
+    "credit": {
+     "title": "KSHarp_C5_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_C5_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-76-f-1.npz",
+    "midi": 76,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0217,
+    "cents": -11.5,
+    "gain_db": 22.53,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_E5_f1.wav",
+    "credit": {
+     "title": "KSHarp_E5_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_E5_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-76-mf-1.npz",
+    "midi": 76,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0253,
+    "cents": -11.4,
+    "gain_db": 28.42,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_E5_mf1.wav",
+    "credit": {
+     "title": "KSHarp_E5_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_E5_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-79-f-1.npz",
+    "midi": 79,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 3.946,
+    "onset_s": 0.0177,
+    "cents": -6.7,
+    "gain_db": 25.42,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "KSHarp_G5_f1.wav",
+    "credit": {
+     "title": "KSHarp_G5_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_G5_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-79-mf-1.npz",
+    "midi": 79,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 3.999,
+    "onset_s": 0.0232,
+    "cents": -5.7,
+    "gain_db": 31.81,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_G5_mf1.wav",
+    "credit": {
+     "title": "KSHarp_G5_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_G5_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-83-f-1.npz",
+    "midi": 83,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 3.421,
+    "onset_s": 0.0235,
+    "cents": -14.2,
+    "gain_db": 30.55,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_B5_f1.wav",
+    "credit": {
+     "title": "KSHarp_B5_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_B5_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-83-mf-1.npz",
+    "midi": 83,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 2.724,
+    "onset_s": 0.0243,
+    "cents": -8.2,
+    "gain_db": 32.72,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_B5_mf1.wav",
+    "credit": {
+     "title": "KSHarp_B5_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_B5_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-86-f-1.npz",
+    "midi": 86,
+    "dynamic": "f",
+    "take": 1,
+    "len_s": 2.033,
+    "onset_s": 0.046,
+    "cents": -12.4,
+    "gain_db": 24.55,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "KSHarp_D6_f1.wav",
+    "credit": {
+     "title": "KSHarp_D6_f1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_D6_f1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "harp/harp-86-mf-1.npz",
+    "midi": 86,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 2.397,
+    "onset_s": 0.023,
+    "cents": -7.2,
+    "gain_db": 31.42,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "KSHarp_D6_mf1.wav",
+    "credit": {
+     "title": "KSHarp_D6_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://raw.githubusercontent.com/sgossner/VCSL/master/Chordophones/Composite%20Chordophones/Concert%20Harp/KSHarp_D6_mf1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   }
+  ]
+ },
+ {
+  "instrument": "pizzicato",
+  "says": "pizzicato strings: a cello section up to B4, a solo violin above, soft and medium",
+  "dynamics": {
+   "v1": 0.5,
+   "v2": 0.9
+  },
+  "notes": [
+   {
+    "file": "pizzicato/pizzicato-47-v1-1.npz",
+    "midi": 47,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.0032,
+    "cents": -12.8,
+    "gain_db": 32.19,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_B1_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_B1_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B1_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-47-v1-2.npz",
+    "midi": 47,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.136,
+    "cents": -4.7,
+    "gain_db": 33.46,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_B1_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_B1_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B1_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-47-v2-1.npz",
+    "midi": 47,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.11,
+    "cents": -7.5,
+    "gain_db": 30.15,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "pizzT_B1_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_B1_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B1_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-47-v2-2.npz",
+    "midi": 47,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.036,
+    "cents": -8.9,
+    "gain_db": 31.03,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "pizzT_B1_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_B1_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B1_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-50-v1-1.npz",
+    "midi": 50,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.074,
+    "cents": -5.1,
+    "gain_db": 34.67,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_D2_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_D2_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_D2_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-50-v1-2.npz",
+    "midi": 50,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.096,
+    "cents": -4.1,
+    "gain_db": 25.36,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_D2_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_D2_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_D2_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-50-v2-1.npz",
+    "midi": 50,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.068,
+    "cents": -7.1,
+    "gain_db": 8.14,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "pizzT_D2_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_D2_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_D2_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-50-v2-2.npz",
+    "midi": 50,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.072,
+    "cents": 0.7,
+    "gain_db": 15.71,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "pizzT_D2_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_D2_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_D2_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-53-v1-1.npz",
+    "midi": 53,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 1.543,
+    "onset_s": 0.048,
+    "cents": 8.8,
+    "gain_db": 23.93,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "pizzT_F2_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_F2_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_F2_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-53-v1-2.npz",
+    "midi": 53,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 1.654,
+    "onset_s": 0.106,
+    "cents": 6.2,
+    "gain_db": 26.48,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "pizzT_F2_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_F2_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_F2_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-53-v2-1.npz",
+    "midi": 53,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 1.811,
+    "onset_s": 0.0125,
+    "cents": 13.7,
+    "gain_db": 16.34,
+    "tilt": -1.8,
+    "stereo": true,
+    "source": "pizzT_F2_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_F2_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_F2_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-53-v2-2.npz",
+    "midi": 53,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 1.45,
+    "onset_s": 0.008,
+    "cents": 21.4,
+    "gain_db": 17.62,
+    "tilt": -1.62,
+    "stereo": true,
+    "source": "pizzT_F2_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_F2_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_F2_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-57-v1-1.npz",
+    "midi": 57,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.004,
+    "cents": -3.1,
+    "gain_db": 26.31,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_A2_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_A2_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_A2_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-57-v1-2.npz",
+    "midi": 57,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.0032,
+    "cents": -4.3,
+    "gain_db": 26.96,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_A2_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_A2_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_A2_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-57-v2-1.npz",
+    "midi": 57,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.0063,
+    "cents": -1.5,
+    "gain_db": 21.1,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_A2_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_A2_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_A2_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-57-v2-2.npz",
+    "midi": 57,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.064,
+    "cents": -4.1,
+    "gain_db": 16.89,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_A2_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_A2_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_A2_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-60-v1-1.npz",
+    "midi": 60,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 1.628,
+    "onset_s": 0.084,
+    "cents": 1.5,
+    "gain_db": 27.32,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_C3_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_C3_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_C3_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-60-v1-2.npz",
+    "midi": 60,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 1.8,
+    "onset_s": 0.112,
+    "cents": 2.8,
+    "gain_db": 24.9,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_C3_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_C3_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_C3_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-60-v2-1.npz",
+    "midi": 60,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 1.75,
+    "onset_s": 0.0217,
+    "cents": 2.0,
+    "gain_db": 17.45,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_C3_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_C3_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_C3_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-60-v2-2.npz",
+    "midi": 60,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 1.851,
+    "onset_s": 0.0057,
+    "cents": -0.9,
+    "gain_db": 18.03,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_C3_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_C3_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_C3_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-64-v1-1.npz",
+    "midi": 64,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 1.606,
+    "onset_s": 0.07,
+    "cents": 0.1,
+    "gain_db": 32.42,
+    "tilt": 2.8,
+    "stereo": true,
+    "source": "pizzT_E3_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_E3_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_E3_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-64-v1-2.npz",
+    "midi": 64,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 1.332,
+    "onset_s": 0.046,
+    "cents": -1.3,
+    "gain_db": 23.37,
+    "tilt": 1.03,
+    "stereo": true,
+    "source": "pizzT_E3_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_E3_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_E3_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-64-v2-1.npz",
+    "midi": 64,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 1.343,
+    "onset_s": 0.0063,
+    "cents": 2.9,
+    "gain_db": 18.46,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_E3_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_E3_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_E3_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-64-v2-2.npz",
+    "midi": 64,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 1.324,
+    "onset_s": 0.0063,
+    "cents": 5.1,
+    "gain_db": 16.72,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_E3_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_E3_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_E3_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-67-v1-1.npz",
+    "midi": 67,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.0088,
+    "cents": -1.4,
+    "gain_db": 25.94,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_G3_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_G3_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_G3_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-67-v1-2.npz",
+    "midi": 67,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.0063,
+    "cents": 0.7,
+    "gain_db": 21.05,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_G3_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_G3_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_G3_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-67-v2-1.npz",
+    "midi": 67,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 1.804,
+    "onset_s": 0.04,
+    "cents": 4.5,
+    "gain_db": 20.77,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_G3_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_G3_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_G3_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-67-v2-2.npz",
+    "midi": 67,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.0075,
+    "cents": 5.8,
+    "gain_db": 18.88,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_G3_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_G3_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_G3_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-71-v1-1.npz",
+    "midi": 71,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 1.883,
+    "onset_s": 0.0015,
+    "cents": 0.6,
+    "gain_db": 35.26,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_B3_v1_RR1.wav",
+    "credit": {
+     "title": "pizzT_B3_v1_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B3_v1_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-71-v1-2.npz",
+    "midi": 71,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 0.805,
+    "onset_s": 0.0085,
+    "cents": -2.3,
+    "gain_db": 30.9,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "pizzT_B3_v1_RR2.wav",
+    "credit": {
+     "title": "pizzT_B3_v1_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B3_v1_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-71-v2-1.npz",
+    "midi": 71,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 0.631,
+    "onset_s": 0.007,
+    "cents": 4.2,
+    "gain_db": 28.22,
+    "tilt": 2.62,
+    "stereo": true,
+    "source": "pizzT_B3_v2_RR1.wav",
+    "credit": {
+     "title": "pizzT_B3_v2_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B3_v2_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-71-v2-2.npz",
+    "midi": 71,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 0.829,
+    "onset_s": 0.007,
+    "cents": 5.4,
+    "gain_db": 22.13,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "pizzT_B3_v2_RR2.wav",
+    "credit": {
+     "title": "pizzT_B3_v2_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Cello%20Section/pizzT/pizzT_B3_v2_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-72-v1-1.npz",
+    "midi": 72,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 0.402,
+    "onset_s": 0.0037,
+    "cents": -17.4,
+    "gain_db": 34.1,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_C5_p_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_C5_p_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_C5_p_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-76-v1-1.npz",
+    "midi": 76,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 1.532,
+    "onset_s": 0.003,
+    "cents": 3.5,
+    "gain_db": 34.88,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_E5_p_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_E5_p_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_E5_p_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-76-v1-2.npz",
+    "midi": 76,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 1.859,
+    "onset_s": 0.0032,
+    "cents": 3.7,
+    "gain_db": 37.48,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_E5_p_RR2.wav",
+    "credit": {
+     "title": "LLVln_Pizz_E5_p_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_E5_p_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-76-v2-1.npz",
+    "midi": 76,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 2.0,
+    "onset_s": 0.0022,
+    "cents": 4.6,
+    "gain_db": 21.8,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_E5_f_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_E5_f_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_E5_f_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-76-v2-2.npz",
+    "midi": 76,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 2.0,
+    "onset_s": 0.0022,
+    "cents": 5.0,
+    "gain_db": 22.25,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_E5_f_RR2.wav",
+    "credit": {
+     "title": "LLVln_Pizz_E5_f_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_E5_f_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-79-v1-1.npz",
+    "midi": 79,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 0.614,
+    "onset_s": 0.0022,
+    "cents": 1.1,
+    "gain_db": 31.21,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_G5_p_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_G5_p_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_G5_p_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-79-v1-2.npz",
+    "midi": 79,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 0.651,
+    "onset_s": 0.0027,
+    "cents": -1.3,
+    "gain_db": 31.76,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_G5_p_RR2.wav",
+    "credit": {
+     "title": "LLVln_Pizz_G5_p_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_G5_p_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-79-v2-1.npz",
+    "midi": 79,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 0.772,
+    "onset_s": 0.0025,
+    "cents": 3.0,
+    "gain_db": 18.64,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_G5_f_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_G5_f_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_G5_f_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-79-v2-2.npz",
+    "midi": 79,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 0.833,
+    "onset_s": 0.003,
+    "cents": 5.3,
+    "gain_db": 18.16,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_G5_f_RR2.wav",
+    "credit": {
+     "title": "LLVln_Pizz_G5_f_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_G5_f_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-81-v1-1.npz",
+    "midi": 81,
+    "dynamic": "v1",
+    "take": 1,
+    "len_s": 0.908,
+    "onset_s": 0.0022,
+    "cents": -6.7,
+    "gain_db": 36.65,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_A5_p_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_A5_p_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_A5_p_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-81-v1-2.npz",
+    "midi": 81,
+    "dynamic": "v1",
+    "take": 2,
+    "len_s": 0.923,
+    "onset_s": 0.0022,
+    "cents": -5.8,
+    "gain_db": 37.61,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_A5_p_RR2.wav",
+    "credit": {
+     "title": "LLVln_Pizz_A5_p_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_A5_p_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-81-v2-1.npz",
+    "midi": 81,
+    "dynamic": "v2",
+    "take": 1,
+    "len_s": 0.998,
+    "onset_s": 0.002,
+    "cents": -6.7,
+    "gain_db": 17.49,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_A5_f_RR1.wav",
+    "credit": {
+     "title": "LLVln_Pizz_A5_f_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_A5_f_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "pizzicato/pizzicato-81-v2-2.npz",
+    "midi": 81,
+    "dynamic": "v2",
+    "take": 2,
+    "len_s": 0.897,
+    "onset_s": 0.0025,
+    "cents": -8.9,
+    "gain_db": 15.89,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "LLVln_Pizz_A5_f_RR2.wav",
+    "credit": {
+     "title": "LLVln_Pizz_A5_f_RR2.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/Solo%20Violin/Pizz/LLVln_Pizz_A5_f_RR2.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   }
+  ]
+ },
+ {
+  "instrument": "upright_piano",
+  "says": "an upright piano played softly and at medium strength, close-miked",
+  "dynamics": {
+   "pp": 0.15,
+   "mf": 0.5
+  },
+  "notes": [
+   {
+    "file": "upright_piano/upright-piano-48-mf-1.npz",
+    "midi": 48,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0045,
+    "cents": -5.6,
+    "gain_db": 18.46,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "UR1_C3_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_C3_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C3_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-48-pp-1.npz",
+    "midi": 48,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.036,
+    "cents": -8.4,
+    "gain_db": 37.58,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "UR1_C3_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_C3_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C3_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-55-mf-1.npz",
+    "midi": 55,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.007,
+    "cents": -3.6,
+    "gain_db": 21.61,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "UR1_G3_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_G3_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_G3_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-55-pp-1.npz",
+    "midi": 55,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.002,
+    "cents": -5.5,
+    "gain_db": 43.67,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "UR1_G3_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_G3_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_G3_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-60-mf-1.npz",
+    "midi": 60,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0035,
+    "cents": -2.3,
+    "gain_db": 16.05,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "UR1_C4_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_C4_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C4_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-60-pp-1.npz",
+    "midi": 60,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0032,
+    "cents": -2.6,
+    "gain_db": 34.7,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "UR1_C4_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_C4_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C4_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-67-mf-1.npz",
+    "midi": 67,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0025,
+    "cents": -3.1,
+    "gain_db": 14.96,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "UR1_G4_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_G4_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_G4_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-67-pp-1.npz",
+    "midi": 67,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0003,
+    "cents": -2.6,
+    "gain_db": 33.7,
+    "tilt": -3.0,
+    "stereo": true,
+    "source": "UR1_G4_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_G4_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_G4_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-72-mf-1.npz",
+    "midi": 72,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0097,
+    "cents": -1.4,
+    "gain_db": 16.93,
+    "tilt": -2.5,
+    "stereo": true,
+    "source": "UR1_C5_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_C5_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C5_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-72-pp-1.npz",
+    "midi": 72,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0132,
+    "cents": -1.3,
+    "gain_db": 37.35,
+    "tilt": 0.0,
+    "stereo": true,
+    "source": "UR1_C5_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_C5_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C5_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-79-mf-1.npz",
+    "midi": 79,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.003,
+    "cents": 2.3,
+    "gain_db": 18.69,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "UR1_G5_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_G5_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_G5_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-79-pp-1.npz",
+    "midi": 79,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0,
+    "cents": 0.4,
+    "gain_db": 39.03,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "UR1_G5_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_G5_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_G5_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-84-mf-1.npz",
+    "midi": 84,
+    "dynamic": "mf",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0025,
+    "cents": 5.6,
+    "gain_db": 17.37,
+    "tilt": 3.0,
+    "stereo": true,
+    "source": "UR1_C6_mf_RR1.wav",
+    "credit": {
+     "title": "UR1_C6_mf_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C6_mf_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   },
+   {
+    "file": "upright_piano/upright-piano-84-pp-1.npz",
+    "midi": 84,
+    "dynamic": "pp",
+    "take": 1,
+    "len_s": 4.0,
+    "onset_s": 0.0005,
+    "cents": 5.8,
+    "gain_db": 37.63,
+    "tilt": 2.2,
+    "stereo": true,
+    "source": "UR1_C6_pp_RR1.wav",
+    "credit": {
+     "title": "UR1_C6_pp_RR1.wav",
+     "author": "Versilian Studios / Sam Gossner, Ivy Audio / Simon Dalzell (VSCO-2 Community Edition, github.com/sgossner/VSCO-2-CE)",
+     "page": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Keys/Upright%20Nr1/UR1_C6_pp_RR1.wav",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+   }
+  ]
+ }
+]

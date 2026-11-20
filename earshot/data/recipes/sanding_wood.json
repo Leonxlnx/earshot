@@ -1,0 +1,9 @@
+{
+ "name": "sanding_wood",
+ "says": "sanding wood by hand",
+ "things": ["sanding wood", "sandpaper", "sanding a board", "sanding a plank"],
+ "built": "A broom sweeping higher and shorter, back and forth five times, as the sandpaper on the board.",
+ "layers": [
+  {"sound": "broom/sweep", "pitch": 3, "cut": [0, 0.5], "fade_in": 0.05, "decay": 0.12, "gain": 0, "events": {"count": 5, "gap": 0.48, "loose": 0.1}}
+ ]
+}

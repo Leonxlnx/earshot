@@ -1,0 +1,11 @@
+{
+ "name": "zombie_groan",
+ "says": "a zombie groaning",
+ "things": ["zombie groan", "zombie groaning", "zombie moan", "zombie"],
+ "built": "A person's yawn far lower and rough as the groan, a snore lower inside it, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "yawn/person", "pitch": -8, "gain": 0, "lowpass": 3000},
+  {"sound": "snore/person", "pitch": -6, "cut": [0, 2.4], "decay": 0.5, "gain": -6}
+ ]
+}

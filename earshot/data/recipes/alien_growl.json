@@ -1,0 +1,11 @@
+{
+ "name": "alien_growl",
+ "says": "an alien creature growling",
+ "things": ["alien creature growl", "alien growl", "alien creature", "alien screech"],
+ "built": "A cat's hiss far lower, a lion's roar higher inside it, a pig's grunt lower as the wet throat.",
+ "layers": [
+  {"sound": "cat/hiss", "pitch": -7, "gain": -4},
+  {"sound": "lion/roar", "pitch": 3, "at": 0.1, "gain": 0, "lowpass": 5000},
+  {"sound": "pig/oink", "pitch": -5, "at": 0.3, "gain": -8}
+ ]
+}

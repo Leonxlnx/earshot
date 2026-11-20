@@ -15,6 +15,7 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 
 import numpy as np
 
@@ -55,13 +56,24 @@ def frame_diff(path, cache=True):
                         f'scale={FRAME_W}:{FRAME_H}:flags=area,format=gray', '-f', 'rawvideo', '-'], capture_output=True)
     if p.returncode != 0 or not p.stdout:
         raise audio.AudioError(f'cannot decode the picture of {path}: {p.stderr.decode(errors="replace")[:200]}')
-    fr = np.frombuffer(p.stdout, np.uint8)
-    fr = fr[: len(fr) // (FRAME_W * FRAME_H) * FRAME_W * FRAME_H].reshape(-1, FRAME_H, FRAME_W).astype(np.float32)
-    d = np.concatenate([[0.0], np.abs(np.diff(fr, axis=0)).mean(axis=(1, 2)) / 255]).astype(np.float32)
+    d = _frame_differences(p.stdout)
     tmp = f + f'.{os.getpid()}.tmp.npz'
     np.savez(tmp, fps=fps, d=d)
     audio.replace_quietly(tmp, f)
     return float(fps), d
+
+
+def _frame_differences(raw):
+    """Mean differences of complete raw grey frames, with bounded float32 intermediates."""
+    fr = np.frombuffer(raw, np.uint8)
+    fr = fr[: len(fr) // (FRAME_W * FRAME_H) * FRAME_W * FRAME_H].reshape(-1, FRAME_H, FRAME_W)
+    # Retain the original single zero even when a nonempty decode has no complete frame.
+    d = np.zeros(max(1, len(fr)), np.float32)
+    for start in range(1, len(fr), 256):
+        stop = min(start + 256, len(fr))
+        block = fr[start - 1:stop].astype(np.float32)
+        d[start:stop] = np.abs(np.diff(block, axis=0)).mean(axis=(1, 2)) / 255
+    return d
 
 
 def diff_events(d, fps, ratio=4.0, floor=0.012, big=0.15, gap=0.12):
@@ -92,7 +104,11 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
     k = hashlib.sha1(f'{audio.file_id(path)}|{threshold}|{min_gap}|v2'.encode()).hexdigest()[:20]
     f = _cache(f'cuts_{k}.json')
     if cache and os.path.exists(f):
-        return json.load(open(f))
+        try:
+            with open(f) as saved:
+                return json.load(saved)
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            pass  # a missing, unreadable or interrupted cache is not a failed scan
     p = subprocess.run(['ffmpeg', '-hide_banner', '-nostdin', '-i', path, '-an', '-vf',
                         f"scale=320:-2,select='gt(scene,{threshold})',showinfo", '-f', 'null', '-'],
                        capture_output=True, text=True, errors='replace')
@@ -103,7 +119,21 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
     for t in ts:
         if not out or t - out[-1] >= min_gap:
             out.append(round(t, 3))
-    json.dump(out, open(f, 'w'))
+    tmp = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', dir=os.path.dirname(f),
+                                         prefix=os.path.basename(f) + '.', suffix='.tmp', delete=False) as saved:
+            tmp = saved.name
+            json.dump(out, saved)
+        audio.replace_quietly(tmp, f)
+    except OSError:
+        pass  # caching is optional; the scan itself succeeded
+    finally:
+        if tmp is not None:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
     return out
 
 

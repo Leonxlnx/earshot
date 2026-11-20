@@ -1,0 +1,13 @@
+{
+ "name": "sword_on_shield",
+ "says": "a sword hitting a shield",
+ "things": ["sword hitting a shield", "sword on shield", "sword hits shield", "sword shield"],
+ "built": "A sword cutting the air, then a clash of swords on a hollow knock lower as the wooden shield, a saucepan struck lower and dull as its metal boss, and a body punch as the weight.",
+ "layers": [
+  {"sound": "sword/swing", "gain": -9, "cut": [0, 0.25]},
+  {"sound": "clash/sword", "at": 0.2, "gain": 0},
+  {"sound": "knock/hollow", "pitch": -7, "at": 0.2, "gain": -3},
+  {"sound": "saucepan/hit", "pitch": -7, "at": 0.2, "gain": -10, "lowpass": 3000, "decay": 0.3},
+  {"sound": "punch/body", "at": 0.2, "gain": -6}
+ ]
+}

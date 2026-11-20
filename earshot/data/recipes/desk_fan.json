@@ -1,0 +1,13 @@
+{
+ "name": "desk_fan",
+ "says": "a desk fan running",
+ "things": ["desk fan", "electric fan", "fan humming", "fan running", "ceiling fan"],
+ "built": "A small switch, then the even middle of a vacuum cleaner far lower and dull as the motor, three times over, and soft air noise as the blades moving the air.",
+ "kind": "ambience",
+ "dur": 8,
+ "layers": [
+  {"sound": "vacuum/cleaner", "pitch": -12, "cut": [1.0, 4.0], "gain": -6, "lowpass": 900, "fade_in": 0.5, "fade_out": 0.5, "events": {"count": 3, "gap": 2.7}},
+  {"source": "noise", "color": "pink", "dur": 8, "lowpass": 2000, "highpass": 250, "gain": 0},
+  {"sound": "switch/small", "gain": -6}
+ ]
+}

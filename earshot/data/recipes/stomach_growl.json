@@ -1,0 +1,10 @@
+{
+ "name": "stomach_growl",
+ "says": "a stomach growling",
+ "things": ["stomach growl", "stomach growling", "stomach rumble", "tummy rumble", "belly rumbling"],
+ "built": "Bubbles blown through a straw far lower and dull as the gurgle, a cat's purr lower as the rumble, close.",
+ "layers": [
+  {"sound": "straw/bubbles", "pitch": -12, "gain": 0, "lowpass": 1200},
+  {"sound": "cat/purr", "pitch": -5, "cut": [0, 1.6], "gain": -6, "lowpass": 1500, "decay": 0.5}
+ ]
+}

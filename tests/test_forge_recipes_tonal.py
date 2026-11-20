@@ -208,6 +208,7 @@ def test_round5_pro_pop_is_a_natural_pop():
     """round 5 (polish-pro; the round-4 judge: CLAP still says '8-bit'): every pro_pop member is the natural chirp
     (c_nat): no drive, no stepped gate; a rounded body with no square-ish (odd) harmonics; the pitch falls fast and
     settles; the level decays exponentially (straight in dB); a tiny air puff; near mono, pro_pop length"""
+    pytest.importorskip('torch')            # needs the listen extra
     _, pop, _ = _mods()
     from earshot.forge import polish
     from earshot.forge.critic import study_measures
@@ -272,6 +273,7 @@ def test_round6_pro_pop_natural_and_varied():
     """round 6 (pop-notify; the round-5 judge: natural but four near-steady tones, variety lost): every member is a
     natural pop (n6: no drive, no stepped gate, soft partials) whose pitch moves through its decay; the family covers
     falling and rising pitches, low and high registers and a double pop; the round-5 sets render exactly as before"""
+    pytest.importorskip('torch')            # needs the listen extra
     _, pop, _ = _mods()
     from earshot.forge import polish
     from earshot.forge.critic import study_measures

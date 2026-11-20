@@ -1,0 +1,13 @@
+{
+ "name": "catapult",
+ "says": "a catapult released",
+ "things": ["catapult launching", "catapult", "trebuchet", "catapult firing"],
+ "sketch": true,
+ "built": "A door's creak lower, cut short, as the rope straining, a slapstick's crack far lower as the arm hitting its stop, a heavy whoosh as the stone flying off, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "door/creak", "pitch": -7, "cut": [0, 1.0], "decay": 0.3, "gain": -4},
+  {"sound": "slapstick/crack", "pitch": -9, "at": 0.9, "gain": 0},
+  {"sound": "whoosh/heavy", "pitch": -3, "at": 0.95, "gain": -3}
+ ]
+}

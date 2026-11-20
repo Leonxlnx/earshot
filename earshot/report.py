@@ -72,6 +72,15 @@ def emit(result, args, text=None):
     return result
 
 
+def read_json(path):
+    """a JSON file that a person or an agent wrote, in the encodings their tools use: UTF-8, UTF-8 with a byte order
+    mark (Windows PowerShell 5.1's `Out-File -Encoding utf8` and `Set-Content -Encoding UTF8`, Notepad) and UTF-16
+    (PowerShell 5.1's `>`). json.load on a UTF-8 text file refuses the first ("Unexpected UTF-8 BOM") and cannot
+    decode the second; json.loads on the bytes detects all three. Bad JSON raises ValueError, as json.load does"""
+    with open(path, 'rb') as fh:
+        return json.loads(fh.read())
+
+
 def error_line(cmd, msg):
     """the one-line error every command prints on stderr: 'earshot <cmd>: error: <msg>'"""
     msg = ' '.join(str(msg).split()) or 'unknown error'

@@ -1,0 +1,10 @@
+{
+ "name": "robot_arm",
+ "says": "a robot arm moving, its servos whirring",
+ "things": ["robot arm moving", "robot arm", "servo motor", "servo whirring", "robotic arm"],
+ "built": "Half a second of an electric drill higher, rising as it runs, three times as the servos, a dumbbell set down higher as the arm stopping.",
+ "layers": [
+  {"sound": "drill/electric", "pitch": 5, "glide": 9, "cut": [0.3, 0.8], "gain": 0, "events": {"count": 3, "gap": 0.55}},
+  {"sound": "dumbbell/place", "pitch": 5, "at": 1.65, "gain": -8}
+ ]
+}

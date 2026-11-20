@@ -1,0 +1,12 @@
+{
+ "name": "clockwork",
+ "says": "a clockwork mechanism turning",
+ "things": ["clockwork gears turning", "clockwork", "gears turning", "clockwork mechanism"],
+ "sketch": true,
+ "built": "A mechanical clock ticking, a zip tie pulled far lower three times as the ratchet, a chain rattled softly as the gears.",
+ "layers": [
+  {"sound": "clock/ticktock", "gain": 0},
+  {"sound": "zip_tie/pull", "pitch": -7, "gain": -8, "events": {"count": 3, "gap": 1.0}},
+  {"sound": "chain/rattle", "pitch": -3, "gain": -14}
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "name": "vampire_hiss",
+ "says": "a vampire hissing",
+ "things": ["vampire hiss", "vampire hissing", "vampire"],
+ "sketch": true,
+ "built": "A cat's hiss a little lower, the start of a sigh lower as the breath behind it, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "cat/hiss", "pitch": -3, "gain": 0},
+  {"sound": "sigh/person", "pitch": -5, "cut": [0, 0.8], "decay": 0.3, "gain": -6}
+ ]
+}

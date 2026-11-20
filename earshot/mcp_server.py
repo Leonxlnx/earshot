@@ -35,6 +35,7 @@ import inspect
 import io
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -65,7 +66,12 @@ needs models takes ~20-60 s; later calls are fast (models stay loaded)."""
 
 INSTRUCTIONS += """
 Sounds for a film (no models, fast): sfx_list (the shipped bank) -> sfx_render (one take aimed at a cue: dur, apex,
-pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take)."""
+pitch) or kit_render (a film's kit.json -> takes + kit.lock.json with measured onset / peak / end per take).
+To get a sound, ask for it: make (a request in words -> one finished file; interface, game, everyday, motion, drum,
+instrument and ambience sounds, each computed at request time: the realistic ones from models learned from
+public-domain recordings, shipped as numbers, the rest written as code), make_set (a whole product's sounds as one
+family, one call), sounds (the catalogue). When the answer says "earshot makes no X", build it from the catalogue's
+parts with make's `recipe`. No models are loaded for these."""
 
 IMG_INLINE_MAX = 1600        # px, long edge of the inline copy (sent as JPEG q88: ~1/3 of the PNG bytes)
 JSON_MAX = 7000
@@ -94,6 +100,7 @@ def _field_types():
                                                'keyboard key press" (describe the sound itself, not its use)')],
         Video=Annotated[str | None, Field(description='optional path to the film (mp4/mov) for picture cuts and '
                                                       'frames')],
+        SetName=Annotated[str | None, Field(description=set_help())],
         Cues=Annotated[list[float] | str | None, Field(description='optional picture event times: a list of seconds, '
                                                                    '"1.2,3.4", or an absolute path to a cues JSON '
                                                                    'file ({fps, events: [{f or t, kind}]})')])
@@ -135,6 +142,9 @@ def _api(name):
     try:
         return api._fn(name)
     except Exception as e:  # noqa: BLE001
+        from .extras import plain
+        if plain(e, name):
+            raise ToolFailure(_failure(name, e)) from None
         mod = api._FUNCS.get(name, (name, name))[0]
         if importlib.util.find_spec(f'earshot.{mod}') is None:
             present = [k for k in (f.__name__[5:] for f, _, _ in TOOLS)
@@ -199,9 +209,20 @@ def _format(r, full=False, ignored=()):
         head = ''
     if len(body) > TEXT_MAX and not full:
         body = body[:TEXT_MAX] + f'\n... (text cut at {TEXT_MAX} characters; full=true gives all of it)'
-    js = json.dumps(_clean(r), ensure_ascii=False) if full else compact(r)
     note = f'(this earshot version ignored: {", ".join(ignored)})' if ignored else ''
+    if r.get('brief') and not full:      # the text is the whole answer (make, sounds): no JSON unless asked for
+        return '\n\n'.join(x for x in (head, body, note) if x)
+    js = json.dumps(_clean(r), ensure_ascii=False) if full else compact(r)
     return '\n\n'.join(x for x in (head, body, note, ('JSON: ' if full else 'JSON (compact): ') + js) if x)
+
+
+def _failure(name, e):
+    """the one plain line of a failed call: the install command when a missing extra caused it, else the error's
+    type and message"""
+    from .extras import plain
+    said = plain(e, name)
+    return (said if said.startswith('earshot ') else f'{name}: {said}') if said else \
+        f'{name} failed: {type(e).__name__}: {e}'
 
 
 def _result(name, kw, fn=None):
@@ -209,11 +230,13 @@ def _result(name, kw, fn=None):
     with _LOCK, contextlib.redirect_stdout(sys.stderr):
         fn = fn or _api(name)
         try:
+            from .extras import check
+            check(name)         # a tool whose extra is missing says so before it starts
             r, ignored = _call(fn, kw)
         except ToolFailure:
             raise
         except Exception as e:  # noqa: BLE001
-            raise ToolFailure(f'{name} failed: {type(e).__name__}: {e}') from None
+            raise ToolFailure(_failure(name, e)) from None
     return (r if isinstance(r, dict) else {'summary': str(r)}), ignored
 
 
@@ -607,6 +630,241 @@ def tool_kit_render(kit: Annotated[str, Field(description="absolute path of the 
 TOOLS += [(tool_sfx_list, True, False), (tool_sfx_render, False, False), (tool_kit_render, False, False)]
 
 
+# ------------------------------------------------------------------------- sounds made from words (no models)
+def _summary_only(fn):
+    def run(**kw):
+        r = fn(**{k: v for k, v in kw.items() if v is not None})
+        r['summary'] = _BUILD_OFFER.sub(r'\1call the tool build with want="\2" (and parts: what it is made of)',
+                                        r['summary'])
+        r.update(text=r['summary'], brief=True)
+        return r
+    return run
+
+
+# the line of make's answer that offers a build: over MCP it names the tool, not the shell command
+_BUILD_OFFER = re.compile(r'^(or let earshot draft, hear and tune it: )earshot build "(.*)"$', re.M)
+
+
+def tool_make(want: Annotated[str, Field(description='the sound in words: what it is or the job it plays, how it '
+                                                     'should feel, what it is made of, e.g. "a soft wooden success '
+                                                     'chime for a finance app, 400 ms, in D" or "coin pickup, '
+                                                     'bright, 8-bit"')],
+              out: Annotated[str, Field(description='absolute path of the file to write; the extension picks the '
+                                                    'format (wav, flac, ogg, mp3, m4a, webm)')],
+              sound: Annotated[str | None, Field(description='a design id from `sounds` to use instead of ranking '
+                                                             'the words, e.g. "success/rise"')] = None,
+              n: Annotated[int, Field(description='how many takes (file_1 .. file_n): variations for a sound a '
+                                                  'game repeats', ge=1, le=12)] = 1,
+              theme: Annotated[str | None, Field(description='a theme preset so several calls sound like one '
+                                                             'product: soft, glass, wood, felt, tine, metal, '
+                                                             'electric, digital, retro')] = None,
+              pitch: Annotated[str | None, Field(description='a note ("C5") or Hz for a tonal sound')] = None,
+              dur: Annotated[float | None, Field(description='seconds, up to 120: how long a figure of notes sounds '
+                                                             '(damped '
+                                                             'by the hand to end there; it rings no longer than it '
+                                                             'rings), the hold of a pad, the length of an ambience '
+                                                             '(shorter than its shortest loop: a cut, not a loop, '
+                                                             'unless the request says "loop") or a whoosh; a music '
+                                                             'loop keeps whole bars; a single struck sound (a tap, a '
+                                                             'hit) rings as it rings: it ignores dur and says so',
+                                                 gt=0)] = None,
+              voice: Annotated[str | None, Field(description='the instrument or patch of a tonal sound: "marimba" '
+                                                             '(the default of figures), "harp", "pizzicato" and '
+                                                             '"felt_piano" are real instruments learned note by '
+                                                             'note; "kalimba", "glockenspiel", "soft_pluck" ... '
+                                                             'are models')] = None,
+              material: Annotated[str | None, Field(description='what a tap, click or knock is made of, e.g. '
+                                                                '"wood", "glass", "metal", "plastic"; on a tonal '
+                                                                'sound it picks the voice (wood: a marimba)')] = None,
+              loop: Annotated[bool | None, Field(description='false: an ambience or other loop once, with a fade '
+                                                             'in and out, instead of a seamless loop')] = None,
+              events: Annotated[int | None, Field(description='for a thing a person does several times in a row '
+                                                              '(footsteps, knocking, typing): 1 = one event, 2 or '
+                                                              'more = the action with that many events; by default '
+                                                              'the words decide ("footsteps", "three knocks" are '
+                                                              'the action, "a footstep" one event); any one-shot '
+                                                              'plays as a row of that many in one file', ge=1)] = None,
+              seed: Annotated[int, Field(description='another take of the same sound')] = 0,
+              listen: Annotated[bool, Field(description="also rank the whole catalogue by how each design sounds "
+                                                        "like the request (CLAP against earshot's sound atlas), "
+                                                        "blended into the choice of words, and report what the "
+                                                        "written sound is heard as (loads the model: 20-40 s the "
+                                                        "first time, then it stays warm)")] = False,
+              recipe: Annotated[dict | str | None, Field(description='instead of ranking the words: a sound you '
+                                                                     'build from the catalogue\'s parts, as an '
+                                                                     'object (or the name of a cookbook recipe), '
+                                                                     'e.g. {"name": "dragon_roar", "says": "a dragon '
+                                                                     'roaring", "layers": [{"sound": "lion/roar", '
+                                                                     '"pitch": -7}, {"source": "noise", "dur": 2.5, '
+                                                                     '"lowpass": [70, 160], "gain": -14, "swell": '
+                                                                     '0.6}], "space": "hall"}. A layer is "sound" '
+                                                                     '(a design id from `sounds`) or "source" '
+                                                                     '("noise" with dur and color, "sine" with dur '
+                                                                     'and hz 20-150), with seed, dur, pitch '
+                                                                     '(semitones -24..12, lower is slower), glide, '
+                                                                     'reverse, cut [from, to], halt, lowpass / '
+                                                                     'highpass (Hz or [from, to]), pan, gain (dB), at '
+                                                                     '(s), fade_in, fade_out, swell, decay, the '
+                                                                     'design\'s axes (-1..1), events {"count", "gap", '
+                                                                     '"faster", "softer", "loose"}, follow '
+                                                                     '{"layer", "amount", "smooth"}, scatter {"rate", '
+                                                                     '"rate_to", "dur", "pitch", "gain", "pan", '
+                                                                     '"grain"} (many at random moments: rain from '
+                                                                     'drops), stretch, level [[s, dB], ...], bend '
+                                                                     '[[s, semitones], ...], pass {"at", "speed"}, '
+                                                                     'spin {"rate", "depth", "shape"}; a layer may '
+                                                                     'be "recipe": a cookbook name; the whole takes '
+                                                                     'name, says, layers, '
+                                                                     'dur, space (dry, booth, room, studio, hall, '
+                                                                     'plate, cathedral), kind (event, ambience). '
+                                                                     '`want` then says what the sound is')] = None,
+              full: Full = False) -> str:
+    """Make a sound from a request in words and write it to a file (no models, about a second; nothing is
+    downloaded). Every sound is computed at request time: the realistic ones (everyday things, footsteps, doors,
+    keys and switches, animals, interface sounds, motion effects, ambiences, drums) are rendered from models learned
+    from public-domain recordings, shipped as numbers, no audio file; tonal figures, chip sound and the music loops
+    are written in code. Covers interface sounds (taps, toggles, success, error, notifications: things a hand does,
+    no instrument), game sounds (coins, jumps, hits, fanfares, 8-bit), everyday foley, motion-design effects as
+    motion videos use them (short dry hits under a title or a logo, thumps, ticks, whooshes and risers of air),
+    drums, instrument notes and ambience loops. An interface or motion request gets no notes unless its words ask
+    for music (an instrument, a chime, a jingle, a melody) or a game sound. Name the thing, the job or the sound
+    first; what follows "on" or "in" is its surface or place ("rain on wood"). A learned design's seeds walk through
+    its recordings, the fullest clean one first, so `n` gives different real takes ("recording 2 of 3" says which).
+    A thing a person does in a row is played as that action when the words ask for it ("footsteps on gravel",
+    "knocking", "typing") and as one event otherwise ("a footstep"); `events` sets it. A counted action ("four
+    knocks on the table") is one file of that many events, and a length or a gap asked with it ("three knocks, 2
+    seconds", "200 ms apart") is kept; a count of separate things ("five coin pickups", "3 variations") is that
+    many files. The answer's first line gives the design, its length, where its loudest moment is ("peak at"), its
+    loudness and "clean" or what the check found; then what else would fit (`also`) and any words that were not
+    followed or not understood. Every request gets a file: when the catalogue lacks the thing, the answer says
+    "earshot makes no X; Y is only the nearest sound it has" and offers three starting points. Then build it from
+    parts with `recipe`: say what physically makes the sound, find two to four real parts with `sounds`, layer them
+    (a recording moved in pitch, reversed, filtered, repeated as events; noise only for air and rumble), render,
+    read the result line and change one thing at a time. A cookbook recipe answers some requests on its own (a car
+    crash, a werewolf howl) and says what it is built from; a recording of the thing answers first. earshot does
+    not pan and makes no speech or singing. Use it whenever a product, a game or a film needs a sound and no
+    recording is at hand; use make_set when it needs several that belong together. Everything made is free to use
+    in any product."""
+    from . import make as M
+    return _run('make', dict(want=want, out=_out_path(out, 'out'), sound=sound, n=n, theme=theme, pitch=pitch,
+                             dur=dur, voice=voice, material=material, loop=loop, events=events, seed=seed,
+                             listen=listen, recipe=recipe), full, _summary_only(M.make))
+
+
+def set_help():
+    """the description of make_set's `set`, with each set's size counted from earshot.sounds.sets"""
+    from .sounds import sets
+    n = {k: len(v['sounds']) for k, v in sets.SETS.items()}
+    return (f'a ready-made set: "ui" ({n["ui"]} interface sounds, each a normal thing a hand does: a key, a page, '
+            f'a drawer, knocks, a camera shutter; with a theme: tonal figures in its voice), "game" ({n["game"]}: '
+            f'menus, rewards, jingles, actions), "arcade" ({n["arcade"]} chip sounds), "film" ({n["film"]}: a '
+            f'motion-design starter)')
+
+
+def tool_make_set(out: Annotated[str, Field(description='absolute path of the folder for the files and '
+                                                        'manifest.json')],
+                  set: SetName = None,
+                  sounds: Annotated[list[dict] | None, Field(description='your own sounds, or changes to the set: '
+                                                                         '[{"name": "tap", "want": "a soft tap"}, '
+                                                                         '{"name": "success", "sound": '
+                                                                         '"success/triad", "dur": 0.5}]; fields: '
+                                                                         'name, want, sound, pitch, dur, voice, '
+                                                                         'material, seed, n, axes, lufs, events, '
+                                                                         'loop; or name and recipe (a sound built '
+                                                                         'from parts, as in make)')] = None,
+                  theme: Annotated[str | None, Field(description='one voice, key and room for the whole set: soft, '
+                                                                 'glass, wood, felt, tine, metal, electric, '
+                                                                 'digital, retro')] = None,
+                  format: Annotated[str, Field(description='wav, ogg (Vorbis), webm (Opus), m4a (AAC), mp3 or flac; '
+                                                           'several with commas, e.g. "webm,mp3": every sound in '
+                                                           'each, a browser plays the first it can. Loops: not mp3 '
+                                                           'or m4a (a gap at the seam)')] = 'wav',
+                  sprite: Annotated[str | None, Field(description='also pack the set into one file with a howler-'
+                                                                  'style map, e.g. "sprite.webm"')] = None,
+                  full: Full = False) -> str:
+    """Make a whole set of sounds in one call, as one family (no models): the same voice, key and room for every
+    tonal sound, every one-shot as loud as it is made alone and within 2.5 dB of the others, loops and beds
+    levelled by kind, a manifest.json with every file, and optionally one sprite file with a map for the web. Your
+    own `sounds` add to a ready-made set, or without `set` they are the whole list (the handful of sounds a landing
+    page or a scene needs). Use it for a product's interface, a game's sound effects or a film's kit instead of
+    many single `make` calls."""
+    from . import make as M
+    if not (set or sounds):
+        raise ToolFailure('give a ready-made `set` (ui, game, arcade, film) and / or your own `sounds`')
+    spec = {k: v for k, v in dict(set=set, sounds=sounds).items() if v}
+    return _run('make_set', dict(spec=spec, out=_out_path(out, 'out'), theme=theme, fmt=format, sprite=sprite),
+                full, _summary_only(M.make_set))
+
+
+def tool_sounds(search: Annotated[str | None, Field(description='words to rank the catalogue by, as `make` would, '
+                                                                'e.g. "notification" or "explosion"')] = None,
+                domain: Annotated[str | None, Field(description='ui, game, motion, ambience or music')] = None,
+                family: Annotated[str | None, Field(description='one family, e.g. "success", "whoosh_fast", '
+                                                                '"note"')] = None,
+                full: Full = False) -> str:
+    """List the sounds `make` can make (no models, instant): id, usual length and what each sounds like. Filter with
+    search, domain or family: the whole catalogue is several hundred lines. Use it to see what exists before naming
+    a `sound` in make or make_set; a plain request in words to make does not need it."""
+    from . import make as M
+    if not (search or domain or family):
+        def fams():
+            r = M.sounds()
+            by = {}
+            for x in r['sounds']:
+                by.setdefault(x['id'].split('/')[0], []).append(x['id'].split('/')[1])
+            r['text'] = f"{len(r['sounds'])} sounds in {len(by)} families (search, domain or family lists them): " \
+                + '; '.join(f"{f}: {', '.join(m[:6])}{' ...' if len(m) > 6 else ''}" for f, m in by.items())
+            return r
+        return _run('sounds', {}, full, lambda: (lambda r: dict(r, summary=r['text'], brief=True))(fams()))
+    return _run('sounds', dict(search=search, domain=domain, family=family), full, _summary_only(M.sounds))
+
+
+def tool_build(want: Annotated[str, Field(description='the sound in words: the thing, what it does, on what, where, '
+                                                      'how many, how long, e.g. "hail on a tin roof" or "a whale '
+                                                      'singing"')],
+               out: Annotated[str, Field(description='absolute path of the file to write; the recipe is written '
+                                                     'beside it as <name>.recipe.json')],
+               recipe: Annotated[dict | str | None, Field(description='your own recipe instead of a draft (an '
+                                                                      'object as `make` takes it, the path of a '
+                                                                      'JSON file such as the .recipe.json a build '
+                                                                      'wrote, or a cookbook name): rendered and '
+                                                                      'heard; tuned only when rounds is given')]
+               = None,
+               rounds: Annotated[int | None, Field(description='tuning rounds, a render and a hearing each (default '
+                                                               '20; 0: no tuning)', ge=0, le=200)] = None,
+               without: Annotated[list[str] | None, Field(description='design ids ("rain/tin_roof") or families '
+                                                                      '("rain") the build must not use')] = None,
+               seed: Annotated[int, Field(description='the seed of the takes and of the tuning search')] = 0,
+               parts: Annotated[list[str] | None, Field(description='what the sound is made of, one plain phrase a '
+                                                                    'part: the thing and how many, when, how long, '
+                                                                    'how it moves, its pitch, distance and force '
+                                                                    '("hundreds of hoofbeats on dirt, for 6 s, getting '
+                                                                    'louder", "a low rumble under everything", "a '
+                                                                    'horse neighing, twice, far"; sound=<id> names '
+                                                                    'the design): each is grounded in a recording '
+                                                                    'and becomes a layer')] = None,
+               full: Full = False) -> str:
+    """Build a sound the catalogue lacks from its recorded parts, with earshot as the ears: it drafts one to three
+    recipes from the words (a structure by the kind of sound: one event, a row, very many small events, something
+    that runs, passes, a creature's voice, something made up, a place; the parts are the recorded designs nearest
+    the words, never an instrument or a synth), renders them, hears them, tunes the numbers of the best in a seeded
+    search and writes the sound and its recipe. The answer says what it is built from, what it is heard as, its fit
+    to the words as a z beside the design `make` would hand over ("sounds like it" when clean, z >= 3 and 1 over
+    it; else "a sketch"), whether it is heard as recorded, and what is still off, each with the recipe field to
+    change. Name the parts yourself with `parts` (what physically makes the sound, a phrase each): earshot finds a
+    recording for each, writes its layer and says which design each became and why, and which words it did not
+    understand. Then edit the recipe and call build again with `recipe`. Without the listen extra it drafts, renders,
+    audits and measures, and says so. Use it when make answers "earshot makes no X", or for any sound the catalogue
+    has nothing of; it takes a model load and about a minute on a laptop CPU."""
+    from . import build as B
+    return _run('build', dict(words=want, out=_out_path(out, 'out'), recipe=recipe, rounds=rounds, without=without,
+                              seed=seed, parts=parts), full, _summary_only(B.build))
+
+
+TOOLS += [(tool_make, False, False), (tool_make_set, False, False), (tool_sounds, True, False),
+          (tool_build, False, False)]
+
+
 def _sdk():
     try:
         from mcp.server.mcpserver import Image, MCPServer as Server
@@ -676,7 +934,8 @@ def warm():
                     vocab.get()
                 print(f'earshot mcp: models warm ({time.time() - t:.0f} s)', file=sys.stderr)
             except Exception as e:  # noqa: BLE001
-                print(f'earshot mcp: warm-up failed: {type(e).__name__}: {e}', file=sys.stderr)
+                from .extras import plain
+                print(f'earshot mcp: warm-up failed: {plain(e) or f"{type(e).__name__}: {e}"}', file=sys.stderr)
     threading.Thread(target=load, daemon=True).start()
 
 
@@ -694,7 +953,9 @@ def serve(args):
     try:
         srv = build()
     except ImportError as e:
-        print(f'earshot mcp needs the MCP SDK: pip install "earshot[mcp]" ({e})', file=sys.stderr)
+        from .extras import plain
+        said = plain(e) or f'needs the MCP SDK: pip install "earshot[mcp]" ({e})'
+        print(f'earshot mcp: {said}', file=sys.stderr)
         return 1
     if args.warm:
         warm()

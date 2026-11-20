@@ -1,0 +1,12 @@
+{
+ "name": "slot_machine",
+ "says": "a slot machine: the lever, the reels and coins paying out",
+ "things": ["slot machine", "one-armed bandit", "fruit machine"],
+ "built": "A latch lower as the lever, three dial clicks lower as the reels stopping, then a handful of coins and coins falling in a cup as the payout.",
+ "layers": [
+  {"sound": "lock/latch", "pitch": -4, "gain": -2},
+  {"sound": "dial/click", "pitch": -5, "at": 0.4, "gain": -3, "events": {"count": 3, "gap": 0.45}},
+  {"sound": "coins/handful", "at": 1.8, "gain": 0},
+  {"sound": "coin/cup", "at": 1.95, "gain": 0, "events": {"count": 14, "gap": 0.09, "loose": 0.7}}
+ ]
+}

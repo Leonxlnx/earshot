@@ -1,0 +1,13 @@
+{
+ "name": "rocket_launch",
+ "says": "a rocket launching",
+ "things": ["rocket launch", "rocket launching", "rocket taking off", "rocket liftoff"],
+ "sketch": true,
+ "built": "A recorded rocket launch with a gas burner igniting before it as the ignition, low rumble under it.",
+ "dur": 7.5,
+ "layers": [
+  {"sound": "gas_stove/ignite", "gain": -8},
+  {"sound": "rocket/launch", "seed": 2, "at": 0.3, "gain": 0},
+  {"source": "noise", "color": "brown", "dur": 6.5, "at": 0.3, "lowpass": [90, 240], "gain": -14, "swell": 1.0, "decay": 3.0}
+ ]
+}

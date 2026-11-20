@@ -1,0 +1,12 @@
+{
+ "name": "werewolf_howl",
+ "says": "a werewolf howling",
+ "things": ["werewolf howl", "werewolf howling", "werewolf"],
+ "built": "A lion's roar lower as the snarl it starts from, a wolf howl lower out of it and a second take lower still inside, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "lion/roar", "pitch": -4, "cut": [0, 1.2], "decay": 0.4, "gain": -3},
+  {"sound": "wolf/howl", "pitch": -4, "at": 0.6, "gain": 0},
+  {"sound": "wolf/howl", "seed": 1, "pitch": -8, "at": 0.65, "gain": -7, "lowpass": 2500}
+ ]
+}

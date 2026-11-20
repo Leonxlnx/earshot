@@ -1,0 +1,13 @@
+{
+ "name": "spaceship_landing",
+ "says": "a spaceship coming down and landing",
+ "things": ["spaceship landing", "spacecraft landing", "spaceship touching down"],
+ "sketch": true,
+ "built": "A big swelling whoosh lower as the descent, a vacuum cleaner far lower running down as the engines, a spray can far lower as the thrusters, a heavy landing lower.",
+ "layers": [
+  {"sound": "whoosh_big/swell", "pitch": -5, "gain": -2},
+  {"sound": "spray_can/spray", "pitch": -7, "at": 1.4, "gain": -2, "cut": [0, 1.4], "decay": 0.8},
+  {"sound": "land/heavy", "pitch": -7, "at": 1.6, "gain": 0},
+  {"sound": "vacuum/cleaner", "pitch": -14, "lowpass": 900, "halt": 1.5, "at": 0.4, "gain": -8}
+ ]
+}

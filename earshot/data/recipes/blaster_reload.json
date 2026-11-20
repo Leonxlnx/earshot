@@ -1,0 +1,10 @@
+{
+ "name": "blaster_reload",
+ "says": "a sci-fi blaster reloaded and charging",
+ "things": ["blaster reloading", "blaster reload", "sci-fi gun reload", "laser gun reload"],
+ "built": "A gun reloaded a little lower, then half a second of an electric drill higher and rising as the cell charging.",
+ "layers": [
+  {"sound": "gun/reload", "pitch": -2, "gain": 0},
+  {"sound": "drill/electric", "pitch": 7, "glide": 12, "cut": [0.3, 0.9], "at": 0.6, "gain": -8}
+ ]
+}

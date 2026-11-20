@@ -1,0 +1,13 @@
+{
+ "name": "spaceship_door",
+ "says": "a spaceship door sliding open",
+ "things": ["spaceship door", "sci-fi door", "starship door", "spaceship door opening"],
+ "built": "A spray can's hiss as the air, an electric drill far lower running down as the motor, a sliding door, and a latch lower as the stop.",
+ "space": "studio",
+ "layers": [
+  {"sound": "spray_can/spray", "gain": -9, "highpass": 800, "cut": [0, 0.5]},
+  {"sound": "drill/electric", "pitch": -9, "cut": [0.5, 1.3], "at": 0.15, "gain": -7, "lowpass": 3000, "fade_in": 0.1, "halt": 0.7},
+  {"sound": "door/slide", "at": 0.15, "gain": -2},
+  {"sound": "lock/latch", "pitch": -5, "at": 1.25, "gain": -3}
+ ]
+}

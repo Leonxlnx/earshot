@@ -1,0 +1,11 @@
+{
+ "name": "dog_growl",
+ "says": "a dog growling",
+ "things": ["dog growl", "dog growling", "growling dog", "angry dog growl"],
+ "built": "A cat's purr far lower and rough as the growl, a lion's roar much higher and soft inside it, ending on a short bark.",
+ "layers": [
+  {"sound": "cat/purr", "pitch": -7, "cut": [0, 2.0], "decay": 0.3, "gain": 0, "lowpass": 2500},
+  {"sound": "lion/roar", "pitch": 5, "cut": [0, 1.8], "decay": 0.4, "gain": -8},
+  {"sound": "dog/bark", "pitch": -2, "at": 2.0, "gain": -3}
+ ]
+}

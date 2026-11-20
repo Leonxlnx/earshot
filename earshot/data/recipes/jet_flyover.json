@@ -1,0 +1,13 @@
+{
+ "name": "jet_flyover",
+ "says": "a jet flying overhead",
+ "things": ["jet flying over", "jet flyover", "jet overhead", "plane flying over"],
+ "sketch": true,
+ "built": "A gale a little lower and an earthquake's rumble passing overhead at 75 m/s, so their pitch falls as they go over, with a jet's pass inside them.",
+ "dur": 9,
+ "layers": [
+  {"sound": "wind/gale", "dur": 10, "pitch": -3, "pass": {"at": 4.5, "speed": 75}},
+  {"sound": "rumble/quake", "dur": 10, "gain": -5, "pass": {"at": 4.5, "speed": 75}},
+  {"sound": "pass/jet", "gain": -6, "at": 2.5}
+ ]
+}

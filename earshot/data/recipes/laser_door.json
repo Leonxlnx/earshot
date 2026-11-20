@@ -1,0 +1,11 @@
+{
+ "name": "laser_door",
+ "says": "a laser door switching off and sliding open",
+ "things": ["laser door", "laser gate", "laser barrier"],
+ "built": "A fly's buzz far lower as the beams, water sizzling as they cut out, a sliding door opening.",
+ "layers": [
+  {"sound": "fly/buzz", "pitch": -8, "cut": [0, 1.2], "decay": 0.3, "gain": -2},
+  {"sound": "water/sizzle", "highpass": 2500, "at": 1.0, "gain": -8},
+  {"sound": "door/slide", "at": 1.1, "gain": 0}
+ ]
+}

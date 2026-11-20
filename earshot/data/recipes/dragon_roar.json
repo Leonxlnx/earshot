@@ -1,0 +1,14 @@
+{
+ "name": "dragon_roar",
+ "says": "a dragon roaring",
+ "things": ["dragon roar", "dragon roaring", "dragon growl"],
+ "sketch": true,
+ "built": "A lion's roar a fourth lower as the voice, a horse's neigh an octave lower inside it, a burst of flame as its breath, low rumble under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "lion/roar", "pitch": -5, "gain": 0},
+  {"sound": "horse/neigh", "pitch": -12, "at": 0.1, "gain": -9, "lowpass": 3500},
+  {"sound": "fire/whoosh", "pitch": -5, "at": 0.5, "gain": -10},
+  {"source": "noise", "color": "brown", "dur": 3.5, "lowpass": [70, 150], "gain": -18, "swell": 0.6, "decay": 1.5}
+ ]
+}

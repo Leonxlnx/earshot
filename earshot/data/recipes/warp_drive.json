@@ -1,0 +1,12 @@
+{
+ "name": "warp_drive",
+ "says": "a warp drive charging up",
+ "things": ["warp drive", "warp drive charging", "warp drive charging up", "hyperdrive", "hyperdrive charging"],
+ "built": "A vacuum cleaner far lower that swells as the drive's motor, a rush of air that rises over it, a spaceship's engine room under it, and a jet passing as the jump.",
+ "layers": [
+  {"sound": "vacuum/cleaner", "pitch": -10, "gain": 0, "swell": 3.0, "lowpass": [600, 5000]},
+  {"sound": "swell/air", "pitch": -3, "at": 1.2, "gain": -4},
+  {"sound": "space_hum/ship", "dur": 4.5, "gain": -10, "swell": 2.0},
+  {"sound": "pass/jet", "pitch": -3, "cut": [2.0, 5.0], "at": 3.6, "gain": -2, "fade_in": 0.05}
+ ]
+}

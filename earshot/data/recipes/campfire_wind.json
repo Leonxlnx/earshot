@@ -1,0 +1,14 @@
+{
+ "name": "campfire_wind",
+ "says": "a campfire in the wind",
+ "things": ["campfire wind", "windy campfire", "campfire in the wind", "fire in the wind"],
+ "built": "A campfire, wind in trees that comes up, a gust of noise that opens and closes, and twigs snapping in the fire.",
+ "kind": "ambience",
+ "dur": 8,
+ "layers": [
+  {"sound": "fire/camp", "dur": 8, "gain": 0},
+  {"sound": "wind/trees", "dur": 8, "gain": -5, "swell": 2.0},
+  {"source": "noise", "color": "pink", "dur": 6, "at": 1.0, "lowpass": [500, 1400], "highpass": 150, "gain": -16, "swell": 2.5, "decay": 3},
+  {"sound": "twigs/snap", "cut": [0, 0.5], "decay": 0.15, "at": 0.7, "gain": -10, "events": {"count": 5, "gap": 1.4, "loose": 0.9}}
+ ]
+}

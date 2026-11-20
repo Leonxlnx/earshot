@@ -1,0 +1,12 @@
+{
+ "name": "dragon_wings",
+ "says": "a dragon's wings beating",
+ "things": ["dragon wings flapping", "dragon wings", "dragon's wings", "dragon wing beat"],
+ "sketch": true,
+ "built": "A bird's wings flapping far lower and a big cape whoosh lower, four beats, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "wings/flap", "pitch": -7, "gain": 0, "events": {"count": 4, "gap": 0.7}},
+  {"sound": "whoosh_big/cape", "pitch": -5, "gain": -4, "events": {"count": 4, "gap": 0.7}}
+ ]
+}

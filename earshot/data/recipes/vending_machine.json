@@ -1,0 +1,12 @@
+{
+ "name": "vending_machine",
+ "says": "a vending machine dropping a can",
+ "things": ["vending machine", "vending machine dropping a can", "soda machine", "drink machine"],
+ "sketch": true,
+ "built": "A button pressed, an electric drill far lower as the motor turning the spiral, a can dropping into the tray.",
+ "layers": [
+  {"sound": "switch/panel", "gain": -6},
+  {"sound": "drill/electric", "pitch": -8, "cut": [0.2, 1.4], "at": 0.3, "gain": -10, "lowpass": 2500, "fade_in": 0.1, "fade_out": 0.1},
+  {"sound": "can/drop", "at": 1.5, "gain": 0}
+ ]
+}

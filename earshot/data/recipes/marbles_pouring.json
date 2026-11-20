@@ -1,0 +1,11 @@
+{
+ "name": "marbles_pouring",
+ "says": "marbles pouring onto a table",
+ "things": ["marbles pouring", "marbles spilling", "pouring marbles", "spilled marbles"],
+ "built": "Taps on glass scattered thick at first and thinning out, each a little higher or lower, with dice rolling among them.",
+ "dur": 3.5,
+ "layers": [
+  {"sound": "glass/tap", "scatter": {"rate": 90, "rate_to": 8, "dur": 2.6, "pitch": 5, "gain": 12, "pan": 0.5}},
+  {"sound": "dice/roll", "scatter": {"rate": 12, "rate_to": 2, "dur": 2.6, "pitch": 3, "gain": 8, "pan": 0.5}, "gain": -6}
+ ]
+}

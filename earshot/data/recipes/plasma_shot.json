@@ -1,0 +1,11 @@
+{
+ "name": "plasma_shot",
+ "says": "a plasma gun shot",
+ "things": ["plasma shot", "plasma gun", "plasma blast", "plasma cannon"],
+ "built": "The first 0.6 s of a burst of flame higher as the charge leaving, a small explosion far higher as the shot, water sizzling higher as the hot tail.",
+ "layers": [
+  {"sound": "fire/whoosh", "pitch": 5, "cut": [0, 0.6], "decay": 0.3, "gain": -2},
+  {"sound": "explosion/small", "pitch": 7, "gain": 0},
+  {"sound": "water/sizzle", "pitch": 5, "at": 0.08, "gain": -6, "decay": 0.4}
+ ]
+}

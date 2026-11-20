@@ -329,6 +329,7 @@ def test_pinned_ids_are_never_read_as_folders(cache, tmp_path, monkeypatch):
 def test_local_folder_embedding_caches_stay_inside_the_cache_root(cache, tmp_path, monkeypatch):
     """a folder path (with a drive letter on Windows) must become one path component, or os.path.join would leave
     EMB_CACHE; new weights in the same folder get a fresh cache. The pinned models keep their old names"""
+    pytest.importorskip('torch')            # needs the listen extra
     from earshot import vocab
     from earshot.forge import critic
     d = model_folder(tmp_path / 'clap ft')
@@ -388,6 +389,7 @@ def test_doctor_reports_revisions_and_cache_state(cache):
 
 
 def test_doctor_names_the_offline_flag_when_models_are_missing(cache, monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     monkeypatch.setenv('TRANSFORMERS_OFFLINE', '1')
     r = doctor.check()
     assert r['offline'] == 'TRANSFORMERS_OFFLINE' and r['models_cached'] == {CLAP_ID: False, AST_ID: False}
@@ -395,6 +397,7 @@ def test_doctor_names_the_offline_flag_when_models_are_missing(cache, monkeypatc
 
 
 def test_doctor_load_reports_instead_of_failing(cache, monkeypatch):
+    pytest.importorskip('torch')            # needs the listen extra
     monkeypatch.setenv('EARSHOT_OFFLINE', '1')
     monkeypatch.setattr(doctor, '_load', lambda r: pytest.fail('loaded a model that is not cached while offline'))
     r = doctor.check(load=True)
@@ -446,3 +449,16 @@ def test_cached_models_load_without_network(tmp_path):
     assert not any('load failed' in x for x in r['problems']), r['problems']
     assert (r['clap_revision'], r['ast_revision']) == (s[0].sha, s[1].sha)
     assert (r['clap_weights'], r['ast_weights']) == (s[0].weights, s[1].weights)
+
+
+def test_a_download_is_announced_in_one_line_and_a_cached_model_is_not(cache, downloads, capsys, monkeypatch):
+    hub.ensure(CLAP_ID)
+    err = capsys.readouterr().err.strip().splitlines()
+    assert len(err) == 1 and f'downloading the listening model {CLAP_ID}@16c8cc3 (about 776 MB, once)' in err[0]
+    assert config.HF_CACHE in err[0] and '`earshot doctor --fetch` downloads the models ahead of time' in err[0]
+    hub.ensure(CLAP_ID)
+    assert capsys.readouterr().err == '' and len(downloads.calls) == 1
+    monkeypatch.setenv('EARSHOT_OFFLINE', '1')          # offline: its own error, no announcement
+    with pytest.raises(RuntimeError):
+        hub.ensure(AST_ID)
+    assert 'downloading' not in capsys.readouterr().err

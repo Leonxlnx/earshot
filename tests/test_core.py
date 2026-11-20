@@ -9,6 +9,8 @@ import sys
 import numpy as np
 import pytest
 
+pytest.importorskip('torch')            # these tests exercise the listening side: skipped without the listen extra
+pytest.importorskip('transformers')
 from earshot import audio, cli, critique, features, profile, report, search, sheet
 
 SR = 48000
@@ -220,7 +222,8 @@ def test_critique_flags_windows_at_the_window_threshold():
 
 # ------------------------------------------------------------------------------------------------- version
 def test_one_version_everywhere():
-    """the package, pyproject and the newest changelog entry name one version"""
+    """the package, pyproject, the Claude Code plugin and the newest changelog entry name one version"""
+    import json
     import re
 
     import earshot
@@ -229,4 +232,6 @@ def test_one_version_everywhere():
         pyproject = re.search(r'^version = "([^"]+)"', fh.read(), re.M).group(1)
     with open(os.path.join(root, 'CHANGELOG.md'), encoding='utf-8') as fh:
         top = re.search(r'^## (\S+)', fh.read(), re.M).group(1)
-    assert earshot.__version__ == pyproject == top == '0.4.1'
+    with open(os.path.join(root, '.claude-plugin', 'plugin.json'), encoding='utf-8') as fh:
+        plugin = json.load(fh)['version']
+    assert earshot.__version__ == pyproject == top == plugin == '1.0.0'

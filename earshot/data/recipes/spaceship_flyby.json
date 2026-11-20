@@ -1,0 +1,11 @@
+{
+ "name": "spaceship_flyby",
+ "says": "a spaceship flying past",
+ "things": ["spaceship flying past", "spaceship flyby", "spaceship passing", "spaceship flying by", "starship flying past", "ufo flying past"],
+ "built": "A jet passing lower as the ship, a fly-by lower still inside it, and a spaceship's engine room that swells and falls with it.",
+ "layers": [
+  {"sound": "pass/jet", "pitch": -4, "gain": 0},
+  {"sound": "pass/flyby", "pitch": -7, "gain": -5},
+  {"sound": "space_hum/ship", "dur": 5.0, "gain": -10, "swell": 2.0, "decay": 2.5}
+ ]
+}

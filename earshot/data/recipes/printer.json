@@ -1,0 +1,11 @@
+{
+ "name": "printer",
+ "says": "a printer printing a page",
+ "things": ["printer printing", "printer", "printing a page", "inkjet printer"],
+ "built": "An electric drill far higher and quiet as the print head's motor, going back and forth six times with ballpoint strokes, a page turned as the sheet sliding out.",
+ "layers": [
+  {"sound": "drill/electric", "pitch": 10, "cut": [0.3, 0.6], "gain": -6, "lowpass": 5000, "fade_in": 0.03, "events": {"count": 6, "gap": 0.42}},
+  {"sound": "pen/ballpoint", "pitch": -3, "gain": -10, "events": {"count": 6, "gap": 0.42}},
+  {"sound": "page/turn", "at": 2.6, "gain": 0}
+ ]
+}

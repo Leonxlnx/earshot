@@ -158,8 +158,8 @@ Each item is small and keeps the synthesized path as the default.
    export, marking skipped keys `variant: "silent"`, so a recordings design sounds exactly the keys score.py would.
 3. **`av-audit.py`:** when `engine` is `real`, read `out/qa/cues_sounded.json` and skip the score.py typing replay.
 4. **`references/sound.md`:** a §1b "Real recordings" pointing at real-sound, and a "real palette" column in the
-   personality table (calm: felt piano, soft wood; fast: tight drum hits, metal latches; bright: marimba, claps, cork
-   pops; precise: sparse piano, glass; raw: switches, latches; warm: plucked strings, soft taps).
+   personality table (calm: soft wood, cloth; fast: tight drum hits, metal latches; bright: claps, cork
+   pops, ticks; precise: clicks, glass taps; raw: switches, latches; warm: soft taps, paper; no instrument notes).
 5. **`assets/critics/sound-sync.md`:** with `engine: real`, replace "Never propose stock or sampled sounds" by
    "propose recordings from the manifests or a new sourcing need; never synthesized sounds", and read `qa.json` and
    the earshot transcript / scorecard.

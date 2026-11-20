@@ -1,0 +1,10 @@
+{
+ "name": "heartbeat_faster",
+ "says": "a heartbeat getting faster",
+ "things": ["heartbeat getting faster", "heartbeat speeding up", "heartbeat faster", "racing heartbeat"],
+ "sketch": true,
+ "built": "The first beat of a heart twelve times, each gap a little shorter than the one before.",
+ "layers": [
+  {"sound": "heart/beat", "cut": [0, 0.75], "decay": 0.15, "gain": 0, "events": {"count": 12, "gap": 0.9, "faster": 0.92}}
+ ]
+}

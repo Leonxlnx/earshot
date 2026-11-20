@@ -1,0 +1,12 @@
+{
+ "name": "punch_whoosh",
+ "says": "a whoosh and then a punch landing",
+ "things": ["punch with a whoosh", "whoosh and punch", "whoosh before a punch", "punch whoosh"],
+ "sketch": true,
+ "built": "A stick through the air and a rustle of cloth as the arm, then a punch on a body.",
+ "layers": [
+  {"sound": "whoosh/stick", "gain": -4},
+  {"sound": "cloth/rustle", "gain": -13, "cut": [0, 0.3]},
+  {"sound": "punch/body", "at": 0.22, "gain": 0}
+ ]
+}

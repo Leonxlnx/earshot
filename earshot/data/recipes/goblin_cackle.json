@@ -1,0 +1,10 @@
+{
+ "name": "goblin_cackle",
+ "says": "a goblin cackling",
+ "things": ["goblin cackle", "goblin cackling", "goblin laughing", "goblin laugh"],
+ "built": "A person laughing higher and quicker as the goblin's cackle, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "laugh/person", "pitch": 4, "cut": [0, 2.2], "decay": 0.4, "gain": 0}
+ ]
+}

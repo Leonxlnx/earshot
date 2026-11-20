@@ -1,0 +1,12 @@
+{
+ "name": "door_slam_hall",
+ "says": "a door slammed in a big hall",
+ "things": ["echoing door slam", "door slam echoing", "door slam hall", "door slammed in a big hall", "door slam cathedral"],
+ "built": "A door slamming and its latch, a heavy boom far under it as the weight, in a cathedral.",
+ "space": "cathedral",
+ "layers": [
+  {"sound": "door/slam", "gain": 0},
+  {"sound": "lock/latch", "at": 0.05, "gain": -10},
+  {"sound": "boom/heavy", "pitch": -3, "at": 0.01, "gain": -15, "lowpass": 250}
+ ]
+}

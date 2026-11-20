@@ -1,0 +1,13 @@
+{
+ "name": "lightning_spell",
+ "says": "a lightning spell striking",
+ "things": ["lightning spell", "lightning bolt spell", "casting lightning", "lightning magic"],
+ "sketch": true,
+ "built": "A fly's buzz lower swelling as the charge, two seconds of a close thunder clap as the bolt, water sizzling higher as the arc.",
+ "space": "hall",
+ "layers": [
+  {"sound": "fly/buzz", "pitch": -6, "cut": [0, 0.7], "gain": -8, "swell": 0.5},
+  {"sound": "thunder/crack", "cut": [0, 2.0], "decay": 1.2, "at": 0.65, "gain": 0},
+  {"sound": "water/sizzle", "pitch": 5, "highpass": 2000, "at": 0.65, "gain": -4, "decay": 0.6}
+ ]
+}

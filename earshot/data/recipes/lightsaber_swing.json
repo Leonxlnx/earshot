@@ -1,0 +1,13 @@
+{
+ "name": "lightsaber_swing",
+ "says": "a lightsaber swinging",
+ "things": ["lightsaber", "lightsaber swing", "light saber", "laser sword"],
+ "built": "A fly's buzz far lower as the electric hum, a low tone gliding up under it, and a sword and a spun rope cutting the air as the swing.",
+ "dur": 1.7,
+ "layers": [
+  {"sound": "fly/buzz", "pitch": -17, "cut": [0.6, 2.0], "gain": -5, "lowpass": 2500, "fade_in": 0.08, "fade_out": 0.3},
+  {"source": "sine", "hz": 92, "to": 120, "dur": 1.3, "gain": -12, "swell": 0.25, "decay": 0.6},
+  {"sound": "sword/swing", "pitch": -4, "at": 0.3, "gain": 0},
+  {"sound": "whoosh/spin", "pitch": -3, "at": 0.25, "gain": -7}
+ ]
+}

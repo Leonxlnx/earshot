@@ -1,0 +1,14 @@
+{
+ "name": "typewriter_return",
+ "says": "a typewriter: a few keys and the carriage return",
+ "things": ["typewriter carriage return", "carriage return", "typewriter return"],
+ "sketch": true,
+ "built": "Seven typewriter keys, then a cable tie pulled lower as the carriage ratcheting back, a wooden drawer as its slide, a lower key as the stop and three keys more.",
+ "layers": [
+  {"sound": "typewriter/key", "gain": 0, "events": {"count": 7, "gap": 0.13, "loose": 0.4}},
+  {"sound": "zip_tie/pull", "pitch": -3, "at": 1.0, "gain": -2},
+  {"sound": "drawer/wood", "pitch": 2, "cut": [0, 0.6], "at": 1.0, "gain": -9, "decay": 0.2},
+  {"sound": "typewriter/key", "seed": 3, "pitch": -4, "at": 1.85, "gain": 0},
+  {"sound": "typewriter/key", "seed": 5, "at": 2.3, "gain": -2, "events": {"count": 3, "gap": 0.14, "loose": 0.4}}
+ ]
+}

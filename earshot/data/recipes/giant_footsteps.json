@@ -1,0 +1,12 @@
+{
+ "name": "giant_footsteps",
+ "says": "the footsteps of a giant",
+ "things": ["giant's footsteps", "giant footsteps", "giant walking", "giant steps"],
+ "built": "A hard step on concrete an octave lower and a heavy thing dropped on a floor lower, four times, each with the ground rumbling a moment, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "step/concrete", "pitch": -12, "gain": 0, "events": {"count": 4, "gap": 1.1}},
+  {"sound": "heavy_drop/floor", "pitch": -7, "at": 0.01, "gain": -3, "events": {"count": 4, "gap": 1.1}},
+  {"sound": "rumble/quake", "pitch": -3, "cut": [0, 0.9], "decay": 0.6, "at": 0.03, "gain": -10, "events": {"count": 4, "gap": 1.1}}
+ ]
+}

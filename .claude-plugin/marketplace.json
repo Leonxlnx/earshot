@@ -1,0 +1,15 @@
+{
+  "name": "earshot",
+  "description": "earshot for Claude Code: the earshot and real-sound skills, the earshot MCP server and two commands.",
+  "owner": {
+    "name": "Leon Lin",
+    "url": "https://github.com/Leonxlnx"
+  },
+  "plugins": [
+    {
+      "name": "earshot",
+      "source": "./",
+      "description": "Make sound effects from a request in words: interface sounds, everyday foley, ambience, game, film and motion sounds and drums, computed when asked (the realistic ones learned from public-domain recordings, no audio shipped), and build what the catalogue lacks from its parts. Listen to sound an agent cannot hear: describe, match, measure and critique it."
+    }
+  ]
+}

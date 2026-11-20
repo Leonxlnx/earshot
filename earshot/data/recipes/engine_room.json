@@ -1,0 +1,14 @@
+{
+ "name": "engine_room",
+ "says": "the engine room of a starship",
+ "things": ["starship engine room", "engine room on a starship", "starship engine"],
+ "built": "A vacuum cleaner and a blender far lower and dull as the drives, a spray can lower as steam let off twice, a chain rattled far lower as the machinery.",
+ "kind": "ambience",
+ "dur": 8,
+ "layers": [
+  {"sound": "vacuum/cleaner", "pitch": -18, "lowpass": 500, "gain": 0, "fade_in": 0.5, "fade_out": 0.5, "events": {"count": 2, "gap": 3.6}},
+  {"sound": "blender/run", "pitch": -18, "lowpass": 700, "gain": -6},
+  {"sound": "spray_can/spray", "pitch": -6, "at": 3.0, "gain": -14, "events": {"count": 2, "gap": 3.0}},
+  {"sound": "chain/rattle", "pitch": -12, "gain": -18, "events": {"count": 3, "gap": 2.4, "loose": 0.5}}
+ ]
+}

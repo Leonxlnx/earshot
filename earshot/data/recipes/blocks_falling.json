@@ -1,0 +1,12 @@
+{
+ "name": "blocks_falling",
+ "says": "a tower of wooden toy blocks falling over",
+ "things": ["toy blocks falling", "building blocks falling", "tower of blocks falling", "wooden blocks falling"],
+ "built": "Knocks on wood and wooden ticks scattered thick at first and thinning out as the tower comes down, a wooden thing landing among them, in a room.",
+ "space": "room",
+ "layers": [
+  {"sound": "knock/wood", "scatter": {"rate": 45, "rate_to": 3, "dur": 1.4, "pitch": 5, "gain": 12, "pan": 0.6}},
+  {"sound": "tick/wood", "scatter": {"rate": 30, "rate_to": 2, "dur": 1.6, "pitch": 4, "gain": 10, "pan": 0.6}, "gain": -4, "at": 0.05},
+  {"sound": "land/wood", "pitch": 5, "gain": -6, "at": 0.1}
+ ]
+}

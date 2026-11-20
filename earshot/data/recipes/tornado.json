@@ -1,0 +1,13 @@
+{
+ "name": "tornado",
+ "says": "a tornado roaring",
+ "things": ["tornado", "twister", "tornado passing"],
+ "built": "A gale a little lower that swells as it nears, an earthquake's rumble surging slowly, and mountain wind far lower surging faster and faster.",
+ "kind": "ambience",
+ "dur": 9,
+ "layers": [
+  {"sound": "wind/gale", "dur": 9.5, "pitch": -4, "level": [[0, -14], [4, 0], [9.5, -4]]},
+  {"sound": "rumble/quake", "dur": 9.5, "gain": -6, "spin": {"rate": 0.7, "depth": 0.4}},
+  {"sound": "wind/mountain", "dur": 9.5, "pitch": -9, "gain": -8, "spin": {"rate": [0.5, 1.2], "depth": 0.5}}
+ ]
+}

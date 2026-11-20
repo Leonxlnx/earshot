@@ -1,0 +1,11 @@
+{
+ "name": "spaceship_takeoff",
+ "says": "a spaceship powering up and taking off",
+ "things": ["spaceship taking off", "spaceship takeoff", "spacecraft taking off", "spaceship launch"],
+ "built": "A vacuum cleaner far lower and dull winding up as the engines, a rocket launch a little higher as the lift-off, a big jet whoosh lower as it leaves.",
+ "layers": [
+  {"sound": "vacuum/cleaner", "pitch": -14, "glide": -4, "lowpass": 1500, "gain": -4, "swell": 1.0},
+  {"sound": "rocket/launch", "pitch": 3, "at": 1.0, "gain": 0},
+  {"sound": "whoosh_big/jet", "pitch": -3, "at": 2.0, "gain": -4}
+ ]
+}

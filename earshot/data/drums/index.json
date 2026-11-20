@@ -1,0 +1,5212 @@
+[
+ {
+  "id": "kick/soft",
+  "says": [
+   "a soft round kick drum, a bass drum played gently",
+   "a gentle muffled bass drum thump",
+   "a warm low drum thud"
+  ],
+  "uses": [
+   "drum",
+   "kick drum",
+   "logo",
+   "soft impact",
+   "heartbeat",
+   "pulse"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "thud",
+  "dur_s": 0.123,
+  "note": 89.9,
+  "vel": 0.3,
+  "size": 1.0,
+  "room": "booth",
+  "amount": -0.3,
+  "width": 0.3,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "kick-soft-1.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl1_rr1.flac",
+    "source_peak": -23.4,
+    "onset_s": 0.022,
+    "dur_s": 1.2,
+    "end_s": 0.123,
+    "centroid": 743,
+    "stereo": false,
+    "quality": {
+     "span": 7.37,
+     "centroid": 743,
+     "end_db": -131.0,
+     "tail_ms": 1076.6,
+     "start_db": -104.0,
+     "rise_ms": 2.67,
+     "peak": -25.3
+    },
+    "cut": true,
+    "hp": 28.0,
+    "bytes": 4415,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.0
+   },
+   {
+    "file": "kick-soft-2.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl2_rr1.flac",
+    "source_peak": -20.4,
+    "onset_s": 0.024,
+    "dur_s": 1.2,
+    "end_s": 0.124,
+    "centroid": 372,
+    "stereo": false,
+    "quality": {
+     "span": 2.33,
+     "centroid": 372,
+     "end_db": -133.9,
+     "tail_ms": 1076.3,
+     "start_db": -105.9,
+     "rise_ms": 2.56,
+     "peak": -22.3
+    },
+    "cut": true,
+    "hp": 28.0,
+    "bytes": 4374,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.14
+   },
+   {
+    "file": "kick-soft-3.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl4_rr1.flac",
+    "source_peak": -17.1,
+    "onset_s": 0.022,
+    "dur_s": 1.023,
+    "end_s": 0.132,
+    "centroid": 141,
+    "stereo": false,
+    "quality": {
+     "span": 1.68,
+     "centroid": 141,
+     "end_db": -133.4,
+     "tail_ms": 891.5,
+     "start_db": -101.6,
+     "rise_ms": 2.42,
+     "peak": -18.9
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 4146,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.294
+   },
+   {
+    "file": "kick-soft-4.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl6_rr1.flac",
+    "source_peak": -13.1,
+    "onset_s": 0.024,
+    "dur_s": 0.771,
+    "end_s": 0.103,
+    "centroid": 71,
+    "stereo": false,
+    "quality": {
+     "span": 2.42,
+     "centroid": 71,
+     "end_db": -123.1,
+     "tail_ms": 668.0,
+     "start_db": -109.3,
+     "rise_ms": 2.42,
+     "peak": -14.9
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 4143,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl6_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.481
+   },
+   {
+    "file": "kick-soft-5.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl8_rr1.flac",
+    "source_peak": -9.2,
+    "onset_s": 0.0018,
+    "dur_s": 0.93,
+    "end_s": 0.159,
+    "centroid": 50,
+    "stereo": false,
+    "quality": {
+     "span": 1.75,
+     "centroid": 50,
+     "end_db": -131.6,
+     "tail_ms": 771.1,
+     "start_db": -122.2,
+     "rise_ms": 2.48,
+     "peak": -11.3
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 5236,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl8_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.664
+   },
+   {
+    "file": "kick-soft-6.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl9_rr1.flac",
+    "source_peak": -8.0,
+    "onset_s": 0.0018,
+    "dur_s": 0.742,
+    "end_s": 0.126,
+    "centroid": 51,
+    "stereo": false,
+    "quality": {
+     "span": 2.38,
+     "centroid": 51,
+     "end_db": -132.5,
+     "tail_ms": 615.8,
+     "start_db": -97.3,
+     "rise_ms": 2.5,
+     "peak": -10.0
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 5258,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl9_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.72
+   },
+   {
+    "file": "kick-soft-7.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl11_rr1.flac",
+    "source_peak": -4.3,
+    "onset_s": 0.0022,
+    "dur_s": 0.688,
+    "end_s": 0.108,
+    "centroid": 74,
+    "stereo": false,
+    "quality": {
+     "span": 2.44,
+     "centroid": 74,
+     "end_db": -123.9,
+     "tail_ms": 579.8,
+     "start_db": -98.5,
+     "rise_ms": 1.73,
+     "peak": -6.0
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 6064,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl11_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.893
+   },
+   {
+    "file": "kick-soft-8.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl13_rr1.flac",
+    "source_peak": -2.0,
+    "onset_s": 0.0025,
+    "dur_s": 0.657,
+    "end_s": 0.079,
+    "centroid": 90,
+    "stereo": false,
+    "quality": {
+     "span": 2.4,
+     "centroid": 90,
+     "end_db": -133.0,
+     "tail_ms": 578.4,
+     "start_db": -95.1,
+     "rise_ms": 5.23,
+     "peak": -3.7
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 6168,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl13_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "kick/punch",
+  "says": [
+   "a tight punchy kick drum with a clear beater attack",
+   "a hard rock kick drum hit",
+   "a short bass drum played hard"
+  ],
+  "uses": [
+   "drum",
+   "kick drum",
+   "impact",
+   "hit",
+   "accent",
+   "downbeat"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "thud",
+  "dur_s": 0.123,
+  "note": 89.9,
+  "vel": 0.95,
+  "size": 1.0,
+  "room": "booth",
+  "amount": -0.3,
+  "width": 0.3,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "kick-soft-1.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl1_rr1.flac",
+    "source_peak": -23.4,
+    "onset_s": 0.022,
+    "dur_s": 1.2,
+    "end_s": 0.123,
+    "centroid": 743,
+    "stereo": false,
+    "quality": {
+     "span": 7.37,
+     "centroid": 743,
+     "end_db": -131.0,
+     "tail_ms": 1076.6,
+     "start_db": -104.0,
+     "rise_ms": 2.67,
+     "peak": -25.3
+    },
+    "cut": true,
+    "hp": 28.0,
+    "bytes": 4415,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.0
+   },
+   {
+    "file": "kick-soft-2.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl2_rr1.flac",
+    "source_peak": -20.4,
+    "onset_s": 0.024,
+    "dur_s": 1.2,
+    "end_s": 0.124,
+    "centroid": 372,
+    "stereo": false,
+    "quality": {
+     "span": 2.33,
+     "centroid": 372,
+     "end_db": -133.9,
+     "tail_ms": 1076.3,
+     "start_db": -105.9,
+     "rise_ms": 2.56,
+     "peak": -22.3
+    },
+    "cut": true,
+    "hp": 28.0,
+    "bytes": 4374,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.14
+   },
+   {
+    "file": "kick-soft-3.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl4_rr1.flac",
+    "source_peak": -17.1,
+    "onset_s": 0.022,
+    "dur_s": 1.023,
+    "end_s": 0.132,
+    "centroid": 141,
+    "stereo": false,
+    "quality": {
+     "span": 1.68,
+     "centroid": 141,
+     "end_db": -133.4,
+     "tail_ms": 891.5,
+     "start_db": -101.6,
+     "rise_ms": 2.42,
+     "peak": -18.9
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 4146,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.294
+   },
+   {
+    "file": "kick-soft-4.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl6_rr1.flac",
+    "source_peak": -13.1,
+    "onset_s": 0.024,
+    "dur_s": 0.771,
+    "end_s": 0.103,
+    "centroid": 71,
+    "stereo": false,
+    "quality": {
+     "span": 2.42,
+     "centroid": 71,
+     "end_db": -123.1,
+     "tail_ms": 668.0,
+     "start_db": -109.3,
+     "rise_ms": 2.42,
+     "peak": -14.9
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 4143,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl6_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.481
+   },
+   {
+    "file": "kick-soft-5.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl8_rr1.flac",
+    "source_peak": -9.2,
+    "onset_s": 0.0018,
+    "dur_s": 0.93,
+    "end_s": 0.159,
+    "centroid": 50,
+    "stereo": false,
+    "quality": {
+     "span": 1.75,
+     "centroid": 50,
+     "end_db": -131.6,
+     "tail_ms": 771.1,
+     "start_db": -122.2,
+     "rise_ms": 2.48,
+     "peak": -11.3
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 5236,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl8_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.664
+   },
+   {
+    "file": "kick-soft-6.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl9_rr1.flac",
+    "source_peak": -8.0,
+    "onset_s": 0.0018,
+    "dur_s": 0.742,
+    "end_s": 0.126,
+    "centroid": 51,
+    "stereo": false,
+    "quality": {
+     "span": 2.38,
+     "centroid": 51,
+     "end_db": -132.5,
+     "tail_ms": 615.8,
+     "start_db": -97.3,
+     "rise_ms": 2.5,
+     "peak": -10.0
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 5258,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl9_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.72
+   },
+   {
+    "file": "kick-soft-7.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl11_rr1.flac",
+    "source_peak": -4.3,
+    "onset_s": 0.0022,
+    "dur_s": 0.688,
+    "end_s": 0.108,
+    "centroid": 74,
+    "stereo": false,
+    "quality": {
+     "span": 2.44,
+     "centroid": 74,
+     "end_db": -123.9,
+     "tail_ms": 579.8,
+     "start_db": -98.5,
+     "rise_ms": 1.73,
+     "peak": -6.0
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 6064,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl11_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 0.893
+   },
+   {
+    "file": "kick-soft-8.npz",
+    "source": "karoryfer/kick_24__kick__kick__k_vl13_rr1.flac",
+    "source_peak": -2.0,
+    "onset_s": 0.0025,
+    "dur_s": 0.657,
+    "end_s": 0.079,
+    "centroid": 90,
+    "stereo": false,
+    "quality": {
+     "span": 2.4,
+     "centroid": 90,
+     "end_db": -133.0,
+     "tail_ms": 578.4,
+     "start_db": -95.1,
+     "rise_ms": 5.23,
+     "peak": -3.7
+    },
+    "cut": false,
+    "hp": 28.0,
+    "bytes": 6168,
+    "credit": {
+     "title": "kick_24__kick__kick__k_vl13_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 89.9,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "kick/deep",
+  "says": [
+   "a big open bass drum booming",
+   "a large deep kick drum with a long low ring",
+   "a deep resonant drum boom"
+  ],
+  "uses": [
+   "drum",
+   "kick drum",
+   "impact",
+   "boom",
+   "logo",
+   "trailer hit"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "thud",
+  "dur_s": 0.87,
+  "note": 30.9,
+  "vel": 0.75,
+  "size": 1.0,
+  "room": "booth",
+  "amount": 0.0,
+  "width": 0.3,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "kick-deep-1.npz",
+    "source": "karoryfer/kick_24_nodamp__kick__kick__k_nodamp_vl1_rr1.flac",
+    "source_peak": -17.6,
+    "onset_s": 0.016,
+    "dur_s": 2.5,
+    "end_s": 1.335,
+    "centroid": 58,
+    "stereo": false,
+    "quality": {
+     "span": 1.77,
+     "centroid": 58,
+     "end_db": -135.2,
+     "tail_ms": 1165.4,
+     "start_db": -102.1,
+     "rise_ms": 1.85,
+     "peak": -20.1
+    },
+    "cut": true,
+    "hp": 25.0,
+    "bytes": 6900,
+    "credit": {
+     "title": "kick_24_nodamp__kick__kick__k_nodamp_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 30.9,
+    "vel": 0.0
+   },
+   {
+    "file": "kick-deep-2.npz",
+    "source": "karoryfer/kick_24_nodamp__kick__kick__k_nodamp_vl2_rr1.flac",
+    "source_peak": -13.5,
+    "onset_s": 0.022,
+    "dur_s": 2.5,
+    "end_s": 1.011,
+    "centroid": 58,
+    "stereo": false,
+    "quality": {
+     "span": 2.21,
+     "centroid": 58,
+     "end_db": -132.6,
+     "tail_ms": 1488.9,
+     "start_db": -104.5,
+     "rise_ms": 1.6,
+     "peak": -15.4
+    },
+    "cut": true,
+    "hp": 25.0,
+    "bytes": 6682,
+    "credit": {
+     "title": "kick_24_nodamp__kick__kick__k_nodamp_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 30.9,
+    "vel": 0.308
+   },
+   {
+    "file": "kick-deep-3.npz",
+    "source": "karoryfer/kick_24_nodamp__kick__kick__k_nodamp_vl4_rr1.flac",
+    "source_peak": -6.7,
+    "onset_s": 0.0037,
+    "dur_s": 2.5,
+    "end_s": 0.636,
+    "centroid": 63,
+    "stereo": false,
+    "quality": {
+     "span": 2.21,
+     "centroid": 63,
+     "end_db": -135.2,
+     "tail_ms": 1864.2,
+     "start_db": -99.4,
+     "rise_ms": 1.46,
+     "peak": -8.4
+    },
+    "cut": true,
+    "hp": 25.0,
+    "bytes": 8423,
+    "credit": {
+     "title": "kick_24_nodamp__kick__kick__k_nodamp_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 30.9,
+    "vel": 0.82
+   },
+   {
+    "file": "kick-deep-4.npz",
+    "source": "karoryfer/kick_24_nodamp__kick__kick__k_nodamp_vl5_rr1.flac",
+    "source_peak": -4.3,
+    "onset_s": 0.0032,
+    "dur_s": 2.5,
+    "end_s": 0.729,
+    "centroid": 65,
+    "stereo": false,
+    "quality": {
+     "span": 1.76,
+     "centroid": 65,
+     "end_db": -134.9,
+     "tail_ms": 1770.9,
+     "start_db": -103.0,
+     "rise_ms": 1.29,
+     "peak": -6.2
+    },
+    "cut": true,
+    "hp": 25.0,
+    "bytes": 8578,
+    "credit": {
+     "title": "kick_24_nodamp__kick__kick__k_nodamp_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 30.9,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "snare/tight",
+  "says": [
+   "a tight snare drum hit",
+   "a crisp snare drum crack with a short buzz of the wires",
+   "a stick hitting a snare drum"
+  ],
+  "uses": [
+   "drum",
+   "snare",
+   "hit",
+   "accent",
+   "backbeat",
+   "cut"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 0.128,
+  "note": null,
+  "vel": 0.75,
+  "size": 1.0,
+  "room": "studio",
+  "amount": -0.2,
+  "width": 0.6,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "snare-tight-1.npz",
+    "source": "karoryfer/snare_14__center__top__sn_center_vl1_rr1.flac",
+    "source_peak": -32.4,
+    "onset_s": 0.0025,
+    "dur_s": 1.2,
+    "end_s": 0.147,
+    "centroid": 6378,
+    "stereo": false,
+    "quality": {
+     "span": 6.86,
+     "centroid": 6378,
+     "end_db": -122.5,
+     "tail_ms": 1052.8,
+     "start_db": -78.5,
+     "rise_ms": 0.69,
+     "peak": -30.6
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 11889,
+    "credit": {
+     "title": "snare_14__center__top__sn_center_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "snare-tight-2.npz",
+    "source": "karoryfer/snare_14__center__top__sn_center_vl2_rr1.flac",
+    "source_peak": -26.3,
+    "onset_s": 0.0027,
+    "dur_s": 1.2,
+    "end_s": 0.117,
+    "centroid": 3730,
+    "stereo": false,
+    "quality": {
+     "span": 6.78,
+     "centroid": 3730,
+     "end_db": -129.3,
+     "tail_ms": 1083.2,
+     "start_db": -78.4,
+     "rise_ms": 0.77,
+     "peak": -24.2
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 11060,
+    "credit": {
+     "title": "snare_14__center__top__sn_center_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.264
+   },
+   {
+    "file": "snare-tight-3.npz",
+    "source": "karoryfer/snare_14__center__top__sn_center_vl4_rr1.flac",
+    "source_peak": -24.0,
+    "onset_s": 0.0025,
+    "dur_s": 1.2,
+    "end_s": 0.129,
+    "centroid": 3154,
+    "stereo": false,
+    "quality": {
+     "span": 6.72,
+     "centroid": 3154,
+     "end_db": -131.7,
+     "tail_ms": 1070.6,
+     "start_db": -81.0,
+     "rise_ms": 0.85,
+     "peak": -22.5
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 10774,
+    "credit": {
+     "title": "snare_14__center__top__sn_center_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.364
+   },
+   {
+    "file": "snare-tight-4.npz",
+    "source": "karoryfer/snare_14__center__top__sn_center_vl6_rr1.flac",
+    "source_peak": -15.3,
+    "onset_s": 0.0025,
+    "dur_s": 0.596,
+    "end_s": 0.111,
+    "centroid": 1758,
+    "stereo": false,
+    "quality": {
+     "span": 5.21,
+     "centroid": 1758,
+     "end_db": -123.1,
+     "tail_ms": 485.8,
+     "start_db": -81.8,
+     "rise_ms": 0.88,
+     "peak": -14.0
+    },
+    "cut": false,
+    "hp": 70.0,
+    "bytes": 10306,
+    "credit": {
+     "title": "snare_14__center__top__sn_center_vl6_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.74
+   },
+   {
+    "file": "snare-tight-5.npz",
+    "source": "karoryfer/snare_14__center__top__sn_center_vl7_rr1.flac",
+    "source_peak": -14.0,
+    "onset_s": 0.0022,
+    "dur_s": 0.62,
+    "end_s": 0.142,
+    "centroid": 1755,
+    "stereo": false,
+    "quality": {
+     "span": 5.31,
+     "centroid": 1755,
+     "end_db": -124.0,
+     "tail_ms": 478.3,
+     "start_db": -77.7,
+     "rise_ms": 1.04,
+     "peak": -14.1
+    },
+    "cut": false,
+    "hp": 70.0,
+    "bytes": 12265,
+    "credit": {
+     "title": "snare_14__center__top__sn_center_vl7_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.797
+   },
+   {
+    "file": "snare-tight-6.npz",
+    "source": "karoryfer/snare_14__center__top__sn_center_vl9_rr1.flac",
+    "source_peak": -9.3,
+    "onset_s": 0.003,
+    "dur_s": 0.601,
+    "end_s": 0.126,
+    "centroid": 1730,
+    "stereo": false,
+    "quality": {
+     "span": 4.91,
+     "centroid": 1730,
+     "end_db": -125.0,
+     "tail_ms": 475.2,
+     "start_db": -82.6,
+     "rise_ms": 1.02,
+     "peak": -8.7
+    },
+    "cut": false,
+    "hp": 70.0,
+    "bytes": 11345,
+    "credit": {
+     "title": "snare_14__center__top__sn_center_vl9_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "snare/fat",
+  "says": [
+   "a fat low snare drum with a ringing body",
+   "a deep snare drum hit with rattling wires",
+   "a big round snare drum crack"
+  ],
+  "uses": [
+   "drum",
+   "snare",
+   "hit",
+   "backbeat",
+   "accent"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 0.238,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "snare-fat-1.npz",
+    "source": "vcsl/Snare2_HitSN_v5_rr2_Mid.wav",
+    "source_peak": -23.4,
+    "onset_s": 0.0105,
+    "dur_s": 1.414,
+    "end_s": 0.219,
+    "centroid": 660,
+    "stereo": true,
+    "quality": {
+     "span": 5.84,
+     "centroid": 660,
+     "end_db": -129.7,
+     "tail_ms": 1194.9,
+     "start_db": -98.0,
+     "rise_ms": 10.62,
+     "peak": -23.0
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 11276,
+    "credit": {
+     "title": "Snare2_HitSN_v5_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "snare-fat-4.npz",
+    "source": "vcsl/Snare4_HitSN_v2_rr1_Mid.wav",
+    "source_peak": -33.8,
+    "onset_s": 0.0097,
+    "dur_s": 0.749,
+    "end_s": 0.402,
+    "centroid": 699,
+    "stereo": true,
+    "quality": {
+     "span": 4.43,
+     "centroid": 699,
+     "end_db": -115.6,
+     "tail_ms": 347.1,
+     "start_db": -99.2,
+     "rise_ms": 11.27,
+     "peak": -34.2
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 10937,
+    "credit": {
+     "title": "Snare4_HitSN_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "snare-fat-3.npz",
+    "source": "vcsl/Snare3M_HitSN_v3_rr2_Mid.wav",
+    "source_peak": -17.3,
+    "onset_s": 0.01,
+    "dur_s": 0.743,
+    "end_s": 0.238,
+    "centroid": 497,
+    "stereo": true,
+    "quality": {
+     "span": 3.69,
+     "centroid": 497,
+     "end_db": -124.3,
+     "tail_ms": 505.3,
+     "start_db": -123.1,
+     "rise_ms": 11.31,
+     "peak": -17.7
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 9320,
+    "credit": {
+     "title": "Snare3M_HitSN_v3_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "snare-fat-2.npz",
+    "source": "vcsl/Snare2_HitSN_v9_rr2_Mid.wav",
+    "source_peak": -3.1,
+    "onset_s": 0.0107,
+    "dur_s": 0.709,
+    "end_s": 0.238,
+    "centroid": 820,
+    "stereo": true,
+    "quality": {
+     "span": 4.39,
+     "centroid": 820,
+     "end_db": -124.8,
+     "tail_ms": 471.1,
+     "start_db": -125.3,
+     "rise_ms": 2.25,
+     "peak": -2.7
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 10008,
+    "credit": {
+     "title": "Snare2_HitSN_v9_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   },
+   {
+    "file": "snare-fat-5.npz",
+    "source": "vcsl/Snare4_HitSN_v4_rr2_Mid.wav",
+    "source_peak": -19.9,
+    "onset_s": 0.01,
+    "dur_s": 0.897,
+    "end_s": 0.276,
+    "centroid": 669,
+    "stereo": true,
+    "quality": {
+     "span": 4.71,
+     "centroid": 669,
+     "end_db": -125.4,
+     "tail_ms": 620.6,
+     "start_db": -122.7,
+     "rise_ms": 6.71,
+     "peak": -21.5
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 11741,
+    "credit": {
+     "title": "Snare4_HitSN_v4_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "rim/shot",
+  "says": [
+   "a snare drum rimshot, a loud ringing crack",
+   "a stick hitting the rim and the head of a snare at once",
+   "a sharp metallic snare crack"
+  ],
+  "uses": [
+   "drum",
+   "snare",
+   "rimshot",
+   "accent",
+   "hit",
+   "impact",
+   "cut"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 0.14,
+  "note": null,
+  "vel": 0.8,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 0.6,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "rim-shot-2.npz",
+    "source": "karoryfer/snare_14__rimshot__top__sn_rims_vl1_rr1.flac",
+    "source_peak": -20.6,
+    "onset_s": 0.0022,
+    "dur_s": 1.5,
+    "end_s": 0.134,
+    "centroid": 4629,
+    "stereo": false,
+    "quality": {
+     "span": 6.2,
+     "centroid": 4629,
+     "end_db": -136.2,
+     "tail_ms": 1365.7,
+     "start_db": -78.6,
+     "rise_ms": 3.33,
+     "peak": -21.7
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 9358,
+    "credit": {
+     "title": "snare_14__rimshot__top__sn_rims_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "rim-shot-1.npz",
+    "source": "vcsl/Snare4_rimshot_v4_rr2_Mid.wav",
+    "source_peak": -9.0,
+    "onset_s": 0.011,
+    "dur_s": 1.5,
+    "end_s": 0.322,
+    "centroid": 831,
+    "stereo": true,
+    "quality": {
+     "span": 4.13,
+     "centroid": 831,
+     "end_db": -137.7,
+     "tail_ms": 1178.4,
+     "start_db": -117.5,
+     "rise_ms": 2.5,
+     "peak": -9.3
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 10138,
+    "credit": {
+     "title": "Snare4_rimshot_v4_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "rim-shot-3.npz",
+    "source": "karoryfer/snare_14__rimshot__top__sn_rims_vl3_rr1.flac",
+    "source_peak": -9.9,
+    "onset_s": 0.0022,
+    "dur_s": 0.613,
+    "end_s": 0.146,
+    "centroid": 1196,
+    "stereo": false,
+    "quality": {
+     "span": 4.1,
+     "centroid": 1196,
+     "end_db": -125.7,
+     "tail_ms": 467.0,
+     "start_db": -86.1,
+     "rise_ms": 2.1,
+     "peak": -10.8
+    },
+    "cut": false,
+    "hp": 70.0,
+    "bytes": 10087,
+    "credit": {
+     "title": "snare_14__rimshot__top__sn_rims_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.69
+   },
+   {
+    "file": "rim-shot-4.npz",
+    "source": "karoryfer/snare_14__rimshot__top__sn_rims_vl5_rr1.flac",
+    "source_peak": -5.1,
+    "onset_s": 0.002,
+    "dur_s": 0.595,
+    "end_s": 0.131,
+    "centroid": 1211,
+    "stereo": false,
+    "quality": {
+     "span": 4.46,
+     "centroid": 1211,
+     "end_db": -125.4,
+     "tail_ms": 464.5,
+     "start_db": -76.8,
+     "rise_ms": 2.19,
+     "peak": -6.4
+    },
+    "cut": false,
+    "hp": 70.0,
+    "bytes": 8890,
+    "credit": {
+     "title": "snare_14__rimshot__top__sn_rims_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "rim/click",
+  "says": [
+   "a cross-stick click on a snare drum",
+   "a dry woody rim click",
+   "a hollow wooden knock on a drum rim"
+  ],
+  "uses": [
+   "drum",
+   "rim",
+   "cross-stick",
+   "click",
+   "bossa nova",
+   "ballad",
+   "tick",
+   "count"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "click",
+  "dur_s": 0.189,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "studio",
+  "amount": -0.2,
+  "width": 0.6,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "rim-click-3.npz",
+    "source": "karoryfer/snare_14__sidestick__top__sn_ss_vl1_rr1.flac",
+    "source_peak": -34.6,
+    "onset_s": 0.002,
+    "dur_s": 0.8,
+    "end_s": 0.228,
+    "centroid": 3886,
+    "stereo": false,
+    "quality": {
+     "span": 7.14,
+     "centroid": 3886,
+     "end_db": -105.3,
+     "tail_ms": 571.6,
+     "start_db": -68.0,
+     "rise_ms": 0.85,
+     "peak": -38.6
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 11713,
+    "credit": {
+     "title": "snare_14__sidestick__top__sn_ss_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "rim-click-1.npz",
+    "source": "vcsl/Snare3M_Xstick_v2_rr1_Mid.wav",
+    "source_peak": -21.4,
+    "onset_s": 0.0105,
+    "dur_s": 0.8,
+    "end_s": 0.189,
+    "centroid": 1026,
+    "stereo": true,
+    "quality": {
+     "span": 4.54,
+     "centroid": 1026,
+     "end_db": -119.5,
+     "tail_ms": 610.7,
+     "start_db": -114.7,
+     "rise_ms": 1.94,
+     "peak": -21.7
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 9486,
+    "credit": {
+     "title": "Snare3M_Xstick_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "rim-click-2.npz",
+    "source": "vcsl/Snare4_Xstick_v2_rr2_Mid.wav",
+    "source_peak": -23.6,
+    "onset_s": 0.012,
+    "dur_s": 0.8,
+    "end_s": 0.21,
+    "centroid": 1264,
+    "stereo": true,
+    "quality": {
+     "span": 5.77,
+     "centroid": 1264,
+     "end_db": -110.6,
+     "tail_ms": 590.2,
+     "start_db": -108.3,
+     "rise_ms": 2.27,
+     "peak": -24.0
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 9638,
+    "credit": {
+     "title": "Snare4_Xstick_v2_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "rim-click-4.npz",
+    "source": "karoryfer/snare_14__sidestick__top__sn_ss_vl2_rr1.flac",
+    "source_peak": -23.0,
+    "onset_s": 0.0025,
+    "dur_s": 0.8,
+    "end_s": 0.147,
+    "centroid": 2022,
+    "stereo": false,
+    "quality": {
+     "span": 4.66,
+     "centroid": 2022,
+     "end_db": -121.8,
+     "tail_ms": 653.2,
+     "start_db": -66.4,
+     "rise_ms": 2.02,
+     "peak": -23.7
+    },
+    "cut": true,
+    "hp": 70.0,
+    "bytes": 10540,
+    "credit": {
+     "title": "snare_14__sidestick__top__sn_ss_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.644
+   },
+   {
+    "file": "rim-click-5.npz",
+    "source": "karoryfer/snare_14__sidestick__top__sn_ss_vl3_rr1.flac",
+    "source_peak": -16.6,
+    "onset_s": 0.0022,
+    "dur_s": 0.732,
+    "end_s": 0.138,
+    "centroid": 1900,
+    "stereo": false,
+    "quality": {
+     "span": 4.63,
+     "centroid": 1900,
+     "end_db": -123.6,
+     "tail_ms": 593.6,
+     "start_db": -62.1,
+     "rise_ms": 1.94,
+     "peak": -16.8
+    },
+    "cut": false,
+    "hp": 70.0,
+    "bytes": 9898,
+    "credit": {
+     "title": "snare_14__sidestick__top__sn_ss_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "tom/high",
+  "says": [
+   "a high tom drum hit",
+   "a small tom-tom with a short pitched ring",
+   "a stick on a high rack tom"
+  ],
+  "uses": [
+   "drum",
+   "tom",
+   "fill",
+   "hit",
+   "accent"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 0.443,
+  "note": 106.8,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "tom-high-1.npz",
+    "source": "vcsl/TomH_HitS_v3_rr1_Mid.wav",
+    "source_peak": -15.9,
+    "onset_s": 0.0127,
+    "dur_s": 1.565,
+    "end_s": 0.69,
+    "centroid": 121,
+    "stereo": true,
+    "quality": {
+     "span": 1.14,
+     "centroid": 121,
+     "end_db": -138.5,
+     "tail_ms": 874.2,
+     "start_db": -134.7,
+     "rise_ms": 2.71,
+     "peak": -15.4
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9601,
+    "credit": {
+     "title": "TomH_HitS_v3_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 105.5,
+    "vel": 0.0
+   },
+   {
+    "file": "tom-high-4.npz",
+    "source": "karoryfer/tom_18__center__cl__t18_vl1_rr1.flac",
+    "source_peak": -19.1,
+    "onset_s": 0.0022,
+    "dur_s": 1.611,
+    "end_s": 0.28,
+    "centroid": 211,
+    "stereo": false,
+    "quality": {
+     "span": 1.83,
+     "centroid": 211,
+     "end_db": -139.7,
+     "tail_ms": 1331.5,
+     "start_db": -79.9,
+     "rise_ms": 1.98,
+     "peak": -19.9
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8282,
+    "credit": {
+     "title": "tom_18__center__cl__t18_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 108.1,
+    "vel": 0.0
+   },
+   {
+    "file": "tom-high-5.npz",
+    "source": "karoryfer/tom_18__center__cl__t18_vl3_rr1.flac",
+    "source_peak": -14.2,
+    "onset_s": 0.002,
+    "dur_s": 1.592,
+    "end_s": 0.279,
+    "centroid": 137,
+    "stereo": false,
+    "quality": {
+     "span": 1.9,
+     "centroid": 137,
+     "end_db": -139.2,
+     "tail_ms": 1312.9,
+     "start_db": -80.4,
+     "rise_ms": 2.35,
+     "peak": -14.8
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8055,
+    "credit": {
+     "title": "tom_18__center__cl__t18_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 108.1,
+    "vel": 0.368
+   },
+   {
+    "file": "tom-high-2.npz",
+    "source": "vcsl/TomH_HitS_v4_rr1_Mid.wav",
+    "source_peak": -9.6,
+    "onset_s": 0.0125,
+    "dur_s": 1.557,
+    "end_s": 0.537,
+    "centroid": 130,
+    "stereo": true,
+    "quality": {
+     "span": 1.43,
+     "centroid": 130,
+     "end_db": -135.8,
+     "tail_ms": 1020.5,
+     "start_db": -141.0,
+     "rise_ms": 17.71,
+     "peak": -9.1
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9517,
+    "credit": {
+     "title": "TomH_HitS_v4_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 105.5,
+    "vel": 0.887
+   },
+   {
+    "file": "tom-high-3.npz",
+    "source": "vcsl/TomH_HitS_v4_rr2_Mid.wav",
+    "source_peak": -8.8,
+    "onset_s": 0.0115,
+    "dur_s": 1.909,
+    "end_s": 0.541,
+    "centroid": 139,
+    "stereo": true,
+    "quality": {
+     "span": 1.36,
+     "centroid": 139,
+     "end_db": -142.0,
+     "tail_ms": 1368.0,
+     "start_db": -141.3,
+     "rise_ms": 3.25,
+     "peak": -9.0
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9901,
+    "credit": {
+     "title": "TomH_HitS_v4_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 105.5,
+    "vel": 1.0
+   },
+   {
+    "file": "tom-high-6.npz",
+    "source": "karoryfer/tom_18__center__cl__t18_vl6_rr1.flac",
+    "source_peak": -5.8,
+    "onset_s": 0.0022,
+    "dur_s": 1.374,
+    "end_s": 0.349,
+    "centroid": 111,
+    "stereo": false,
+    "quality": {
+     "span": 1.66,
+     "centroid": 111,
+     "end_db": -139.0,
+     "tail_ms": 1025.7,
+     "start_db": -82.6,
+     "rise_ms": 0.88,
+     "peak": -5.6
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8549,
+    "credit": {
+     "title": "tom_18__center__cl__t18_vl6_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 108.1,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "tom/mid",
+  "says": [
+   "a medium tom drum hit",
+   "a tom-tom with a round pitched ring",
+   "a stick on a rack tom"
+  ],
+  "uses": [
+   "drum",
+   "tom",
+   "fill",
+   "hit",
+   "accent"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 0.51,
+  "note": 93.3,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "tom-mid-1.npz",
+    "source": "karoryfer/tom_14__center__cl__t14_vl1_rr1.flac",
+    "source_peak": -23.7,
+    "onset_s": 0.001,
+    "dur_s": 1.961,
+    "end_s": 0.817,
+    "centroid": 102,
+    "stereo": false,
+    "quality": {
+     "span": 0.02,
+     "centroid": 102,
+     "end_db": -141.8,
+     "tail_ms": 1144.5,
+     "start_db": -87.4,
+     "rise_ms": 2.17,
+     "peak": -24.0
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8546,
+    "credit": {
+     "title": "tom_14__center__cl__t14_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 95.7,
+    "vel": 0.0
+   },
+   {
+    "file": "tom-mid-4.npz",
+    "source": "karoryfer/tom_15__center__cl__t15_vl1_rr1.flac",
+    "source_peak": -23.4,
+    "onset_s": 0.0013,
+    "dur_s": 1.616,
+    "end_s": 0.419,
+    "centroid": 119,
+    "stereo": false,
+    "quality": {
+     "span": 0.94,
+     "centroid": 119,
+     "end_db": -138.9,
+     "tail_ms": 1197.5,
+     "start_db": -89.1,
+     "rise_ms": 1.23,
+     "peak": -22.6
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 7429,
+    "credit": {
+     "title": "tom_15__center__cl__t15_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 90.9,
+    "vel": 0.0
+   },
+   {
+    "file": "tom-mid-2.npz",
+    "source": "karoryfer/tom_14__center__cl__t14_vl3_rr1.flac",
+    "source_peak": -14.9,
+    "onset_s": 0.0022,
+    "dur_s": 1.647,
+    "end_s": 0.676,
+    "centroid": 110,
+    "stereo": false,
+    "quality": {
+     "span": 1.11,
+     "centroid": 110,
+     "end_db": -138.8,
+     "tail_ms": 970.5,
+     "start_db": -90.9,
+     "rise_ms": 1.96,
+     "peak": -13.4
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8703,
+    "credit": {
+     "title": "tom_14__center__cl__t14_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 95.7,
+    "vel": 0.583
+   },
+   {
+    "file": "tom-mid-5.npz",
+    "source": "karoryfer/tom_15__center__cl__t15_vl3_rr1.flac",
+    "source_peak": -14.7,
+    "onset_s": 0.002,
+    "dur_s": 1.559,
+    "end_s": 0.452,
+    "centroid": 106,
+    "stereo": false,
+    "quality": {
+     "span": 0.94,
+     "centroid": 106,
+     "end_db": -141.6,
+     "tail_ms": 1106.6,
+     "start_db": -91.4,
+     "rise_ms": 1.27,
+     "peak": -13.5
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 7687,
+    "credit": {
+     "title": "tom_15__center__cl__t15_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 90.9,
+    "vel": 0.664
+   },
+   {
+    "file": "tom-mid-3.npz",
+    "source": "karoryfer/tom_14__center__cl__t14_vl5_rr1.flac",
+    "source_peak": -8.6,
+    "onset_s": 0.0032,
+    "dur_s": 1.652,
+    "end_s": 0.529,
+    "centroid": 218,
+    "stereo": false,
+    "quality": {
+     "span": 2.08,
+     "centroid": 218,
+     "end_db": -144.7,
+     "tail_ms": 1122.4,
+     "start_db": -90.7,
+     "rise_ms": 1.83,
+     "peak": -7.1
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9497,
+    "credit": {
+     "title": "tom_14__center__cl__t14_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 95.7,
+    "vel": 1.0
+   },
+   {
+    "file": "tom-mid-6.npz",
+    "source": "karoryfer/tom_15__center__cl__t15_vl5_rr1.flac",
+    "source_peak": -10.3,
+    "onset_s": 0.0022,
+    "dur_s": 1.576,
+    "end_s": 0.492,
+    "centroid": 126,
+    "stereo": false,
+    "quality": {
+     "span": 0.94,
+     "centroid": 126,
+     "end_db": -141.1,
+     "tail_ms": 1084.1,
+     "start_db": -90.2,
+     "rise_ms": 1.44,
+     "peak": -8.8
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8461,
+    "credit": {
+     "title": "tom_15__center__cl__t15_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 90.9,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "tom/floor",
+  "says": [
+   "a deep floor tom hit",
+   "a big low tom drum with a long ring",
+   "a stick on a floor tom"
+  ],
+  "uses": [
+   "drum",
+   "tom",
+   "fill",
+   "hit",
+   "impact",
+   "tribal"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 0.79,
+  "note": 66.9,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "tom-floor-1.npz",
+    "source": "vcsl/TomL_HitS_v2_rr1_Mid.wav",
+    "source_peak": -24.6,
+    "onset_s": 0.0115,
+    "dur_s": 2.2,
+    "end_s": 0.746,
+    "centroid": 92,
+    "stereo": true,
+    "quality": {
+     "span": 0.03,
+     "centroid": 92,
+     "end_db": -144.7,
+     "tail_ms": 1454.5,
+     "start_db": -108.8,
+     "rise_ms": 2.29,
+     "peak": -24.3
+    },
+    "cut": true,
+    "hp": 30.0,
+    "bytes": 9491,
+    "credit": {
+     "title": "TomL_HitS_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 88.7,
+    "vel": 0.0
+   },
+   {
+    "file": "tom-floor-4.npz",
+    "source": "karoryfer/tom_22__center__cl__t22_vl1_rr1.flac",
+    "source_peak": -22.4,
+    "onset_s": 0.036,
+    "dur_s": 2.2,
+    "end_s": 0.951,
+    "centroid": 71,
+    "stereo": false,
+    "quality": {
+     "span": 1.32,
+     "centroid": 71,
+     "end_db": -143.4,
+     "tail_ms": 1249.2,
+     "start_db": -82.5,
+     "rise_ms": 1.21,
+     "peak": -22.6
+    },
+    "cut": true,
+    "hp": 30.0,
+    "bytes": 6981,
+    "credit": {
+     "title": "tom_22__center__cl__t22_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 45.1,
+    "vel": 0.0
+   },
+   {
+    "file": "tom-floor-5.npz",
+    "source": "karoryfer/tom_22__center__cl__t22_vl3_rr1.flac",
+    "source_peak": -13.4,
+    "onset_s": 0.0032,
+    "dur_s": 2.2,
+    "end_s": 0.95,
+    "centroid": 83,
+    "stereo": false,
+    "quality": {
+     "span": 1.45,
+     "centroid": 83,
+     "end_db": -143.0,
+     "tail_ms": 1250.4,
+     "start_db": -81.7,
+     "rise_ms": 1.04,
+     "peak": -13.8
+    },
+    "cut": true,
+    "hp": 30.0,
+    "bytes": 8759,
+    "credit": {
+     "title": "tom_22__center__cl__t22_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 45.1,
+    "vel": 0.612
+   },
+   {
+    "file": "tom-floor-2.npz",
+    "source": "vcsl/TomL_HitS_v3_rr1_Mid.wav",
+    "source_peak": -13.8,
+    "onset_s": 0.0123,
+    "dur_s": 2.2,
+    "end_s": 0.675,
+    "centroid": 98,
+    "stereo": true,
+    "quality": {
+     "span": 0.26,
+     "centroid": 98,
+     "end_db": -150.8,
+     "tail_ms": 1524.8,
+     "start_db": -115.5,
+     "rise_ms": 2.31,
+     "peak": -14.5
+    },
+    "cut": true,
+    "hp": 30.0,
+    "bytes": 10578,
+    "credit": {
+     "title": "TomL_HitS_v3_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 88.7,
+    "vel": 0.73
+   },
+   {
+    "file": "tom-floor-3.npz",
+    "source": "vcsl/TomL_HitS_v4_rr2_Mid.wav",
+    "source_peak": -9.8,
+    "onset_s": 0.0132,
+    "dur_s": 1.934,
+    "end_s": 0.678,
+    "centroid": 101,
+    "stereo": true,
+    "quality": {
+     "span": 0.65,
+     "centroid": 101,
+     "end_db": -153.8,
+     "tail_ms": 1256.5,
+     "start_db": -140.4,
+     "rise_ms": 3.46,
+     "peak": -9.7
+    },
+    "cut": false,
+    "hp": 30.0,
+    "bytes": 10183,
+    "credit": {
+     "title": "TomL_HitS_v4_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 88.7,
+    "vel": 1.0
+   },
+   {
+    "file": "tom-floor-6.npz",
+    "source": "karoryfer/tom_22__center__cl__t22_vl5_rr1.flac",
+    "source_peak": -7.7,
+    "onset_s": 0.0035,
+    "dur_s": 2.2,
+    "end_s": 0.834,
+    "centroid": 86,
+    "stereo": false,
+    "quality": {
+     "span": 1.45,
+     "centroid": 86,
+     "end_db": -139.1,
+     "tail_ms": 1366.4,
+     "start_db": -82.4,
+     "rise_ms": 3.71,
+     "peak": -8.1
+    },
+    "cut": true,
+    "hp": 30.0,
+    "bytes": 9334,
+    "credit": {
+     "title": "tom_22__center__cl__t22_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 45.1,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "hat/closed",
+  "says": [
+   "a closed hi-hat, a short tight chick",
+   "a stick tapping closed hi-hat cymbals",
+   "a crisp short metallic tick of a hi-hat"
+  ],
+  "uses": [
+   "drum",
+   "hi-hat",
+   "tick",
+   "groove",
+   "rhythm"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "tick",
+  "dur_s": 0.212,
+  "note": null,
+  "vel": 0.6,
+  "size": 1.0,
+  "room": "studio",
+  "amount": -0.3,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "hat-closed-1.npz",
+    "source": "vcsl/HiHat_HitC_v1_rr2_Mid.wav",
+    "source_peak": -34.2,
+    "onset_s": 0.01,
+    "dur_s": 0.8,
+    "end_s": 0.182,
+    "centroid": 5510,
+    "stereo": true,
+    "quality": {
+     "span": 4.38,
+     "centroid": 5510,
+     "end_db": -117.8,
+     "tail_ms": 618.0,
+     "start_db": -136.1,
+     "rise_ms": 1.46,
+     "peak": -34.6
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 9260,
+    "credit": {
+     "title": "HiHat_HitC_v1_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "hat-closed-5.npz",
+    "source": "karoryfer/hihat_14__cl__cl__ht_cl_vl1_rr1.flac",
+    "source_peak": -28.1,
+    "onset_s": 0.0022,
+    "dur_s": 0.8,
+    "end_s": 0.342,
+    "centroid": 4483,
+    "stereo": false,
+    "quality": {
+     "span": 4.49,
+     "centroid": 4483,
+     "end_db": -106.2,
+     "tail_ms": 457.6,
+     "start_db": -98.7,
+     "rise_ms": 1.06,
+     "peak": -32.3
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 11772,
+    "credit": {
+     "title": "hihat_14__cl__cl__ht_cl_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "hat-closed-6.npz",
+    "source": "karoryfer/hihat_14__cl__cl__ht_cl_vl2_rr1.flac",
+    "source_peak": -24.0,
+    "onset_s": 0.0018,
+    "dur_s": 0.8,
+    "end_s": 0.246,
+    "centroid": 5810,
+    "stereo": false,
+    "quality": {
+     "span": 4.65,
+     "centroid": 5810,
+     "end_db": -115.3,
+     "tail_ms": 553.5,
+     "start_db": -97.8,
+     "rise_ms": 0.94,
+     "peak": -22.5
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 12151,
+    "credit": {
+     "title": "hihat_14__cl__cl__ht_cl_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.263
+   },
+   {
+    "file": "hat-closed-2.npz",
+    "source": "vcsl/HiHat_HitC_v2_rr1_Mid.wav",
+    "source_peak": -25.7,
+    "onset_s": 0.01,
+    "dur_s": 0.8,
+    "end_s": 0.163,
+    "centroid": 5753,
+    "stereo": true,
+    "quality": {
+     "span": 5.03,
+     "centroid": 5753,
+     "end_db": -123.7,
+     "tail_ms": 636.8,
+     "start_db": -163.2,
+     "rise_ms": 4.44,
+     "peak": -23.0
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 8973,
+    "credit": {
+     "title": "HiHat_HitC_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.455
+   },
+   {
+    "file": "hat-closed-7.npz",
+    "source": "karoryfer/hihat_14__cl__cl__ht_cl_vl3_rr1.flac",
+    "source_peak": -20.6,
+    "onset_s": 0.0022,
+    "dur_s": 0.8,
+    "end_s": 0.242,
+    "centroid": 5940,
+    "stereo": false,
+    "quality": {
+     "span": 4.75,
+     "centroid": 5940,
+     "end_db": -115.2,
+     "tail_ms": 558.3,
+     "start_db": -102.5,
+     "rise_ms": 1.44,
+     "peak": -23.8
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 13293,
+    "credit": {
+     "title": "hihat_14__cl__cl__ht_cl_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.481
+   },
+   {
+    "file": "hat-closed-3.npz",
+    "source": "vcsl/HiHat_HitC_v3_rr2_Mid.wav",
+    "source_peak": -18.7,
+    "onset_s": 0.0097,
+    "dur_s": 0.646,
+    "end_s": 0.191,
+    "centroid": 7991,
+    "stereo": true,
+    "quality": {
+     "span": 5.01,
+     "centroid": 7991,
+     "end_db": -120.8,
+     "tail_ms": 454.8,
+     "start_db": -133.2,
+     "rise_ms": 5.08,
+     "peak": -18.0
+    },
+    "cut": false,
+    "hp": 250.0,
+    "bytes": 9049,
+    "credit": {
+     "title": "HiHat_HitC_v3_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.829
+   },
+   {
+    "file": "hat-closed-4.npz",
+    "source": "vcsl/HiHat_HitC_v3_rr1_Mid.wav",
+    "source_peak": -15.5,
+    "onset_s": 0.01,
+    "dur_s": 0.633,
+    "end_s": 0.196,
+    "centroid": 9039,
+    "stereo": true,
+    "quality": {
+     "span": 4.91,
+     "centroid": 9039,
+     "end_db": -121.6,
+     "tail_ms": 436.7,
+     "start_db": -171.1,
+     "rise_ms": 1.62,
+     "peak": -15.1
+    },
+    "cut": false,
+    "hp": 250.0,
+    "bytes": 8852,
+    "credit": {
+     "title": "HiHat_HitC_v3_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   },
+   {
+    "file": "hat-closed-8.npz",
+    "source": "karoryfer/hihat_14__cl__cl__ht_cl_vl5_rr1.flac",
+    "source_peak": -12.5,
+    "onset_s": 0.0018,
+    "dur_s": 0.8,
+    "end_s": 0.227,
+    "centroid": 7051,
+    "stereo": false,
+    "quality": {
+     "span": 4.94,
+     "centroid": 7051,
+     "end_db": -120.1,
+     "tail_ms": 573.3,
+     "start_db": -80.2,
+     "rise_ms": 1.02,
+     "peak": -14.4
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 10633,
+    "credit": {
+     "title": "hihat_14__cl__cl__ht_cl_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "hat/open",
+  "says": [
+   "an open hi-hat, a sizzling cymbal wash",
+   "a stick hitting a loose open hi-hat",
+   "a bright metallic sizzle ringing out"
+  ],
+  "uses": [
+   "drum",
+   "hi-hat",
+   "groove",
+   "accent",
+   "swish"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 2.117,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.0,
+  "allows": [
+   "ring"
+  ],
+  "members": [
+   {
+    "file": "hat-open-2.npz",
+    "source": "karoryfer/hihat_14__open__cl__ht_open_vl1_rr1.flac",
+    "source_peak": -27.2,
+    "onset_s": 0.002,
+    "dur_s": 2.5,
+    "end_s": 2.204,
+    "centroid": 1173,
+    "stereo": false,
+    "quality": {
+     "span": 2.76,
+     "centroid": 1173,
+     "end_db": -108.2,
+     "tail_ms": 296.4,
+     "start_db": -91.7,
+     "rise_ms": 21.31,
+     "peak": -30.6
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 17637,
+    "credit": {
+     "title": "hihat_14__open__cl__ht_open_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "hat-open-3.npz",
+    "source": "karoryfer/hihat_14__open__cl__ht_open_vl3_rr1.flac",
+    "source_peak": -21.3,
+    "onset_s": 0.0025,
+    "dur_s": 2.5,
+    "end_s": 2.129,
+    "centroid": 1725,
+    "stereo": false,
+    "quality": {
+     "span": 2.96,
+     "centroid": 1725,
+     "end_db": -109.5,
+     "tail_ms": 370.6,
+     "start_db": -83.0,
+     "rise_ms": 6.5,
+     "peak": -22.8
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 18461,
+    "credit": {
+     "title": "hihat_14__open__cl__ht_open_vl3_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.518
+   },
+   {
+    "file": "hat-open-1.npz",
+    "source": "vcsl/HiHat_HitO_rr1_Mid.wav",
+    "source_peak": -11.0,
+    "onset_s": 0.0105,
+    "dur_s": 2.5,
+    "end_s": 1.45,
+    "centroid": 7110,
+    "stereo": true,
+    "quality": {
+     "span": 3.42,
+     "centroid": 7110,
+     "end_db": -140.8,
+     "tail_ms": 1050.1,
+     "start_db": -188.6,
+     "rise_ms": 12.12,
+     "peak": -11.2
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 17832,
+    "credit": {
+     "title": "HiHat_HitO_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "hat-open-4.npz",
+    "source": "karoryfer/hihat_14__open__cl__ht_open_vl5_rr1.flac",
+    "source_peak": -15.8,
+    "onset_s": 0.0015,
+    "dur_s": 2.5,
+    "end_s": 2.104,
+    "centroid": 1964,
+    "stereo": false,
+    "quality": {
+     "span": 2.88,
+     "centroid": 1964,
+     "end_db": -114.1,
+     "tail_ms": 396.4,
+     "start_db": -89.5,
+     "rise_ms": 2.35,
+     "peak": -17.6
+    },
+    "cut": true,
+    "hp": 250.0,
+    "bytes": 19197,
+    "credit": {
+     "title": "hihat_14__open__cl__ht_open_vl5_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "hat/pedal",
+  "says": [
+   "a hi-hat closed with the foot pedal, a soft chick",
+   "two cymbals clapped together softly",
+   "a soft short metallic chick"
+  ],
+  "uses": [
+   "drum",
+   "hi-hat",
+   "groove",
+   "tick",
+   "rhythm"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "tick",
+  "dur_s": 0.188,
+  "note": null,
+  "vel": 0.6,
+  "size": 1.0,
+  "room": "studio",
+  "amount": -0.3,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "hat-pedal-1.npz",
+    "source": "vcsl/HiHat_Close_rr2_Mid.wav",
+    "source_peak": -22.6,
+    "onset_s": 0.0295,
+    "dur_s": 0.646,
+    "end_s": 0.21,
+    "centroid": 5808,
+    "stereo": true,
+    "quality": {
+     "span": 6.15,
+     "centroid": 5808,
+     "end_db": -124.9,
+     "tail_ms": 435.7,
+     "start_db": -118.7,
+     "rise_ms": 11.98,
+     "peak": -22.7
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 9033,
+    "credit": {
+     "title": "HiHat_Close_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "hat-pedal-3.npz",
+    "source": "karoryfer/hihat_14__chik__cl__ht_chik_vl1_rr1.flac",
+    "source_peak": -20.9,
+    "onset_s": 0.0027,
+    "dur_s": 0.8,
+    "end_s": 0.188,
+    "centroid": 6700,
+    "stereo": false,
+    "quality": {
+     "span": 6.0,
+     "centroid": 6700,
+     "end_db": -122.1,
+     "tail_ms": 612.3,
+     "start_db": -80.7,
+     "rise_ms": 3.29,
+     "peak": -21.6
+    },
+    "cut": true,
+    "hp": 200.0,
+    "bytes": 11468,
+    "credit": {
+     "title": "hihat_14__chik__cl__ht_chik_vl1_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "hat-pedal-4.npz",
+    "source": "karoryfer/hihat_14__chik__cl__ht_chik_vl2_rr1.flac",
+    "source_peak": -18.0,
+    "onset_s": 0.0015,
+    "dur_s": 0.8,
+    "end_s": 0.188,
+    "centroid": 6861,
+    "stereo": false,
+    "quality": {
+     "span": 6.06,
+     "centroid": 6861,
+     "end_db": -122.7,
+     "tail_ms": 612.2,
+     "start_db": -71.7,
+     "rise_ms": 1.81,
+     "peak": -19.0
+    },
+    "cut": true,
+    "hp": 200.0,
+    "bytes": 11325,
+    "credit": {
+     "title": "hihat_14__chik__cl__ht_chik_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.296
+   },
+   {
+    "file": "hat-pedal-2.npz",
+    "source": "vcsl/HiHat_Close_rr1_Mid.wav",
+    "source_peak": -20.0,
+    "onset_s": 0.0227,
+    "dur_s": 0.629,
+    "end_s": 0.183,
+    "centroid": 4453,
+    "stereo": true,
+    "quality": {
+     "span": 5.99,
+     "centroid": 4453,
+     "end_db": -121.6,
+     "tail_ms": 446.3,
+     "start_db": -130.1,
+     "rise_ms": 6.21,
+     "peak": -20.5
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 9561,
+    "credit": {
+     "title": "HiHat_Close_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   },
+   {
+    "file": "hat-pedal-5.npz",
+    "source": "karoryfer/hihat_14__chik__cl__ht_chik_vl4_rr1.flac",
+    "source_peak": -11.1,
+    "onset_s": 0.0025,
+    "dur_s": 0.557,
+    "end_s": 0.172,
+    "centroid": 7973,
+    "stereo": false,
+    "quality": {
+     "span": 6.33,
+     "centroid": 7973,
+     "end_db": -123.4,
+     "tail_ms": 385.2,
+     "start_db": -88.0,
+     "rise_ms": 10.42,
+     "peak": -13.0
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 9829,
+    "credit": {
+     "title": "hihat_14__chik__cl__ht_chik_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "crash/bright",
+  "says": [
+   "a bright crash of cymbals",
+   "a loud shimmering cymbal crash",
+   "a splashy metallic cymbal hit"
+  ],
+  "uses": [
+   "drum",
+   "crash cymbal",
+   "cymbal",
+   "accent",
+   "impact",
+   "finale",
+   "reveal",
+   "transition"
+  ],
+  "tags": [
+   "kit",
+   "orchestral"
+  ],
+  "kind": "hit",
+  "dur_s": 1.352,
+  "note": null,
+  "vel": 0.8,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 1.0,
+  "finish": false,
+  "prior": 1.03,
+  "allows": [
+   "ring"
+  ],
+  "members": [
+   {
+    "file": "crash-bright-1.npz",
+    "source": "vcsl/cymbal_crash1_mf1.wav",
+    "source_peak": -5.2,
+    "onset_s": 0.0043,
+    "dur_s": 3.5,
+    "end_s": 1.352,
+    "centroid": 2123,
+    "stereo": true,
+    "quality": {
+     "span": 4.2,
+     "centroid": 2123,
+     "end_db": -129.5,
+     "tail_ms": 2147.8,
+     "start_db": -108.0,
+     "rise_ms": 14.44,
+     "peak": -6.8
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 21277,
+    "credit": {
+     "title": "cymbal_crash1_mf1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "crash-bright-3.npz",
+    "source": "vcsl/susCymb1_hit_fff1.wav",
+    "source_peak": -7.3,
+    "onset_s": 0.014,
+    "dur_s": 3.0,
+    "end_s": 2.717,
+    "centroid": 3393,
+    "stereo": true,
+    "quality": {
+     "span": 3.71,
+     "centroid": 3393,
+     "end_db": -108.7,
+     "tail_ms": 282.6,
+     "start_db": -112.6,
+     "rise_ms": 9.35,
+     "peak": -8.0
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 21786,
+    "credit": {
+     "title": "susCymb1_hit_fff1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "crash-bright-2.npz",
+    "source": "vcsl/cymbal_crash1_ff2.wav",
+    "source_peak": -3.1,
+    "onset_s": 0.0032,
+    "dur_s": 3.5,
+    "end_s": 1.306,
+    "centroid": 2641,
+    "stereo": true,
+    "quality": {
+     "span": 3.63,
+     "centroid": 2641,
+     "end_db": -129.1,
+     "tail_ms": 2194.0,
+     "start_db": -96.9,
+     "rise_ms": 7.79,
+     "peak": -4.0
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 20699,
+    "credit": {
+     "title": "cymbal_crash1_ff2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "crash/dark",
+  "says": [
+   "a dark crash cymbal",
+   "a deep washy cymbal crash",
+   "a large trashy cymbal hit"
+  ],
+  "uses": [
+   "drum",
+   "crash cymbal",
+   "cymbal",
+   "accent",
+   "impact",
+   "finale",
+   "transition"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 2.474,
+  "note": null,
+  "vel": 0.8,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 1.0,
+  "finish": false,
+  "prior": 1.0,
+  "allows": [
+   "ring"
+  ],
+  "members": [
+   {
+    "file": "crash-dark-1.npz",
+    "source": "karoryfer/crash_17__cr__oh__cr_vl2_rr1.flac",
+    "source_peak": -17.6,
+    "onset_s": 0.0022,
+    "dur_s": 3.0,
+    "end_s": 2.612,
+    "centroid": 1318,
+    "stereo": true,
+    "quality": {
+     "span": 3.43,
+     "centroid": 1318,
+     "end_db": -114.8,
+     "tail_ms": 387.8,
+     "start_db": -118.4,
+     "rise_ms": 4.42,
+     "peak": -21.3
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 19164,
+    "credit": {
+     "title": "crash_17__cr__oh__cr_vl2_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "crash-dark-2.npz",
+    "source": "karoryfer/crash_17__cr__oh__cr_vl4_rr1.flac",
+    "source_peak": -8.7,
+    "onset_s": 0.0018,
+    "dur_s": 3.0,
+    "end_s": 2.336,
+    "centroid": 2561,
+    "stereo": true,
+    "quality": {
+     "span": 3.72,
+     "centroid": 2561,
+     "end_db": -121.5,
+     "tail_ms": 663.9,
+     "start_db": -120.0,
+     "rise_ms": 11.02,
+     "peak": -12.6
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 19143,
+    "credit": {
+     "title": "crash_17__cr__oh__cr_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "ride/ping",
+  "says": [
+   "a ride cymbal ping",
+   "a stick tapping a ride cymbal, a clear ping with a long shimmer",
+   "a metallic ping that rings on"
+  ],
+  "uses": [
+   "drum",
+   "ride",
+   "cymbal",
+   "jazz",
+   "groove",
+   "rhythm"
+  ],
+  "tags": [
+   "kit"
+  ],
+  "kind": "hit",
+  "dur_s": 2.171,
+  "note": null,
+  "vel": 0.6,
+  "size": 1.0,
+  "room": "studio",
+  "amount": 0.0,
+  "width": 1.0,
+  "finish": false,
+  "prior": 1.03,
+  "allows": [
+   "ring"
+  ],
+  "members": [
+   {
+    "file": "ride-ping-1.npz",
+    "source": "karoryfer/ride_22__rd__oh__rd_vl4_rr1.flac",
+    "source_peak": -11.0,
+    "onset_s": 0.0027,
+    "dur_s": 3.0,
+    "end_s": 2.292,
+    "centroid": 1044,
+    "stereo": true,
+    "quality": {
+     "span": 2.94,
+     "centroid": 1044,
+     "end_db": -123.6,
+     "tail_ms": 708.0,
+     "start_db": -121.2,
+     "rise_ms": 0.67,
+     "peak": -10.7
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 16227,
+    "credit": {
+     "title": "ride_22__rd__oh__rd_vl4_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "ride-ping-2.npz",
+    "source": "karoryfer/ride_22__rd__oh__rd_vl7_rr1.flac",
+    "source_peak": -6.6,
+    "onset_s": 0.0027,
+    "dur_s": 3.0,
+    "end_s": 2.051,
+    "centroid": 1027,
+    "stereo": true,
+    "quality": {
+     "span": 2.69,
+     "centroid": 1027,
+     "end_db": -123.7,
+     "tail_ms": 949.4,
+     "start_db": -122.7,
+     "rise_ms": 0.69,
+     "peak": -6.1
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 16585,
+    "credit": {
+     "title": "ride_22__rd__oh__rd_vl7_rr1.flac",
+     "author": "Karoryfer Samples (Big Rusty Drums, github.com/sfzinstruments/karoryfer.big-rusty-drums)",
+     "page": "https://github.com/sfzinstruments/karoryfer.big-rusty-drums",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "clap/hands",
+  "says": [
+   "a single hand clap",
+   "two hands clapping once",
+   "a sharp clap of palms"
+  ],
+  "uses": [
+   "clap",
+   "applause",
+   "accent",
+   "success",
+   "attention"
+  ],
+  "tags": [
+   "body"
+  ],
+  "kind": "hit",
+  "dur_s": 0.086,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.35,
+  "width": 0.6,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "clap-hands-4.npz",
+    "source": "freesound_e1/151219.mp3",
+    "cut_s": [
+     2.445,
+     2.659
+    ],
+    "source_peak": -8.8,
+    "onset_s": 0.0293,
+    "dur_s": 0.214,
+    "end_s": 0.1,
+    "centroid": 1631,
+    "stereo": true,
+    "quality": {
+     "span": 1.24,
+     "centroid": 1631,
+     "end_db": -81.7,
+     "tail_ms": 114.2,
+     "start_db": -148.3,
+     "rise_ms": 1.27,
+     "peak": -8.7
+    },
+    "cut": true,
+    "hp": 100.0,
+    "bytes": 6074,
+    "credit": {
+     "title": "Solo Clap",
+     "author": "OwlStorm",
+     "page": "https://freesound.org/people/OwlStorm/sounds/151219/",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "clap-hands-2.npz",
+    "source": "freesound_e1/151219.mp3",
+    "cut_s": [
+     2.136,
+     2.332
+    ],
+    "source_peak": -6.7,
+    "onset_s": 0.0177,
+    "dur_s": 0.196,
+    "end_s": 0.08,
+    "centroid": 1439,
+    "stereo": true,
+    "quality": {
+     "span": 1.52,
+     "centroid": 1439,
+     "end_db": -79.6,
+     "tail_ms": 116.3,
+     "start_db": -150.1,
+     "rise_ms": 1.81,
+     "peak": -6.4
+    },
+    "cut": true,
+    "hp": 100.0,
+    "bytes": 5616,
+    "credit": {
+     "title": "Solo Clap",
+     "author": "OwlStorm",
+     "page": "https://freesound.org/people/OwlStorm/sounds/151219/",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.247
+   },
+   {
+    "file": "clap-hands-3.npz",
+    "source": "freesound_e1/151219.mp3",
+    "cut_s": [
+     1.146,
+     1.345
+    ],
+    "source_peak": -4.8,
+    "onset_s": 0.0175,
+    "dur_s": 0.199,
+    "end_s": 0.086,
+    "centroid": 1603,
+    "stereo": true,
+    "quality": {
+     "span": 2.5,
+     "centroid": 1603,
+     "end_db": -82.8,
+     "tail_ms": 113.2,
+     "start_db": -142.2,
+     "rise_ms": 2.21,
+     "peak": -6.3
+    },
+    "cut": true,
+    "hp": 100.0,
+    "bytes": 6520,
+    "credit": {
+     "title": "Solo Clap",
+     "author": "OwlStorm",
+     "page": "https://freesound.org/people/OwlStorm/sounds/151219/",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.471
+   },
+   {
+    "file": "clap-hands-1.npz",
+    "source": "freesound_e1/151219.mp3",
+    "cut_s": [
+     0.711,
+     0.909
+    ],
+    "source_peak": -0.3,
+    "onset_s": 0.0177,
+    "dur_s": 0.198,
+    "end_s": 0.087,
+    "centroid": 1504,
+    "stereo": true,
+    "quality": {
+     "span": 1.24,
+     "centroid": 1504,
+     "end_db": -80.9,
+     "tail_ms": 110.9,
+     "start_db": -158.4,
+     "rise_ms": 1.02,
+     "peak": -0.5
+    },
+    "cut": true,
+    "hp": 100.0,
+    "bytes": 5523,
+    "credit": {
+     "title": "Solo Clap",
+     "author": "OwlStorm",
+     "page": "https://freesound.org/people/OwlStorm/sounds/151219/",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "clap/group",
+  "says": [
+   "a group of people clapping together once",
+   "several hand claps at once, a crowd clap",
+   "a layered clap of many hands"
+  ],
+  "uses": [
+   "clap",
+   "applause",
+   "accent",
+   "success",
+   "crowd"
+  ],
+  "tags": [
+   "body"
+  ],
+  "kind": "hit",
+  "dur_s": 0.15,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "hall",
+  "amount": -0.4,
+  "width": 1.0,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [
+   "stacked"
+  ],
+  "members": [
+   {
+    "file": "clap-group-1.npz",
+    "source": "vcsl/Clap_rr2.wav",
+    "source_peak": -0.4,
+    "onset_s": 0.0022,
+    "dur_s": 0.713,
+    "end_s": 0.145,
+    "centroid": 2410,
+    "stereo": true,
+    "quality": {
+     "span": 3.02,
+     "centroid": 2410,
+     "end_db": -116.3,
+     "tail_ms": 568.3,
+     "start_db": -101.6,
+     "rise_ms": 3.88,
+     "peak": -0.2
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 13182,
+    "credit": {
+     "title": "Clap_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "clap-group-2.npz",
+    "source": "vcsl/Clap_rr6.wav",
+    "source_peak": -0.4,
+    "onset_s": 0.0022,
+    "dur_s": 0.467,
+    "end_s": 0.148,
+    "centroid": 2995,
+    "stereo": true,
+    "quality": {
+     "span": 3.43,
+     "centroid": 2995,
+     "end_db": -115.0,
+     "tail_ms": 319.5,
+     "start_db": -117.6,
+     "rise_ms": 1.62,
+     "peak": 0.1
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 14185,
+    "credit": {
+     "title": "Clap_rr6.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "clap-group-3.npz",
+    "source": "vcsl/Clap_rr1.wav",
+    "source_peak": -0.4,
+    "onset_s": 0.0027,
+    "dur_s": 0.739,
+    "end_s": 0.165,
+    "centroid": 2775,
+    "stereo": true,
+    "quality": {
+     "span": 3.06,
+     "centroid": 2775,
+     "end_db": -115.4,
+     "tail_ms": 573.8,
+     "start_db": -120.1,
+     "rise_ms": 1.31,
+     "peak": -0.3
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 12405,
+    "credit": {
+     "title": "Clap_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "clap-group-4.npz",
+    "source": "vcsl/Clap_rr3.wav",
+    "source_peak": -0.4,
+    "onset_s": 0.0032,
+    "dur_s": 0.688,
+    "end_s": 0.153,
+    "centroid": 2586,
+    "stereo": true,
+    "quality": {
+     "span": 2.79,
+     "centroid": 2586,
+     "end_db": -112.2,
+     "tail_ms": 535.8,
+     "start_db": -107.8,
+     "rise_ms": 1.23,
+     "peak": 0.5
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 12118,
+    "credit": {
+     "title": "Clap_rr3.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "clap-group-5.npz",
+    "source": "vcsl/Clap_rr4.wav",
+    "source_peak": -0.4,
+    "onset_s": 0.0032,
+    "dur_s": 0.769,
+    "end_s": 0.129,
+    "centroid": 2786,
+    "stereo": true,
+    "quality": {
+     "span": 3.13,
+     "centroid": 2786,
+     "end_db": -118.3,
+     "tail_ms": 640.0,
+     "start_db": -113.4,
+     "rise_ms": 6.31,
+     "peak": -0.3
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 12209,
+    "credit": {
+     "title": "Clap_rr4.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "clap-group-6.npz",
+    "source": "vcsl/Clap_rr5.wav",
+    "source_peak": -0.4,
+    "onset_s": 0.0152,
+    "dur_s": 0.658,
+    "end_s": 0.152,
+    "centroid": 2840,
+    "stereo": true,
+    "quality": {
+     "span": 3.4,
+     "centroid": 2840,
+     "end_db": -115.7,
+     "tail_ms": 505.9,
+     "start_db": -105.1,
+     "rise_ms": 5.38,
+     "peak": -0.7
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 12224,
+    "credit": {
+     "title": "Clap_rr5.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   }
+  ]
+ },
+ {
+  "id": "shaker/tick",
+  "says": [
+   "a single shake of a shaker",
+   "one short stroke of a shaker, a quick chk",
+   "a small rattle of beads in a shell"
+  ],
+  "uses": [
+   "shaker",
+   "rhythm",
+   "tick",
+   "groove",
+   "percussion"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "tick",
+  "dur_s": 0.356,
+  "note": null,
+  "vel": 0.6,
+  "size": 1.0,
+  "room": "room",
+  "amount": -0.3,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "shaker-tick-1.npz",
+    "source": "vcsl/LShaker_Hit_rr1_Mid.wav",
+    "source_peak": -13.2,
+    "onset_s": 0.013,
+    "dur_s": 0.677,
+    "end_s": 0.225,
+    "centroid": 5314,
+    "stereo": true,
+    "quality": {
+     "span": 1.2,
+     "centroid": 5314,
+     "end_db": -123.9,
+     "tail_ms": 451.8,
+     "start_db": -118.9,
+     "rise_ms": 8.54,
+     "peak": -12.8
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 12491,
+    "credit": {
+     "title": "LShaker_Hit_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "shaker-tick-3.npz",
+    "source": "vcsl/LShaker_Shake1D_rr2_Mid.wav",
+    "source_peak": -24.1,
+    "onset_s": 0.074,
+    "dur_s": 0.871,
+    "end_s": 0.385,
+    "centroid": 5359,
+    "stereo": true,
+    "quality": {
+     "span": 1.46,
+     "centroid": 5359,
+     "end_db": -128.0,
+     "tail_ms": 486.6,
+     "start_db": -126.7,
+     "rise_ms": 17.31,
+     "peak": -24.2
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 14765,
+    "credit": {
+     "title": "LShaker_Shake1D_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "shaker-tick-5.npz",
+    "source": "vcsl/LShaker_Shake1U_rr1_Mid.wav",
+    "source_peak": -28.5,
+    "onset_s": 0.1217,
+    "dur_s": 1.0,
+    "end_s": 0.461,
+    "centroid": 5149,
+    "stereo": true,
+    "quality": {
+     "span": 1.24,
+     "centroid": 5149,
+     "end_db": -125.1,
+     "tail_ms": 538.7,
+     "start_db": -211.4,
+     "rise_ms": 116.31,
+     "peak": -28.6
+    },
+    "cut": true,
+    "hp": 200.0,
+    "bytes": 18951,
+    "credit": {
+     "title": "LShaker_Shake1U_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "shaker-tick-2.npz",
+    "source": "vcsl/LShaker_Hit_rr2_Mid.wav",
+    "source_peak": -11.5,
+    "onset_s": 0.0192,
+    "dur_s": 0.663,
+    "end_s": 0.207,
+    "centroid": 5257,
+    "stereo": true,
+    "quality": {
+     "span": 1.32,
+     "centroid": 5257,
+     "end_db": -121.4,
+     "tail_ms": 455.4,
+     "start_db": -115.3,
+     "rise_ms": 5.04,
+     "peak": -11.7
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 10555,
+    "credit": {
+     "title": "LShaker_Hit_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   },
+   {
+    "file": "shaker-tick-4.npz",
+    "source": "vcsl/LShaker_Shake1D_rr3_Mid.wav",
+    "source_peak": -21.2,
+    "onset_s": 0.0653,
+    "dur_s": 0.813,
+    "end_s": 0.326,
+    "centroid": 5415,
+    "stereo": true,
+    "quality": {
+     "span": 1.5,
+     "centroid": 5415,
+     "end_db": -126.1,
+     "tail_ms": 486.2,
+     "start_db": -118.0,
+     "rise_ms": 34.54,
+     "peak": -21.1
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 11369,
+    "credit": {
+     "title": "LShaker_Shake1D_rr3_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   },
+   {
+    "file": "shaker-tick-6.npz",
+    "source": "vcsl/LShaker_Shake1U_rr4_Mid.wav",
+    "source_peak": -25.9,
+    "onset_s": 0.083,
+    "dur_s": 0.944,
+    "end_s": 0.411,
+    "centroid": 5245,
+    "stereo": true,
+    "quality": {
+     "span": 1.3,
+     "centroid": 5245,
+     "end_db": -130.9,
+     "tail_ms": 532.9,
+     "start_db": -151.0,
+     "rise_ms": 49.17,
+     "peak": -25.9
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 17196,
+    "credit": {
+     "title": "LShaker_Shake1U_rr4_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "tambourine/hit",
+  "says": [
+   "a tambourine struck once",
+   "a hand hitting a tambourine, a bright jingle",
+   "a burst of small metal jingles"
+  ],
+  "uses": [
+   "tambourine",
+   "accent",
+   "backbeat",
+   "percussion",
+   "success"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.34,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": -0.1,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "tambourine-hit-1.npz",
+    "source": "vcsl/Tamb1_Hit_v1_rr1_Mid.wav",
+    "source_peak": -28.5,
+    "onset_s": 0.021,
+    "dur_s": 1.465,
+    "end_s": 0.344,
+    "centroid": 7622,
+    "stereo": true,
+    "quality": {
+     "span": 2.01,
+     "centroid": 7622,
+     "end_db": -135.1,
+     "tail_ms": 1120.6,
+     "start_db": -211.7,
+     "rise_ms": 52.81,
+     "peak": -28.3
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 11718,
+    "credit": {
+     "title": "Tamb1_Hit_v1_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "tambourine-hit-2.npz",
+    "source": "vcsl/Tamb1_Hit_v2_rr1_Mid.wav",
+    "source_peak": -16.4,
+    "onset_s": 0.014,
+    "dur_s": 0.872,
+    "end_s": 0.336,
+    "centroid": 8097,
+    "stereo": true,
+    "quality": {
+     "span": 2.04,
+     "centroid": 8097,
+     "end_db": -130.9,
+     "tail_ms": 535.7,
+     "start_db": -223.8,
+     "rise_ms": 5.17,
+     "peak": -16.2
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 8162,
+    "credit": {
+     "title": "Tamb1_Hit_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "tambourine/shake",
+  "says": [
+   "a tambourine being shaken",
+   "jingles of a tambourine rattling",
+   "a shimmering shake of metal jingles"
+  ],
+  "uses": [
+   "tambourine",
+   "groove",
+   "rhythm",
+   "percussion",
+   "shake",
+   "celebration"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "noise",
+  "dur_s": 0.352,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": -0.1,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.0,
+  "allows": [
+   "tail"
+  ],
+  "members": [
+   {
+    "file": "tambourine-shake-1.npz",
+    "source": "vcsl/Tamb1_Shake_rr2_Mid.wav",
+    "source_peak": -25.5,
+    "onset_s": 0.0592,
+    "dur_s": 0.864,
+    "end_s": 0.327,
+    "centroid": 8978,
+    "stereo": true,
+    "quality": {
+     "span": 2.02,
+     "centroid": 8978,
+     "end_db": -125.0,
+     "tail_ms": 536.7,
+     "start_db": -124.2,
+     "rise_ms": 43.58,
+     "peak": -25.0
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 12043,
+    "credit": {
+     "title": "Tamb1_Shake_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "tambourine-shake-2.npz",
+    "source": "vcsl/Tamb1_Shake_rr1_Mid.wav",
+    "source_peak": -24.7,
+    "onset_s": 0.1273,
+    "dur_s": 0.784,
+    "end_s": 0.376,
+    "centroid": 8372,
+    "stereo": true,
+    "quality": {
+     "span": 2.04,
+     "centroid": 8372,
+     "end_db": -125.7,
+     "tail_ms": 408.5,
+     "start_db": -164.2,
+     "rise_ms": 33.42,
+     "peak": -25.2
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 10182,
+    "credit": {
+     "title": "Tamb1_Shake_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   }
+  ]
+ },
+ {
+  "id": "conga/open",
+  "says": [
+   "an open conga tone",
+   "a hand striking a conga drum, a round ringing note",
+   "a warm pitched hand drum hit"
+  ],
+  "uses": [
+   "conga",
+   "latin",
+   "groove",
+   "percussion",
+   "rhythm"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.422,
+  "note": 151.7,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "conga-open-1.npz",
+    "source": "vcsl/Conga_HitN_v1_rr2_Sum.wav",
+    "source_peak": -29.0,
+    "onset_s": 0.002,
+    "dur_s": 0.653,
+    "end_s": 0.325,
+    "centroid": 162,
+    "stereo": true,
+    "quality": {
+     "span": 0.19,
+     "centroid": 162,
+     "end_db": -146.2,
+     "tail_ms": 327.8,
+     "start_db": -96.4,
+     "rise_ms": 18.6,
+     "peak": -29.1
+    },
+    "cut": false,
+    "hp": 40.0,
+    "bytes": 6705,
+    "credit": {
+     "title": "Conga_HitN_v1_rr2_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 164.3,
+    "vel": 0.6
+   },
+   {
+    "file": "conga-open-2.npz",
+    "source": "vcsl/Tumba_HitN_v2_rr1_Sum.wav",
+    "source_peak": -30.3,
+    "onset_s": 0.003,
+    "dur_s": 0.844,
+    "end_s": 0.52,
+    "centroid": 149,
+    "stereo": true,
+    "quality": {
+     "span": 1.41,
+     "centroid": 149,
+     "end_db": -157.6,
+     "tail_ms": 323.6,
+     "start_db": -114.0,
+     "rise_ms": 7.33,
+     "peak": -30.6
+    },
+    "cut": false,
+    "hp": 40.0,
+    "bytes": 8517,
+    "credit": {
+     "title": "Tumba_HitN_v2_rr1_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 139.1,
+    "vel": 0.6
+   }
+  ]
+ },
+ {
+  "id": "conga/muted",
+  "says": [
+   "a muted conga stroke, a short dull thump",
+   "a hand pressing a conga head as it strikes",
+   "a damped hand drum tap"
+  ],
+  "uses": [
+   "conga",
+   "latin",
+   "groove",
+   "percussion",
+   "rhythm"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.317,
+  "note": 82.1,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "conga-muted-1.npz",
+    "source": "vcsl/Conga_HitFM_v1_rr1_Sum.wav",
+    "source_peak": -27.2,
+    "onset_s": 0.0027,
+    "dur_s": 0.624,
+    "end_s": 0.317,
+    "centroid": 97,
+    "stereo": true,
+    "quality": {
+     "span": 0.74,
+     "centroid": 97,
+     "end_db": -134.2,
+     "tail_ms": 306.6,
+     "start_db": -118.5,
+     "rise_ms": 0.96,
+     "peak": -25.2
+    },
+    "cut": false,
+    "hp": 40.0,
+    "bytes": 9615,
+    "credit": {
+     "title": "Conga_HitFM_v1_rr1_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 83.2,
+    "vel": 0.6
+   },
+   {
+    "file": "conga-muted-2.npz",
+    "source": "vcsl/Quinto_HitFM1_v1_rr2_Sum.wav",
+    "source_peak": -36.8,
+    "onset_s": 0.0003,
+    "dur_s": 0.583,
+    "end_s": 0.287,
+    "centroid": 169,
+    "stereo": true,
+    "quality": {
+     "span": 2.3,
+     "centroid": 169,
+     "end_db": -142.2,
+     "tail_ms": 296.2,
+     "start_db": -92.2,
+     "rise_ms": 1.79,
+     "peak": -36.3
+    },
+    "cut": false,
+    "hp": 40.0,
+    "bytes": 8062,
+    "credit": {
+     "title": "Quinto_HitFM1_v1_rr2_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 82.1,
+    "vel": 0.6
+   },
+   {
+    "file": "conga-muted-3.npz",
+    "source": "vcsl/Tumba_HitFM_v3_rr1_Sum.wav",
+    "source_peak": -21.7,
+    "onset_s": 0.003,
+    "dur_s": 0.522,
+    "end_s": 0.325,
+    "centroid": 97,
+    "stereo": true,
+    "quality": {
+     "span": 0.82,
+     "centroid": 97,
+     "end_db": -117.1,
+     "tail_ms": 196.9,
+     "start_db": -103.0,
+     "rise_ms": 2.44,
+     "peak": -21.2
+    },
+    "cut": false,
+    "hp": 40.0,
+    "bytes": 8087,
+    "credit": {
+     "title": "Tumba_HitFM_v3_rr1_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 81.1,
+    "vel": 0.6
+   }
+  ]
+ },
+ {
+  "id": "bongo/high",
+  "says": [
+   "a high bongo hit",
+   "a small hand drum with a bright pitched pop",
+   "fingers striking a bongo"
+  ],
+  "uses": [
+   "bongo",
+   "latin",
+   "groove",
+   "percussion",
+   "rhythm",
+   "tap"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.242,
+  "note": 300.5,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "bongo-high-1.npz",
+    "source": "vcsl/BongoH_Hit1_v1_rr1_Mid.wav",
+    "source_peak": -30.3,
+    "onset_s": 0.0107,
+    "dur_s": 0.738,
+    "end_s": 0.242,
+    "centroid": 402,
+    "stereo": true,
+    "quality": {
+     "span": 1.91,
+     "centroid": 402,
+     "end_db": -152.7,
+     "tail_ms": 495.5,
+     "start_db": -150.2,
+     "rise_ms": 5.56,
+     "peak": -31.6
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 8585,
+    "credit": {
+     "title": "BongoH_Hit1_v1_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 300.5,
+    "vel": 0.0
+   },
+   {
+    "file": "bongo-high-3.npz",
+    "source": "vcsl/BongoH_HitMuted1_v2_rr2_Mid.wav",
+    "source_peak": -12.9,
+    "onset_s": 0.0105,
+    "dur_s": 0.739,
+    "end_s": 0.235,
+    "centroid": 426,
+    "stereo": true,
+    "quality": {
+     "span": 1.0,
+     "centroid": 426,
+     "end_db": -132.6,
+     "tail_ms": 504.1,
+     "start_db": -172.4,
+     "rise_ms": 2.88,
+     "peak": -13.7
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 7749,
+    "credit": {
+     "title": "BongoH_HitMuted1_v2_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 300.2,
+    "vel": 0.6
+   },
+   {
+    "file": "bongo-high-2.npz",
+    "source": "vcsl/BongoH_Hit1_v3_rr1_Mid.wav",
+    "source_peak": -8.9,
+    "onset_s": 0.01,
+    "dur_s": 0.748,
+    "end_s": 0.26,
+    "centroid": 420,
+    "stereo": true,
+    "quality": {
+     "span": 0.75,
+     "centroid": 420,
+     "end_db": -127.8,
+     "tail_ms": 488.8,
+     "start_db": -162.1,
+     "rise_ms": 5.25,
+     "peak": -9.0
+    },
+    "cut": false,
+    "hp": 60.0,
+    "bytes": 7181,
+    "credit": {
+     "title": "BongoH_Hit1_v3_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 300.5,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "bongo/low",
+  "says": [
+   "a low bongo hit",
+   "the larger of a pair of bongos, a round pitched pop",
+   "fingers striking a low bongo"
+  ],
+  "uses": [
+   "bongo",
+   "latin",
+   "groove",
+   "percussion",
+   "rhythm"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.308,
+  "note": 260.9,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "bongo-low-1.npz",
+    "source": "vcsl/BongoL_Hit1_v1_rr1_Mid.wav",
+    "source_peak": -28.2,
+    "onset_s": 0.0103,
+    "dur_s": 0.808,
+    "end_s": 0.341,
+    "centroid": 350,
+    "stereo": true,
+    "quality": {
+     "span": 1.11,
+     "centroid": 350,
+     "end_db": -129.8,
+     "tail_ms": 467.4,
+     "start_db": -122.8,
+     "rise_ms": 5.85,
+     "peak": -28.5
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 7434,
+    "credit": {
+     "title": "BongoL_Hit1_v1_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 260.9,
+    "vel": 0.0
+   },
+   {
+    "file": "bongo-low-3.npz",
+    "source": "vcsl/BongoL_HitMuted2_v2_rr2_Mid.wav",
+    "source_peak": -14.0,
+    "onset_s": 0.0105,
+    "dur_s": 0.769,
+    "end_s": 0.286,
+    "centroid": 317,
+    "stereo": true,
+    "quality": {
+     "span": 1.15,
+     "centroid": 317,
+     "end_db": -133.7,
+     "tail_ms": 482.8,
+     "start_db": -182.6,
+     "rise_ms": 3.75,
+     "peak": -14.6
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 7469,
+    "credit": {
+     "title": "BongoL_HitMuted2_v2_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 274.6,
+    "vel": 0.6
+   },
+   {
+    "file": "bongo-low-2.npz",
+    "source": "vcsl/BongoL_Hit1_v3_rr1_Mid.wav",
+    "source_peak": -10.4,
+    "onset_s": 0.0118,
+    "dur_s": 0.816,
+    "end_s": 0.308,
+    "centroid": 347,
+    "stereo": true,
+    "quality": {
+     "span": 1.11,
+     "centroid": 347,
+     "end_db": -128.1,
+     "tail_ms": 508.2,
+     "start_db": -171.7,
+     "rise_ms": 6.67,
+     "peak": -10.1
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 7606,
+    "credit": {
+     "title": "BongoL_Hit1_v3_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 260.9,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "cajon/bass",
+  "says": [
+   "a cajon bass tone, a deep thump on a wooden box drum",
+   "a palm striking the middle of a cajon",
+   "a low woody box drum thud"
+  ],
+  "uses": [
+   "cajon",
+   "acoustic",
+   "groove",
+   "percussion",
+   "kick drum"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "thud",
+  "dur_s": 0.158,
+  "note": 81.0,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.6,
+  "finish": true,
+  "prior": 1.03,
+  "allows": [],
+  "members": [
+   {
+    "file": "cajon-bass-1.npz",
+    "source": "vcsl/Cajon_hit1_f_rr1.wav",
+    "source_peak": -8.1,
+    "onset_s": 0.0027,
+    "dur_s": 0.796,
+    "end_s": 0.148,
+    "centroid": 295,
+    "stereo": true,
+    "quality": {
+     "span": 2.89,
+     "centroid": 295,
+     "end_db": -131.2,
+     "tail_ms": 647.4,
+     "start_db": -99.7,
+     "rise_ms": 3.23,
+     "peak": -9.0
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8448,
+    "credit": {
+     "title": "Cajon_hit1_f_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 81.0,
+    "vel": 0.0
+   },
+   {
+    "file": "cajon-bass-3.npz",
+    "source": "vcsl/Cajon_hit2_mp_rr2.wav",
+    "source_peak": -8.9,
+    "onset_s": 0.003,
+    "dur_s": 0.757,
+    "end_s": 0.185,
+    "centroid": 143,
+    "stereo": true,
+    "quality": {
+     "span": 0.79,
+     "centroid": 143,
+     "end_db": -126.3,
+     "tail_ms": 571.4,
+     "start_db": -110.5,
+     "rise_ms": 8.0,
+     "peak": -9.6
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9037,
+    "credit": {
+     "title": "Cajon_hit2_mp_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 80.8,
+    "vel": 0.0
+   },
+   {
+    "file": "cajon-bass-5.npz",
+    "source": "vcsl/Cajon_hit3_mp_rr2.wav",
+    "source_peak": -5.3,
+    "onset_s": 0.0035,
+    "dur_s": 0.769,
+    "end_s": 0.186,
+    "centroid": 143,
+    "stereo": true,
+    "quality": {
+     "span": 0.8,
+     "centroid": 143,
+     "end_db": -130.9,
+     "tail_ms": 582.6,
+     "start_db": -108.8,
+     "rise_ms": 1.58,
+     "peak": -6.3
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 12901,
+    "credit": {
+     "title": "Cajon_hit3_mp_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 82.2,
+    "vel": 0.0
+   },
+   {
+    "file": "cajon-bass-2.npz",
+    "source": "vcsl/Cajon_hit1_fff_rr1.wav",
+    "source_peak": -0.6,
+    "onset_s": 0.0025,
+    "dur_s": 0.69,
+    "end_s": 0.144,
+    "centroid": 406,
+    "stereo": true,
+    "quality": {
+     "span": 3.37,
+     "centroid": 406,
+     "end_db": -129.2,
+     "tail_ms": 545.6,
+     "start_db": -105.0,
+     "rise_ms": 8.0,
+     "peak": 0.1
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9183,
+    "credit": {
+     "title": "Cajon_hit1_fff_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 81.0,
+    "vel": 1.0
+   },
+   {
+    "file": "cajon-bass-4.npz",
+    "source": "vcsl/Cajon_hit2_f_rr1.wav",
+    "source_peak": -2.2,
+    "onset_s": 0.0032,
+    "dur_s": 0.819,
+    "end_s": 0.167,
+    "centroid": 148,
+    "stereo": true,
+    "quality": {
+     "span": 0.83,
+     "centroid": 148,
+     "end_db": -129.2,
+     "tail_ms": 651.9,
+     "start_db": -85.2,
+     "rise_ms": 5.9,
+     "peak": -3.5
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8729,
+    "credit": {
+     "title": "Cajon_hit2_f_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 80.8,
+    "vel": 1.0
+   },
+   {
+    "file": "cajon-bass-6.npz",
+    "source": "vcsl/Cajon_hit3_f_rr2.wav",
+    "source_peak": -2.0,
+    "onset_s": 0.0025,
+    "dur_s": 0.788,
+    "end_s": 0.137,
+    "centroid": 149,
+    "stereo": true,
+    "quality": {
+     "span": 0.9,
+     "centroid": 149,
+     "end_db": -124.5,
+     "tail_ms": 651.6,
+     "start_db": -111.2,
+     "rise_ms": 5.92,
+     "peak": -2.4
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 8451,
+    "credit": {
+     "title": "Cajon_hit3_f_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "hz": 82.2,
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "darbuka/hit",
+  "says": [
+   "a darbuka struck by hand, a deep doum or a bright tek",
+   "a goblet drum struck, a ringing hand drum stroke",
+   "a middle eastern hand drum"
+  ],
+  "uses": [
+   "darbuka",
+   "percussion",
+   "groove",
+   "rhythm",
+   "middle eastern",
+   "hand drum"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.345,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "darbuka-hit-1.npz",
+    "source": "vcsl/Darbuka_1_hit_vl2_rr2.wav",
+    "source_peak": -0.0,
+    "onset_s": 0.0022,
+    "dur_s": 1.2,
+    "end_s": 0.562,
+    "centroid": 144,
+    "stereo": true,
+    "quality": {
+     "span": 0.03,
+     "centroid": 144,
+     "end_db": -121.6,
+     "tail_ms": 638.3,
+     "start_db": -86.6,
+     "rise_ms": 3.46,
+     "peak": 2.6
+    },
+    "cut": true,
+    "hp": 50.0,
+    "bytes": 7002,
+    "credit": {
+     "title": "Darbuka_1_hit_vl2_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "darbuka-hit-2.npz",
+    "source": "vcsl/Darbuka_2_hit_vl2_rr1.wav",
+    "source_peak": -5.3,
+    "onset_s": 0.0032,
+    "dur_s": 0.555,
+    "end_s": 0.128,
+    "centroid": 809,
+    "stereo": true,
+    "quality": {
+     "span": 3.55,
+     "centroid": 809,
+     "end_db": -125.2,
+     "tail_ms": 427.3,
+     "start_db": -95.2,
+     "rise_ms": 2.56,
+     "peak": -5.3
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 6592,
+    "credit": {
+     "title": "Darbuka_2_hit_vl2_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "darbuka-hit-3.npz",
+    "source": "vcsl/Darbuka_3_hit_vl2_rr1.wav",
+    "source_peak": -11.3,
+    "onset_s": 0.003,
+    "dur_s": 0.521,
+    "end_s": 0.108,
+    "centroid": 411,
+    "stereo": true,
+    "quality": {
+     "span": 2.81,
+     "centroid": 411,
+     "end_db": -130.8,
+     "tail_ms": 413.1,
+     "start_db": -94.2,
+     "rise_ms": 3.83,
+     "peak": -11.7
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 7345,
+    "credit": {
+     "title": "Darbuka_3_hit_vl2_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "darbuka-hit-4.npz",
+    "source": "vcsl/Darbuka_4_hit_vl1_rr2.wav",
+    "source_peak": -22.1,
+    "onset_s": 0.0027,
+    "dur_s": 0.606,
+    "end_s": 0.352,
+    "centroid": 175,
+    "stereo": true,
+    "quality": {
+     "span": 0.03,
+     "centroid": 175,
+     "end_db": -115.4,
+     "tail_ms": 254.3,
+     "start_db": -75.5,
+     "rise_ms": 3.4,
+     "peak": -21.4
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 9803,
+    "credit": {
+     "title": "Darbuka_4_hit_vl1_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "darbuka-hit-5.npz",
+    "source": "vcsl/Darbuka_5_hit_vl1_rr1.wav",
+    "source_peak": -25.7,
+    "onset_s": 0.042,
+    "dur_s": 0.54,
+    "end_s": 0.345,
+    "centroid": 310,
+    "stereo": true,
+    "quality": {
+     "span": 2.34,
+     "centroid": 310,
+     "end_db": -119.0,
+     "tail_ms": 194.7,
+     "start_db": -84.4,
+     "rise_ms": 2.77,
+     "peak": -24.6
+    },
+    "cut": false,
+    "hp": 50.0,
+    "bytes": 11000,
+    "credit": {
+     "title": "Darbuka_5_hit_vl1_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   }
+  ]
+ },
+ {
+  "id": "frame_drum/deep",
+  "says": [
+   "a frame drum struck by hand, a deep soft boom with a skin ring",
+   "a large shallow drum struck with the hand",
+   "a soft round hand drum thump"
+  ],
+  "uses": [
+   "frame_drum",
+   "hand drum",
+   "percussion",
+   "tribal",
+   "ritual",
+   "groove"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "hit",
+  "dur_s": 0.483,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 0.8,
+  "allows": [],
+  "members": [
+   {
+    "file": "frame-drum-deep-1.npz",
+    "source": "vcsl/HDrumL_HitMuted_v3_rr1_Sum.wav",
+    "source_peak": -9.4,
+    "onset_s": 0.0027,
+    "dur_s": 0.738,
+    "end_s": 0.261,
+    "centroid": 193,
+    "stereo": true,
+    "quality": {
+     "span": 3.11,
+     "centroid": 193,
+     "end_db": -128.3,
+     "tail_ms": 476.5,
+     "start_db": -119.8,
+     "rise_ms": 3.29,
+     "peak": -10.1
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 10253,
+    "credit": {
+     "title": "HDrumL_HitMuted_v3_rr1_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "frame-drum-deep-2.npz",
+    "source": "vcsl/HDrumL_Hit_v2_rr2_Sum.wav",
+    "source_peak": -28.0,
+    "onset_s": 0.007,
+    "dur_s": 2.0,
+    "end_s": 0.76,
+    "centroid": 212,
+    "stereo": true,
+    "quality": {
+     "span": 2.72,
+     "centroid": 212,
+     "end_db": -138.2,
+     "tail_ms": 1240.4,
+     "start_db": -109.4,
+     "rise_ms": 1.08,
+     "peak": -28.6
+    },
+    "cut": true,
+    "hp": 35.0,
+    "bytes": 9365,
+    "credit": {
+     "title": "HDrumL_Hit_v2_rr2_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "frame-drum-deep-3.npz",
+    "source": "vcsl/HDrumS_HitMuted_v3_rr1_Sum.wav",
+    "source_peak": -16.7,
+    "onset_s": 0.0027,
+    "dur_s": 0.745,
+    "end_s": 0.287,
+    "centroid": 469,
+    "stereo": true,
+    "quality": {
+     "span": 1.96,
+     "centroid": 469,
+     "end_db": -128.5,
+     "tail_ms": 458.0,
+     "start_db": -116.9,
+     "rise_ms": 3.12,
+     "peak": -16.6
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 9685,
+    "credit": {
+     "title": "HDrumS_HitMuted_v3_rr1_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "frame-drum-deep-4.npz",
+    "source": "vcsl/HDrumS_Hit_v2_rr2_Sum.wav",
+    "source_peak": -37.1,
+    "onset_s": 0.003,
+    "dur_s": 1.668,
+    "end_s": 0.679,
+    "centroid": 208,
+    "stereo": true,
+    "quality": {
+     "span": 1.7,
+     "centroid": 208,
+     "end_db": -153.3,
+     "tail_ms": 988.7,
+     "start_db": -106.9,
+     "rise_ms": 3.58,
+     "peak": -36.9
+    },
+    "cut": false,
+    "hp": 35.0,
+    "bytes": 10537,
+    "credit": {
+     "title": "HDrumS_Hit_v2_rr2_Sum.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   }
+  ]
+ },
+ {
+  "id": "clave/click",
+  "says": [
+   "a clave click, two hard wooden sticks struck together",
+   "a bright hollow wooden click",
+   "a high woody tock of claves"
+  ],
+  "uses": [
+   "clave",
+   "latin",
+   "click",
+   "tick",
+   "rhythm",
+   "metronome",
+   "percussion"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "click",
+  "dur_s": 0.207,
+  "note": null,
+  "vel": 0.7,
+  "size": 1.0,
+  "room": "room",
+  "amount": -0.2,
+  "width": 0.6,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "clave-click-1.npz",
+    "source": "vcsl/Claves1_Hit_v1_rr1_Mid.wav",
+    "source_peak": -38.6,
+    "onset_s": 0.0105,
+    "dur_s": 0.8,
+    "end_s": 0.301,
+    "centroid": 2082,
+    "stereo": true,
+    "quality": {
+     "span": 0.34,
+     "centroid": 2082,
+     "end_db": -113.9,
+     "tail_ms": 498.7,
+     "start_db": -167.5,
+     "rise_ms": 1.23,
+     "peak": -39.0
+    },
+    "cut": true,
+    "hp": 150.0,
+    "bytes": 8006,
+    "credit": {
+     "title": "Claves1_Hit_v1_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "clave-click-4.npz",
+    "source": "vcsl/Claves2_Hit_v1_rr1_Mid.wav",
+    "source_peak": -34.8,
+    "onset_s": 0.01,
+    "dur_s": 0.621,
+    "end_s": 0.205,
+    "centroid": 2411,
+    "stereo": true,
+    "quality": {
+     "span": 0.2,
+     "centroid": 2411,
+     "end_db": -157.8,
+     "tail_ms": 415.4,
+     "start_db": -135.7,
+     "rise_ms": 1.58,
+     "peak": -35.0
+    },
+    "cut": false,
+    "hp": 150.0,
+    "bytes": 6669,
+    "credit": {
+     "title": "Claves2_Hit_v1_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "clave-click-2.npz",
+    "source": "vcsl/Claves1_Hit_v2_rr1_Mid.wav",
+    "source_peak": -24.2,
+    "onset_s": 0.01,
+    "dur_s": 0.783,
+    "end_s": 0.247,
+    "centroid": 2175,
+    "stereo": true,
+    "quality": {
+     "span": 0.9,
+     "centroid": 2175,
+     "end_db": -130.7,
+     "tail_ms": 536.9,
+     "start_db": -180.2,
+     "rise_ms": 1.08,
+     "peak": -24.6
+    },
+    "cut": false,
+    "hp": 150.0,
+    "bytes": 7121,
+    "credit": {
+     "title": "Claves1_Hit_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.593
+   },
+   {
+    "file": "clave-click-3.npz",
+    "source": "vcsl/Claves1_Hit_v3_rr1_Mid.wav",
+    "source_peak": -14.3,
+    "onset_s": 0.0097,
+    "dur_s": 0.754,
+    "end_s": 0.207,
+    "centroid": 2916,
+    "stereo": true,
+    "quality": {
+     "span": 1.41,
+     "centroid": 2916,
+     "end_db": -128.4,
+     "tail_ms": 546.8,
+     "start_db": -185.8,
+     "rise_ms": 4.69,
+     "peak": -13.9
+    },
+    "cut": false,
+    "hp": 150.0,
+    "bytes": 7652,
+    "credit": {
+     "title": "Claves1_Hit_v3_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   },
+   {
+    "file": "clave-click-5.npz",
+    "source": "vcsl/Claves2_Hit_v2_rr1_Mid.wav",
+    "source_peak": -21.1,
+    "onset_s": 0.01,
+    "dur_s": 0.72,
+    "end_s": 0.205,
+    "centroid": 2468,
+    "stereo": true,
+    "quality": {
+     "span": 0.6,
+     "centroid": 2468,
+     "end_db": -127.4,
+     "tail_ms": 515.6,
+     "start_db": -164.5,
+     "rise_ms": 4.04,
+     "peak": -21.0
+    },
+    "cut": false,
+    "hp": 150.0,
+    "bytes": 6428,
+    "credit": {
+     "title": "Claves2_Hit_v2_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "cabasa/hit",
+  "says": [
+   "a cabasa twisted once, a dry rasp of metal beads",
+   "a short scrape of a bead chain",
+   "a crisp beady rasp"
+  ],
+  "uses": [
+   "cabasa",
+   "shaker",
+   "latin",
+   "rhythm",
+   "percussion"
+  ],
+  "tags": [
+   "hand percussion"
+  ],
+  "kind": "tick",
+  "dur_s": 0.107,
+  "note": null,
+  "vel": 0.6,
+  "size": 1.0,
+  "room": "room",
+  "amount": -0.3,
+  "width": 0.8,
+  "finish": false,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "cabasa-hit-1.npz",
+    "source": "vcsl/Cabasa1_Hit_rr1_Mid.wav",
+    "source_peak": -20.2,
+    "onset_s": 0.0112,
+    "dur_s": 0.557,
+    "end_s": 0.114,
+    "centroid": 6864,
+    "stereo": true,
+    "quality": {
+     "span": 3.07,
+     "centroid": 6864,
+     "end_db": -124.2,
+     "tail_ms": 442.5,
+     "start_db": -120.9,
+     "rise_ms": 1.85,
+     "peak": -19.5
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 6732,
+    "credit": {
+     "title": "Cabasa1_Hit_rr1_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.0
+   },
+   {
+    "file": "cabasa-hit-2.npz",
+    "source": "vcsl/Cabasa1_Hit_rr2_Mid.wav",
+    "source_peak": -19.0,
+    "onset_s": 0.0115,
+    "dur_s": 0.577,
+    "end_s": 0.1,
+    "centroid": 6888,
+    "stereo": true,
+    "quality": {
+     "span": 3.39,
+     "centroid": 6888,
+     "end_db": -123.5,
+     "tail_ms": 477.5,
+     "start_db": -121.4,
+     "rise_ms": 3.02,
+     "peak": -18.4
+    },
+    "cut": false,
+    "hp": 200.0,
+    "bytes": 7764,
+    "credit": {
+     "title": "Cabasa1_Hit_rr2_Mid.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 1.0
+   }
+  ]
+ },
+ {
+  "id": "slapstick/crack",
+  "says": [
+   "a slapstick snapped shut, a loud wooden crack",
+   "two boards clapped together hard",
+   "a sharp whip-like wooden slap"
+  ],
+  "uses": [
+   "slapstick",
+   "whip",
+   "crack",
+   "accent",
+   "cartoon",
+   "comedy",
+   "hit"
+  ],
+  "tags": [
+   "hand percussion",
+   "orchestral"
+  ],
+  "kind": "hit",
+  "dur_s": 0.146,
+  "note": null,
+  "vel": 0.8,
+  "size": 1.0,
+  "room": "room",
+  "amount": 0.0,
+  "width": 0.8,
+  "finish": true,
+  "prior": 1.0,
+  "allows": [],
+  "members": [
+   {
+    "file": "slapstick-crack-1.npz",
+    "source": "vcsl/slapstick_rr2.wav",
+    "source_peak": -0.8,
+    "onset_s": 0.0217,
+    "dur_s": 0.446,
+    "end_s": 0.108,
+    "centroid": 4300,
+    "stereo": true,
+    "quality": {
+     "span": 2.39,
+     "centroid": 4300,
+     "end_db": -126.9,
+     "tail_ms": 337.9,
+     "start_db": -145.8,
+     "rise_ms": 0.44,
+     "peak": -0.5
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 7945,
+    "credit": {
+     "title": "slapstick_rr2.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "slapstick-crack-2.npz",
+    "source": "vcsl/slapstick_rr3.wav",
+    "source_peak": -0.7,
+    "onset_s": 0.0155,
+    "dur_s": 0.47,
+    "end_s": 0.146,
+    "centroid": 4378,
+    "stereo": true,
+    "quality": {
+     "span": 2.33,
+     "centroid": 4378,
+     "end_db": -125.4,
+     "tail_ms": 324.3,
+     "start_db": -149.0,
+     "rise_ms": 0.44,
+     "peak": -0.8
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 8101,
+    "credit": {
+     "title": "slapstick_rr3.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   },
+   {
+    "file": "slapstick-crack-3.npz",
+    "source": "vcsl/slapstick_rr1.wav",
+    "source_peak": -0.6,
+    "onset_s": 0.0032,
+    "dur_s": 0.446,
+    "end_s": 0.156,
+    "centroid": 4409,
+    "stereo": true,
+    "quality": {
+     "span": 2.2,
+     "centroid": 4409,
+     "end_db": -125.6,
+     "tail_ms": 290.3,
+     "start_db": -126.9,
+     "rise_ms": 0.44,
+     "peak": -0.9
+    },
+    "cut": false,
+    "hp": 100.0,
+    "bytes": 8086,
+    "credit": {
+     "title": "slapstick_rr1.wav",
+     "author": "Versilian Studios (VCSL, github.com/sgossner/VCSL)",
+     "page": "https://github.com/sgossner/VCSL",
+     "licence": "CC0 1.0 (public domain dedication)",
+     "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "vel": 0.6
+   }
+  ]
+ }
+]

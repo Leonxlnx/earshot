@@ -1,0 +1,15 @@
+{
+ "name": "wolf_pack",
+ "says": "a pack of wolves howling",
+ "things": ["wolf pack howling", "wolf pack", "wolves howling", "pack of wolves"],
+ "sketch": true,
+ "built": "Four wolf howls, each another take: one near, three that join later, lower or higher, duller and to the sides, with wind in trees far under them, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "wolf/howl", "gain": 0, "pan": -0.3},
+  {"sound": "wolf/howl", "seed": 1, "pitch": -3, "at": 0.9, "gain": -4, "pan": 0.5, "lowpass": 3500},
+  {"sound": "wolf/howl", "seed": 2, "pitch": 2, "at": 1.8, "gain": -7, "pan": -0.7, "lowpass": 2500},
+  {"sound": "wolf/howl", "seed": 3, "pitch": -5, "at": 2.6, "gain": -9, "pan": 0.2, "lowpass": 2000},
+  {"sound": "wind/trees", "dur": 7, "gain": -22}
+ ]
+}

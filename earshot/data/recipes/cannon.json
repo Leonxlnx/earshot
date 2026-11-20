@@ -1,0 +1,12 @@
+{
+ "name": "cannon",
+ "says": "a cannon firing",
+ "things": ["cannon", "cannon firing", "cannon shot", "cannon blast"],
+ "built": "A near explosion lower as the blast, a rifle shot far lower as its crack, a heavy boom under it, in a hall.",
+ "space": "hall",
+ "layers": [
+  {"sound": "explosion/near", "pitch": -4, "gain": 0},
+  {"sound": "gunshot/rifle", "pitch": -10, "gain": -4},
+  {"sound": "boom/heavy", "pitch": -3, "gain": -8}
+ ]
+}

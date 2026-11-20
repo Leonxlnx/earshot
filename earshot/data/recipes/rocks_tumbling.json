@@ -1,0 +1,12 @@
+{
+ "name": "rocks_tumbling",
+ "says": "rocks tumbling down a slope",
+ "things": ["rocks tumbling", "rocks tumbling down", "falling rocks", "stones tumbling down"],
+ "built": "Rocks breaking and steps on gravel, scattered thick at first and thinning out as they come to rest, a quake's rumble dying away under them.",
+ "dur": 4,
+ "layers": [
+  {"sound": "break/rock", "scatter": {"rate": 14, "rate_to": 2, "dur": 3.0, "pitch": 5, "gain": 10, "pan": 0.7}},
+  {"sound": "step/gravel", "scatter": {"rate": 40, "rate_to": 4, "dur": 3.2, "pitch": 4, "gain": 10, "pan": 0.8}, "gain": -6},
+  {"sound": "rumble/quake", "dur": 3.5, "gain": -12, "decay": 2.0}
+ ]
+}

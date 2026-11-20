@@ -1,0 +1,13 @@
+{
+ "name": "avalanche",
+ "says": "an avalanche roaring down a mountain",
+ "things": ["avalanche", "snow avalanche", "rockslide", "landslide"],
+ "built": "Rolling thunder far lower as the roar of the snow, a deep whoosh as it comes, rocks breaking lower inside it, low rumble under it.",
+ "dur": 7,
+ "layers": [
+  {"sound": "thunder/roll", "pitch": -7, "gain": 0, "swell": 1.0},
+  {"sound": "whoosh_big/deep", "pitch": -5, "at": 0.3, "gain": -6},
+  {"sound": "break/rock", "pitch": -5, "at": 1.0, "gain": -10, "events": {"count": 4, "gap": 0.9, "loose": 0.6}},
+  {"source": "noise", "color": "brown", "dur": 6.5, "lowpass": [120, 300], "gain": -12, "swell": 1.5, "decay": 3.0}
+ ]
+}
