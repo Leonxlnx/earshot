@@ -1208,7 +1208,9 @@ def timeline(path, video=None, cues=None, start=None, end=None, detail='normal',
     if not pr.get('codec') and not video:
         raise ValueError(f'{os.path.basename(path)} has no audio stream')
     cue_list, cue_fps = read_cues(cues)
-    key = hashlib.sha1(f'{audio.file_id(path)}|{audio.file_id(video) if video else None}|{_cue_key(cues)}|{start}|'
+    # Key the same cue snapshot that is analysed, not the raw spelling or a second read of its file.
+    cue_key = _cue_key({'events': cue_list, 'fps': cue_fps})
+    key = hashlib.sha1(f'{audio.file_id(path)}|{audio.file_id(video) if video else None}|{cue_key}|{start}|'
                        f'{end}|{detail}|{CODE_ID}|{CORE_ID}'.encode()).hexdigest()[:24]
     cfile = os.path.join(config.EMB_CACHE, 'timeline', f'{key}.json')
     if cache and not fresh and os.path.exists(cfile):
