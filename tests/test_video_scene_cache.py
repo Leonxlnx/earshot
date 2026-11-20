@@ -2,6 +2,7 @@
 import builtins
 import json
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -78,7 +79,7 @@ def test_failed_scene_cache_write_keeps_successful_scan(film, monkeypatch):
     def unavailable(**kwargs):
         raise PermissionError('cache unavailable')
 
-    monkeypatch.setattr(video.tempfile, 'NamedTemporaryFile', unavailable)
+    monkeypatch.setattr(tempfile, 'NamedTemporaryFile', unavailable)
     assert video.cuts(path, method='scene', cache=False) == [1.5]
     assert json.loads(cached.read_text()) == []
     assert not list(cached.parent.glob('*.tmp'))

@@ -15,7 +15,6 @@ import json
 import os
 import re
 import subprocess
-import tempfile
 
 import numpy as np
 
@@ -36,10 +35,7 @@ def info(path):
 
 
 def _cache(name):
-    config.ensure_dirs()
-    d = os.path.join(config.EMB_CACHE, 'video')
-    os.makedirs(d, exist_ok=True)
-    return os.path.join(d, name)
+    return os.path.join(config.EMB_CACHE, 'video', name)
 
 
 def frame_diff(path, cache=True):
@@ -57,9 +53,7 @@ def frame_diff(path, cache=True):
     if p.returncode != 0 or not p.stdout:
         raise audio.AudioError(f'cannot decode the picture of {path}: {p.stderr.decode(errors="replace")[:200]}')
     d = _frame_differences(p.stdout)
-    tmp = f + f'.{os.getpid()}.tmp.npz'
-    np.savez(tmp, fps=fps, d=d)
-    audio.replace_quietly(tmp, f)
+    audio.write_cache(f, lambda tmp: np.savez(tmp, fps=fps, d=d))
     return float(fps), d
 
 
@@ -119,21 +113,10 @@ def cuts(path, method='diff', threshold=0.3, min_gap=0.2, cache=True):
     for t in ts:
         if not out or t - out[-1] >= min_gap:
             out.append(round(t, 3))
-    tmp = None
-    try:
-        with tempfile.NamedTemporaryFile(mode='w', dir=os.path.dirname(f),
-                                         prefix=os.path.basename(f) + '.', suffix='.tmp', delete=False) as saved:
-            tmp = saved.name
+    def save(tmp):
+        with open(tmp, 'w') as saved:
             json.dump(out, saved)
-        audio.replace_quietly(tmp, f)
-    except OSError:
-        pass  # caching is optional; the scan itself succeeded
-    finally:
-        if tmp is not None:
-            try:
-                os.remove(tmp)
-            except OSError:
-                pass
+    audio.write_cache(f, save)
     return out
 
 
