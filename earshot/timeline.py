@@ -784,8 +784,8 @@ def _cached(model, fid, spans, kind, compute, reuse=True):
 
 
 def span_id(path):
-    """file id for the per-span model cache; mono sources decode at unity gain since core decode v2"""
-    return audio.file_id(path) + ('|mono2' if audio.probe(path).get('channels') == 1 else '')
+    """per-span models consume the stereo decode averaged to mono, so follow its decode version"""
+    return audio.file_id(path) + f'|decode{audio.DECODE_VERSION}'
 
 
 def _seg(x, a, b):
