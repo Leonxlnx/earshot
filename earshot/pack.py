@@ -56,6 +56,8 @@ def pack(files, out, gap=GAP_S, mono=False, names=None, loops=(), ys=None):
     if not files:
         raise ValueError('nothing to pack: no audio files')
     names = list(names) if names else [os.path.splitext(os.path.basename(f))[0] for f in files]
+    if len(names) != len(files):
+        raise ValueError('a sprite needs one name per audio file')
     if len(set(names)) != len(names):
         raise ValueError('two sounds of a sprite share a name')
     parts, sprite, t = [], {}, 0.0
