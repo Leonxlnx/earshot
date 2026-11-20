@@ -11,11 +11,13 @@ whip transitions on white-background motion graphics, where the scene score find
 missed or found late; treat the result as "big visual change" markers, not an edit decision list.
 """
 import hashlib
+from fractions import Fraction
 import json
 import os
 import re
 import subprocess
 import tempfile
+import threading
 
 import numpy as np
 
@@ -43,24 +45,150 @@ def _cache(name):
 
 
 def frame_diff(path, cache=True):
-    """(fps, d): mean absolute difference (0..1) between consecutive 96x54 grey frames (d[0] = 0), cached"""
-    f = _cache('diff_' + hashlib.sha1(f'{audio.file_id(path)}|{FRAME_W}x{FRAME_H}|v1'.encode()).hexdigest()[:20] + '.npz')
+    """(decoded fps, d): consecutive 96x54 grey-frame differences (d[0] = 0), cached.
+
+    The rate belongs to FFmpeg's selected decode, not necessarily probe()'s first stream.
+    """
+    f = _cache('diff_' + hashlib.sha1(f'{audio.file_id(path)}|{FRAME_W}x{FRAME_H}|v2'.encode()).hexdigest()[:20] + '.npz')
     if cache and os.path.exists(f):
         try:
             with np.load(f, allow_pickle=False) as z:
                 return float(z['fps']), np.array(z['d'])
         except Exception:
             pass
-    fps = (audio.probe(path).get('video') or {}).get('fps') or 30.0
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-i', path, '-an', '-vf',
-                        f'scale={FRAME_W}:{FRAME_H}:flags=area,format=gray', '-f', 'rawvideo', '-'], capture_output=True)
-    if p.returncode != 0 or not p.stdout:
-        raise audio.AudioError(f'cannot decode the picture of {path}: {p.stderr.decode(errors="replace")[:200]}')
-    d = _frame_differences(p.stdout)
+    raw, log, returncode = _decode_picture(path)
+    if returncode != 0 or not raw:
+        reason = audio._ffmpeg_reason(log.tail.decode(errors='replace'))
+        raise audio.AudioError(f'cannot decode the picture of {path}: {reason}')
+    fps = log.rate(path)
+    d = _frame_differences(raw)
     tmp = f + f'.{os.getpid()}.tmp.npz'
     np.savez(tmp, fps=fps, d=d)
     audio.replace_quietly(tmp, f)
     return float(fps), d
+
+
+class _PictureLog:
+    """Drain verbose FFmpeg output without retaining per-frame logs or long metadata."""
+    LIMIT = 4096
+
+    def __init__(self):
+        self.tail = self.pending = b''
+        self.dropping = self.invalid = False
+        self.fps = None
+
+    @staticmethod
+    def _is_config(line):
+        return re.match(rb'^\[showinfo@earshot_rate @ [^\]]+\] config in ', line) is not None
+
+    def _line(self, line):
+        if not self._is_config(line):
+            return
+        try:
+            fps = _decoded_rate(line, 'FFmpeg output')
+            if self.fps is not None and self.fps != fps:
+                self.invalid = True
+            self.fps = fps
+        except audio.AudioError:
+            self.invalid = True
+
+    def feed(self, chunk):
+        self.tail = (self.tail + chunk)[-self.LIMIT:]
+        if self.dropping:
+            end = chunk.find(b'\n')
+            if end < 0:
+                return
+            chunk = chunk[end + 1:]
+            self.dropping = False
+        data = self.pending + chunk
+        lines = data.split(b'\n')
+        for line in lines[:-1]:
+            if len(line) <= self.LIMIT:
+                self._line(line)
+            elif self._is_config(line):
+                self.invalid = True
+        self.pending = lines[-1]
+        if len(self.pending) > self.LIMIT:
+            if self._is_config(self.pending):
+                self.invalid = True
+            self.pending = b''
+            self.dropping = True
+
+    def finish(self):
+        if self.pending:
+            self._line(self.pending)
+        self.pending = b''
+
+    def rate(self, path):
+        if self.invalid or self.fps is None:
+            raise audio.AudioError(f'cannot determine decoded picture frame rate of {path}')
+        return float(self.fps)
+
+
+def _decode_picture(path):
+    """The original raw-frame decode, with a bounded concurrent stderr consumer."""
+    args = ['ffmpeg', '-hide_banner', '-v', 'info', '-nostats', '-nostdin', '-i', path, '-an', '-vf',
+            f'scale={FRAME_W}:{FRAME_H}:flags=area,format=gray,showinfo@earshot_rate=checksum=0',
+            '-f', 'rawvideo', '-']
+    log = _PictureLog()
+    with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
+        def drain():
+            try:
+                while True:
+                    chunk = proc.stderr.read(8192)
+                    if not chunk:
+                        break
+                    log.feed(chunk)
+                log.finish()
+            except Exception:
+                log.invalid = True
+                proc.stderr.close()
+
+        reader = threading.Thread(target=drain)
+        try:
+            reader.start()
+            raw = proc.stdout.read()
+            returncode = proc.wait()
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait()
+            proc.stdout.close()
+            if reader.ident is not None:
+                reader.join()
+    return raw, log, returncode
+
+
+def _decoded_fps(stderr, path):
+    return float(_decoded_rate(stderr, path))
+
+
+def _decoded_rate(stderr, path):
+    """Read the rate of the actual selected decode, not ffprobe's first picture stream.
+
+    showinfo observes the existing filter graph without changing its frames or
+    FFmpeg's automatic stream selection / output synchronization.
+    """
+    entries = re.findall(rb'^\[showinfo@earshot_rate @ [^\]]+\] config in (.*)$',
+                         stderr, re.MULTILINE)
+    try:
+        rates = set()
+        for entry in entries:
+            match = re.fullmatch(rb'time_base: (\d+)/(\d+), frame_rate: (\d+)/(\d+)', entry.strip())
+            if match is None:
+                raise ValueError('malformed rate configuration')
+            tn, td, n, d = map(int, match.groups())
+            if Fraction(tn, td) <= 0 or Fraction(n, d) <= 0:
+                raise ValueError('nonpositive timing')
+            rates.add(Fraction(n, d))
+        if len(rates) != 1:
+            raise ValueError('missing or changing rate')
+        rate = rates.pop()
+        if not np.isfinite(float(rate)) or float(rate) <= 0:
+            raise ValueError('invalid rate')
+    except (ValueError, ZeroDivisionError, OverflowError) as exc:
+        raise audio.AudioError(f'cannot determine decoded picture frame rate of {path}') from exc
+    return rate
 
 
 def _frame_differences(raw):
