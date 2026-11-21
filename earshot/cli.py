@@ -126,12 +126,27 @@ def _missing_line(cmd, said):
     return 1
 
 
+def _command(argv):
+    """the command word in argv: its first argument that is not a flag, skipping the value of a global option that
+    takes one, so `--threads 4 describe x.wav` names `describe` (its value `4` is not a command, and reading it as one
+    registered every module, which is what `--threads=4` avoids)"""
+    value_next = False
+    for a in argv:
+        if value_next:
+            value_next = False
+        elif a == '--threads':
+            value_next = True
+        elif not a.startswith('-'):
+            return a
+    return None
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else list(argv)
     _hold_blas(argv)
     ap = _parser()
     sub = ap.add_subparsers(dest='command', metavar='<command>')
-    cmd = next((a for a in argv if not a.startswith('-')), None)
+    cmd = _command(argv)
     if '--version' in (argv[:argv.index(cmd)] if cmd in argv else argv):   # no command module needs to load
         print(_version())
         return 0
