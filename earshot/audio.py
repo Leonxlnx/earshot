@@ -79,6 +79,13 @@ def replace_quietly(tmp, dst, tries=5):
     return False
 
 
+def _ffmpeg_input(path):
+    """Disambiguate existing local files without rewriting URLs or other FFmpeg inputs."""
+    path = os.fsdecode(path)
+    # Do not normalize away symlink/.. components or change native drive-relative paths.
+    return os.path.join(os.curdir, path) if os.path.exists(path) else path
+
+
 def file_id(path):
     """stable id of a file's content state (path + size + mtime + sampled content); used as a cache key by the models"""
     return hashlib.sha1(_state(path).encode()).hexdigest()[:20]
@@ -98,7 +105,7 @@ def _ffmpeg_reason(err):
 
 
 def _decode(path, sr, ch):
-    cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-i', path, '-vn']
+    cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-i', _ffmpeg_input(path), '-vn']
     if ch == 2:
         # Inspect the actually selected input layout, not the first audio stream: ffmpeg may select a later track.
         # Keep mono at unity; stereo and surround retain ffmpeg's usual stereo downmix.
@@ -169,7 +176,7 @@ def probe(path):
         out = subprocess.run(['ffprobe', '-v', 'error', '-show_entries',
                               'stream=codec_type,codec_name,sample_rate,channels,bit_rate,width,height,r_frame_rate:'
                               'stream_disposition=attached_pic:'
-                              'format=duration,bit_rate', '-of', 'json', path],
+                              'format=duration,bit_rate', '-of', 'json', _ffmpeg_input(path)],
                              capture_output=True, text=True, timeout=60).stdout
         j = json.loads(out or '{}')
     except Exception as e:  # noqa: BLE001

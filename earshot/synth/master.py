@@ -208,7 +208,7 @@ def write(path, y, sr=SR, mono=False, bits=24, bitrate=None):
         cmd = [ff, '-v', 'error', '-y', '-i', tmp, '-c:a', CODEC[ext], '-b:a', bitrate or BITRATE[ext]]
         if ext == 'webm' and sr not in (8000, 12000, 16000, 24000, 48000):
             cmd += ['-ar', '48000']                        # Opus has no 44.1 kHz
-        p = subprocess.run(cmd + [path], capture_output=True, text=True)
+        p = subprocess.run(cmd + [os.path.join(os.curdir, path)], capture_output=True, text=True)
         if p.returncode != 0:
             raise RuntimeError(f'ffmpeg could not write {path}: {p.stderr.strip()[:300]}')
     finally:
