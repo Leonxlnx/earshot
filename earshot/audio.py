@@ -8,6 +8,9 @@ content, so a same-size replacement that kept its timestamp is still noticed), s
     m = load('kick.ogg', mono=True)      # (n,)
     seg = load('long.wav', start=1.2, end=1.8, mono=True)
 
+Track selection stays with ffmpeg (including default-track preferences); probe() reports the first audio track,
+which may not be the selected track in a multi-track file.
+
 Levels: the stereo decode keeps true sample levels (a mono file is duplicated to both channels at unity gain), so
 measure peaks and loudness on it (features.measure does). mono=True is ffmpeg's downmix, which sums a stereo source
 at -3 dB per channel: correlated stereo reads up to +3 dB hotter than mean(L, R). It is the models' input convention
@@ -33,7 +36,7 @@ class AudioError(RuntimeError):
     pass
 
 
-DECODE_VERSION = 2  # bump when decoded samples change (derived caches may key on it)
+DECODE_VERSION = 3  # bump when decoded samples change (derived caches may key on it)
 
 
 def _sample_hash(path, size, blocks=16, block=4096):
@@ -76,15 +79,6 @@ def replace_quietly(tmp, dst, tries=5):
     return False
 
 
-def _src_channels(path):
-    try:
-        out = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'a:0', '-show_entries', 'stream=channels',
-                              '-of', 'csv=p=0', path], capture_output=True, text=True, timeout=60).stdout.strip()
-        return int(out.splitlines()[0]) if out else 0
-    except Exception:  # noqa: BLE001
-        return 0
-
-
 def file_id(path):
     """stable id of a file's content state (path + size + mtime + sampled content); used as a cache key by the models"""
     return hashlib.sha1(_state(path).encode()).hexdigest()[:20]
@@ -104,9 +98,14 @@ def _ffmpeg_reason(err):
 
 
 def _decode(path, sr, ch):
-    up = ch == 2 and _src_channels(path) == 1  # ffmpeg would upmix mono at -3 dB; duplicate at unity instead
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-i', path, '-vn', '-f', 'f32le', '-acodec', 'pcm_f32le',
-                        '-ac', '1' if up else str(ch), '-ar', str(sr), '-'], capture_output=True)
+    cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-i', path, '-vn']
+    if ch == 2:
+        # Inspect the actually selected input layout, not the first audio stream: ffmpeg may select a later track.
+        # Keep mono at unity; stereo and surround retain ffmpeg's usual stereo downmix.
+        cmd += ['-af', "aformat=channel_layouts=mono|stereo,"
+                       "aeval=exprs='val(0)|val(if(eq(nb_in_channels,1),0,1))':channel_layout=stereo"]
+    cmd += ['-f', 'f32le', '-acodec', 'pcm_f32le', '-ac', str(ch), '-ar', str(sr), '-']
+    p = subprocess.run(cmd, capture_output=True)
     err = p.stderr.decode(errors='replace')
     if p.returncode != 0 or not p.stdout:
         pr = probe(path)
@@ -116,8 +115,6 @@ def _decode(path, sr, ch):
             raise AudioError(f'{path}: no audio stream')
         raise AudioError(f'cannot decode {path}: {_ffmpeg_reason(err)}')
     x = np.frombuffer(p.stdout, np.float32).copy()
-    if up:
-        return np.repeat(x[:, None], 2, axis=1)
     return x.reshape(-1, ch) if ch > 1 else x
 
 
