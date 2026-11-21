@@ -1240,20 +1240,21 @@ def _load_range(path, pr, start, end, reuse=True):
             raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
                              f'{name} is {fdur:.2f} s long')
         return np.zeros((int(round(fdur * SR)), 2), np.float32), 0.0, t0, t1, fdur
+    # The container can outlast its selected audio stream. load already decodes the
+    # whole track before slicing, so use those samples to bound every audio window.
+    x = audio.load(path, cache=reuse)
+    fdur = len(x) / SR
     if start is None and end is None:
-        x = audio.load(path, cache=reuse)
-        fdur = len(x) / SR
         if fdur < 0.1:
             raise ValueError(f'{name} is {fdur:.2f} s long: too short for a timeline (>= 0.1 s); for a one-shot use '
                              'earshot measure / describe')
         return x, 0.0, 0.0, fdur, fdur
-    fdur = float(pr.get('duration') or 0) or len(audio.load(path, mono=True, cache=reuse)) / SR
     t0, t1 = max(0.0, float(start or 0)), min(fdur, float(end)) if end is not None else fdur
     if t1 - t0 < 0.1:
         raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
                          f'{name} is {fdur:.2f} s long')
     c0, c1 = max(0.0, t0 - CONTEXT_S), min(fdur, t1 + CONTEXT_S)
-    return audio.load(path, start=c0, end=c1, cache=reuse), c0, t0, t1, fdur
+    return x[int(round(c0 * SR)):int(round(c1 * SR))], c0, t0, t1, fdur
 
 
 def _analyse(path, pr, video, cue_list, cue_fps, start, end, cfg, reuse):
