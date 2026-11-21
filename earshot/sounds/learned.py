@@ -358,8 +358,8 @@ def perform(sid, seed=0, events=None, peak_db=-1.0, lufs=None, check=True, **req
     pat = e.get('pattern') or {}
     # a walk is heard from standing height: the pattern's `far` tilts every step (dB per octave around 1 kHz); a
     # request that asks for a close or dry sound (space under 0) hears the recording's own closeness
-    near = (request.get('space') or 0.0) < 0
-    far = {'bright': float(pat['far'])} if pat.get('name') == 'walk' and pat.get('far') and not near else None
+    far = ({'bright': float(pat['far'])}
+           if pat.get('name') == 'walk' and pat.get('far') and c.space >= 0 else None)
     whole = wholes(e)
     walk = order(sid)
     play, p, cut, long = None, {}, None, False
