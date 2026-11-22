@@ -9,8 +9,8 @@ import wave
 import numpy as np
 import pytest
 
+import earshot.timeline as tl              # the module itself: `from earshot import timeline` asks for the listen extra
 from earshot import audio, config, video
-from earshot import timeline as tl
 
 
 @pytest.fixture

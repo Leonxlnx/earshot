@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from earshot import audio, timeline
+import earshot.timeline as timeline        # the module itself: `from earshot import timeline` asks for the listen extra
+from earshot import audio
 
 
 def _wav(tmp_path, channels, sr=48000):

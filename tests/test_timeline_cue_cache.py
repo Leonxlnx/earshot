@@ -3,7 +3,8 @@ import json
 import numpy as np
 import soundfile as sf
 import pytest
-from earshot import timeline as tl, config
+import earshot.timeline as tl              # the module itself: `from earshot import timeline` asks for the listen extra
+from earshot import config
 
 @pytest.fixture
 def setup(tmp_path, monkeypatch):
