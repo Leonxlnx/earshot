@@ -268,4 +268,4 @@ def test_one_version_everywhere():
         top = re.search(r'^## (\S+)', fh.read(), re.M).group(1)
     with open(os.path.join(root, '.claude-plugin', 'plugin.json'), encoding='utf-8') as fh:
         plugin = json.load(fh)['version']
-    assert earshot.__version__ == pyproject == top == plugin == '1.0.0'
+    assert earshot.__version__ == pyproject == top == plugin == '1.1.0'

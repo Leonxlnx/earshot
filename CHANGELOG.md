@@ -1,5 +1,48 @@
 # Changelog
 
+## 1.1.0 - unreleased
+
+Fixes from the community, thanks to @liugedragon and @fcy222fcy, and three found by an automated review of the 1.0
+release.
+
+### Fixed
+
+**Making sounds**
+
+- **`make --listen` hears the take it wrote.** For ogg, mp3, m4a and webm it rendered a new single event to listen
+  to, so the `heard` line of "footsteps" with `events=8` described one step. It now hears the samples it wrote.
+- **A recipe cannot ask for an endless timeline.** Events whose gaps grow (`"faster": 2`) could start billions of
+  seconds in and allocate far more memory than any machine has before the recipe's length cut them; the last event
+  of a layer now starts within 120 s, or the recipe is refused with one sentence.
+- **`build` hears a sound file at its own sample rate**: a 24 kHz file was measured half as long and twice as high.
+- **A set refuses names and sprites that would overwrite each other** (#39): `tap` with two takes and another sound
+  named `tap_1`, two names with the same file name in different folders, or a sprite named like a take or
+  `manifest.json` stop with one sentence before anything is written.
+- **`pack` refuses a name count that differs from the file count** (#41), before it reads any audio.
+- **A bank sound keeps its asked peak after resampling** (#33).
+- **A named theme's axes no longer share state with its preset** (#34): changing one no longer changed the other.
+- **A walk's distance tilt uses the composed space** (#48).
+
+**Listening and video**
+
+- **The selected audio track keeps its level and stereo image** (#28). In a file with several audio tracks, the
+  stereo decode read the channel count of the first track while ffmpeg decoded another: a stereo track could become
+  dual mono, a mono track 3 dB too quiet. The decode version is 3, so the decode caches fill again once.
+- **Picture cut timing uses the frame rate of the decoded track** (#45), not the first video track's: cuts in a
+  file with two video tracks of different rates landed at the wrong times.
+- **Local media names are unambiguous for ffmpeg** (#47): a file named `take:01.wav` or starting with `-` is read
+  and written as a file, not as a protocol or an option.
+- **A failed write to an optional media cache is no longer an error** (#42): the analysis goes on without the cache.
+- **Timeline caches are keyed by the parsed cues** (#43), and **timeline ranges are bounded by the decoded
+  samples** (#44).
+- **The search index stays alive behind its cached positions** (#36).
+- **`earshot --threads 2 <command>` loads only that command** (#46): the value of `--threads` was read as the
+  command word, so every command module was loaded and the start took about three times as long.
+
+### Changed
+
+- `docs/TESTING.md` says that torch and transformers come with the `listen` extra.
+
 ## 1.0.0 - 2026-11-20
 
 earshot now makes sounds as well as listening to them. An agent asks for a sound in words and earshot renders a new
