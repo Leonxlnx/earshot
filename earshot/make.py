@@ -758,14 +758,22 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         req['dur'] = round(0.02 + (int(perf[1]) - 1) * float(b['gap']) + ring, 3)
     n = takes_asked(b, pick['why'], perf, n)
     paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
-    takes = []
+    takes, first = [], None
     for i, p in enumerate(paths):
         y, meta = take(pick['id'], seed + i, req, lufs, perform=perf)
+        first = y if first is None else first
         master.write(p, y, sr=sr, mono=mono, bits=bits)
         takes.append({**meta, 'file': p})
     if listen and heard is None:
-        heard = _heard(paths[0] if paths[0].lower().endswith(('.wav', '.flac')) else _tmp_wav(pick['id'], seed, req),
-                       ([want] if want else []) + list(registry.get(pick['id']).says))
+        # the first take as it was delivered (its performance and level): a wav or flac is heard as written, any
+        # other format from the same samples in a wav, so that what is heard is what was handed over
+        queries = ([want] if want else []) + list(registry.get(pick['id']).says)
+        if paths[0].lower().endswith(('.wav', '.flac')):
+            heard = _heard(paths[0], queries)
+        else:
+            import tempfile
+            with tempfile.TemporaryDirectory() as tmp:
+                heard = _heard(master.write(os.path.join(tmp, 'heard.wav'), first, sr=sr, mono=mono), queries)
     why = brief.shown(b, pick['why'])
     lines = [_line(t, t['file'], ', '.join(why) if i == 0 else '') for i, t in enumerate(takes)]
     played = takes[0].get('performance')
@@ -816,13 +824,6 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if heard:
         res['heard'] = heard
     return res
-
-
-def _tmp_wav(sound, seed, req):
-    import tempfile
-    from .synth import master
-    y, _ = take(sound, seed, req)
-    return master.write(os.path.join(tempfile.mkdtemp(), 'heard.wav'), y)
 
 
 def found_by(why, sound=None):
