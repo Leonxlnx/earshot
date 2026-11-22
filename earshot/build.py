@@ -1450,8 +1450,11 @@ def hear(recipe, words=None, without=(), seed=SEED, ears=None, near=None, layers
         y, meta = take[:2]
     elif isinstance(recipe, str) and os.path.isfile(recipe) and not recipe.lower().endswith('.json'):
         import soundfile as sf
-        y, _ = sf.read(recipe, always_2d=True)
+        y, rate = sf.read(recipe, always_2d=True)
         y = np.asarray(y, np.float64)
+        if rate != 48000:                  # every measure, the audit and the ears read 48 kHz samples
+            import soxr
+            y = np.asarray(soxr.resample(y, rate, 48000, quality='HQ'), np.float64)
         from .sounds import registry
         from types import SimpleNamespace
         meta = {'checks': registry.audit(y, SimpleNamespace(kind='object', pitch=None, loop=False, allows=()))}

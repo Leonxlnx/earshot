@@ -277,6 +277,21 @@ def test_hear_without_ears_names_fields(tmp_path):
     assert any('`dur`' in x for x in h['off'])
 
 
+def test_hear_reads_a_sound_file_at_its_own_rate(tmp_path):
+    # a file at 24 kHz is the same sound as at 48 kHz: the same length and brightness, not half as long and twice as high
+    import soundfile as sf
+    t = np.arange(int(1.0 * 24000)) / 24000
+    y = 0.3 * np.sin(2 * np.pi * 1000 * t) * np.exp(-3 * t)
+    p24, p48 = str(tmp_path / 'tone24.wav'), str(tmp_path / 'tone48.wav')
+    sf.write(p24, np.stack([y, y], axis=1), 24000)
+    t = np.arange(int(1.0 * 48000)) / 48000
+    y = 0.3 * np.sin(2 * np.pi * 1000 * t) * np.exp(-3 * t)
+    sf.write(p48, np.stack([y, y], axis=1), 48000)
+    a, b = B.hear(p24, 'a tone', listen=False), B.hear(p48, 'a tone', listen=False)
+    assert a['dur'] == pytest.approx(1.0, abs=0.01) and a['dur'] == pytest.approx(b['dur'], abs=0.01)
+    assert a['bright'] == pytest.approx(b['bright'], rel=0.05)
+
+
 def test_the_command_line_builds(tmp_path, capsys):
     from earshot import cli
     out = str(tmp_path / 'cli.wav')

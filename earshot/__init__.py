@@ -15,7 +15,7 @@ without it they raise earshot.extras.MissingExtra, whose message is the install 
 """
 import importlib
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 # modules that are callable as their main function (see _callable.py)
 _CALLABLE = {'describe', 'match', 'compare', 'realness', 'timeline', 'sheet', 'critique', 'profile'}

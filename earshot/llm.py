@@ -256,7 +256,7 @@ def encode(path, start=None, end=None, max_seconds=600.0, kbps=KBPS):
     trimmed = b - a > max_seconds
     if trimmed:
         b = a + max_seconds
-    cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-ss', f'{a:.3f}', '-i', path, '-t', f'{b - a:.3f}', '-vn', '-ac', '1',
+    cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-ss', f'{a:.3f}', '-i', audio._ffmpeg_input(path), '-t', f'{b - a:.3f}', '-vn', '-ac', '1',
            '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', f'{kbps}k', '-f', 'mp3', '-']
     p = subprocess.run(cmd, capture_output=True)
     if p.returncode != 0 or not p.stdout:

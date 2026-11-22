@@ -15,8 +15,8 @@ python3.12 -m venv .venv-fast
 EARSHOT_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 MPLBACKEND=Agg OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv-fast/bin/python -m pytest -q -p no:cacheprovider -rs tests
 ```
 
-This intentionally leaves out Torch and Transformers, which remain required by
-the normal package metadata. It is **not** a full installation or a packaging
+This intentionally leaves out Torch and Transformers, which come with the
+`listen` extra; the tests that need them skip without them. It is **not** a full installation or a packaging
 dependency check. Follow the README's installation instructions when running
 model-dependent features. Do not run `doctor --load` in this reduced environment.
 

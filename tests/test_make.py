@@ -841,3 +841,23 @@ def test_a_length_within_a_tenth_of_a_second_says_nothing(tmp_path):
     assert _note(t, 8.0) is None
     t = {'dur_s': 5.0, 'note': '5.00 s, shorter than the 8 s asked: the longest this sound is made'}
     assert _note(t, 8.0) == '5.00 s, shorter than the 8 s asked'
+
+
+def test_listening_hears_the_take_that_was_written_in_any_format(tmp_path, monkeypatch):
+    # an ogg is heard from the samples written into it: the walk of eight steps, not a new single step
+    if not shutil.which('ffmpeg'):
+        pytest.skip('ogg needs ffmpeg')
+    from earshot import extras, make as M
+    heard = []
+
+    def ear(path, queries):
+        y, sr = sf.read(path)
+        heard.append(len(y) / sr)
+        return {'query': queries[0], 'z': 0.0, 'verdict': 'no match'}
+
+    monkeypatch.setattr(extras, 'need', lambda *a, **k: None)
+    monkeypatch.setattr(M, 'semantic', lambda want, listen=None: (None, None))
+    monkeypatch.setattr(M, '_heard', ear)
+    r = make('footsteps on gravel', str(tmp_path / 'walk.ogg'), events=8, listen=True)
+    assert r['takes'][0]['performance']['events'] == 8
+    assert heard and heard[0] == pytest.approx(r['takes'][0]['dur_s'], abs=0.01)

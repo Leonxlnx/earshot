@@ -777,15 +777,13 @@ def _cached(model, fid, spans, kind, compute, reuse=True):
         res = compute([spans[i] for i in todo])
         for i, v in zip(todo, res):
             out[i] = v
-            tmp = f'{files[i]}.{os.getpid()}.tmp.npy'
-            np.save(tmp, v)
-            audio.replace_quietly(tmp, files[i])
+            audio.write_cache(files[i], lambda tmp: np.save(tmp, v))
     return np.stack(out) if out else None
 
 
 def span_id(path):
-    """file id for the per-span model cache; mono sources decode at unity gain since core decode v2"""
-    return audio.file_id(path) + ('|mono2' if audio.probe(path).get('channels') == 1 else '')
+    """per-span models consume the stereo decode averaged to mono, so follow its decode version"""
+    return audio.file_id(path) + f'|decode{audio.DECODE_VERSION}'
 
 
 def _seg(x, a, b):
@@ -1208,7 +1206,9 @@ def timeline(path, video=None, cues=None, start=None, end=None, detail='normal',
     if not pr.get('codec') and not video:
         raise ValueError(f'{os.path.basename(path)} has no audio stream')
     cue_list, cue_fps = read_cues(cues)
-    key = hashlib.sha1(f'{audio.file_id(path)}|{audio.file_id(video) if video else None}|{_cue_key(cues)}|{start}|'
+    # Key the same cue snapshot that is analysed, not the raw spelling or a second read of its file.
+    cue_key = _cue_key({'events': cue_list, 'fps': cue_fps})
+    key = hashlib.sha1(f'{audio.file_id(path)}|{audio.file_id(video) if video else None}|{cue_key}|{start}|'
                        f'{end}|{detail}|{CODE_ID}|{CORE_ID}'.encode()).hexdigest()[:24]
     cfile = os.path.join(config.EMB_CACHE, 'timeline', f'{key}.json')
     if cache and not fresh and os.path.exists(cfile):
@@ -1222,11 +1222,10 @@ def timeline(path, video=None, cues=None, start=None, end=None, detail='normal',
     r['summary'] = _summary(r)
     r['text'] = transcript(r)
     if cache or fresh:
-        os.makedirs(os.path.dirname(cfile), exist_ok=True)
-        tmp = f'{cfile}.{os.getpid()}.tmp'
-        with open(tmp, 'w', encoding='utf-8') as fh:
-            fh.write(to_json(r))
-        audio.replace_quietly(tmp, cfile)
+        def save(tmp):
+            with open(tmp, 'w', encoding='utf-8') as fh:
+                fh.write(to_json(r))
+        audio.write_cache(cfile, save)
     return dict(r, cached=False)
 
 
@@ -1241,20 +1240,21 @@ def _load_range(path, pr, start, end, reuse=True):
             raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
                              f'{name} is {fdur:.2f} s long')
         return np.zeros((int(round(fdur * SR)), 2), np.float32), 0.0, t0, t1, fdur
+    # The container can outlast its selected audio stream. load already decodes the
+    # whole track before slicing, so use those samples to bound every audio window.
+    x = audio.load(path, cache=reuse)
+    fdur = len(x) / SR
     if start is None and end is None:
-        x = audio.load(path, cache=reuse)
-        fdur = len(x) / SR
         if fdur < 0.1:
             raise ValueError(f'{name} is {fdur:.2f} s long: too short for a timeline (>= 0.1 s); for a one-shot use '
                              'earshot measure / describe')
         return x, 0.0, 0.0, fdur, fdur
-    fdur = float(pr.get('duration') or 0) or len(audio.load(path, mono=True, cache=reuse)) / SR
     t0, t1 = max(0.0, float(start or 0)), min(fdur, float(end)) if end is not None else fdur
     if t1 - t0 < 0.1:
         raise ValueError(f"nothing to analyse between {t0:g} s and {'the end' if end is None else f'{end:g} s'}: "
                          f'{name} is {fdur:.2f} s long')
     c0, c1 = max(0.0, t0 - CONTEXT_S), min(fdur, t1 + CONTEXT_S)
-    return audio.load(path, start=c0, end=c1, cache=reuse), c0, t0, t1, fdur
+    return x[int(round(c0 * SR)):int(round(c1 * SR))], c0, t0, t1, fdur
 
 
 def _analyse(path, pr, video, cue_list, cue_fps, start, end, cfg, reuse):

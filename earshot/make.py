@@ -758,14 +758,22 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
         req['dur'] = round(0.02 + (int(perf[1]) - 1) * float(b['gap']) + ring, 3)
     n = takes_asked(b, pick['why'], perf, n)
     paths = _paths(out or pick['id'].replace('/', '_') + '.' + (fmt or 'wav'), n, fmt)
-    takes = []
+    takes, first = [], None
     for i, p in enumerate(paths):
         y, meta = take(pick['id'], seed + i, req, lufs, perform=perf)
+        first = y if first is None else first
         master.write(p, y, sr=sr, mono=mono, bits=bits)
         takes.append({**meta, 'file': p})
     if listen and heard is None:
-        heard = _heard(paths[0] if paths[0].lower().endswith(('.wav', '.flac')) else _tmp_wav(pick['id'], seed, req),
-                       ([want] if want else []) + list(registry.get(pick['id']).says))
+        # the first take as it was delivered (its performance and level): a wav or flac is heard as written, any
+        # other format from the same samples in a wav, so that what is heard is what was handed over
+        queries = ([want] if want else []) + list(registry.get(pick['id']).says)
+        if paths[0].lower().endswith(('.wav', '.flac')):
+            heard = _heard(paths[0], queries)
+        else:
+            import tempfile
+            with tempfile.TemporaryDirectory() as tmp:
+                heard = _heard(master.write(os.path.join(tmp, 'heard.wav'), first, sr=sr, mono=mono), queries)
     why = brief.shown(b, pick['why'])
     lines = [_line(t, t['file'], ', '.join(why) if i == 0 else '') for i, t in enumerate(takes)]
     played = takes[0].get('performance')
@@ -816,13 +824,6 @@ def make(want=None, out=None, sound=None, n=1, seed=0, theme=None, listen=False,
     if heard:
         res['heard'] = heard
     return res
-
-
-def _tmp_wav(sound, seed, req):
-    import tempfile
-    from .synth import master
-    y, _ = take(sound, seed, req)
-    return master.write(os.path.join(tempfile.mkdtemp(), 'heard.wav'), y)
 
 
 def found_by(why, sound=None):
@@ -971,6 +972,10 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
          "lufs": -18, "sprite": "sprite.webm",
          "sounds": [{"name": "tap", "want": "a soft tap for buttons"},
                     {"name": "success", "want": "a quick success sound", "axes": {"bright": 0.2}}]}
+    Expanded take names must be unique ("tap" with n=2 would conflict with "tap_1"); a conflict is refused before
+    that name is rendered and before anything is written. Names also identify manifest rows, so directory prefixes
+    do not distinguish two takes with the same basename. Sprite audio and map paths must not overwrite takes or
+    manifest.json; such a collision is refused before anything is written.
     "set" starts from a ready-made list; "sounds" adds to it, or changes the sound of the same name. Each sound
     takes name (the file name) and want (words) and / or sound (a design id), plus pitch, dur, voice, material,
     seed, n, axes, lufs, events (a thing done in a row, as in `make`) and loop (false: once); or name and recipe (a
@@ -1026,9 +1031,24 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
     fmts = _formats(fmt or spec.get('format') or 'wav')
     mono = spec.get('mono', False) if mono is None else mono
     top = lufs if lufs is not None else spec.get('lufs')
+    sprite = sprite or spec.get('sprite')
+    outs = []
+    if sprite:
+        stem, ext = os.path.splitext(os.path.join(out, os.path.basename(sprite)))
+        ext = ext.lower().lstrip('.')
+        outs = [f'{stem}.{f}' for f in fmts] if not ext or ext in fmts else [f'{stem}.{ext}']
+    seen = set()            # take names: each names one manifest row and one sprite region, so one name is one file
+
+    def claim(p):
+        key = os.path.normcase(os.path.splitext(os.path.basename(p))[0])
+        if key in seen:
+            raise ValueError(f'take name {os.path.basename(p)!r} is used more than once: rename a sound of the set')
+        seen.add(key)
+
     rows, lines, ys, alts, missed, first, played, pending, takes = [], [], [], {}, {}, {}, {}, [], {}
     for it in items:
         if it.get('recipe') is not None:        # a sound built from parts (earshot.recipe), levelled with the set
+            claim(os.path.join(out, f'{it["name"]}.{fmts[0]}'))
             lines.append(None)
             pending.append({**_set_recipe(it, seed, top, out, fmts[0]), 'line': len(lines) - 1})
             lines += [f'  {note}' for note in pending[-1]['meta'].get('notes', ())]
@@ -1058,8 +1078,11 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
         alone = it.get('lufs') is None and top is None and not d.loop and d.kind not in registry.LOUDEST
         level = None if alone else it.get('lufs', (TOP if top is None else top) + WEIGHT.get(d.kind, -4.0))
         k = int(it.get('n') or b['n'] or 1)
+        paths = _paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0])
+        for p in paths:
+            claim(p)
         mine = {}                         # the recordings this name played: {n: meta['member']}
-        for j, p in enumerate(_paths(os.path.join(out, f'{it["name"]}.{fmts[0]}'), k, fmts[0])):
+        for j, p in enumerate(paths):
             s = int(it['seed']) + j if it.get('seed') is not None else seed + takes.get(d.id, 0)
             takes[d.id] = takes.get(d.id, 0) + 1
             y, meta = take(d.id, s, _request(b, theme), lufs=level, perform=perf)
@@ -1103,6 +1126,18 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
             lines.append('  ' + (guess(b, cands, alts[it['name']]) or 'also: ' + ', '.join(alts[it['name']])))
         if unknown:
             lines.append(f"  not understood: {', '.join(unknown)}")
+    man = os.path.join(out, 'manifest.json')
+    if outs:                # the sprite and its map must not land on a take or the manifest: checked before any write
+        taken = {os.path.normcase(os.path.abspath(man))}
+        for q in pending:
+            stem = os.path.splitext(q['p'])[0]
+            own = _loop_formats(fmts) if q['meta'].get('loop') else fmts
+            taken.update(os.path.normcase(os.path.abspath(f'{stem}.{f}')) for f in own)
+        for p in outs + [os.path.splitext(outs[0])[0] + '.json']:
+            key = os.path.normcase(os.path.abspath(p))
+            if key in taken:
+                raise ValueError(f'sprite output {p!r} would overwrite a set file: rename the sprite')
+            taken.add(key)
     balance(pending, quiet)
     for q in pending:
         y, meta, d, p = q['y'], q['meta'], q['d'], q['p']
@@ -1119,19 +1154,14 @@ def make_set(spec, out=None, theme=None, fmt=None, seed=0, mono=None, lufs=None,
                      **({'member': meta['member']} if meta.get('member') else {})})
         shown = p if len(own) == 1 else f'{stem}.{{{",".join(own)}}}'
         lines[q['line']] = _line(meta, shown, q['why'])
-    man = os.path.join(out, 'manifest.json')
     with open(man, 'w', encoding='utf-8', newline='\n') as fh:
         json.dump({'theme': theme, 'format': fmts[0], 'formats': fmts, 'sounds': rows}, fh, indent=1)
         fh.write('\n')
     head = f'{len(rows)} sounds in {out} ({", ".join(fmts)}), manifest.json'
     res = {'files': [os.path.join(out, f) for r in rows for f in r['files']], 'manifest': man, 'sounds': rows,
            'also': alts, 'not_in_sound': missed}
-    sprite = sprite or spec.get('sprite')
-    if sprite:
+    if outs:
         from .pack import pack
-        stem, ext = os.path.splitext(os.path.join(out, os.path.basename(sprite)))
-        ext = ext.lower().lstrip('.')
-        outs = [f'{stem}.{f}' for f in fmts] if not ext or ext in fmts else [f'{stem}.{ext}']
         sp = pack([os.path.join(out, r['file']) for r in rows], outs, mono=mono,
                   loops=[r['name'] for r in rows if r['loop']], ys=ys)
         lines.append(sp['summary'])

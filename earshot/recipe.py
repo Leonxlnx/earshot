@@ -49,8 +49,8 @@ a short creak stretched a long one, a moo bent a whale's song. Each layer has it
     events           {"count", "gap", "faster", "softer", "loose"}: the layer several times, each a new take: `gap`
                      s from one to the next, each gap `faster` times the one before (under 1: faster and faster),
                      each event `softer` dB against the one before, each up to `loose` (0 .. 1) of half its gap
-                     early or late (drops, crackles, clicks that come as they come)
-    scatter          {"rate", "rate_to", "dur", "pitch", "gain", "pan", "grain"}: the layer many times at random
+                     early or late (drops, crackles, clicks that come as they come); the last starts within 120 s
+    scatter         {"rate", "rate_to", "dur", "pitch", "gain", "pan", "grain"}: the layer many times at random
                      moments (a Poisson process): `rate` events a second (0.5 .. 400) moving to `rate_to` by the end,
                      over `dur` s; each event up to `pitch` semitones (0 .. 12) higher or lower, up to `gain` dB
                      (0 .. 40) softer and up to `pan` (0 .. 1) to either side; with `grain` (0.005 .. 2 s) each is a
@@ -144,6 +144,7 @@ RANGE = {'dur': (0.02, 120.0, 'a length in seconds'), 'pitch': (-24.0, 12.0, 'a 
          'hz': (20.0, 150.0, 'a frequency in Hz'),
          'to': (20.0, 150.0, 'a frequency in Hz'), **{a: (-1.0, 1.0, 'an amount') for a in AXES}}
 CUTOFF = (20.0, 20000.0)
+LATEST = 120.0             # s: the last event of a layer starts by then, as `at` does (a layer is mixed whole first)
 EVENT_RANGE = {'count': (2, 64, 'a whole number'), 'gap': (0.02, 30.0, 'a time in seconds'),
                'faster': (0.5, 2.0, 'a factor'), 'softer': (-12.0, 12.0, 'a level in dB'),
                'loose': (0.0, 1.0, 'an amount')}
@@ -381,6 +382,17 @@ def check(recipe):
         if 'follow' in lay and lay['follow']['layer'] >= len(layers):
             raise RecipeError(f'layers[{i}].follow.layer is {lay["follow"]["layer"]}, but the recipe has '
                               f'{len(layers)} layers (0 to {len(layers) - 1})')
+        if 'events' in lay:     # each gap `faster` times the one before: the last start can run far past any sound
+            ev, last = lay['events'], lay.get('at', 0.0)
+            gap = ev['gap']
+            for _ in range(int(ev['count']) - 1):
+                last += gap
+                gap *= ev.get('faster', 1.0)
+                if last > LATEST:
+                    break
+            if last > LATEST:
+                raise RecipeError(f'layers[{i}].events: its last event would start after {LATEST:.0f} s; events '
+                                  f'start within {LATEST:.0f} s (fewer events, a shorter gap or a smaller "faster")')
     if 'says' in recipe and not (isinstance(recipe['says'], str) and recipe['says'].strip()):
         raise RecipeError(f'says is what the sound is, in words ("a dragon roaring"), not {recipe["says"]!r}')
     if 'built' in recipe and not isinstance(recipe['built'], str):

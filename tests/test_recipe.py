@@ -227,6 +227,16 @@ def test_events_repeat_a_layer_faster_and_softer():
     assert 0.75 < meta['dur_s'] < 1.6 and meta['source'] == 'recipe'
 
 
+def test_events_that_would_start_past_two_minutes_are_refused_before_any_buffer():
+    # each gap twice the one before: the 32nd event would start about 2 billion seconds in (about 1.6 PB of samples)
+    with pytest.raises(R.RecipeError, match=r'layers\[0\]\.events: its last event would start after 120 s'):
+        R.check(rec({**TAP, 'events': {'count': 32, 'gap': 1, 'faster': 2}}))
+    with pytest.raises(R.RecipeError, match=r'layers\[0\]\.events'):
+        R.check(rec({**TAP, 'at': 100, 'events': {'count': 3, 'gap': 15}}))
+    assert R.check(rec({**TAP, 'at': 10, 'events': {'count': 64, 'gap': 1.5, 'faster': 1}}))   # the last at 104.5 s
+    assert R.check(rec({**TAP, 'events': {'count': 64, 'gap': 30, 'faster': 0.5}}))           # under a minute
+
+
 def test_follow_gives_a_layer_the_loudness_of_another_or_makes_it_give_way():
     lead = np.zeros((dsp.n_of(1.0), 2))
     lead[dsp.n_of(0.2):dsp.n_of(0.4)] = 0.5

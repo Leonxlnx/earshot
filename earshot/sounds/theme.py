@@ -48,7 +48,7 @@ def get(theme=None):
     if isinstance(theme, str):
         if theme not in THEMES:
             raise ValueError(f'unknown theme {theme!r}: one of {", ".join(THEMES)}')
-        return dict(THEMES[theme], name=theme)
+        return dict(THEMES[theme], name=theme, axes=dict(THEMES[theme]['axes']))
     t = dict(theme)
     base = t.pop('base', None)
     if base is not None and base not in THEMES:
