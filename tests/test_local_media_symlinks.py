@@ -1,4 +1,5 @@
 """FFmpeg filename disambiguation must preserve symlink/.. traversal."""
+import os
 from pathlib import Path
 import subprocess
 
@@ -12,6 +13,8 @@ from earshot.synth import master
 
 @pytest.fixture
 def linked(tmp_path, monkeypatch):
+    if os.name == 'nt':
+        pytest.skip('Windows resolves "link/.." by the name before it follows the link: there is no such path')
     target = tmp_path / 'target'
     nested = target / 'nested'
     nested.mkdir(parents=True)
